@@ -4,8 +4,10 @@ Mandantenfähige SaaS-Plattform für deutsche Immobilienmakler und
 Immobiliensachverständige: Objekte, Kontakte, Exposés, Wertermittlung,
 Portalexport, Verträge und Abrechnung in einer Anwendung.
 
-**Aktueller Stand: Phase 0 — Analyse und Fundament. Warten auf Gate-A-Freigabe.**
-Ohne diese Freigabe entsteht kein Phase-1-Code.
+**Aktueller Stand: Phase 1, Durchstich v0.1.** Gate A ist freigegeben.
+Verfügbar sind Registrierung, Mandant und Rollen, Objekte, Kontakte, Exposé mit
+Textentwurf und PDF-Export. Der Rest von Phase 1 folgt; **Gate B** steht vor dem
+Livebetrieb der Abrechnung.
 
 ---
 
@@ -18,6 +20,7 @@ Ohne diese Freigabe entsteht kein Phase-1-Code.
 | [`docs/BESTANDSAUFNAHME.md`](docs/BESTANDSAUFNAHME.md) | Analyse der Referenz-Anwendung |
 | [`docs/FUNKTIONSMATRIX.md`](docs/FUNKTIONSMATRIX.md) | Übernehmen / nicht übernehmen / neu konzipieren |
 | [`docs/UMSETZUNGSPLAN.md`](docs/UMSETZUNGSPLAN.md) | Phasen, Aufwandsschätzung, Risiken |
+| [`docs/TESTBERICHT.md`](docs/TESTBERICHT.md) | Was geprüft ist — und was nicht |
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Zielarchitektur, Job-Verarbeitung, Sicherheit |
 | [`DATA_MODEL.md`](DATA_MODEL.md) | Mandanten-, Rollen- und Datenmodell |
 | [`OPENIMMO_MAPPING.md`](OPENIMMO_MAPPING.md) | Feldabbildung für den Portalexport |
@@ -62,6 +65,7 @@ erst mit den jeweiligen Funktionen benötigt.
 Weitere Werkzeuge:
 
 ```bash
+psql "$DATENBANK_URL" -f supabase/tests/rls-mandantentrennung.sql  # Mandantentrennung
 python3 scripts/guv-modell.py            # Wirtschaftlichkeitsmodell neu rechnen
 python3 scripts/build-brand.py <ttf>     # Markenassets neu erzeugen
 scripts/analyse-referenz.sh              # Referenzanalyse reproduzieren

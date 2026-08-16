@@ -6,13 +6,7 @@ import { buttonKlassen } from "@/components/ui/Button";
 import { Karte, KarteInhalt } from "@/components/ui/Karte";
 import { Hinweis } from "@/components/ui/Status";
 
-/**
- * Einstiegsseite waehrend Phase 0.
- *
- * Die eigentliche Anwendung entsteht erst nach der Gate-A-Freigabe
- * (Master-Prompt Abschnitt 18). Bis dahin fuehrt diese Seite nur zum
- * Styleguide, der Bestandteil der Freigabe ist.
- */
+/** Oeffentliche Einstiegsseite. */
 export default function Startseite() {
   return (
     <div className="flex min-h-screen flex-col bg-grund">
@@ -28,15 +22,28 @@ export default function Startseite() {
           Maklersoftware für Objekte, Exposés und Wertermittlung
         </h1>
         <p className="mt-3 max-w-xl text-sm leading-relaxed text-gedaempft">
-          ImmoOffice.ai befindet sich in Phase 0 — Analyse und Fundament. Die
-          Anwendung selbst entsteht nach der Freigabe des Gate-A-Pakets.
+          Objekte, Kontakte und Exposés in einer Anwendung — mit Datenhaltung in
+          Deutschland und einem Datenmodell, das den Portalexport von Anfang an
+          mitdenkt.
         </p>
 
+        <div className="mt-7 flex flex-wrap gap-3">
+          <Link href="/registrieren" className={buttonKlassen({ groesse: "gross" })}>
+            7 Tage kostenlos testen
+          </Link>
+          <Link
+            href="/anmelden"
+            className={buttonKlassen({ variante: "sekundaer", groesse: "gross" })}
+          >
+            Anmelden
+          </Link>
+        </div>
+
         <div className="mt-8">
-          <Hinweis ton="info" titel="Phase 0: Analyse und Fundament">
-            Fertig sind Bestandsaufnahme, Funktionsmatrix, Designsystem,
-            Architektur, Datenmodell und OpenImmo-Mapping. Ohne ausdrückliche
-            Freigabe entsteht kein Phase-1-Code.
+          <Hinweis ton="info" titel="Stand: Durchstich v0.1">
+            Verfügbar sind Registrierung, Mandant und Rollen, Objekte, Kontakte,
+            Exposé mit Textentwurf und PDF-Export. Kalender, Suchprofile,
+            Portalexport und Abrechnung folgen im weiteren Verlauf von Phase 1.
           </Hinweis>
         </div>
 

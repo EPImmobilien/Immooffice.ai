@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+import { sitzungAktualisieren } from "@/lib/supabase/middleware";
+
 /**
  * Sicherheits-Middleware (Master-Prompt Abschnitt 16).
  *
@@ -15,10 +17,10 @@ import type { NextRequest } from "next/server";
  * ergaenzt um `strict-dynamic`, damit von Next nachgeladene Bundles ohne
  * Pflege einer Positivliste erlaubt bleiben.
  */
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const nonce = crypto.randomUUID().replaceAll("-", "");
   const produktion = process.env.NODE_ENV === "production";
-  const supabase = process.env["NEXT_PUBLIC_SUPABASE_URL"] ?? "";
+  const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 
   const richtlinien = [
     "default-src 'self'",
@@ -45,7 +47,11 @@ export function middleware(request: NextRequest) {
   kopfzeilen.set("Content-Security-Policy", richtlinien);
   kopfzeilen.set("x-nonce", nonce);
 
-  const antwort = NextResponse.next({ request: { headers: kopfzeilen } });
+  const basis = NextResponse.next({ request: { headers: kopfzeilen } });
+
+  // Sitzung auffrischen und geschuetzte Routen absichern. Liefert entweder die
+  // Basisantwort zurueck oder eine Weiterleitung.
+  const antwort = await sitzungAktualisieren(request, basis);
 
   antwort.headers.set("Content-Security-Policy", richtlinien);
   antwort.headers.set("X-Content-Type-Options", "nosniff");
