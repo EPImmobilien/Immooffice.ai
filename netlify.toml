@@ -15,11 +15,10 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Vorschau-Deployments duerfen niemals indexiert werden.
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Robots-Tag = "noindex"
+# Hinweis: [[headers]] laesst sich in netlify.toml NICHT je Kontext setzen.
+# Ein pauschales noindex haette auch die Produktion aus dem Index gehalten.
+# Die Steuerung uebernimmt deshalb src/middleware.ts anhand von
+# NEXT_PUBLIC_UMGEBUNG.
 
 [context.production]
   [context.production.environment]

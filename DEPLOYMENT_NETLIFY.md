@@ -76,12 +76,34 @@ Webhooks werden idempotent verarbeitet: Jede Ereignis-ID wird gespeichert, eine 
 verarbeitete wird verworfen. Stripe stellt mehrfach zu; ohne diese Prüfung würden
 Credits doppelt gutgeschrieben.
 
+### Erstes Deployment — Reihenfolge
+
+1. Repository verbinden, **Branch `claude/immooffice-master-prompt-v2-2zci7y`**
+   als zu bauenden Branch wählen (oder vorher nach `main` mergen).
+2. `NEXT_PUBLIC_SUPABASE_URL` und `NEXT_PUBLIC_SUPABASE_ANON_KEY` setzen —
+   ohne sie schlägt bereits die Middleware fehl und **jede** Seite antwortet
+   mit HTTP 500.
+3. Deployment starten und die vergebene Adresse notieren.
+4. In Supabase unter *Authentication → URL Configuration* die Adresse als
+   *Site URL* und als *Redirect URL* eintragen. Ohne diesen Schritt schlägt die
+   Anmeldung ohne sichtbare Meldung fehl.
+5. Entscheiden, ob die **E-Mail-Bestätigung** aktiv sein soll. Ist sie aktiv,
+   entsteht bei der Registrierung noch keine Sitzung; die Anwendung zeigt dann
+   den Hinweis, die Adresse zuerst zu bestätigen. Für einen schnellen Test ist
+   sie einfacher abgeschaltet, für den Produktivbetrieb gehört sie an.
+6. *Authentication → Policies*: **Schutz gegen bekannte geleakte Passwörter
+   aktivieren** (Abschnitt 16 fordert ihn).
+
 ## 3. Betrieb
 
 ### Vorschau-Deployments
 
-Jeder Pull Request erhält ein eigenes Deployment. Diese tragen `X-Robots-Tag: noindex`
-(in `netlify.toml`) und dürfen keine echten Kundendaten enthalten.
+Jeder Pull Request erhält ein eigenes Deployment. Diese tragen
+`X-Robots-Tag: noindex, nofollow` und dürfen keine echten Kundendaten enthalten.
+
+Der Header wird in `src/middleware.ts` anhand von `NEXT_PUBLIC_UMGEBUNG` gesetzt,
+**nicht** in `netlify.toml`: Dort gelten Kopfzeilen für alle Kontexte, ein
+pauschales `noindex` hätte auch die Produktion aus dem Index gehalten.
 
 ### Hintergrundaufgaben
 

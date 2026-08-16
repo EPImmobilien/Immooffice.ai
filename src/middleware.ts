@@ -68,6 +68,16 @@ export async function middleware(request: NextRequest) {
     );
   }
 
+  // Vorschau- und Branch-Deployments duerfen nicht in den Index geraten.
+  // Bewusst hier und nicht in netlify.toml: Dort gelten Kopfzeilen fuer alle
+  // Kontexte, ein pauschales noindex haette auch die Produktion getroffen.
+  // Die Produktion steuert ihre Indexierung ueber die Metadaten je Seite —
+  // der angemeldete Bereich bleibt ausgeschlossen, oeffentliche Web-Exposés
+  // sollen dagegen auffindbar sein.
+  if (process.env.NEXT_PUBLIC_UMGEBUNG === "vorschau") {
+    antwort.headers.set("X-Robots-Tag", "noindex, nofollow");
+  }
+
   return antwort;
 }
 
