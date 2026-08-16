@@ -1,0 +1,32 @@
+# ---------------------------------------------------------------------------
+# Netlify-Konfiguration ImmoOffice.ai
+# Ausfuehrlich: docs/DEPLOYMENT_NETLIFY.md
+# ---------------------------------------------------------------------------
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  # Schriften werden zur Bauzeit geladen und selbst gehostet.
+  NEXT_TELEMETRY_DISABLED = "1"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Vorschau-Deployments duerfen niemals indexiert werden.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex"
+
+[context.production]
+  [context.production.environment]
+    NEXT_PUBLIC_UMGEBUNG = "produktion"
+
+[context.deploy-preview.environment]
+  NEXT_PUBLIC_UMGEBUNG = "vorschau"
+
+[context.branch-deploy.environment]
+  NEXT_PUBLIC_UMGEBUNG = "vorschau"

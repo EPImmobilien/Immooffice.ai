@@ -1,0 +1,279 @@
+@import "tailwindcss";
+
+/* ===========================================================================
+   Design-Tokens ImmoOffice.ai
+
+   Die Markenfarben aus Abschnitt 3 des Master-Prompts sind fixiert und stehen
+   als Rohwerte unten. Alles Weitere wird ueber SEMANTISCHE Tokens angesprochen
+   (--f-grund, --f-text ...), niemals ueber Rohwerte — nur so bleibt der
+   Dunkelmodus wartbar und das Mandanten-Branding spaeter ueberschreibbar.
+   =========================================================================== */
+
+:root {
+  /* --- Markenfarben, fixiert (Abschnitt 3) --- */
+  --marke-marine: #1b2a47;
+  --marke-marine-dunkel: #12203b;
+  --marke-gold: #b5934f;
+  --marke-gold-hell: #c9ae72;
+
+  /* --- Semantische Tokens: Hellmodus --- */
+  --f-grund: #fafafa;           /* Seitenhintergrund */
+  --f-flaeche: #ffffff;         /* Karten, Dialoge */
+  --f-flaeche-gedaempft: #f3f4f6;
+  --f-linie: #e6e8eb;
+  --f-linie-stark: #d3d7dd;
+
+  --f-text: #1b2a47;
+  --f-text-gedaempft: #7a828c;
+  --f-text-invers: #ffffff;
+
+  --f-primaer: #1b2a47;
+  --f-primaer-hover: #12203b;
+  --f-primaer-text: #ffffff;
+
+  --f-akzent: #b5934f;
+  --f-akzent-hover: #a3833f;
+  --f-akzent-text: #ffffff;
+  --f-akzent-schwach: #f6f1e6;
+
+  /* Statusfarben bewusst gedaempft — kein Neon, kein „KI-Look“ */
+  --f-erfolg: #1f7a5c;
+  --f-erfolg-schwach: #e8f4ef;
+  --f-warnung: #a66a1f;
+  --f-warnung-schwach: #fbf1e3;
+  --f-fehler: #a33a3a;
+  --f-fehler-schwach: #f9ecec;
+  --f-fehler-text: #ffffff;   /* Text auf gefuellter Fehlerflaeche */
+  --f-info: #2c5f8f;
+  --f-info-schwach: #eaf1f8;
+
+  --f-fokus: #b5934f;
+
+  /* --- Radien: zurueckhaltend, passend zur geometrischen Bildmarke --- */
+  --radius-klein: 3px;
+  --radius: 5px;
+  --radius-gross: 8px;
+  --radius-voll: 9999px;
+
+  /* --- Schatten: sehr subtil, Tiefe entsteht ueber Linien --- */
+  --schatten-klein: 0 1px 2px rgb(27 42 71 / 0.05);
+  --schatten: 0 1px 3px rgb(27 42 71 / 0.07), 0 1px 2px rgb(27 42 71 / 0.04);
+  --schatten-gross: 0 8px 24px rgb(27 42 71 / 0.10);
+}
+
+/* ---------------------------------------------------------------------------
+   Dunkelmodus
+
+   Grundton ist das dunkle Marineblau der Marke, nicht neutrales Grau — die
+   Marke traegt bis in den Hintergrund.
+
+   Der Modus wird rein ueber CSS entschieden. Das ist bewusst so: ein
+   blockierendes Skript im <head> waere im App Router weder zuverlaessig noch
+   noetig. Ohne ausdrueckliche Wahl gilt die Systemeinstellung, ganz ohne
+   JavaScript und damit ohne Aufblitzen des Hellmodus.
+
+   Die Palette steht EINMAL unter --dp-*. Die beiden Aktivierungsbloecke
+   darunter bilden sie nur ab.
+   --------------------------------------------------------------------------- */
+
+:root {
+  --dp-grund: #0e1a30;
+  --dp-flaeche: #12203b;
+  --dp-flaeche-gedaempft: #182a49;
+  --dp-linie: #24354f;
+  --dp-linie-stark: #33465f;
+
+  --dp-text: #eef1f5;
+  --dp-text-gedaempft: #94a0b0;
+  --dp-text-invers: #12203b;
+
+  /* Marineblau traegt auf dunklem Grund nicht — Gold uebernimmt die
+     Primaeraktion und behaelt den Markencharakter. */
+  --dp-primaer: #c9ae72;
+  --dp-primaer-hover: #d8c08c;
+  --dp-primaer-text: #12203b;
+
+  --dp-akzent: #c9ae72;
+  --dp-akzent-hover: #d8c08c;
+  --dp-akzent-text: #12203b;
+  --dp-akzent-schwach: #1e2f4d;
+
+  --dp-erfolg: #4fb08c;
+  --dp-erfolg-schwach: #16304a;
+  --dp-warnung: #d9a054;
+  --dp-warnung-schwach: #2c2a3d;
+  --dp-fehler: #e08585;
+  --dp-fehler-schwach: #33253a;
+  /* Auf dem aufgehellten Rot traegt Weiss nicht — dunkler Text haelt den
+     Kontrast auch bei gefuellten Schaltflaechen. */
+  --dp-fehler-text: #2a1414;
+  --dp-info: #7fb0dc;
+  --dp-info-schwach: #172d47;
+
+  --dp-schatten-klein: 0 1px 2px rgb(0 0 0 / 0.3);
+  --dp-schatten: 0 1px 3px rgb(0 0 0 / 0.4), 0 1px 2px rgb(0 0 0 / 0.3);
+  --dp-schatten-gross: 0 8px 24px rgb(0 0 0 / 0.5);
+}
+
+/* Beide Bloecke muessen identisch bleiben. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-modus="hell"]) {
+    --f-grund: var(--dp-grund);
+    --f-flaeche: var(--dp-flaeche);
+    --f-flaeche-gedaempft: var(--dp-flaeche-gedaempft);
+    --f-linie: var(--dp-linie);
+    --f-linie-stark: var(--dp-linie-stark);
+    --f-text: var(--dp-text);
+    --f-text-gedaempft: var(--dp-text-gedaempft);
+    --f-text-invers: var(--dp-text-invers);
+    --f-primaer: var(--dp-primaer);
+    --f-primaer-hover: var(--dp-primaer-hover);
+    --f-primaer-text: var(--dp-primaer-text);
+    --f-akzent: var(--dp-akzent);
+    --f-akzent-hover: var(--dp-akzent-hover);
+    --f-akzent-text: var(--dp-akzent-text);
+    --f-akzent-schwach: var(--dp-akzent-schwach);
+    --f-erfolg: var(--dp-erfolg);
+    --f-erfolg-schwach: var(--dp-erfolg-schwach);
+    --f-warnung: var(--dp-warnung);
+    --f-warnung-schwach: var(--dp-warnung-schwach);
+    --f-fehler: var(--dp-fehler);
+    --f-fehler-schwach: var(--dp-fehler-schwach);
+    --f-fehler-text: var(--dp-fehler-text);
+    --f-info: var(--dp-info);
+    --f-info-schwach: var(--dp-info-schwach);
+    --f-fokus: var(--dp-akzent);
+    --schatten-klein: var(--dp-schatten-klein);
+    --schatten: var(--dp-schatten);
+    --schatten-gross: var(--dp-schatten-gross);
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-modus="dunkel"] {
+  --f-grund: var(--dp-grund);
+  --f-flaeche: var(--dp-flaeche);
+  --f-flaeche-gedaempft: var(--dp-flaeche-gedaempft);
+  --f-linie: var(--dp-linie);
+  --f-linie-stark: var(--dp-linie-stark);
+  --f-text: var(--dp-text);
+  --f-text-gedaempft: var(--dp-text-gedaempft);
+  --f-text-invers: var(--dp-text-invers);
+  --f-primaer: var(--dp-primaer);
+  --f-primaer-hover: var(--dp-primaer-hover);
+  --f-primaer-text: var(--dp-primaer-text);
+  --f-akzent: var(--dp-akzent);
+  --f-akzent-hover: var(--dp-akzent-hover);
+  --f-akzent-text: var(--dp-akzent-text);
+  --f-akzent-schwach: var(--dp-akzent-schwach);
+  --f-erfolg: var(--dp-erfolg);
+  --f-erfolg-schwach: var(--dp-erfolg-schwach);
+  --f-warnung: var(--dp-warnung);
+  --f-warnung-schwach: var(--dp-warnung-schwach);
+  --f-fehler: var(--dp-fehler);
+  --f-fehler-schwach: var(--dp-fehler-schwach);
+  --f-fehler-text: var(--dp-fehler-text);
+  --f-info: var(--dp-info);
+  --f-info-schwach: var(--dp-info-schwach);
+  --f-fokus: var(--dp-akzent);
+  --schatten-klein: var(--dp-schatten-klein);
+  --schatten: var(--dp-schatten);
+  --schatten-gross: var(--dp-schatten-gross);
+
+  color-scheme: dark;
+}
+
+/* Tokens an Tailwind uebergeben. `inline` sorgt dafuer, dass die Utilities auf
+   die CSS-Variablen zeigen und der Moduswechsel ohne Neubau greift. */
+@theme inline {
+  --color-grund: var(--f-grund);
+  --color-flaeche: var(--f-flaeche);
+  --color-flaeche-gedaempft: var(--f-flaeche-gedaempft);
+  --color-linie: var(--f-linie);
+  --color-linie-stark: var(--f-linie-stark);
+
+  --color-text: var(--f-text);
+  --color-gedaempft: var(--f-text-gedaempft);
+  --color-invers: var(--f-text-invers);
+
+  --color-primaer: var(--f-primaer);
+  --color-primaer-hover: var(--f-primaer-hover);
+  --color-primaer-text: var(--f-primaer-text);
+
+  --color-akzent: var(--f-akzent);
+  --color-akzent-hover: var(--f-akzent-hover);
+  --color-akzent-text: var(--f-akzent-text);
+  --color-akzent-schwach: var(--f-akzent-schwach);
+
+  --color-erfolg: var(--f-erfolg);
+  --color-erfolg-schwach: var(--f-erfolg-schwach);
+  --color-warnung: var(--f-warnung);
+  --color-warnung-schwach: var(--f-warnung-schwach);
+  --color-fehler: var(--f-fehler);
+  --color-fehler-schwach: var(--f-fehler-schwach);
+  --color-fehler-text: var(--f-fehler-text);
+  --color-info: var(--f-info);
+  --color-info-schwach: var(--f-info-schwach);
+
+  --radius-klein: var(--radius-klein);
+  --radius-standard: var(--radius);
+  --radius-gross: var(--radius-gross);
+
+  --shadow-klein: var(--schatten-klein);
+  --shadow-standard: var(--schatten);
+  --shadow-gross: var(--schatten-gross);
+
+  /* Schriften werden in layout.tsx ueber next/font gesetzt und
+     selbst gehostet — keine Anfrage an fremde CDNs (siehe DSGVO). */
+  --font-titel: var(--schrift-titel), ui-sans-serif, system-ui, sans-serif;
+  --font-text: var(--schrift-text), ui-sans-serif, system-ui, sans-serif;
+  --font-zahl: var(--schrift-text), ui-monospace, monospace;
+}
+
+/* ===========================================================================
+   Grundlagen
+   =========================================================================== */
+
+* {
+  border-color: var(--f-linie);
+}
+
+body {
+  background-color: var(--f-grund);
+  color: var(--f-text);
+  font-family: var(--font-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-titel);
+  letter-spacing: -0.011em;
+  text-wrap: balance;
+}
+
+/* Sichtbarer, markenkonformer Fokus. Wird NICHT entfernt — Tastaturbedienung
+   ist Barrierefreiheitsanforderung, nicht Kosmetik. */
+:focus-visible {
+  outline: 2px solid var(--f-fokus);
+  outline-offset: 2px;
+  border-radius: var(--radius-klein);
+}
+
+/* Zahlen in Tabellen sollen untereinander stehen. */
+.zahl {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
