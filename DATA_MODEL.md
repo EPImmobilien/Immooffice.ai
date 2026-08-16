@@ -137,9 +137,10 @@ objekte
   geloescht_am
 ```
 
-**Bewusst nicht übernommen:** die Veröffentlichungsflags der Referenz
-(`website_veroeffentlichen`, `shoptv_veroeffentlichen` …). Veröffentlichung ist kein
-Objektattribut, sondern ein eigener Vorgang je Kanal — siehe `objekt_veroeffentlichung`.
+**Bewusst nicht übernommen:** die einzelnen Veröffentlichungsflags der Referenz, die je
+Ausgabekanal eine eigene Ja/Nein-Spalte am Objekt führten. Veröffentlichung ist kein
+Objektattribut, sondern ein eigener Vorgang je Kanal — mit Zeitpunkt, Status und
+Protokoll. Siehe `objekt_veroeffentlichung`.
 
 ```
 objekt_ausstattung                         -- strukturiert statt Freitext
