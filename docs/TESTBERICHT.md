@@ -10,8 +10,8 @@
 |---|---|---|
 | Typprüfung (strict) | `npm run typecheck` | bestanden |
 | Linting | `npm run lint` | bestanden |
-| Unit-Tests | `npm run test` | 12 Tests bestanden |
-| Produktions-Build | `npm run build` | bestanden, 16 Routen |
+| Unit-Tests | `npm run test` | 30 Tests bestanden |
+| Produktions-Build | `npm run build` | bestanden, 17 Routen |
 | Marken-Scan | `npm run marken-scan` | sauber, keine Treffer |
 
 Alles zusammen: `npm run pruefen`.
@@ -24,6 +24,9 @@ Alles zusammen: `npm run pruefen`.
 | Lückenerkennung | Vollständige Objekte melden keine Lücken; fehlende Pflichtangaben werden gemeldet statt ergänzt; kategorieabhängige Regeln greifen nur, wo sie gelten |
 | Entwurfstexte | Ohne Modell keine KI-Kennzeichnung und keine Credits; nur erfasste Werte werden verwendet; bei fehlendem Baujahr taucht **kein** Jahr im Text auf |
 | Exposé-PDF | Erzeugt eine gültige PDF-Datei; kommt auch ohne optionale Angaben aus |
+| OpenImmo-Prüfung | Vollständiges Objekt geht durch; fehlende Freigabe, Energieangaben oder Kaltmiete blockieren; Grundstücke brauchen keine Energieangaben; „Preis auf Anfrage“ ist zulässig |
+| OpenImmo-XML | Rahmenelemente und Namensraum; Vermarktungs- und Nutzungsart als Attribute; Straße nur bei freigegebener Adresse; Punkt als Dezimaltrenner; Übertragungsart NEU/CHANGE; Mehrfachobjekte; Maskierung von Sonderzeichen und Entfernen von Steuerzeichen |
+| Energiekennwert | **Bedarfsausweis schreibt `endenergiebedarf`, Verbrauchsausweis `energieverbrauchkennwert` — und jeweils das andere Element gerade nicht.** Portale weisen Objekte ab, bei denen Typ und Element nicht zusammenpassen |
 
 Der Token-Test wurde durch gezieltes Entfernen eines Tokens gegengeprüft und
 schlägt dann fehl — er kann die Regression also tatsächlich erkennen.
@@ -55,6 +58,18 @@ der Datenbank. Alles läuft in einer Transaktion und wird zurückgerollt.
 
 **13 von 13 bestanden.** Prüfung 8 ist bewusst enthalten: Ohne sie könnte der
 Test auch dann grün sein, wenn schlicht gar nichts erlaubt wäre.
+
+### Wohlgeformtheit des XML
+
+Das erzeugte Dokument wurde zusätzlich mit einem echten XML-Parser gegengelesen:
+Wurzelelement und Namensraum stimmen, die Struktur ist wohlgeformt, und
+maskierte Sonderzeichen (`< & " ²`) kommen beim Auslesen unverändert zurück.
+
+**Offen:** Die Prüfung gegen die **offizielle XSD** des OpenImmo e. V. steht aus
+— das Schema liegt hier nicht vor. Bis dahin gilt der Vorbehalt aus dem
+Kopfabschnitt von `OPENIMMO_MAPPING.md`: Die Feldabbildung ist fachlich
+abgeleitet, die exakten Elementnamen sind vor dem Produktivbetrieb zu
+bestätigen.
 
 ## 3. Manuell geprüft
 

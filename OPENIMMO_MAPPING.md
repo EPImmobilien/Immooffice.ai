@@ -235,5 +235,9 @@ Plattform-Administratoren nicht lesbar.
 
 - **Phase 1:** Datenmodell entlang dieser Abbildung, Exportgerüst mit XML-Erzeugung und
   Schema-Validierung, Vollständigkeitsprüfung in der Oberfläche.
+  **Stand:** umgesetzt. XML-Erzeugung in `src/lib/openimmo/xml.ts`,
+  Vollständigkeitsprüfung in `src/lib/openimmo/pruefung.ts`, Ausgabe über
+  `/api/openimmo/<objekt-id>`, Anzeige der Bereitschaft auf der Objektseite.
+  Offen bleibt die Prüfung gegen die offizielle XSD (siehe Vorbehalt oben).
 - **Phase 2:** produktive Übertragung an ImmoScout24, Immowelt und Kleinanzeigen samt
   Rückmeldungen und Protokoll je Portal.

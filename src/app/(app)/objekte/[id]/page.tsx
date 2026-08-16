@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { PortalBereitschaft } from "@/components/PortalBereitschaft";
 import { Seitenkopf } from "@/components/Seitenkopf";
 import { Button, buttonKlassen } from "@/components/ui/Button";
 import {
@@ -10,7 +11,7 @@ import {
   KarteKopf,
   KarteTitel,
 } from "@/components/ui/Karte";
-import { Hinweis, KiKennzeichen, Marke } from "@/components/ui/Status";
+import { KiKennzeichen, Marke } from "@/components/ui/Status";
 import { hatRecht } from "@/lib/auth/rechte";
 import { sitzungErzwingen } from "@/lib/auth/sitzung";
 import { adresse, datum, euro, flaeche, zahl } from "@/lib/format";
@@ -24,6 +25,8 @@ import {
   istMiete,
   statusTon,
 } from "@/lib/objekt-begriffe";
+import { exportPruefen } from "@/lib/openimmo/pruefung";
+import type { OpenImmoObjekt } from "@/lib/openimmo/typen";
 import { serverClient } from "@/lib/supabase/server";
 import { objektLoeschen } from "@/server/objekt-aktionen";
 
@@ -59,10 +62,9 @@ export default async function ObjektSeite({
   // die die Existenz verraten wuerde.
   if (!objekt) notFound();
 
+  const befunde = exportPruefen(objekt as OpenImmoObjekt);
   const darfAendern = hatRecht(sitzung.rolle, "objekte", "aendern");
   const darfLoeschen = hatRecht(sitzung.rolle, "objekte", "loeschen");
-  const energieFehlt =
-    !objekt.energieausweis_typ || objekt.energie_kennwert === null;
 
   return (
     <>
@@ -100,13 +102,6 @@ export default async function ObjektSeite({
         </Marke>
         {objekt.texte_ki_erzeugt && <KiKennzeichen art="erzeugt" />}
       </div>
-
-      {energieFehlt && (
-        <Hinweis ton="warnung" titel="Angaben unvollständig" className="mb-5">
-          Für die Veröffentlichung fehlen Angaben zum Energieausweis. Ohne sie
-          ist kein Portalexport möglich.
-        </Hinweis>
-      )}
 
       <div className="grid gap-5 lg:grid-cols-3">
         <div className="space-y-5 lg:col-span-2">
@@ -158,6 +153,8 @@ export default async function ObjektSeite({
               )}
             </KarteInhalt>
           </Karte>
+
+          <PortalBereitschaft objektId={objekt.id} befunde={befunde} />
 
           <Karte>
             <KarteKopf>
