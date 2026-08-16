@@ -22,19 +22,20 @@ interface Eintrag {
  * verschweigt — und macht den Stand des Durchstichs sofort erkennbar.
  */
 const EINTRAEGE: Eintrag[] = [
-  { modul: null, pfad: "/dashboard", bezeichnung: "Dashboard" },
+  { modul: null, pfad: "/dashboard", bezeichnung: "Übersicht" },
   { modul: "objekte", pfad: "/objekte", bezeichnung: "Objekte" },
   { modul: "kontakte", pfad: "/kontakte", bezeichnung: "Kontakte" },
   { modul: "kontakte", pfad: "/suchprofile", bezeichnung: "Suchprofile", geplant: true },
   { modul: "exposes", pfad: "/exposes", bezeichnung: "Exposés" },
+  { modul: "objekte", pfad: "/portale", bezeichnung: "Portalexport" },
   { modul: "wertermittlung", pfad: "/wertermittlung", bezeichnung: "Wertermittlung", geplant: true },
   { modul: "vertraege", pfad: "/vertraege", bezeichnung: "Verträge", geplant: true },
-  { modul: "marketing", pfad: "/marketing", bezeichnung: "Marketing", geplant: true },
+  { modul: "marketing", pfad: "/marketing", bezeichnung: "Marketing" },
   { modul: "kalender", pfad: "/kalender", bezeichnung: "Kalender", geplant: true },
   { modul: "kalender", pfad: "/aufgaben", bezeichnung: "Aufgaben", geplant: true },
   { modul: "auswertungen", pfad: "/auswertungen", bezeichnung: "Auswertungen", geplant: true },
   { modul: "einstellungen", pfad: "/einstellungen", bezeichnung: "Einstellungen", geplant: true },
-  { modul: "abrechnung", pfad: "/abrechnung", bezeichnung: "Abo und Credits", geplant: true },
+  { modul: "abrechnung", pfad: "/credits", bezeichnung: "Abo und Credits" },
 ];
 
 export function Navigation({ erlaubteModule }: { erlaubteModule: Modul[] }) {
