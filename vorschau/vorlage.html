@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="de" data-modus="">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>ImmoOffice.ai — Design-Vorschau</title>
+<style>
+/* SCHRIFTEN_PLATZHALTER */
+
+/* ===================================================================
+   Design-Tokens — identisch mit src/app/globals.css der Anwendung.
+   =================================================================== */
+:root{
+  --marke-gold:#b5934f;
+  --f-grund:#fafafa; --f-flaeche:#fff; --f-flaeche-gedaempft:#f3f4f6;
+  --f-linie:#e6e8eb; --f-linie-stark:#d3d7dd;
+  --f-text:#1b2a47; --f-gedaempft:#7a828c;
+  --f-primaer:#1b2a47; --f-primaer-text:#fff;
+  --f-akzent:#b5934f; --f-akzent-text:#fff; --f-akzent-schwach:#f6f1e6;
+  --f-erfolg:#1f7a5c; --f-erfolg-schwach:#e8f4ef;
+  --f-warnung:#a66a1f; --f-warnung-schwach:#fbf1e3;
+  --f-fehler:#a33a3a;  --f-fehler-schwach:#f9ecec;
+  --f-info:#2c5f8f;    --f-info-schwach:#eaf1f8;
+  --radius:5px; --radius-gross:8px;
+  --schatten-klein:0 1px 2px rgb(27 42 71/.05);
+}
+:root{
+  --dp-grund:#0e1a30; --dp-flaeche:#12203b; --dp-flaeche-gedaempft:#182a49;
+  --dp-linie:#24354f; --dp-linie-stark:#33465f;
+  --dp-text:#eef1f5; --dp-gedaempft:#94a0b0;
+  --dp-primaer:#c9ae72; --dp-primaer-text:#12203b;
+  --dp-akzent:#c9ae72; --dp-akzent-text:#12203b; --dp-akzent-schwach:#1e2f4d;
+  --dp-erfolg:#4fb08c; --dp-erfolg-schwach:#16304a;
+  --dp-warnung:#d9a054; --dp-warnung-schwach:#2c2a3d;
+  --dp-fehler:#e08585;  --dp-fehler-schwach:#33253a;
+  --dp-info:#7fb0dc;    --dp-info-schwach:#172d47;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-modus=hell]){
+    --f-grund:var(--dp-grund); --f-flaeche:var(--dp-flaeche);
+    --f-flaeche-gedaempft:var(--dp-flaeche-gedaempft);
+    --f-linie:var(--dp-linie); --f-linie-stark:var(--dp-linie-stark);
+    --f-text:var(--dp-text); --f-gedaempft:var(--dp-gedaempft);
+    --f-primaer:var(--dp-primaer); --f-primaer-text:var(--dp-primaer-text);
+    --f-akzent:var(--dp-akzent); --f-akzent-text:var(--dp-akzent-text);
+    --f-akzent-schwach:var(--dp-akzent-schwach);
+    --f-erfolg:var(--dp-erfolg); --f-erfolg-schwach:var(--dp-erfolg-schwach);
+    --f-warnung:var(--dp-warnung); --f-warnung-schwach:var(--dp-warnung-schwach);
+    --f-fehler:var(--dp-fehler); --f-fehler-schwach:var(--dp-fehler-schwach);
+    --f-info:var(--dp-info); --f-info-schwach:var(--dp-info-schwach);
+    --schatten-klein:0 1px 2px rgb(0 0 0/.3);
+    color-scheme:dark;
+  }
+}
+:root[data-modus=dunkel]{
+  --f-grund:var(--dp-grund); --f-flaeche:var(--dp-flaeche);
+  --f-flaeche-gedaempft:var(--dp-flaeche-gedaempft);
+  --f-linie:var(--dp-linie); --f-linie-stark:var(--dp-linie-stark);
+  --f-text:var(--dp-text); --f-gedaempft:var(--dp-gedaempft);
+  --f-primaer:var(--dp-primaer); --f-primaer-text:var(--dp-primaer-text);
+  --f-akzent:var(--dp-akzent); --f-akzent-text:var(--dp-akzent-text);
+  --f-akzent-schwach:var(--dp-akzent-schwach);
+  --f-erfolg:var(--dp-erfolg); --f-erfolg-schwach:var(--dp-erfolg-schwach);
+  --f-warnung:var(--dp-warnung); --f-warnung-schwach:var(--dp-warnung-schwach);
+  --f-fehler:var(--dp-fehler); --f-fehler-schwach:var(--dp-fehler-schwach);
+  --f-info:var(--dp-info); --f-info-schwach:var(--dp-info-schwach);
+  --schatten-klein:0 1px 2px rgb(0 0 0/.3);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--f-grund); color:var(--f-text);
+  font-family:Inter,ui-sans-serif,system-ui,sans-serif;
+  font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:Poppins,ui-sans-serif,system-ui,sans-serif;letter-spacing:-.011em}
+.zahl{font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--f-akzent);outline-offset:2px;border-radius:3px}
+a{color:inherit;text-decoration:none}
+
+/* --- Banner --------------------------------------------------------- */
+.banner{
+  background:var(--f-warnung-schwach); color:var(--f-warnung);
+  border-bottom:1px solid color-mix(in srgb,var(--f-warnung) 25%,transparent);
+  padding:9px 20px; font-size:12.5px; text-align:center;
+}
+.banner strong{font-weight:600}
+
+/* --- Kopfzeile ------------------------------------------------------ */
+header.kopf{
+  position:sticky; top:0; z-index:20;
+  background:var(--f-flaeche); border-bottom:1px solid var(--f-linie);
+}
+.kopf-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 20px}
+.marke{display:inline-flex;align-items:center;gap:10px}
+.marke svg{width:28px;height:28px;flex:0 0 auto}
+.marke-text{font-family:Poppins,sans-serif;font-weight:600;font-size:19px;line-height:1;letter-spacing:-.02em}
+.marke-text i{color:var(--f-akzent);font-style:normal}
+.kopf-rechts{display:flex;align-items:center;gap:12px}
+.nutzer{text-align:right;line-height:1.25}
+.nutzer b{display:block;font-size:13px;font-weight:500}
+.nutzer span{display:block;font-size:11px;color:var(--f-gedaempft)}
+
+/* --- Schaltflächen -------------------------------------------------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  height:40px;padding:0 16px;border-radius:var(--radius);
+  font-family:inherit;font-size:14px;font-weight:500;white-space:nowrap;
+  border:1px solid transparent;cursor:pointer;transition:background-color .15s,border-color .15s;
+}
+.btn-primaer{background:var(--f-primaer);color:var(--f-primaer-text)}
+.btn-sek{background:var(--f-flaeche);color:var(--f-text);border-color:var(--f-linie-stark)}
+.btn-sek:hover{background:var(--f-flaeche-gedaempft)}
+.btn-klein{height:32px;padding:0 12px;font-size:13px}
+
+/* --- Gerüst --------------------------------------------------------- */
+.huelle{max-width:1180px;margin:0 auto;display:flex;gap:24px;padding:24px 20px}
+aside{width:212px;flex:0 0 auto}
+.seitenleiste{position:sticky;top:80px;background:var(--f-flaeche);border:1px solid var(--f-linie);border-radius:var(--radius-gross);padding:10px}
+nav ul{list-style:none;display:flex;flex-direction:column;gap:2px}
+nav a{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:8px 12px;border-radius:var(--radius);font-size:13px;cursor:pointer;
+}
+nav a:hover{background:var(--f-flaeche-gedaempft)}
+nav a[aria-current=page]{background:var(--f-akzent-schwach);color:var(--f-akzent);font-weight:500}
+nav a.geplant{color:color-mix(in srgb,var(--f-gedaempft) 65%,transparent);cursor:default}
+nav a.geplant:hover{background:transparent}
+nav .marker{font-size:10px;text-transform:uppercase;letter-spacing:.03em}
+main{flex:1;min-width:0}
+
+/* --- Karten --------------------------------------------------------- */
+.karte{background:var(--f-flaeche);border:1px solid var(--f-linie);border-radius:var(--radius-gross);box-shadow:var(--schatten-klein)}
+.karte-kopf{border-bottom:1px solid var(--f-linie);padding:14px 20px}
+.karte-kopf h3{font-size:15px;font-weight:600}
+.karte-kopf p{font-size:13px;color:var(--f-gedaempft);margin-top:3px}
+.karte-inhalt{padding:16px 20px}
+
+/* --- Seitenkopf ----------------------------------------------------- */
+.seitenkopf{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}
+.seitenkopf h1{font-size:21px;font-weight:600}
+.seitenkopf p{font-size:13px;color:var(--f-gedaempft);margin-top:4px}
+.seitenkopf .aktionen{display:flex;gap:8px;flex-wrap:wrap}
+
+/* --- Marken (Status) ------------------------------------------------ */
+.mk{display:inline-flex;align-items:center;gap:4px;border:1px solid;border-radius:3px;padding:2px 8px;font-size:12px;font-weight:500;white-space:nowrap}
+.mk-neutral{background:var(--f-flaeche-gedaempft);color:var(--f-gedaempft);border-color:var(--f-linie)}
+.mk-info{background:var(--f-info-schwach);color:var(--f-info);border-color:color-mix(in srgb,var(--f-info) 25%,transparent)}
+.mk-erfolg{background:var(--f-erfolg-schwach);color:var(--f-erfolg);border-color:color-mix(in srgb,var(--f-erfolg) 25%,transparent)}
+.mk-warnung{background:var(--f-warnung-schwach);color:var(--f-warnung);border-color:color-mix(in srgb,var(--f-warnung) 25%,transparent)}
+.mk-akzent{background:var(--f-akzent-schwach);color:var(--f-akzent);border-color:color-mix(in srgb,var(--f-akzent) 30%,transparent)}
+.ki{display:inline-flex;align-items:center;gap:4px;border:1px solid color-mix(in srgb,var(--f-akzent) 40%,transparent);background:var(--f-akzent-schwach);color:var(--f-akzent);border-radius:3px;padding:2px 6px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.ki svg{width:11px;height:11px}
+
+/* --- Hinweise ------------------------------------------------------- */
+.hinweis{border:1px solid;border-radius:var(--radius);padding:12px 16px;font-size:13px;line-height:1.55}
+.hinweis b{display:block;font-weight:600;margin-bottom:2px}
+.hinweis-info{background:var(--f-info-schwach);color:var(--f-info);border-color:color-mix(in srgb,var(--f-info) 25%,transparent)}
+.hinweis-warnung{background:var(--f-warnung-schwach);color:var(--f-warnung);border-color:color-mix(in srgb,var(--f-warnung) 25%,transparent)}
+
+/* --- Raster --------------------------------------------------------- */
+.raster{display:grid;gap:16px}
+.r4{grid-template-columns:repeat(4,1fr)}
+.r3{grid-template-columns:2fr 1fr}
+.r2{grid-template-columns:1fr 1fr}
+.kennzahl p:first-child{font-size:13px;color:var(--f-gedaempft)}
+.kennzahl .wert{font-family:Poppins,sans-serif;font-size:26px;font-weight:600;margin-top:5px;line-height:1.1}
+.kennzahl .zusatz{font-size:12px;color:var(--f-gedaempft);margin-top:2px}
+
+/* --- Objektliste ---------------------------------------------------- */
+.objekt{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;background:var(--f-flaeche);border:1px solid var(--f-linie);border-radius:var(--radius-gross);padding:15px 20px;cursor:pointer;transition:border-color .15s}
+.objekt:hover{border-color:color-mix(in srgb,var(--f-akzent) 50%,transparent)}
+.objekt .nr{font-size:11px;color:var(--f-gedaempft)}
+.objekt .titel{font-size:14px;font-weight:500;margin-top:4px}
+.objekt .meta{font-size:13px;color:var(--f-gedaempft);margin-top:2px}
+.objekt .preis{font-size:14px;font-weight:600;text-align:right}
+.objekt .kennwerte{font-size:13px;color:var(--f-gedaempft);text-align:right;margin-top:2px}
+.liste{display:flex;flex-direction:column;gap:8px}
+
+/* --- Eckdaten ------------------------------------------------------- */
+dl.eck div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid var(--f-linie);padding:7px 0}
+dl.eck div:last-child{border-bottom:0}
+dl.eck dt{font-size:13px;color:var(--f-gedaempft)}
+dl.eck dd{font-size:13px;font-weight:500}
+
+/* --- Texte ---------------------------------------------------------- */
+.textblock h4{font-size:13px;font-weight:600;margin-bottom:4px}
+.textblock p{font-size:13px;color:var(--f-gedaempft);line-height:1.6}
+.textblock+.textblock{margin-top:18px}
+
+/* --- Prüfliste ------------------------------------------------------ */
+.pruef{list-style:none;display:flex;flex-direction:column;gap:7px}
+.pruef li{display:flex;gap:9px;font-size:13px}
+.punkt{width:6px;height:6px;border-radius:50%;flex:0 0 auto;margin-top:6px}
+.punkt-fehler{background:var(--f-fehler)}
+.punkt-warnung{background:var(--f-warnung)}
+.pruef b{font-weight:500}
+.pruef span{display:block;color:var(--f-gedaempft)}
+
+/* --- Formular ------------------------------------------------------- */
+.feld{display:flex;flex-direction:column;gap:6px}
+.feld label{font-size:13px;font-weight:500}
+.feld label i{color:var(--f-fehler);font-style:normal}
+.feld input,.feld select,.feld textarea{
+  width:100%;border:1px solid var(--f-linie-stark);background:var(--f-flaeche);
+  color:var(--f-text);border-radius:var(--radius);padding:8px 12px;
+  font-family:inherit;font-size:14px;
+}
+.feld .hilfe{font-size:12px;color:var(--f-gedaempft)}
+
+.ansicht{display:none}
+.ansicht.aktiv{display:block}
+
+footer{border-top:1px solid var(--f-linie);padding:18px 20px;margin-top:12px}
+footer p{max-width:1180px;margin:0 auto;font-size:12.5px;color:var(--f-gedaempft)}
+
+@media(max-width:980px){
+  aside{display:none}
+  .r4{grid-template-columns:repeat(2,1fr)}
+  .r3,.r2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="banner">
+  <strong>Design-Vorschau ohne Funktion.</strong>
+  Alle Angaben sind erfunden. Die tatsächliche Anwendung läuft serverseitig mit Datenbank, Anmeldung und Mandantentrennung.
+</div>
+
+<header class="kopf">
+  <div class="kopf-inner">
+    <span class="marke">
+      <svg viewBox="0 0 64 64" role="img" aria-label="ImmoOffice.ai">
+        <path fill="var(--f-primaer)" d="M16 55V26a16 16 0 0 1 32 0v29Z"/>
+        <path fill="var(--marke-gold)" d="M12 57h40a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2Z"/>
+        <path fill="var(--marke-gold)" d="M32 19a7.5 7.5 0 0 0-4.1 13.78L25.4 46h13.2l-2.5-13.22A7.5 7.5 0 0 0 32 19Z"/>
+      </svg>
+      <span class="marke-text">ImmoOffice<i>.ai</i></span>
+    </span>
+    <div class="kopf-rechts">
+      <div class="nutzer">
+        <b>Maria Berger</b>
+        <span>Nordlicht Immobilien · Unternehmensinhaber</span>
+      </div>
+      <span class="mk mk-warnung">Testphase</span>
+      <button class="btn btn-sek btn-klein" id="modus" aria-label="Farbmodus wechseln">
+        <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M16.5 11.8A7 7 0 1 1 8.2 3.5a5.6 5.6 0 0 0 8.3 8.3Z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="huelle">
+  <aside>
+    <div class="seitenleiste">
+      <nav aria-label="Hauptnavigation">
+        <ul>
+          <li><a data-ziel="dashboard" aria-current="page">Dashboard</a></li>
+          <li><a data-ziel="objekte">Objekte</a></li>
+          <li><a data-ziel="detail">Objektdetail</a></li>
+          <li><a data-ziel="expose">Exposé</a></li>
+          <li><a data-ziel="formular">Objekt anlegen</a></li>
+          <li><a class="geplant">Kontakte<span class="marker">demnächst</span></a></li>
+          <li><a class="geplant">Suchprofile<span class="marker">geplant</span></a></li>
+          <li><a class="geplant">Wertermittlung<span class="marker">geplant</span></a></li>
+          <li><a class="geplant">Verträge<span class="marker">geplant</span></a></li>
+          <li><a class="geplant">Marketing<span class="marker">geplant</span></a></li>
+          <li><a class="geplant">Kalender<span class="marker">geplant</span></a></li>
+          <li><a class="geplant">Auswertungen<span class="marker">geplant</span></a></li>
+          <li><a class="geplant">Einstellungen<span class="marker">geplant</span></a></li>
+          <li><a class="geplant">Abo und Credits<span class="marker">geplant</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <main>
+    <!-- ============ DASHBOARD ============ -->
+    <section class="ansicht aktiv" id="dashboard">
+      <div class="seitenkopf">
+        <div><h1>Willkommen, Maria</h1><p>Nordlicht Immobilien</p></div>
+        <div class="aktionen"><button class="btn btn-primaer">Objekt anlegen</button></div>
+      </div>
+
+      <div class="hinweis hinweis-info" style="margin-bottom:18px">
+        <b>Testphase läuft</b>
+        Noch 5 Tage bis zum 23.08.2026. Es entstehen keine Kosten, solange kein Tarif ausgewählt wurde.
+      </div>
+
+      <div class="raster r4" style="margin-bottom:18px">
+        <div class="karte kennzahl"><div class="karte-inhalt"><p>Aktive Objekte</p><p class="wert zahl">12</p><p class="zusatz">3 in Vorbereitung</p></div></div>
+        <div class="karte kennzahl"><div class="karte-inhalt"><p>Kontakte</p><p class="wert zahl">148</p><p class="zusatz">9 neue Anfragen</p></div></div>
+        <div class="karte kennzahl"><div class="karte-inhalt"><p>Abgeschlossen</p><p class="wert zahl">7</p><p class="zusatz">verkauft oder vermietet</p></div></div>
+        <div class="karte kennzahl"><div class="karte-inhalt"><p>Credits</p><p class="wert zahl">1.240</p><p class="zusatz">von 1.500 im Monat</p></div></div>
+      </div>
+
+      <div class="raster r3">
+        <div class="karte">
+          <div class="karte-kopf"><h3>Zuletzt bearbeitet</h3></div>
+          <div class="karte-inhalt liste" style="gap:0">
+            <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--f-linie)">
+              <span><b style="font-size:13px;font-weight:500">Helle 3-Zimmer-Wohnung mit Südbalkon</b><span class="zahl" style="display:block;font-size:12px;color:var(--f-gedaempft)">0001 · 16.08.2026</span></span>
+              <span class="mk mk-info">In Vermarktung</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--f-linie)">
+              <span><b style="font-size:13px;font-weight:500">Einfamilienhaus mit Garten</b><span class="zahl" style="display:block;font-size:12px;color:var(--f-gedaempft)">0002 · 15.08.2026</span></span>
+              <span class="mk mk-warnung">Reserviert</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--f-linie)">
+              <span><b style="font-size:13px;font-weight:500">Bürofläche im Zentrum</b><span class="zahl" style="display:block;font-size:12px;color:var(--f-gedaempft)">0004 · 14.08.2026</span></span>
+              <span class="mk mk-info">In Vermarktung</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0">
+              <span><b style="font-size:13px;font-weight:500">Mehrfamilienhaus, 6 Einheiten</b><span class="zahl" style="display:block;font-size:12px;color:var(--f-gedaempft)">0005 · 11.08.2026</span></span>
+              <span class="mk mk-erfolg">Verkauft</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="karte">
+          <div class="karte-kopf"><h3>Anstehend</h3></div>
+          <div class="karte-inhalt">
+            <dl class="eck">
+              <div><dt>Besichtigungen</dt><dd class="zahl">4</dd></div>
+              <div><dt>Offene Aufgaben</dt><dd class="zahl">11</dd></div>
+              <div><dt>Wiedervorlagen</dt><dd class="zahl">3</dd></div>
+              <div><dt>Verträge offen</dt><dd class="zahl">2</dd></div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ OBJEKTLISTE ============ -->
+    <section class="ansicht" id="objekte">
+      <div class="seitenkopf">
+        <div><h1>Objekte</h1><p>5 Objekte</p></div>
+        <div class="aktionen">
+          <button class="btn btn-sek">Filter</button>
+          <button class="btn btn-primaer">Objekt anlegen</button>
+        </div>
+      </div>
+      <div class="liste">
+        <div class="objekt">
+          <div>
+            <div style="display:flex;gap:8px;align-items:center"><span class="nr zahl">0001</span><span class="mk mk-info">In Vermarktung</span></div>
+            <div class="titel">Helle 3-Zimmer-Wohnung mit Südbalkon</div>
+            <div class="meta">Wohnung · Rosenweg 12, 24103 Kiel</div>
+          </div>
+          <div><div class="preis zahl">349.000 €</div><div class="kennwerte zahl">78,5 m² · 3 Zi.</div></div>
+        </div>
+        <div class="objekt">
+          <div>
+            <div style="display:flex;gap:8px;align-items:center"><span class="nr zahl">0002</span><span class="mk mk-warnung">Reserviert</span></div>
+            <div class="titel">Einfamilienhaus mit Garten in ruhiger Lage</div>
+            <div class="meta">Haus · Birkenallee 8, 24222 Schwentinental</div>
+          </div>
+          <div><div class="preis zahl">545.000 €</div><div class="kennwerte zahl">142,0 m² · 5 Zi.</div></div>
+        </div>
+        <div class="objekt">
+          <div>
+            <div style="display:flex;gap:8px;align-items:center"><span class="nr zahl">0003</span><span class="mk mk-neutral">Akquise</span></div>
+            <div class="titel">Baugrundstück, voll erschlossen</div>
+            <div class="meta">Grundstück · Am Moorweg, 24211 Preetz</div>
+          </div>
+          <div><div class="preis zahl">189.000 €</div><div class="kennwerte zahl">640,0 m² Grundstück</div></div>
+        </div>
+        <div class="objekt">
+          <div>
+            <div style="display:flex;gap:8px;align-items:center"><span class="nr zahl">0004</span><span class="mk mk-info">In Vermarktung</span></div>
+            <div class="titel">Bürofläche im Zentrum, flexibel teilbar</div>
+            <div class="meta">Gewerbe · Holstenstraße 44, 24103 Kiel</div>
+          </div>
+          <div><div class="preis zahl">1.850 € / Monat</div><div class="kennwerte zahl">210,0 m² Nutzfläche</div></div>
+        </div>
+        <div class="objekt">
+          <div>
+            <div style="display:flex;gap:8px;align-items:center"><span class="nr zahl">0005</span><span class="mk mk-erfolg">Verkauft</span></div>
+            <div class="titel">Mehrfamilienhaus mit sechs Einheiten</div>
+            <div class="meta">Anlageimmobilie · Feldstraße 21, 24105 Kiel</div>
+          </div>
+          <div><div class="preis zahl">1.290.000 €</div><div class="kennwerte zahl">412,0 m² · 6 Einheiten</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ OBJEKTDETAIL ============ -->
+    <section class="ansicht" id="detail">
+      <div class="seitenkopf">
+        <div>
+          <h1>Helle 3-Zimmer-Wohnung mit Südbalkon</h1>
+          <p class="zahl">0001 · Rosenweg 12, 24103 Kiel</p>
+        </div>
+        <div class="aktionen">
+          <button class="btn btn-sek">Zur Übersicht</button>
+          <button class="btn btn-primaer">Bearbeiten</button>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px">
+        <span class="mk mk-info">In Vermarktung</span>
+        <span class="mk mk-neutral">Kauf</span>
+        <span class="mk mk-neutral">Wohnung</span>
+        <span class="ki"><svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 .5 7.2 4.2 11 5.4 7.2 6.6 6 10.3 4.8 6.6 1 5.4 4.8 4.2Z"/></svg>KI-erzeugt</span>
+      </div>
+
+      <div class="raster r3">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="karte">
+            <div class="karte-kopf"><h3>Beschreibung</h3></div>
+            <div class="karte-inhalt">
+              <div class="textblock"><h4>Objekt</h4><p>Die Wohnung liegt im dritten Obergeschoss eines gepflegten Mehrfamilienhauses und verfügt über einen nach Süden ausgerichteten Balkon. Das Treppenhaus wurde 2019 modernisiert.</p></div>
+              <div class="textblock"><h4>Ausstattung</h4><p>Südbalkon, Einbauküche aus dem Jahr 2021, Kellerabteil, Stellplatz, Fußbodenheizung im Bad.</p></div>
+              <div class="textblock"><h4>Lage</h4><p>Ruhige Wohnlage in Düsternbrook, fußläufig zur Kiellinie.</p></div>
+            </div>
+          </div>
+
+          <div class="karte">
+            <div class="karte-kopf" style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+              <div><h3>Portalexport</h3><p>OpenImmo 1.2.7 für ImmoScout24, Immowelt und Kleinanzeigen</p></div>
+              <span class="mk mk-warnung">2 Angaben fehlen</span>
+            </div>
+            <div class="karte-inhalt">
+              <p style="font-size:13px;font-weight:500;margin-bottom:9px">Vor der Veröffentlichung zu ergänzen</p>
+              <ul class="pruef" style="margin-bottom:16px">
+                <li><span class="punkt punkt-fehler"></span><span><b>Energiekennwert</b><span>Beim Verbrauchsausweis ist der Energieverbrauchskennwert anzugeben.</span></span></li>
+                <li><span class="punkt punkt-fehler"></span><span><b>Freigabe der Texte</b><span>Die Texte sind vor der Veröffentlichung zu prüfen und freizugeben.</span></span></li>
+              </ul>
+              <p style="font-size:13px;font-weight:500;margin-bottom:9px">Empfohlen</p>
+              <ul class="pruef" style="margin-bottom:16px">
+                <li><span class="punkt punkt-warnung"></span><span><b>Geokoordinaten</b><span>Ohne Koordinaten platzieren Portale das Objekt nur ungefähr.</span></span></li>
+              </ul>
+              <button class="btn btn-sek btn-klein">OpenImmo-XML herunterladen</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="karte">
+            <div class="karte-kopf"><h3>Eckdaten</h3></div>
+            <div class="karte-inhalt">
+              <dl class="eck">
+                <div><dt>Kaufpreis</dt><dd class="zahl">349.000 €</dd></div>
+                <div><dt>Nebenkosten</dt><dd class="zahl">210 €</dd></div>
+                <div><dt>Hausgeld</dt><dd class="zahl">285 €</dd></div>
+                <div><dt>Wohnfläche</dt><dd class="zahl">78,5 m²</dd></div>
+                <div><dt>Zimmer</dt><dd class="zahl">3</dd></div>
+                <div><dt>Baujahr</dt><dd class="zahl">1998</dd></div>
+                <div><dt>Nutzungsart</dt><dd>Wohnen</dd></div>
+              </dl>
+            </div>
+          </div>
+          <div class="karte">
+            <div class="karte-kopf"><h3>Energieausweis</h3></div>
+            <div class="karte-inhalt">
+              <dl class="eck">
+                <div><dt>Art</dt><dd>Verbrauchsausweis</dd></div>
+                <div><dt>Kennwert</dt><dd style="color:var(--f-gedaempft)">–</dd></div>
+                <div><dt>Klasse</dt><dd>C</dd></div>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ EXPOSÉ ============ -->
+    <section class="ansicht" id="expose">
+      <div class="seitenkopf">
+        <div><h1>Exposé</h1><p class="zahl">0001 · Helle 3-Zimmer-Wohnung mit Südbalkon</p></div>
+        <div class="aktionen">
+          <button class="btn btn-sek">Zum Objekt</button>
+          <button class="btn btn-primaer">PDF herunterladen</button>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px">
+        <span class="ki"><svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 .5 7.2 4.2 11 5.4 7.2 6.6 6 10.3 4.8 6.6 1 5.4 4.8 4.2Z"/></svg>KI-erzeugt</span>
+        <span class="mk mk-warnung">Nicht freigegeben</span>
+      </div>
+
+      <div class="raster r2">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="karte">
+            <div class="karte-kopf"><h3>Texte erzeugen</h3><p>Erzeugt Titel, Objekt-, Ausstattungs- und Lagebeschreibung.</p></div>
+            <div class="karte-inhalt">
+              <div style="display:flex;flex-direction:column;gap:18px">
+                <div class="feld">
+                  <label for="stil">Textstil</label>
+                  <select id="stil">
+                    <option>Sachlich</option><option>Emotional</option><option>Hochwertig</option>
+                    <option>Familienorientiert</option><option>Kapitalanlage</option><option>Luxusimmobilie</option>
+                  </select>
+                </div>
+                <div class="feld">
+                  <label for="stich">Stichpunkte zur Ausstattung</label>
+                  <textarea id="stich" rows="3" placeholder="Südbalkon, Einbauküche 2021, Kellerabteil, Stellplatz"></textarea>
+                  <span class="hilfe">Nur was hier oder im Objekt steht, wird verwendet. Es wird nichts hinzuerfunden.</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                  <button class="btn btn-primaer">Texte erzeugen</button>
+                  <span style="font-size:12px;color:var(--f-gedaempft)">10 Credits</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hinweis hinweis-warnung">
+            <b>Nicht belegte Angaben</b>
+            Diese Angaben fehlen und wurden bewusst <strong>nicht</strong> ergänzt:
+            <strong>Energieeffizienzklasse</strong> — für Anzeigen nach GEG erforderlich.
+          </div>
+        </div>
+
+        <div class="karte">
+          <div class="karte-kopf" style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+            <div><h3>Texte</h3><p>Vollständig bearbeitbar im Objekt.</p></div>
+            <button class="btn btn-primaer btn-klein">Texte freigeben</button>
+          </div>
+          <div class="karte-inhalt">
+            <div class="textblock"><h4>Titel</h4><p>Helle 3-Zimmer-Wohnung mit Südbalkon</p></div>
+            <div class="textblock"><h4>Objektbeschreibung</h4><p>Die Wohnung liegt im dritten Obergeschoss eines gepflegten Mehrfamilienhauses und verfügt über einen nach Süden ausgerichteten Balkon.</p></div>
+            <div class="textblock"><h4>Ausstattung</h4><p>Südbalkon, Einbauküche aus dem Jahr 2021, Kellerabteil, Stellplatz.</p></div>
+            <div class="textblock"><h4>Lage</h4><p>Ruhige Wohnlage in Düsternbrook, fußläufig zur Kiellinie.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FORMULAR ============ -->
+    <section class="ansicht" id="formular">
+      <div class="seitenkopf">
+        <div><h1>Neues Objekt</h1><p>Die Felder richten sich nach Objektkategorie und Vermarktungsart.</p></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="karte">
+          <div class="karte-kopf"><h3>Stammdaten</h3></div>
+          <div class="karte-inhalt">
+            <div class="raster r2">
+              <div class="feld" style="grid-column:1/-1">
+                <label for="bez">Objektbezeichnung <i>*</i></label>
+                <input id="bez" placeholder="z. B. ETW Rosenweg 12">
+                <span class="hilfe">Interne Bezeichnung, erscheint nicht im Exposé.</span>
+              </div>
+              <div class="feld"><label for="verm">Vermarktungsart <i>*</i></label><select id="verm"><option>Kauf</option><option>Miete</option><option>Kauf oder Miete</option></select></div>
+              <div class="feld"><label for="kat">Objektkategorie <i>*</i></label><select id="kat"><option>Wohnung</option><option>Haus</option><option>Grundstück</option><option>Gewerbe</option><option>Anlageimmobilie</option></select></div>
+              <div class="feld"><label for="art">Objektart</label><select id="art"><option>Etagenwohnung</option><option>Erdgeschosswohnung</option><option>Dachgeschosswohnung</option><option>Maisonette</option><option>Penthouse</option></select></div>
+              <div class="feld"><label for="stat">Vermarktungsstatus <i>*</i></label><select id="stat"><option>Akquise</option><option>In Vorbereitung</option><option>In Vermarktung</option><option>Reserviert</option></select></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="karte">
+          <div class="karte-kopf"><h3>Flächen und Räume</h3><p>Sichtbar sind nur die Felder, die zur gewählten Objektkategorie passen.</p></div>
+          <div class="karte-inhalt">
+            <div class="raster r4">
+              <div class="feld"><label for="wfl">Wohnfläche in m²</label><input id="wfl" inputmode="decimal" value="78,5"></div>
+              <div class="feld"><label for="zi">Zimmer</label><input id="zi" inputmode="decimal" value="3"></div>
+              <div class="feld"><label for="bj">Baujahr</label><input id="bj" inputmode="numeric" value="1998"></div>
+              <div class="feld"><label for="kp">Kaufpreis in €</label><input id="kp" inputmode="decimal" value="349.000"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button class="btn btn-primaer">Objekt anlegen</button>
+          <button class="btn btn-sek">Abbrechen</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <p>ImmoOffice.ai · Design-Vorschau vom 16.08.2026 · Daten werden in der EU verarbeitet (Frankfurt am Main) · Alle dargestellten Objekte, Personen und Firmen sind frei erfunden.</p>
+</footer>
+
+<script>
+(function(){
+  var wurzel=document.documentElement;
+  document.getElementById('modus').addEventListener('click',function(){
+    var dunkel=getComputedStyle(document.body).backgroundColor==='rgb(14, 26, 48)';
+    wurzel.setAttribute('data-modus',dunkel?'hell':'dunkel');
+  });
+  var glieder=document.querySelectorAll('nav a[data-ziel]');
+  glieder.forEach(function(a){
+    a.addEventListener('click',function(){
+      glieder.forEach(function(x){x.removeAttribute('aria-current')});
+      a.setAttribute('aria-current','page');
+      document.querySelectorAll('.ansicht').forEach(function(s){s.classList.remove('aktiv')});
+      document.getElementById(a.dataset.ziel).classList.add('aktiv');
+      window.scrollTo(0,0);
+    });
+  });
+})();
+</script>
+</body>
+</html>
