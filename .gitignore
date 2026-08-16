@@ -1,0 +1,46 @@
+# --- Referenzmaterial -------------------------------------------------------
+# Die Referenz-Anwendung ist Arbeitsmaterial, kein Produktbestandteil. Sie traegt
+# durchgehend Kennzeichen des Referenzunternehmens; ein Mitversionieren wuerde
+# Abschnitt 2 des Master-Prompts unterlaufen. Siehe docs/BESTANDSAUFNAHME.md.
+reference/*
+!reference/README.md
+
+# --- Abhaengigkeiten --------------------------------------------------------
+node_modules/
+.pnp/
+.pnp.*
+
+# --- Build ------------------------------------------------------------------
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# --- Test und Werkzeuge -----------------------------------------------------
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+blob-report/
+.eslintcache
+
+# --- Umgebung: NIEMALS echte Geheimnisse versionieren -----------------------
+.env
+.env.*
+!.env.example
+
+# --- Netlify / Supabase -----------------------------------------------------
+.netlify/
+.supabase/
+supabase/.temp/
+
+# --- Betriebssystem und Editor ----------------------------------------------
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+.idea/
+.vscode/*
+!.vscode/extensions.json
