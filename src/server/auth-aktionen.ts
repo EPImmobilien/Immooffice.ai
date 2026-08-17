@@ -108,11 +108,24 @@ export async function registrieren(
   if (error) return { fehler: meldung(error.message) };
 
   // Ist die E-Mail-Bestaetigung aktiv, entsteht noch keine Sitzung.
+  //
+  // Achtung: Bei einer BEREITS REGISTRIERTEN Adresse meldet Supabase ebenfalls
+  // Erfolg — es legt nichts an und verschickt nichts. Das ist beabsichtigt:
+  // Sonst liesse sich ueber das Registrierungsformular herausfinden, wer hier
+  // Kunde ist. Erkennbar ist der Fall nur an der leeren Identitaetenliste.
+  //
+  // Die Meldung muss deshalb in BEIDEN Faellen zutreffen und in beiden Faellen
+  // GLEICH lauten. Ein schlichtes "Wir haben Ihnen eine E-Mail geschickt" waere
+  // bei einer vorhandenen Adresse schlicht falsch — der Nutzer wartet dann auf
+  // Post, die nie kommt. Genau das ist beim ersten Test passiert. Zwei
+  // unterschiedliche Texte wiederum wuerden verraten, was Supabase gerade
+  // verbirgt.
   if (!data.session) {
     return {
       hinweis:
-        "Wir haben Ihnen eine E-Mail geschickt. Bitte bestätigen Sie die Adresse " +
-        "und melden Sie sich anschließend an.",
+        "Ist diese Adresse noch nicht vergeben, haben wir Ihnen eine E-Mail zur " +
+        "Bestätigung geschickt — bitte sehen Sie auch im Spam-Ordner nach. " +
+        "Gehört die Adresse bereits zu einem Konto, melden Sie sich einfach an.",
     };
   }
 

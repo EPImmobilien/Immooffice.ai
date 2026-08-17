@@ -16,9 +16,21 @@ export function RegistrierFormular() {
 
   if (zustand.hinweis) {
     return (
-      <Hinweis ton="erfolg" titel="Fast geschafft">
-        {zustand.hinweis}
-      </Hinweis>
+      <div className="space-y-4">
+        <Hinweis ton="erfolg" titel="Fast geschafft">
+          {zustand.hinweis}
+        </Hinweis>
+        {/* Der Hinweis deckt bewusst beide Faelle ab — auch den, dass die
+            Adresse bereits vergeben ist. Dann fuehrt kein Weg ueber eine
+            E-Mail, sondern nur ueber die Anmeldung. Ohne diesen Verweis
+            bliebe der Nutzer auf einer Seite ohne Ausgang stehen. */}
+        <p className="text-[13px] text-gedaempft">
+          Sie haben bereits ein Konto?{" "}
+          <Link href="/anmelden" className="font-medium text-akzent hover:underline">
+            Zur Anmeldung
+          </Link>
+        </p>
+      </div>
     );
   }
 
