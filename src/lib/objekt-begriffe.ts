@@ -39,6 +39,15 @@ export const OBJEKTSTATUS = {
   archiviert: "Archiviert",
 } as const;
 
+/**
+ * Statuswerte als Typ.
+ *
+ * Bis hierher stand `keyof typeof OBJEKTSTATUS` an mehreren Stellen wortwoertlich
+ * im Code. Ein Name dafuer macht die Absicht sichtbar und erspart die
+ * Wiederholung.
+ */
+export type Objektstatus = keyof typeof OBJEKTSTATUS;
+
 export const ENERGIEAUSWEISTYPEN = {
   bedarf: "Bedarfsausweis",
   verbrauch: "Verbrauchsausweis",
@@ -88,7 +97,7 @@ export const OBJEKTARTEN: Record<keyof typeof OBJEKTKATEGORIEN, string[]> = {
 
 /** Farbton der Statusmarkierung. */
 export function statusTon(
-  status: keyof typeof OBJEKTSTATUS,
+  status: Objektstatus,
 ): "neutral" | "info" | "warnung" | "erfolg" | "fehler" {
   switch (status) {
     case "aktiv":

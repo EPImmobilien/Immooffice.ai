@@ -194,9 +194,9 @@ export default async function UebersichtSeite() {
     },
     darf("auswertungen") && {
       titel: "Auswertungen",
-      hinweis: "Bestand, Vermarktung, Abschlüsse",
+      hinweis: "Bestand, Vermarktungsdauer, Abschlüsse",
       symbol: "auswertungen" as const,
-      geplant: true,
+      pfad: "/auswertungen",
     },
   ].filter(Boolean) as KachelDaten[];
 
