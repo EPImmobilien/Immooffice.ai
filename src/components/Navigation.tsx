@@ -23,6 +23,9 @@ interface Eintrag {
  */
 const EINTRAEGE: Eintrag[] = [
   { modul: null, pfad: "/dashboard", bezeichnung: "Übersicht" },
+  // Vor den Objekten, weil die Aufnahme dem Objekt vorausgeht: erst der Termin
+  // beim Eigentuemer, dann — bei Auftrag — der Datensatz im Bestand.
+  { modul: "objekte", pfad: "/aufnahmen", bezeichnung: "Objektaufnahmen" },
   { modul: "objekte", pfad: "/objekte", bezeichnung: "Objekte" },
   { modul: "kontakte", pfad: "/kontakte", bezeichnung: "Kontakte" },
   { modul: "kontakte", pfad: "/suchprofile", bezeichnung: "Suchprofile" },

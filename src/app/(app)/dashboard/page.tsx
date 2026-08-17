@@ -61,7 +61,7 @@ export default async function UebersichtSeite() {
   );
   const heuteDatum = tagesbeginn.toISOString().slice(0, 10);
 
-  const [faelligAntwort, termineAntwort] = await Promise.all([
+  const [faelligAntwort, termineAntwort, aufnahmenAntwort] = await Promise.all([
     supabase
       .from("aufgaben")
       .select("id", { count: "exact", head: true })
@@ -72,9 +72,14 @@ export default async function UebersichtSeite() {
       .select("id", { count: "exact", head: true })
       .is("abgesagt_am", null)
       .gte("beginnt_am", tagesbeginn.toISOString()),
+    supabase
+      .from("objektaufnahmen")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "offen"),
   ]);
 
   const faellig = faelligAntwort.count ?? 0;
+  const offeneAufnahmen = aufnahmenAntwort.count ?? 0;
   const naechsteTermine = termineAntwort.count ?? 0;
 
   const objekte = objekteAntwort.data ?? [];
@@ -92,6 +97,15 @@ export default async function UebersichtSeite() {
   const darf = (modul: Modul) => hatRecht(sitzung.rolle, modul, "lesen");
 
   const tagesgeschaeft: KachelDaten[] = [
+    darf("objekte") && {
+      titel: "Objektaufnahmen",
+      hinweis: "Der Vor-Ort-Termin, bevor ein Objekt entsteht",
+      symbol: "objekte" as const,
+      pfad: "/aufnahmen",
+      zahl: offeneAufnahmen,
+      zahlHinweis: "offen",
+      betont: offeneAufnahmen > 0,
+    },
     darf("objekte") && {
       titel: "Objekte",
       hinweis: "Bestand, Neubau und Vermarktung",
@@ -175,12 +189,6 @@ export default async function UebersichtSeite() {
       titel: "Verträge",
       hinweis: "Aufträge, Reservierungen, Protokolle",
       symbol: "vertraege" as const,
-      geplant: true,
-    },
-    darf("kalender") && {
-      titel: "Aufgaben",
-      hinweis: "Fälligkeiten und Zuständigkeiten",
-      symbol: "aufgaben" as const,
       geplant: true,
     },
     darf("auswertungen") && {
