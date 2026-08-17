@@ -5,7 +5,7 @@ import { umbrechen } from "@/lib/textumbruch";
 
 import { ABSTAND, FARBE, GROESSE, SCHRIFT, gesperrt } from "./stil";
 import type { ExposeBild, ExposeBranding } from "./typen";
-import type { Eckdatum } from "./gemeinsam";
+import { KI_BILDVERMERK, KI_TEXTVERMERK, type Eckdatum } from "./gemeinsam";
 
 /**
  * Wiederverwendbare Bausteine der Exposé-Vorlagen.
@@ -231,23 +231,49 @@ export function Bildkachel({
   );
 }
 
+/**
+ * Fusszeile mit Kontakt, Haftungshinweis und KI-Vermerk.
+ *
+ * Der KI-Vermerk steht hier und nicht im Seitenfluss. Zwei Gruende: Er
+ * gehoert zu den Hinweisen, nicht zum Inhalt — und im Fluss war er die
+ * Ursache dafuer, dass Seiten um wenige Punkte uebergelaufen sind und eine
+ * fast leere Folgeseite entstand. In der festen Fusszeile kann er das nicht
+ * mehr und erscheint zugleich auf jeder Seite.
+ *
+ * Die Kennzeichnung KI-bearbeiteter Bilder traegt zusaetzlich jede
+ * Bildkachel als Marke (Abschnitt 11).
+ */
 export function Fusszeile({
   branding,
   haftung,
+  kiTexte = false,
+  kiBilder = false,
   style,
 }: {
   branding: ExposeBranding;
   haftung: string;
+  kiTexte?: boolean;
+  kiBilder?: boolean;
   style?: Style;
 }) {
   const kontakt = [branding.firmenname, branding.telefon, branding.email, branding.web]
     .filter(Boolean)
     .join(" · ");
 
+  const hinweise = [
+    kiTexte ? KI_TEXTVERMERK : null,
+    kiBilder ? KI_BILDVERMERK : null,
+    haftung,
+  ].filter(Boolean) as string[];
+
   return (
     <View style={[stile.fuss, style ?? {}]} fixed>
       <Text style={stile.fussZeile}>{kontakt}</Text>
-      <Text style={[stile.fussZeile, { marginTop: 2 }]}>{haftung}</Text>
+      {hinweise.map((zeile, i) => (
+        <Text key={i} style={[stile.fussZeile, { marginTop: 2 }]}>
+          {zeile}
+        </Text>
+      ))}
     </View>
   );
 }

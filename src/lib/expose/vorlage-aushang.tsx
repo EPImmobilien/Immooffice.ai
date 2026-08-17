@@ -4,7 +4,8 @@ import { Bildkachel } from "./bausteine";
 import {
   eckdaten,
   HAFTUNG,
-  KiVermerk,
+  KI_BILDVERMERK,
+  KI_TEXTVERMERK,
   kategorieName,
   kontaktzeile,
   kuerzen,
@@ -179,11 +180,16 @@ export function ExposeAushang({
 
         <View style={stile.fuss} fixed>
           <Text style={[stile.kontakt, { color: primaer }]}>{kontaktzeile(branding)}</Text>
-          <KiVermerk
-            texteKiErzeugt={objekt.texte_ki_erzeugt}
-            bilderKiBearbeitet={bildBearbeitet}
-            style={{ fontSize: 6.5 * f }}
-          />
+          {(objekt.texte_ki_erzeugt || bildBearbeitet) && (
+            <Text style={stile.klein}>
+              {[
+                objekt.texte_ki_erzeugt ? KI_TEXTVERMERK : null,
+                bildBearbeitet ? KI_BILDVERMERK : null,
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            </Text>
+          )}
           <Text style={stile.klein}>
             Objekt {objekt.objektnummer} · {HAFTUNG}
           </Text>

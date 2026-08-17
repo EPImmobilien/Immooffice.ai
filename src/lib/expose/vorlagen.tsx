@@ -14,6 +14,11 @@ import { ExposePremium } from "./vorlage-premium";
  * Eine Stelle, an der alle Vorlagen stehen: Oberflaeche, PDF-Route und Tests
  * lesen dieselbe Liste. Damit kann keine Vorlage in der Auswahl fehlen oder in
  * den Tests uebersehen werden.
+ *
+ * Die vier Exposé-Vorlagen sind quer. Der Schaufensteraushang bleibt hoch:
+ * Er haengt im Fenster oder am Bauzaun, und dort ist das Hochformat das
+ * uebliche — quer wuerde er auf halber Hoehe abschliessen und wirkte
+ * verloren. Er ist auch kein Exposé, sondern ein Plakat.
  */
 
 export type VorlagenSchluessel =
@@ -41,23 +46,23 @@ export const VORLAGEN: Vorlage[] = [
     name: "Klassisch, ausführlich",
     hinweis: "Alle Angaben und Texte, mehrseitig. Die Vorlage für den Regelfall.",
     bilder: 7,
-    format: "A4",
+    format: "A4 quer",
     bauen: (d) => <ExposeKlassisch {...d} />,
   },
   {
     schluessel: "modern",
     name: "Modern, minimalistisch",
-    hinweis: "Viel Weißraum, ruhige Typografie, ein großes Bild.",
+    hinweis: "Breite Bildbahn, ruhige Typografie, wenige Kennzahlen.",
     bilder: 4,
-    format: "A4",
+    format: "A4 quer",
     bauen: (d) => <ExposeModern {...d} />,
   },
   {
     schluessel: "premium",
     name: "Bildstark, Premium",
-    hinweis: "Randlose Titelseite und große Bildtafeln, dreiseitig.",
+    hinweis: "Randlose Titelseite im Kinoformat, große Bildtafeln, dreiseitig.",
     bilder: 6,
-    format: "A4",
+    format: "A4 quer",
     bauen: (d) => <ExposePremium {...d} />,
   },
   {
@@ -65,15 +70,15 @@ export const VORLAGEN: Vorlage[] = [
     name: "Kurzexposé",
     hinweis: "Genau eine Seite. Für Erstkontakt und Besichtigung.",
     bilder: 1,
-    format: "A4",
+    format: "A4 quer",
     bauen: (d) => <ExposeFactsheet {...d} />,
   },
   {
     schluessel: "aushang_a4",
     name: "Schaufensteraushang A4",
-    hinweis: "Große Schrift, wenige Angaben — aus einem Meter Entfernung lesbar.",
+    hinweis: "Große Schrift, wenige Angaben — aus einem Meter Entfernung lesbar. Hochformat.",
     bilder: 1,
-    format: "A4",
+    format: "A4 hoch",
     bauen: (d) => <ExposeAushang {...d} format="a4" />,
   },
   {
@@ -81,7 +86,7 @@ export const VORLAGEN: Vorlage[] = [
     name: "Schaufensteraushang A3",
     hinweis: "Dasselbe im doppelten Format, für Fenster und Bauzaun.",
     bilder: 1,
-    format: "A3",
+    format: "A3 hoch",
     bauen: (d) => <ExposeAushang {...d} format="a3" />,
   },
 ];

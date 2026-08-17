@@ -117,7 +117,9 @@ describe("Exposé-Vorlagen", () => {
    * Seiten statt drei, und keine Pruefung hat es bemerkt.
    */
   const SEITEN: Record<string, number> = {
-    klassisch: 3,
+    // Klassisch: Objektseite, Textseite und je eine Bildseite fuer drei
+    // weitere Aufnahmen. Bei sieben Bildern also zwei Bildseiten.
+    klassisch: 4,
     modern: 2,
     premium: 3,
     factsheet: 1,

@@ -60,7 +60,16 @@ MUSTER_ZIEL=/tmp/muster npx vitest run src/lib/expose/muster.test.tsx
 pdftoppm -png -r 72 /tmp/muster/klassisch.pdf /tmp/muster/klassisch
 ```
 
-Der Seitenzahltest hält seither fest, was jede Vorlage produzieren soll.
+Der Seitenzahltest hält seither fest, was jede Vorlage produzieren soll. Er hat
+sich beim Wechsel auf Querformat sofort bezahlt gemacht: Drei Vorlagen liefen
+dabei um wenige Punkte über und erzeugten je eine fast leere Folgeseite.
+
+**Eigene Höhenrechnung statt Layout-Engine.** Die Premium-Titelseite besteht aus
+einem Bildbereich und einem Titelband. Mit `flexGrow` für das Bild füllte dieses
+die Seite und schob das Band auf die nächste. Eine Rechnung aus der Zeilenzahl
+des Titels lag mal vier Punkt zu niedrig, mal vierzehn zu hoch — beides genügt
+für eine überzählige Seite. Jetzt sind beide Höhen feste Zahlen, die zusammen
+genau eine Seite ergeben, und der Titel ist auf zwei Zeilen begrenzt.
 
 ## 2. Nachweis der Mandantentrennung
 
