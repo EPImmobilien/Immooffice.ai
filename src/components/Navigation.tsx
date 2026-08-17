@@ -25,7 +25,7 @@ const EINTRAEGE: Eintrag[] = [
   { modul: null, pfad: "/dashboard", bezeichnung: "Übersicht" },
   { modul: "objekte", pfad: "/objekte", bezeichnung: "Objekte" },
   { modul: "kontakte", pfad: "/kontakte", bezeichnung: "Kontakte" },
-  { modul: "kontakte", pfad: "/suchprofile", bezeichnung: "Suchprofile", geplant: true },
+  { modul: "kontakte", pfad: "/suchprofile", bezeichnung: "Suchprofile" },
   { modul: "exposes", pfad: "/exposes", bezeichnung: "Exposés" },
   { modul: "objekte", pfad: "/portale", bezeichnung: "Portalexport" },
   { modul: "wertermittlung", pfad: "/wertermittlung", bezeichnung: "Wertermittlung", geplant: true },

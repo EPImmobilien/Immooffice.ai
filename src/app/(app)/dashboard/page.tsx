@@ -29,7 +29,7 @@ export default async function UebersichtSeite() {
   const sitzung = await sitzungErzwingen();
   const supabase = await serverClient();
 
-  const [objekteAntwort, kontakteAntwort, letzteAntwort, guthaben] =
+  const [objekteAntwort, kontakteAntwort, letzteAntwort, guthaben, trefferAntwort] =
     await Promise.all([
       supabase
         .from("objekte")
@@ -46,6 +46,10 @@ export default async function UebersichtSeite() {
         .order("geaendert_am", { ascending: false })
         .limit(5),
       supabase.rpc("credits_verfuegbar"),
+      supabase
+        .from("treffer")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "neu"),
     ]);
 
   const objekte = objekteAntwort.data ?? [];
@@ -57,6 +61,7 @@ export default async function UebersichtSeite() {
   ).length;
   const ohneTexte = 0; // wird mit der Exposé-Auswertung gefüllt
   const kontakteAnzahl = kontakteAntwort.count ?? 0;
+  const offeneTreffer = trefferAntwort.count ?? 0;
   const credits = typeof guthaben.data === "number" ? guthaben.data : 0;
 
   const darf = (modul: Modul) => hatRecht(sitzung.rolle, modul, "lesen");
@@ -81,9 +86,11 @@ export default async function UebersichtSeite() {
     },
     darf("kontakte") && {
       titel: "Suchprofile",
-      hinweis: "Automatisches und manuelles Matching",
+      hinweis: "Gesuche der Interessenten gegen den Bestand",
       symbol: "suchprofile" as const,
-      geplant: true,
+      pfad: "/suchprofile",
+      zahl: offeneTreffer,
+      zahlHinweis: offeneTreffer === 1 ? "offener Treffer" : "offene Treffer",
     },
     darf("kalender") && {
       titel: "Termine",
