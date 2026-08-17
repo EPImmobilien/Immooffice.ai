@@ -6,6 +6,7 @@ import { VORLAGEN, vorlageFinden } from "./vorlagen";
 
 const branding: ExposeBranding = {
   firmenname: "Nordlicht Immobilien",
+  logo: null,
   farbePrimaer: "#1B2A47",
   farbeAkzent: "#B5934F",
   strasse: "Hafenstraße 4",
@@ -135,6 +136,50 @@ describe("Exposé-Vorlagen", () => {
       expect(seiten(puffer)).toBe(SEITEN[vorlage.schluessel]);
     }, 40_000);
   }
+
+  it("bettet ein hinterlegtes Logo wirklich ein", async () => {
+    // Diese Prüfung ist der Grund, warum sie existiert: Die PDF-Erzeugung
+    // verwirft ein unlesbares Bild WORTLOS. Ein Logo, das nicht ankommt, würde
+    // sonst als leerer Kopfbereich durchgehen — und niemand erfährt, warum das
+    // Firmenlogo im Exposé fehlt.
+    const mitLogo = {
+      ...branding,
+      logo: { daten: PNGS[0]!, format: "png" as const },
+    };
+
+    const ohne = await renderToBuffer(
+      vorlageFinden("klassisch")!.bauen({ objekt, branding, bilder: [bild(1)] }),
+    );
+    const mit = await renderToBuffer(
+      vorlageFinden("klassisch")!.bauen({
+        objekt,
+        branding: mitLogo,
+        bilder: [bild(1)],
+      }),
+    );
+
+    // Das Logo steht in der Kopfzeile jeder Seite, wird aber nur einmal
+    // eingebettet — die Seiten verweisen auf dasselbe Objekt.
+    expect(eingebetteteBilder(mit)).toBe(eingebetteteBilder(ohne) + 1);
+  }, 60_000);
+
+  it("kommt mit einem Logo aus, das kein Bild ist", async () => {
+    // Aus dem Storage kann alles kommen. Ein kaputtes Logo darf das Exposé
+    // nicht verhindern: Ohne Kopfbild ist es brauchbar, ohne Exposé nicht.
+    const kaputt = {
+      ...branding,
+      logo: { daten: Buffer.from("kein Bild"), format: "png" as const },
+    };
+
+    const puffer = await renderToBuffer(
+      vorlageFinden("klassisch")!.bauen({
+        objekt,
+        branding: kaputt,
+        bilder: [bild(1)],
+      }),
+    );
+    expect(istPdf(puffer)).toBe(true);
+  }, 40_000);
 
   it("Kurzexposé bleibt auch mit langen Texten einseitig", async () => {
     const lang = "Ein ausgesprochen ausführlicher Beschreibungstext. ".repeat(60);

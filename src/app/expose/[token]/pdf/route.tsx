@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { BILD_BUCKET } from "@/lib/bilder";
+import { logoLaden } from "@/lib/expose/logo-laden";
 import type { ExposeBild, ExposeBranding, ExposeObjekt } from "@/lib/expose/typen";
 import { vorlageFinden } from "@/lib/expose/vorlagen";
 import { serverClient } from "@/lib/supabase/server";
@@ -62,6 +63,9 @@ export async function GET(
   const marke = antwort.anbieter ?? {};
   const branding: ExposeBranding = {
     firmenname: marke["firmenname"] || "Immobilienangebot",
+    // Auch im oeffentlichen PDF. Der Bucket ist oeffentlich lesbar, das Laden
+    // gelingt hier also ohne Anmeldung.
+    logo: await logoLaden(supabase, marke["logo_pfad"]),
     farbePrimaer: marke["farbe_primaer"] || "#1B2A47",
     farbeAkzent: marke["farbe_akzent"] || "#B5934F",
     strasse: marke["strasse"] ?? null,

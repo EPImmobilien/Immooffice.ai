@@ -9,6 +9,8 @@ import {
   dateigroesse,
   type Dokumentart,
 } from "@/lib/dokumente";
+import { markeUrl } from "@/lib/marke";
+import { supabaseUmgebung } from "@/lib/supabase/umgebung";
 import { euro, flaeche, zahl } from "@/lib/format";
 import {
   ENERGIEAUSWEISTYPEN,
@@ -191,6 +193,14 @@ export default async function WebExposeSeite({
   }
 
   const firmenname = textOder(anbieter["firmenname"], "Der Anbieter");
+  // Der Marke-Bucket ist oeffentlich lesbar — ein Logo erscheint ohnehin auf
+  // jeder veroeffentlichten Seite. Deshalb genuegt hier die feste Adresse, und
+  // es braucht keinen kurzlebigen signierten Verweis wie bei Bildern.
+  const logoPfadAnbieter = textOder(anbieter["logo_pfad"]);
+  const logoAdresse =
+    logoPfadAnbieter !== ""
+      ? markeUrl(supabaseUmgebung().url, logoPfadAnbieter)
+      : null;
   const primaer = textOder(anbieter["farbe_primaer"], "#1B2A47");
   const akzent = textOder(anbieter["farbe_akzent"], "#B5934F");
 
@@ -463,7 +473,16 @@ export default async function WebExposeSeite({
 
       <footer className="border-t border-linie bg-flaeche px-5 py-8 text-[12px] text-gedaempft sm:px-8">
         <div className="mx-auto max-w-3xl space-y-2">
-          <p className="font-medium text-text">{firmenname}</p>
+          {logoAdresse ? (
+            /* eslint-disable-next-line @next/next/no-img-element -- fremde Datei in wechselnden Formaten, auch SVG; der Bildoptimierer bringt hier nichts */
+            <img
+              src={logoAdresse}
+              alt={firmenname}
+              className="mb-1 max-h-9 max-w-[180px]"
+            />
+          ) : (
+            <p className="font-medium text-text">{firmenname}</p>
+          )}
           <p>
             {[
               textOder(anbieter["strasse"]),

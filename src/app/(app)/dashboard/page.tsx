@@ -202,9 +202,9 @@ export default async function UebersichtSeite() {
   const verwaltung: KachelDaten[] = [
     darf("einstellungen") && {
       titel: "Einstellungen",
-      hinweis: "Unternehmen, Benutzer, Branding",
+      hinweis: "Unternehmen, Erscheinungsbild, Rechtstexte, Zugänge",
       symbol: "einstellungen" as const,
-      geplant: true,
+      pfad: "/einstellungen",
     },
     darf("abrechnung") && {
       titel: "Abo und Credits",

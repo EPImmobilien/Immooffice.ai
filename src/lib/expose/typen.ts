@@ -9,6 +9,14 @@
 
 export interface ExposeBranding {
   firmenname: string;
+  /**
+   * Logo als Rohdaten, nicht als Adresse.
+   *
+   * Die PDF-Erzeugung laedt keine Verweise nach; sie braucht die Bytes. Fehlt
+   * das Logo, tritt die Wortmarke aus dem Firmennamen an seine Stelle — ein
+   * Exposé ohne Kopf waere schlechter als eines mit gesetztem Namen.
+   */
+  logo: { daten: Buffer; format: "png" | "jpg" } | null;
   farbePrimaer: string;
   farbeAkzent: string;
   strasse: string | null;

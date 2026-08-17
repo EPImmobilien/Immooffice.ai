@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { rechtErzwingen } from "@/lib/auth/rechte";
 import { sitzungLaden } from "@/lib/auth/sitzung";
 import { exposeBilderLaden } from "@/lib/expose/bilder-laden";
+import { logoLaden } from "@/lib/expose/logo-laden";
 import type { ExposeBranding, ExposeObjekt } from "@/lib/expose/typen";
 import { STANDARDVORLAGE, vorlageFinden } from "@/lib/expose/vorlagen";
 import { serverClient } from "@/lib/supabase/server";
@@ -65,6 +66,7 @@ export async function GET(
 
   const marke: ExposeBranding = {
     firmenname: branding?.firmenname || sitzung.mandantName,
+    logo: await logoLaden(supabase, branding?.logo_pfad),
     // Vorbelegung mit der Plattformfarbwelt, solange der Mandant nichts
     // hinterlegt hat (Abschnitt 5).
     farbePrimaer: branding?.farbe_primaer || "#1B2A47",

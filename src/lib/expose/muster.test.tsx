@@ -4,7 +4,8 @@ import { it } from "vitest";
 import type { ExposeBild, ExposeBranding, ExposeObjekt } from "./typen";
 import { VORLAGEN } from "./vorlagen";
 const branding: ExposeBranding = {
-  firmenname: "Nordlicht Immobilien", farbePrimaer: "#1B2A47", farbeAkzent: "#B5934F",
+  firmenname: "Nordlicht Immobilien",
+  logo: null, farbePrimaer: "#1B2A47", farbeAkzent: "#B5934F",
   strasse: "Hafenstraße 4", plz: "24103", ort: "Kiel",
   telefon: "0431 1234567", email: "info@nordlicht.example",
   web: "www.nordlicht.example", impressum: null,

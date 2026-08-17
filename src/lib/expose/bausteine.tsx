@@ -20,6 +20,9 @@ import { KI_BILDVERMERK, KI_TEXTVERMERK, type Eckdatum } from "./gemeinsam";
 const stile = StyleSheet.create({
   kopf: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end" },
   firma: { fontFamily: SCHRIFT.titel, fontSize: GROESSE.klein, fontWeight: 600 },
+  // Hoehe fest, Breite begrenzt: Ein hochkantes Logo wuerde den Kopfbereich
+  // sonst in die Hoehe treiben und die Seitenaufteilung verschieben.
+  logo: { height: 22, maxWidth: 150, objectFit: "contain" as const },
   anschrift: { fontFamily: SCHRIFT.text, fontSize: GROESSE.winzig, color: FARBE.gedaempft, marginTop: 2 },
   kennung: { fontFamily: SCHRIFT.text, fontSize: GROESSE.winzig, color: FARBE.gedaempft },
 
@@ -103,7 +106,18 @@ export function Kopfzeile({
     <View>
       <View style={stile.kopf}>
         <View>
-          <Text style={[stile.firma, { color: primaer }]}>{branding.firmenname}</Text>
+          {/* Logo, wenn hinterlegt — sonst die Wortmarke aus dem Firmennamen.
+              Feste Hoehe und `objectFit: "contain"`: Ein Logo kommt in jedem
+              Seitenverhaeltnis, und ohne diese Vorgabe verzerrt es oder sprengt
+              den Kopfbereich. */}
+          {branding.logo ? (
+            <Image
+              style={stile.logo}
+              src={{ data: branding.logo.daten, format: branding.logo.format }}
+            />
+          ) : (
+            <Text style={[stile.firma, { color: primaer }]}>{branding.firmenname}</Text>
+          )}
           {anschrift !== "" && <Text style={stile.anschrift}>{anschrift}</Text>}
         </View>
         <Text style={stile.kennung}>Objekt {objektnummer}</Text>
