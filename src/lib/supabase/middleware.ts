@@ -4,8 +4,30 @@ import type { NextRequest } from "next/server";
 
 import { supabaseUmgebung } from "./umgebung";
 
-/** Routen, die ohne Anmeldung erreichbar sind. */
-const OEFFENTLICH = ["/", "/anmelden", "/registrieren", "/styleguide", "/expose"];
+/**
+ * Routen, die ohne Anmeldung erreichbar sind.
+ *
+ * `/passwort-vergessen` muss hier stehen — wer sein Passwort vergessen hat, ist
+ * gerade NICHT angemeldet. Ohne den Eintrag landet er auf der Anmeldeseite und
+ * damit in einer Schleife.
+ *
+ * `/auth` ist der Ruecklaeufer aller Mail-Links: Bestaetigung, Einladung,
+ * Passwort neu. Er wird ebenfalls ohne Sitzung aufgerufen — die Sitzung entsteht
+ * ja erst dort.
+ *
+ * `/passwort-neu` steht bewusst NICHT hier. Diese Seite ist nur mit der Sitzung
+ * erreichbar, die der Wiederherstellungslink erzeugt hat — das ist der Nachweis,
+ * dass der Aufrufer Zugriff auf das Postfach hat.
+ */
+const OEFFENTLICH = [
+  "/",
+  "/anmelden",
+  "/registrieren",
+  "/passwort-vergessen",
+  "/auth",
+  "/styleguide",
+  "/expose",
+];
 
 function istOeffentlich(pfad: string): boolean {
   return OEFFENTLICH.some(

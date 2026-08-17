@@ -1,9 +1,12 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { sicheresZiel } from "@/lib/auth/ziel";
 import { serverClient } from "@/lib/supabase/server";
+import { basisUrlErmitteln } from "@/lib/web-expose";
 
 /** Rueckgabe aller Formularaktionen: Fehler werden angezeigt, nicht geworfen. */
 export interface AktionsErgebnis {
@@ -79,11 +82,10 @@ export async function anmelden(
 
   if (error) return { fehler: meldung(error.message) };
 
-  const weiter = String(formular.get("weiter") ?? "").trim();
   // Nur eigene Pfade zulassen — sonst waere die Weiterleitung ein offener
-  // Umleitungspunkt auf fremde Seiten.
-  const ziel = weiter.startsWith("/") && !weiter.startsWith("//") ? weiter : "/dashboard";
-  redirect(ziel);
+  // Umleitungspunkt auf fremde Seiten. Die Pruefung ist geteilt mit dem
+  // Ruecklaeufer der Mail-Links und in `sicheresZiel` geprueft.
+  redirect(sicheresZiel(String(formular.get("weiter") ?? "")));
 }
 
 export async function registrieren(
@@ -130,6 +132,88 @@ export async function registrieren(
   }
 
   redirect("/registrieren/unternehmen");
+}
+
+/**
+ * Fordert einen Link zum Neusetzen des Passworts an.
+ *
+ * Die Antwort ist IMMER dieselbe, ob die Adresse zu einem Konto gehoert oder
+ * nicht. Ein „diese Adresse kennen wir nicht" waere eine Auskunft darueber, wer
+ * hier Kunde ist — dieselbe Ueberlegung wie bei der Registrierung.
+ *
+ * Auch ein Fehler von Supabase wird deshalb nicht durchgereicht: Ein
+ * Mengenlimit sagt dem Angreifer, dass er die richtige Adresse getroffen hat.
+ */
+export async function passwortVergessen(
+  _vorher: AktionsErgebnis,
+  formular: FormData,
+): Promise<AktionsErgebnis> {
+  const geprueft = z
+    .string()
+    .trim()
+    .toLowerCase()
+    .pipe(z.email())
+    .safeParse(formular.get("email"));
+
+  if (!geprueft.success) {
+    return { fehler: "Bitte eine gültige E-Mail-Adresse angeben." };
+  }
+
+  const basis = basisUrlErmitteln(await headers());
+  const supabase = await serverClient();
+
+  await supabase.auth.resetPasswordForEmail(geprueft.data, {
+    redirectTo: `${basis}/auth/bestaetigen?next=/passwort-neu`,
+  });
+
+  return {
+    hinweis:
+      "Gehört diese Adresse zu einem Konto, haben wir eine E-Mail mit einem Link " +
+      "zum Neusetzen des Passworts geschickt — bitte sehen Sie auch im " +
+      "Spam-Ordner nach. Der Link gilt eine Stunde.",
+  };
+}
+
+/**
+ * Setzt das Passwort neu.
+ *
+ * Setzt voraus, dass der Wiederherstellungslink zuvor eine Sitzung erzeugt hat;
+ * das geschieht in `/auth/bestaetigen`. Ohne Sitzung wird hier abgebrochen —
+ * sonst liesse sich der Aufruf ohne jeden Nachweis verwenden.
+ */
+export async function passwortNeuSetzen(
+  _vorher: AktionsErgebnis,
+  formular: FormData,
+): Promise<AktionsErgebnis> {
+  const geprueft = registrierSchema.shape.passwort.safeParse(
+    formular.get("passwort"),
+  );
+
+  if (!geprueft.success) {
+    return { fehler: geprueft.error.issues[0]?.message ?? "Passwort zu kurz." };
+  }
+
+  if (formular.get("passwort") !== formular.get("passwort_wiederholung")) {
+    return { fehler: "Die beiden Eingaben stimmen nicht überein." };
+  }
+
+  const supabase = await serverClient();
+
+  const { data: sitzung } = await supabase.auth.getUser();
+  if (!sitzung.user) {
+    return {
+      fehler:
+        "Der Link ist abgelaufen oder wurde bereits verwendet. Bitte fordern Sie einen neuen an.",
+    };
+  }
+
+  const { error } = await supabase.auth.updateUser({
+    password: geprueft.data,
+  });
+
+  if (error) return { fehler: meldung(error.message) };
+
+  redirect("/dashboard");
 }
 
 export async function unternehmenAnlegen(

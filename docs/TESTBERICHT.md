@@ -294,6 +294,39 @@ Die Liste wird in `web_expose_oeffnen` Feld für Feld aufgebaut und nicht mit
 `to_jsonb` erzeugt (3). Sonst wanderte jede später ergänzte Spalte automatisch
 nach draußen — der interne Vermerk zum Beispiel.
 
+## 4e. Passwort-Wiederherstellung — geprüft und offen
+
+Neu geprüft (`src/lib/auth/ziel.test.ts`, 7 Prüfungen): Die Weiterleitung nach
+Anmeldung und nach einem Mail-Link nimmt nur eigene Pfade an. Abgewiesen werden
+vollständige Adressen, **schemalose** Adressen (`//fremde.example` — kein
+relativer Pfad, sondern ein fremder Host) und der Rückstrich (`/\fremde.example`
+— Browser lesen ihn in der Hostposition wie einen Schrägstrich). Ohne diese
+Prüfung wäre jeder der beiden Wege eine offene Weiterleitung: ein Link, der auf
+der vertrauten Adresse beginnt und auf einer fremden endet.
+
+Die Prüfung lag vorher zweimal im Code, in zwei unterschiedlich strengen
+Fassungen. Jetzt einmal, mit Test.
+
+Beim Bauen gefunden und behoben: `/passwort-vergessen` und der Rückläufer
+`/auth/bestaetigen` waren nicht als öffentlich eingetragen. Wer sein Passwort
+vergisst, ist gerade **nicht** angemeldet — die Seite hätte auf die Anmeldung
+zurückgeworfen und damit eine Schleife gebildet. `/passwort-neu` bleibt
+absichtlich geschützt: Dorthin gelangt man nur mit der Sitzung, die der
+Wiederherstellungslink erzeugt, und genau das ist der Nachweis über das Postfach.
+
+**Zwei Handgriffe in der Supabase-Konsole, ohne die der Link nicht ankommt:**
+
+1. Unter *Authentication → URL Configuration* die Adresse
+   `https://<ihre-domain>/auth/bestaetigen` als **Redirect URL** eintragen.
+   Supabase leitet nur auf freigegebene Adressen weiter.
+2. `NEXT_PUBLIC_APP_URL` auf die Produktionsadresse setzen. Ohne diese Angabe
+   wird die Basisadresse aus den Anfragekopfzeilen erschlossen — das trägt, ist
+   aber bei einem vorgeschalteten Dienst nicht verlässlich.
+
+Nicht geprüft, weil in dieser Arbeitsumgebung nicht prüfbar: der Mailversand
+selbst und der vollständige Durchlauf im Browser. Der eingebaute Versand von
+Supabase ist mengenbegrenzt und für den Dauerbetrieb nicht geeignet.
+
 ## 5. Offene Punkte aus der Sicherheitsprüfung
 
 Die Prüfung des Datenbankanbieters meldet einen verbleibenden Punkt:

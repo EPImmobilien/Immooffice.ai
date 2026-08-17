@@ -7,9 +7,9 @@ export const metadata: Metadata = { title: "Anmelden" };
 export default async function AnmeldenSeite({
   searchParams,
 }: {
-  searchParams: Promise<{ weiter?: string }>;
+  searchParams: Promise<{ weiter?: string; fehler?: string }>;
 }) {
-  const { weiter } = await searchParams;
+  const { weiter, fehler } = await searchParams;
 
   return (
     <>
@@ -17,7 +17,7 @@ export default async function AnmeldenSeite({
       <p className="mt-1.5 mb-7 text-sm text-gedaempft">
         Willkommen zurück bei ImmoOffice.ai.
       </p>
-      <AnmeldeFormular weiter={weiter ?? ""} />
+      <AnmeldeFormular weiter={weiter ?? ""} linkFehler={fehler === "link"} />
     </>
   );
 }
