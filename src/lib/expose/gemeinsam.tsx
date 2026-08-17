@@ -154,9 +154,10 @@ export function anschriftzeile(branding: ExposeBranding): string {
 
 const stile = StyleSheet.create({
   vermerk: {
-    fontSize: 7,
+    fontFamily: "Inter",
+    fontSize: 7.5,
+    lineHeight: 1.5,
     color: "#7A828C",
-    fontFamily: "Helvetica-Oblique",
     marginTop: 4,
   },
 });

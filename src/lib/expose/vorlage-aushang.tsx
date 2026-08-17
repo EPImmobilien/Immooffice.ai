@@ -1,19 +1,22 @@
-import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 
+import { Bildkachel } from "./bausteine";
 import {
   eckdaten,
   HAFTUNG,
   KiVermerk,
   kategorieName,
-  kuerzen,
   kontaktzeile,
+  kuerzen,
   ortszeile,
   preisAngabe,
 } from "./gemeinsam";
+import { schriftenBereitstellen } from "./schriften";
+import { FARBE, SCHRIFT, gesperrt } from "./stil";
 import type { ExposeDaten } from "./typen";
 
 /**
- * Vorlage 5: „Schaufensteraushang“ (Abschnitt 8), A4 oder A3.
+ * Vorlage 5: „Schaufensteraushang" (Abschnitt 8), A4 oder A3.
  *
  * Wird aus einem Meter Entfernung gelesen, nicht in der Hand. Alles ist
  * deshalb eine Stufe groesser, und es steht nur das darauf, was aus der
@@ -21,96 +24,80 @@ import type { ExposeDaten } from "./typen";
  * Beschreibungstexte fehlen bewusst — sie waeren aus dieser Entfernung nicht
  * lesbar und wuerden nur die Flaeche fuellen.
  *
+ * Der Preis sitzt in einem vollflaechigen Band in der Hausfarbe. Auf einem
+ * Aushang ist er die Angabe, die von weitem ankommen muss; ein zarter Kasten
+ * wie im Exposé traegt ueber diese Entfernung nicht.
+ *
  * Die Groessen skalieren mit dem Format, damit A3 kein aufgeblasenes A4 ist.
  */
 
 export type Aushangformat = "a4" | "a3";
 
-function stileFuer(faktor: number) {
+function stileFuer(f: number) {
   return StyleSheet.create({
     seite: {
-      paddingTop: 34 * faktor,
-      paddingBottom: 30 * faktor,
-      paddingHorizontal: 34 * faktor,
-      color: "#1B2A47",
-      fontFamily: "Helvetica",
+      paddingTop: 40 * f,
+      paddingBottom: 34 * f,
+      paddingHorizontal: 40 * f,
+      fontFamily: SCHRIFT.text,
     },
+    kopf: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" },
     marke: {
-      fontSize: 10 * faktor,
-      letterSpacing: 2 * faktor,
-      textTransform: "uppercase",
-      marginBottom: 10 * faktor,
+      fontFamily: SCHRIFT.titel,
+      fontSize: 11 * f,
+      fontWeight: 600,
     },
     kopfzeile: {
-      fontSize: 13 * faktor,
-      fontFamily: "Helvetica-Bold",
-      letterSpacing: 1.2 * faktor,
+      fontFamily: SCHRIFT.text,
+      fontSize: 9 * f,
+      fontWeight: 600,
       textTransform: "uppercase",
-      marginBottom: 14 * faktor,
     },
-    bild: {
-      width: "100%",
-      height: 300 * faktor,
-      objectFit: "cover",
-      marginBottom: 20 * faktor,
-    },
+    strich: { height: 2.5 * f, marginTop: 10 * f, marginBottom: 22 * f },
+    bild: { marginBottom: 24 * f },
+    platzhalter: { height: 300 * f, borderRadius: 2 },
     titel: {
-      fontSize: 26 * faktor,
-      fontFamily: "Helvetica-Bold",
-      lineHeight: 1.16,
+      fontFamily: SCHRIFT.titel,
+      fontSize: 27 * f,
+      fontWeight: 600,
+      lineHeight: 1.14,
     },
-    ort: { fontSize: 13 * faktor, color: "#7A828C", marginTop: 6 * faktor },
+    ort: { fontFamily: SCHRIFT.text, fontSize: 12 * f, color: FARBE.gedaempft, marginTop: 7 * f },
     kennzahlen: {
       flexDirection: "row",
-      marginTop: 22 * faktor,
+      marginTop: 24 * f,
       borderTopWidth: 1,
-      borderBottomWidth: 1,
-      borderColor: "#E6E8EB",
-      paddingVertical: 14 * faktor,
+      borderTopColor: FARBE.linie,
+      paddingTop: 16 * f,
     },
     kennzahl: { flexGrow: 1, flexBasis: 0 },
-    kennLabel: {
-      fontSize: 9 * faktor,
-      letterSpacing: 0.8 * faktor,
-      textTransform: "uppercase",
-      color: "#7A828C",
-    },
-    kennWert: {
-      fontSize: 18 * faktor,
-      fontFamily: "Helvetica-Bold",
-      marginTop: 4 * faktor,
-    },
+    kennLabel: { fontFamily: SCHRIFT.text, fontSize: 8.5 * f, color: FARBE.gedaempft },
+    kennWert: { fontFamily: SCHRIFT.titel, fontSize: 17 * f, fontWeight: 600, marginTop: 4 * f },
     preisband: {
-      marginTop: 24 * faktor,
-      paddingVertical: 16 * faktor,
-      paddingHorizontal: 20 * faktor,
-      borderLeftWidth: 6 * faktor,
+      marginTop: 26 * f,
+      paddingVertical: 18 * f,
+      paddingHorizontal: 22 * f,
     },
     preisLabel: {
-      fontSize: 10 * faktor,
-      letterSpacing: 1 * faktor,
+      fontFamily: SCHRIFT.text,
+      fontSize: 9 * f,
+      fontWeight: 600,
       textTransform: "uppercase",
-      color: "#7A828C",
     },
     preisWert: {
-      fontSize: 32 * faktor,
-      fontFamily: "Helvetica-Bold",
-      marginTop: 4 * faktor,
+      fontFamily: SCHRIFT.titel,
+      fontSize: 31 * f,
+      fontWeight: 600,
+      color: FARBE.weiss,
+      marginTop: 4 * f,
     },
-    fuss: {
-      position: "absolute",
-      bottom: 30 * faktor,
-      left: 34 * faktor,
-      right: 34 * faktor,
-    },
-    kontakt: {
-      fontSize: 12 * faktor,
-      fontFamily: "Helvetica-Bold",
-    },
+    fuss: { position: "absolute", bottom: 32 * f, left: 40 * f, right: 40 * f },
+    kontakt: { fontFamily: SCHRIFT.titel, fontSize: 11 * f, fontWeight: 600 },
     klein: {
-      fontSize: 7 * faktor,
-      color: "#7A828C",
-      marginTop: 5 * faktor,
+      fontFamily: SCHRIFT.text,
+      fontSize: 6.5 * f,
+      color: FARBE.gedaempft,
+      marginTop: 6 * f,
       lineHeight: 1.4,
     },
   });
@@ -122,15 +109,19 @@ export function ExposeAushang({
   bilder,
   format = "a4",
 }: ExposeDaten & { format?: Aushangformat }) {
+  schriftenBereitstellen();
+
   // A3 ist flaechenmaessig doppelt so gross; die Wurzel haelt die
   // Schriftgroessen im richtigen Verhaeltnis zur Flaeche.
-  const faktor = format === "a3" ? Math.SQRT2 : 1;
-  const stile = stileFuer(faktor);
+  const f = format === "a3" ? Math.SQRT2 : 1;
+  const stile = stileFuer(f);
 
   const preis = preisAngabe(objekt);
   const titelbild = bilder[0];
   const kennzahlen = eckdaten(objekt).slice(0, 3);
   const bildBearbeitet = bilder.some((b) => b.kiBearbeitet);
+  const primaer = branding.farbePrimaer;
+  const akzent = branding.farbeAkzent;
 
   const kopfzeile = objekt.vermarktungsart === "miete" ? "Zu vermieten" : "Zu verkaufen";
 
@@ -141,22 +132,22 @@ export function ExposeAushang({
       creator="ImmoOffice.ai"
       producer="ImmoOffice.ai"
     >
-      <Page size={format === "a3" ? "A3" : "A4"} style={stile.seite}>
-        <Text style={[stile.marke, { color: branding.farbePrimaer }]}>
-          {branding.firmenname}
-        </Text>
-        <Text style={[stile.kopfzeile, { color: branding.farbeAkzent }]}>
-          {kopfzeile}
-        </Text>
+      <Page size={format === "a3" ? "A3" : "A4"} style={[stile.seite, { color: primaer }]}>
+        <View style={stile.kopf}>
+          <Text style={[stile.marke, { color: primaer }]}>{branding.firmenname}</Text>
+          <Text style={[stile.kopfzeile, { color: akzent, letterSpacing: gesperrt(9 * f) }]}>
+            {kopfzeile}
+          </Text>
+        </View>
+        <View style={[stile.strich, { backgroundColor: akzent }]} />
 
-        {titelbild ? (
-          <Image
-            style={stile.bild}
-            src={{ data: titelbild.daten, format: titelbild.format }}
-          />
-        ) : (
-          <View style={[stile.bild, { backgroundColor: branding.farbePrimaer }]} />
-        )}
+        <View style={stile.bild}>
+          {titelbild ? (
+            <Bildkachel bild={titelbild} hoehe={300 * f} akzent={akzent} />
+          ) : (
+            <View style={[stile.platzhalter, { backgroundColor: primaer }]} />
+          )}
+        </View>
 
         {/* Zwei Zeilen sind das Maximum: Ab der dritten schiebt der Titel das
             Preisband auf eine zweite Seite, und ein zweiseitiger Aushang ist
@@ -173,32 +164,25 @@ export function ExposeAushang({
             {kennzahlen.map((e) => (
               <View key={e.bezeichnung} style={stile.kennzahl}>
                 <Text style={stile.kennLabel}>{e.bezeichnung}</Text>
-                <Text style={stile.kennWert}>{e.wert}</Text>
+                <Text style={[stile.kennWert, { color: primaer }]}>{e.wert}</Text>
               </View>
             ))}
           </View>
         )}
 
-        <View
-          style={[
-            stile.preisband,
-            { borderLeftColor: branding.farbeAkzent, backgroundColor: "#FAFAFA" },
-          ]}
-        >
-          <Text style={stile.preisLabel}>{preis.label}</Text>
-          <Text style={[stile.preisWert, { color: branding.farbePrimaer }]}>
-            {preis.wert}
+        <View style={[stile.preisband, { backgroundColor: primaer }]}>
+          <Text style={[stile.preisLabel, { color: akzent, letterSpacing: gesperrt(9 * f) }]}>
+            {preis.label}
           </Text>
+          <Text style={stile.preisWert}>{preis.wert}</Text>
         </View>
 
         <View style={stile.fuss} fixed>
-          <Text style={[stile.kontakt, { color: branding.farbePrimaer }]}>
-            {kontaktzeile(branding)}
-          </Text>
+          <Text style={[stile.kontakt, { color: primaer }]}>{kontaktzeile(branding)}</Text>
           <KiVermerk
             texteKiErzeugt={objekt.texte_ki_erzeugt}
             bilderKiBearbeitet={bildBearbeitet}
-            style={{ fontSize: 7 * faktor }}
+            style={{ fontSize: 6.5 * f }}
           />
           <Text style={stile.klein}>
             Objekt {objekt.objektnummer} · {HAFTUNG}

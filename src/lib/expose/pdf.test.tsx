@@ -107,6 +107,33 @@ describe("Exposé-Vorlagen", () => {
     expect(vorlageFinden("gibt-es-nicht")).toBeUndefined();
   });
 
+  /**
+   * Erwartete Seitenzahl bei sieben Bildern und vollstaendigen Angaben.
+   *
+   * Dieser Test ist aus einem echten Fehler entstanden: Die Premium-Vorlage
+   * legte Bild und Titelband absolut uebereinander, die PDF-Erzeugung nahm
+   * beide trotzdem in den Seitenfluss auf — das Bild fuellte Seite eins
+   * allein, der Titel landete auf einer zweiten, sonst leeren Seite. Vier
+   * Seiten statt drei, und keine Pruefung hat es bemerkt.
+   */
+  const SEITEN: Record<string, number> = {
+    klassisch: 3,
+    modern: 2,
+    premium: 3,
+    factsheet: 1,
+    aushang_a4: 1,
+    aushang_a3: 1,
+  };
+
+  for (const vorlage of VORLAGEN) {
+    it(`${vorlage.name}: hat genau ${SEITEN[vorlage.schluessel]} Seiten`, async () => {
+      const puffer = await renderToBuffer(
+        vorlage.bauen({ objekt, branding, bilder: bilder.slice(0, vorlage.bilder) }),
+      );
+      expect(seiten(puffer)).toBe(SEITEN[vorlage.schluessel]);
+    }, 40_000);
+  }
+
   it("Kurzexposé bleibt auch mit langen Texten einseitig", async () => {
     const lang = "Ein ausgesprochen ausführlicher Beschreibungstext. ".repeat(60);
     const puffer = await renderToBuffer(

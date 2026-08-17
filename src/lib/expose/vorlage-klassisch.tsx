@@ -1,99 +1,76 @@
-import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 
+import {
+  Abschnitt,
+  Bildkachel,
+  Eckdatenraster,
+  Fliesstext,
+  Fusszeile,
+  Kopfzeile,
+  Preisblock,
+  Titelzeilen,
+} from "./bausteine";
 import {
   eckdaten,
   energiedaten,
   HAFTUNG,
   KiVermerk,
-  anschriftzeile,
   kategorieName,
-  kontaktzeile,
   ortszeile,
   preisAngabe,
 } from "./gemeinsam";
+import { schriftenBereitstellen } from "./schriften";
+import { ABSTAND, FARBE, GROESSE, SCHRIFT, gesperrt } from "./stil";
 import type { ExposeDaten } from "./typen";
 
 /**
- * Vorlage 1: „Klassisch, ausführlich“ (Abschnitt 8).
+ * Vorlage 1: „Klassisch, ausführlich" (Abschnitt 8).
  *
- * Die Vorlage fuer den Regelfall: alle Angaben, alle Texte, mehrseitig. Das
- * Layout entsteht aus festen Regeln, nicht aus einem Bildmodell
- * (Abschnitt 12). Das Mandanten-Branding kommt als Parameter herein und ist
- * nirgends fest verdrahtet.
+ * Die Vorlage fuer den Regelfall: alle Angaben, alle Texte, mehrseitig.
+ * Das Layout entsteht aus festen Regeln, nicht aus einem Bildmodell
+ * (Abschnitt 12). Das Mandanten-Branding kommt als Parameter herein.
  */
 
 const stile = StyleSheet.create({
   seite: {
-    paddingTop: 42,
-    paddingBottom: 58,
-    paddingHorizontal: 46,
-    fontSize: 10,
-    lineHeight: 1.5,
-    color: "#1B2A47",
-    fontFamily: "Helvetica",
+    paddingTop: ABSTAND.seite,
+    paddingBottom: 62,
+    paddingHorizontal: ABSTAND.seite,
+    fontFamily: SCHRIFT.text,
   },
-  kopf: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    borderBottomWidth: 2,
-    paddingBottom: 10,
-    marginBottom: 22,
-  },
-  firma: { fontSize: 13, fontFamily: "Helvetica-Bold" },
-  kopfZeile: { fontSize: 8, color: "#7A828C", marginTop: 2 },
-  objektnummer: { fontSize: 8, color: "#7A828C" },
-  titelbild: { width: "100%", height: 210, objectFit: "cover", marginBottom: 18 },
-  titel: { fontSize: 19, fontFamily: "Helvetica-Bold", marginBottom: 4 },
-  untertitel: { fontSize: 10, color: "#7A828C", marginBottom: 18 },
-  abschnitt: { marginBottom: 16 },
-  ueberschrift: {
-    fontSize: 11,
-    fontFamily: "Helvetica-Bold",
+  kategorie: {
+    fontFamily: SCHRIFT.text,
+    fontSize: GROESSE.winzig,
+    fontWeight: 600,
+    textTransform: "uppercase",
     marginBottom: 6,
-    paddingBottom: 3,
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#E6E8EB",
   },
-  absatz: { textAlign: "justify", marginBottom: 4 },
-  eckdaten: { flexDirection: "row", flexWrap: "wrap" },
-  eckdatum: { width: "50%", flexDirection: "row", marginBottom: 4, paddingRight: 8 },
-  eckLabel: { width: "55%", color: "#7A828C" },
-  eckWert: { width: "45%", fontFamily: "Helvetica-Bold" },
-  preisKasten: { padding: 12, marginBottom: 18, borderLeftWidth: 3 },
-  preisLabel: { fontSize: 8, color: "#7A828C", textTransform: "uppercase" },
-  preisWert: { fontSize: 17, fontFamily: "Helvetica-Bold", marginTop: 2 },
-  bildreihe: { flexDirection: "row", flexWrap: "wrap", marginHorizontal: -4 },
-  bildfeld: { width: "50%", paddingHorizontal: 4, marginBottom: 8 },
-  bild: { width: "100%", height: 130, objectFit: "cover" },
-  bildunterschrift: { fontSize: 7, color: "#7A828C", marginTop: 2 },
-  fuss: {
-    position: "absolute",
-    bottom: 26,
-    left: 46,
-    right: 46,
-    borderTopWidth: 0.5,
-    borderTopColor: "#E6E8EB",
-    paddingTop: 6,
-    fontSize: 7,
-    color: "#7A828C",
+  ort: {
+    fontFamily: SCHRIFT.text,
+    fontSize: GROESSE.text,
+    color: FARBE.gedaempft,
+    marginTop: 5,
   },
+  bildreihe: { flexDirection: "row", marginHorizontal: -5 },
+  bildfeld: { flexGrow: 1, flexBasis: 0, paddingHorizontal: 5 },
+  fuss: { position: "absolute", bottom: 28, left: ABSTAND.seite, right: ABSTAND.seite },
 });
 
-function Eckdatum({ label, wert }: { label: string; wert: string }) {
-  return (
-    <View style={stile.eckdatum}>
-      <Text style={stile.eckLabel}>{label}</Text>
-      <Text style={stile.eckWert}>{wert}</Text>
-    </View>
-  );
-}
-
 export function ExposeKlassisch({ objekt, branding, bilder }: ExposeDaten) {
+  schriftenBereitstellen();
+
   const preis = preisAngabe(objekt);
   const titelbild = bilder[0];
-  const weitere = bilder.slice(1, 7);
+  // Feste Seitenaufteilung statt freiem Fluss: Seite 1 Objekt, Seite 2 Texte
+  // und Ausstattung, Seite 3 nur weitere Ansichten — und die dritte Seite
+  // entsteht nur, wenn es sie zu fuellen gibt. Ohne diese Aufteilung schob
+  // eine Bildreihe, die nicht mehr auf die Seite passte, sich selbst auf eine
+  // sonst leere Folgeseite.
+  const weitere = bilder.slice(1);
+  const galerie = weitere.slice(3);
   const bildBearbeitet = bilder.some((b) => b.kiBearbeitet);
+  const primaer = branding.farbePrimaer;
+  const akzent = branding.farbeAkzent;
 
   return (
     <Document
@@ -102,113 +79,130 @@ export function ExposeKlassisch({ objekt, branding, bilder }: ExposeDaten) {
       creator="ImmoOffice.ai"
       producer="ImmoOffice.ai"
     >
-      <Page size="A4" style={stile.seite}>
-        <View style={[stile.kopf, { borderBottomColor: branding.farbePrimaer }]}>
-          <View>
-            <Text style={[stile.firma, { color: branding.farbePrimaer }]}>
-              {branding.firmenname}
-            </Text>
-            <Text style={stile.kopfZeile}>{anschriftzeile(branding)}</Text>
-          </View>
-          <Text style={stile.objektnummer}>Objekt {objekt.objektnummer}</Text>
+      <Page size="A4" style={[stile.seite, { color: primaer }]}>
+        <Kopfzeile
+          branding={branding}
+          objektnummer={objekt.objektnummer}
+          primaer={primaer}
+          akzent={akzent}
+        />
+
+        <View style={{ marginTop: ABSTAND.block }}>
+          <Text style={[stile.kategorie, { color: akzent, letterSpacing: gesperrt(GROESSE.winzig) }]}>
+            {kategorieName(objekt)}
+          </Text>
+          <Titelzeilen
+            text={objekt.titel ?? objekt.bezeichnung}
+            breite={503}
+            groesse={GROESSE.gross}
+            farbe={primaer}
+          />
+          <Text style={stile.ort}>{ortszeile(objekt)}</Text>
         </View>
 
         {titelbild && (
-          <Image
-            style={stile.titelbild}
-            src={{ data: titelbild.daten, format: titelbild.format }}
-          />
+          <View style={{ marginTop: 18 }}>
+            <Bildkachel bild={titelbild} hoehe={214} akzent={akzent} />
+          </View>
         )}
 
-        <Text style={stile.titel}>{objekt.titel ?? objekt.bezeichnung}</Text>
-        <Text style={stile.untertitel}>
-          {kategorieName(objekt)} · {ortszeile(objekt)}
-        </Text>
-
-        <View
-          style={[
-            stile.preisKasten,
-            { borderLeftColor: branding.farbeAkzent, backgroundColor: "#FAFAFA" },
-          ]}
-        >
-          <Text style={stile.preisLabel}>{preis.label}</Text>
-          <Text style={[stile.preisWert, { color: branding.farbePrimaer }]}>
-            {preis.wert}
-          </Text>
+        <View style={{ marginTop: 18, marginBottom: ABSTAND.block }}>
+          <Preisblock
+            label={preis.label}
+            wert={preis.wert}
+            primaer={primaer}
+            akzent={akzent}
+          />
         </View>
 
-        <View style={stile.abschnitt}>
-          <Text style={stile.ueberschrift}>Eckdaten</Text>
-          <View style={stile.eckdaten}>
-            {eckdaten(objekt).map((e) => (
-              <Eckdatum key={e.bezeichnung} label={e.bezeichnung} wert={e.wert} />
-            ))}
-          </View>
-        </View>
+        <Abschnitt titel="Eckdaten" akzent={akzent}>
+          <Eckdatenraster daten={eckdaten(objekt)} primaer={primaer} />
+        </Abschnitt>
 
         {objekt.beschreibung_objekt && (
-          <View style={stile.abschnitt}>
-            <Text style={stile.ueberschrift}>Objektbeschreibung</Text>
-            <Text style={stile.absatz}>{objekt.beschreibung_objekt}</Text>
-          </View>
+          <Abschnitt titel="Das Objekt" akzent={akzent}>
+            <Fliesstext text={objekt.beschreibung_objekt} farbe={primaer} />
+          </Abschnitt>
         )}
 
-        {objekt.beschreibung_ausstattung && (
-          <View style={stile.abschnitt}>
-            <Text style={stile.ueberschrift}>Ausstattung</Text>
-            <Text style={stile.absatz}>{objekt.beschreibung_ausstattung}</Text>
-          </View>
-        )}
+        <Fusszeile branding={branding} haftung={HAFTUNG} style={stile.fuss} />
+      </Page>
 
-        {objekt.beschreibung_lage && (
-          <View style={stile.abschnitt}>
-            <Text style={stile.ueberschrift}>Lage</Text>
-            <Text style={stile.absatz}>{objekt.beschreibung_lage}</Text>
-          </View>
-        )}
+      <Page size="A4" style={[stile.seite, { color: primaer }]}>
+        <Kopfzeile
+          branding={branding}
+          objektnummer={objekt.objektnummer}
+          primaer={primaer}
+          akzent={akzent}
+        />
 
-        {weitere.length > 0 && (
-          <View style={stile.abschnitt} break={weitere.length > 2}>
-            <Text style={stile.ueberschrift}>Weitere Ansichten</Text>
-            <View style={stile.bildreihe}>
-              {weitere.map((bild, i) => (
+        <View style={{ marginTop: ABSTAND.block }}>
+          {objekt.beschreibung_ausstattung && (
+            <Abschnitt titel="Ausstattung" akzent={akzent}>
+              <Fliesstext text={objekt.beschreibung_ausstattung} farbe={primaer} />
+            </Abschnitt>
+          )}
+
+          {objekt.beschreibung_lage && (
+            <Abschnitt titel="Lage" akzent={akzent}>
+              <Fliesstext text={objekt.beschreibung_lage} farbe={primaer} />
+            </Abschnitt>
+          )}
+
+          {weitere.slice(0, 3).length > 0 && (
+            <View style={[stile.bildreihe, { marginBottom: ABSTAND.block }]} wrap={false}>
+              {weitere.slice(0, 3).map((bild, i) => (
                 <View key={i} style={stile.bildfeld}>
-                  <Image
-                    style={stile.bild}
-                    src={{ data: bild.daten, format: bild.format }}
-                  />
-                  {(bild.titel || bild.kiBearbeitet) && (
-                    <Text style={stile.bildunterschrift}>
-                      {[bild.titel, bild.kiBearbeitet ? "digital bearbeitet" : null]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </Text>
-                  )}
+                  <Bildkachel bild={bild} hoehe={104} akzent={akzent} mitTitel />
                 </View>
               ))}
             </View>
-          </View>
-        )}
+          )}
 
-        <View style={stile.abschnitt}>
-          <Text style={stile.ueberschrift}>Energieausweis</Text>
-          <View style={stile.eckdaten}>
-            {energiedaten(objekt).map((e) => (
-              <Eckdatum key={e.bezeichnung} label={e.bezeichnung} wert={e.wert} />
-            ))}
-          </View>
+          <Abschnitt titel="Energieausweis" akzent={akzent}>
+            <Eckdatenraster daten={energiedaten(objekt)} primaer={primaer} />
+          </Abschnitt>
+
+          <KiVermerk
+            texteKiErzeugt={objekt.texte_ki_erzeugt}
+            bilderKiBearbeitet={bildBearbeitet}
+          />
         </View>
 
-        <KiVermerk
-          texteKiErzeugt={objekt.texte_ki_erzeugt}
-          bilderKiBearbeitet={bildBearbeitet}
-        />
-
-        <View style={stile.fuss} fixed>
-          <Text>{kontaktzeile(branding)}</Text>
-          <Text style={{ marginTop: 2 }}>{HAFTUNG}</Text>
-        </View>
+        <Fusszeile branding={branding} haftung={HAFTUNG} style={stile.fuss} />
       </Page>
+
+      {galerie.length > 0 && (
+        <Page size="A4" style={[stile.seite, { color: primaer }]}>
+          <Kopfzeile
+            branding={branding}
+            objektnummer={objekt.objektnummer}
+            primaer={primaer}
+            akzent={akzent}
+          />
+          <View style={{ marginTop: ABSTAND.block }}>
+            <Abschnitt titel="Weitere Ansichten" akzent={akzent}>
+              <View style={stile.bildreihe}>
+                {galerie.slice(0, 3).map((bild, i) => (
+                  <View key={i} style={stile.bildfeld}>
+                    <Bildkachel bild={bild} hoehe={132} akzent={akzent} mitTitel />
+                  </View>
+                ))}
+              </View>
+              {galerie.slice(3, 6).length > 0 && (
+                <View style={[stile.bildreihe, { marginTop: 12 }]}>
+                  {galerie.slice(3, 6).map((bild, i) => (
+                    <View key={i} style={stile.bildfeld}>
+                      <Bildkachel bild={bild} hoehe={132} akzent={akzent} mitTitel />
+                    </View>
+                  ))}
+                </View>
+              )}
+            </Abschnitt>
+          </View>
+          <Fusszeile branding={branding} haftung={HAFTUNG} style={stile.fuss} />
+        </Page>
+      )}
     </Document>
   );
 }

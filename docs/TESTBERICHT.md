@@ -10,7 +10,7 @@
 |---|---|---|
 | Typprüfung (strict) | `npm run typecheck` | bestanden |
 | Linting | `npm run lint` | bestanden |
-| Unit-Tests | `npm run test` | 92 Tests bestanden |
+| Unit-Tests | `npm run test` | 103 Tests bestanden |
 | Produktions-Build | `npm run build` | bestanden, 25 Routen |
 | Marken-Scan | `npm run marken-scan` | sauber, keine Treffer |
 
@@ -23,7 +23,7 @@ Alles zusammen: `npm run pruefen`.
 | Design-Tokens | Beide Dunkelmodus-Blöcke setzen dieselben Tokens; jeder Dunkel-Token hat eine Entsprechung im Hellmodus; die fixierten Markenfarben sind unverändert |
 | Lückenerkennung | Vollständige Objekte melden keine Lücken; fehlende Pflichtangaben werden gemeldet statt ergänzt; kategorieabhängige Regeln greifen nur, wo sie gelten |
 | Entwurfstexte | Ohne Modell keine KI-Kennzeichnung und keine Credits; nur erfasste Werte werden verwendet; bei fehlendem Baujahr taucht **kein** Jahr im Text auf |
-| Exposé-Vorlagen | Alle fünf Vorlagen erzeugen gültige PDF-Dateien, kommen ohne Bilder und ohne optionale Angaben aus, **betten die angekündigte Zahl Bilder tatsächlich ein**, und Kurzexposé wie Aushang bleiben auch mit überlangen Texten einseitig |
+| Exposé-Vorlagen | Alle fünf Vorlagen erzeugen gültige PDF-Dateien, kommen ohne Bilder und ohne optionale Angaben aus, **betten die angekündigte Zahl Bilder tatsächlich ein**, **haben die vorgesehene Seitenzahl**, und Kurzexposé wie Aushang bleiben auch mit überlangen Texten einseitig |
 | Marketingmotive | Zeilenumbruch an Wortgrenzen mit sichtbarer Kürzung; alle Texte liegen innerhalb der Fläche; das Preisband überlagert den Textblock in keinem der sechs Formate; Sonderzeichen werden maskiert; Mandanten-Branding schlägt durch; KI-Hinweis nur bei KI-Beteiligung |
 | OpenImmo-Prüfung | Vollständiges Objekt geht durch; fehlende Freigabe, Energieangaben oder Kaltmiete blockieren; Grundstücke brauchen keine Energieangaben; „Preis auf Anfrage“ ist zulässig |
 | OpenImmo-XML | Rahmenelemente und Namensraum; Vermarktungs- und Nutzungsart als Attribute; Straße nur bei freigegebener Adresse; Punkt als Dezimaltrenner; Übertragungsart NEU/CHANGE; Mehrfachobjekte; Maskierung von Sonderzeichen und Entfernen von Steuerzeichen |
@@ -44,6 +44,23 @@ Beim Schreiben der Vorlagentests fiel auf, dass die PDF-Erzeugung ein
 Fassung der Tests prüfte nur, ob eine PDF-Datei entstand, und war deshalb grün,
 obwohl kein einziges Bild eingebettet wurde. Die Tests zählen jetzt die
 eingebetteten Bildobjekte im fertigen Dokument.
+
+**Grün heißt nicht brauchbar.** Die Vorlagen waren nach Testlage fehlerfrei und
+trotzdem unbrauchbar: Sie liefen in Helvetica statt in der Hausschrift, die
+Akzentfarbe kam praktisch nicht vor, und alles lag zwischen 9 und 11 Punkt —
+das Ergebnis las sich wie ein Formular. Bei der Premium-Vorlage füllte das
+Titelbild Seite eins allein, der Titel stand auf einer zweiten, sonst leeren
+Seite. Nichts davon konnte ein Test finden, der nur die Dateikennung prüft.
+Aufgefallen ist es erst beim Betrachten der gerenderten Seiten.
+
+`src/lib/expose/muster.test.tsx` erzeugt die Muster-PDFs dafür auf Zuruf:
+
+```bash
+MUSTER_ZIEL=/tmp/muster npx vitest run src/lib/expose/muster.test.tsx
+pdftoppm -png -r 72 /tmp/muster/klassisch.pdf /tmp/muster/klassisch
+```
+
+Der Seitenzahltest hält seither fest, was jede Vorlage produzieren soll.
 
 ## 2. Nachweis der Mandantentrennung
 

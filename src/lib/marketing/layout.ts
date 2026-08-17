@@ -7,64 +7,10 @@
  * ueberlaufende Zeilen und uebereinanderliegende Bloecke.
  */
 
-/**
- * Mittlere Zeichenbreite im Verhaeltnis zur Schriftgroesse.
- *
- * Naeherungswerte fuer Poppins und Inter in halbfetter Auszeichnung. Eine
- * echte Messung braeuchte die Schriftmetrik; fuer den Umbruch genuegt die
- * Naeherung, solange sie eher zu breit schaetzt als zu schmal — dann bricht
- * lieber eine Zeile zu frueh um, als dass Text ueber den Rand laeuft.
- */
-const ZEICHENBREITE = 0.56;
-
-/** Wie viele Zeichen passen bei dieser Schriftgroesse in die Breite? */
-export function zeichenProZeile(breite: number, schriftgroesse: number): number {
-  return Math.max(8, Math.floor(breite / (schriftgroesse * ZEICHENBREITE)));
-}
-
-/**
- * Bricht Text auf hoechstens `maxZeilen` um und kuerzt bei Bedarf mit Auslassung.
- *
- * Woerter werden nie zerrissen. Passt das letzte Wort nicht mehr, endet die
- * Zeile mit einem Auslassungszeichen — ein abgeschnittener Titel ohne Hinweis
- * wirkt wie ein Fehler.
- */
-export function umbrechen(
-  text: string,
-  breite: number,
-  schriftgroesse: number,
-  maxZeilen: number,
-): string[] {
-  const grenze = zeichenProZeile(breite, schriftgroesse);
-  const worte = text.trim().split(/\s+/);
-  const zeilen: string[] = [];
-  let aktuell = "";
-
-  for (const wort of worte) {
-    const versuch = aktuell ? `${aktuell} ${wort}` : wort;
-
-    if (versuch.length <= grenze) {
-      aktuell = versuch;
-      continue;
-    }
-
-    if (aktuell) zeilen.push(aktuell);
-
-    if (zeilen.length === maxZeilen) {
-      // Kein Platz mehr: letzte Zeile kuerzen und kennzeichnen.
-      const letzte = zeilen[maxZeilen - 1]!;
-      zeilen[maxZeilen - 1] =
-        letzte.length > grenze - 1 ? `${letzte.slice(0, grenze - 1).trimEnd()}…` : `${letzte}…`;
-      return zeilen;
-    }
-
-    // Einzelnes Wort laenger als eine Zeile: hart kuerzen.
-    aktuell = wort.length > grenze ? `${wort.slice(0, grenze - 1)}…` : wort;
-  }
-
-  if (aktuell && zeilen.length < maxZeilen) zeilen.push(aktuell);
-  return zeilen.length > 0 ? zeilen : [""];
-}
+// Der Zeilenumbruch liegt jetzt zentral in src/lib/textumbruch.ts, weil die
+// PDF-Vorlagen ihn ebenfalls brauchen. Der Re-Export haelt die bisherigen
+// Aufrufe im Marketingmodul unveraendert.
+export { ZEICHENBREITE, umbrechen, zeichenProZeile } from "@/lib/textumbruch";
 
 /** Maskiert die fuer XML kritischen Zeichen. */
 export function xmlText(wert: string): string {

@@ -24,7 +24,7 @@ const config = [
     // HTML-Bild: Ein PDF kennt kein alt-Attribut, und die Regel wuerde nur zu
     // wirkungslosen Attributen fuehren. Die Bildunterschriften in den Vorlagen
     // sind die tatsaechliche Beschreibung.
-    files: ["src/lib/expose/vorlage-*.tsx"],
+    files: ["src/lib/expose/vorlage-*.tsx", "src/lib/expose/bausteine.tsx"],
     rules: { "jsx-a11y/alt-text": "off" },
   },
   {

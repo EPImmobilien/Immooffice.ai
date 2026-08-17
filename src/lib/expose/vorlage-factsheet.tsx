@@ -1,5 +1,14 @@
-import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 
+import {
+  AbschnittTitel,
+  Bildkachel,
+  Eckdatenraster,
+  Fusszeile,
+  Kopfzeile,
+  Preisblock,
+  Titelzeilen,
+} from "./bausteine";
 import {
   eckdaten,
   energiedaten,
@@ -7,14 +16,15 @@ import {
   KiVermerk,
   kategorieName,
   kuerzen,
-  kontaktzeile,
   ortszeile,
   preisAngabe,
 } from "./gemeinsam";
+import { schriftenBereitstellen } from "./schriften";
+import { FARBE, GROESSE, SCHRIFT, gesperrt } from "./stil";
 import type { ExposeDaten } from "./typen";
 
 /**
- * Vorlage 4: „Kurzexposé / Factsheet“ (Abschnitt 8).
+ * Vorlage 4: „Kurzexposé / Factsheet" (Abschnitt 8).
  *
  * Genau eine Seite — das ist die Eigenschaft, die diese Vorlage ausmacht.
  * Deshalb werden die Texte hier hart begrenzt statt umbrochen: Ein Factsheet,
@@ -25,73 +35,47 @@ import type { ExposeDaten } from "./typen";
 
 const stile = StyleSheet.create({
   seite: {
-    paddingTop: 34,
-    paddingBottom: 46,
+    paddingTop: 38,
+    paddingBottom: 52,
     paddingHorizontal: 40,
-    fontSize: 9,
-    lineHeight: 1.45,
-    color: "#1B2A47",
-    fontFamily: "Helvetica",
+    fontFamily: SCHRIFT.text,
   },
-  kopf: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 14,
-  },
-  firma: { fontSize: 11, fontFamily: "Helvetica-Bold" },
-  kennung: { fontSize: 7.5, color: "#7A828C" },
-  oben: { flexDirection: "row", marginHorizontal: -8, marginBottom: 14 },
-  spalteBild: { width: "46%", paddingHorizontal: 8 },
-  spalteText: { width: "54%", paddingHorizontal: 8 },
-  bild: { width: "100%", height: 150, objectFit: "cover" },
-  titel: { fontSize: 15, fontFamily: "Helvetica-Bold", lineHeight: 1.2 },
-  ort: { fontSize: 8.5, color: "#7A828C", marginTop: 3, marginBottom: 10 },
-  preisKasten: { paddingVertical: 8, paddingHorizontal: 10, borderLeftWidth: 3 },
-  preisLabel: { fontSize: 7, color: "#7A828C", textTransform: "uppercase" },
-  preisWert: { fontSize: 14, fontFamily: "Helvetica-Bold", marginTop: 1 },
-  bloecke: { flexDirection: "row", marginHorizontal: -8 },
-  block: { flexGrow: 1, flexBasis: 0, paddingHorizontal: 8 },
-  ueberschrift: {
-    fontSize: 7.5,
-    letterSpacing: 0.9,
+  oben: { flexDirection: "row", marginHorizontal: -9, marginTop: 20 },
+  spalteBild: { width: "45%", paddingHorizontal: 9 },
+  spalteText: { width: "55%", paddingHorizontal: 9 },
+  kategorie: {
+    fontFamily: SCHRIFT.text,
+    fontSize: GROESSE.winzig,
+    fontWeight: 600,
     textTransform: "uppercase",
-    color: "#7A828C",
     marginBottom: 5,
   },
-  eckZeile: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#E6E8EB",
-    paddingVertical: 3,
+  ort: {
+    fontFamily: SCHRIFT.text,
+    fontSize: GROESSE.fein,
+    color: FARBE.gedaempft,
+    marginTop: 4,
+    marginBottom: 12,
   },
-  eckWert: { fontFamily: "Helvetica-Bold" },
-  textblock: { marginTop: 12 },
-  fuss: {
-    position: "absolute",
-    bottom: 22,
-    left: 40,
-    right: 40,
-    borderTopWidth: 0.5,
-    borderTopColor: "#E6E8EB",
-    paddingTop: 5,
-    fontSize: 6.5,
-    color: "#7A828C",
-    lineHeight: 1.45,
-  },
+  platzhalter: { height: 148, borderRadius: 2 },
+  block: { marginTop: 18 },
+  spalten: { flexDirection: "row", marginHorizontal: -9 },
+  spalte: { flexGrow: 1, flexBasis: 0, paddingHorizontal: 9 },
+  text: { fontFamily: SCHRIFT.text, fontSize: GROESSE.fein, lineHeight: 1.55 },
+  fuss: { position: "absolute", bottom: 24, left: 40, right: 40 },
 });
 
 export function ExposeFactsheet({ objekt, branding, bilder }: ExposeDaten) {
+  schriftenBereitstellen();
+
   const preis = preisAngabe(objekt);
   const titelbild = bilder[0];
-  const alle = eckdaten(objekt);
-  const links = alle.filter((_, i) => i % 2 === 0);
-  const rechts = alle.filter((_, i) => i % 2 === 1);
   const bildBearbeitet = bilder.some((b) => b.kiBearbeitet);
+  const primaer = branding.farbePrimaer;
+  const akzent = branding.farbeAkzent;
 
-  const objektText = kuerzen(objekt.beschreibung_objekt, 520);
-  const lageText = kuerzen(objekt.beschreibung_lage, 320);
+  const objektText = kuerzen(objekt.beschreibung_objekt, 430);
+  const lageText = kuerzen(objekt.beschreibung_lage, 300);
 
   return (
     <Document
@@ -100,113 +84,78 @@ export function ExposeFactsheet({ objekt, branding, bilder }: ExposeDaten) {
       creator="ImmoOffice.ai"
       producer="ImmoOffice.ai"
     >
-      <Page size="A4" style={stile.seite}>
-        <View style={stile.kopf}>
-          <Text style={[stile.firma, { color: branding.farbePrimaer }]}>
-            {branding.firmenname}
-          </Text>
-          <Text style={stile.kennung}>
-            Kurzexposé · Objekt {objekt.objektnummer}
-          </Text>
-        </View>
+      <Page size="A4" style={[stile.seite, { color: primaer }]}>
+        <Kopfzeile
+          branding={branding}
+          objektnummer={objekt.objektnummer}
+          primaer={primaer}
+          akzent={akzent}
+        />
 
         <View style={stile.oben}>
           <View style={stile.spalteBild}>
             {titelbild ? (
-              <Image
-                style={stile.bild}
-                src={{ data: titelbild.daten, format: titelbild.format }}
-              />
+              <Bildkachel bild={titelbild} hoehe={148} akzent={akzent} />
             ) : (
-              <View
-                style={[stile.bild, { backgroundColor: branding.farbePrimaer }]}
-              />
+              <View style={[stile.platzhalter, { backgroundColor: primaer }]} />
             )}
           </View>
 
           <View style={stile.spalteText}>
-            <Text style={stile.titel}>
-              {kuerzen(objekt.titel ?? objekt.bezeichnung, 70)}
+            <Text style={[stile.kategorie, { color: akzent, letterSpacing: gesperrt(GROESSE.winzig) }]}>
+              {kategorieName(objekt)}
             </Text>
-            <Text style={stile.ort}>
-              {kategorieName(objekt)} · {ortszeile(objekt)}
-            </Text>
-            <View
-              style={[
-                stile.preisKasten,
-                {
-                  borderLeftColor: branding.farbeAkzent,
-                  backgroundColor: "#FAFAFA",
-                },
-              ]}
-            >
-              <Text style={stile.preisLabel}>{preis.label}</Text>
-              <Text style={[stile.preisWert, { color: branding.farbePrimaer }]}>
-                {preis.wert}
-              </Text>
-            </View>
+            <Titelzeilen
+              text={objekt.titel ?? objekt.bezeichnung}
+              breite={265}
+              groesse={GROESSE.mittel}
+              maxZeilen={3}
+              farbe={primaer}
+            />
+            <Text style={stile.ort}>{ortszeile(objekt)}</Text>
+            <Preisblock
+              label={preis.label}
+              wert={preis.wert}
+              primaer={primaer}
+              akzent={akzent}
+            />
           </View>
         </View>
 
-        <View style={stile.bloecke}>
-          <View style={stile.block}>
-            <Text style={stile.ueberschrift}>Eckdaten</Text>
-            {links.map((e) => (
-              <View key={e.bezeichnung} style={stile.eckZeile}>
-                <Text>{e.bezeichnung}</Text>
-                <Text style={stile.eckWert}>{e.wert}</Text>
-              </View>
-            ))}
-          </View>
-          <View style={stile.block}>
-            <Text style={stile.ueberschrift}>&nbsp;</Text>
-            {rechts.map((e) => (
-              <View key={e.bezeichnung} style={stile.eckZeile}>
-                <Text>{e.bezeichnung}</Text>
-                <Text style={stile.eckWert}>{e.wert}</Text>
-              </View>
-            ))}
-          </View>
-          <View style={stile.block}>
-            <Text style={stile.ueberschrift}>Energieausweis</Text>
-            {energiedaten(objekt).map((e) => (
-              <View key={e.bezeichnung} style={stile.eckZeile}>
-                <Text>{e.bezeichnung}</Text>
-                <Text style={stile.eckWert}>{e.wert}</Text>
-              </View>
-            ))}
-          </View>
+        <View style={stile.block}>
+          <AbschnittTitel text="Eckdaten" akzent={akzent} />
+          <Eckdatenraster daten={eckdaten(objekt)} primaer={primaer} spalten={4} />
+        </View>
+
+        <View style={stile.block}>
+          <AbschnittTitel text="Energieausweis" akzent={akzent} />
+          <Eckdatenraster daten={energiedaten(objekt)} primaer={primaer} />
         </View>
 
         {(objektText || lageText) && (
-          <View style={stile.textblock}>
-            <View style={stile.bloecke}>
-              {objektText && (
-                <View style={stile.block}>
-                  <Text style={stile.ueberschrift}>Das Objekt</Text>
-                  <Text>{objektText}</Text>
-                </View>
-              )}
-              {lageText && (
-                <View style={stile.block}>
-                  <Text style={stile.ueberschrift}>Lage</Text>
-                  <Text>{lageText}</Text>
-                </View>
-              )}
-            </View>
+          <View style={[stile.block, stile.spalten]}>
+            {objektText && (
+              <View style={stile.spalte}>
+                <AbschnittTitel text="Das Objekt" akzent={akzent} />
+                <Text style={stile.text}>{objektText}</Text>
+              </View>
+            )}
+            {lageText && (
+              <View style={stile.spalte}>
+                <AbschnittTitel text="Lage" akzent={akzent} />
+                <Text style={stile.text}>{lageText}</Text>
+              </View>
+            )}
           </View>
         )}
 
         <KiVermerk
           texteKiErzeugt={objekt.texte_ki_erzeugt}
           bilderKiBearbeitet={bildBearbeitet}
-          style={{ marginTop: 10 }}
+          style={{ marginTop: 14 }}
         />
 
-        <View style={stile.fuss} fixed>
-          <Text>{kontaktzeile(branding)}</Text>
-          <Text>{HAFTUNG}</Text>
-        </View>
+        <Fusszeile branding={branding} haftung={HAFTUNG} style={stile.fuss} />
       </Page>
     </Document>
   );
