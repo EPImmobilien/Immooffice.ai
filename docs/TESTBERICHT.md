@@ -10,7 +10,7 @@
 |---|---|---|
 | Typprüfung (strict) | `npm run typecheck` | bestanden |
 | Linting | `npm run lint` | bestanden |
-| Unit-Tests | `npm run test` | 112 Tests bestanden |
+| Unit-Tests | `npm run test` | 122 Tests bestanden |
 | Produktions-Build | `npm run build` | bestanden, 33 Routen |
 | Marken-Scan | `npm run marken-scan` | sauber, keine Treffer |
 
@@ -33,12 +33,43 @@ Alles zusammen: `npm run pruefen`.
 | Öffentliche Adresse | Basis und Token werden korrekt zusammengesetzt; weitergeleiteter Host und weitergeleitetes Schema haben Vorrang; lokal bleibt es bei `http` |
 | Energiekennwert | **Bedarfsausweis schreibt `endenergiebedarf`, Verbrauchsausweis `energieverbrauchkennwert` — und jeweils das andere Element gerade nicht.** Portale weisen Objekte ab, bei denen Typ und Element nicht zusammenpassen |
 | Rechteübersteuerung | Gespeichert wird nur die Abweichung von der Rolle, nicht die volle Matrix; **jede Auswahl gilt nach dem Speichern unverändert** (Rundlauf über alle sechs Rollen und alle 50 Felder); leere Auswahl entzieht wirklich alles; unbekannte Module, unbekannte Aktionen und Nicht-Wahrheitswerte aus der Datenbank werden verworfen |
+| Hausschriften | Alle sechs Schnitte liegen als Daten-URL im Modul und beginnen mit der WOFF-Kennung; sie stimmen byteweise mit `@fontsource` überein; **jede der sechs Vorlagen bettet Poppins und Inter ein und kein Helvetica**; im Quelltext führt kein Weg mehr über `require.resolve` zu einer Schriftdatei |
 
-Drei Tests wurden durch gezielte Änderung am Code gegengeprüft und schlagen
+Vier Tests wurden durch gezielte Änderung am Code gegengeprüft und schlagen
 dann fehl — sie können die jeweilige Regression also tatsächlich erkennen:
 der Token-Test (ein Token entfernt), der Überlagerungstest der Marketingmotive
-(Preisband verschoben) und der Einseitigkeitstest des Aushangs (Titelkürzung
-aufgehoben).
+(Preisband verschoben), der Einseitigkeitstest des Aushangs (Titelkürzung
+aufgehoben) und der Schrifttest (Registrierung übersprungen — sechs von zehn
+Prüfungen schlagen fehl).
+
+### `pdf.txt` statt Exposé — ein Fehler, den kein Test finden konnte
+
+Beim Erzeugen eines Exposés landete in der Auslieferung eine Datei namens
+**`pdf.txt`** im Download-Ordner. Die Kette dahinter:
+
+1. `schriften.ts` löste die `.woff`-Dateien zur Laufzeit über `require.resolve`
+   auf — mit dem Paketnamen in einer **Variablen**. Die Abhängigkeitsanalyse
+   von Next sieht darin keinen Bezug auf die Dateien und packt sie nicht ins
+   Auslieferungspaket. Nachgezählt: **null** Schriftdateien im Trace beider
+   PDF-Routen.
+2. Ohne `node_modules` daneben warf `require.resolve` — und mit ihm die ganze
+   Route.
+3. Next beantwortet eine geworfene Route mit `500` als `text/plain`, **ohne**
+   `Content-Disposition`. Nachgemessen an der laufenden Anwendung.
+4. Der Browser leitet den Dateinamen daraus ab: letztes Pfadsegment `pdf`,
+   MIME-Endung `.txt`.
+
+Lokal konnte das nie auffallen, weil `node_modules` immer vorhanden ist. Zwei
+naheliegende Auswege wurden geprüft und verworfen: `outputFileTracingIncludes`
+wird beim Bauen mit Turbopack nicht berücksichtigt, und ein literales
+`require.resolve("….woff")` lässt Turbopack den Build mit „Unknown module type“
+abbrechen. Die Schriften stehen jetzt als Daten-URL im Modul — zur Laufzeit
+wird weder gesucht noch gelesen.
+
+Zusätzlich beantworten beide PDF-Routen einen Fehler nicht mehr mit dem
+`text/plain` von Next, sondern mit einer HTML-Seite. Der Browser zeigt sie an,
+statt sie zu speichern; der technische Grund bleibt im Serverprotokoll und
+nicht vor Kundenaugen. Beides ist an der laufenden Anwendung gegengeprüft.
 
 Beim Schreiben der Vorlagentests fiel auf, dass die PDF-Erzeugung ein
 **unlesbares Bild wortlos verwirft**, ohne einen Fehler zu melden. Die erste

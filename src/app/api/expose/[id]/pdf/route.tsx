@@ -2,6 +2,7 @@ import { renderToBuffer } from "@react-pdf/renderer";
 import { NextResponse } from "next/server";
 
 import { rechtErzwingen } from "@/lib/auth/rechte";
+import { dokumentFehlerAntwort } from "@/lib/expose/fehlerantwort";
 import { sitzungLaden } from "@/lib/auth/sitzung";
 import { exposeBilderLaden } from "@/lib/expose/bilder-laden";
 import type { ExposeBranding, ExposeObjekt } from "@/lib/expose/typen";
@@ -23,7 +24,16 @@ export async function GET(
   anfrage: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { id } = await params;
+  try {
+    return await pdfErzeugen(anfrage, await params);
+  } catch (fehler) {
+    // Ohne diesen Rahmen liefert Next eine geworfene Route als text/plain aus,
+    // und der Browser legt sie als "pdf.txt" ab (siehe fehlerantwort.ts).
+    return dokumentFehlerAntwort(fehler, "expose-pdf");
+  }
+}
+
+async function pdfErzeugen(anfrage: Request, { id }: { id: string }) {
 
   const sitzung = await sitzungLaden();
   if (!sitzung) {

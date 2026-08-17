@@ -1,6 +1,13 @@
-import { createRequire } from "node:module";
-
 import { Font } from "@react-pdf/renderer";
+
+import {
+  INTER_400,
+  INTER_500,
+  INTER_600,
+  POPPINS_500,
+  POPPINS_600,
+  POPPINS_700,
+} from "./schriften-daten";
 
 /**
  * Hausschriften fuer alle PDF-Dokumente.
@@ -11,21 +18,20 @@ import { Font } from "@react-pdf/renderer";
  * Programm. Die Wortmarke steht in Poppins — ein Dokument in Helvetica
  * daneben wirkt wie von einem fremden Absender.
  *
- * Die Dateien liegen in @fontsource und werden ueber `require.resolve`
- * aufgeloest, nicht ueber einen Pfad relativ zum Arbeitsverzeichnis. Auf
- * Netlify laeuft die Funktion in einem anderen Verzeichnis als lokal; ein
- * relativer Pfad haette dort ins Leere gezeigt.
+ * Die Schriften stehen als Daten-URL in `schriften-daten.ts` und werden zur
+ * Laufzeit weder gesucht noch gelesen. Das ist kein Selbstzweck: Zuvor loeste
+ * diese Datei die .woff-Dateien ueber `require.resolve` in `node_modules`
+ * auf. Lokal ging das immer gut, im Auslieferungspaket der Serverfunktion
+ * fehlten die Dateien jedoch — die Abhaengigkeitsanalyse kann einen Aufruf
+ * nicht verfolgen, nur einen `import`. Auf Netlify warf der Aufruf, mit ihm
+ * die ganze Route, und der Browser legte das Ergebnis als `pdf.txt` ab.
+ * Details und die geprueften Alternativen im Kopf von
+ * `scripts/schriften-einbetten.mjs`.
  *
  * Bewusst OHNE `server-only`: Die Datei wird von den Vorlagen eingebunden,
  * und die laufen auch im Test. Die Vorlagen selbst werden ausschliesslich
  * serverseitig gerendert.
  */
-
-const aufloesen = createRequire(import.meta.url);
-
-function datei(paket: string): string {
-  return aufloesen.resolve(paket);
-}
 
 let registriert = false;
 
@@ -41,18 +47,18 @@ export function schriftenBereitstellen(): void {
   Font.register({
     family: "Poppins",
     fonts: [
-      { src: datei("@fontsource/poppins/files/poppins-latin-500-normal.woff"), fontWeight: 500 },
-      { src: datei("@fontsource/poppins/files/poppins-latin-600-normal.woff"), fontWeight: 600 },
-      { src: datei("@fontsource/poppins/files/poppins-latin-700-normal.woff"), fontWeight: 700 },
+      { src: POPPINS_500, fontWeight: 500 },
+      { src: POPPINS_600, fontWeight: 600 },
+      { src: POPPINS_700, fontWeight: 700 },
     ],
   });
 
   Font.register({
     family: "Inter",
     fonts: [
-      { src: datei("@fontsource/inter/files/inter-latin-400-normal.woff"), fontWeight: 400 },
-      { src: datei("@fontsource/inter/files/inter-latin-500-normal.woff"), fontWeight: 500 },
-      { src: datei("@fontsource/inter/files/inter-latin-600-normal.woff"), fontWeight: 600 },
+      { src: INTER_400, fontWeight: 400 },
+      { src: INTER_500, fontWeight: 500 },
+      { src: INTER_600, fontWeight: 600 },
     ],
   });
 

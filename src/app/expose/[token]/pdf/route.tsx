@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { BILD_BUCKET } from "@/lib/bilder";
+import { dokumentFehlerAntwort } from "@/lib/expose/fehlerantwort";
 import type { ExposeBild, ExposeBranding, ExposeObjekt } from "@/lib/expose/typen";
 import { vorlageFinden } from "@/lib/expose/vorlagen";
 import { serverClient } from "@/lib/supabase/server";
@@ -24,7 +25,16 @@ export async function GET(
   _anfrage: Request,
   { params }: { params: Promise<{ token: string }> },
 ) {
-  const { token } = await params;
+  try {
+    return await pdfErzeugen(await params);
+  } catch (fehler) {
+    // Hier wiegt der Rahmen doppelt: Die Seite steht oeffentlich, und eine
+    // rohe Fehlermeldung von Next waere fuer Interessenten sichtbar.
+    return dokumentFehlerAntwort(fehler, "web-expose-pdf");
+  }
+}
+
+async function pdfErzeugen({ token }: { token: string }) {
   if (!/^[a-z0-9]{16,64}$/.test(token)) {
     return new NextResponse("Nicht gefunden", { status: 404 });
   }
