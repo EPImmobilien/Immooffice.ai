@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -18,9 +19,11 @@ import { VORLAGEN } from "@/lib/expose/vorlagen";
 import { datum } from "@/lib/format";
 import { kiVerfuegbar } from "@/lib/ki";
 import { serverClient } from "@/lib/supabase/server";
+import { basisUrlErmitteln } from "@/lib/web-expose";
 import { texteFreigeben } from "@/server/expose-aktionen";
 
 import { TextWerkstatt } from "./TextWerkstatt";
+import { WebExpose } from "./WebExpose";
 
 export const metadata: Metadata = { title: "Exposé" };
 
@@ -69,6 +72,7 @@ export default async function ExposeSeite({
     .eq("objekt_id", objekt.id)
     .is("original_id", null);
 
+  const basisUrl = basisUrlErmitteln(await headers());
   const darfErzeugen = hatRecht(sitzung.rolle, "exposes", "anlegen");
   const darfFreigeben = hatRecht(sitzung.rolle, "exposes", "freigeben");
   const freigegeben = Boolean(objekt.texte_freigegeben_am);
@@ -178,6 +182,12 @@ export default async function ExposeSeite({
               )}
             </KarteInhalt>
           </Karte>
+
+          <WebExpose
+            objektId={objekt.id}
+            darfFreigeben={darfFreigeben}
+            basisUrl={basisUrl}
+          />
         </div>
 
         <Karte>

@@ -128,6 +128,41 @@ Architekturänderung eingesetzt werden kann.
 Kontakt wird anonymisiert, der Vorgang bleibt für die Aufbewahrungsfrist erhalten.
 `kontakte.anonymisiert_am` hält das fest.
 
+## 8a. Öffentliche Web-Exposés
+
+Ein Web-Exposé ist die einzige Stelle, an der Daten ohne Anmeldung sichtbar werden.
+Es ist deshalb bewusst eng gefasst.
+
+- **Kein Lesezugriff für `anon` auf Tabellen.** Der gesamte Zugriff läuft über zwei
+  Datenbankfunktionen. Eine Lesepolicy für nicht angemeldete Besucher hätte den
+  Bestand über die REST-Schnittstelle erreichbar gemacht, sobald jemand eine
+  Objekt-ID errät.
+- **Nur festgelegte Felder.** Die Funktion baut die Antwort selbst zusammen;
+  Mandantenzuordnung, Eigentümer und interne Zuständigkeiten sind nicht enthalten.
+- **Der Link ist der Schlüssel.** Das Token hat 24 Zeichen aus 36 möglichen — rund
+  124 Bit. Gezogen wird aus dem kryptografischen Zufallsgenerator; der Überhang der
+  Modulo-Rechnung wird verworfen, damit die Verteilung gleichmäßig bleibt.
+- **Widerruf und Ablauf wirken sofort.** Beides wird bei jedem Aufruf erneut geprüft,
+  auch bei gesetztem Passwort-Cookie. Ein neuer Link entwertet den alten, ohne die
+  Veröffentlichung zu beenden.
+- **Passwörter** liegen als bcrypt-Hash in der Datenbank, nie im Klartext.
+- **Aufrufstatistik ohne Personenbezug.** Gezählt werden Seitenaufrufe je Tag. Es
+  werden keine IP-Adressen, keine Kennungen und keine Wiedererkennungsmerkmale
+  gespeichert. Eindeutige Besucher lassen sich deshalb **nicht** ausweisen — das
+  wäre nur möglich, indem man Besucher wiedererkennbar macht.
+- **Kontaktformular** nur mit ausdrücklicher, nicht vorausgewählter Einwilligung.
+  Eine Obergrenze je Exposé und Tag begrenzt Missbrauch; feiner geht es ohne
+  Personenbezug nicht.
+- **Bilder** liegen weiter in einem nicht öffentlichen Bucket. Die Freigabe für
+  nicht angemeldete Besucher hängt an einer Storage-Policy, die ein gültiges
+  Web-Exposé zum Objekt verlangt, und endet mit Widerruf oder Ablauf. Die
+  ausgelieferten Verweise sind signiert und kurzlebig.
+
+**Offen und bewusst so:** Bei einem passwortgeschützten Exposé bleiben die Bildpfade
+für die Dauer der Veröffentlichung erreichbar, wenn jemand einen vollständigen Pfad
+kennt. Die Pfade enthalten eine zufällige Kennung und sind nicht erratbar; eine
+Kopplung der Storage-Policy an das Passwort ist für Phase 2 vorgesehen.
+
 ## 9. Offene Punkte
 
 Diese Punkte sind **vor Produktivbetrieb** zu klären. Sie sind nicht durch Technik
@@ -146,6 +181,23 @@ allein lösbar.
 | Verzeichnis von Verarbeitungstätigkeiten | organisatorisch | vor Gate B |
 | Löschfristen je Datenart festlegen | rechtlich | Phase 1 |
 | Wiederherstellung aus Sicherung erproben | technisch | Phase 3 |
+| Bildfreigabe im Storage an den Passwortschutz koppeln | technisch | Phase 2 |
+| Schutz gegen bekannte geleakte Passwörter aktivieren | organisatorisch | Phase 1 |
+
+### Behobene Befunde
+
+| Befund | Schwere | Behoben in |
+|---|---|---|
+| Trigger aus dem Vorentwurf auf `auth.users` schrieb in eine entfernte Tabelle — jede Registrierung wäre gescheitert | hoch | `aufraeumen_und_helfer_kapseln` |
+| RLS-Hilfsfunktionen lagen in `public` und waren als REST-Endpunkte aufrufbar | mittel | `aufraeumen_und_helfer_kapseln` |
+| **`credits_gutschreiben` nahm eine beliebige Mandanten-ID entgegen, prüfte den Aufrufer nicht und war für nicht angemeldete Aufrufer freigeschaltet** — wer eine Mandanten-ID kannte, hätte sich ohne Anmeldung beliebig viele Credits gutschreiben können | **hoch** | `funktionsrechte_einschraenken` |
+| Drei Datenbankfunktionen ohne festen `search_path` | niedrig | `funktionsrechte_einschraenken` |
+
+Ursache des dritten Befunds ist eine Voreinstellung von Postgres: Das Ausführungsrecht
+neuer Funktionen geht an `PUBLIC`, und die REST-Rolle `anon` erbt davon. Jede neue
+Funktion im Schema `public` braucht deshalb eine ausdrückliche Rechtevergabe.
+[`supabase/tests/funktionsrechte.sql`](supabase/tests/funktionsrechte.sql) hält fest,
+welche Funktion für wen erreichbar sein soll.
 
 ## 10. Zur elektronischen Signatur
 

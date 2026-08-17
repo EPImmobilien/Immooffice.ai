@@ -10,8 +10,8 @@
 |---|---|---|
 | Typprüfung (strict) | `npm run typecheck` | bestanden |
 | Linting | `npm run lint` | bestanden |
-| Unit-Tests | `npm run test` | 85 Tests bestanden |
-| Produktions-Build | `npm run build` | bestanden, 23 Routen |
+| Unit-Tests | `npm run test` | 92 Tests bestanden |
+| Produktions-Build | `npm run build` | bestanden, 25 Routen |
 | Marken-Scan | `npm run marken-scan` | sauber, keine Treffer |
 
 Alles zusammen: `npm run pruefen`.
@@ -29,6 +29,8 @@ Alles zusammen: `npm run pruefen`.
 | OpenImmo-XML | Rahmenelemente und Namensraum; Vermarktungs- und Nutzungsart als Attribute; Straße nur bei freigegebener Adresse; Punkt als Dezimaltrenner; Übertragungsart NEU/CHANGE; Mehrfachobjekte; Maskierung von Sonderzeichen und Entfernen von Steuerzeichen |
 | OpenImmo-Anhänge | Gruppe, Format und Dateiname je Anhang; **der Vermerk für KI-bearbeitete Bilder steht im `anhangtitel`**, auch ohne eigenen Bildtitel; ohne Anhänge entfällt der Block; die Position im Dokument liegt zwischen `freitexte` und `verwaltung_objekt` |
 | Übertragungspaket | Archivkennung und zentrales Verzeichnis; gleiche Eingabe ergibt dieselben Bytes; **ein echter Entpacker (`unzip -t`) liest das Archiv und bestätigt die Prüfsummen**; Umlaute im Dateinamen bleiben erhalten; zu große Pakete werden abgewiesen statt still falsch geschrieben |
+| Web-Exposé-Token | Länge und Zeichenmenge stimmen mit der Prüfung in der Datenbank überein; 2000 Aufrufe ergeben 2000 verschiedene Werte; **die Zeichen sind gleichmäßig verteilt** — eine Häufung würde den Raum verkleinern, ohne aufzufallen |
+| Öffentliche Adresse | Basis und Token werden korrekt zusammengesetzt; weitergeleiteter Host und weitergeleitetes Schema haben Vorrang; lokal bleibt es bei `http` |
 | Energiekennwert | **Bedarfsausweis schreibt `endenergiebedarf`, Verbrauchsausweis `energieverbrauchkennwert` — und jeweils das andere Element gerade nicht.** Portale weisen Objekte ab, bei denen Typ und Element nicht zusammenpassen |
 
 Drei Tests wurden durch gezielte Änderung am Code gegengeprüft und schlagen
@@ -93,7 +95,18 @@ der Datenbank, nicht in der Oberfläche.
 |---|---|---|
 | [`credits.sql`](../supabase/tests/credits.sql) | Unveränderbares Ledger, kein negativer Saldo, älteste Credits zuerst, Freigabe reservierter Credits bei fehlgeschlagenen Aufträgen | 16 von 16 |
 | [`matching.sql`](../supabase/tests/matching.sql) | Vermarktungsart, Kategorie, Ort und Preisrahmen schließen aus; weiche Kriterien ordnen nur; bearbeitete Treffer werden nicht überschrieben; keine Treffer über die Mandantengrenze | 10 von 10 |
+| [`web-expose.sql`](../supabase/tests/web-expose.sql) | Nur festgelegte Felder gelangen nach außen; Passwortschutz, Widerruf und Ablauf wirken sofort; Tabellen bleiben für Besucher leer; Kontaktformular prüft Eingaben und Freigabe; der PDF-Download zählt nicht als Seitenaufruf | 20 von 20 |
+| [`funktionsrechte.sql`](../supabase/tests/funktionsrechte.sql) | Nicht angemeldete und angemeldete Aufrufer können keine Credits gutschreiben, kein Monatskontingent zuteilen, keinen fremden Kontostand lesen und kein Matching auslösen — mit Gegenproben für das, was erlaubt bleiben muss | 8 von 8 |
 | [`bilder.sql`](../supabase/tests/bilder.sql) | Original bleibt unverändert, Bearbeitung ist eine eigene Version mit Beschreibung, KI-Kennzeichen nicht entfernbar, Bildpfad unveränderlich, ein Titelbild je Objekt, keine Sicht auf fremde Bilder | 10 von 10 |
+
+Die Prüfung des Datenbankanbieters hat dabei einen **schwerwiegenden Befund**
+zutage gefördert: `credits_gutschreiben` nahm die Mandanten-ID als Parameter
+entgegen, prüfte den Aufrufer nicht und war als security-definer-Funktion für
+**nicht angemeldete** Aufrufer freigeschaltet. Wer eine Mandanten-ID kannte, hätte
+sich ohne Anmeldung beliebig viele Credits gutschreiben können. Ursache ist eine
+Voreinstellung von Postgres, nicht ein Tippfehler: Das Ausführungsrecht neuer
+Funktionen geht an `PUBLIC`, und die REST-Rolle `anon` erbt davon. Behoben in
+`funktionsrechte_einschraenken`, festgehalten in `funktionsrechte.sql`.
 
 Der Matching-Test hat eine **Fehlentscheidung im Entwurf aufgedeckt**: Ein
 Objekt in Hamburg erhielt für ein Kieler Suchprofil noch 75 von 100 Punkten,
@@ -146,7 +159,11 @@ Die Prüfung des Datenbankanbieters meldet einen verbleibenden Punkt:
 |---|---|
 | Schutz gegen bekannte geleakte Passwörter ist deaktiviert | In der Projektverwaltung aktivieren. Abschnitt 16 fordert den Abgleich; er lässt sich nur dort einschalten, nicht per Migration. |
 
-Zwei Befunde wurden bereits während der Umsetzung behoben:
+Die verbleibenden Meldungen zu security-definer-Funktionen betreffen
+`registriere_mandant` sowie die beiden Web-Exposé-Funktionen. Sie **müssen** ohne
+Anmeldung erreichbar sein und prüfen jeweils selbst, was sie preisgeben.
+
+Drei Befunde wurden bereits während der Umsetzung behoben:
 
 1. Auf `auth.users` lag noch ein Trigger aus dem Vorentwurf, der in die
    entfernte Tabelle `profiles` schrieb. **Jede Registrierung wäre daran
@@ -154,6 +171,10 @@ Zwei Befunde wurden bereits während der Umsetzung behoben:
 2. Die RLS-Hilfsfunktionen lagen im Schema `public` und waren dadurch als
    REST-Endpunkte aufrufbar. Sie liegen jetzt im Schema `intern`, das nicht
    ausgeliefert wird.
+3. **`credits_gutschreiben` war ohne Anmeldung aufrufbar** und schrieb einer
+   beliebigen, als Parameter übergebenen Mandanten-ID Credits gut. Entfernt in
+   Migration `funktionsrechte_einschraenken`; die Funktion gehört jetzt
+   ausschließlich zu Stripe-Webhook und Job-Worker.
 
 ## 6. Bekannte Einschränkungen des Durchstichs
 
@@ -164,6 +185,9 @@ Zwei Befunde wurden bereits während der Umsetzung behoben:
   entsteht im weiteren Verlauf von Phase 1.
 - Bildbearbeitung ist datenseitig vorbereitet (Versionen, unveränderbares
   Original, nicht entfernbares KI-Kennzeichen), aber noch ohne Bedienoberfläche.
+- Je Objekt gibt es **einen** öffentlichen Link. Mehrere Links mit eigenem
+  Passwort und eigener Frist — etwa einer je Interessent — sind datenseitig
+  möglich, brauchen aber eine eigene Verwaltung in der Oberfläche.
 - Kalender, Aufgaben, Wertermittlung, Verträge, Auswertungen, Einstellungen und
   Plattform-Admin sind in der Navigation als „geplant“ gekennzeichnet und ohne
   Funktion.
