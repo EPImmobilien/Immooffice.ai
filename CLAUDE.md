@@ -3,6 +3,23 @@
 Destillat des maßgeblichen Auftrags. **Vollständige Fassung:
 [`docs/MASTERPROMPT.md`](docs/MASTERPROMPT.md) — bei Widersprüchen gilt dort.**
 
+Zwei verbindliche Dokumente, klare Rangfolge:
+
+| Dokument | Regelt | Rang |
+|---|---|---|
+| [`docs/MASTERPROMPT.md`](docs/MASTERPROMPT.md) | Technischer Rahmen, Phasen, Gates, **Scope** (WIE, WANN, OB) | **gewinnt** |
+| [`docs/FUNKTIONSPROMPT.md`](docs/FUNKTIONSPROMPT.md) | Fachliche Funktionen je Modul (WAS) | nachrangig |
+
+Der Funktionsprompt beschreibt auch Module, die der Masterprompt ausschließt.
+Er kennzeichnet sie selbst mit „nur bauen, wenn im Scope" — **im Scope sind sie
+nicht.** Siehe Abschnitt „Abgrenzung" weiter unten.
+
+Zusätzlich gelten die sechs **Architektur-Grundprinzipien** des Funktionsprompts
+für jedes Modul und sind Teil der Definition-of-Done: Objekt als Drehkreuz ·
+verkettete Arbeitsschritte statt Insellösungen · KI-Auslese immer über ein
+editierbares Formular · Hintergrundjobs mit Wächter · Rechte als Vorlage plus
+Einzelhäkchen, serverseitig erzwungen · Bild-Pipeline mit Web-Variante.
+
 ## Produkt
 
 Mandantenfähige SaaS-Plattform für deutsche Immobilienmakler und
