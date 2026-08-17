@@ -2,26 +2,29 @@ import { NextResponse } from "next/server";
 
 import { rechtErzwingen } from "@/lib/auth/rechte";
 import { sitzungLaden } from "@/lib/auth/sitzung";
+import { openImmoAnhaengeLaden } from "@/lib/openimmo/anhaenge-laden";
 import { exportMoeglich, exportPruefen } from "@/lib/openimmo/pruefung";
 import type { Ausstattungsmerkmal, OpenImmoObjekt } from "@/lib/openimmo/typen";
 import { openImmoXml } from "@/lib/openimmo/xml";
+import { zipPacken } from "@/lib/openimmo/zip";
 import { serverClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
 /**
- * OpenImmo-Export eines Objekts als XML.
+ * OpenImmo-Export eines Objekts.
  *
- * Der produktive Uebertragungsweg zu den Portalen folgt in Phase 2
- * (OPENIMMO_MAPPING.md, Abschnitt 14). Hier entsteht bereits das
- * schema-orientierte Dokument, damit es gegen die offizielle XSD und gegen die
- * Portale geprueft werden kann.
+ * Ohne Parameter entsteht das reine XML zur Pruefung. Mit `?paket=1` entsteht
+ * das Uebertragungspaket: dasselbe XML samt Bilddateien in einem ZIP-Archiv —
+ * so, wie die Portale es erwarten. Der produktive Uebertragungsweg folgt in
+ * Phase 2 (OPENIMMO_MAPPING.md, Abschnitt 14).
  */
 export async function GET(
-  _anfrage: Request,
+  anfrage: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
+  const alsPaket = new URL(anfrage.url).searchParams.get("paket") === "1";
 
   const sitzung = await sitzungLaden();
   if (!sitzung) {
@@ -84,12 +87,19 @@ export async function GET(
   // Erstuebertragung meldet NEU, jede weitere CHANGE.
   const modus = (veroeff?.uebertragungen ?? 0) > 0 ? "CHANGE" : "NEU";
 
+  // Ohne Paket wuerden die Anhaenge auf Dateien verweisen, die nicht
+  // mitgeliefert werden. Sie stehen deshalb nur im Paket im XML.
+  const paket = alsPaket
+    ? await openImmoAnhaengeLaden(supabase, id, objekt.objektnummer)
+    : null;
+
   const xml = openImmoXml({
     objekte: [
       {
         objekt: objekt as OpenImmoObjekt,
         ausstattung: (merkmale ?? []) as Ausstattungsmerkmal[],
         modus,
+        ...(paket ? { anhaenge: paket.anhaenge } : {}),
       },
     ],
     anbieter: {
@@ -103,11 +113,35 @@ export async function GET(
     zeitstempel: new Date().toISOString().slice(0, 19),
   });
 
-  return new NextResponse(xml, {
+  if (!paket) {
+    return new NextResponse(xml, {
+      headers: {
+        "Content-Type": "application/xml; charset=utf-8",
+        "Content-Disposition": `attachment; filename="openimmo-${objekt.objektnummer}.xml"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  // Der Zeitstempel wird einmal gebildet und fuer XML wie Archiv verwendet,
+  // damit beide zusammenpassen.
+  const archiv = zipPacken(
+    [
+      { name: `openimmo-${objekt.objektnummer}.xml`, daten: Buffer.from(xml, "utf8") },
+      ...paket.dateien,
+    ],
+    new Date(),
+  );
+
+  return new NextResponse(new Uint8Array(archiv), {
     headers: {
-      "Content-Type": "application/xml; charset=utf-8",
-      "Content-Disposition": `attachment; filename="openimmo-${objekt.objektnummer}.xml"`,
+      "Content-Type": "application/zip",
+      "Content-Disposition": `attachment; filename="openimmo-${objekt.objektnummer}.zip"`,
       "Cache-Control": "no-store",
+      // Damit die Oberflaeche melden kann, dass etwas fehlt, statt es zu
+      // verschweigen.
+      "X-Anhaenge": String(paket.anhaenge.length),
+      "X-Anhaenge-Ausgelassen": String(paket.ausgelassen),
     },
   });
 }

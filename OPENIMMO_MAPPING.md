@@ -187,12 +187,26 @@ freigegebene Texte blockieren die Veröffentlichung.
 
 | OpenImmo | Quelle |
 |---|---|
-| `anhaenge/anhang/@gruppe` | `objekt_datei.art` → `TITELBILD` · `BILD` · `GRUNDRISS` · `DOKUMENTE` |
-| `anhaenge/anhang/anhangtitel` | `objekt_datei.titel` |
-| `anhaenge/anhang/format` | aus `mimetype` |
+| `anhaenge/anhang/@gruppe` | `objekt_bilder.art` → `TITELBILD` · `BILD` · `GRUNDRISS` · `KARTEN_LAGEPLAN` · `DOKUMENTE` |
+| `anhaenge/anhang/anhangtitel` | `objekt_bilder.titel` |
+| `anhaenge/anhang/format` | aus `objekt_bilder.mime` |
 | `anhaenge/anhang/daten/pfad` | Dateiname im Übertragungspaket |
 
-Reihenfolge nach `objekt_datei.reihenfolge`; `ist_titelbild` bestimmt `TITELBILD`.
+Reihenfolge nach `objekt_bilder.reihenfolge`; `ist_titelbild` bestimmt `TITELBILD`.
+
+**Dateiname im Paket.** Der Name wird beim Packen neu gebildet
+(`{objektnummer}-{lfd}.{endung}`) und nicht aus dem Storage übernommen. Der
+Speicherpfad beginnt mit der Mandanten-ID, und die hat in einem Paket, das an
+ein Portal geht, nichts zu suchen.
+
+**Bearbeitete Bilder.** Ausgeliefert wird der jüngste bearbeitete Stand; das
+Original bleibt in der Datenbank unangetastet. Das KI-Kennzeichen hängt am
+ausgelieferten Stand.
+
+**Anhänge nur im Paket.** Das reine XML (`/api/openimmo/{id}`) enthält keinen
+`anhaenge`-Block — es liegt keine Datei bei, auf die er verweisen könnte. Der
+Block entsteht ausschließlich beim Übertragungspaket
+(`/api/openimmo/{id}?paket=1`).
 
 **KI-Kennzeichnung im Export.** Abschnitt 10 verlangt, dass die Kennzeichnung KI-
 bearbeiteter Bilder auch in Exporten erhalten bleibt. OpenImmo kennt dafür kein Feld.

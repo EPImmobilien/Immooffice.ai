@@ -10,7 +10,7 @@
 |---|---|---|
 | Typprüfung (strict) | `npm run typecheck` | bestanden |
 | Linting | `npm run lint` | bestanden |
-| Unit-Tests | `npm run test` | 74 Tests bestanden |
+| Unit-Tests | `npm run test` | 85 Tests bestanden |
 | Produktions-Build | `npm run build` | bestanden, 23 Routen |
 | Marken-Scan | `npm run marken-scan` | sauber, keine Treffer |
 
@@ -27,6 +27,8 @@ Alles zusammen: `npm run pruefen`.
 | Marketingmotive | Zeilenumbruch an Wortgrenzen mit sichtbarer Kürzung; alle Texte liegen innerhalb der Fläche; das Preisband überlagert den Textblock in keinem der sechs Formate; Sonderzeichen werden maskiert; Mandanten-Branding schlägt durch; KI-Hinweis nur bei KI-Beteiligung |
 | OpenImmo-Prüfung | Vollständiges Objekt geht durch; fehlende Freigabe, Energieangaben oder Kaltmiete blockieren; Grundstücke brauchen keine Energieangaben; „Preis auf Anfrage“ ist zulässig |
 | OpenImmo-XML | Rahmenelemente und Namensraum; Vermarktungs- und Nutzungsart als Attribute; Straße nur bei freigegebener Adresse; Punkt als Dezimaltrenner; Übertragungsart NEU/CHANGE; Mehrfachobjekte; Maskierung von Sonderzeichen und Entfernen von Steuerzeichen |
+| OpenImmo-Anhänge | Gruppe, Format und Dateiname je Anhang; **der Vermerk für KI-bearbeitete Bilder steht im `anhangtitel`**, auch ohne eigenen Bildtitel; ohne Anhänge entfällt der Block; die Position im Dokument liegt zwischen `freitexte` und `verwaltung_objekt` |
+| Übertragungspaket | Archivkennung und zentrales Verzeichnis; gleiche Eingabe ergibt dieselben Bytes; **ein echter Entpacker (`unzip -t`) liest das Archiv und bestätigt die Prüfsummen**; Umlaute im Dateinamen bleiben erhalten; zu große Pakete werden abgewiesen statt still falsch geschrieben |
 | Energiekennwert | **Bedarfsausweis schreibt `endenergiebedarf`, Verbrauchsausweis `energieverbrauchkennwert` — und jeweils das andere Element gerade nicht.** Portale weisen Objekte ab, bei denen Typ und Element nicht zusammenpassen |
 
 Drei Tests wurden durch gezielte Änderung am Code gegengeprüft und schlagen
@@ -160,8 +162,6 @@ Zwei Befunde wurden bereits während der Umsetzung behoben:
   kosten keine Credits.
 - Der Credit-Kontostand auf dem Dashboard zeigt den Testwert an; das Ledger
   entsteht im weiteren Verlauf von Phase 1.
-- Der OpenImmo-Export enthält noch keine `anhaenge`; das Übertragungspaket mit
-  Bilddateien folgt zu Beginn von Phase 2.
 - Bildbearbeitung ist datenseitig vorbereitet (Versionen, unveränderbares
   Original, nicht entfernbares KI-Kennzeichen), aber noch ohne Bedienoberfläche.
 - Kalender, Aufgaben, Wertermittlung, Verträge, Auswertungen, Einstellungen und

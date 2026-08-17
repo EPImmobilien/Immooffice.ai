@@ -1,6 +1,7 @@
 import type {
   Ausstattungsmerkmal,
   OpenImmoAnbieter,
+  OpenImmoAnhang,
   OpenImmoObjekt,
   Uebertragungsmodus,
 } from "./typen";
@@ -244,6 +245,38 @@ function freitexte(objekt: OpenImmoObjekt): string {
   ].join("");
 }
 
+/**
+ * Vermerk fuer KI-bearbeitete Bilder.
+ *
+ * OpenImmo kennt kein Feld fuer diese Kennzeichnung. Sie gehoert deshalb in
+ * den Anhangtitel — das ist das einzige Textfeld, das die Portale zum Bild
+ * uebernehmen. Abschnitt 10 laesst keinen Weg offen, auf den Vermerk zu
+ * verzichten, also gibt es hier auch keinen Schalter dafuer.
+ */
+const KI_BILDVERMERK = "digital bearbeitet";
+
+function anhaenge(liste: OpenImmoAnhang[]): string {
+  if (liste.length === 0) return "";
+
+  const eintraege = liste.map((anhang) => {
+    const titel = [anhang.titel, anhang.kiBearbeitet ? KI_BILDVERMERK : null]
+      .filter(Boolean)
+      .join(" · ");
+
+    return [
+      `<anhang location="EXTERN" gruppe="${anhang.gruppe}">`,
+      element("anhangtitel", titel),
+      element("format", anhang.format),
+      "<daten>",
+      element("pfad", anhang.dateiname),
+      "</daten>",
+      "</anhang>",
+    ].join("");
+  });
+
+  return `<anhaenge>${eintraege.join("")}</anhaenge>`;
+}
+
 function verwaltung(objekt: OpenImmoObjekt, modus: Uebertragungsmodus): string {
   return [
     "<verwaltung_objekt>",
@@ -265,6 +298,8 @@ export interface XmlAuftrag {
     objekt: OpenImmoObjekt;
     ausstattung: Ausstattungsmerkmal[];
     modus: Uebertragungsmodus;
+    /** Dateien im Übertragungspaket. Ohne Paket bleibt die Liste leer. */
+    anhaenge?: OpenImmoAnhang[];
   }[];
   anbieter: OpenImmoAnbieter;
   /** Zeitstempel der Übertragung. Wird übergeben, damit die Ausgabe testbar bleibt. */
@@ -277,7 +312,7 @@ export function openImmoXml(auftrag: XmlAuftrag): string {
   const { anbieter } = auftrag;
 
   const immobilien = auftrag.objekte
-    .map(({ objekt, ausstattung: merkmale, modus }) =>
+    .map(({ objekt, ausstattung: merkmale, modus, anhaenge: dateien }) =>
       [
         "<immobilie>",
         objektkategorie(objekt),
@@ -287,6 +322,9 @@ export function openImmoXml(auftrag: XmlAuftrag): string {
         ausstattung(merkmale),
         zustand(objekt),
         freitexte(objekt),
+        // Reihenfolge nach dem Schema: anhaenge steht zwischen freitexte und
+        // verwaltung_objekt.
+        anhaenge(dateien ?? []),
         verwaltung(objekt, modus),
         "</immobilie>",
       ].join(""),

@@ -88,9 +88,9 @@ export function PortalBereitschaft({
           </p>
         )}
 
-        <div className="flex flex-wrap items-center gap-3 pt-1">
+        <div className="flex flex-wrap items-center gap-2 pt-1">
           <a
-            href={`/api/openimmo/${objektId}`}
+            href={`/api/openimmo/${objektId}?paket=1`}
             className={buttonKlassen({
               variante: bereit ? "primaer" : "sekundaer",
               groesse: "klein",
@@ -98,12 +98,24 @@ export function PortalBereitschaft({
             download
             aria-disabled={!bereit || undefined}
           >
-            OpenImmo-XML herunterladen
+            Übertragungspaket (ZIP)
           </a>
-          <span className="text-[12px] text-gedaempft">
-            Die Übertragung an die Portale folgt in Phase 2.
-          </span>
+          <a
+            href={`/api/openimmo/${objektId}`}
+            className={buttonKlassen({ variante: "leise", groesse: "klein" })}
+            download
+            aria-disabled={!bereit || undefined}
+          >
+            Nur XML
+          </a>
         </div>
+
+        <p className="text-[12px] text-gedaempft">
+          Das Paket enthält das OpenImmo-Dokument und die Bilddateien, so wie
+          die Portale es erwarten. Das reine XML dient der Prüfung — es
+          verweist auf keine Dateien. Die Übertragung an die Portale folgt in
+          Phase 2.
+        </p>
       </KarteInhalt>
     </Karte>
   );

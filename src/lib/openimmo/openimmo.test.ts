@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import { exportMoeglich, exportPruefen } from "./pruefung";
-import type { OpenImmoAnbieter, OpenImmoObjekt } from "./typen";
+import type {
+  OpenImmoAnbieter,
+  OpenImmoAnhang,
+  OpenImmoObjekt,
+} from "./typen";
 import { openImmoXml } from "./xml";
 
 const anbieter: OpenImmoAnbieter = {
@@ -252,5 +256,80 @@ describe("Robustheit der Maskierung", () => {
     expect(xml).not.toContain(String.fromCharCode(7));
     // Zeilenumbrüche sind in XML zulässig und bleiben erhalten.
     expect(xml).toContain("Zeile zwei\nmit Umbruch");
+  });
+});
+
+describe("Anhänge", () => {
+  const anhaenge: OpenImmoAnhang[] = [
+    {
+      dateiname: "0001-01.jpg",
+      gruppe: "TITELBILD",
+      titel: "Straßenansicht",
+      format: "JPG",
+      kiBearbeitet: false,
+    },
+    {
+      dateiname: "0001-02.jpg",
+      gruppe: "BILD",
+      titel: "Wohnzimmer",
+      format: "JPG",
+      kiBearbeitet: true,
+    },
+    {
+      dateiname: "0001-03.png",
+      gruppe: "GRUNDRISS",
+      titel: null,
+      format: "PNG",
+      kiBearbeitet: false,
+    },
+  ];
+
+  function mitAnhaengen(liste: OpenImmoAnhang[]): string {
+    return openImmoXml({
+      objekte: [{ objekt: vollstaendig, ausstattung: [], modus: "NEU", anhaenge: liste }],
+      anbieter,
+      zeitstempel: "2026-08-16T12:30:00",
+    });
+  }
+
+  it("schreibt Gruppe, Format und Dateiname je Anhang", () => {
+    const xml = mitAnhaengen(anhaenge);
+    expect(xml).toContain('<anhang location="EXTERN" gruppe="TITELBILD">');
+    expect(xml).toContain('<anhang location="EXTERN" gruppe="GRUNDRISS">');
+    expect(xml).toContain("<format>JPG</format>");
+    expect(xml).toContain("<pfad>0001-01.jpg</pfad>");
+    expect(xml.match(/<anhang /g)).toHaveLength(3);
+  });
+
+  it("führt den Vermerk für KI-bearbeitete Bilder im Anhangtitel", () => {
+    const xml = mitAnhaengen(anhaenge);
+
+    // Abschnitt 10: Die Kennzeichnung muss den Export überstehen. OpenImmo
+    // kennt kein eigenes Feld dafür, deshalb steht sie im Anhangtitel.
+    expect(xml).toContain("<anhangtitel>Wohnzimmer · digital bearbeitet</anhangtitel>");
+    expect(xml).toContain("<anhangtitel>Straßenansicht</anhangtitel>");
+  });
+
+  it("kennzeichnet auch ein bearbeitetes Bild ohne eigenen Titel", () => {
+    const xml = mitAnhaengen([
+      { ...anhaenge[2]!, titel: null, kiBearbeitet: true },
+    ]);
+    expect(xml).toContain("<anhangtitel>digital bearbeitet</anhangtitel>");
+  });
+
+  it("lässt den Block ohne Anhänge ganz weg", () => {
+    // Ein leeres <anhaenge/> würde manche Portale zu einer Fehlermeldung
+    // verleiten; ohne Anhänge gehört das Element gar nicht ins Dokument.
+    expect(xmlVon(vollstaendig)).not.toContain("<anhaenge>");
+  });
+
+  it("stellt die Anhänge zwischen Freitexte und Verwaltung", () => {
+    const xml = mitAnhaengen(anhaenge);
+    // Das Schema gibt die Reihenfolge vor; eine falsche Position wird von
+    // validierenden Portalen abgewiesen.
+    expect(xml.indexOf("<anhaenge>")).toBeGreaterThan(xml.indexOf("</freitexte>"));
+    expect(xml.indexOf("<anhaenge>")).toBeLessThan(
+      xml.indexOf("<verwaltung_objekt>"),
+    );
   });
 });

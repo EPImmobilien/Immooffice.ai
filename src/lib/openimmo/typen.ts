@@ -87,6 +87,23 @@ export interface Ausstattungsmerkmal {
   wert: string | null;
 }
 
+/**
+ * Ein Anhang im Übertragungspaket (OPENIMMO_MAPPING.md, Abschnitt 10).
+ *
+ * `dateiname` ist der Name **im Paket**, nicht der Speicherpfad. Portale lesen
+ * die Datei relativ zum XML; ein Storage-Pfad wäre dort wertlos und würde
+ * zudem die Mandanten-ID nach außen tragen.
+ */
+export interface OpenImmoAnhang {
+  dateiname: string;
+  gruppe: "TITELBILD" | "BILD" | "GRUNDRISS" | "KARTEN_LAGEPLAN" | "DOKUMENTE";
+  titel: string | null;
+  /** Kürzel wie `JPG` oder `PNG`, aus dem MIME-Typ abgeleitet. */
+  format: string;
+  /** Abschnitt 10 und 11: Der Vermerk wandert in den Anhangtitel. */
+  kiBearbeitet: boolean;
+}
+
 /** Wie ein Objekt beim Portal ankommt: neu, geändert oder zurückgezogen. */
 export type Uebertragungsmodus = "NEU" | "CHANGE" | "DELETE";
 
