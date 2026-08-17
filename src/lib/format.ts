@@ -47,6 +47,42 @@ export function datum(wert: string | Date | null | undefined): string {
   return Number.isNaN(d.getTime()) ? "–" : DATUM.format(d);
 }
 
+/**
+ * Datum mit Uhrzeit, fuer Termine und Verlaufseintraege.
+ *
+ * Die Zeitzone ist fest auf Europe/Berlin gesetzt. Ohne diese Angabe zeigt der
+ * Server UTC und der Browser Ortszeit — derselbe Termin stuende dann je nach
+ * Ort der Darstellung mit zwei verschiedenen Uhrzeiten da, und beim Abgleich
+ * der Serverdarstellung mit der im Browser (Hydration) faellt das als Fehler
+ * auf.
+ */
+const ZEITPUNKT = new Intl.DateTimeFormat("de-DE", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "Europe/Berlin",
+});
+
+const UHRZEIT = new Intl.DateTimeFormat("de-DE", {
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "Europe/Berlin",
+});
+
+export function zeitpunkt(wert: string | Date | null | undefined): string {
+  if (!wert) return "–";
+  const d = typeof wert === "string" ? new Date(wert) : wert;
+  return Number.isNaN(d.getTime()) ? "–" : `${ZEITPUNKT.format(d)} Uhr`;
+}
+
+export function uhrzeit(wert: string | Date | null | undefined): string {
+  if (!wert) return "–";
+  const d = typeof wert === "string" ? new Date(wert) : wert;
+  return Number.isNaN(d.getTime()) ? "–" : UHRZEIT.format(d);
+}
+
 /** Adresse in einer Zeile, ohne leere Bestandteile. */
 export function adresse(objekt: {
   strasse?: string | null;

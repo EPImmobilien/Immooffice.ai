@@ -7,6 +7,7 @@ import { rechtErzwingen } from "@/lib/auth/rechte";
 import { sitzungErzwingen } from "@/lib/auth/sitzung";
 import { serverClient } from "@/lib/supabase/server";
 import { tokenErzeugen } from "@/lib/web-expose";
+import { verlaufVermerken } from "@/server/verlauf-aktionen";
 
 export interface WebExposeErgebnis {
   fehler?: string;
@@ -118,6 +119,16 @@ export async function webExposeSpeichern(
 
   if (error) return { fehler: "Das Web-Exposé konnte nicht angelegt werden." };
 
+  // In den Verlauf des Objekts: Eine Veroeffentlichung ist der Schritt, bei dem
+  // Objektdaten das Haus verlassen. Spaeter ist die Frage „seit wann ist das
+  // oeffentlich" ohne diesen Eintrag nicht mehr zu beantworten.
+  await verlaufVermerken(
+    daten.objekt_id,
+    "web_expose_veroeffentlicht",
+    "Web-Exposé veröffentlicht",
+    { passwortgeschuetzt: hash !== null },
+  );
+
   revalidatePath(`/objekte/${daten.objekt_id}`);
   revalidatePath(`/exposes/${daten.objekt_id}`);
   return { hinweis: "Das Web-Exposé ist veröffentlicht." };
@@ -137,6 +148,12 @@ export async function webExposeWiderrufen(formular: FormData): Promise<void> {
     .update({ widerrufen_am: new Date().toISOString() })
     .eq("objekt_id", objektId)
     .eq("mandant_id", sitzung.mandantId);
+
+  await verlaufVermerken(
+    objektId,
+    "web_expose_widerrufen",
+    "Web-Exposé widerrufen — der Link ist nicht mehr erreichbar",
+  );
 
   revalidatePath(`/objekte/${objektId}`);
   revalidatePath(`/exposes/${objektId}`);

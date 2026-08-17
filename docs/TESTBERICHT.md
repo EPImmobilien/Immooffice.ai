@@ -217,6 +217,29 @@ Die Lehre ist dieselbe wie beim ungültigen Test-PNG weiter oben: **Ein Test,
 der die Umgebung der Produktion nicht nachbildet, prüft die Fachlogik — nicht
 die Auslieferung.**
 
+## 4b. Nachweise für Unterlagen, Verlauf, Aufgaben und Termine
+
+`supabase/tests/verlauf-und-arbeitsmittel.sql` — **25 von 25 bestanden.**
+Schwerpunkte, die über eine reine Mandantentrennung hinausgehen:
+
+| Nachweis | Warum er zählt |
+|---|---|
+| Ein Verlaufseintrag lässt sich **nicht ändern** (Prüfung 6) | Ein Protokoll, das man glätten kann, ist als Nachweis wertlos |
+| Ein Verlaufseintrag lässt sich **nicht löschen** (7) | Dieselbe Begründung; beides über fehlende Policies, nicht über die Oberfläche |
+| Anlegen, Statuswechsel, Unterlage und Termin erzeugen von selbst einen Eintrag (1, 3, 4, 5) | Ein neuer Codepfad kann das Protokollieren nicht vergessen — es hängt an Datenbank-Triggern |
+| Der Eintrag hält den Verursacher fest (2) | Ohne Urheber ist der Verlauf kein Nachweis |
+| Ein **Grundbuchauszug** kann nicht an Interessenten freigegeben werden (22, 25) | Ein Fehlklick ist nicht zurückzuholen: Die Datei kann in derselben Minute heruntergeladen sein |
+| Unterlagen sind ohne Zutun `intern` (11) | Freigabe ist die Ausnahme, nicht die Vorbelegung |
+| Der Dokumentpfad ist unveränderlich (12) | Ein Update würde den Datensatz unbemerkt von der Datei entkoppeln |
+| „Erledigt" ohne Bearbeiter wird abgelehnt (15) | Sonst steht später „fertig" da, ohne dass jemand dafür geradesteht |
+| `anon` darf nicht in den Verlauf schreiben (21) | Dieselbe Klasse Fehler wie bei `credits_gutschreiben` — die Funktion läuft mit erhöhten Rechten |
+| Nur-Lese-Zugriff sieht den Verlauf, schreibt aber nicht (18–20) | Rollen wirken auch auf die neuen Tabellen |
+
+Die Regel „vertrauliche Unterlagen bleiben intern" steht **doppelt**: als
+Bedingung in der Datenbank und in der Server-Aktion. Das ist bewusst
+redundant — bei einer Unterlage, die einmal draußen ist, hilft keine
+nachträgliche Korrektur.
+
 ## 5. Offene Punkte aus der Sicherheitsprüfung
 
 Die Prüfung des Datenbankanbieters meldet einen verbleibenden Punkt:

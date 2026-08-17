@@ -2,19 +2,32 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { AufgabeAnlegen } from "@/components/AufgabeAnlegen";
+import { Aufgabenliste } from "@/components/Aufgabenliste";
 import { Bildergalerie } from "@/components/Bildergalerie";
+import { Dokumentenliste } from "@/components/Dokumentenliste";
+import { DokumentUpload } from "@/components/DokumentUpload";
 import { PortalBereitschaft } from "@/components/PortalBereitschaft";
 import { Seitenkopf } from "@/components/Seitenkopf";
+import { Terminliste } from "@/components/Terminliste";
+import { Verlauf } from "@/components/Verlauf";
 import { Button, buttonKlassen } from "@/components/ui/Button";
 import {
   Karte,
+  KarteBeschreibung,
   KarteInhalt,
   KarteKopf,
   KarteTitel,
 } from "@/components/ui/Karte";
-import { KiKennzeichen, Marke } from "@/components/ui/Status";
+import { Hinweis, KiKennzeichen, Marke } from "@/components/ui/Status";
+import type { Aufgabe, Termin } from "@/lib/arbeitsmittel";
 import { hatRecht } from "@/lib/auth/rechte";
 import { sitzungErzwingen } from "@/lib/auth/sitzung";
+import {
+  DOKUMENTARTEN,
+  fehlendeUnterlagen,
+  type ObjektDokument,
+} from "@/lib/dokumente";
 import { adresse, datum, euro, flaeche, zahl } from "@/lib/format";
 import {
   ENERGIEAUSWEISTYPEN,
@@ -29,6 +42,7 @@ import {
 import { exportPruefen } from "@/lib/openimmo/pruefung";
 import type { OpenImmoObjekt } from "@/lib/openimmo/typen";
 import { serverClient } from "@/lib/supabase/server";
+import type { Verlaufseintrag } from "@/lib/verlauf";
 import { objektLoeschen } from "@/server/objekt-aktionen";
 
 export const metadata: Metadata = { title: "Objekt" };
@@ -63,9 +77,51 @@ export default async function ObjektSeite({
   // die die Existenz verraten wuerde.
   if (!objekt) notFound();
 
+  // Alles, was am Objekt haengt, in einem Zug: Unterlagen, Verlauf, Aufgaben,
+  // Termine. Vier Abfragen nebeneinander statt hintereinander — sie haengen
+  // nicht voneinander ab, und in Reihe waere die Seite viermal so langsam.
+  const [dokumente, verlauf, aufgaben, termine] = await Promise.all([
+    supabase
+      .from("objekt_dokumente")
+      .select(
+        "id, pfad, dateiname, art, titel, notiz, sichtbarkeit, bytes, mime, gueltig_bis, erstellt_am",
+      )
+      .eq("objekt_id", id)
+      .order("erstellt_am", { ascending: false }),
+    supabase
+      .from("aktivitaeten")
+      .select("id, typ, beschreibung, metadaten, erstellt_am, benutzer:benutzer(name)")
+      .eq("objekt_id", id)
+      .order("erstellt_am", { ascending: false })
+      .limit(50),
+    supabase
+      .from("aufgaben")
+      .select(
+        "id, titel, beschreibung, prioritaet, faellig_am, erledigt_am, objekt_id, kontakt_id, " +
+          "zustaendig:benutzer!aufgaben_zustaendig_id_fkey(name)",
+      )
+      .eq("objekt_id", id)
+      .is("erledigt_am", null)
+      .order("faellig_am", { ascending: true, nullsFirst: false }),
+    supabase
+      .from("termine")
+      .select(
+        "id, titel, art, notiz, beginnt_am, endet_am, ort, abgesagt_am, objekt_id, kontakt_id, " +
+          "zustaendig:benutzer!termine_zustaendig_id_fkey(name)",
+      )
+      .eq("objekt_id", id)
+      .order("beginnt_am", { ascending: true }),
+  ]);
+
+  const unterlagen = (dokumente.data ?? []) as unknown as ObjektDokument[];
+  const fehlend = fehlendeUnterlagen(unterlagen);
+  const heute = new Date().toISOString();
+
   const befunde = exportPruefen(objekt as OpenImmoObjekt);
   const darfAendern = hatRecht(sitzung.rolle, "objekte", "aendern");
   const darfLoeschen = hatRecht(sitzung.rolle, "objekte", "loeschen");
+  const darfTermine = hatRecht(sitzung.rolle, "kalender", "anlegen");
+  const darfTermineAendern = hatRecht(sitzung.rolle, "kalender", "aendern");
 
   return (
     <>
@@ -161,6 +217,41 @@ export default async function ObjektSeite({
             darfAendern={darfAendern}
           />
 
+          <Karte>
+            <KarteKopf>
+              <KarteTitel>Unterlagen</KarteTitel>
+              <KarteBeschreibung>
+                Grundriss, Energieausweis, Grundbuch und alles Weitere. Neue
+                Unterlagen sind zunächst nur intern sichtbar.
+              </KarteBeschreibung>
+            </KarteKopf>
+            <KarteInhalt className="space-y-4">
+              {fehlend.length > 0 && (
+                <Hinweis ton="info" className="text-[13px]">
+                  Häufig erwartet und noch nicht hinterlegt:{" "}
+                  {fehlend.map((art) => DOKUMENTARTEN[art]).join(", ")}. Was
+                  wirklich vorliegen muss, hängt vom Einzelfall ab.
+                </Hinweis>
+              )}
+
+              <Dokumentenliste
+                dokumente={unterlagen}
+                objektId={objekt.id}
+                heute={heute}
+                darfAendern={darfAendern}
+              />
+
+              {darfAendern && (
+                <div className="border-t border-linie pt-4">
+                  <DokumentUpload
+                    objektId={objekt.id}
+                    mandantId={sitzung.mandantId}
+                  />
+                </div>
+              )}
+            </KarteInhalt>
+          </Karte>
+
           <PortalBereitschaft objektId={objekt.id} befunde={befunde} />
 
           <Karte>
@@ -175,6 +266,23 @@ export default async function ObjektSeite({
               <Link href={`/exposes/${objekt.id}`} className={buttonKlassen()}>
                 Exposé öffnen
               </Link>
+            </KarteInhalt>
+          </Karte>
+
+          <Karte>
+            <KarteKopf>
+              <KarteTitel>Verlauf</KarteTitel>
+              <KarteBeschreibung>
+                Wer wann was gemacht hat. Einträge entstehen zum Teil von selbst
+                und lassen sich nicht nachträglich ändern.
+              </KarteBeschreibung>
+            </KarteKopf>
+            <KarteInhalt>
+              <Verlauf
+                eintraege={(verlauf.data ?? []) as unknown as Verlaufseintrag[]}
+                objektId={objekt.id}
+                darfSchreiben={darfAendern}
+              />
             </KarteInhalt>
           </Karte>
         </div>
@@ -241,6 +349,36 @@ export default async function ObjektSeite({
                   }
                 />
               </dl>
+            </KarteInhalt>
+          </Karte>
+
+          <Karte>
+            <KarteKopf>
+              <KarteTitel>Aufgaben</KarteTitel>
+            </KarteKopf>
+            <KarteInhalt className="space-y-3">
+              <Aufgabenliste
+                aufgaben={(aufgaben.data ?? []) as unknown as Aufgabe[]}
+                heute={heute}
+                darfAendern={darfTermineAendern}
+                darfLoeschen={hatRecht(sitzung.rolle, "kalender", "loeschen")}
+                mitBezug={false}
+              />
+              {darfTermine && <AufgabeAnlegen objektId={objekt.id} />}
+            </KarteInhalt>
+          </Karte>
+
+          <Karte>
+            <KarteKopf>
+              <KarteTitel>Termine</KarteTitel>
+            </KarteKopf>
+            <KarteInhalt className="space-y-3">
+              <Terminliste
+                termine={(termine.data ?? []) as unknown as Termin[]}
+                darfAendern={darfTermineAendern}
+                mitBezug={false}
+              />
+              {darfTermine && <AufgabeAnlegen objektId={objekt.id} art="termin" />}
             </KarteInhalt>
           </Karte>
 

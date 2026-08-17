@@ -52,6 +52,31 @@ export default async function UebersichtSeite() {
         .eq("status", "neu"),
     ]);
 
+  // Aufgaben und Termine getrennt geladen, weil beide einen Bezugstag brauchen.
+  // Der Tagesbeginn statt „jetzt": Ein Termin, der heute um 9 Uhr war, gehoert
+  // um 11 Uhr noch zum heutigen Tag und nicht in die Vergangenheit.
+  const jetzt = new Date();
+  const tagesbeginn = new Date(
+    Date.UTC(jetzt.getUTCFullYear(), jetzt.getUTCMonth(), jetzt.getUTCDate()),
+  );
+  const heuteDatum = tagesbeginn.toISOString().slice(0, 10);
+
+  const [faelligAntwort, termineAntwort] = await Promise.all([
+    supabase
+      .from("aufgaben")
+      .select("id", { count: "exact", head: true })
+      .is("erledigt_am", null)
+      .lte("faellig_am", heuteDatum),
+    supabase
+      .from("termine")
+      .select("id", { count: "exact", head: true })
+      .is("abgesagt_am", null)
+      .gte("beginnt_am", tagesbeginn.toISOString()),
+  ]);
+
+  const faellig = faelligAntwort.count ?? 0;
+  const naechsteTermine = termineAntwort.count ?? 0;
+
   const objekte = objekteAntwort.data ?? [];
   const aktiv = objekte.filter((o) =>
     ["aktiv", "reserviert"].includes(o.status),
@@ -93,10 +118,23 @@ export default async function UebersichtSeite() {
       zahlHinweis: offeneTreffer === 1 ? "offener Treffer" : "offene Treffer",
     },
     darf("kalender") && {
+      titel: "Aufgaben",
+      hinweis: "Was ansteht, mit Bezug zu Objekt und Kontakt",
+      symbol: "aufgaben" as const,
+      pfad: "/aufgaben",
+      zahl: faellig,
+      // „Fällig" statt „offen": Die Zahl soll den Blick auf das lenken, was
+      // heute liegen bleibt, nicht auf die Gesamtmenge.
+      zahlHinweis: "heute fällig",
+      betont: faellig > 0,
+    },
+    darf("kalender") && {
       titel: "Termine",
-      hinweis: "Besichtigungen und Wiedervorlagen",
+      hinweis: "Besichtigungen, Übergaben, Notartermine",
       symbol: "kalender" as const,
-      geplant: true,
+      pfad: "/kalender",
+      zahl: naechsteTermine,
+      zahlHinweis: "anstehend",
     },
   ].filter(Boolean) as KachelDaten[];
 
