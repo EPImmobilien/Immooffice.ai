@@ -20,6 +20,14 @@ const config = [
   ...nextCoreWebVitals,
   ...nextTypescript,
   {
+    // Die PDF-Vorlagen verwenden <Image> aus @react-pdf/renderer. Das ist kein
+    // HTML-Bild: Ein PDF kennt kein alt-Attribut, und die Regel wuerde nur zu
+    // wirkungslosen Attributen fuehren. Die Bildunterschriften in den Vorlagen
+    // sind die tatsaechliche Beschreibung.
+    files: ["src/lib/expose/vorlage-*.tsx"],
+    rules: { "jsx-a11y/alt-text": "off" },
+  },
+  {
     rules: {
       // Sicherheitsrelevant: kein stiller Typverlust an Systemgrenzen.
       "@typescript-eslint/no-explicit-any": "error",

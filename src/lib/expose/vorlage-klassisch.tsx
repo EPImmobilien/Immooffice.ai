@@ -1,69 +1,26 @@
-import {
-  Document,
-  Page,
-  StyleSheet,
-  Text,
-  View,
-} from "@react-pdf/renderer";
+import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 
-import { adresse, euro, flaeche, zahl } from "@/lib/format";
 import {
-  ENERGIEAUSWEISTYPEN,
-  OBJEKTKATEGORIEN,
-  istMiete,
-} from "@/lib/objekt-begriffe";
+  eckdaten,
+  energiedaten,
+  HAFTUNG,
+  KiVermerk,
+  anschriftzeile,
+  kategorieName,
+  kontaktzeile,
+  ortszeile,
+  preisAngabe,
+} from "./gemeinsam";
+import type { ExposeDaten } from "./typen";
 
 /**
- * Exposé-Vorlage 1: „Klassisch, ausführlich“ (Abschnitt 8).
+ * Vorlage 1: „Klassisch, ausführlich“ (Abschnitt 8).
  *
- * Deterministisches Layout — kein Bild-KI-Einsatz für Seitengestaltung
- * (Abschnitt 12). Das Mandanten-Branding wird als Parameter übergeben und
- * nicht fest verdrahtet, damit dieselbe Vorlage für jeden Mandanten trägt.
+ * Die Vorlage fuer den Regelfall: alle Angaben, alle Texte, mehrseitig. Das
+ * Layout entsteht aus festen Regeln, nicht aus einem Bildmodell
+ * (Abschnitt 12). Das Mandanten-Branding kommt als Parameter herein und ist
+ * nirgends fest verdrahtet.
  */
-
-export interface ExposeBranding {
-  firmenname: string;
-  farbePrimaer: string;
-  farbeAkzent: string;
-  strasse: string | null;
-  plz: string | null;
-  ort: string | null;
-  telefon: string | null;
-  email: string | null;
-  web: string | null;
-  impressum: string | null;
-}
-
-export interface ExposeObjekt {
-  objektnummer: string;
-  bezeichnung: string;
-  titel: string | null;
-  objektkategorie: string;
-  objektart: string | null;
-  vermarktungsart: string;
-  strasse: string | null;
-  hausnummer: string | null;
-  plz: string | null;
-  ort: string | null;
-  adresse_veroeffentlichen: boolean;
-  wohnflaeche: number | null;
-  nutzflaeche: number | null;
-  grundstuecksflaeche: number | null;
-  zimmer: number | null;
-  baujahr: number | null;
-  kaufpreis: number | null;
-  kaltmiete: number | null;
-  nebenkosten: number | null;
-  hausgeld: number | null;
-  provision_kaeufer: string | null;
-  energieausweis_typ: string | null;
-  energie_kennwert: number | null;
-  energie_klasse: string | null;
-  beschreibung_objekt: string | null;
-  beschreibung_ausstattung: string | null;
-  beschreibung_lage: string | null;
-  texte_ki_erzeugt: boolean;
-}
 
 const stile = StyleSheet.create({
   seite: {
@@ -86,6 +43,7 @@ const stile = StyleSheet.create({
   firma: { fontSize: 13, fontFamily: "Helvetica-Bold" },
   kopfZeile: { fontSize: 8, color: "#7A828C", marginTop: 2 },
   objektnummer: { fontSize: 8, color: "#7A828C" },
+  titelbild: { width: "100%", height: 210, objectFit: "cover", marginBottom: 18 },
   titel: { fontSize: 19, fontFamily: "Helvetica-Bold", marginBottom: 4 },
   untertitel: { fontSize: 10, color: "#7A828C", marginBottom: 18 },
   abschnitt: { marginBottom: 16 },
@@ -102,19 +60,13 @@ const stile = StyleSheet.create({
   eckdatum: { width: "50%", flexDirection: "row", marginBottom: 4, paddingRight: 8 },
   eckLabel: { width: "55%", color: "#7A828C" },
   eckWert: { width: "45%", fontFamily: "Helvetica-Bold" },
-  preisKasten: {
-    padding: 12,
-    marginBottom: 18,
-    borderLeftWidth: 3,
-  },
+  preisKasten: { padding: 12, marginBottom: 18, borderLeftWidth: 3 },
   preisLabel: { fontSize: 8, color: "#7A828C", textTransform: "uppercase" },
   preisWert: { fontSize: 17, fontFamily: "Helvetica-Bold", marginTop: 2 },
-  kiVermerk: {
-    fontSize: 7,
-    color: "#7A828C",
-    marginTop: 4,
-    fontFamily: "Helvetica-Oblique",
-  },
+  bildreihe: { flexDirection: "row", flexWrap: "wrap", marginHorizontal: -4 },
+  bildfeld: { width: "50%", paddingHorizontal: 4, marginBottom: 8 },
+  bild: { width: "100%", height: 130, objectFit: "cover" },
+  bildunterschrift: { fontSize: 7, color: "#7A828C", marginTop: 2 },
   fuss: {
     position: "absolute",
     bottom: 26,
@@ -137,22 +89,11 @@ function Eckdatum({ label, wert }: { label: string; wert: string }) {
   );
 }
 
-export function ExposeKlassisch({
-  objekt,
-  branding,
-}: {
-  objekt: ExposeObjekt;
-  branding: ExposeBranding;
-}) {
-  const miete = istMiete(objekt.vermarktungsart);
-  const ortszeile = objekt.adresse_veroeffentlichen
-    ? adresse(objekt)
-    : [objekt.plz, objekt.ort].filter(Boolean).join(" ") || "Auf Anfrage";
-
-  const kategorie =
-    objekt.objektart ??
-    OBJEKTKATEGORIEN[objekt.objektkategorie as keyof typeof OBJEKTKATEGORIEN] ??
-    "Immobilie";
+export function ExposeKlassisch({ objekt, branding, bilder }: ExposeDaten) {
+  const preis = preisAngabe(objekt);
+  const titelbild = bilder[0];
+  const weitere = bilder.slice(1, 7);
+  const bildBearbeitet = bilder.some((b) => b.kiBearbeitet);
 
   return (
     <Document
@@ -167,67 +108,41 @@ export function ExposeKlassisch({
             <Text style={[stile.firma, { color: branding.farbePrimaer }]}>
               {branding.firmenname}
             </Text>
-            <Text style={stile.kopfZeile}>
-              {[branding.strasse, [branding.plz, branding.ort].filter(Boolean).join(" ")]
-                .filter(Boolean)
-                .join(" · ")}
-            </Text>
+            <Text style={stile.kopfZeile}>{anschriftzeile(branding)}</Text>
           </View>
           <Text style={stile.objektnummer}>Objekt {objekt.objektnummer}</Text>
         </View>
 
+        {titelbild && (
+          <Image
+            style={stile.titelbild}
+            src={{ data: titelbild.daten, format: titelbild.format }}
+          />
+        )}
+
         <Text style={stile.titel}>{objekt.titel ?? objekt.bezeichnung}</Text>
         <Text style={stile.untertitel}>
-          {kategorie} · {ortszeile}
+          {kategorieName(objekt)} · {ortszeile(objekt)}
         </Text>
 
         <View
           style={[
             stile.preisKasten,
-            {
-              borderLeftColor: branding.farbeAkzent,
-              backgroundColor: "#FAFAFA",
-            },
+            { borderLeftColor: branding.farbeAkzent, backgroundColor: "#FAFAFA" },
           ]}
         >
-          <Text style={stile.preisLabel}>
-            {miete ? "Kaltmiete monatlich" : "Kaufpreis"}
-          </Text>
+          <Text style={stile.preisLabel}>{preis.label}</Text>
           <Text style={[stile.preisWert, { color: branding.farbePrimaer }]}>
-            {miete ? euro(objekt.kaltmiete) : euro(objekt.kaufpreis)}
+            {preis.wert}
           </Text>
         </View>
 
         <View style={stile.abschnitt}>
           <Text style={stile.ueberschrift}>Eckdaten</Text>
           <View style={stile.eckdaten}>
-            {objekt.wohnflaeche !== null && (
-              <Eckdatum label="Wohnfläche" wert={flaeche(objekt.wohnflaeche)} />
-            )}
-            {objekt.nutzflaeche !== null && (
-              <Eckdatum label="Nutzfläche" wert={flaeche(objekt.nutzflaeche)} />
-            )}
-            {objekt.grundstuecksflaeche !== null && (
-              <Eckdatum
-                label="Grundstück"
-                wert={flaeche(objekt.grundstuecksflaeche)}
-              />
-            )}
-            {objekt.zimmer !== null && (
-              <Eckdatum label="Zimmer" wert={zahl(objekt.zimmer)} />
-            )}
-            {objekt.baujahr !== null && (
-              <Eckdatum label="Baujahr" wert={String(objekt.baujahr)} />
-            )}
-            {objekt.nebenkosten !== null && (
-              <Eckdatum label="Nebenkosten" wert={euro(objekt.nebenkosten)} />
-            )}
-            {objekt.hausgeld !== null && (
-              <Eckdatum label="Hausgeld" wert={euro(objekt.hausgeld)} />
-            )}
-            {objekt.provision_kaeufer && (
-              <Eckdatum label="Provision" wert={objekt.provision_kaeufer} />
-            )}
+            {eckdaten(objekt).map((e) => (
+              <Eckdatum key={e.bezeichnung} label={e.bezeichnung} wert={e.wert} />
+            ))}
           </View>
         </View>
 
@@ -252,52 +167,46 @@ export function ExposeKlassisch({
           </View>
         )}
 
+        {weitere.length > 0 && (
+          <View style={stile.abschnitt} break={weitere.length > 2}>
+            <Text style={stile.ueberschrift}>Weitere Ansichten</Text>
+            <View style={stile.bildreihe}>
+              {weitere.map((bild, i) => (
+                <View key={i} style={stile.bildfeld}>
+                  <Image
+                    style={stile.bild}
+                    src={{ data: bild.daten, format: bild.format }}
+                  />
+                  {(bild.titel || bild.kiBearbeitet) && (
+                    <Text style={stile.bildunterschrift}>
+                      {[bild.titel, bild.kiBearbeitet ? "digital bearbeitet" : null]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </Text>
+                  )}
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
         <View style={stile.abschnitt}>
           <Text style={stile.ueberschrift}>Energieausweis</Text>
           <View style={stile.eckdaten}>
-            <Eckdatum
-              label="Art"
-              wert={
-                objekt.energieausweis_typ
-                  ? (ENERGIEAUSWEISTYPEN[
-                      objekt.energieausweis_typ as keyof typeof ENERGIEAUSWEISTYPEN
-                    ] ?? "–")
-                  : "Liegt nicht vor"
-              }
-            />
-            <Eckdatum
-              label="Kennwert"
-              wert={
-                objekt.energie_kennwert !== null
-                  ? `${zahl(objekt.energie_kennwert)} kWh/(m²·a)`
-                  : "–"
-              }
-            />
-            <Eckdatum label="Effizienzklasse" wert={objekt.energie_klasse ?? "–"} />
+            {energiedaten(objekt).map((e) => (
+              <Eckdatum key={e.bezeichnung} label={e.bezeichnung} wert={e.wert} />
+            ))}
           </View>
         </View>
 
-        {/* Kennzeichnung KI-erzeugter Inhalte bleibt im Export erhalten
-            (Abschnitt 10) und ist nicht abschaltbar. */}
-        {objekt.texte_ki_erzeugt && (
-          <Text style={stile.kiVermerk}>
-            Die Beschreibungstexte wurden mit Unterstützung künstlicher
-            Intelligenz erstellt und redaktionell geprüft.
-          </Text>
-        )}
+        <KiVermerk
+          texteKiErzeugt={objekt.texte_ki_erzeugt}
+          bilderKiBearbeitet={bildBearbeitet}
+        />
 
         <View style={stile.fuss} fixed>
-          <Text>
-            {branding.firmenname}
-            {branding.telefon ? ` · ${branding.telefon}` : ""}
-            {branding.email ? ` · ${branding.email}` : ""}
-            {branding.web ? ` · ${branding.web}` : ""}
-          </Text>
-          <Text style={{ marginTop: 2 }}>
-            Alle Angaben beruhen auf Informationen des Eigentümers. Eine Haftung
-            für Vollständigkeit und Richtigkeit wird nicht übernommen. Irrtum und
-            Zwischenverkauf vorbehalten.
-          </Text>
+          <Text>{kontaktzeile(branding)}</Text>
+          <Text style={{ marginTop: 2 }}>{HAFTUNG}</Text>
         </View>
       </Page>
     </Document>

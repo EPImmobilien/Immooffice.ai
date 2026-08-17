@@ -1,6 +1,6 @@
 # Testbericht Durchstich v0.1
 
-**Stand:** 16.08.2026 · Master-Prompt Abschnitt 19 · Phase 1, Durchstich
+**Stand:** 17.08.2026 · Master-Prompt Abschnitt 19 · Phase 1
 
 ---
 
@@ -10,8 +10,8 @@
 |---|---|---|
 | Typprüfung (strict) | `npm run typecheck` | bestanden |
 | Linting | `npm run lint` | bestanden |
-| Unit-Tests | `npm run test` | 30 Tests bestanden |
-| Produktions-Build | `npm run build` | bestanden, 17 Routen |
+| Unit-Tests | `npm run test` | 74 Tests bestanden |
+| Produktions-Build | `npm run build` | bestanden, 23 Routen |
 | Marken-Scan | `npm run marken-scan` | sauber, keine Treffer |
 
 Alles zusammen: `npm run pruefen`.
@@ -23,13 +23,23 @@ Alles zusammen: `npm run pruefen`.
 | Design-Tokens | Beide Dunkelmodus-Blöcke setzen dieselben Tokens; jeder Dunkel-Token hat eine Entsprechung im Hellmodus; die fixierten Markenfarben sind unverändert |
 | Lückenerkennung | Vollständige Objekte melden keine Lücken; fehlende Pflichtangaben werden gemeldet statt ergänzt; kategorieabhängige Regeln greifen nur, wo sie gelten |
 | Entwurfstexte | Ohne Modell keine KI-Kennzeichnung und keine Credits; nur erfasste Werte werden verwendet; bei fehlendem Baujahr taucht **kein** Jahr im Text auf |
-| Exposé-PDF | Erzeugt eine gültige PDF-Datei; kommt auch ohne optionale Angaben aus |
+| Exposé-Vorlagen | Alle fünf Vorlagen erzeugen gültige PDF-Dateien, kommen ohne Bilder und ohne optionale Angaben aus, **betten die angekündigte Zahl Bilder tatsächlich ein**, und Kurzexposé wie Aushang bleiben auch mit überlangen Texten einseitig |
+| Marketingmotive | Zeilenumbruch an Wortgrenzen mit sichtbarer Kürzung; alle Texte liegen innerhalb der Fläche; das Preisband überlagert den Textblock in keinem der sechs Formate; Sonderzeichen werden maskiert; Mandanten-Branding schlägt durch; KI-Hinweis nur bei KI-Beteiligung |
 | OpenImmo-Prüfung | Vollständiges Objekt geht durch; fehlende Freigabe, Energieangaben oder Kaltmiete blockieren; Grundstücke brauchen keine Energieangaben; „Preis auf Anfrage“ ist zulässig |
 | OpenImmo-XML | Rahmenelemente und Namensraum; Vermarktungs- und Nutzungsart als Attribute; Straße nur bei freigegebener Adresse; Punkt als Dezimaltrenner; Übertragungsart NEU/CHANGE; Mehrfachobjekte; Maskierung von Sonderzeichen und Entfernen von Steuerzeichen |
 | Energiekennwert | **Bedarfsausweis schreibt `endenergiebedarf`, Verbrauchsausweis `energieverbrauchkennwert` — und jeweils das andere Element gerade nicht.** Portale weisen Objekte ab, bei denen Typ und Element nicht zusammenpassen |
 
-Der Token-Test wurde durch gezieltes Entfernen eines Tokens gegengeprüft und
-schlägt dann fehl — er kann die Regression also tatsächlich erkennen.
+Drei Tests wurden durch gezielte Änderung am Code gegengeprüft und schlagen
+dann fehl — sie können die jeweilige Regression also tatsächlich erkennen:
+der Token-Test (ein Token entfernt), der Überlagerungstest der Marketingmotive
+(Preisband verschoben) und der Einseitigkeitstest des Aushangs (Titelkürzung
+aufgehoben).
+
+Beim Schreiben der Vorlagentests fiel auf, dass die PDF-Erzeugung ein
+**unlesbares Bild wortlos verwirft**, ohne einen Fehler zu melden. Die erste
+Fassung der Tests prüfte nur, ob eine PDF-Datei entstand, und war deshalb grün,
+obwohl kein einziges Bild eingebettet wurde. Die Tests zählen jetzt die
+eingebetteten Bildobjekte im fertigen Dokument.
 
 ## 2. Nachweis der Mandantentrennung
 
@@ -70,6 +80,24 @@ maskierte Sonderzeichen (`< & " ²`) kommen beim Auslesen unverändert zurück.
 Kopfabschnitt von `OPENIMMO_MAPPING.md`: Die Feldabbildung ist fachlich
 abgeleitet, die exakten Elementnamen sind vor dem Produktivbetrieb zu
 bestätigen.
+
+## 2a. Weitere Nachweise in der Datenbank
+
+Dieselbe Bauart wie der RLS-Test: Transaktion, Rollenwechsel per
+`set_config`, Rollback am Ende. Geprüft wird die Regel dort, wo sie gilt — in
+der Datenbank, nicht in der Oberfläche.
+
+| Skript | Gegenstand | Ergebnis |
+|---|---|---|
+| [`credits.sql`](../supabase/tests/credits.sql) | Unveränderbares Ledger, kein negativer Saldo, älteste Credits zuerst, Freigabe reservierter Credits bei fehlgeschlagenen Aufträgen | 16 von 16 |
+| [`matching.sql`](../supabase/tests/matching.sql) | Vermarktungsart, Kategorie, Ort und Preisrahmen schließen aus; weiche Kriterien ordnen nur; bearbeitete Treffer werden nicht überschrieben; keine Treffer über die Mandantengrenze | 10 von 10 |
+| [`bilder.sql`](../supabase/tests/bilder.sql) | Original bleibt unverändert, Bearbeitung ist eine eigene Version mit Beschreibung, KI-Kennzeichen nicht entfernbar, Bildpfad unveränderlich, ein Titelbild je Objekt, keine Sicht auf fremde Bilder | 10 von 10 |
+
+Der Matching-Test hat eine **Fehlentscheidung im Entwurf aufgedeckt**: Ein
+Objekt in Hamburg erhielt für ein Kieler Suchprofil noch 75 von 100 Punkten,
+weil der Ort als weiches Kriterium zählte. Für den Makler ist das kein
+schlechterer Treffer, sondern Rauschen. Der Ort ist seither ein
+Ausschlusskriterium (Migration `matching_ort_als_ausschluss`).
 
 ## 3. Manuell geprüft
 
@@ -132,6 +160,10 @@ Zwei Befunde wurden bereits während der Umsetzung behoben:
   kosten keine Credits.
 - Der Credit-Kontostand auf dem Dashboard zeigt den Testwert an; das Ledger
   entsteht im weiteren Verlauf von Phase 1.
-- Von den fünf Exposé-Vorlagen ist eine umgesetzt.
-- Kalender, Aufgaben, Suchprofile, Portalexport, Abrechnung und Plattform-Admin
-  sind in der Navigation als „geplant“ gekennzeichnet und ohne Funktion.
+- Der OpenImmo-Export enthält noch keine `anhaenge`; das Übertragungspaket mit
+  Bilddateien folgt zu Beginn von Phase 2.
+- Bildbearbeitung ist datenseitig vorbereitet (Versionen, unveränderbares
+  Original, nicht entfernbares KI-Kennzeichen), aber noch ohne Bedienoberfläche.
+- Kalender, Aufgaben, Wertermittlung, Verträge, Auswertungen, Einstellungen und
+  Plattform-Admin sind in der Navigation als „geplant“ gekennzeichnet und ohne
+  Funktion.

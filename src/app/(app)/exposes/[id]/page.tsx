@@ -14,6 +14,7 @@ import {
 import { Hinweis, KiKennzeichen, Marke } from "@/components/ui/Status";
 import { hatRecht } from "@/lib/auth/rechte";
 import { sitzungErzwingen } from "@/lib/auth/sitzung";
+import { VORLAGEN } from "@/lib/expose/vorlagen";
 import { datum } from "@/lib/format";
 import { kiVerfuegbar } from "@/lib/ki";
 import { serverClient } from "@/lib/supabase/server";
@@ -61,6 +62,12 @@ export default async function ExposeSeite({
     .maybeSingle();
 
   if (!objekt) notFound();
+
+  const { count: bildAnzahl } = await supabase
+    .from("objekt_bilder")
+    .select("id", { count: "exact", head: true })
+    .eq("objekt_id", objekt.id)
+    .is("original_id", null);
 
   const darfErzeugen = hatRecht(sitzung.rolle, "exposes", "anlegen");
   const darfFreigeben = hatRecht(sitzung.rolle, "exposes", "freigeben");
@@ -119,28 +126,56 @@ export default async function ExposeSeite({
 
           <Karte>
             <KarteKopf>
-              <KarteTitel>PDF-Export</KarteTitel>
+              <KarteTitel>Vorlagen</KarteTitel>
               <KarteBeschreibung>
-                Vorlage „Klassisch, ausführlich“ mit dem Branding Ihres
-                Unternehmens.
+                Alle Vorlagen übernehmen das Branding Ihres Unternehmens
+                automatisch.
               </KarteBeschreibung>
             </KarteKopf>
             <KarteInhalt className="space-y-3">
               <p className="text-[13px] text-gedaempft">
                 Der Export bestehender Inhalte kostet keine Credits — beliebig
-                oft.
+                oft und in jeder Vorlage.
               </p>
-              <a
-                href={`/api/expose/${objekt.id}/pdf`}
-                className={buttonKlassen({ variante: "sekundaer" })}
-                download
-              >
-                Exposé als PDF
-              </a>
-              <p className="text-[12px] text-gedaempft">
-                Die weiteren vier Vorlagen aus Abschnitt 8 folgen im Verlauf von
-                Phase 1.
-              </p>
+
+              <ul className="divide-y divide-linie">
+                {VORLAGEN.map((vorlage) => (
+                  <li
+                    key={vorlage.schluessel}
+                    className="flex flex-wrap items-center justify-between gap-3 py-3"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-medium text-text">
+                        {vorlage.name}{" "}
+                        <span className="font-normal text-gedaempft">
+                          · {vorlage.format}
+                        </span>
+                      </p>
+                      <p className="text-[12px] text-gedaempft">
+                        {vorlage.hinweis}
+                      </p>
+                    </div>
+                    <a
+                      href={`/api/expose/${objekt.id}/pdf?vorlage=${vorlage.schluessel}`}
+                      className={buttonKlassen({
+                        variante: "sekundaer",
+                        groesse: "klein",
+                      })}
+                      download
+                    >
+                      PDF
+                    </a>
+                  </li>
+                ))}
+              </ul>
+
+              {bildAnzahl === 0 && (
+                <Hinweis ton="warnung">
+                  Für dieses Objekt sind noch keine Bilder hinterlegt. Die
+                  bildstarken Vorlagen bleiben dadurch leer — Bilder lassen sich
+                  direkt beim Objekt hochladen.
+                </Hinweis>
+              )}
             </KarteInhalt>
           </Karte>
         </div>

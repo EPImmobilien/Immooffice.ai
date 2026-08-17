@@ -3,24 +3,24 @@ import { NextResponse } from "next/server";
 
 import { rechtErzwingen } from "@/lib/auth/rechte";
 import { sitzungLaden } from "@/lib/auth/sitzung";
-import {
-  ExposeKlassisch,
-  type ExposeBranding,
-  type ExposeObjekt,
-} from "@/lib/expose/vorlage-klassisch";
+import { exposeBilderLaden } from "@/lib/expose/bilder-laden";
+import type { ExposeBranding, ExposeObjekt } from "@/lib/expose/typen";
+import { STANDARDVORLAGE, vorlageFinden } from "@/lib/expose/vorlagen";
 import { serverClient } from "@/lib/supabase/server";
 
 // @react-pdf/renderer benoetigt Node-APIs; die Edge-Laufzeit reicht nicht.
 export const runtime = "nodejs";
 
 /**
- * PDF-Export eines Exposés.
+ * PDF-Export eines Exposés in einer der fuenf Vorlagen (Abschnitt 8).
  *
  * Kostet KEINE Credits (Abschnitt 8 und 14): Nur die KI-Erstellung ist
  * kostenpflichtig, der Export bestehender Inhalte beliebig oft kostenfrei.
+ * Auch der Wechsel der Vorlage ist deshalb frei — er erzeugt keinen neuen
+ * Inhalt, sondern setzt vorhandenen anders.
  */
 export async function GET(
-  _anfrage: Request,
+  anfrage: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
@@ -30,6 +30,16 @@ export async function GET(
     return NextResponse.json({ fehler: "Nicht angemeldet." }, { status: 401 });
   }
   rechtErzwingen(sitzung.rolle, "exposes", "lesen");
+
+  const gewuenscht =
+    new URL(anfrage.url).searchParams.get("vorlage") ?? STANDARDVORLAGE;
+  const vorlage = vorlageFinden(gewuenscht);
+  if (!vorlage) {
+    return NextResponse.json(
+      { fehler: "Unbekannte Vorlage." },
+      { status: 400 },
+    );
+  }
 
   const supabase = await serverClient();
 
@@ -68,11 +78,13 @@ export async function GET(
     impressum: branding?.impressum ?? null,
   };
 
+  const bilder = await exposeBilderLaden(supabase, id, vorlage.bilder);
+
   const puffer = await renderToBuffer(
-    <ExposeKlassisch objekt={objekt as ExposeObjekt} branding={marke} />,
+    vorlage.bauen({ objekt: objekt as ExposeObjekt, branding: marke, bilder }),
   );
 
-  const dateiname = `Expose-${objekt.objektnummer}.pdf`;
+  const dateiname = `Expose-${objekt.objektnummer}-${vorlage.schluessel}.pdf`;
 
   return new NextResponse(new Uint8Array(puffer), {
     headers: {

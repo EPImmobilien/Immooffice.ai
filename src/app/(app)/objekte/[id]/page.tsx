@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { Bildergalerie } from "@/components/Bildergalerie";
 import { PortalBereitschaft } from "@/components/PortalBereitschaft";
 import { Seitenkopf } from "@/components/Seitenkopf";
 import { Button, buttonKlassen } from "@/components/ui/Button";
@@ -153,6 +154,12 @@ export default async function ObjektSeite({
               )}
             </KarteInhalt>
           </Karte>
+
+          <Bildergalerie
+            objektId={objekt.id}
+            mandantId={sitzung.mandantId}
+            darfAendern={darfAendern}
+          />
 
           <PortalBereitschaft objektId={objekt.id} befunde={befunde} />
 
