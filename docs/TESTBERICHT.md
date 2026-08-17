@@ -263,6 +263,37 @@ angehängt an `kontakt_objekt`, `objekt_dokumente`, `aktivitaeten`, `aufgaben`,
 abgewiesen werden (1, 2, 4, 5, 6, 7) **und** dass stimmige weiter durchlaufen
 (3, 8, 9) — eine Härtung, die den Normalfall mit abwürgt, ist keine.
 
+## 4d. Nur freigegebene Unterlagen im Web-Exposé
+
+`supabase/tests/web-expose-unterlagen.sql` — **7 von 7 bestanden.**
+
+Anders als bei Bildern ist hier **nicht** alles öffentlich, was am Objekt hängt.
+Bilder eines veröffentlichten Objekts sind samt und sonders zur Ansicht
+gedacht; Unterlagen sind es nicht. Geprüft ist deshalb beides — dass die
+freigegebene Unterlage ankommt und dass drei andere Fälle draußen bleiben:
+
+| Fall | Erwartung |
+|---|---|
+| Grundriss, freigegeben, gültig | erscheint |
+| Protokoll, nicht freigegeben | erscheint nicht |
+| Grundbuchauszug | kann „freigegeben" nicht erreichen (Bedingung in der Tabelle) |
+| Energieausweis, freigegeben, **abgelaufen** | erscheint nicht |
+
+Zwei Punkte, die über die Liste hinausgehen:
+
+- **Die Speicherfreigabe zieht dieselbe Grenze wie die Liste** (4–6). Wäre sie
+  weiter, käme man an der Liste vorbei an die Datei. Die Prüffunktion vergleicht
+  deshalb den **vollständigen Pfad** gegen die Unterlagentabelle — nicht, wie
+  das Gegenstück für Bilder, ein Pfadsegment gegen die Veröffentlichung. Bei
+  geändertem Pfadaufbau gäbe eine Segmentprüfung eine Datei frei, die niemand
+  freigegeben hat.
+- **Nach Widerruf ist die Datei gesperrt** (7). Eine Seite ohne Verweis, deren
+  Dateien weiter erreichbar sind, wäre kein Widerruf.
+
+Die Liste wird in `web_expose_oeffnen` Feld für Feld aufgebaut und nicht mit
+`to_jsonb` erzeugt (3). Sonst wanderte jede später ergänzte Spalte automatisch
+nach draußen — der interne Vermerk zum Beispiel.
+
 ## 5. Offene Punkte aus der Sicherheitsprüfung
 
 Die Prüfung des Datenbankanbieters meldet einen verbleibenden Punkt:

@@ -3,6 +3,12 @@ import { cookies } from "next/headers";
 
 import { KiKennzeichen, Marke } from "@/components/ui/Status";
 import { BILD_BUCKET } from "@/lib/bilder";
+import {
+  DOKUMENTARTEN,
+  DOKUMENT_BUCKET,
+  dateigroesse,
+  type Dokumentart,
+} from "@/lib/dokumente";
 import { euro, flaeche, zahl } from "@/lib/format";
 import {
   ENERGIEAUSWEISTYPEN,
@@ -32,6 +38,23 @@ interface Bild {
   mime: string | null;
 }
 
+/**
+ * Freigegebene Unterlage.
+ *
+ * Die Datenbank liefert hier ausschliesslich Unterlagen mit
+ * `sichtbarkeit = 'kunde'`, die nicht abgelaufen sind. Vertrauliche Arten wie
+ * ein Grundbuchauszug koennen diesen Zustand gar nicht erreichen — das ist als
+ * Bedingung in der Tabelle verankert.
+ */
+interface Unterlage {
+  pfad: string;
+  dateiname: string;
+  art: string;
+  titel: string | null;
+  bytes: number | null;
+  mime: string | null;
+}
+
 interface Antwort {
   zustand: WebExposeZustand;
   download_erlaubt?: boolean;
@@ -39,6 +62,7 @@ interface Antwort {
   objekt?: Record<string, unknown>;
   anbieter?: Record<string, unknown>;
   bilder?: Bild[];
+  unterlagen?: Unterlage[];
 }
 
 function textOder(wert: unknown, ersatz = ""): string {
@@ -142,6 +166,26 @@ export default async function WebExposeSeite({
     for (const eintrag of signiert ?? []) {
       if (eintrag.signedUrl && eintrag.path) {
         verweise.set(eintrag.path, eintrag.signedUrl);
+      }
+    }
+  }
+
+  // Dasselbe fuer die freigegebenen Unterlagen, aus einem eigenen Bucket. Die
+  // Freigabe haengt am Kennzeichen der einzelnen Unterlage und endet mit
+  // Widerruf oder Ablauf des Exposés — auch fuer eine bereits erzeugte Adresse,
+  // sobald sie nach dreissig Minuten verfaellt.
+  const unterlagen = antwort.unterlagen ?? [];
+  const unterlagenVerweise = new Map<string, string>();
+  if (unterlagen.length > 0) {
+    const { data: signiert } = await supabase.storage
+      .from(DOKUMENT_BUCKET)
+      .createSignedUrls(
+        unterlagen.map((u) => u.pfad),
+        60 * 30,
+      );
+    for (const eintrag of signiert ?? []) {
+      if (eintrag.signedUrl && eintrag.path) {
+        unterlagenVerweise.set(eintrag.path, eintrag.signedUrl);
       }
     }
   }
@@ -350,6 +394,49 @@ export default async function WebExposeSeite({
             {bildBearbeitet &&
               "Einzelne Bilder wurden digital nachbearbeitet; die bauliche Substanz bleibt davon unberührt."}
           </p>
+        )}
+
+        {unterlagen.length > 0 && (
+          <section className="mt-8">
+            <h2 className="text-lg font-semibold text-text">Unterlagen</h2>
+            <p className="mt-1 mb-4 text-[13px] text-gedaempft">
+              Vom Anbieter zur Weitergabe freigegeben.
+            </p>
+            <ul className="divide-y divide-linie rounded-[var(--radius-gross)] bg-flaeche px-5">
+              {unterlagen.map((unterlage) => {
+                const verweis = unterlagenVerweise.get(unterlage.pfad);
+                if (!verweis) return null;
+
+                return (
+                  <li
+                    key={unterlage.pfad}
+                    className="flex flex-wrap items-center justify-between gap-3 py-3.5"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-[14px] text-text">
+                        {unterlage.titel ||
+                          DOKUMENTARTEN[unterlage.art as Dokumentart] ||
+                          unterlage.dateiname}
+                      </p>
+                      <p className="mt-0.5 text-[12px] text-gedaempft">
+                        {DOKUMENTARTEN[unterlage.art as Dokumentart]} ·{" "}
+                        {dateigroesse(unterlage.bytes)}
+                      </p>
+                    </div>
+                    <a
+                      href={verweis}
+                      className="shrink-0 text-[13px] font-medium underline decoration-2 underline-offset-2"
+                      style={{ color: primaer, textDecorationColor: akzent }}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Herunterladen
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
         )}
 
         {antwort.download_erlaubt && (

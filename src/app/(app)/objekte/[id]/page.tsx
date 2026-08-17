@@ -276,7 +276,9 @@ export default async function ObjektSeite({
               <KarteTitel>Unterlagen</KarteTitel>
               <KarteBeschreibung>
                 Grundriss, Energieausweis, Grundbuch und alles Weitere. Neue
-                Unterlagen sind zunächst nur intern sichtbar.
+                Unterlagen sind zunächst nur intern. Freigegebene erscheinen im
+                veröffentlichten Web-Exposé zum Download — vertrauliche Arten
+                lassen sich nicht freigeben.
               </KarteBeschreibung>
             </KarteKopf>
             <KarteInhalt className="space-y-4">
