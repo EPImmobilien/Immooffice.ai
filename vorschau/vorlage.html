@@ -210,6 +210,73 @@ dl.eck dd{font-size:13px;font-weight:500}
 }
 .feld .hilfe{font-size:12px;color:var(--f-gedaempft)}
 
+/* --- Kacheln -------------------------------------------------------- */
+.kacheln{display:grid;gap:16px;grid-template-columns:repeat(4,1fr)}
+.gruppe{margin-bottom:30px}
+.gruppe>h2{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--f-gedaempft);margin-bottom:12px}
+.kachel{display:flex;flex-direction:column;background:var(--f-flaeche);border:1px solid var(--f-linie);border-radius:var(--radius-gross);padding:18px;box-shadow:var(--schatten-klein);cursor:pointer;transition:border-color .15s}
+.kachel:hover{border-color:color-mix(in srgb,var(--f-akzent) 60%,transparent)}
+.kachel.aus{opacity:.7;cursor:default}
+.kachel.aus:hover{border-color:var(--f-linie)}
+.kachel-kopf{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.sym{display:flex;width:40px;height:40px;flex:0 0 auto;align-items:center;justify-content:center;border-radius:var(--radius);background:var(--f-akzent-schwach);color:var(--f-akzent)}
+.sym.betont{background:var(--f-akzent);color:var(--f-akzent-text)}
+.sym.grau{background:var(--f-flaeche-gedaempft);color:var(--f-gedaempft)}
+.sym svg{width:20px;height:20px}
+.kachel .zahl-gross{font-family:Poppins,sans-serif;font-size:20px;font-weight:600;line-height:1;display:block;text-align:right}
+.kachel .zahl-hinweis{font-size:11px;color:var(--f-gedaempft);display:block;text-align:right;margin-top:4px;line-height:1.25}
+.kachel .plan{border:1px solid var(--f-linie);border-radius:3px;padding:2px 6px;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--f-gedaempft)}
+.kachel h3{font-family:Poppins,sans-serif;font-size:15px;font-weight:600;margin-top:16px}
+.kachel.aus h3{color:var(--f-gedaempft)}
+.kachel p{font-size:12.5px;color:var(--f-gedaempft);margin-top:2px;line-height:1.4}
+
+/* --- Bilder --------------------------------------------------------- */
+.bilder{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.bild{border:1px solid var(--f-linie);border-radius:var(--radius);overflow:hidden;background:var(--f-flaeche-gedaempft)}
+.bild .flaeche{position:relative;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,color-mix(in srgb,var(--f-primaer) 88%,#000),color-mix(in srgb,var(--f-primaer) 60%,#fff))}
+/* In einem Flex-Container legt die Ausrichtung die statische Position fest;
+   ein absolut gesetztes Kind wird dadurch aufgespannt statt zu schrumpfen.
+   Die Ausrichtung des Inhalts loest das unabhaengig davon. */
+.bild .flaeche span.oben,.bild .flaeche span.unten{position:absolute;left:8px;right:8px}
+.bild .flaeche span.oben{top:8px;text-align:left}
+.bild .flaeche span.unten{bottom:8px;text-align:right}
+.bild .flaeche svg{width:34%;height:34%;opacity:.16;fill:#fff}
+.bild .fuss{padding:8px 10px;font-size:12px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.bild .fuss b{font-weight:500}
+
+/* --- Vorlagenliste -------------------------------------------------- */
+.zeile{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--f-linie)}
+.zeile:last-child{border-bottom:0}
+.zeile b{font-size:13px;font-weight:500;display:block}
+.zeile small{font-size:12px;color:var(--f-gedaempft);display:block;margin-top:1px}
+
+/* --- Web-Exposé ----------------------------------------------------- */
+.adresse{background:var(--f-flaeche-gedaempft);border-radius:var(--radius);padding:12px 14px}
+.adresse .kl{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--f-gedaempft)}
+.adresse .url{font-size:13px;margin-top:4px;word-break:break-all}
+.schalter{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--f-gedaempft);margin-top:8px}
+.schalter input{margin-top:3px;accent-color:var(--f-akzent)}
+
+/* --- Motiv-Vorschau ------------------------------------------------- */
+.motive{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;align-items:start}
+.motiv{border:1px solid var(--f-linie);border-radius:var(--radius);overflow:hidden;background:var(--f-flaeche)}
+.motiv>svg{border-bottom:1px solid var(--f-linie)}
+.motiv .unten{padding:10px 12px}
+.motiv .unten b{font-size:13px;font-weight:500;display:block}
+.motiv .unten small{font-size:11.5px;color:var(--f-gedaempft)}
+
+@media(max-width:980px){
+  .kacheln{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:640px){
+  .kacheln{grid-template-columns:1fr}
+  /* Auf schmalen Geräten weichen Nutzerangabe und Testhinweis. Sonst
+     schiebt die Kopfzeile die Seite waagerecht aus dem Bild. */
+  .nutzer,.kopf-inner .mk{display:none}
+  .huelle{padding:18px 14px}
+  .karte-kopf,.karte-inhalt{padding-left:14px;padding-right:14px}
+}
+
 .ansicht{display:none}
 .ansicht.aktiv{display:block}
 
@@ -258,20 +325,22 @@ footer p{max-width:1180px;margin:0 auto;font-size:12.5px;color:var(--f-gedaempft
     <div class="seitenleiste">
       <nav aria-label="Hauptnavigation">
         <ul>
-          <li><a data-ziel="dashboard" aria-current="page">Dashboard</a></li>
+          <li><a data-ziel="dashboard" aria-current="page">Übersicht</a></li>
           <li><a data-ziel="objekte">Objekte</a></li>
           <li><a data-ziel="detail">Objektdetail</a></li>
+          <li><a data-ziel="kontakte">Kontakte</a></li>
+          <li><a data-ziel="suchprofile">Suchprofile</a></li>
           <li><a data-ziel="expose">Exposé</a></li>
+          <li><a data-ziel="webexpose">Web-Exposé</a></li>
+          <li><a data-ziel="portale">Portalexport</a></li>
+          <li><a data-ziel="marketing">Marketing</a></li>
+          <li><a data-ziel="credits">Abo und Credits</a></li>
           <li><a data-ziel="formular">Objekt anlegen</a></li>
-          <li><a class="geplant">Kontakte<span class="marker">demnächst</span></a></li>
-          <li><a class="geplant">Suchprofile<span class="marker">geplant</span></a></li>
           <li><a class="geplant">Wertermittlung<span class="marker">geplant</span></a></li>
           <li><a class="geplant">Verträge<span class="marker">geplant</span></a></li>
-          <li><a class="geplant">Marketing<span class="marker">geplant</span></a></li>
           <li><a class="geplant">Kalender<span class="marker">geplant</span></a></li>
           <li><a class="geplant">Auswertungen<span class="marker">geplant</span></a></li>
           <li><a class="geplant">Einstellungen<span class="marker">geplant</span></a></li>
-          <li><a class="geplant">Abo und Credits<span class="marker">geplant</span></a></li>
         </ul>
       </nav>
     </div>
@@ -281,42 +350,28 @@ footer p{max-width:1180px;margin:0 auto;font-size:12.5px;color:var(--f-gedaempft
     <!-- ============ DASHBOARD ============ -->
     <section class="ansicht aktiv" id="dashboard">
       <div class="seitenkopf">
-        <div><h1>Willkommen, Maria</h1><p>Nordlicht Immobilien</p></div>
-        <div class="aktionen"><button class="btn btn-primaer">Objekt anlegen</button></div>
+        <div><h1>Willkommen, Maria</h1><p>Nordlicht Immobilien · Unternehmensinhaber</p></div>
+        <div class="aktionen"><button class="btn btn-sek">Kontakt anlegen</button><button class="btn btn-primaer">Objekt anlegen</button></div>
       </div>
 
-      <div class="hinweis hinweis-info" style="margin-bottom:18px">
+      <div class="hinweis hinweis-info" style="margin-bottom:26px">
         <b>Testphase läuft</b>
-        Noch 5 Tage bis zum 23.08.2026. Es entstehen keine Kosten, solange kein Tarif ausgewählt wurde.
+        Noch 5 Tage bis zum 23.08.2026. Es entstehen keine Kosten, solange kein Tarif gewählt wurde.
       </div>
 
-      <div class="raster r4" style="margin-bottom:18px">
-        <div class="karte kennzahl"><div class="karte-inhalt"><p>Aktive Objekte</p><p class="wert zahl">12</p><p class="zusatz">3 in Vorbereitung</p></div></div>
-        <div class="karte kennzahl"><div class="karte-inhalt"><p>Kontakte</p><p class="wert zahl">148</p><p class="zusatz">9 neue Anfragen</p></div></div>
-        <div class="karte kennzahl"><div class="karte-inhalt"><p>Abgeschlossen</p><p class="wert zahl">7</p><p class="zusatz">verkauft oder vermietet</p></div></div>
-        <div class="karte kennzahl"><div class="karte-inhalt"><p>Credits</p><p class="wert zahl">1.240</p><p class="zusatz">von 1.500 im Monat</p></div></div>
-      </div>
+      <section class="gruppe"><h2>Tagesgeschäft</h2><div class="kacheln"><div class="kachel" data-ziel="objekte"><div class="kachel-kopf"><span class="sym betont"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 4l9 6.5"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/></svg></span><span><span class="zahl-gross zahl">12</span><span class="zahl-hinweis">aktiv · 3 in Vorbereitung</span></span></div><h3>Objekte</h3><p>Bestand, Neubau und Vermarktung</p></div><div class="kachel" data-ziel="kontakte"><div class="kachel-kopf"><span class="sym"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.2 19.5c.6-3.1 3-5 5.8-5s5.2 1.9 5.8 5"/><path d="M16.2 6.2a3 3 0 0 1 0 5.6"/><path d="M17.6 14.9c2 .6 3.4 2.3 3.8 4.6"/></svg></span><span><span class="zahl-gross zahl">148</span><span class="zahl-hinweis">erfasst</span></span></div><h3>Kontakte</h3><p>Eigentümer, Interessenten, Dienstleister</p></div><div class="kachel" data-ziel="suchprofile"><div class="kachel-kopf"><span class="sym"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.2"/><path d="M15.2 15.2 20.5 20.5"/><path d="M8 10.5h5M10.5 8v5"/></svg></span><span><span class="zahl-gross zahl">9</span><span class="zahl-hinweis">offene Treffer</span></span></div><h3>Suchprofile</h3><p>Gesuche der Interessenten gegen den Bestand</p></div><div class="kachel aus"><div class="kachel-kopf"><span class="sym grau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17"/><path d="M8 3v4M16 3v4"/><path d="M8 14h3v3H8Z"/></svg></span><span class="plan">geplant</span></div><h3>Termine</h3><p>Besichtigungen und Wiedervorlagen</p></div></div></section>
+      <section class="gruppe"><h2>Vermarktung</h2><div class="kacheln"><div class="kachel" data-ziel="expose"><div class="kachel-kopf"><span class="sym"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h8.5L19 8v12.5H6Z"/><path d="M14 3.5V8h5"/><path d="M9 12.5h7M9 16h5"/></svg></span><span><span class="zahl-gross zahl">5</span><span class="zahl-hinweis">Vorlagen</span></span></div><h3>Exposés</h3><p>KI-Texte, fünf Vorlagen, PDF und Web</p></div><div class="kachel" data-ziel="webexpose"><div class="kachel-kopf"><span class="sym"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 6.5h5l2 2.5h8v11h-15Z"/><path d="M4.5 6.5V4.5h5l2 2.5"/></svg></span><span><span class="zahl-gross zahl">3</span><span class="zahl-hinweis">veröffentlicht</span></span></div><h3>Web-Exposé</h3><p>Eigene Adresse mit Passwort und Frist</p></div><div class="kachel" data-ziel="portale"><div class="kachel-kopf"><span class="sym"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.2 2.4 3.4 5.4 3.4 8.5s-1.2 6.1-3.4 8.5c-2.2-2.4-3.4-5.4-3.4-8.5s1.2-6.1 3.4-8.5Z"/></svg></span><span><span class="zahl-gross zahl">4</span><span class="zahl-hinweis">bereit</span></span></div><h3>Portalexport</h3><p>OpenImmo 1.2.7 als Übertragungspaket</p></div><div class="kachel" data-ziel="marketing"><div class="kachel-kopf"><span class="sym"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5l6 4V5.5l-6 4Z"/><path d="M17.5 8.5a5 5 0 0 1 0 7"/><path d="M7.5 14.5v4.5"/></svg></span><span><span class="zahl-gross zahl">6</span><span class="zahl-hinweis">Formate</span></span></div><h3>Marketing</h3><p>Sechs Formate, Motive aus Objektdaten</p></div></div></section>
+      <section class="gruppe"><h2>Abwicklung</h2><div class="kacheln"><div class="kachel aus"><div class="kachel-kopf"><span class="sym grau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V9.5l8-5.5 8 5.5V20"/><path d="M4 20h16"/><path d="M9.5 16.5v-3.5M12 16.5v-6M14.5 16.5v-2"/></svg></span><span class="plan">geplant</span></div><h3>Wertermittlung</h3><p>Offene Rechenblätter, keine Blackbox</p></div><div class="kachel aus"><div class="kachel-kopf"><span class="sym grau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h12v17H6Z"/><path d="M9 8h6M9 11.5h6"/><path d="M9 16.5c1.4-1.6 2.6-1.6 3.4 0 .7 1.4 1.8 1.2 2.6-.5"/></svg></span><span class="plan">geplant</span></div><h3>Verträge</h3><p>Muster, Felder und einfache Signatur</p></div><div class="kachel aus"><div class="kachel-kopf"><span class="sym grau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4.5h6M8 4.5H6.5A1.5 1.5 0 0 0 5 6v13a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19V6a1.5 1.5 0 0 0-1.5-1.5H16"/><path d="M9 3.5h6v2H9Z"/><path d="m8.5 11.5 1.8 1.8 3.7-3.7"/><path d="M8.5 17h7"/></svg></span><span class="plan">geplant</span></div><h3>Aufgaben</h3><p>Wiedervorlagen und Checklisten</p></div><div class="kachel aus"><div class="kachel-kopf"><span class="sym grau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"/><path d="M7 20v-6M12 20V7M17 20v-9"/></svg></span><span class="plan">geplant</span></div><h3>Auswertungen</h3><p>Bestand, Vermarktung und Erfolg</p></div></div></section>
+      <section class="gruppe"><h2>Verwaltung</h2><div class="kacheln"><div class="kachel" data-ziel="credits"><div class="kachel-kopf"><span class="sym"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="2"/><path d="M2.5 10h19"/><path d="M6 14.5h4"/></svg></span><span><span class="zahl-gross zahl">1.240</span><span class="zahl-hinweis">von 1.500 im Monat</span></span></div><h3>Abo und Credits</h3><p>Tarif, Verbrauch und Rechnungen</p></div><div class="kachel aus"><div class="kachel-kopf"><span class="sym grau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.2a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1v.2a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-2.8-1.1l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7H3.3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.5 6.6l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 2.7-1.1V2.5a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7h.2a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.4 1Z"/></svg></span><span class="plan">geplant</span></div><h3>Einstellungen</h3><p>Branding, Benutzer und Rechte</p></div></div></section>
 
       <div class="raster r3">
         <div class="karte">
           <div class="karte-kopf"><h3>Zuletzt bearbeitet</h3></div>
-          <div class="karte-inhalt liste" style="gap:0">
-            <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--f-linie)">
-              <span><b style="font-size:13px;font-weight:500">Helle 3-Zimmer-Wohnung mit Südbalkon</b><span class="zahl" style="display:block;font-size:12px;color:var(--f-gedaempft)">0001 · 16.08.2026</span></span>
-              <span class="mk mk-info">In Vermarktung</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--f-linie)">
-              <span><b style="font-size:13px;font-weight:500">Einfamilienhaus mit Garten</b><span class="zahl" style="display:block;font-size:12px;color:var(--f-gedaempft)">0002 · 15.08.2026</span></span>
-              <span class="mk mk-warnung">Reserviert</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--f-linie)">
-              <span><b style="font-size:13px;font-weight:500">Bürofläche im Zentrum</b><span class="zahl" style="display:block;font-size:12px;color:var(--f-gedaempft)">0004 · 14.08.2026</span></span>
-              <span class="mk mk-info">In Vermarktung</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0">
-              <span><b style="font-size:13px;font-weight:500">Mehrfamilienhaus, 6 Einheiten</b><span class="zahl" style="display:block;font-size:12px;color:var(--f-gedaempft)">0005 · 11.08.2026</span></span>
-              <span class="mk mk-erfolg">Verkauft</span>
-            </div>
+          <div class="karte-inhalt" style="padding-top:4px;padding-bottom:8px">
+            <div class="zeile"><span><b>Helle 3-Zimmer-Wohnung mit Südbalkon</b><small class="zahl">0001 · 17.08.2026</small></span><span class="mk mk-info">In Vermarktung</span></div>
+            <div class="zeile"><span><b>Einfamilienhaus mit Garten</b><small class="zahl">0002 · 15.08.2026</small></span><span class="mk mk-warnung">Reserviert</span></div>
+            <div class="zeile"><span><b>Bürofläche im Zentrum</b><small class="zahl">0004 · 14.08.2026</small></span><span class="mk mk-info">In Vermarktung</span></div>
+            <div class="zeile"><span><b>Mehrfamilienhaus, 6 Einheiten</b><small class="zahl">0005 · 11.08.2026</small></span><span class="mk mk-erfolg">Verkauft</span></div>
           </div>
         </div>
 
@@ -324,10 +379,10 @@ footer p{max-width:1180px;margin:0 auto;font-size:12.5px;color:var(--f-gedaempft
           <div class="karte-kopf"><h3>Anstehend</h3></div>
           <div class="karte-inhalt">
             <dl class="eck">
-              <div><dt>Besichtigungen</dt><dd class="zahl">4</dd></div>
-              <div><dt>Offene Aufgaben</dt><dd class="zahl">11</dd></div>
-              <div><dt>Wiedervorlagen</dt><dd class="zahl">3</dd></div>
-              <div><dt>Verträge offen</dt><dd class="zahl">2</dd></div>
+              <div><dt>Neue Treffer</dt><dd class="zahl">9</dd></div>
+              <div><dt>Anfragen aus Web-Exposés</dt><dd class="zahl">3</dd></div>
+              <div><dt>Objekte ohne Freigabe</dt><dd class="zahl">2</dd></div>
+              <div><dt>Objekte ohne Bilder</dt><dd class="zahl">1</dd></div>
             </dl>
           </div>
         </div>
@@ -419,6 +474,35 @@ footer p{max-width:1180px;margin:0 auto;font-size:12.5px;color:var(--f-gedaempft
           </div>
 
           <div class="karte">
+            <div class="karte-kopf"><h3>Bilder</h3><p>4 Bilder · das Titelbild führt Exposé und Portalexport an</p></div>
+            <div class="karte-inhalt">
+              <div class="bilder">
+                <div class="bild">
+                  <div class="flaeche"><span class="oben"><span class="mk mk-akzent">Titelbild</span></span><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M16 55V26a16 16 0 0 1 32 0v29Z"/><path d="M32 19a7.5 7.5 0 0 0-4.1 13.78L25.4 46h13.2l-2.5-13.22A7.5 7.5 0 0 0 32 19Z"/></svg></div>
+                  <div class="fuss"><b>Straßenansicht</b><span style="color:var(--f-gedaempft)">1</span></div>
+                </div>
+                <div class="bild">
+                  <div class="flaeche"><span class="unten"><span class="ki"><svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 .5 7.2 4.2 11 5.4 7.2 6.6 6 10.3 4.8 6.6 1 5.4 4.8 4.2Z"/></svg>KI-bearbeitet</span></span><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M16 55V26a16 16 0 0 1 32 0v29Z"/><path d="M32 19a7.5 7.5 0 0 0-4.1 13.78L25.4 46h13.2l-2.5-13.22A7.5 7.5 0 0 0 32 19Z"/></svg></div>
+                  <div class="fuss"><b>Wohnzimmer</b><span style="color:var(--f-gedaempft)">2</span></div>
+                </div>
+                <div class="bild">
+                  <div class="flaeche"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M16 55V26a16 16 0 0 1 32 0v29Z"/><path d="M32 19a7.5 7.5 0 0 0-4.1 13.78L25.4 46h13.2l-2.5-13.22A7.5 7.5 0 0 0 32 19Z"/></svg></div>
+                  <div class="fuss"><b>Grundriss</b><span style="color:var(--f-gedaempft)">3</span></div>
+                </div>
+              </div>
+              <p style="font-size:12px;color:var(--f-gedaempft);margin-top:12px">
+                Eine Bearbeitung überschreibt das Original nie, sondern legt eine Version daneben.
+                Das Kennzeichen einer KI-Bearbeitung lässt sich nicht mehr entfernen — es wandert in
+                PDF, Web-Exposé und Portalexport mit.
+              </p>
+              <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+                <button class="btn btn-sek btn-klein">Bilder auswählen</button>
+                <button class="btn btn-sek btn-klein">Reihenfolge ändern</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="karte">
             <div class="karte-kopf" style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
               <div><h3>Portalexport</h3><p>OpenImmo 1.2.7 für ImmoScout24, Immowelt und Kleinanzeigen</p></div>
               <span class="mk mk-warnung">2 Angaben fehlen</span>
@@ -433,7 +517,14 @@ footer p{max-width:1180px;margin:0 auto;font-size:12.5px;color:var(--f-gedaempft
               <ul class="pruef" style="margin-bottom:16px">
                 <li><span class="punkt punkt-warnung"></span><span><b>Geokoordinaten</b><span>Ohne Koordinaten platzieren Portale das Objekt nur ungefähr.</span></span></li>
               </ul>
-              <button class="btn btn-sek btn-klein">OpenImmo-XML herunterladen</button>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-sek btn-klein">Übertragungspaket (ZIP)</button>
+                <button class="btn btn-sek btn-klein">Nur XML</button>
+              </div>
+              <p style="font-size:12px;color:var(--f-gedaempft);margin-top:9px">
+                Das Paket enthält das OpenImmo-Dokument und die Bilddateien, so wie die Portale es
+                erwarten. Das reine XML dient der Prüfung.
+              </p>
             </div>
           </div>
         </div>
@@ -473,7 +564,7 @@ footer p{max-width:1180px;margin:0 auto;font-size:12.5px;color:var(--f-gedaempft
         <div><h1>Exposé</h1><p class="zahl">0001 · Helle 3-Zimmer-Wohnung mit Südbalkon</p></div>
         <div class="aktionen">
           <button class="btn btn-sek">Zum Objekt</button>
-          <button class="btn btn-primaer">PDF herunterladen</button>
+          <button class="btn btn-primaer" data-ziel="webexpose">Web-Exposé</button>
         </div>
       </div>
 
@@ -513,6 +604,21 @@ footer p{max-width:1180px;margin:0 auto;font-size:12.5px;color:var(--f-gedaempft
             Diese Angaben fehlen und wurden bewusst <strong>nicht</strong> ergänzt:
             <strong>Energieeffizienzklasse</strong> — für Anzeigen nach GEG erforderlich.
           </div>
+
+          <div class="karte">
+            <div class="karte-kopf"><h3>Vorlagen</h3><p>Alle Vorlagen übernehmen Ihr Branding automatisch.</p></div>
+            <div class="karte-inhalt" style="padding-top:6px">
+              <p style="font-size:13px;color:var(--f-gedaempft);margin-bottom:6px">
+                Der Export bestehender Inhalte kostet keine Credits — beliebig oft und in jeder Vorlage.
+              </p>
+              <div class="zeile"><span><b>Klassisch, ausführlich · A4</b><small>Alle Angaben und Texte, mehrseitig. Die Vorlage für den Regelfall.</small></span><button class="btn btn-sek btn-klein">PDF</button></div>
+              <div class="zeile"><span><b>Modern, minimalistisch · A4</b><small>Viel Weißraum, ruhige Typografie, ein großes Bild.</small></span><button class="btn btn-sek btn-klein">PDF</button></div>
+              <div class="zeile"><span><b>Bildstark, Premium · A4</b><small>Randlose Titelseite und große Bildtafeln, dreiseitig.</small></span><button class="btn btn-sek btn-klein">PDF</button></div>
+              <div class="zeile"><span><b>Kurzexposé · A4</b><small>Genau eine Seite. Für Erstkontakt und Besichtigung.</small></span><button class="btn btn-sek btn-klein">PDF</button></div>
+              <div class="zeile"><span><b>Schaufensteraushang · A4</b><small>Große Schrift, wenige Angaben — aus einem Meter Entfernung lesbar.</small></span><button class="btn btn-sek btn-klein">PDF</button></div>
+              <div class="zeile"><span><b>Schaufensteraushang · A3</b><small>Dasselbe im doppelten Format, für Fenster und Bauzaun.</small></span><button class="btn btn-sek btn-klein">PDF</button></div>
+            </div>
+          </div>
         </div>
 
         <div class="karte">
@@ -527,6 +633,417 @@ footer p{max-width:1180px;margin:0 auto;font-size:12.5px;color:var(--f-gedaempft
             <div class="textblock"><h4>Lage</h4><p>Ruhige Wohnlage in Düsternbrook, fußläufig zur Kiellinie.</p></div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- ============ KONTAKTE ============ -->
+    <section class="ansicht" id="kontakte">
+      <div class="seitenkopf">
+        <div><h1>Kontakte</h1><p>148 Kontakte</p></div>
+        <div class="aktionen"><button class="btn btn-primaer">Kontakt anlegen</button></div>
+      </div>
+      <div class="karte">
+        <div class="karte-inhalt" style="padding-top:4px;padding-bottom:8px">
+          <div class="zeile"><span><b>Petersen, Anke</b><small>Interessentin · anke.petersen@beispiel.test · 0431 1234567</small></span><span class="mk mk-info">Interessent</span></div>
+          <div class="zeile"><span><b>Brandt, Hendrik</b><small>Eigentümer Objekt 0002 · h.brandt@beispiel.test</small></span><span class="mk mk-akzent">Eigentümer</span></div>
+          <div class="zeile"><span><b>Nordbau Handwerk GmbH</b><small>Dienstleister · Sanierung und Malerarbeiten</small></span><span class="mk mk-neutral">Dienstleister</span></div>
+          <div class="zeile"><span><b>Larsen, Mette</b><small>Interessentin · 2 Suchprofile · zuletzt 16.08.2026</small></span><span class="mk mk-info">Interessent</span></div>
+          <div class="zeile"><span><b>Sparkasse Kiel, Frau Ohlsen</b><small>Finanzierung · Ansprechpartnerin für Objektfinanzierung</small></span><span class="mk mk-neutral">Bank</span></div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--f-gedaempft);margin-top:12px">
+        Jeder Kontakt trägt eine Mandantenzuordnung. Die Trennung wird in der Datenbank erzwungen,
+        nicht durch ausgeblendete Bedienelemente.
+      </p>
+    </section>
+
+    <!-- ============ SUCHPROFILE ============ -->
+    <section class="ansicht" id="suchprofile">
+      <div class="seitenkopf">
+        <div><h1>Suchprofile</h1><p>3 Suchprofile</p></div>
+        <div class="aktionen"><button class="btn btn-primaer">Suchprofil anlegen</button></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="karte">
+          <div class="karte-kopf" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:12px">
+            <div>
+              <h3>ETW Kiel bis 400.000</h3>
+              <p>Anke Petersen · Kauf · Wohnung · Kiel · bis 400.000 € · ab 70,0 m² · ab 3 Zi.</p>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span class="mk mk-erfolg">2 neue Treffer</span>
+              <button class="btn btn-sek btn-klein">Erneut suchen</button>
+            </div>
+          </div>
+          <div class="karte-inhalt" style="padding-top:4px;padding-bottom:8px">
+            <div class="zeile">
+              <span style="display:flex;gap:12px;align-items:center">
+                <span class="mk mk-erfolg">100 %</span>
+                <span><b>Helle 3-Zimmer-Wohnung mit Südbalkon</b><small class="zahl">0001 · Kiel · 349.000 € · 78,5 m²</small></span>
+              </span>
+              <span style="display:flex;gap:8px">
+                <button class="btn btn-sek btn-klein">Vormerken</button>
+                <button class="btn btn-sek btn-klein">Passt nicht</button>
+              </span>
+            </div>
+            <div class="zeile">
+              <span style="display:flex;gap:12px;align-items:center">
+                <span class="mk mk-neutral">40 %</span>
+                <span><b>Kompakte 2-Zimmer-Wohnung</b><small class="zahl">0006 · Kiel · 300.000 € · 48,0 m²</small></span>
+              </span>
+              <span style="display:flex;gap:8px">
+                <button class="btn btn-sek btn-klein">Vormerken</button>
+                <button class="btn btn-sek btn-klein">Passt nicht</button>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="karte">
+          <div class="karte-kopf" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:12px">
+            <div>
+              <h3>Haus im Umland</h3>
+              <p>Mette Larsen · Kauf · Haus · Preetz, Schwentinental · bis 600.000 €</p>
+            </div>
+            <span class="mk mk-neutral">keine offenen Treffer</span>
+          </div>
+          <div class="karte-inhalt">
+            <p style="font-size:13px;color:var(--f-gedaempft)">
+              Im Bestand passt derzeit nichts. Neue Objekte werden automatisch geprüft.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="hinweis hinweis-info" style="margin-top:18px">
+        Vermarktungsart, Kategorie, Ort und Preisrahmen schließen aus. Fläche und Zimmerzahl bestimmen
+        nur die Reihenfolge — ein Objekt, das knapp danebenliegt, bleibt dadurch sichtbar.
+        Die Auswahl trifft weiterhin der Makler, nicht das System.
+      </div>
+    </section>
+
+    <!-- ============ WEB-EXPOSÉ ============ -->
+    <section class="ansicht" id="webexpose">
+      <div class="seitenkopf">
+        <div><h1>Web-Exposé</h1><p class="zahl">0001 · Helle 3-Zimmer-Wohnung mit Südbalkon</p></div>
+        <div class="aktionen"><button class="btn btn-sek" data-ziel="expose">Zum Exposé</button></div>
+      </div>
+
+      <div class="raster r2">
+        <div class="karte">
+          <div class="karte-kopf" style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+            <div><h3>Veröffentlichung</h3><p>Eine eigene Adresse zum Weitergeben — ohne Zugang zur Anwendung.</p></div>
+            <span class="mk mk-erfolg">öffentlich</span>
+          </div>
+          <div class="karte-inhalt">
+            <div class="adresse">
+              <div class="kl">Adresse</div>
+              <div class="url zahl">https://app.immooffice.ai/expose/k7m2q9xr4td8vn3wp6bz1chy</div>
+              <p style="font-size:12px;color:var(--f-gedaempft);margin-top:8px">
+                Passwortgeschützt. Sichtbar bis 30.09.2026.
+              </p>
+            </div>
+
+            <div style="display:flex;gap:26px;margin-top:18px;flex-wrap:wrap">
+              <div><div class="kl" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--f-gedaempft)">Aufrufe</div><div class="zahl" style="font-family:Poppins,sans-serif;font-size:19px;font-weight:600;margin-top:2px">47</div></div>
+              <div><div class="kl" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--f-gedaempft)">Anfragen</div><div class="zahl" style="font-family:Poppins,sans-serif;font-size:19px;font-weight:600;margin-top:2px">3 <span style="font-size:12px;font-weight:400;color:var(--f-akzent)">1 neu</span></div></div>
+            </div>
+            <p style="font-size:12px;color:var(--f-gedaempft);margin-top:10px">
+              Gezählt werden Seitenaufrufe je Tag. Es werden keine IP-Adressen und keine
+              Wiedererkennungsmerkmale gespeichert — eindeutige Besucher lassen sich deshalb
+              nicht ausweisen.
+            </p>
+
+            <div style="display:flex;flex-direction:column;gap:14px;margin-top:20px;border-top:1px solid var(--f-linie);padding-top:18px">
+              <div class="feld"><label for="ablauf">Sichtbar bis</label><input id="ablauf" value="30.09.2026"><span class="hilfe">Leer lassen für eine unbefristete Veröffentlichung</span></div>
+              <div class="feld"><label for="pw">Passwort</label><input id="pw" value="Nordlicht-2026"><span class="hilfe">Leer lassen für einen offenen Link. Mindestens sechs Zeichen.</span></div>
+              <div>
+                <p style="font-size:13px;font-weight:500;margin-bottom:4px">Was Besucher dürfen</p>
+                <label class="schalter"><input type="checkbox" checked> Kontaktformular anzeigen</label>
+                <label class="schalter"><input type="checkbox"> Exposé als PDF zum Herunterladen anbieten</label>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-primaer btn-klein">Einstellungen speichern</button>
+                <button class="btn btn-sek btn-klein">Neuen Link erzeugen</button>
+              </div>
+              <p style="font-size:12px;color:var(--f-gedaempft)">
+                Ein neuer Link macht die bisherige Adresse sofort ungültig — der richtige Weg, wenn ein
+                Link in falsche Hände geraten ist. Der Widerruf beendet die Veröffentlichung ganz.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="karte">
+            <div class="karte-kopf"><h3>So sieht es der Besucher</h3></div>
+            <div class="karte-inhalt">
+              <div style="border:1px solid var(--f-linie);border-radius:var(--radius);overflow:hidden">
+                <div style="background:var(--f-primaer);color:var(--f-primaer-text);padding:9px 14px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase">Nordlicht Immobilien</div>
+                <div style="aspect-ratio:16/10;background:linear-gradient(135deg,color-mix(in srgb,var(--f-primaer) 88%,#000),color-mix(in srgb,var(--f-primaer) 60%,#fff));display:flex;align-items:center;justify-content:center"><svg style="width:26%;height:26%;opacity:.18;fill:#fff" viewBox="0 0 64 64" aria-hidden="true"><path d="M16 55V26a16 16 0 0 1 32 0v29Z"/><path d="M32 19a7.5 7.5 0 0 0-4.1 13.78L25.4 46h13.2l-2.5-13.22A7.5 7.5 0 0 0 32 19Z"/></svg></div>
+                <div style="padding:14px">
+                  <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="mk mk-akzent">Zu verkaufen</span><span class="mk mk-neutral">Etagenwohnung</span></div>
+                  <h3 style="font-size:17px;font-weight:600;margin-top:8px">Helle 3-Zimmer-Wohnung mit Südbalkon</h3>
+                  <p style="font-size:12.5px;color:var(--f-gedaempft);margin-top:2px">24103 Kiel</p>
+                  <div style="border-left:3px solid var(--f-akzent);background:var(--f-flaeche-gedaempft);padding:9px 12px;margin-top:12px">
+                    <div style="font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--f-gedaempft)">Kaufpreis</div>
+                    <div class="zahl" style="font-family:Poppins,sans-serif;font-size:20px;font-weight:600;margin-top:1px">349.000 €</div>
+                  </div>
+                  <dl class="eck" style="margin-top:12px">
+                    <div><dt>Wohnfläche</dt><dd class="zahl">78,5 m²</dd></div>
+                    <div><dt>Zimmer</dt><dd class="zahl">3</dd></div>
+                    <div><dt>Baujahr</dt><dd class="zahl">1998</dd></div>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="karte">
+            <div class="karte-kopf"><h3>Anfragen</h3></div>
+            <div class="karte-inhalt" style="padding-top:4px;padding-bottom:8px">
+              <div class="zeile"><span><b>Anke Petersen <span class="mk mk-akzent">neu</span></b><small class="zahl">anke.petersen@beispiel.test · 17.08.2026</small><small style="color:var(--f-gedaempft);margin-top:4px">Gibt es einen Besichtigungstermin am Wochenende?</small></span><button class="btn btn-sek btn-klein">Gelesen</button></div>
+              <div class="zeile"><span><b>Mette Larsen</b><small class="zahl">m.larsen@beispiel.test · 15.08.2026</small></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PORTALEXPORT ============ -->
+    <section class="ansicht" id="portale">
+      <div class="seitenkopf">
+        <div><h1>Portalexport</h1><p>OpenImmo 1.2.7 für ImmoScout24, Immowelt und Kleinanzeigen</p></div>
+      </div>
+
+      <div class="karte" style="margin-bottom:16px">
+        <div class="karte-kopf"><h3>Bereitschaft je Objekt</h3><p>Geprüft wird vor der Übertragung, nicht danach.</p></div>
+        <div class="karte-inhalt" style="padding-top:4px;padding-bottom:8px">
+          <div class="zeile"><span><b>Helle 3-Zimmer-Wohnung mit Südbalkon</b><small class="zahl">0001 · Kiel</small></span><span style="display:flex;gap:8px;align-items:center"><span class="mk mk-warnung">2 Angaben fehlen</span><button class="btn btn-sek btn-klein">Prüfen</button></span></div>
+          <div class="zeile"><span><b>Einfamilienhaus mit Garten</b><small class="zahl">0002 · Schwentinental</small></span><span style="display:flex;gap:8px;align-items:center"><span class="mk mk-erfolg">Bereit</span><button class="btn btn-sek btn-klein">Paket (ZIP)</button></span></div>
+          <div class="zeile"><span><b>Bürofläche im Zentrum</b><small class="zahl">0004 · Kiel</small></span><span style="display:flex;gap:8px;align-items:center"><span class="mk mk-erfolg">Bereit</span><button class="btn btn-sek btn-klein">Paket (ZIP)</button></span></div>
+        </div>
+      </div>
+
+      <div class="hinweis hinweis-info">
+        <b>Übertragungspaket statt loser Datei</b>
+        Das ZIP enthält das OpenImmo-Dokument und die Bilddateien, so wie die Portale es erwarten.
+        Die Kennzeichnung KI-bearbeiteter Bilder steht im Anhangtitel — OpenImmo kennt dafür kein
+        eigenes Feld, und die Kennzeichnung muss den Export überstehen.
+        Die tatsächliche Übertragung an die Portale folgt in Phase 2.
+      </div>
+    </section>
+
+    <!-- ============ MARKETING ============ -->
+    <section class="ansicht" id="marketing">
+      <div class="seitenkopf">
+        <div><h1>Marketing</h1><p>Sechs Formate · Motive entstehen aus den Objektdaten</p></div>
+        <div class="aktionen"><button class="btn btn-sek">Objekt wechseln</button></div>
+      </div>
+
+      <div class="motive" style="margin-bottom:18px"><div class="motiv"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" style="width:100%;height:auto;display:block" role="img" aria-label="Helle 3-Zimmer-Wohnung mit Südbalkon">
+  <rect width="1080" height="1080" fill="#FFFFFF"/>
+
+  
+  <rect x="0" y="0" width="1080" height="392" fill="#1B2A47"/>
+  <g opacity="0.12" fill="#FFFFFF" transform="translate(477.28 133.28) scale(1.96)">
+    <path d="M16 55V26a16 16 0 0 1 32 0v29Z"/>
+    <path d="M32 19a7.5 7.5 0 0 0-4.1 13.78L25.4 46h13.2l-2.5-13.22A7.5 7.5 0 0 0 32 19Z"/>
+  </g>
+  <text x="81" y="113" font-family="Inter, sans-serif" font-size="32" font-weight="600" letter-spacing="4.48" fill="#B5934F">ZU VERKAUFEN</text>
+
+
+  
+  <text x="81" y="559.14" font-family="Poppins, Inter, sans-serif" font-size="73" font-weight="600" fill="#1B2A47">Helle 3-Zimmer-Wohnun…</text>
+  <text x="81" y="619.89" font-family="Inter, sans-serif" font-size="45" fill="#1B2A47" opacity="0.62">24103 Kiel · Düsternbrook</text>
+  <text x="81" y="688.79" font-family="Inter, sans-serif" font-size="32" fill="#1B2A47" opacity="0.6">Wohnfläche</text><text x="81" y="740.04" font-family="Inter, sans-serif" font-size="41" font-weight="600" fill="#1B2A47">78,5 m²</text><text x="387" y="688.79" font-family="Inter, sans-serif" font-size="32" fill="#1B2A47" opacity="0.6">Zimmer</text><text x="387" y="740.04" font-family="Inter, sans-serif" font-size="41" font-weight="600" fill="#1B2A47">3</text><text x="693" y="688.79" font-family="Inter, sans-serif" font-size="32" fill="#1B2A47" opacity="0.6">Baujahr</text><text x="693" y="740.04" font-family="Inter, sans-serif" font-size="41" font-weight="600" fill="#1B2A47">1998</text>
+
+  
+  <rect x="0" y="752.6" width="1080" height="176" fill="#B5934F" opacity="0.1"/>
+  <rect x="0" y="752.6" width="24" height="176" fill="#B5934F"/>
+  <text x="81" y="800.6" font-family="Inter, sans-serif" font-size="32" letter-spacing="3.2" fill="#1B2A47" opacity="0.65">KAUFPREIS</text>
+  <text x="81" y="899.2" font-family="Poppins, Inter, sans-serif" font-size="84" font-weight="600" fill="#1B2A47">349.000 €</text>
+
+  
+  <text x="81" y="999" font-family="Inter, sans-serif" font-size="32" font-weight="600" fill="#1B2A47">Nordlicht Immobilien</text>
+  <text x="999" y="999" text-anchor="end" font-family="Inter, sans-serif" font-size="32" fill="#1B2A47" opacity="0.62">0431 1234567</text>
+</svg><div class="unten"><b>Instagram-Post</b><small>1080 · 1080 · quadratisch</small></div></div><div class="motiv"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" style="width:100%;height:auto;display:block" role="img" aria-label="Helle 3-Zimmer-Wohnung mit Südbalkon">
+  <rect width="1080" height="1920" fill="#FFFFFF"/>
+
+  
+  <rect x="0" y="0" width="1080" height="1146" fill="#1B2A47"/>
+  <g opacity="0.12" fill="#FFFFFF" transform="translate(367.2 400.2) scale(5.4)">
+    <path d="M16 55V26a16 16 0 0 1 32 0v29Z"/>
+    <path d="M32 19a7.5 7.5 0 0 0-4.1 13.78L25.4 46h13.2l-2.5-13.22A7.5 7.5 0 0 0 32 19Z"/>
+  </g>
+  <text x="81" y="113" font-family="Inter, sans-serif" font-size="32" font-weight="600" letter-spacing="4.48" fill="#B5934F">ZU VERKAUFEN</text>
+
+
+  
+  <text x="81" y="1313.14" font-family="Poppins, Inter, sans-serif" font-size="73" font-weight="600" fill="#1B2A47">Helle 3-Zimmer-Wohnung</text><text x="81" y="1399.2800000000002" font-family="Poppins, Inter, sans-serif" font-size="73" font-weight="600" fill="#1B2A47">mit Südbalkon</text>
+  <text x="81" y="1460.0300000000002" font-family="Inter, sans-serif" font-size="45" fill="#1B2A47" opacity="0.62">24103 Kiel · Düsternbrook</text>
+  <text x="81" y="1528.9300000000003" font-family="Inter, sans-serif" font-size="32" fill="#1B2A47" opacity="0.6">Wohnfläche</text><text x="81" y="1580.1800000000003" font-family="Inter, sans-serif" font-size="41" font-weight="600" fill="#1B2A47">78,5 m²</text><text x="387" y="1528.9300000000003" font-family="Inter, sans-serif" font-size="32" fill="#1B2A47" opacity="0.6">Zimmer</text><text x="387" y="1580.1800000000003" font-family="Inter, sans-serif" font-size="41" font-weight="600" fill="#1B2A47">3</text><text x="693" y="1528.9300000000003" font-family="Inter, sans-serif" font-size="32" fill="#1B2A47" opacity="0.6">Baujahr</text><text x="693" y="1580.1800000000003" font-family="Inter, sans-serif" font-size="41" font-weight="600" fill="#1B2A47">1998</text>
+
+  
+  <rect x="0" y="1592.6" width="1080" height="176" fill="#B5934F" opacity="0.1"/>
+  <rect x="0" y="1592.6" width="24" height="176" fill="#B5934F"/>
+  <text x="81" y="1640.6" font-family="Inter, sans-serif" font-size="32" letter-spacing="3.2" fill="#1B2A47" opacity="0.65">KAUFPREIS</text>
+  <text x="81" y="1739.1999999999998" font-family="Poppins, Inter, sans-serif" font-size="84" font-weight="600" fill="#1B2A47">349.000 €</text>
+
+  
+  <text x="81" y="1839" font-family="Inter, sans-serif" font-size="32" font-weight="600" fill="#1B2A47">Nordlicht Immobilien</text>
+  <text x="999" y="1839" text-anchor="end" font-family="Inter, sans-serif" font-size="32" fill="#1B2A47" opacity="0.62">0431 1234567</text>
+</svg><div class="unten"><b>Instagram-Story</b><small>1080 · 1920 · hoch</small></div></div><div class="motiv"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 842 1191" style="width:100%;height:auto;display:block" role="img" aria-label="Helle 3-Zimmer-Wohnung mit Südbalkon">
+  <rect width="842" height="1191" fill="#FFFFFF"/>
+
+  
+  <rect x="0" y="0" width="842" height="586" fill="#1B2A47"/>
+  <g opacity="0.12" fill="#FFFFFF" transform="translate(327.24 199.24) scale(2.93)">
+    <path d="M16 55V26a16 16 0 0 1 32 0v29Z"/>
+    <path d="M32 19a7.5 7.5 0 0 0-4.1 13.78L25.4 46h13.2l-2.5-13.22A7.5 7.5 0 0 0 32 19Z"/>
+  </g>
+  <text x="63" y="88" font-family="Inter, sans-serif" font-size="25" font-weight="600" letter-spacing="3.5000000000000004" fill="#B5934F">ZU VERKAUFEN</text>
+
+
+  
+  <text x="63" y="716.26" font-family="Poppins, Inter, sans-serif" font-size="57" font-weight="600" fill="#1B2A47">Helle 3-Zimmer-Wohnung</text><text x="63" y="783.52" font-family="Poppins, Inter, sans-serif" font-size="57" font-weight="600" fill="#1B2A47">mit Südbalkon</text>
+  <text x="63" y="830.77" font-family="Inter, sans-serif" font-size="35" fill="#1B2A47" opacity="0.62">24103 Kiel · Düsternbrook</text>
+  <text x="63" y="884.5699999999999" font-family="Inter, sans-serif" font-size="25" fill="#1B2A47" opacity="0.6">Wohnfläche</text><text x="63" y="924.5699999999999" font-family="Inter, sans-serif" font-size="32" font-weight="600" fill="#1B2A47">78,5 m²</text><text x="301.66666666666663" y="884.5699999999999" font-family="Inter, sans-serif" font-size="25" fill="#1B2A47" opacity="0.6">Zimmer</text><text x="301.66666666666663" y="924.5699999999999" font-family="Inter, sans-serif" font-size="32" font-weight="600" fill="#1B2A47">3</text><text x="540.3333333333333" y="884.5699999999999" font-family="Inter, sans-serif" font-size="25" fill="#1B2A47" opacity="0.6">Baujahr</text><text x="540.3333333333333" y="924.5699999999999" font-family="Inter, sans-serif" font-size="32" font-weight="600" fill="#1B2A47">1998</text>
+
+  
+  <rect x="0" y="934" width="842" height="139" fill="#B5934F" opacity="0.1"/>
+  <rect x="0" y="934" width="19" height="139" fill="#B5934F"/>
+  <text x="63" y="971.5" font-family="Inter, sans-serif" font-size="25" letter-spacing="2.5" fill="#1B2A47" opacity="0.65">KAUFPREIS</text>
+  <text x="63" y="1049.9" font-family="Poppins, Inter, sans-serif" font-size="66" font-weight="600" fill="#1B2A47">349.000 €</text>
+
+  
+  <text x="63" y="1128" font-family="Inter, sans-serif" font-size="25" font-weight="600" fill="#1B2A47">Nordlicht Immobilien</text>
+  <text x="779" y="1128" text-anchor="end" font-family="Inter, sans-serif" font-size="25" fill="#1B2A47" opacity="0.62">0431 1234567</text>
+</svg><div class="unten"><b>Verkaufsschild A3</b><small>Fenster und Bauzaun</small></div></div><div class="motiv"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 595" style="width:100%;height:auto;display:block" role="img" aria-label="Helle 3-Zimmer-Wohnung mit Südbalkon">
+  <rect width="420" height="595" fill="#FFFFFF"/>
+
+  
+  <rect x="0" y="0" width="420" height="288" fill="#1B2A47"/>
+  <g opacity="0.12" fill="#FFFFFF" transform="translate(163.92000000000002 97.92) scale(1.44)">
+    <path d="M16 55V26a16 16 0 0 1 32 0v29Z"/>
+    <path d="M32 19a7.5 7.5 0 0 0-4.1 13.78L25.4 46h13.2l-2.5-13.22A7.5 7.5 0 0 0 32 19Z"/>
+  </g>
+  <text x="32" y="45" font-family="Inter, sans-serif" font-size="13" font-weight="600" letter-spacing="1.8200000000000003" fill="#B5934F">ZU VERKAUFEN</text>
+
+
+  
+  <text x="32" y="354.22" font-family="Poppins, Inter, sans-serif" font-size="29" font-weight="600" fill="#1B2A47">Helle</text><text x="32" y="388.44000000000005" font-family="Poppins, Inter, sans-serif" font-size="29" font-weight="600" fill="#1B2A47">3-Zimmer-Wohnung mit…</text>
+  <text x="32" y="412.74000000000007" font-family="Inter, sans-serif" font-size="18" fill="#1B2A47" opacity="0.62">24103 Kiel · Düsternbrook</text>
+  <text x="32" y="440.14000000000004" font-family="Inter, sans-serif" font-size="13" fill="#1B2A47" opacity="0.6">Wohnfläche</text><text x="32" y="460.14000000000004" font-family="Inter, sans-serif" font-size="16" font-weight="600" fill="#1B2A47">78,5 m²</text><text x="150.66666666666669" y="440.14000000000004" font-family="Inter, sans-serif" font-size="13" fill="#1B2A47" opacity="0.6">Zimmer</text><text x="150.66666666666669" y="460.14000000000004" font-family="Inter, sans-serif" font-size="16" font-weight="600" fill="#1B2A47">3</text><text x="269.33333333333337" y="440.14000000000004" font-family="Inter, sans-serif" font-size="13" fill="#1B2A47" opacity="0.6">Baujahr</text><text x="269.33333333333337" y="460.14000000000004" font-family="Inter, sans-serif" font-size="16" font-weight="600" fill="#1B2A47">1998</text>
+
+  
+  <rect x="0" y="465.4" width="420" height="69" fill="#B5934F" opacity="0.1"/>
+  <rect x="0" y="465.4" width="10" height="69" fill="#B5934F"/>
+  <text x="32" y="484.9" font-family="Inter, sans-serif" font-size="13" letter-spacing="1.3" fill="#1B2A47" opacity="0.65">KAUFPREIS</text>
+  <text x="32" y="522.85" font-family="Poppins, Inter, sans-serif" font-size="33" font-weight="600" fill="#1B2A47">349.000 €</text>
+
+  
+  <text x="32" y="563" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#1B2A47">Nordlicht Immobilien</text>
+  <text x="388" y="563" text-anchor="end" font-family="Inter, sans-serif" font-size="13" fill="#1B2A47" opacity="0.62">0431 1234567</text>
+</svg><div class="unten"><b>Flyer A5</b><small>Handzettel und Auslage</small></div></div><div class="motiv"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 628" style="width:100%;height:auto;display:block" role="img" aria-label="Helle 3-Zimmer-Wohnung mit Südbalkon">
+  <rect width="1200" height="628" fill="#FFFFFF"/>
+
+  
+  <rect x="0" y="0" width="528" height="628" fill="#1B2A47"/>
+  <g opacity="0.12" fill="#FFFFFF" transform="translate(179.51999999999998 229.51999999999998) scale(2.64)">
+    <path d="M16 55V26a16 16 0 0 1 32 0v29Z"/>
+    <path d="M32 19a7.5 7.5 0 0 0-4.1 13.78L25.4 46h13.2l-2.5-13.22A7.5 7.5 0 0 0 32 19Z"/>
+  </g>
+  <text x="47" y="64" font-family="Inter, sans-serif" font-size="17" font-weight="600" letter-spacing="2.3800000000000003" fill="#B5934F">ZU VERKAUFEN</text>
+
+
+  
+  <text x="575" y="97.74" font-family="Poppins, Inter, sans-serif" font-size="43" font-weight="600" fill="#1B2A47">Helle 3-Zimmer-Wohnung</text><text x="575" y="148.48" font-family="Poppins, Inter, sans-serif" font-size="43" font-weight="600" fill="#1B2A47">mit Südbalkon</text>
+  <text x="575" y="180.88" font-family="Inter, sans-serif" font-size="24" fill="#1B2A47" opacity="0.62">24103 Kiel · Düsternbrook</text>
+  <text x="575" y="217.68" font-family="Inter, sans-serif" font-size="17" fill="#1B2A47" opacity="0.6">Wohnfläche</text><text x="575" y="245.18" font-family="Inter, sans-serif" font-size="22" font-weight="600" fill="#1B2A47">78,5 m²</text><text x="767.6666666666666" y="217.68" font-family="Inter, sans-serif" font-size="17" fill="#1B2A47" opacity="0.6">Zimmer</text><text x="767.6666666666666" y="245.18" font-family="Inter, sans-serif" font-size="22" font-weight="600" fill="#1B2A47">3</text><text x="960.3333333333333" y="217.68" font-family="Inter, sans-serif" font-size="17" fill="#1B2A47" opacity="0.6">Baujahr</text><text x="960.3333333333333" y="245.18" font-family="Inter, sans-serif" font-size="22" font-weight="600" fill="#1B2A47">1998</text>
+
+  
+  <rect x="528" y="434.6" width="672" height="109" fill="#B5934F" opacity="0.1"/>
+  <rect x="528" y="434.6" width="14" height="109" fill="#B5934F"/>
+  <text x="575" y="460.1" font-family="Inter, sans-serif" font-size="17" letter-spacing="1.7000000000000002" fill="#1B2A47" opacity="0.65">KAUFPREIS</text>
+  <text x="575" y="525.4" font-family="Poppins, Inter, sans-serif" font-size="52" font-weight="600" fill="#1B2A47">349.000 €</text>
+
+  
+  <text x="575" y="581" font-family="Inter, sans-serif" font-size="17" font-weight="600" fill="#1B2A47">Nordlicht Immobilien</text>
+  <text x="1153" y="581" text-anchor="end" font-family="Inter, sans-serif" font-size="17" fill="#1B2A47" opacity="0.62">0431 1234567</text>
+</svg><div class="unten"><b>Objektanzeige</b><small>1200 · 628 · quer</small></div></div><div class="motiv"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595 420" style="width:100%;height:auto;display:block" role="img" aria-label="Helle 3-Zimmer-Wohnung mit Südbalkon">
+  <rect width="595" height="420" fill="#FFFFFF"/>
+
+  
+  <rect x="0" y="0" width="262" height="420" fill="#1B2A47"/>
+  <g opacity="0.12" fill="#FFFFFF" transform="translate(89.08 168.07999999999998) scale(1.31)">
+    <path d="M16 55V26a16 16 0 0 1 32 0v29Z"/>
+    <path d="M32 19a7.5 7.5 0 0 0-4.1 13.78L25.4 46h13.2l-2.5-13.22A7.5 7.5 0 0 0 32 19Z"/>
+  </g>
+  <text x="32" y="40" font-family="Inter, sans-serif" font-size="8" font-weight="600" letter-spacing="1.12" fill="#B5934F">ZU VERKAUFEN</text>
+
+
+  
+  <text x="294" y="55.599999999999994" font-family="Poppins, Inter, sans-serif" font-size="20" font-weight="600" fill="#1B2A47">Helle 3-Zimmer-Wohnung</text><text x="294" y="79.19999999999999" font-family="Poppins, Inter, sans-serif" font-size="20" font-weight="600" fill="#1B2A47">mit Südbalkon</text>
+  <text x="294" y="94.04999999999998" font-family="Inter, sans-serif" font-size="11" fill="#1B2A47" opacity="0.62">24103 Kiel · Düsternbrook</text>
+  <text x="294" y="111.04999999999998" font-family="Inter, sans-serif" font-size="8" fill="#1B2A47" opacity="0.6">Wohnfläche</text><text x="294" y="123.54999999999998" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#1B2A47">78,5 m²</text><text x="383.6666666666667" y="111.04999999999998" font-family="Inter, sans-serif" font-size="8" fill="#1B2A47" opacity="0.6">Zimmer</text><text x="383.6666666666667" y="123.54999999999998" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#1B2A47">3</text><text x="473.33333333333337" y="111.04999999999998" font-family="Inter, sans-serif" font-size="8" fill="#1B2A47" opacity="0.6">Baujahr</text><text x="473.33333333333337" y="123.54999999999998" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#1B2A47">1998</text>
+
+  
+  <rect x="262" y="320.4" width="333" height="50" fill="#B5934F" opacity="0.1"/>
+  <rect x="262" y="320.4" width="10" height="50" fill="#B5934F"/>
+  <text x="294" y="332.4" font-family="Inter, sans-serif" font-size="8" letter-spacing="0.8" fill="#1B2A47" opacity="0.65">KAUFPREIS</text>
+  <text x="294" y="362" font-family="Poppins, Inter, sans-serif" font-size="24" font-weight="600" fill="#1B2A47">349.000 €</text>
+
+  
+  <text x="294" y="388" font-family="Inter, sans-serif" font-size="8" font-weight="600" fill="#1B2A47">Nordlicht Immobilien</text>
+  <text x="563" y="388" text-anchor="end" font-family="Inter, sans-serif" font-size="8" fill="#1B2A47" opacity="0.62">0431 1234567</text>
+</svg><div class="unten"><b>Postkarte A6</b><small>Akquise im Umfeld</small></div></div></div>
+        <div class="motiv"><div class="kopfbild" style="aspect-ratio:9/16"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M16 55V26a16 16 0 0 1 32 0v29Z"/><path d="M32 19a7.5 7.5 0 0 0-4.1 13.78L25.4 46h13.2l-2.5-13.22A7.5 7.5 0 0 0 32 19Z"/></svg></div><div class="unten"><b>Instagram-Story</b><small>1080 · 1920 · hoch</small></div></div>
+        <div class="motiv"><div class="kopfbild" style="aspect-ratio:1/1.414"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M16 55V26a16 16 0 0 1 32 0v29Z"/><path d="M32 19a7.5 7.5 0 0 0-4.1 13.78L25.4 46h13.2l-2.5-13.22A7.5 7.5 0 0 0 32 19Z"/></svg></div><div class="unten"><b>Verkaufsschild A3</b><small>Fenster und Bauzaun</small></div></div>
+        <div class="motiv"><div class="kopfbild" style="aspect-ratio:1/1.414"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M16 55V26a16 16 0 0 1 32 0v29Z"/><path d="M32 19a7.5 7.5 0 0 0-4.1 13.78L25.4 46h13.2l-2.5-13.22A7.5 7.5 0 0 0 32 19Z"/></svg></div><div class="unten"><b>Flyer A5</b><small>Handzettel und Auslage</small></div></div>
+        <div class="motiv"><div class="kopfbild" style="aspect-ratio:1.91/1"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M16 55V26a16 16 0 0 1 32 0v29Z"/><path d="M32 19a7.5 7.5 0 0 0-4.1 13.78L25.4 46h13.2l-2.5-13.22A7.5 7.5 0 0 0 32 19Z"/></svg></div><div class="unten"><b>Objektanzeige</b><small>1200 · 628 · quer</small></div></div>
+        <div class="motiv"><div class="kopfbild" style="aspect-ratio:1.414/1"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M16 55V26a16 16 0 0 1 32 0v29Z"/><path d="M32 19a7.5 7.5 0 0 0-4.1 13.78L25.4 46h13.2l-2.5-13.22A7.5 7.5 0 0 0 32 19Z"/></svg></div><div class="unten"><b>Postkarte A6</b><small>Akquise im Umfeld</small></div></div>
+      </div>
+
+      <div class="hinweis hinweis-info">
+        <b>Layout aus Regeln, nicht aus einem Bildmodell</b>
+        Bild-KI erzeugt hübsche Flächen, setzt Text aber unzuverlässig — ein Verkaufsschild mit
+        verrutschtem Preis ist wertlos. Die Motive entstehen deshalb aus festen Regeln;
+        Bild-KI liefert später Bildinhalte, nicht das Layout.
+      </div>
+    </section>
+
+    <!-- ============ ABO UND CREDITS ============ -->
+    <section class="ansicht" id="credits">
+      <div class="seitenkopf">
+        <div><h1>Abo und Credits</h1><p>Nordlicht Immobilien · Testphase bis 23.08.2026</p></div>
+        <div class="aktionen"><button class="btn btn-primaer">Tarif wählen</button></div>
+      </div>
+
+      <div class="raster r4" style="margin-bottom:18px">
+        <div class="karte kennzahl"><div class="karte-inhalt"><p>Verfügbar</p><p class="wert zahl">1.240</p><p class="zusatz">Credits</p></div></div>
+        <div class="karte kennzahl"><div class="karte-inhalt"><p>Diesen Monat verbraucht</p><p class="wert zahl">260</p><p class="zusatz">von 1.500</p></div></div>
+        <div class="karte kennzahl"><div class="karte-inhalt"><p>Reserviert</p><p class="wert zahl">0</p><p class="zusatz">laufende Aufträge</p></div></div>
+        <div class="karte kennzahl"><div class="karte-inhalt"><p>Gekauft</p><p class="wert zahl">0</p><p class="zusatz">12 Monate gültig</p></div></div>
+      </div>
+
+      <div class="karte" style="margin-bottom:16px">
+        <div class="karte-kopf"><h3>Verbrauch</h3><p>Jede Buchung bleibt unveränderbar erhalten.</p></div>
+        <div class="karte-inhalt" style="padding-top:4px;padding-bottom:8px">
+          <div class="zeile"><span><b>Exposé-Texte erzeugt</b><small class="zahl">Objekt 0001 · 17.08.2026, 09:14</small></span><span class="zahl" style="font-weight:600">–10</span></div>
+          <div class="zeile"><span><b>Exposé-Texte erneut erzeugt</b><small class="zahl">Objekt 0002 · 16.08.2026, 16:02</small></span><span class="zahl" style="font-weight:600">–10</span></div>
+          <div class="zeile"><span><b>Auftrag fehlgeschlagen — Reservierung freigegeben</b><small class="zahl">Objekt 0004 · 16.08.2026, 11:47</small></span><span class="zahl" style="font-weight:600;color:var(--f-erfolg)">+10</span></div>
+          <div class="zeile"><span><b>Monatliches Inklusivkontingent</b><small class="zahl">01.08.2026</small></span><span class="zahl" style="font-weight:600;color:var(--f-erfolg)">+1.500</span></div>
+        </div>
+      </div>
+
+      <div class="hinweis hinweis-info">
+        <b>Was Credits kostet — und was nicht</b>
+        Kostenpflichtig ist nur die KI-Erstellung und die erneute KI-Generierung.
+        PDF-Export bestehender Inhalte, Veröffentlichung als Web-Exposé, manuelle Bearbeitung und
+        erneute Downloads kosten <strong>nichts</strong>. Ein fehlgeschlagener Auftrag gibt die
+        reservierten Credits automatisch wieder frei. Alle Preise sind Nettopreise zzgl. USt.
       </div>
     </section>
 
@@ -576,7 +1093,7 @@ footer p{max-width:1180px;margin:0 auto;font-size:12.5px;color:var(--f-gedaempft
 </div>
 
 <footer>
-  <p>ImmoOffice.ai · Design-Vorschau vom 16.08.2026 · Daten werden in der EU verarbeitet (Frankfurt am Main) · Alle dargestellten Objekte, Personen und Firmen sind frei erfunden.</p>
+  <p>ImmoOffice.ai · Design-Vorschau vom 17.08.2026 · Daten werden in der EU verarbeitet (Frankfurt am Main) · Alle dargestellten Objekte, Personen und Firmen sind frei erfunden.</p>
 </footer>
 
 <script>
@@ -586,11 +1103,12 @@ footer p{max-width:1180px;margin:0 auto;font-size:12.5px;color:var(--f-gedaempft
     var dunkel=getComputedStyle(document.body).backgroundColor==='rgb(14, 26, 48)';
     wurzel.setAttribute('data-modus',dunkel?'hell':'dunkel');
   });
-  var glieder=document.querySelectorAll('nav a[data-ziel]');
+  var glieder=document.querySelectorAll('[data-ziel]');
   glieder.forEach(function(a){
     a.addEventListener('click',function(){
-      glieder.forEach(function(x){x.removeAttribute('aria-current')});
-      a.setAttribute('aria-current','page');
+      document.querySelectorAll('nav a[data-ziel]').forEach(function(x){x.removeAttribute('aria-current')});
+      var punkt=document.querySelector('nav a[data-ziel="'+a.dataset.ziel+'"]');
+      if(punkt)punkt.setAttribute('aria-current','page');
       document.querySelectorAll('.ansicht').forEach(function(s){s.classList.remove('aktiv')});
       document.getElementById(a.dataset.ziel).classList.add('aktiv');
       window.scrollTo(0,0);

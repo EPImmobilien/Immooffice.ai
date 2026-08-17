@@ -128,3 +128,39 @@ describe("Marketingmotive", () => {
     expect(mit).toContain("Text KI-erzeugt");
   });
 });
+
+describe("Bildanteil der Motive", () => {
+  /** Hoehe des Bildbereichs aus dem erzeugten SVG. */
+  function bildHoehe(svg: string): number {
+    const t = /<rect x="0" y="0" width="[\d.]+" height="([\d.]+)"/.exec(svg);
+    return t ? Number(t[1]) : 0;
+  }
+
+  for (const format of FORMATE.filter((f) => f.breite <= f.hoehe * 1.25)) {
+    it(`${format.name}: das Bild bleibt deutlich über der Untergrenze`, () => {
+      const svg = motivSvg(format, inhalt);
+      const anteil = bildHoehe(svg) / format.hoehe;
+
+      // Ein Motiv, das vom Bild lebt, darf den Bildbereich nicht bis auf die
+      // Untergrenze von 20 Prozent zusammenschieben, nur weil der Titel drei
+      // Zeilen braucht. Genau das tat die erste Fassung — aufgefallen ist es
+      // erst beim Betrachten der erzeugten Motive, nicht im Test.
+      //
+      // Angestrebt sind 45 Prozent. Das quadratische Format erreicht sie nicht:
+      // Preisband, Eckdaten und Fußzeile sind dort im Verhältnis zur Höhe
+      // besonders groß. Ein Drittel ist die Grenze, die alle Hochformate
+      // einhalten müssen.
+      expect(anteil).toBeGreaterThanOrEqual(0.33);
+    });
+  }
+
+  it("kürzt den Titel, statt das Bild zu opfern", () => {
+    const lang = motivSvg(FORMATE[0]!, {
+      ...inhalt,
+      titel: "Außergewöhnlich helle Vierzimmerwohnung mit Südbalkon und Blick über die Förde",
+    });
+    // Der Titel weicht auf weniger Zeilen aus; sichtbar an der Auslassung.
+    expect(lang).toMatch(/…/);
+    expect(bildHoehe(lang) / FORMATE[0]!.hoehe).toBeGreaterThanOrEqual(0.33);
+  });
+});

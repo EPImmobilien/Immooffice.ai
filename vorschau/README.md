@@ -19,12 +19,27 @@ Objekte, Personen und Firmen sind frei erfunden.
 Die Design-Tokens sind mit `src/app/globals.css` der Anwendung identisch. Ändert
 sich dort die Farbwelt, ist die Vorschau nachzuziehen.
 
+Die sechs Marketingmotive in der Ansicht „Marketing“ sind **keine Attrappen**:
+Sie stammen aus `src/lib/marketing/vorlagen.ts` und zeigen die tatsächliche
+Ausgabe der Software. Ändert sich dort das Layout, sind sie neu zu erzeugen.
+
 ## Neu erzeugen
 
 Die Schriften werden auf die tatsächlich verwendeten Zeichen reduziert und als
-WOFF2 eingebettet — dadurch bleibt die Datei bei rund 80 KB und benötigt **kein**
+WOFF2 eingebettet — dadurch bleibt die Datei bei rund 130 KB und benötigt **kein**
 fremdes CDN. Das entspricht der Vorgabe aus Abschnitt 16, keine IP-Adressen an
 Dritte zu übertragen.
+
+**Nur Text geändert** — das ist der Regelfall:
+
+```bash
+python3 scripts/vorschau-neu-bauen.py
+```
+
+Dieses Skript übernimmt die bereits eingebetteten Schriften. Kommen Zeichen vor,
+die im vorhandenen Schnitt fehlen, meldet es sie und bricht ab.
+
+**Vollständig neu** — nötig, wenn neue Zeichen hinzukommen:
 
 ```bash
 pip install fonttools brotli

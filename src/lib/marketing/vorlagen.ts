@@ -138,7 +138,9 @@ export function motivSvg(
   // zwei Zeilen nur um den Preis eines geschrumpften Bildes.
   const titelGr = Math.round(bezug * (quer ? 0.075 : 0.068));
   const ortGr = Math.round(bezug * 0.042);
-  const preisGr = Math.round(bezug * 0.09);
+  // Im Hochformat etwas kleiner: Preisband und Fusszeile sind fest verankert
+  // und nehmen dem Bild sonst Hoehe, die es dort dringender braucht.
+  const preisGr = Math.round(bezug * (quer ? 0.09 : 0.078));
   const eckGr = Math.round(bezug * 0.038);
   const kleinGr = Math.round(bezug * 0.03);
 
@@ -154,7 +156,16 @@ export function motivSvg(
   // erkennbares Bild, weicht der TITEL — lieber eine Zeile weniger als ein
   // Preisband, das im Text liegt. Genau dieser Fall trat beim quadratischen
   // Format mit langem Titel auf.
+  //
+  // Zwei Groessen statt einer: `bildZiel` ist die Aufteilung, die das Motiv
+  // anstrebt, `bildMindest` die Grenze, unter die es nie faellt. Mit nur einer
+  // Groesse blieb das Bild genau auf der Untergrenze stehen, sobald der Titel
+  // drei Zeilen brauchte — bei einem Instagram-Beitrag, der vom Bild lebt, ist
+  // ein Fuenftel der Flaeche zu wenig. Aufgefallen ist das erst beim
+  // Betrachten der erzeugten Motive.
   const bildMindest = Math.round(h * (quer ? 1 : 0.2));
+  const bildZiel = Math.round(h * (quer ? 1 : 0.45));
+  const abstandUeberText = 1.15;
 
   const blockHoehe = (anzahlZeilen: number) =>
     anzahlZeilen * titelGr * 1.18 +
@@ -165,13 +176,13 @@ export function motivSvg(
   if (!quer) {
     for (const grenze of [3, 2, 1]) {
       zeilen = umbrechen(inhalt.titel, textBreite, titelGr, grenze);
-      if (bandY - rand * 1.6 - blockHoehe(zeilen.length) >= bildMindest) break;
+      if (bandY - rand * abstandUeberText - blockHoehe(zeilen.length) >= bildZiel) break;
     }
   }
 
   const bildHoehe = quer
     ? h
-    : Math.max(bildMindest, Math.round(bandY - rand * 1.6 - blockHoehe(zeilen.length)));
+    : Math.max(bildMindest, Math.round(bandY - rand * abstandUeberText - blockHoehe(zeilen.length)));
 
   const fluss = new Fluss(quer ? rand : bildHoehe + rand);
   const t = xmlText;
