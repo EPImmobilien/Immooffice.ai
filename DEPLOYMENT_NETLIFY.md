@@ -28,17 +28,32 @@ Die Konfiguration steht in [`netlify.toml`](netlify.toml).
 Alle Variablen aus [`.env.example`](.env.example) in Netlify hinterlegen.
 **Niemals** in das Repository schreiben.
 
-Zwingend für den ersten erfolgreichen Build:
+Für den ersten Build ist **nichts** zu setzen: Die beiden Supabase-Werte stehen
+in [`netlify.toml`](netlify.toml).
 
 ```
-NEXT_PUBLIC_SUPABASE_URL
-NEXT_PUBLIC_SUPABASE_ANON_KEY
+NEXT_PUBLIC_SUPABASE_URL       steht in netlify.toml
+NEXT_PUBLIC_SUPABASE_ANON_KEY  steht in netlify.toml
 ```
+
+Das ist bewusst so. Next setzt jede Variable mit dem Präfix `NEXT_PUBLIC_` zur
+Bauzeit fest in den Code ein — der Anon-Schlüssel wird also ohnehin an jeden
+Browser ausgeliefert. Der Schutz der Daten hängt an der Row-Level-Security, nicht
+an der Geheimhaltung dieses Schlüssels. Im Gegenzug läuft ein frisch verbundenes
+Netlify-Projekt ohne einen einzigen Handgriff in der Oberfläche.
+
+**Werte aus `netlify.toml` haben Vorrang vor der Oberfläche.** Für ein anderes
+Supabase-Projekt sind die beiden Zeilen dort zu entfernen, nicht in der
+Oberfläche zu überschreiben.
+
+`NEXT_PUBLIC_APP_URL` ist optional: Ohne diesen Wert bildet die Anwendung die
+Adresse von Web-Exposés aus dem Host der Anfrage. Gesetzt werden sollte er,
+sobald eine eigene Domain davorsteht.
 
 Vor dem ersten Produktivbetrieb zusätzlich:
 
 ```
-SUPABASE_SERVICE_ROLE_KEY      nur serverseitig
+SUPABASE_SERVICE_ROLE_KEY      nur serverseitig, NIEMALS in netlify.toml
 STRIPE_SECRET_KEY
 STRIPE_WEBHOOK_SECRET
 OPENAI_API_KEY

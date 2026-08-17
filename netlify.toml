@@ -12,6 +12,33 @@
   # Schriften werden zur Bauzeit geladen und selbst gehostet.
   NEXT_TELEMETRY_DISABLED = "1"
 
+  # -------------------------------------------------------------------------
+  # Verbindung zur Datenbank.
+  #
+  # Diese beiden Werte stehen bewusst im Repository. Sie sind KEINE
+  # Geheimnisse: Next setzt jede Variable mit dem Praefix NEXT_PUBLIC_ zur
+  # Bauzeit fest in den Code ein, der Anon-Schluessel wird also ohnehin an
+  # jeden Browser ausgeliefert. Der Schutz der Daten haengt nicht an diesem
+  # Schluessel, sondern an der Row-Level-Security in der Datenbank.
+  #
+  # NICHT hierher gehoeren der Dienstschluessel, Stripe-Schluessel, der
+  # Mailversand und der Verschluesselungsschluessel. Die umgehen die
+  # Row-Level-Security oder kosten Geld und werden ausschliesslich in der
+  # Netlify-Oberflaeche gesetzt (siehe .env.example).
+  #
+  # Zum Wechsel auf ein anderes Supabase-Projekt beide Zeilen entfernen und
+  # die Werte in der Netlify-Oberflaeche setzen. Achtung: Werte aus dieser
+  # Datei haben Vorrang vor der Oberflaeche, nicht umgekehrt.
+  # -------------------------------------------------------------------------
+  NEXT_PUBLIC_SUPABASE_URL = "https://usguiggfciavwzkdfjgt.supabase.co"
+  NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzZ3VpZ2dmY2lhdnd6a2Rmamd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyOTE5NDcsImV4cCI6MjA5OTg2Nzk0N30.zVgnE4ZcERP6R5Fu9rC38N4NnZR3o2q4OISlZNstYJI"
+
+  # Netlify durchsucht das Bauergebnis nach den Werten der Umgebungsvariablen
+  # und bricht ab, wenn es sie findet. Genau das ist hier beabsichtigt: Der
+  # Anon-Schluessel MUSS im ausgelieferten Code stehen, sonst kann der Browser
+  # die Datenbank nicht erreichen. Nur diese beiden Namen sind ausgenommen.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
