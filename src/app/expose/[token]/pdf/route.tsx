@@ -81,24 +81,35 @@ export async function GET(
     .filter((b) => b.mime === "image/jpeg" || b.mime === "image/png")
     .slice(0, vorlage.bilder);
 
-  const bilder: ExposeBild[] = [];
-  for (const bild of auswahl) {
-    const { data: datei } = await supabase.storage
-      .from(BILD_BUCKET)
-      .download(bild.pfad);
-    if (!datei) continue;
-    bilder.push({
-      daten: Buffer.from(await datei.arrayBuffer()),
-      format: bild.mime === "image/png" ? "png" : "jpg",
-      titel: bild.titel,
-      art: bild.art,
-      kiBearbeitet: bild.ki_bearbeitet,
-    });
-  }
+  let puffer: Buffer;
+  try {
+    const bilder: ExposeBild[] = [];
+    for (const bild of auswahl) {
+      const { data: datei } = await supabase.storage
+        .from(BILD_BUCKET)
+        .download(bild.pfad);
+      if (!datei) continue;
+      bilder.push({
+        daten: Buffer.from(await datei.arrayBuffer()),
+        format: bild.mime === "image/png" ? "png" : "jpg",
+        titel: bild.titel,
+        art: bild.art,
+        kiBearbeitet: bild.ki_bearbeitet,
+      });
+    }
 
-  const puffer = await renderToBuffer(
-    vorlage.bauen({ objekt: antwort.objekt, branding, bilder }),
-  );
+    puffer = await renderToBuffer(
+      vorlage.bauen({ objekt: antwort.objekt, branding, bilder }),
+    );
+  } catch (fehler) {
+    // Der Fehlertext bleibt unverfaenglich: Diese Seite ist oeffentlich, und
+    // Interna gehoeren nicht in eine Antwort an unbekannte Besucher.
+    console.error("[Web-Exposé] PDF-Erzeugung fehlgeschlagen", { token, fehler });
+    return new NextResponse(
+      "Das PDF konnte gerade nicht erzeugt werden. Bitte versuchen Sie es später erneut.",
+      { status: 500 },
+    );
+  }
 
   return new NextResponse(new Uint8Array(puffer), {
     headers: {

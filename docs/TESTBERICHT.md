@@ -177,6 +177,46 @@ Die zugrunde liegenden Bausteine sind einzeln geprüft: Die Datenbankschicht üb
 den RLS-Test, die Texterzeugung und die PDF-Ausgabe über Unit-Tests, der
 Auslieferungsweg über die manuellen Prüfungen.
 
+## 4a. Ein Ausfall, den kein Test gesehen hat
+
+In der Produktion ließ sich **kein einziges PDF-Exposé erzeugen**, während
+lokal und im Test alle 34 PDF-Prüfungen grün waren. Der Fall ist hier
+festgehalten, weil er eine Lücke in der Prüfstrategie offenlegt und nicht
+einen Fehler in der Fachlogik.
+
+Ursache: Die Hausschriften wurden zur Laufzeit über `require.resolve` aus
+`@fontsource` geladen. Für einen Bundler ist ein `require.resolve` auf eine
+`.woff`-Datei nicht nachvollziehbar — die Dateien landeten nicht im
+Funktionsbündel, `Font.register` zeigte auf Pfade, die es dort nicht gab, und
+`renderToBuffer` brach mit `MODULE_NOT_FOUND` ab. Im Test fiel das nie auf,
+weil `node_modules` dort immer vorhanden ist.
+
+Der naheliegende Ausweg trägt nicht: `outputFileTracingIncludes` in
+`next.config.ts` wendet Next **nur auf webpack-Einträge** an, gebaut wird mit
+Turbopack. Nachgeprüft an den erzeugten `.nft.json`-Dateien — sie blieben ohne
+jede Schriftdatei, obwohl der Eintrag gesetzt war.
+
+Behoben, indem die sechs Schnitte als Base64 Teil des Quelltexts sind
+(`scripts/schriften-einbetten.mjs` erzeugt `src/lib/expose/schriften-daten.ts`).
+Damit existiert kein Pfad mehr, der ins Leere zeigen kann.
+
+Drei Nachweise, die den Fehler künftig fangen:
+
+| Nachweis | Was er sichert |
+|---|---|
+| `schriften.test.ts` prüft Datenquellen statt Dateipfade | Ein Rückfall auf `require.resolve` fällt sofort auf |
+| PDF-Tests laufen mit **entferntem** `@fontsource` durch (34/34) | Die Erzeugung hängt an keiner Datei auf der Platte |
+| Base64 der eingebetteten Schnitte gegen `@fontsource` verglichen | Eine Aktualisierung der Schriften läuft nicht still auseinander |
+
+Zusätzlich haben beide PDF-Routen jetzt eine Fehlerbehandlung. Vorher schlug
+ein Fehlschlag als allgemeine Serverfehlerseite durch: Der Download blieb ohne
+Erklärung leer, und in welchem Schritt es klemmte, war von außen nicht zu
+erkennen.
+
+Die Lehre ist dieselbe wie beim ungültigen Test-PNG weiter oben: **Ein Test,
+der die Umgebung der Produktion nicht nachbildet, prüft die Fachlogik — nicht
+die Auslieferung.**
+
 ## 5. Offene Punkte aus der Sicherheitsprüfung
 
 Die Prüfung des Datenbankanbieters meldet einen verbleibenden Punkt:

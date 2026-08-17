@@ -78,11 +78,31 @@ export async function GET(
     impressum: branding?.impressum ?? null,
   };
 
-  const bilder = await exposeBilderLaden(supabase, id, vorlage.bilder);
-
-  const puffer = await renderToBuffer(
-    vorlage.bauen({ objekt: objekt as ExposeObjekt, branding: marke, bilder }),
-  );
+  // Bilder und Erzeugung getrennt abgesichert, aber mit einer Antwort: Ohne
+  // diese Behandlung schlug ein Fehler als allgemeine Serverfehlerseite durch —
+  // der Download blieb ohne Erklaerung leer, und in welchem Schritt es klemmte,
+  // war von aussen nicht zu erkennen.
+  let puffer: Buffer;
+  try {
+    const bilder = await exposeBilderLaden(supabase, id, vorlage.bilder);
+    puffer = await renderToBuffer(
+      vorlage.bauen({ objekt: objekt as ExposeObjekt, branding: marke, bilder }),
+    );
+  } catch (fehler) {
+    console.error("[Exposé] PDF-Erzeugung fehlgeschlagen", {
+      objekt: id,
+      vorlage: vorlage.schluessel,
+      fehler,
+    });
+    return NextResponse.json(
+      {
+        fehler:
+          "Das PDF konnte nicht erzeugt werden. Bitte versuchen Sie es erneut — " +
+          "bleibt es dabei, ist der Fehler im Server-Protokoll vermerkt.",
+      },
+      { status: 500 },
+    );
+  }
 
   const dateiname = `Expose-${objekt.objektnummer}-${vorlage.schluessel}.pdf`;
 

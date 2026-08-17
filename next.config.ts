@@ -6,6 +6,18 @@ import type { NextConfig } from "next";
  * sich deshalb hier nicht statisch definieren. Schriften werden selbst
  * gehostet; ein fremder Font-CDN ist bewusst nirgends erlaubt.
  */
+/**
+ * Zu den Schriften der PDF-Erzeugung steht hier absichtlich nichts.
+ *
+ * Der naheliegende Eintrag waere `outputFileTracingIncludes`, um die
+ * .woff-Dateien aus @fontsource in das Funktionsbuendel zu holen. Er wirkt
+ * hier nicht: Next wendet diese Liste nur auf webpack-Eintraege an, gebaut
+ * wird aber mit Turbopack. Nachgeprueft an den erzeugten .nft.json-Dateien —
+ * sie blieben ohne jede Schriftdatei, obwohl der Eintrag gesetzt war.
+ *
+ * Die Schriften sind deshalb als Base64 Teil des Quelltexts; sie koennen
+ * schon im Ansatz nicht fehlen. Siehe src/lib/expose/schriften.ts.
+ */
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
