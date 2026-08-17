@@ -4,6 +4,11 @@ import { notFound } from "next/navigation";
 
 import { AufgabeAnlegen } from "@/components/AufgabeAnlegen";
 import { Aufgabenliste } from "@/components/Aufgabenliste";
+import {
+  Beteiligte,
+  type Beteiligung,
+  type KontaktWahl,
+} from "@/components/Beteiligte";
 import { Bildergalerie } from "@/components/Bildergalerie";
 import { Dokumentenliste } from "@/components/Dokumentenliste";
 import { DokumentUpload } from "@/components/DokumentUpload";
@@ -80,7 +85,14 @@ export default async function ObjektSeite({
   // Alles, was am Objekt haengt, in einem Zug: Unterlagen, Verlauf, Aufgaben,
   // Termine. Vier Abfragen nebeneinander statt hintereinander — sie haengen
   // nicht voneinander ab, und in Reihe waere die Seite viermal so langsam.
-  const [dokumente, verlauf, aufgaben, termine] = await Promise.all([
+  const [
+    dokumente,
+    verlauf,
+    aufgaben,
+    termine,
+    beteiligungen,
+    kontaktwahl,
+  ] = await Promise.all([
     supabase
       .from("objekt_dokumente")
       .select(
@@ -111,11 +123,33 @@ export default async function ObjektSeite({
       )
       .eq("objekt_id", id)
       .order("beginnt_am", { ascending: true }),
+    supabase
+      .from("kontakt_objekt")
+      .select(
+        "id, rolle, anteil, kontakt:kontakte(id, vorname, nachname, firma, email, telefon)",
+      )
+      .eq("objekt_id", id),
+    // Auswahlliste zum Verknuepfen. Nur Name und ID — mehr braucht die Auswahl
+      // nicht, und die uebrigen Felder waeren unnoetig im Seitenquelltext.
+    supabase
+      .from("kontakte")
+      .select("id, vorname, nachname, firma")
+      .is("geloescht_am", null)
+      .order("nachname", { ascending: true })
+      .limit(500),
   ]);
 
   const unterlagen = (dokumente.data ?? []) as unknown as ObjektDokument[];
   const fehlend = fehlendeUnterlagen(unterlagen);
   const heute = new Date().toISOString();
+
+  const kontakte: KontaktWahl[] = (kontaktwahl.data ?? []).map((k) => ({
+    id: k.id,
+    name:
+      [k.vorname, k.nachname].filter(Boolean).join(" ") ||
+      k.firma ||
+      "Ohne Namen",
+  }));
 
   const befunde = exportPruefen(objekt as OpenImmoObjekt);
   const darfAendern = hatRecht(sitzung.rolle, "objekte", "aendern");
@@ -216,6 +250,26 @@ export default async function ObjektSeite({
             mandantId={sitzung.mandantId}
             darfAendern={darfAendern}
           />
+
+          <Karte>
+            <KarteKopf>
+              <KarteTitel>Beteiligte</KarteTitel>
+              <KarteBeschreibung>
+                Eigentümer, Interessenten, Notar. Von hier aus führt der Weg zum
+                Kontakt und zurück.
+              </KarteBeschreibung>
+            </KarteKopf>
+            <KarteInhalt>
+              <Beteiligte
+                objektId={objekt.id}
+                beteiligungen={
+                  (beteiligungen.data ?? []) as unknown as Beteiligung[]
+                }
+                kontakte={kontakte}
+                darfAendern={darfAendern}
+              />
+            </KarteInhalt>
+          </Karte>
 
           <Karte>
             <KarteKopf>

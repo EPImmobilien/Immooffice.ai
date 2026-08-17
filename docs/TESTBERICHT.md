@@ -240,6 +240,29 @@ Bedingung in der Datenbank und in der Server-Aktion. Das ist bewusst
 redundant — bei einer Unterlage, die einmal draußen ist, hilft keine
 nachträgliche Korrektur.
 
+## 4c. Verweise überschreiten den Mandanten nicht
+
+`supabase/tests/verweise-mandantenrein.sql` — **9 von 9 bestanden.**
+
+Beim Verdrahten der Beteiligten ist ein Befund aufgefallen: Jede Policy prüfte
+bisher nur den **eigenen** `mandant_id` einer Zeile. Ein Datensatz mit dem
+eigenen Mandanten, aber einem **fremden** `objekt_id` oder `kontakt_id` kam
+damit durch — Fremdschlüssel verweisen auf die Tabelle, nicht auf den
+Mandanten.
+
+Ein Datenleck war das nicht: Beim Lesen filtert die Row-Level-Security der
+Zieltabelle, ein solcher Verweis liefert nichts. Es entstanden aber Zeilen,
+die auf Fremdes zeigen — eine Aufgabe zu einem unsichtbaren Objekt, ein
+Verlaufseintrag an einem fremden Kontakt. Bei jeder späteren Auswertung ist
+das eine Fehlerquelle, und die nächste Policy, die über einen solchen Verweis
+joint, macht daraus ein echtes Problem.
+
+Geschlossen durch einen zentralen Trigger `intern.verweise_mandantenrein()`,
+angehängt an `kontakt_objekt`, `objekt_dokumente`, `aktivitaeten`, `aufgaben`,
+`termine` und `objekt_bilder`. Geprüft ist beides: dass fremde Verweise
+abgewiesen werden (1, 2, 4, 5, 6, 7) **und** dass stimmige weiter durchlaufen
+(3, 8, 9) — eine Härtung, die den Normalfall mit abwürgt, ist keine.
+
 ## 5. Offene Punkte aus der Sicherheitsprüfung
 
 Die Prüfung des Datenbankanbieters meldet einen verbleibenden Punkt:

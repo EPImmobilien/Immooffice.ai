@@ -63,9 +63,10 @@ export default async function KontakteSeite() {
             const rollen = (kontakt.kontakt_rollen ?? []) as { rolle: string }[];
 
             return (
-              <div
+              <Link
                 key={kontakt.id}
-                className="rounded-[var(--radius-gross)] border border-linie bg-flaeche px-5 py-4"
+                href={`/kontakte/${kontakt.id}`}
+                className="block rounded-[var(--radius-gross)] border border-linie bg-flaeche px-5 py-4 transition-colors hover:border-akzent/50"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
@@ -90,7 +91,7 @@ export default async function KontakteSeite() {
                     {kontakt.telefon && <p className="zahl truncate">{kontakt.telefon}</p>}
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
