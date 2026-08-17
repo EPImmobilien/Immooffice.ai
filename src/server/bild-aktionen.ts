@@ -35,7 +35,7 @@ export async function bildErfassen(
   eingabe: z.input<typeof erfassen>,
 ): Promise<BildErgebnis> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "objekte", "aendern");
+  rechtErzwingen(sitzung, "objekte", "aendern");
 
   const geprueft = erfassen.safeParse(eingabe);
   if (!geprueft.success) return { fehler: "Die Bildangaben sind unvollständig." };
@@ -87,7 +87,7 @@ export async function bildErfassen(
 
 export async function bildLoeschen(formular: FormData): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "objekte", "aendern");
+  rechtErzwingen(sitzung, "objekte", "aendern");
 
   const id = String(formular.get("bild_id") ?? "").trim();
   const objektId = String(formular.get("objekt_id") ?? "").trim();
@@ -120,7 +120,7 @@ export async function bildLoeschen(formular: FormData): Promise<void> {
 
 export async function titelbildSetzen(formular: FormData): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "objekte", "aendern");
+  rechtErzwingen(sitzung, "objekte", "aendern");
 
   const id = String(formular.get("bild_id") ?? "").trim();
   const objektId = String(formular.get("objekt_id") ?? "").trim();
@@ -150,7 +150,7 @@ export async function titelbildSetzen(formular: FormData): Promise<void> {
 /** Verschiebt ein Bild um eine Position nach vorn oder hinten. */
 export async function bildVerschieben(formular: FormData): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "objekte", "aendern");
+  rechtErzwingen(sitzung, "objekte", "aendern");
 
   const id = String(formular.get("bild_id") ?? "").trim();
   const objektId = String(formular.get("objekt_id") ?? "").trim();

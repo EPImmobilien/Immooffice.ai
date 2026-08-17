@@ -4,7 +4,13 @@ import { RegistrierFormular } from "./RegistrierFormular";
 
 export const metadata: Metadata = { title: "Registrieren" };
 
-export default function RegistrierenSeite() {
+export default async function RegistrierenSeite({
+  searchParams,
+}: {
+  searchParams: Promise<{ weiter?: string }>;
+}) {
+  const { weiter } = await searchParams;
+
   return (
     <>
       <h1 className="font-titel text-2xl font-semibold text-text">
@@ -13,7 +19,7 @@ export default function RegistrierenSeite() {
       <p className="mt-1.5 mb-7 text-sm text-gedaempft">
         7 Tage unverbindlich, ohne Zahlungsdaten.
       </p>
-      <RegistrierFormular />
+      <RegistrierFormular weiter={weiter ?? ""} />
     </>
   );
 }

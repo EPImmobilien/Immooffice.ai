@@ -34,7 +34,7 @@ const EINTRAEGE: Eintrag[] = [
   { modul: "kalender", pfad: "/kalender", bezeichnung: "Kalender", geplant: true },
   { modul: "kalender", pfad: "/aufgaben", bezeichnung: "Aufgaben", geplant: true },
   { modul: "auswertungen", pfad: "/auswertungen", bezeichnung: "Auswertungen", geplant: true },
-  { modul: "einstellungen", pfad: "/einstellungen", bezeichnung: "Einstellungen", geplant: true },
+  { modul: "einstellungen", pfad: "/einstellungen", bezeichnung: "Einstellungen" },
   { modul: "abrechnung", pfad: "/credits", bezeichnung: "Abo und Credits" },
 ];
 

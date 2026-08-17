@@ -43,7 +43,36 @@ benutzer                                   -- 1:1 zu auth.users
   name, email, telefon, funktion, foto_pfad
   rolle, rechte_uebersteuerung jsonb
   aktiv, letzter_login_am
+
+einladungen                                -- der einzige Weg in einen Mandanten
+  id, mandant_id
+  email, rolle, rechte_uebersteuerung jsonb
+  token_hash                               -- SHA-256, nie der Klartext
+  eingeladen_von, erstellt_am, gueltig_bis
+  eingeloest_am, eingeloest_von, widerrufen_am
 ```
+
+### Einladungen
+
+Gespeichert wird nur der **Hash** des Tokens. Wer die Datenbank liest, kann
+damit keinem Mandanten beitreten; dafür lässt sich ein verlorener Link nicht
+wiederherstellen, sondern nur ersetzen (`einladung_erneuern`). Das Einlösen
+verlangt zusätzlich, dass die **E-Mail-Adresse des Kontos der Einladung
+entspricht** — ein weitergeleiteter Link nützt einem Dritten nichts.
+
+Anlegen und Einlösen laufen ausschließlich über security-definer-Funktionen;
+die Tabelle hat bewusst keine `insert`-Policy. Ein Teilindex lässt je Mandant
+und Adresse nur **eine** offene Einladung zu.
+
+### Zwei Regeln, die kein Formular durchsetzen kann
+
+Beide stecken in Triggern auf `benutzer`, weil sie über die REST-Schnittstelle
+sonst zu umgehen wären:
+
+- Die **Inhaberrolle** vergibt und entzieht nur ein Inhaber — ein Administrator
+  könnte sich sonst selbst erheben oder den Inhaber entmachten.
+- Ein Mandant behält **mindestens einen aktiven Inhaber**. Ohne diese Regel
+  ließe sich ein Unternehmen unverwaltbar machen, ohne dass jemand es merkt.
 
 ### Rollen
 

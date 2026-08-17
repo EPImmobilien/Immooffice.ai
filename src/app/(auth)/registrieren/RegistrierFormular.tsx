@@ -8,11 +8,16 @@ import { Eingabe, Feld } from "@/components/ui/Feld";
 import { Hinweis } from "@/components/ui/Status";
 import { registrieren, type AktionsErgebnis } from "@/server/auth-aktionen";
 
-export function RegistrierFormular() {
+export function RegistrierFormular({ weiter }: { weiter?: string }) {
   const [zustand, aktion, laeuft] = useActionState<AktionsErgebnis, FormData>(
     registrieren,
     {},
   );
+
+  // Eine Einladung darf beim Umweg über die Anmeldung nicht verloren gehen.
+  const anmeldeZiel = weiter
+    ? `/anmelden?weiter=${encodeURIComponent(weiter)}`
+    : "/anmelden";
 
   if (zustand.hinweis) {
     return (
@@ -26,7 +31,7 @@ export function RegistrierFormular() {
             bliebe der Nutzer auf einer Seite ohne Ausgang stehen. */}
         <p className="text-[13px] text-gedaempft">
           Sie haben bereits ein Konto?{" "}
-          <Link href="/anmelden" className="font-medium text-akzent hover:underline">
+          <Link href={anmeldeZiel} className="font-medium text-akzent hover:underline">
             Zur Anmeldung
           </Link>
         </p>
@@ -36,6 +41,8 @@ export function RegistrierFormular() {
 
   return (
     <form action={aktion} className="space-y-5">
+      <input type="hidden" name="weiter" value={weiter ?? ""} />
+
       {zustand.fehler && (
         <Hinweis ton="fehler" titel="Registrierung nicht möglich">
           {zustand.fehler}
@@ -73,7 +80,7 @@ export function RegistrierFormular() {
       <p className="text-center text-[13px] text-gedaempft">
         Bereits ein Konto?{" "}
         <Link
-          href="/anmelden"
+          href={anmeldeZiel}
           className="font-medium text-akzent underline-offset-2 hover:underline"
         >
           Anmelden

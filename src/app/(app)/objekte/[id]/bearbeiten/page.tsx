@@ -18,7 +18,7 @@ export default async function ObjektBearbeitenSeite({
   const { id } = await params;
   const sitzung = await sitzungErzwingen();
 
-  if (!hatRecht(sitzung.rolle, "objekte", "aendern")) redirect(`/objekte/${id}`);
+  if (!hatRecht(sitzung, "objekte", "aendern")) redirect(`/objekte/${id}`);
 
   const supabase = await serverClient();
   const { data: objekt } = await supabase

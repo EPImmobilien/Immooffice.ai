@@ -22,7 +22,7 @@ export default async function KontakteSeite() {
     .is("geloescht_am", null)
     .order("nachname", { ascending: true, nullsFirst: false });
 
-  const darfAnlegen = hatRecht(sitzung.rolle, "kontakte", "anlegen");
+  const darfAnlegen = hatRecht(sitzung, "kontakte", "anlegen");
   const liste = kontakte ?? [];
 
   return (

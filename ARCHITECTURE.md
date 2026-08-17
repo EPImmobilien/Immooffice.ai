@@ -124,9 +124,16 @@ Drei Ebenen, absichtlich redundant:
    Pfadsegment. Es gibt keine öffentlichen Buckets außer den ausdrücklich
    veröffentlichten Web-Exposé-Bildern.
 
-Die Dienstrolle (`SUPABASE_SERVICE_ROLE_KEY`) umgeht RLS und ist deshalb auf drei
-Stellen begrenzt: Benutzereinladung, Stripe-Webhooks, Job-Worker. Sie wird nie in einer
+Die Dienstrolle (`SUPABASE_SERVICE_ROLE_KEY`) umgeht RLS und ist deshalb auf zwei
+Stellen begrenzt: Stripe-Webhooks und Job-Worker. Sie wird nie in einer
 Client-Komponente importiert.
+
+Die Benutzereinladung war ursprünglich als dritte Stelle vorgesehen, braucht die
+Dienstrolle aber nicht: `einladung_erstellen`, `einladung_erneuern` und
+`einladung_einloesen` laufen als `security definer` und lesen Mandant, Rolle und
+Aufrufer aus der Sitzung, statt sie sich übergeben zu lassen. Das ist die engere
+Lösung — ein Schlüssel, der RLS vollständig umgeht, ist im Ablauf gar nicht
+beteiligt.
 
 ## 6. Sicherheit im Auslieferungsweg
 

@@ -37,6 +37,20 @@ const unternehmenSchema = z.object({
     .max(200, "Der Name ist zu lang."),
 });
 
+/**
+ * Nur eigene Pfade zulassen.
+ *
+ * Ohne diese Pruefung waere jedes `weiter` ein offener Umleitungspunkt: Ein
+ * Link auf die eigene Anmeldeseite koennte nach erfolgreicher Anmeldung auf
+ * eine fremde Seite fuehren, und der Nutzer haette keinen Anlass zu
+ * misstrauen. `//host` faellt ebenfalls heraus — der Browser liest es als
+ * absolute Adresse.
+ */
+function sicheresZiel(weiter: unknown, standard: string): string {
+  const pfad = String(weiter ?? "").trim();
+  return pfad.startsWith("/") && !pfad.startsWith("//") ? pfad : standard;
+}
+
 /** Übersetzt Supabase-Meldungen ins Deutsche, ohne Kontoexistenz zu verraten. */
 function meldung(text: string): string {
   const t = text.toLowerCase();
@@ -79,11 +93,7 @@ export async function anmelden(
 
   if (error) return { fehler: meldung(error.message) };
 
-  const weiter = String(formular.get("weiter") ?? "").trim();
-  // Nur eigene Pfade zulassen — sonst waere die Weiterleitung ein offener
-  // Umleitungspunkt auf fremde Seiten.
-  const ziel = weiter.startsWith("/") && !weiter.startsWith("//") ? weiter : "/dashboard";
-  redirect(ziel);
+  redirect(sicheresZiel(formular.get("weiter"), "/dashboard"));
 }
 
 export async function registrieren(
@@ -129,7 +139,9 @@ export async function registrieren(
     };
   }
 
-  redirect("/registrieren/unternehmen");
+  // Wer über eine Einladung kommt, soll dorthin zurück statt ein eigenes
+  // Unternehmen anzulegen.
+  redirect(sicheresZiel(formular.get("weiter"), "/registrieren/unternehmen"));
 }
 
 export async function unternehmenAnlegen(

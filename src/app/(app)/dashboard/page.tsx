@@ -64,7 +64,7 @@ export default async function UebersichtSeite() {
   const offeneTreffer = trefferAntwort.count ?? 0;
   const credits = typeof guthaben.data === "number" ? guthaben.data : 0;
 
-  const darf = (modul: Modul) => hatRecht(sitzung.rolle, modul, "lesen");
+  const darf = (modul: Modul) => hatRecht(sitzung, modul, "lesen");
 
   const tagesgeschaeft: KachelDaten[] = [
     darf("objekte") && {
@@ -156,9 +156,9 @@ export default async function UebersichtSeite() {
   const verwaltung: KachelDaten[] = [
     darf("einstellungen") && {
       titel: "Einstellungen",
-      hinweis: "Unternehmen, Benutzer, Branding",
+      hinweis: "Unternehmen, Benutzer, Rollen, Einladungen",
       symbol: "einstellungen" as const,
-      geplant: true,
+      pfad: "/einstellungen",
     },
     darf("abrechnung") && {
       titel: "Abo und Credits",
@@ -178,7 +178,7 @@ export default async function UebersichtSeite() {
         titel={`Willkommen, ${sitzung.name.split(" ")[0]}`}
         beschreibung={sitzung.mandantName}
       >
-        {hatRecht(sitzung.rolle, "objekte", "anlegen") && (
+        {hatRecht(sitzung, "objekte", "anlegen") && (
           <Link href="/objekte/neu" className={buttonKlassen()}>
             Objekt anlegen
           </Link>

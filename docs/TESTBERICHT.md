@@ -10,8 +10,8 @@
 |---|---|---|
 | Typprüfung (strict) | `npm run typecheck` | bestanden |
 | Linting | `npm run lint` | bestanden |
-| Unit-Tests | `npm run test` | 103 Tests bestanden |
-| Produktions-Build | `npm run build` | bestanden, 25 Routen |
+| Unit-Tests | `npm run test` | 112 Tests bestanden |
+| Produktions-Build | `npm run build` | bestanden, 33 Routen |
 | Marken-Scan | `npm run marken-scan` | sauber, keine Treffer |
 
 Alles zusammen: `npm run pruefen`.
@@ -32,6 +32,7 @@ Alles zusammen: `npm run pruefen`.
 | Web-Exposé-Token | Länge und Zeichenmenge stimmen mit der Prüfung in der Datenbank überein; 2000 Aufrufe ergeben 2000 verschiedene Werte; **die Zeichen sind gleichmäßig verteilt** — eine Häufung würde den Raum verkleinern, ohne aufzufallen |
 | Öffentliche Adresse | Basis und Token werden korrekt zusammengesetzt; weitergeleiteter Host und weitergeleitetes Schema haben Vorrang; lokal bleibt es bei `http` |
 | Energiekennwert | **Bedarfsausweis schreibt `endenergiebedarf`, Verbrauchsausweis `energieverbrauchkennwert` — und jeweils das andere Element gerade nicht.** Portale weisen Objekte ab, bei denen Typ und Element nicht zusammenpassen |
+| Rechteübersteuerung | Gespeichert wird nur die Abweichung von der Rolle, nicht die volle Matrix; **jede Auswahl gilt nach dem Speichern unverändert** (Rundlauf über alle sechs Rollen und alle 50 Felder); leere Auswahl entzieht wirklich alles; unbekannte Module, unbekannte Aktionen und Nicht-Wahrheitswerte aus der Datenbank werden verworfen |
 
 Drei Tests wurden durch gezielte Änderung am Code gegengeprüft und schlagen
 dann fehl — sie können die jeweilige Regression also tatsächlich erkennen:
@@ -124,6 +125,7 @@ der Datenbank, nicht in der Oberfläche.
 | [`web-expose.sql`](../supabase/tests/web-expose.sql) | Nur festgelegte Felder gelangen nach außen; Passwortschutz, Widerruf und Ablauf wirken sofort; Tabellen bleiben für Besucher leer; Kontaktformular prüft Eingaben und Freigabe; der PDF-Download zählt nicht als Seitenaufruf | 20 von 20 |
 | [`funktionsrechte.sql`](../supabase/tests/funktionsrechte.sql) | Nicht angemeldete und angemeldete Aufrufer können keine Credits gutschreiben, kein Monatskontingent zuteilen, keinen fremden Kontostand lesen und kein Matching auslösen — mit Gegenproben für das, was erlaubt bleiben muss | 8 von 8 |
 | [`bilder.sql`](../supabase/tests/bilder.sql) | Original bleibt unverändert, Bearbeitung ist eine eigene Version mit Beschreibung, KI-Kennzeichen nicht entfernbar, Bildpfad unveränderlich, ein Titelbild je Objekt, keine Sicht auf fremde Bilder | 10 von 10 |
+| [`einladungen.sql`](../supabase/tests/einladungen.sql) | Token steht nie im Klartext in der Tabelle; nur eine offene Einladung je Adresse; ein weitergeleiteter Link nützt einem Dritten nichts; eine Einladung gilt genau einmal; Widerruf und Ablauf wirken; ein Administrator vergibt keine Inhaberrolle und entmachtet den Inhaber nicht; ein Mandant behält mindestens einen aktiven Inhaber; niemand befördert sich selbst, erweitert seine eigenen Rechte oder schaltet den eigenen Zugang ab | 32 von 32 |
 
 Die Prüfung des Datenbankanbieters hat dabei einen **schwerwiegenden Befund**
 zutage gefördert: `credits_gutschreiben` nahm die Mandanten-ID als Parameter
@@ -133,6 +135,14 @@ sich ohne Anmeldung beliebig viele Credits gutschreiben können. Ursache ist ein
 Voreinstellung von Postgres, nicht ein Tippfehler: Das Ausführungsrecht neuer
 Funktionen geht an `PUBLIC`, und die REST-Rolle `anon` erbt davon. Behoben in
 `funktionsrechte_einschraenken`, festgehalten in `funktionsrechte.sql`.
+
+Beim Einladungstest ist eine **grüne Prüfung aufgefallen, die nichts prüfte**:
+Der Versuch, den letzten Inhaber zu löschen, lief zunächst aus dessen eigener
+Sitzung. Dort greift aber schon die Policy (`id <> auth.uid()`), und ein
+`delete` ohne betroffene Zeile wirft keinen Fehler — die Prüfung wäre auch dann
+bestanden gewesen, wenn es den Trigger gar nicht gäbe. Sie läuft jetzt aus der
+Sitzung des Administrators und zählt anschließend nach, dass der Inhaber noch
+da ist.
 
 Der Matching-Test hat eine **Fehlentscheidung im Entwurf aufgedeckt**: Ein
 Objekt in Hamburg erhielt für ein Kieler Suchprofil noch 75 von 100 Punkten,
@@ -172,6 +182,8 @@ Nachweis steht aber aus und ist beim ersten Deployment nachzuholen:
 | Exposé-Textentwurf mit echten Objektdaten | beim ersten Deployment |
 | PDF-Export mit echten Mandantendaten | beim ersten Deployment |
 | Verhalten bei aktivierter E-Mail-Bestätigung | beim ersten Deployment |
+| Einladung von Anfang bis Ende: Link erzeugen, zweites Konto registrieren, beitreten | beim ersten Deployment |
+| Ein abgeschalteter Zugang landet auf `/zugang-abgeschaltet` statt in einer Schleife | beim ersten Deployment |
 
 Die zugrunde liegenden Bausteine sind einzeln geprüft: Die Datenbankschicht über
 den RLS-Test, die Texterzeugung und die PDF-Ausgabe über Unit-Tests, der
@@ -214,6 +226,10 @@ Drei Befunde wurden bereits während der Umsetzung behoben:
 - Je Objekt gibt es **einen** öffentlichen Link. Mehrere Links mit eigenem
   Passwort und eigener Frist — etwa einer je Interessent — sind datenseitig
   möglich, brauchen aber eine eigene Verwaltung in der Oberfläche.
-- Kalender, Aufgaben, Wertermittlung, Verträge, Auswertungen, Einstellungen und
-  Plattform-Admin sind in der Navigation als „geplant“ gekennzeichnet und ohne
-  Funktion.
+- Kalender, Aufgaben, Wertermittlung, Verträge, Auswertungen und Plattform-Admin
+  sind in der Navigation als „geplant“ gekennzeichnet und ohne Funktion.
+- Einladungen werden **nicht automatisch verschickt** — der E-Mail-Versand ist
+  noch nicht eingerichtet. Der Link wird beim Anlegen einmal angezeigt und ist
+  vom Einladenden weiterzugeben. Das steht auch in der Oberfläche.
+- Ein Logo lässt sich in den Einstellungen noch nicht hochladen; die Spalten
+  dafür bestehen, die Bild-Pipeline dahinter entsteht mit dem Marketingmodul.

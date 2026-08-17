@@ -30,7 +30,7 @@ export async function GET(
   if (!sitzung) {
     return NextResponse.json({ fehler: "Nicht angemeldet." }, { status: 401 });
   }
-  rechtErzwingen(sitzung.rolle, "objekte", "lesen");
+  rechtErzwingen(sitzung, "objekte", "lesen");
 
   const supabase = await serverClient();
 

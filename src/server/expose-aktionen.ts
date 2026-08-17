@@ -44,7 +44,7 @@ export async function texteErzeugen(
   formular: FormData,
 ): Promise<TextErgebnisAnzeige> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "exposes", "anlegen");
+  rechtErzwingen(sitzung, "exposes", "anlegen");
 
   const geprueft = auftragSchema.safeParse({
     objektId: formular.get("objektId"),
@@ -150,7 +150,7 @@ export async function texteErzeugen(
 
 export async function texteFreigeben(formular: FormData): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "exposes", "freigeben");
+  rechtErzwingen(sitzung, "exposes", "freigeben");
 
   const objektId = String(formular.get("objektId") ?? "").trim();
   if (!objektId) return;

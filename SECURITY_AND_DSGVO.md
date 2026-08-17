@@ -36,7 +36,8 @@ Drei Ebenen, absichtlich redundant (siehe `ARCHITECTURE.md`):
 3. **Storage-Policies** auf dem ersten Pfadsegment (`mandant_id/...`).
 
 Schlüssel sind UUIDs, damit IDs nicht erratbar sind. Die Dienstrolle umgeht RLS und ist
-auf drei Stellen begrenzt: Benutzereinladung, Stripe-Webhooks, Job-Worker.
+auf zwei Stellen begrenzt: Stripe-Webhooks und Job-Worker. Die Benutzereinladung kommt
+ohne sie aus (Abschnitt 3).
 
 **Nachweis:** Cross-Tenant-Isolation wird durch automatisierte Tests belegt (`pgtap`
 direkt in der Datenbank, ergänzt um Integrationstests). Gate B verlangt diesen Nachweis
@@ -49,8 +50,19 @@ ausdrücklich.
 - Zwei-Faktor-Verfahren ist in Version 1 **nicht verpflichtend** (Abschnitt 16), aber
   technisch vorbereitet: Das Benutzermodell trägt die nötigen Felder, und die
   Anmeldung ist als eigener Schritt gekapselt.
-- Einladung neuer Benutzer serverseitig über die Dienstrolle — **nicht** über
+- Einladung neuer Benutzer über geprüfte Datenbankfunktionen — **nicht** über
   `signUp` wie in der Referenz, wo jeder Aufrufer die Rolle mitgeben konnte.
+  Ursprünglich war dafür die Dienstrolle vorgesehen. Umgesetzt ist es ohne sie:
+  `einladung_erstellen`, `einladung_erneuern` und `einladung_einloesen` laufen
+  als `security definer` und ermitteln Mandant, Rolle und Aufrufer selbst aus
+  der Sitzung. Damit taucht der Dienstschlüssel in diesem Ablauf gar nicht erst
+  auf, und die Regeln gelten auch für jeden, der die REST-Schnittstelle direkt
+  anspricht. Es bleiben zwei Stellen für die Dienstrolle: Stripe-Webhooks und
+  Job-Worker.
+- Vom Einladungstoken wird nur der **SHA-256-Hash** gespeichert. Der Link ist
+  einmalig sichtbar; verloren heißt neu erzeugen, nicht wiederherstellen.
+- Eine Einladung lässt sich nur von der **eingeladenen E-Mail-Adresse**
+  einlösen. Ein weitergeleiteter Link öffnet damit keinen fremden Mandanten.
 
 ## 4. Auslieferungssicherheit
 

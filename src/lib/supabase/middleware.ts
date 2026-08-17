@@ -5,7 +5,16 @@ import type { NextRequest } from "next/server";
 import { supabaseUmgebung } from "./umgebung";
 
 /** Routen, die ohne Anmeldung erreichbar sind. */
-const OEFFENTLICH = ["/", "/anmelden", "/registrieren", "/styleguide", "/expose"];
+const OEFFENTLICH = [
+  "/",
+  "/anmelden",
+  "/registrieren",
+  "/styleguide",
+  "/expose",
+  // Eine Einladung wird angesehen, bevor ein Konto besteht. Die Seite selbst
+  // gibt nur preis, wer den Token kennt.
+  "/einladung",
+];
 
 function istOeffentlich(pfad: string): boolean {
   return OEFFENTLICH.some(

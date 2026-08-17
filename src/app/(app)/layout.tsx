@@ -20,7 +20,7 @@ export default async function AppLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const sitzung = await sitzungErzwingen();
-  const erlaubteModule = sichtbareModule(sitzung.rolle);
+  const erlaubteModule = sichtbareModule(sitzung);
 
   return (
     <div className="min-h-screen bg-grund">
@@ -31,14 +31,20 @@ export default async function AppLayout({
           </Link>
 
           <div className="flex items-center gap-3">
-            <div className="hidden text-right sm:block">
+            {/* Der eigene Name ist der Weg ins eigene Profil — das kennen
+                Nutzer aus anderen Anwendungen, und es haelt die
+                Hauptnavigation frei von einem Eintrag, der kein Modul ist. */}
+            <Link
+              href="/profil"
+              className="hidden rounded-[var(--radius)] px-2 py-1 text-right transition-colors hover:bg-flaeche-gedaempft sm:block"
+            >
               <p className="text-[13px] leading-tight font-medium text-text">
                 {sitzung.name}
               </p>
               <p className="text-[11px] leading-tight text-gedaempft">
                 {sitzung.mandantName} · {ROLLEN_BEZEICHNUNG[sitzung.rolle]}
               </p>
-            </div>
+            </Link>
             {sitzung.aboStatus === "test" && (
               <Marke ton="warnung" className="hidden md:inline-flex">
                 Testphase

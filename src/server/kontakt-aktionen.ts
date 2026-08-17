@@ -60,7 +60,7 @@ export async function kontaktSpeichern(
   const id = String(formular.get("id") ?? "").trim();
   const istNeu = id === "";
 
-  rechtErzwingen(sitzung.rolle, "kontakte", istNeu ? "anlegen" : "aendern");
+  rechtErzwingen(sitzung, "kontakte", istNeu ? "anlegen" : "aendern");
 
   const roh: Record<string, unknown> = {};
   for (const feld of [

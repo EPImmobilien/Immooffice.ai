@@ -64,8 +64,8 @@ export default async function ObjektSeite({
   if (!objekt) notFound();
 
   const befunde = exportPruefen(objekt as OpenImmoObjekt);
-  const darfAendern = hatRecht(sitzung.rolle, "objekte", "aendern");
-  const darfLoeschen = hatRecht(sitzung.rolle, "objekte", "loeschen");
+  const darfAendern = hatRecht(sitzung, "objekte", "aendern");
+  const darfLoeschen = hatRecht(sitzung, "objekte", "loeschen");
 
   return (
     <>

@@ -35,7 +35,7 @@ export default async function ObjekteSeite() {
     .is("geloescht_am", null)
     .order("erstellt_am", { ascending: false });
 
-  const darfAnlegen = hatRecht(sitzung.rolle, "objekte", "anlegen");
+  const darfAnlegen = hatRecht(sitzung, "objekte", "anlegen");
   const liste = objekte ?? [];
 
   return (

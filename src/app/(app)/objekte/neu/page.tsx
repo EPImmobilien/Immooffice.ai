@@ -13,7 +13,7 @@ export default async function NeuesObjektSeite() {
   const sitzung = await sitzungErzwingen();
 
   // Auch die Seite selbst prueft — nicht nur die Server Action.
-  if (!hatRecht(sitzung.rolle, "objekte", "anlegen")) redirect("/objekte");
+  if (!hatRecht(sitzung, "objekte", "anlegen")) redirect("/objekte");
 
   return (
     <>
