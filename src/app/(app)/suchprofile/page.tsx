@@ -56,7 +56,7 @@ export default async function SuchprofileSeite() {
     .order("punktzahl", { ascending: false });
 
   const liste = profile ?? [];
-  const darfAendern = hatRecht(sitzung.rolle, "kontakte", "aendern");
+  const darfAendern = hatRecht(sitzung.rolle, "kontakte", "aendern", sitzung.uebersteuerung);
 
   const trefferJeProfil = new Map<string, typeof treffer>();
   for (const t of treffer ?? []) {
@@ -73,7 +73,7 @@ export default async function SuchprofileSeite() {
           liste.length === 1 ? "1 Suchprofil" : `${liste.length} Suchprofile`
         }
       >
-        {hatRecht(sitzung.rolle, "kontakte", "anlegen") && (
+        {hatRecht(sitzung.rolle, "kontakte", "anlegen", sitzung.uebersteuerung) && (
           <Link href="/suchprofile/neu" className={buttonKlassen()}>
             Suchprofil anlegen
           </Link>

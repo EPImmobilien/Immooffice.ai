@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Neuer Kontakt" };
 
 export default async function NeuerKontaktSeite() {
   const sitzung = await sitzungErzwingen();
-  if (!hatRecht(sitzung.rolle, "kontakte", "anlegen")) redirect("/kontakte");
+  if (!hatRecht(sitzung.rolle, "kontakte", "anlegen", sitzung.uebersteuerung)) redirect("/kontakte");
 
   return (
     <>

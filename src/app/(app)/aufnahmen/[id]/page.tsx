@@ -60,8 +60,8 @@ export default async function AufnahmeSeite({
   const daten = aufnahme as unknown as Objektaufnahme;
   const status = daten.status;
   const offen = status === "offen";
-  const darfAendern = hatRecht(sitzung.rolle, "objekte", "aendern");
-  const darfAnlegen = hatRecht(sitzung.rolle, "objekte", "anlegen");
+  const darfAendern = hatRecht(sitzung.rolle, "objekte", "aendern", sitzung.uebersteuerung);
+  const darfAnlegen = hatRecht(sitzung.rolle, "objekte", "anlegen", sitzung.uebersteuerung);
   const fehlend = (daten.unterlagen_offen ?? []) as Dokumentart[];
 
   return (

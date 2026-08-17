@@ -73,8 +73,8 @@ export default async function ExposeSeite({
     .is("original_id", null);
 
   const basisUrl = basisUrlErmitteln(await headers());
-  const darfErzeugen = hatRecht(sitzung.rolle, "exposes", "anlegen");
-  const darfFreigeben = hatRecht(sitzung.rolle, "exposes", "freigeben");
+  const darfErzeugen = hatRecht(sitzung.rolle, "exposes", "anlegen", sitzung.uebersteuerung);
+  const darfFreigeben = hatRecht(sitzung.rolle, "exposes", "freigeben", sitzung.uebersteuerung);
   const freigegeben = Boolean(objekt.texte_freigegeben_am);
   const hatTexte = Boolean(
     objekt.beschreibung_objekt ||

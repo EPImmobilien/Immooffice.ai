@@ -25,7 +25,7 @@ export async function GET(
   if (!sitzung) {
     return NextResponse.json({ fehler: "Nicht angemeldet." }, { status: 401 });
   }
-  rechtErzwingen(sitzung.rolle, "marketing", "lesen");
+  rechtErzwingen(sitzung.rolle, "marketing", "lesen", sitzung.uebersteuerung);
 
   const format = formatFinden(formatSchluessel);
   if (!format) {

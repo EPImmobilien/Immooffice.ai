@@ -56,7 +56,7 @@ export async function suchprofilSpeichern(
   formular: FormData,
 ): Promise<SuchprofilErgebnis> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "kontakte", "anlegen");
+  rechtErzwingen(sitzung.rolle, "kontakte", "anlegen", sitzung.uebersteuerung);
 
   const geprueft = schema.safeParse({
     kontakt_id: formular.get("kontakt_id"),
@@ -103,7 +103,7 @@ export async function suchprofilSpeichern(
 /** Sucht für ein Profil erneut — etwa nach Änderungen am Bestand. */
 export async function trefferAktualisieren(formular: FormData): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "kontakte", "aendern");
+  rechtErzwingen(sitzung.rolle, "kontakte", "aendern", sitzung.uebersteuerung);
 
   const profil = String(formular.get("profil_id") ?? "").trim();
   if (!profil) return;
@@ -117,7 +117,7 @@ export async function trefferAktualisieren(formular: FormData): Promise<void> {
 /** Setzt den Status eines Treffers — vorgemerkt, gesendet oder abgelehnt. */
 export async function trefferStatusSetzen(formular: FormData): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "kontakte", "aendern");
+  rechtErzwingen(sitzung.rolle, "kontakte", "aendern", sitzung.uebersteuerung);
 
   const treffer = String(formular.get("treffer_id") ?? "").trim();
   const status = String(formular.get("status") ?? "").trim();

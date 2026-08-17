@@ -24,7 +24,7 @@ const AUSWAHL =
 
 export default async function AufgabenSeite() {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "kalender", "lesen");
+  rechtErzwingen(sitzung.rolle, "kalender", "lesen", sitzung.uebersteuerung);
 
   const supabase = await serverClient();
 
@@ -51,9 +51,9 @@ export default async function AufgabenSeite() {
     ["ueberfaellig", "heute"].includes(fristlage(a.faellig_am, stichtag)),
   );
 
-  const darfAendern = hatRecht(sitzung.rolle, "kalender", "aendern");
-  const darfLoeschen = hatRecht(sitzung.rolle, "kalender", "loeschen");
-  const darfAnlegen = hatRecht(sitzung.rolle, "kalender", "anlegen");
+  const darfAendern = hatRecht(sitzung.rolle, "kalender", "aendern", sitzung.uebersteuerung);
+  const darfLoeschen = hatRecht(sitzung.rolle, "kalender", "loeschen", sitzung.uebersteuerung);
+  const darfAnlegen = hatRecht(sitzung.rolle, "kalender", "anlegen", sitzung.uebersteuerung);
 
   return (
     <div className="space-y-6">

@@ -20,7 +20,7 @@ export default async function AppLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const sitzung = await sitzungErzwingen();
-  const erlaubteModule = sichtbareModule(sitzung.rolle);
+  const erlaubteModule = sichtbareModule(sitzung.rolle, sitzung.uebersteuerung);
 
   return (
     <div className="min-h-screen bg-grund">

@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: "Neue Objektaufnahme" };
 
 export default async function NeueAufnahmeSeite() {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "objekte", "anlegen");
+  rechtErzwingen(sitzung.rolle, "objekte", "anlegen", sitzung.uebersteuerung);
 
   const supabase = await serverClient();
   const { data: kontakte } = await supabase

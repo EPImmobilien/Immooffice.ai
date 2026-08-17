@@ -129,7 +129,12 @@ export async function objektSpeichern(
 
   // Serverseitige Rechtepruefung. Die Datenbank prueft zusaetzlich per RLS —
   // ausgeblendete Schaltflaechen sind ausdruecklich kein Schutz (Abschnitt 5).
-  rechtErzwingen(sitzung.rolle, "objekte", istNeu ? "anlegen" : "aendern");
+  rechtErzwingen(
+    sitzung.rolle,
+    "objekte",
+    istNeu ? "anlegen" : "aendern",
+    sitzung.uebersteuerung,
+  );
 
   const geprueft = objektSchema.safeParse(formularLesen(formular));
   if (!geprueft.success) {
@@ -180,7 +185,7 @@ export async function objektSpeichern(
 
 export async function objektLoeschen(formular: FormData): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "objekte", "loeschen");
+  rechtErzwingen(sitzung.rolle, "objekte", "loeschen", sitzung.uebersteuerung);
 
   const id = String(formular.get("id") ?? "").trim();
   if (!id) return;

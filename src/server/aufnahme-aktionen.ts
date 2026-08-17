@@ -133,7 +133,7 @@ export async function aufnahmeAnlegen(
   formular: FormData,
 ): Promise<AufnahmeErgebnis> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "objekte", "anlegen");
+  rechtErzwingen(sitzung.rolle, "objekte", "anlegen", sitzung.uebersteuerung);
 
   const geprueft = auslesen(formular);
   if (!geprueft.success) {
@@ -164,7 +164,7 @@ export async function aufnahmeSpeichern(
   formular: FormData,
 ): Promise<AufnahmeErgebnis> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "objekte", "aendern");
+  rechtErzwingen(sitzung.rolle, "objekte", "aendern", sitzung.uebersteuerung);
 
   const id = String(formular.get("aufnahme_id") ?? "").trim();
   if (!id) return { fehler: "Die Aufnahme wurde nicht gefunden." };
@@ -204,7 +204,7 @@ export async function aufnahmeSpeichern(
  */
 export async function aufnahmeUebernehmen(formular: FormData): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "objekte", "anlegen");
+  rechtErzwingen(sitzung.rolle, "objekte", "anlegen", sitzung.uebersteuerung);
 
   const id = String(formular.get("aufnahme_id") ?? "").trim();
   if (!id) return;
@@ -232,7 +232,7 @@ export async function aufnahmeUebernehmen(formular: FormData): Promise<void> {
  */
 export async function aufnahmeVerwerfen(formular: FormData): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "objekte", "aendern");
+  rechtErzwingen(sitzung.rolle, "objekte", "aendern", sitzung.uebersteuerung);
 
   const id = String(formular.get("aufnahme_id") ?? "").trim();
   if (!id) return;

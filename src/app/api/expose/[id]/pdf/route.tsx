@@ -30,7 +30,7 @@ export async function GET(
   if (!sitzung) {
     return NextResponse.json({ fehler: "Nicht angemeldet." }, { status: 401 });
   }
-  rechtErzwingen(sitzung.rolle, "exposes", "lesen");
+  rechtErzwingen(sitzung.rolle, "exposes", "lesen", sitzung.uebersteuerung);
 
   const gewuenscht =
     new URL(anfrage.url).searchParams.get("vorlage") ?? STANDARDVORLAGE;

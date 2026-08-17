@@ -54,7 +54,7 @@ const aufgabe = z.object({
 
 export async function aufgabeAnlegen(formular: FormData): Promise<ArbeitsErgebnis> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "kalender", "anlegen");
+  rechtErzwingen(sitzung.rolle, "kalender", "anlegen", sitzung.uebersteuerung);
 
   const geprueft = aufgabe.safeParse({
     titel: String(formular.get("titel") ?? ""),
@@ -102,7 +102,7 @@ export async function aufgabeAnlegen(formular: FormData): Promise<ArbeitsErgebni
  */
 export async function aufgabeUmschalten(formular: FormData): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "kalender", "aendern");
+  rechtErzwingen(sitzung.rolle, "kalender", "aendern", sitzung.uebersteuerung);
 
   const id = String(formular.get("aufgabe_id") ?? "").trim();
   if (!id) return;
@@ -137,7 +137,7 @@ export async function aufgabeUmschalten(formular: FormData): Promise<void> {
 
 export async function aufgabeLoeschen(formular: FormData): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "kalender", "loeschen");
+  rechtErzwingen(sitzung.rolle, "kalender", "loeschen", sitzung.uebersteuerung);
 
   const id = String(formular.get("aufgabe_id") ?? "").trim();
   if (!id) return;
@@ -183,7 +183,7 @@ const termin = z
 
 export async function terminAnlegen(formular: FormData): Promise<ArbeitsErgebnis> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "kalender", "anlegen");
+  rechtErzwingen(sitzung.rolle, "kalender", "anlegen", sitzung.uebersteuerung);
 
   const geprueft = termin.safeParse({
     titel: String(formular.get("titel") ?? ""),
@@ -237,7 +237,7 @@ export async function terminAnlegen(formular: FormData): Promise<ArbeitsErgebnis
  */
 export async function terminAbsagen(formular: FormData): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "kalender", "aendern");
+  rechtErzwingen(sitzung.rolle, "kalender", "aendern", sitzung.uebersteuerung);
 
   const id = String(formular.get("termin_id") ?? "").trim();
   if (!id) return;

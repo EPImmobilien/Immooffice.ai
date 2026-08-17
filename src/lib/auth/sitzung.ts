@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { serverClient } from "@/lib/supabase/server";
 
-import type { Rolle } from "./rechte";
+import type { Rolle, Uebersteuerung } from "./rechte";
 
 export interface Sitzung {
   benutzerId: string;
@@ -10,9 +10,43 @@ export interface Sitzung {
   name: string;
   email: string;
   rolle: Rolle;
+  /**
+   * Abweichungen von der Rollenvorbelegung, je Benutzer.
+   *
+   * Muss bei JEDER Rechtepruefung mitgegeben werden. Wird sie vergessen, gilt
+   * stillschweigend wieder die reine Rolle — ein entzogenes Recht waere dann
+   * weiterhin vorhanden, ohne dass es auffiele. Genau dieser Zustand bestand,
+   * bevor dieses Feld hier eingezogen ist: Die Spalte gab es in der Datenbank,
+   * die Auswertung gab es in `hatRecht`, nur den Weg dazwischen gab es nicht.
+   */
+  uebersteuerung: Uebersteuerung;
   mandantName: string;
   aboStatus: string;
   testphaseBis: string;
+}
+
+/**
+ * Nimmt nur an, was der erwarteten Form entspricht.
+ *
+ * Der Wert kommt aus einer jsonb-Spalte und ist damit beliebig. Ein
+ * unerwarteter Aufbau darf keine Rechtepruefung durcheinanderbringen — im
+ * Zweifel gilt die Rolle.
+ */
+function uebersteuerungLesen(wert: unknown): Uebersteuerung {
+  if (!wert || typeof wert !== "object" || Array.isArray(wert)) return {};
+
+  const ergebnis: Record<string, Record<string, boolean>> = {};
+  for (const [modul, aktionen] of Object.entries(wert)) {
+    if (!aktionen || typeof aktionen !== "object" || Array.isArray(aktionen)) {
+      continue;
+    }
+    const gefiltert: Record<string, boolean> = {};
+    for (const [aktion, erlaubt] of Object.entries(aktionen)) {
+      if (typeof erlaubt === "boolean") gefiltert[aktion] = erlaubt;
+    }
+    if (Object.keys(gefiltert).length > 0) ergebnis[modul] = gefiltert;
+  }
+  return ergebnis as Uebersteuerung;
 }
 
 /**
@@ -35,7 +69,7 @@ export async function sitzungLaden(): Promise<Sitzung | null> {
   const { data } = await supabase
     .from("benutzer")
     .select(
-      "id, mandant_id, name, email, rolle, mandanten(name, abo_status, testphase_bis)",
+      "id, mandant_id, name, email, rolle, rechte_uebersteuerung, mandanten(name, abo_status, testphase_bis)",
     )
     .eq("id", user.id)
     .maybeSingle();
@@ -54,6 +88,7 @@ export async function sitzungLaden(): Promise<Sitzung | null> {
     name: data.name,
     email: data.email,
     rolle: data.rolle as Rolle,
+    uebersteuerung: uebersteuerungLesen(data.rechte_uebersteuerung),
     mandantName: mandant?.name ?? "",
     aboStatus: mandant?.abo_status ?? "test",
     testphaseBis: mandant?.testphase_bis ?? "",

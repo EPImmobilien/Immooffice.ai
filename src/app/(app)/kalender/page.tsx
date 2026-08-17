@@ -32,7 +32,7 @@ const AUSWAHL =
  */
 export default async function KalenderSeite() {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "kalender", "lesen");
+  rechtErzwingen(sitzung.rolle, "kalender", "lesen", sitzung.uebersteuerung);
 
   const supabase = await serverClient();
 
@@ -56,8 +56,8 @@ export default async function KalenderSeite() {
     .order("beginnt_am", { ascending: false })
     .limit(20);
 
-  const darfAendern = hatRecht(sitzung.rolle, "kalender", "aendern");
-  const darfAnlegen = hatRecht(sitzung.rolle, "kalender", "anlegen");
+  const darfAendern = hatRecht(sitzung.rolle, "kalender", "aendern", sitzung.uebersteuerung);
+  const darfAnlegen = hatRecht(sitzung.rolle, "kalender", "anlegen", sitzung.uebersteuerung);
 
   const kommendeListe = (kommend ?? []) as unknown as Termin[];
 

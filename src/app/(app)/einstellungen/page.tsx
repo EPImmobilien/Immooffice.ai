@@ -34,7 +34,7 @@ export const metadata: Metadata = { title: "Einstellungen" };
  */
 export default async function EinstellungenSeite() {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "einstellungen", "lesen");
+  rechtErzwingen(sitzung.rolle, "einstellungen", "lesen", sitzung.uebersteuerung);
 
   const supabase = await serverClient();
   const { url } = supabaseUmgebung();
@@ -50,13 +50,13 @@ export default async function EinstellungenSeite() {
       .maybeSingle(),
     supabase
       .from("benutzer")
-      .select("id, name, email, rolle, aktiv, letzter_login_am")
+      .select("id, name, email, rolle, rechte_uebersteuerung, aktiv, letzter_login_am")
       .order("name", { ascending: true }),
   ]);
 
   const branding = (brandingAntwort.data ?? null) as unknown as Branding | null;
   const benutzer = (benutzerAntwort.data ?? []) as unknown as BenutzerZeile[];
-  const darfAendern = hatRecht(sitzung.rolle, "einstellungen", "aendern");
+  const darfAendern = hatRecht(sitzung.rolle, "einstellungen", "aendern", sitzung.uebersteuerung);
 
   // Solange kein Firmenname hinterlegt ist, behilft sich die Anwendung mit dem
   // bei der Registrierung angegebenen Namen. Das funktioniert, sieht aber in

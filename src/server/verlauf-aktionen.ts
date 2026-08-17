@@ -35,7 +35,7 @@ export interface VerlaufErgebnis {
 
 export async function verlaufEintragen(formular: FormData): Promise<VerlaufErgebnis> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "objekte", "aendern");
+  rechtErzwingen(sitzung.rolle, "objekte", "aendern", sitzung.uebersteuerung);
 
   const rohObjekt = String(formular.get("objekt_id") ?? "").trim();
   const rohKontakt = String(formular.get("kontakt_id") ?? "").trim();

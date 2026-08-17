@@ -112,9 +112,9 @@ export default async function KontaktSeite({
     ]);
 
   const heute = new Date().toISOString();
-  const darfAendern = hatRecht(sitzung.rolle, "kontakte", "aendern");
-  const darfTermine = hatRecht(sitzung.rolle, "kalender", "anlegen");
-  const darfTermineAendern = hatRecht(sitzung.rolle, "kalender", "aendern");
+  const darfAendern = hatRecht(sitzung.rolle, "kontakte", "aendern", sitzung.uebersteuerung);
+  const darfTermine = hatRecht(sitzung.rolle, "kalender", "anlegen", sitzung.uebersteuerung);
+  const darfTermineAendern = hatRecht(sitzung.rolle, "kalender", "aendern", sitzung.uebersteuerung);
 
   const person = [kontakt.anrede, kontakt.titel, kontakt.vorname, kontakt.nachname]
     .filter(Boolean)
@@ -304,7 +304,7 @@ export default async function KontaktSeite({
                 aufgaben={(aufgabenAntwort.data ?? []) as unknown as Aufgabe[]}
                 heute={heute}
                 darfAendern={darfTermineAendern}
-                darfLoeschen={hatRecht(sitzung.rolle, "kalender", "loeschen")}
+                darfLoeschen={hatRecht(sitzung.rolle, "kalender", "loeschen", sitzung.uebersteuerung)}
               />
               {darfTermine && <AufgabeAnlegen kontaktId={kontakt.id} />}
             </KarteInhalt>

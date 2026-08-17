@@ -49,7 +49,7 @@ export async function dokumentErfassen(
   eingabe: z.input<typeof erfassen>,
 ): Promise<DokumentErgebnis> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "objekte", "aendern");
+  rechtErzwingen(sitzung.rolle, "objekte", "aendern", sitzung.uebersteuerung);
 
   const geprueft = erfassen.safeParse(eingabe);
   if (!geprueft.success) {
@@ -100,7 +100,7 @@ export async function dokumentErfassen(
 
 export async function dokumentLoeschen(formular: FormData): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "objekte", "aendern");
+  rechtErzwingen(sitzung.rolle, "objekte", "aendern", sitzung.uebersteuerung);
 
   const id = String(formular.get("dokument_id") ?? "").trim();
   const objektId = String(formular.get("objekt_id") ?? "").trim();
@@ -142,7 +142,7 @@ export async function sichtbarkeitUmschalten(
   formular: FormData,
 ): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "objekte", "aendern");
+  rechtErzwingen(sitzung.rolle, "objekte", "aendern", sitzung.uebersteuerung);
 
   const id = String(formular.get("dokument_id") ?? "").trim();
   const objektId = String(formular.get("objekt_id") ?? "").trim();
@@ -182,7 +182,7 @@ export async function dokumentVerweis(
   id: string,
 ): Promise<{ url?: string; fehler?: string }> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "objekte", "lesen");
+  rechtErzwingen(sitzung.rolle, "objekte", "lesen", sitzung.uebersteuerung);
 
   const supabase = await serverClient();
 

@@ -58,7 +58,7 @@ interface Zeile {
 
 export default async function AufnahmenSeite() {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "objekte", "lesen");
+  rechtErzwingen(sitzung.rolle, "objekte", "lesen", sitzung.uebersteuerung);
 
   const supabase = await serverClient();
   const { data: aufnahmen } = await supabase
@@ -68,7 +68,7 @@ export default async function AufnahmenSeite() {
 
   const liste = (aufnahmen ?? []) as unknown as Zeile[];
   const offen = liste.filter((a) => a.status === "offen").length;
-  const darfAnlegen = hatRecht(sitzung.rolle, "objekte", "anlegen");
+  const darfAnlegen = hatRecht(sitzung.rolle, "objekte", "anlegen", sitzung.uebersteuerung);
 
   return (
     <>

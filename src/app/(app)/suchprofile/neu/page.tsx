@@ -15,7 +15,7 @@ export const metadata: Metadata = { title: "Neues Suchprofil" };
 
 export default async function NeuesSuchprofilSeite() {
   const sitzung = await sitzungErzwingen();
-  if (!hatRecht(sitzung.rolle, "kontakte", "anlegen")) redirect("/suchprofile");
+  if (!hatRecht(sitzung.rolle, "kontakte", "anlegen", sitzung.uebersteuerung)) redirect("/suchprofile");
 
   const supabase = await serverClient();
   const { data } = await supabase

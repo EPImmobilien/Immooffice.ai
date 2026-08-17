@@ -39,8 +39,8 @@ export async function beteiligtenVerknuepfen(
   formular: FormData,
 ): Promise<BeteiligteErgebnis> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "objekte", "aendern");
-  rechtErzwingen(sitzung.rolle, "kontakte", "lesen");
+  rechtErzwingen(sitzung.rolle, "objekte", "aendern", sitzung.uebersteuerung);
+  rechtErzwingen(sitzung.rolle, "kontakte", "lesen", sitzung.uebersteuerung);
 
   const rohAnteil = String(formular.get("anteil") ?? "").trim();
 
@@ -119,7 +119,7 @@ export async function beteiligtenVerknuepfen(
  */
 export async function beteiligtenEntfernen(formular: FormData): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "objekte", "aendern");
+  rechtErzwingen(sitzung.rolle, "objekte", "aendern", sitzung.uebersteuerung);
 
   const id = String(formular.get("verknuepfung_id") ?? "").trim();
   if (!id) return;

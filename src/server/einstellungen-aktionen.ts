@@ -3,7 +3,15 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { ROLLEN, rechtErzwingen, type Rolle } from "@/lib/auth/rechte";
+import {
+  AKTIONEN,
+  MODULE,
+  ROLLEN,
+  hatRecht,
+  rechtErzwingen,
+  type Rolle,
+  type Uebersteuerung,
+} from "@/lib/auth/rechte";
 import { sitzungErzwingen } from "@/lib/auth/sitzung";
 import { MARKE_BUCKET } from "@/lib/marke";
 import { serverClient } from "@/lib/supabase/server";
@@ -61,7 +69,7 @@ export async function stammdatenSpeichern(
   formular: FormData,
 ): Promise<EinstellungenErgebnis> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "einstellungen", "aendern");
+  rechtErzwingen(sitzung.rolle, "einstellungen", "aendern", sitzung.uebersteuerung);
 
   const geprueft = stammdaten.safeParse({
     firmenname: String(formular.get("firmenname") ?? ""),
@@ -102,7 +110,7 @@ export async function erscheinungsbildSpeichern(
   formular: FormData,
 ): Promise<EinstellungenErgebnis> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "einstellungen", "aendern");
+  rechtErzwingen(sitzung.rolle, "einstellungen", "aendern", sitzung.uebersteuerung);
 
   const primaer = text(formular, "farbe_primaer");
   const akzent = text(formular, "farbe_akzent");
@@ -133,7 +141,7 @@ export async function rechtstexteSpeichern(
   formular: FormData,
 ): Promise<EinstellungenErgebnis> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "einstellungen", "aendern");
+  rechtErzwingen(sitzung.rolle, "einstellungen", "aendern", sitzung.uebersteuerung);
 
   const supabase = await serverClient();
   await brandingSichern(supabase, sitzung.mandantId);
@@ -167,7 +175,7 @@ export async function logoErfassen(
   pfad: string,
 ): Promise<EinstellungenErgebnis> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "einstellungen", "aendern");
+  rechtErzwingen(sitzung.rolle, "einstellungen", "aendern", sitzung.uebersteuerung);
 
   if (!pfad.startsWith(`${sitzung.mandantId}/`)) {
     return { fehler: "Der Dateipfad gehört nicht zu diesem Unternehmen." };
@@ -202,7 +210,7 @@ export async function logoErfassen(
 
 export async function logoEntfernen(): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "einstellungen", "aendern");
+  rechtErzwingen(sitzung.rolle, "einstellungen", "aendern", sitzung.uebersteuerung);
 
   const supabase = await serverClient();
   const { data: vorher } = await supabase
@@ -230,7 +238,7 @@ export async function rolleSetzen(
   formular: FormData,
 ): Promise<EinstellungenErgebnis> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "einstellungen", "aendern");
+  rechtErzwingen(sitzung.rolle, "einstellungen", "aendern", sitzung.uebersteuerung);
 
   const benutzerId = String(formular.get("benutzer_id") ?? "").trim();
   const rolle = String(formular.get("rolle") ?? "").trim();
@@ -263,6 +271,88 @@ export async function rolleSetzen(
 }
 
 /**
+ * Setzt die Rechteabweichungen eines Benutzers.
+ *
+ * Gespeichert werden nur ABWEICHUNGEN von der Rollenvorbelegung, nicht die
+ * vollstaendige Rechteliste. Der Unterschied ist wichtig: Wird die Rolle spaeter
+ * geaendert oder die Vorbelegung angepasst, wirkt das weiterhin — ausser bei den
+ * Punkten, die hier ausdruecklich anders gesetzt sind. Eine gespeicherte
+ * Vollliste waere dagegen ab dem Speichern eingefroren.
+ */
+export async function rechteSetzen(
+  formular: FormData,
+): Promise<EinstellungenErgebnis> {
+  const sitzung = await sitzungErzwingen();
+  rechtErzwingen(
+    sitzung.rolle,
+    "einstellungen",
+    "aendern",
+    sitzung.uebersteuerung,
+  );
+
+  const benutzerId = String(formular.get("benutzer_id") ?? "").trim();
+  if (!benutzerId) return { fehler: "Der Zugang wurde nicht gefunden." };
+
+  // Auch die Datenbank weist das ab. Hier entsteht daraus eine Erklaerung
+  // statt eines Fehlers.
+  if (benutzerId === sitzung.benutzerId) {
+    return {
+      fehler:
+        "Die eigenen Rechte lassen sich nicht selbst ändern. Bitten Sie eine andere Person mit Verwaltungsrechten darum.",
+    };
+  }
+
+  const supabase = await serverClient();
+  const { data: ziel } = await supabase
+    .from("benutzer")
+    .select("rolle")
+    .eq("id", benutzerId)
+    .eq("mandant_id", sitzung.mandantId)
+    .maybeSingle();
+
+  if (!ziel) return { fehler: "Der Zugang wurde nicht gefunden." };
+
+  // Aus den angekreuzten Kaestchen wird der Ist-Zustand gebildet und gegen die
+  // Rollenvorbelegung verglichen. Nur die Unterschiede werden gespeichert.
+  const gewaehlt = new Set(
+    formular.getAll("recht").map((w) => String(w)),
+  );
+
+  const abweichungen: Uebersteuerung = {};
+  for (const modul of MODULE) {
+    for (const aktion of AKTIONEN) {
+      const soll = gewaehlt.has(`${modul}:${aktion}`);
+      const ausRolle = hatRecht(ziel.rolle as Rolle, modul, aktion);
+      if (soll !== ausRolle) {
+        abweichungen[modul] = { ...abweichungen[modul], [aktion]: soll };
+      }
+    }
+  }
+
+  const { error } = await supabase
+    .from("benutzer")
+    .update({ rechte_uebersteuerung: abweichungen })
+    .eq("id", benutzerId)
+    .eq("mandant_id", sitzung.mandantId);
+
+  if (error) return { fehler: "Die Rechte konnten nicht gespeichert werden." };
+
+  revalidatePath("/einstellungen");
+
+  const anzahl = Object.values(abweichungen).reduce(
+    (summe, aktionen) => summe + Object.keys(aktionen ?? {}).length,
+    0,
+  );
+
+  return {
+    hinweis:
+      anzahl === 0
+        ? "Gespeichert. Es gelten wieder ausschließlich die Rechte der Rolle."
+        : `Gespeichert. ${anzahl} ${anzahl === 1 ? "Abweichung" : "Abweichungen"} von der Rolle.`,
+  };
+}
+
+/**
  * Schaltet einen Zugang ab oder wieder frei.
  *
  * Kein Loeschen: Ein Benutzer haengt an Objekten, Aufgaben und
@@ -273,7 +363,7 @@ export async function zugangUmschalten(
   formular: FormData,
 ): Promise<EinstellungenErgebnis> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "einstellungen", "aendern");
+  rechtErzwingen(sitzung.rolle, "einstellungen", "aendern", sitzung.uebersteuerung);
 
   const benutzerId = String(formular.get("benutzer_id") ?? "").trim();
   if (!benutzerId) return {};

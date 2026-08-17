@@ -152,10 +152,10 @@ export default async function ObjektSeite({
   }));
 
   const befunde = exportPruefen(objekt as OpenImmoObjekt);
-  const darfAendern = hatRecht(sitzung.rolle, "objekte", "aendern");
-  const darfLoeschen = hatRecht(sitzung.rolle, "objekte", "loeschen");
-  const darfTermine = hatRecht(sitzung.rolle, "kalender", "anlegen");
-  const darfTermineAendern = hatRecht(sitzung.rolle, "kalender", "aendern");
+  const darfAendern = hatRecht(sitzung.rolle, "objekte", "aendern", sitzung.uebersteuerung);
+  const darfLoeschen = hatRecht(sitzung.rolle, "objekte", "loeschen", sitzung.uebersteuerung);
+  const darfTermine = hatRecht(sitzung.rolle, "kalender", "anlegen", sitzung.uebersteuerung);
+  const darfTermineAendern = hatRecht(sitzung.rolle, "kalender", "aendern", sitzung.uebersteuerung);
 
   return (
     <>
@@ -417,7 +417,7 @@ export default async function ObjektSeite({
                 aufgaben={(aufgaben.data ?? []) as unknown as Aufgabe[]}
                 heute={heute}
                 darfAendern={darfTermineAendern}
-                darfLoeschen={hatRecht(sitzung.rolle, "kalender", "loeschen")}
+                darfLoeschen={hatRecht(sitzung.rolle, "kalender", "loeschen", sitzung.uebersteuerung)}
                 mitBezug={false}
               />
               {darfTermine && <AufgabeAnlegen objektId={objekt.id} />}

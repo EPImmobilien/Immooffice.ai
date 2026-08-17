@@ -45,7 +45,7 @@ export async function webExposeSpeichern(
   formular: FormData,
 ): Promise<WebExposeErgebnis> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "exposes", "freigeben");
+  rechtErzwingen(sitzung.rolle, "exposes", "freigeben", sitzung.uebersteuerung);
 
   const geprueft = einstellungen.safeParse(ausFormular(formular));
   if (!geprueft.success) {
@@ -137,7 +137,7 @@ export async function webExposeSpeichern(
 /** Zieht die Veroeffentlichung zurueck. Der Link ist danach sofort tot. */
 export async function webExposeWiderrufen(formular: FormData): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "exposes", "freigeben");
+  rechtErzwingen(sitzung.rolle, "exposes", "freigeben", sitzung.uebersteuerung);
 
   const objektId = String(formular.get("objekt_id") ?? "").trim();
   if (!objektId) return;
@@ -168,7 +168,7 @@ export async function webExposeWiderrufen(formular: FormData): Promise<void> {
  */
 export async function webExposeLinkErneuern(formular: FormData): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "exposes", "freigeben");
+  rechtErzwingen(sitzung.rolle, "exposes", "freigeben", sitzung.uebersteuerung);
 
   const objektId = String(formular.get("objekt_id") ?? "").trim();
   if (!objektId) return;
@@ -187,7 +187,7 @@ export async function webExposeLinkErneuern(formular: FormData): Promise<void> {
 /** Markiert eine Anfrage aus dem Kontaktformular als gelesen. */
 export async function anfrageGelesen(formular: FormData): Promise<void> {
   const sitzung = await sitzungErzwingen();
-  rechtErzwingen(sitzung.rolle, "kontakte", "aendern");
+  rechtErzwingen(sitzung.rolle, "kontakte", "aendern", sitzung.uebersteuerung);
 
   const id = String(formular.get("anfrage_id") ?? "").trim();
   const objektId = String(formular.get("objekt_id") ?? "").trim();

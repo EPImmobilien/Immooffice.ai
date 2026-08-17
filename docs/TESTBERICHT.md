@@ -327,6 +327,40 @@ Nicht geprüft, weil in dieser Arbeitsumgebung nicht prüfbar: der Mailversand
 selbst und der vollständige Durchlauf im Browser. Der eingebaute Versand von
 Supabase ist mengenbegrenzt und für den Dauerbetrieb nicht geeignet.
 
+## 4f. Rechte je Benutzer — und ein Fehler, den erst der Test fand
+
+`supabase/tests/rechte-selbstermaechtigung.sql` — **9 von 9 bestanden**, dazu
+13 Einheitentests in `src/lib/auth/rechte.test.ts`.
+
+**Befund vorab: die Übersteuerung war wirkungslos.** Die Spalte
+`benutzer.rechte_uebersteuerung` gab es seit dem Datenmodell, die Auswertung in
+`hatRecht` ebenfalls — nur den Weg dazwischen nicht. Die Sitzung lud das Feld
+nicht, und alle 78 Prüfstellen riefen ohne Übersteuerung auf. Ein entzogenes
+Recht wäre also weiterhin vorhanden gewesen, ohne dass irgendetwas
+fehlgeschlagen wäre. Behoben: Die Sitzung trägt das Feld, alle Prüfstellen und
+die Navigation geben es mit.
+
+**Selbstermächtigung geschlossen.** Bisher galt die Sperre nur für Nutzer ohne
+Verwaltungsrechte. Ein Administrator konnte sich selbst Rechte geben, die seine
+Rolle nicht vorsieht. Jetzt sind Rolle und Rechte am **eigenen** Datensatz für
+niemanden änderbar — dasselbe Prinzip wie beim Löschen und Abschalten.
+
+**Was der Test fand — und die Migration allein nicht gezeigt hätte:**
+
+Der erste Anlauf schrieb die Sperre als
+`create or replace function public.pruefe_benutzer_aenderung()`. Die Migration
+meldete Erfolg. Der Trigger zeigt aber auf die Fassung in `intern`: Es entstand
+eine zweite, von niemandem aufgerufene Funktion, die Sperre blieb wirkungslos,
+und nichts wies darauf hin. Nur weil Prüfung 3 die **Wirkung** misst statt die
+Anwendung der Migration, fiel es auf.
+
+Beim Nachsehen kam ein zweiter Punkt heraus: Die wirksame Fassung enthielt
+**mehr Regeln als die älteste Migrationsdatei zeigt** — Schutz des letzten
+aktiven Inhabers, Vergabe der Inhaberrolle nur durch den Inhaber, E-Mail-Änderung
+nur durch die Verwaltung. Hätte die erste Fassung das richtige Schema getroffen,
+wären diese drei Regeln stillschweigend verschwunden. Die Prüfungen 5 bis 9
+halten sie seither fest.
+
 ## 5. Offene Punkte aus der Sicherheitsprüfung
 
 Die Prüfung des Datenbankanbieters meldet einen verbleibenden Punkt:
