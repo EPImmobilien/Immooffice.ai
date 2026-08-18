@@ -397,6 +397,55 @@ Ersatz für ein Verkehrswertgutachten nach § 194 BauGB) steht an einer Stelle i
 Code und erscheint auf der Übersicht **und** oben auf jedem Rechenblatt — nicht
 als Fußnote.
 
+## 4h. Verträge und die einfache elektronische Signatur
+
+`supabase/tests/vertraege.sql` — **12 von 12 bestanden**, dazu 18
+Einheitentests in `src/lib/vertraege.test.ts`.
+
+Drei rechtliche Vorgaben bestimmen den Aufbau, und alle drei sind geprüft:
+
+**Die Signatur ist eine einfache.** Sie wird an keiner Stelle als
+fortgeschrittene oder qualifizierte Signatur dargestellt. Der Einordnungstext
+steht an einer einzigen Stelle im Code und erscheint in der Übersicht, auf der
+Vertragsseite **und** auf der öffentlichen Unterschriftsseite — wer
+unterzeichnet, soll wissen, was er tut. Für die Textform nach § 126b BGB
+genügt sie, und § 656a BGB verlangt für Maklerverträge über Wohnungen und
+Einfamilienhäuser mit Verbrauchern ausdrücklich Textform, nicht Schriftform.
+
+**Das Widerrufsrecht wird mitgeführt, nicht erwähnt.** Ohne hinterlegtes
+Belehrungsdatum zeigt die Anwendung nicht vierzehn Tage an, sondern zwölf
+Monate und vierzehn Tage nach § 356 Absatz 3 Satz 2 BGB. Eine Anwendung, die
+pauschal vierzehn Tage anzeigt, wiegt einen Makler in Sicherheit, der seine
+Provision noch ein Jahr lang verlieren kann. Bei unlesbarem Belehrungsdatum
+gilt die **lange** Frist — der sichere Fehlschlag ist der zum Nachteil des
+Maklers, nicht der des Kunden.
+
+**Kein Muster wird als rechtssicher bezeichnet.** ImmoOffice.ai liefert
+bewusst gar keinen Mustertext mit; der Hinweis auf anwaltliche Prüfung ist
+fest verdrahtet, und ein Test prüft, dass das Wort „rechtssicher" darin nicht
+vorkommt.
+
+Technisch entscheidend:
+
+| Prüfung | Warum sie zählt |
+|---|---|
+| Text nach der ersten Unterschrift gesperrt (10) | Sonst stünde eine Unterschrift unter einem anderen Text als dem unterzeichneten |
+| Entwurf bleibt änderbar (11) | Gegenprobe — eine Sperre, die den Normalfall mit abwürgt, ist keine |
+| Fingerabdruck stimmt mit der Anwendung überein (8) | Datenbank und TypeScript rechnen SHA-256 über denselben Text. Wichen sie ab, meldete die Anwendung bei **jedem** Vertrag fälschlich eine Änderung — der Hinweis wäre wertlos, weil er immer erschiene |
+| Kein zweites Unterzeichnen über denselben Link (12) | Der Vertrag ist danach nicht mehr `versendet` |
+| Kein Mandantenbezug nach außen (3) | Die Auskunft zählt die Felder auf, statt sie abzuziehen |
+
+Der Fingerabdruck entsteht **in der Datenbank** aus dem gespeicherten Text. Ein
+vom Browser mitgeschickter Hash wäre die Behauptung des Unterzeichners darüber,
+was er gesehen hat, und damit als Nachweis wertlos. Er ist ausdrücklich als
+Schutz gegen **versehentliche** Änderung bezeichnet, nicht als
+kryptografischer Manipulationsschutz: Wer die Datenbank beherrscht, kann Text
+und Fingerabdruck gemeinsam austauschen.
+
+**Offen:** Der Unterschriftslink wird nicht automatisch versendet — dafür fehlt
+der eigene Mailversand. Die Oberfläche sagt das ausdrücklich, statt es
+vorzutäuschen.
+
 ## 5. Offene Punkte aus der Sicherheitsprüfung
 
 Die Prüfung des Datenbankanbieters meldet einen verbleibenden Punkt:

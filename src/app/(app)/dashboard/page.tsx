@@ -188,9 +188,9 @@ export default async function UebersichtSeite() {
   const abwicklung: KachelDaten[] = [
     darf("vertraege") && {
       titel: "Verträge",
-      hinweis: "Aufträge, Reservierungen, Protokolle",
+      hinweis: "Aufträge, Reservierungen, Protokolle mit Signatur",
       symbol: "vertraege" as const,
-      geplant: true,
+      pfad: "/vertraege",
     },
     darf("auswertungen") && {
       titel: "Auswertungen",

@@ -27,6 +27,9 @@ const OEFFENTLICH = [
   "/auth",
   "/styleguide",
   "/expose",
+  // Der Unterschriftslink geht an die Gegenseite. Ohne Eintrag hier landet ein
+  // Vertragspartner auf der Anmeldung eines Programms, das er nicht benutzt.
+  "/vertrag",
 ];
 
 function istOeffentlich(pfad: string): boolean {
