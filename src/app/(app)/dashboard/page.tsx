@@ -179,9 +179,9 @@ export default async function UebersichtSeite() {
     },
     darf("wertermittlung") && {
       titel: "Wertermittlung",
-      hinweis: "Marktpreiseinschätzung als Akquiseinstrument",
+      hinweis: "Offene Rechenblätter nach ImmoWertV, als Akquiseinstrument",
       symbol: "wertermittlung" as const,
-      geplant: true,
+      pfad: "/wertermittlung",
     },
   ].filter(Boolean) as KachelDaten[];
 

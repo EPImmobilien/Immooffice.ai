@@ -361,6 +361,42 @@ nur durch die Verwaltung. Hätte die erste Fassung das richtige Schema getroffen
 wären diese drei Regeln stillschweigend verschwunden. Die Prüfungen 5 bis 9
 halten sie seither fest.
 
+## 4g. Wertermittlung — geprüfte Rechnung statt Blackbox
+
+`src/lib/wertermittlung.test.ts` — **22 Prüfungen.** Der Master-Prompt verlangt
+hier ausdrücklich keine Blackbox und keine automatisch „ermittelten" Werte. Die
+Rechenfunktionen beschaffen deshalb keine Marktdaten, schätzen nichts und füllen
+keine Annahme selbst aus; jeder Ansatz kommt vom Nutzer.
+
+Geprüft ist unter anderem:
+
+| Prüfung | Warum sie zählt |
+|---|---|
+| Vervielfältiger 5 % / 30 Jahre ≈ 15,37 | Nachgerechnetes Lehrbuchbeispiel zu § 20 ImmoWertV |
+| Zinssatz 0 fällt auf die Restnutzungsdauer zurück | Die Formel ist bei p = 0 nicht definiert; ohne Sonderfall entstünde `NaN` und liefe als Ergebnis durch |
+| Alterswertminderung auf 100 % begrenzt | Ohne Grenze ergäbe ein 120 Jahre altes Haus bei 80 Jahren Gesamtnutzungsdauer einen **negativen** Gebäudewert — der Sachwert läge unter dem Bodenwert |
+| Median statt Mittelwert beim Vergleichswert | Bei drei Vergleichen zieht ein Ausreißer den Mittelwert um 25 % nach oben |
+| Negativer Gebäudereinertrag wird erklärt | Ein zulässiges Ergebnis bei hohem Bodenwert — es muss erklärt und nicht versteckt werden |
+| Bewirtschaftungsquote 0 gilt als Angabe | Eine Wahrheitsprüfung hätte sie als „fehlt" behandelt |
+| Fehlende Ansätze werden benannt, nicht geraten | Der Kern der Vorgabe |
+
+**Bewusst nicht gebaut:** ein gewichteter Mittelwert über die drei Verfahren.
+Welches Verfahren trägt, ist eine fachliche Entscheidung — bei einer
+selbstgenutzten Wohnung der Vergleichswert, bei einem Zinshaus der Ertragswert.
+Eine Software, die daraus stillschweigend einen Durchschnitt bildet, trifft
+diese Entscheidung anstelle des Nutzers und verdeckt sie. Angezeigt wird die
+Bandbreite; das führende Verfahren wählt der Nutzer.
+
+Gespeichert werden **nur die Ansätze**, nie das Ergebnis. Ein gespeichertes
+Ergebnis könnte von seinen Ansätzen abweichen, sobald an der Rechnung etwas
+korrigiert wird — dann stünde eine Zahl im System, die sich aus den daneben
+stehenden Angaben nicht mehr herleiten lässt.
+
+Der Pflichthinweis (Marktpreiseinschätzung, keine gutachterliche Aussage, kein
+Ersatz für ein Verkehrswertgutachten nach § 194 BauGB) steht an einer Stelle im
+Code und erscheint auf der Übersicht **und** oben auf jedem Rechenblatt — nicht
+als Fußnote.
+
 ## 5. Offene Punkte aus der Sicherheitsprüfung
 
 Die Prüfung des Datenbankanbieters meldet einen verbleibenden Punkt:
