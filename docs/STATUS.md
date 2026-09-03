@@ -5,6 +5,44 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 03.09.2026 (Paket 6, Teil 1) — Schnittstelle, Bildmarke, Produktionsfehler, Funktionsabgleich
+
+**Branch:** `claude/autonomie-integrations-prompt-rl2qkr`
+
+### Erledigt
+
+- **Eigene Schnittstelle** (Migration `20260903180000_schnittstelle.sql`, im
+  Projekt ausgerollt, 27 Nachweise grün): `/api/v1/objekte`, `/kontakte`,
+  `/termine` mit Schlüssel je Mandant (`io_…`, nur Hash gespeichert), Rechte je
+  Bereich, 600 Anfragen je Minute und Schlüssel, Lesemodus-Sperre, OpenAPI
+  unter `/api/v1/openapi.json`, signierte Rückrufe `objekt.angelegt`,
+  `kontakt.angelegt`, `termin.angelegt` mit Wiederholung (2^n Minuten, acht
+  Versuche). Oberfläche zur Schlüsselverwaltung folgt (Aufgabe #21).
+- **Bildmarke und Wortmarke** auf das Schlüsselloch im Goldkreis umgestellt
+  (`public/marke/`, Komponente `Marke`, Favicon, Styleguide).
+- **Vollständiger Durchlauf des Produktionsbuilds** gegen eine lokale Datenbank
+  mit allen 34 Migrationen und einem Demo-Unternehmen: 30 Seiten fotografiert
+  und als Gesamtübersicht an den Auftraggeber gegeben. Dabei zwei Abstürze im
+  Produktionsbuild gefunden und behoben: Werte aus `"use client"`-Modulen
+  waren in Server-Komponenten importiert (Anmelde-/Registrierseite,
+  Einstellungen, Onboarding-Schritt 8). Der Entwicklungsmodus verdeckt das.
+- **Funktionsabgleich 1:1** gegen die Referenz: `docs/FUNKTIONSABGLEICH.md`
+  (16 Kacheln, je Funktion Stand und Paket), Entscheidung E-2026-09-03-36.
+
+### Nicht erledigt — und warum
+
+| Punkt | Grund |
+|---|---|
+| Schnittstellen-Oberfläche, Anleitung, Nachweis-Zahlen im Status | folgt als nächstes Paket (#21), bevor die fehlenden Module der Referenz beginnen |
+| Supabase aus der Entwicklungsumgebung erreichbar | Netzwerkrichtlinie der Umgebung blockiert `*.supabase.co`; Migrationen und Nachweise laufen über die Verwaltungsschnittstelle, die Anwendung selbst gegen einen lokalen Stack |
+
+### Wie es weitergeht
+
+Reihenfolge laut `docs/FUNKTIONSABGLEICH.md`: S1 → V1 → V2 → M1 → A1/A2 → N1 →
+R1 → K1/K2 → W1/W2 → D1 → P1/P2 → F1.
+
+---
+
 ## 03.09.2026 (Paket 5) — Härtung: Volltextsuche, Missbrauchsschutz, Wächter, Sicherung
 
 **Branch:** `claude/autonomie-integrations-prompt-rl2qkr`

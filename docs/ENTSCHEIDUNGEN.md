@@ -404,6 +404,31 @@ Grün. Der Zustand liegt in `plattform_einstellungen.waechter_zustand`.
 **Begründung:** Wörtlich nach Grundprinzip 4. Hinweise bleiben aus dem Hash
 heraus, damit ein Mandant im Lesemodus keine tägliche Alarmmail auslöst.
 
+### E-2026-09-03-36 — Funktionale 1:1-Übernahme der Referenz
+
+**Frage:** Der Auftraggeber hat am 03.09.2026 festgelegt, dass ImmoOffice.ai
+funktional eine 1:1-Kopie der Referenzsoftware werden soll. Der Masterprompt
+schließt einzelne Module ausdrücklich aus (OneDrive, Bewerber, Kundenportal,
+Liquidität, Digital Signage, Provisionsrechner); `docs/SCOPE.md` führt sie als
+NEIN.
+
+**Entscheidung:** Die Vorgabe des Auftraggebers gilt als jüngste Weisung. Alle
+Funktionen der Referenz werden nachgebaut, Reihenfolge und Stand in
+`docs/FUNKTIONSABGLEICH.md`. Die vom Masterprompt ausgeschlossenen Module
+werden **zuletzt** gebaut und im Status als Widerspruch zum Masterprompt
+gekennzeichnet, damit der Auftraggeber sie einzeln streichen kann. Nicht
+nachgebaut werden nur Dinge, die ohne fremde Verträge oder Hardware nicht
+gehen (Bürobildschirm-API, iPhone-Raumscanner, externer Bewertungsdienst) —
+dort bleibt der Datenimport.
+
+**Unverändert:** Keine Kennzeichen der Referenz (Name, Domain, Projekt,
+Adressen, Beispieldaten); eigenes Layout und eigene Komponenten; Rechte
+serverseitig; alle KI-Auslesungen über editierbare Formulare.
+
+**Begründung:** Der Auftraggeber entscheidet den Umfang. Die Reihenfolge
+schützt davor, dass umstrittene Module Arbeitszeit vor den unstrittigen
+binden.
+
 ### E-2026-09-03-13 — Credit-Werte bleiben die der Datenbank
 
 **Frage:** S4 nennt Startwerte (Exposétext 5, Kurztext 2, Bild 3 je Bild,
