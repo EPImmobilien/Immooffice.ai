@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { SozialAnmeldung, sozialeAnmeldung } from "@/components/SozialAnmeldung";
 import { einladungAnsehen } from "@/lib/einladung";
 import { serverClient } from "@/lib/supabase/server";
 
@@ -40,6 +41,13 @@ export default async function RegistrierenSeite({
       <RegistrierFormular
         {...(gueltig ? { einladung: token!, eingeladeneEmail: einladung.email! } : {})}
       />
+      <div className="mt-6">
+        <SozialAnmeldung
+          {...sozialeAnmeldung()}
+          weiter={gueltig ? `/einladung/${token}` : "/registrieren/unternehmen"}
+          aktion="registrieren"
+        />
+      </div>
     </>
   );
 }

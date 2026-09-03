@@ -260,6 +260,41 @@ export async function unternehmenAnlegen(
   redirect("/dashboard");
 }
 
+/**
+ * Anmeldung oder Registrierung ueber Google bzw. Microsoft (Supabase Auth,
+ * docs/AUTONOMIE.md Abschnitt 7, Phase 4). Die Anbieter werden im
+ * Supabase-Dashboard eingerichtet (docs/ANLEITUNG.md, Abschnitt 9); die
+ * Schaltflaechen erscheinen nur mit gesetztem NEXT_PUBLIC_ANMELDUNG_*.
+ *
+ * Wer so zum ersten Mal kommt, hat noch kein Unternehmen: `sitzungErzwingen`
+ * fuehrt dann zur Registrierung des Unternehmens — derselbe Weg wie nach der
+ * E-Mail-Bestaetigung.
+ */
+export async function sozialAnmelden(formular: FormData): Promise<void> {
+  const wahl = String(formular.get("anbieter") ?? "");
+  const anbieter = wahl === "google" ? "google" : wahl === "microsoft" ? "azure" : null;
+  const weiter = sicheresZiel(String(formular.get("weiter") ?? ""));
+  const aktiv =
+    anbieter === "google"
+      ? process.env["NEXT_PUBLIC_ANMELDUNG_GOOGLE"] === "1"
+      : anbieter === "azure"
+        ? process.env["NEXT_PUBLIC_ANMELDUNG_MICROSOFT"] === "1"
+        : false;
+  if (!anbieter || !aktiv) redirect("/anmelden?fehler=anbieter");
+
+  const supabase = await serverClient();
+  const basis = basisUrlErmitteln(await headers());
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: anbieter,
+    options: {
+      redirectTo: `${basis}/auth/bestaetigen?next=${encodeURIComponent(weiter)}`,
+      ...(anbieter === "azure" ? { scopes: "email openid profile" } : {}),
+    },
+  });
+  if (error || !data.url) redirect("/anmelden?fehler=anbieter");
+  redirect(data.url);
+}
+
 export async function abmelden(): Promise<void> {
   const supabase = await serverClient();
   await supabase.auth.signOut();

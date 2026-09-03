@@ -337,6 +337,39 @@ verschieben; unmarkierte Annahmen hießen, Kunden eine funktionierende
 Anbindung vorzuspiegeln. Der Mittelweg macht den ersten echten Lauf zu einer
 Sache von Minuten und lässt niemanden im Unklaren.
 
+### E-2026-09-03-32 — Anmeldung über Google und Microsoft läuft über Supabase Auth
+
+**Frage:** Eigener OAuth-Ablauf (wie bei den Postfächern) oder die Anbieter
+von Supabase Auth?
+
+**Entscheidung:** Supabase Auth. Google und Azure werden im Dashboard
+eingerichtet; die Anwendung startet den Ablauf serverseitig
+(`signInWithOAuth`), der bestehende Rückläufer `/auth/bestaetigen` tauscht den
+Code gegen die Sitzung. Die Schaltflächen erscheinen nur mit
+`NEXT_PUBLIC_ANMELDUNG_GOOGLE/MICROSOFT="1"`. Wer so neu kommt, hat kein
+Unternehmen und landet — wie nach der E-Mail-Bestätigung — in der
+Unternehmensregistrierung; Einladungen werden über das Weiterleitungsziel
+übernommen.
+
+**Begründung:** Ein zweiter Identitätsanbieter neben Supabase Auth hieße zwei
+Sitzungsmodelle. Die Postfach-Anmeldung braucht dagegen eigene Tokens für
+Mail-Zugriff — das ist ein anderer Zweck als die Anmeldung.
+
+### E-2026-09-03-33 — Stripe-Livebetrieb nur mit doppeltem Schalter
+
+**Frage:** Gate B ist freigegeben. Darf das Einrichtungsskript jetzt
+Live-Schlüssel annehmen?
+
+**Entscheidung:** Ja, aber nur mit `--live` **und** `STRIPE_LIVE_BESTAETIGT="ja"`.
+Ein Live-Schlüssel ohne beides bricht ab; `--live` mit Testschlüssel ebenso.
+Die Anwendung selbst kennt keinen Unterschied — Test und Live sind Schlüssel,
+keine Codepfade.
+
+**Begründung:** Die Liveschaltung setzt anwaltlich geprüfte Rechtstexte
+voraus (Masterprompt, Gate B). Der zweite Schalter ist die Stelle, an der der
+Auftraggeber diese Voraussetzung bewusst bestätigt, statt dass ein Skript sie
+stillschweigend annimmt.
+
 ### E-2026-09-03-13 — Credit-Werte bleiben die der Datenbank
 
 **Frage:** S4 nennt Startwerte (Exposétext 5, Kurztext 2, Bild 3 je Bild,

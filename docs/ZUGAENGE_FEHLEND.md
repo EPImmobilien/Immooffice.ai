@@ -20,6 +20,7 @@ die Nachweise ausgeführt (`docs/STATUS.md`). Für alles andere gilt die Tabelle
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anwendung gegen die Datenbank starten | lokaler Start, Endtest „Neuer Makler“ |
 | `SUPABASE_SERVICE_ROLE_KEY` | Einladung einlösen (Dienstrolle), Stripe-Rückrufe, Hintergrundjobs | Einlösen von Einladungen im Betrieb |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Phase 3: Tarife, Abrechnungsportal, Rückrufe im Testmodus | Modul Abo (Phase 3) |
+| Stripe-Live-Schlüssel (`sk_live_…`, `pk_live_…`, Webhook-Geheimnis im Livemodus) und `STRIPE_LIVE_BESTAETIGT="ja"` | Livebetrieb der Abrechnung nach Gate B — Voraussetzung: anwaltlich geprüfte Rechtstexte | Stripe bleibt im Testmodus; das Einrichtungsskript verweigert Live-Schlüssel ohne `--live` und Bestätigung (`docs/ANLEITUNG.md`, Abschnitt 8) |
 | `OPENAI_API_KEY` bzw. `ANTHROPIC_API_KEY` | KI-Texte, Bildbearbeitung | KI-Erzeugung; die Anwendung kennzeichnet fehlende KI (`src/lib/ki/ohne-ki.ts`) |
 | `MAIL_API_KEY`, `MAIL_ABSENDER` | Transaktionsmails: Einladungen, Testphasen-Erinnerungen | automatischer Versand von Einladungslinks — bis dahin Link zum Kopieren (E-2026-09-03-07) |
 | `GOOGLE_CLIENT_ID/SECRET`, `MICROSOFT_CLIENT_ID/SECRET/TENANT_ID` | Phase 4: Postfächer über Microsoft 365 und Google (OAuth), Anmeldung über Google/Microsoft | Verbinden von Microsoft-/Google-Postfächern — IMAP/SMTP funktioniert ohne; die Schaltflächen bleiben bis dahin mit Hinweis gesperrt (`docs/ANLEITUNG.md`, Abschnitt 9) |

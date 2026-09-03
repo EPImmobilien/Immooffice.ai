@@ -8,10 +8,11 @@
  * abweichen. Preise sind Daten (tarife, preise) — dieses Skript ist nur der
  * Bote zu Stripe.
  *
- * Braucht in der Umgebung: STRIPE_SECRET_KEY (Testmodus, bis Gate B),
- * NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
+ * Braucht in der Umgebung: STRIPE_SECRET_KEY, NEXT_PUBLIC_SUPABASE_URL,
+ * SUPABASE_SERVICE_ROLE_KEY. Live nur mit --live und STRIPE_LIVE_BESTAETIGT="ja".
  *
  * Aufruf:  node --env-file=.env.local scripts/stripe-einrichten.mjs
+ *          node --env-file=.env.local scripts/stripe-einrichten.mjs --live
  */
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
@@ -24,8 +25,20 @@ if (!stripeKey || !url || !dienst) {
   console.error("STRIPE_SECRET_KEY, NEXT_PUBLIC_SUPABASE_URL und SUPABASE_SERVICE_ROLE_KEY werden gebraucht.");
   process.exit(2);
 }
-if (!stripeKey.startsWith("sk_test_")) {
-  console.error("Nur Testschluessel (sk_test_…) — Livebetrieb erst nach Gate B.");
+// Livebetrieb nur ausdruecklich: Schalter --live UND STRIPE_LIVE_BESTAETIGT="ja"
+// — nach Gate B und mit anwaltlich gepruefeten Rechtstexten (ANLEITUNG 8).
+const live = process.argv.includes("--live");
+if (stripeKey.startsWith("sk_live_")) {
+  if (!live || process.env.STRIPE_LIVE_BESTAETIGT !== "ja") {
+    console.error('Live-Schluessel erkannt. Livebetrieb nur mit --live UND STRIPE_LIVE_BESTAETIGT="ja" (docs/ANLEITUNG.md, Abschnitt 8).');
+    process.exit(2);
+  }
+  console.warn("ACHTUNG: LIVEMODUS — Produkte, Preise und Portal entstehen im echten Stripe-Konto.");
+} else if (!stripeKey.startsWith("sk_test_")) {
+  console.error("Unbekannter Schluessel: erwartet sk_test_… (Testmodus) oder sk_live_… mit --live.");
+  process.exit(2);
+} else if (live) {
+  console.error("--live verlangt einen Live-Schluessel (sk_live_…).");
   process.exit(2);
 }
 

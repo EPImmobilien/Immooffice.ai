@@ -5,6 +5,53 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 03.09.2026 (Paket 4c) — Phase 4: Anmeldung über Google/Microsoft, Stripe-Livevorbereitung
+
+**Branch:** `claude/autonomie-integrations-prompt-rl2qkr`
+
+### Erledigt
+
+- **Anmeldung und Registrierung über Google und Microsoft** (Supabase Auth,
+  E-32): serverseitiger Start des Ablaufs, bestehender Rückläufer
+  `/auth/bestaetigen`, neue Konten landen in der Unternehmensregistrierung,
+  Einladungen werden über das Weiterleitungsziel übernommen. Schaltflächen
+  nur mit `NEXT_PUBLIC_ANMELDUNG_GOOGLE/MICROSOFT="1"`; Anleitung Abschnitt 9.
+- **Stripe-Livebetrieb vorbereitet** (E-33): Das Einrichtungsskript nimmt
+  Live-Schlüssel nur mit `--live` **und** `STRIPE_LIVE_BESTAETIGT="ja"`;
+  Anleitung Abschnitt 8, Schritte 8–10 (Liveschaltung, Probebuchung);
+  `docs/ZUGAENGE_FEHLEND.md` um die Live-Schlüssel ergänzt.
+
+**Nachweise:** Typecheck, Lint, 347 Unit-Tests, Marken-Scan, Produktions-Build grün.
+
+### Phase 4 — Stand
+
+| Baustein | Stand |
+|---|---|
+| Postfächer (Microsoft 365, Google, IMAP) | gebaut und nachgewiesen (45 Datenbank-, 37 Unit-Prüfungen); der erste Lauf gegen ein echtes Konto wartet auf Client-IDs bzw. ein IMAP-Konto |
+| Propstack, FlowFact | gebaut, 16 Unit-Tests; Pfade und Feldnamen als Annahme markiert, Testzugänge fehlen (E-31) |
+| Anmeldung über Google/Microsoft | gebaut; Einrichtung der Anbieter im Supabase-Dashboard durch den Auftraggeber (Anleitung 9) |
+| Stripe live | vorbereitet; Live-Schlüssel und anwaltlich geprüfte Rechtstexte fehlen |
+
+### Nicht erledigt — und warum
+
+| Punkt | Grund |
+|---|---|
+| Ende-zu-Ende-Test der Anmeldung über Google/Microsoft | die Anbieter sind im Supabase-Dashboard nicht eingerichtet (Client-IDs fehlen) |
+| Kalender-Synchronisation mit Google/Outlook (Masterprompt Phase 2) | eigenes Paket nach den Postfächern; die OAuth-Registrierungen brauchen dafür zusätzliche Berechtigungen (Anleitung 9) |
+
+### Wie es weitergeht
+
+Ohne weitere Zugänge (Netlify, Stripe, Client-IDs, Testkonten der
+Maklersoftware) lassen sich die verbleibenden Punkte nur teilweise umsetzen.
+Nächste Pakete ohne Zugänge: **Härtung** (Volltextsuche im Postfach,
+Missbrauchsschutz bei der Registrierung, Wächter-Mail für Hintergrundketten,
+Backup-Wiederherstellung dokumentieren), danach **Phase 5** mit der eigenen
+Schnittstelle samt Rückrufen (`docs/AUTONOMIE.md` 5.4). Subdomains je
+Unternehmen und Portalanbindungen brauchen Netlify beziehungsweise
+Partnerprogramme.
+
+---
+
 ## 03.09.2026 (Paket 4b) — Phase 4: Connectoren Propstack und FlowFact
 
 **Branch:** `claude/autonomie-integrations-prompt-rl2qkr`

@@ -199,12 +199,22 @@ Netlify ruft den Arbeiter danach von selbst jede Minute auf
    buchen, bei Stripe die Testkarte `4242 4242 4242 4242` mit beliebigem
    Datum in der Zukunft eingeben. Nach wenigen Sekunden zeigt die Seite den
    Tarif als aktiv und das Monatskontingent als Gutschrift.
-8. **Vor der Liveschaltung** (nach Gate B) müssen Sie selbst: **Settings** →
-   **Business** → alle Unternehmensangaben ausfüllen, ein Bankkonto für
-   Auszahlungen hinterlegen, unter **Settings** → **Tax** die Steuererfassung
-   auch im Livemodus aktivieren, dann die Schritte 2, 4, 5 und 6 mit den
-   Live-Schlüsseln wiederholen. Dann teilen Sie mit, dass der Livemodus
-   freigegeben ist.
+8. **Liveschaltung** (Gate B ist freigegeben; Voraussetzung bleiben die
+   anwaltlich geprüften Rechtstexte — AGB, Widerruf, Datenschutz,
+   Auftragsverarbeitung): **Settings** → **Business** → alle
+   Unternehmensangaben ausfüllen, ein Bankkonto für Auszahlungen hinterlegen,
+   unter **Settings** → **Tax** die Steuererfassung auch im Livemodus
+   aktivieren. Dann den Umschalter „Test mode" **aus**schalten und die Schritte
+   2, 5 und 6 mit den Live-Schlüsseln (`sk_live_…`, `pk_live_…`, neues
+   Webhook-Geheimnis) wiederholen — in `.env.local` **und** bei Netlify.
+9. Produkte und Preise im Livekonto anlegen — das Skript verlangt dafür
+   ausdrücklich beides, den Schalter und die Bestätigung:
+   `STRIPE_LIVE_BESTAETIGT=ja node --env-file=.env.local scripts/stripe-einrichten.mjs --live`
+   Ohne `--live` und ohne die Bestätigung bricht es bei einem Live-Schlüssel ab.
+10. **Probebuchung im Livemodus** mit einer echten Karte über „Abo und
+    Credits", danach im Abrechnungsportal wieder kündigen. Erst wenn Tarif,
+    Rechnung mit ausgewiesener Umsatzsteuer und Gutschrift der Credits
+    stimmen, ist die Abrechnung live.
 
 ## 9. Postfächer und Kalender (Phase 4)
 
@@ -249,6 +259,24 @@ Netlify ruft den Arbeiter danach von selbst jede Minute auf
    fertig ist — das dauert mehrere Wochen und braucht eine öffentliche
    Datenschutzerklärung unter `https://immooffice.ai/datenschutz`. Bis dahin
    verbinden nur die eingetragenen Testnutzer.
+
+### Anmeldung über Google und Microsoft (Supabase Auth)
+
+Dieselben Registrierungen wie oben, plus zwei Einträge im Supabase-Dashboard:
+
+1. Bei Google (Schritt 4 oben) und bei Microsoft (**Authentication** →
+   **Add a platform** → Web) die Adresse
+   `https://usguiggfciavwzkdfjgt.supabase.co/auth/v1/callback` als
+   Weiterleitung eintragen.
+2. Im Supabase-Dashboard → **Authentication** → **Providers** → **Google**
+   einschalten, Client-ID und Client-Geheimnis eintragen → Save. Ebenso
+   **Azure** (so heißt Microsoft dort): Client-ID, Geheimnis, bei „Azure
+   Tenant URL" leer lassen (alle Konten) → Save.
+3. In `.env.local` und bei Netlify `NEXT_PUBLIC_ANMELDUNG_GOOGLE="1"` und/oder
+   `NEXT_PUBLIC_ANMELDUNG_MICROSOFT="1"` setzen. Erst damit erscheinen die
+   Schaltflächen „Anmelden mit Google/Microsoft" auf Anmelden und
+   Registrieren. Wer so zum ersten Mal kommt, legt danach sein Unternehmen an;
+   eine Einladung wird übernommen.
 
 ### Andere Anbieter (IMAP/SMTP)
 
