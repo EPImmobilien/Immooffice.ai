@@ -101,10 +101,21 @@ export async function registrieren(
     return { fehler: geprueft.error.issues[0]?.message ?? "Eingabe unvollständig." };
   }
 
+  // Kommt die Registrierung ueber einen Einladungslink, muss der Token die
+  // E-Mail-Bestaetigung ueberleben: Er wandert in das Ziel des
+  // Bestaetigungslinks. Nur das Format wird geprueft; ob die Einladung gilt,
+  // entscheidet spaeter die Datenbank.
+  const einladung = String(formular.get("einladung") ?? "").trim();
+  const mitEinladung = /^[0-9a-f]{64}$/.test(einladung);
+  const basis = basisUrlErmitteln(await headers());
+
   const supabase = await serverClient();
   const { data, error } = await supabase.auth.signUp({
     email: geprueft.data.email,
     password: geprueft.data.passwort,
+    ...(mitEinladung
+      ? { options: { emailRedirectTo: `${basis}/auth/bestaetigen?next=/einladung/${einladung}` } }
+      : {}),
   });
 
   if (error) return { fehler: meldung(error.message) };
@@ -131,7 +142,7 @@ export async function registrieren(
     };
   }
 
-  redirect("/registrieren/unternehmen");
+  redirect(mitEinladung ? `/einladung/${einladung}` : "/registrieren/unternehmen");
 }
 
 /**

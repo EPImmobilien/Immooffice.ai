@@ -51,9 +51,16 @@ E-Mail-Vorlage.
 - Das Supabase-Projekt der Referenz (`eu-west-1`) wird **nie** angefasst.
 
 **Ersatzlos entfallen:** OneDrive · Bewerber/Einstellungstest · Kundenportal.
-**Nicht übernehmen:** Posteingang/E-Mail-Client · Liquiditätsplanung · GoBD-Rechnungs-
-modul · Shop-TV/Digital Signage · onOffice-Synchronisation · Provisionsrechner.
+**Nicht übernehmen:** vollwertiger E-Mail-Client · Liquiditätsplanung ·
+Shop-TV/Digital Signage · Provisionsrechner.
 Ein öffentliches **Web-Exposé ist erwünscht** und gilt nicht als Kundenportal.
+
+Die verbindliche Ja/Nein-Liste je Referenzmodul steht in
+[`docs/SCOPE.md`](docs/SCOPE.md) — sie entscheidet die Frage „ist Modul X im
+Scope" und hat dort Vorrang. Danach sind **onOffice als Connector** (Phase 2, nur
+die Abgleichlogik, keine Kennungen der Referenz) und ein **reduziertes Postfach**
+(Phase 4, kein Vollclient) im Scope. Arbeitsweise und Standardentscheidungen:
+[`docs/AUTONOMIE.md`](docs/AUTONOMIE.md).
 
 ## Feste Rahmenbedingungen
 

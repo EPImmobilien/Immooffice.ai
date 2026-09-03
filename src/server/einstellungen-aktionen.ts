@@ -13,6 +13,8 @@ import {
   type Uebersteuerung,
 } from "@/lib/auth/rechte";
 import { sitzungErzwingen } from "@/lib/auth/sitzung";
+import { kontrastPruefen } from "@/lib/branding/farben";
+import { istSchrift } from "@/lib/branding/schriften";
 import { MARKE_BUCKET } from "@/lib/marke";
 import { serverClient } from "@/lib/supabase/server";
 
@@ -40,13 +42,19 @@ const FARBE = /^#[0-9A-Fa-f]{6}$/;
 
 const stammdaten = z.object({
   firmenname: z.string().trim().min(1).max(200),
+  rechtsform: z.string().trim().max(60).nullable(),
+  geschaeftsfuehrer: z.string().trim().max(200).nullable(),
   strasse: z.string().trim().max(200).nullable(),
   hausnummer: z.string().trim().max(20).nullable(),
-  plz: z.string().trim().max(10).nullable(),
+  plz: z.string().trim().regex(/^[0-9]{5}$/).nullable(),
   ort: z.string().trim().max(120).nullable(),
   telefon: z.string().trim().max(60).nullable(),
   email: z.email().max(200).nullable(),
   web: z.string().trim().max(200).nullable(),
+  // Impressumsangaben (docs/AUTONOMIE.md O1 Schritt 3, R4).
+  handelsregister: z.string().trim().max(120).nullable(),
+  ust_id: z.string().trim().toUpperCase().regex(/^[A-Z]{2}[A-Z0-9]{2,12}$/).nullable(),
+  aufsichtsbehoerde: z.string().trim().max(200).nullable(),
 });
 
 /**
@@ -73,6 +81,8 @@ export async function stammdatenSpeichern(
 
   const geprueft = stammdaten.safeParse({
     firmenname: String(formular.get("firmenname") ?? ""),
+    rechtsform: text(formular, "rechtsform"),
+    geschaeftsfuehrer: text(formular, "geschaeftsfuehrer"),
     strasse: text(formular, "strasse"),
     hausnummer: text(formular, "hausnummer"),
     plz: text(formular, "plz"),
@@ -80,12 +90,16 @@ export async function stammdatenSpeichern(
     telefon: text(formular, "telefon"),
     email: text(formular, "email"),
     web: text(formular, "web"),
+    handelsregister: text(formular, "handelsregister"),
+    ust_id: text(formular, "ust_id"),
+    aufsichtsbehoerde: text(formular, "aufsichtsbehoerde"),
   });
 
   if (!geprueft.success) {
     return {
       fehler:
-        "Bitte prüfen Sie die Angaben — ein Firmenname ist nötig, und die E-Mail-Adresse muss gültig sein.",
+        "Bitte prüfen Sie die Angaben — ein Firmenname ist nötig, die Postleitzahl hat fünf Ziffern, " +
+        "die E-Mail-Adresse muss gültig sein und die USt-IdNr. beginnt mit dem Länderkürzel (etwa DE123456789).",
     };
   }
 
@@ -121,20 +135,43 @@ export async function erscheinungsbildSpeichern(
     return { fehler: "Farben werden als Sechsstellen-Hexwert erwartet, etwa #1B2A47." };
   }
 
+  // Schriften (B2): nur aus der kuratierten Liste, je Kategorie eine. Fehlt
+  // die Angabe (aelteres Formular), bleibt der gespeicherte Wert stehen.
+  const serifenlos = text(formular, "schrift_serifenlos");
+  const serifen = text(formular, "schrift_serifen");
+  if ((serifenlos && !istSchrift(serifenlos, "serifenlos")) || (serifen && !istSchrift(serifen, "serifen"))) {
+    return { fehler: "Bitte je eine Schrift aus der Liste wählen." };
+  }
+
   const supabase = await serverClient();
   await brandingSichern(supabase, sitzung.mandantId);
 
   const { error } = await supabase
     .from("mandant_branding")
-    .update({ farbe_primaer: primaer, farbe_akzent: akzent })
+    .update({
+      farbe_primaer: primaer ? primaer.toUpperCase() : null,
+      farbe_akzent: akzent ? akzent.toUpperCase() : null,
+      ...(serifenlos ? { schrift_serifenlos: serifenlos } : {}),
+      ...(serifen ? { schrift_serifen: serifen } : {}),
+    })
     .eq("mandant_id", sitzung.mandantId);
 
   if (error) return { fehler: "Das Erscheinungsbild konnte nicht gespeichert werden." };
 
+  // Kontrastbefunde sind ein Hinweis, kein Speicherhindernis (B1): Die Marke
+  // gehoert dem Mandanten. Gemeldet wird trotzdem, was schlecht lesbar ist.
+  const befunde = primaer && akzent ? kontrastPruefen(primaer, akzent) : [];
+
   revalidatePath("/einstellungen");
   revalidatePath("/exposes");
   revalidatePath("/marketing");
-  return { hinweis: "Das Erscheinungsbild wurde gespeichert." };
+  revalidatePath("/", "layout");
+  return {
+    hinweis:
+      befunde.length === 0
+        ? "Das Erscheinungsbild wurde gespeichert."
+        : `Gespeichert. Hinweis: ${befunde.length === 1 ? "Eine Farbkombination liegt" : `${befunde.length} Farbkombinationen liegen`} unter der empfohlenen Lesbarkeit (WCAG AA) — siehe die Warnungen oben.`,
+  };
 }
 
 export async function rechtstexteSpeichern(
@@ -173,6 +210,7 @@ export async function rechtstexteSpeichern(
  */
 export async function logoErfassen(
   pfad: string,
+  variante: "hell" | "dunkel" = "hell",
 ): Promise<EinstellungenErgebnis> {
   const sitzung = await sitzungErzwingen();
   rechtErzwingen(sitzung.rolle, "einstellungen", "aendern", sitzung.uebersteuerung);
@@ -181,6 +219,9 @@ export async function logoErfassen(
     return { fehler: "Der Dateipfad gehört nicht zu diesem Unternehmen." };
   }
 
+  // B3: helle Fassung in logo_pfad, dunkle (optional) in logo_invers_pfad.
+  const spalte = variante === "dunkel" ? "logo_invers_pfad" : "logo_pfad";
+
   const supabase = await serverClient();
   await brandingSichern(supabase, sitzung.mandantId);
 
@@ -188,47 +229,54 @@ export async function logoErfassen(
   // liegen bleibt.
   const { data: vorher } = await supabase
     .from("mandant_branding")
-    .select("logo_pfad")
+    .select(spalte)
     .eq("mandant_id", sitzung.mandantId)
     .maybeSingle();
+  const alterPfad = (vorher as Record<string, string | null> | null)?.[spalte] ?? null;
 
   const { error } = await supabase
     .from("mandant_branding")
-    .update({ logo_pfad: pfad })
+    .update({ [spalte]: pfad })
     .eq("mandant_id", sitzung.mandantId);
 
   if (error) return { fehler: "Das Logo konnte nicht gespeichert werden." };
 
-  if (vorher?.logo_pfad && vorher.logo_pfad !== pfad) {
-    await supabase.storage.from(MARKE_BUCKET).remove([vorher.logo_pfad]);
+  if (alterPfad && alterPfad !== pfad) {
+    await supabase.storage.from(MARKE_BUCKET).remove([alterPfad]);
   }
 
   revalidatePath("/einstellungen");
+  revalidatePath("/onboarding", "layout");
   revalidatePath("/exposes");
-  return { hinweis: "Das Logo wurde gespeichert." };
+  return { hinweis: variante === "dunkel" ? "Das Logo für dunkle Flächen wurde gespeichert." : "Das Logo wurde gespeichert." };
 }
 
-export async function logoEntfernen(): Promise<void> {
+/** Entfernt die helle oder dunkle Fassung (`variante` im Formular). */
+export async function logoEntfernen(formular?: FormData): Promise<void> {
   const sitzung = await sitzungErzwingen();
   rechtErzwingen(sitzung.rolle, "einstellungen", "aendern", sitzung.uebersteuerung);
+
+  const spalte = formular?.get("variante") === "dunkel" ? "logo_invers_pfad" : "logo_pfad";
 
   const supabase = await serverClient();
   const { data: vorher } = await supabase
     .from("mandant_branding")
-    .select("logo_pfad")
+    .select(spalte)
     .eq("mandant_id", sitzung.mandantId)
     .maybeSingle();
+  const alterPfad = (vorher as Record<string, string | null> | null)?.[spalte] ?? null;
 
   await supabase
     .from("mandant_branding")
-    .update({ logo_pfad: null })
+    .update({ [spalte]: null })
     .eq("mandant_id", sitzung.mandantId);
 
-  if (vorher?.logo_pfad) {
-    await supabase.storage.from(MARKE_BUCKET).remove([vorher.logo_pfad]);
+  if (alterPfad) {
+    await supabase.storage.from(MARKE_BUCKET).remove([alterPfad]);
   }
 
   revalidatePath("/einstellungen");
+  revalidatePath("/onboarding", "layout");
   revalidatePath("/exposes");
 }
 

@@ -1,0 +1,40 @@
+/* ===========================================================================
+   Kuratierte Schriften fuer das Erscheinungsbild der Mandanten
+   (docs/AUTONOMIE.md B2, E-2026-09-03-09).
+
+   Zwoelf Schriften unter der SIL Open Font License, als npm-Pakete
+   mitgeliefert und von der eigenen Domain ausgeliefert. Hier werden nur die
+   @font-face-Regeln eingebunden: Der Browser laedt eine Schriftdatei erst,
+   wenn Text sie tatsaechlich verwendet — die Liste kostet also nichts, solange
+   ein Mandant bei der Voreinstellung bleibt.
+
+   Die Schluessel und Familiennamen spiegelt src/lib/branding/schriften.ts.
+   Marcellus hat nur einen Schnitt (400).
+   =========================================================================== */
+
+/* Serifenlos */
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/montserrat/400.css";
+@import "@fontsource/montserrat/600.css";
+@import "@fontsource/poppins/400.css";
+@import "@fontsource/poppins/600.css";
+@import "@fontsource/work-sans/400.css";
+@import "@fontsource/work-sans/600.css";
+@import "@fontsource/source-sans-3/400.css";
+@import "@fontsource/source-sans-3/600.css";
+@import "@fontsource/nunito-sans/400.css";
+@import "@fontsource/nunito-sans/600.css";
+
+/* Serifen */
+@import "@fontsource/marcellus/400.css";
+@import "@fontsource/cormorant-garamond/400.css";
+@import "@fontsource/cormorant-garamond/600.css";
+@import "@fontsource/playfair-display/400.css";
+@import "@fontsource/playfair-display/600.css";
+@import "@fontsource/lora/400.css";
+@import "@fontsource/lora/600.css";
+@import "@fontsource/eb-garamond/400.css";
+@import "@fontsource/eb-garamond/600.css";
+@import "@fontsource/libre-baskerville/400.css";
+@import "@fontsource/libre-baskerville/700.css";

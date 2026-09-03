@@ -8,7 +8,14 @@ import { Eingabe, Feld } from "@/components/ui/Feld";
 import { Hinweis } from "@/components/ui/Status";
 import { registrieren, type AktionsErgebnis } from "@/server/auth-aktionen";
 
-export function RegistrierFormular() {
+export function RegistrierFormular({
+  einladung,
+  eingeladeneEmail,
+}: {
+  /** Token aus dem Einladungslink; das Konto tritt damit dem einladenden Unternehmen bei. */
+  einladung?: string;
+  eingeladeneEmail?: string;
+}) {
   const [zustand, aktion, laeuft] = useActionState<AktionsErgebnis, FormData>(
     registrieren,
     {},
@@ -42,12 +49,23 @@ export function RegistrierFormular() {
         </Hinweis>
       )}
 
-      <Feld id="email" beschriftung="E-Mail-Adresse" pflicht>
+      {einladung && <input type="hidden" name="einladung" value={einladung} />}
+
+      <Feld
+        id="email"
+        beschriftung="E-Mail-Adresse"
+        pflicht
+        {...(eingeladeneEmail
+          ? { hinweis: "Die Einladung gilt nur für diese Adresse." }
+          : {})}
+      >
         <Eingabe
           type="email"
           name="email"
           autoComplete="email"
-          autoFocus
+          autoFocus={!eingeladeneEmail}
+          defaultValue={eingeladeneEmail ?? ""}
+          readOnly={Boolean(eingeladeneEmail)}
           placeholder="name@unternehmen.de"
         />
       </Feld>
@@ -58,22 +76,37 @@ export function RegistrierFormular() {
         pflicht
         hinweis="Mindestens 12 Zeichen."
       >
-        <Eingabe type="password" name="passwort" autoComplete="new-password" />
+        <Eingabe type="password" name="passwort" autoComplete="new-password" autoFocus={Boolean(eingeladeneEmail)} />
       </Feld>
 
+      {/* S8: Zielgruppe sind ausschliesslich Gewerbetreibende. Die Bestaetigung
+          ist Pflicht, damit Verbraucherschutzregeln gar nicht erst greifen. */}
+      {!einladung && (
+        <label className="flex items-start gap-2 text-[13px] text-text">
+          <input type="checkbox" name="unternehmer" required className="mt-0.5" />
+          <span>
+            Ich handle als Unternehmer im Sinne des § 14 BGB und nutze
+            ImmoOffice.ai gewerblich.
+          </span>
+        </label>
+      )}
+
       <Button type="submit" laedt={laeuft} className="w-full">
-        Testphase starten
+        {einladung ? "Konto anlegen und beitreten" : "Testphase starten"}
       </Button>
 
-      <p className="text-[12px] leading-relaxed text-gedaempft">
-        7 Tage kostenlos testen, ein Benutzer, 100 Credits. Es entstehen keine
-        Kosten, solange kein Tarif ausgewählt wurde.
-      </p>
+      {!einladung && (
+        <p className="text-[12px] leading-relaxed text-gedaempft">
+          7 Tage kostenlos testen, ein Benutzer, 100 Credits. Es entstehen keine
+          Kosten, solange kein Tarif ausgewählt wurde. Alle Preise verstehen sich
+          netto zzgl. USt.
+        </p>
+      )}
 
       <p className="text-center text-[13px] text-gedaempft">
         Bereits ein Konto?{" "}
         <Link
-          href="/anmelden"
+          href={einladung ? `/anmelden?weiter=/einladung/${einladung}` : "/anmelden"}
           className="font-medium text-akzent underline-offset-2 hover:underline"
         >
           Anmelden

@@ -23,6 +23,13 @@ export interface Sitzung {
   mandantName: string;
   aboStatus: string;
   testphaseBis: string;
+  /**
+   * Onboarding-Zustand des Mandanten (docs/AUTONOMIE.md O1). Solange das
+   * Onboarding offen ist, leitet der angemeldete Bereich die Verwaltung in
+   * den Assistenten; alle anderen Rollen arbeiten normal weiter.
+   */
+  onboardingAbgeschlossen: boolean;
+  onboardingSchritt: number;
 }
 
 /**
@@ -68,8 +75,11 @@ export async function sitzungLaden(): Promise<Sitzung | null> {
 
   const { data } = await supabase
     .from("benutzer")
+    // Ein einziger Literal-String: Nur so kann supabase-js die Spalten zur
+    // Bauzeit typisieren. Ein zusammengesetzter String faellt auf einen
+    // Fehlertyp zurueck, und jeder Zugriff darunter wird rot.
     .select(
-      "id, mandant_id, name, email, rolle, rechte_uebersteuerung, mandanten(name, abo_status, testphase_bis)",
+      "id, mandant_id, name, email, rolle, rechte_uebersteuerung, mandanten(name, abo_status, testphase_bis, onboarding_abgeschlossen, onboarding_schritt)",
     )
     .eq("id", user.id)
     .maybeSingle();
@@ -80,6 +90,8 @@ export async function sitzungLaden(): Promise<Sitzung | null> {
     name: string;
     abo_status: string;
     testphase_bis: string;
+    onboarding_abgeschlossen: boolean | null;
+    onboarding_schritt: number | null;
   } | null;
 
   return {
@@ -92,6 +104,10 @@ export async function sitzungLaden(): Promise<Sitzung | null> {
     mandantName: mandant?.name ?? "",
     aboStatus: mandant?.abo_status ?? "test",
     testphaseBis: mandant?.testphase_bis ?? "",
+    // Fehlt die Spalte (Datenbank vor der Migration), gilt das Onboarding als
+    // erledigt — niemand darf durch einen Schemaunterschied ausgesperrt werden.
+    onboardingAbgeschlossen: mandant?.onboarding_abgeschlossen ?? true,
+    onboardingSchritt: mandant?.onboarding_schritt ?? 1,
   };
 }
 

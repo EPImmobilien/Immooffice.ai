@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { Benutzerliste, type BenutzerZeile } from "@/components/einstellungen/Benutzerliste";
+import { EINLADUNG_SPALTEN, Einladungen, type EinladungZeile } from "@/components/einstellungen/Einladungen";
 import { Erscheinungsbild } from "@/components/einstellungen/Erscheinungsbild";
 import { Rechtstexte } from "@/components/einstellungen/Rechtstexte";
 import { Stammdaten, type Branding } from "@/components/einstellungen/Stammdaten";
@@ -39,12 +40,14 @@ export default async function EinstellungenSeite() {
   const supabase = await serverClient();
   const { url } = supabaseUmgebung();
 
-  const [brandingAntwort, benutzerAntwort] = await Promise.all([
+  const [brandingAntwort, benutzerAntwort, einladungsAntwort] = await Promise.all([
     supabase
       .from("mandant_branding")
       .select(
-        "firmenname, strasse, hausnummer, plz, ort, telefon, email, web, " +
-          "farbe_primaer, farbe_akzent, logo_pfad, impressum, datenschutztext, widerrufsbelehrung",
+        "firmenname, rechtsform, geschaeftsfuehrer, strasse, hausnummer, plz, ort, telefon, email, web, " +
+          "handelsregister, ust_id, aufsichtsbehoerde, " +
+          "farbe_primaer, farbe_akzent, schrift_serifenlos, schrift_serifen, logo_pfad, logo_invers_pfad, " +
+          "impressum, datenschutztext, widerrufsbelehrung",
       )
       .eq("mandant_id", sitzung.mandantId)
       .maybeSingle(),
@@ -52,10 +55,19 @@ export default async function EinstellungenSeite() {
       .from("benutzer")
       .select("id, name, email, rolle, rechte_uebersteuerung, aktiv, letzter_login_am")
       .order("name", { ascending: true }),
+    // Offene Einladungen. Angenommene bleiben in der Tabelle als Nachweis,
+    // gehoeren aber in die Benutzerliste, nicht hierher.
+    supabase
+      .from("einladungen")
+      .select(EINLADUNG_SPALTEN)
+      .is("eingeloest_am", null)
+      .is("widerrufen_am", null)
+      .order("erstellt_am", { ascending: false }),
   ]);
 
   const branding = (brandingAntwort.data ?? null) as unknown as Branding | null;
   const benutzer = (benutzerAntwort.data ?? []) as unknown as BenutzerZeile[];
+  const einladungen = (einladungsAntwort.data ?? []) as unknown as EinladungZeile[];
   const darfAendern = hatRecht(sitzung.rolle, "einstellungen", "aendern", sitzung.uebersteuerung);
 
   // Solange kein Firmenname hinterlegt ist, behilft sich die Anwendung mit dem
@@ -173,7 +185,13 @@ export default async function EinstellungenSeite() {
           </KarteKopf>
           <KarteInhalt>
             {darfAendern ? (
-              <Benutzerliste benutzer={benutzer} eigeneId={sitzung.benutzerId} />
+              <div className="space-y-6">
+                <Benutzerliste benutzer={benutzer} eigeneId={sitzung.benutzerId} />
+                <div className="border-t border-linie pt-5">
+                  <p className="mb-3 text-[13px] font-medium text-text">Einladen</p>
+                  <Einladungen einladungen={einladungen} eigeneRolle={sitzung.rolle} />
+                </div>
+              </div>
             ) : (
               <p className="text-[13px] text-gedaempft">
                 {benutzer.length}{" "}

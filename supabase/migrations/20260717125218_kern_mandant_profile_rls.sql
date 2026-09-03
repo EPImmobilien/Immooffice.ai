@@ -1,0 +1,12 @@
+-- ===========================================================================
+-- Platzhalter fuer den Vorentwurf im Produktivprojekt
+-- (supabase_migrations.schema_migrations, Version 20260717125218).
+--
+-- Der Vorentwurf legte `profiles` und `firma_stammdaten` an. Beide wurden
+-- mit 20260816200259_kern_mandanten_benutzer.sql verworfen (Master-Prompt
+-- Abschnitt 0: verwerfbarer Entwurf). Auf einer frischen Datenbank ist hier
+-- nichts zu tun; die Datei existiert, damit die Versionsliste des
+-- Produktivprojekts und die des Repositories deckungsgleich sind und
+-- `supabase db push` nicht ueber eine unbekannte Fernversion stolpert.
+-- ===========================================================================
+select 1;

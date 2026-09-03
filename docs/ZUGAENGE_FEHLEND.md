@@ -1,0 +1,30 @@
+# Fehlende Zugänge
+
+Verlangt von [`docs/AUTONOMIE.md`](AUTONOMIE.md), Abschnitt 0.2: Fehlt ein Wert in
+`.env.local`, steht hier, **was** fehlt und **wofür**. Alles andere läuft weiter;
+nur das betroffene Modul wartet.
+
+Vorlage aller Schlüssel: [`.env.example`](../.env.example). Wie die Werte
+beschafft werden: [`docs/ANLEITUNG.md`](ANLEITUNG.md).
+
+**Stand:** 03.09.2026 — in der Entwicklungsumgebung dieses Laufs lag **keine**
+`.env.local` vor. Die Datenbank war trotzdem erreichbar: über die
+Verwaltungsschnittstelle des Projekts wurden die Migrationen ausgerollt und
+die Nachweise ausgeführt (`docs/STATUS.md`). Für alles andere gilt die Tabelle.
+
+| Schlüssel | Wofür | Blockiert |
+|---|---|---|
+| `GITHUB_TOKEN`, `GITHUB_OWNER` | Branch-Schutz für `main`, Repository-Einstellungen per CLI | nichts — Push läuft über die Sitzung; Branch-Schutz ist in `docs/ANLEITUNG.md` beschrieben |
+| `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_NAME` | Site anlegen, Umgebungsvariablen setzen, Deploy-Vorschau | Deploy-Vorschau je Arbeitspaket |
+| `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD` | `supabase link`, `supabase db push` als Werkzeugkette des Auftraggebers | nichts Akutes — die Migrationen `20260903*` sind ausgerollt; die CLI-Kette bleibt für künftige Läufe einzurichten |
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anwendung gegen die Datenbank starten | lokaler Start, Endtest „Neuer Makler“ |
+| `SUPABASE_SERVICE_ROLE_KEY` | Einladung einlösen (Dienstrolle), Stripe-Rückrufe, Hintergrundjobs | Einlösen von Einladungen im Betrieb |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Phase 3: Tarife, Kundenportal, Rückrufe im Testmodus | Modul Abo (Phase 3) |
+| `OPENAI_API_KEY` bzw. `ANTHROPIC_API_KEY` | KI-Texte, Bildbearbeitung | KI-Erzeugung; die Anwendung kennzeichnet fehlende KI (`src/lib/ki/ohne-ki.ts`) |
+| `MAIL_API_KEY`, `MAIL_ABSENDER` | Transaktionsmails: Einladungen, Testphasen-Erinnerungen | automatischer Versand von Einladungslinks — bis dahin Link zum Kopieren (E-2026-09-03-07) |
+| `GOOGLE_CLIENT_ID/SECRET`, `MICROSOFT_CLIENT_ID/SECRET/TENANT_ID` | Phase 4: Postfächer, Kalender, Anmeldung über Google/Microsoft | Modul Postfächer (Phase 4) |
+| `VERSCHLUESSELUNG_SCHLUESSEL` | Zugangsdaten von Integrationen und Postfächern verschlüsseln | Speichern einer Integration mit Zugangsdaten; Erzeugen: `openssl rand -base64 32` |
+
+Sobald ein Wert vorliegt, wird die Zeile hier gestrichen und der zugehörige
+Schritt (Migration ausrollen, Deploy, Test) nachgeholt und in `docs/STATUS.md`
+vermerkt.

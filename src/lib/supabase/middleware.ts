@@ -30,6 +30,9 @@ const OEFFENTLICH = [
   // Der Unterschriftslink geht an die Gegenseite. Ohne Eintrag hier landet ein
   // Vertragspartner auf der Anmeldung eines Programms, das er nicht benutzt.
   "/vertrag",
+  // Einladungslink: Wer ihn oeffnet, hat noch kein Konto. Die Seite zeigt,
+  // wer einlaedt, und fuehrt zur Registrierung — mit Token.
+  "/einladung",
 ];
 
 function istOeffentlich(pfad: string): boolean {

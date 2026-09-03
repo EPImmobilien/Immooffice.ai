@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { Wortmarke } from "@/components/Marke";
 import { ModusSchalter } from "@/components/ModusSchalter";
@@ -7,6 +8,8 @@ import { Button } from "@/components/ui/Button";
 import { Marke } from "@/components/ui/Status";
 import { sitzungErzwingen } from "@/lib/auth/sitzung";
 import { ROLLEN_BEZEICHNUNG, sichtbareModule } from "@/lib/auth/rechte";
+import { mandantenStil } from "@/lib/branding/stil";
+import { serverClient } from "@/lib/supabase/server";
 import { abmelden } from "@/server/auth-aktionen";
 
 /**
@@ -22,8 +25,31 @@ export default async function AppLayout({
   const sitzung = await sitzungErzwingen();
   const erlaubteModule = sichtbareModule(sitzung.rolle, sitzung.uebersteuerung);
 
+  // Offenes Onboarding: Die Verwaltung wird in den Assistenten geleitet, bis
+  // Firmierung, Anschrift und Impressum stehen (docs/AUTONOMIE.md O1). Alle
+  // anderen Rollen arbeiten weiter — sie koennen das Onboarding nicht
+  // erledigen und sollen nicht davor stehen bleiben.
+  if (
+    !sitzung.onboardingAbgeschlossen &&
+    (sitzung.rolle === "inhaber" || sitzung.rolle === "administrator")
+  ) {
+    redirect(`/onboarding/${Math.min(Math.max(sitzung.onboardingSchritt, 1), 8)}`);
+  }
+
+  // Erscheinungsbild des Mandanten (docs/AUTONOMIE.md B4/B6): Kopfzeile,
+  // Hauptschaltflaechen und Akzente tragen die Farben des Unternehmens. Die
+  // Werte werden als CSS-Variablen auf den Rahmen gesetzt — kein Neuladen,
+  // kein Skript. Die Anmeldeseite bleibt im Plattformdesign.
+  const supabase = await serverClient();
+  const { data: marke } = await supabase
+    .from("mandant_branding")
+    .select("farbe_primaer, farbe_akzent")
+    .eq("mandant_id", sitzung.mandantId)
+    .maybeSingle();
+  const stil = mandantenStil(marke?.farbe_primaer ?? null, marke?.farbe_akzent ?? null);
+
   return (
-    <div className="min-h-screen bg-grund">
+    <div className="min-h-screen bg-grund" style={stil}>
       <header className="sticky top-0 z-20 border-b border-linie bg-flaeche">
         <div className="flex items-center justify-between gap-4 px-5 py-3">
           <Link href="/dashboard" aria-label="Zum Dashboard">

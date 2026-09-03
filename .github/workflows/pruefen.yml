@@ -1,0 +1,76 @@
+# ---------------------------------------------------------------------------
+# Pruefung bei jedem Push und Pull Request (docs/AUTONOMIE.md, Abschnitt 1.2).
+#
+# Vier Stufen, alle Pflicht: Typecheck, Lint, Unit-Tests, Marken-Scan. Der
+# Marken-Scan ist das Neutralitaets-Gate — ein Treffer laesst den Lauf rot
+# werden, bevor irgendetwas ausgeliefert wird.
+#
+# Der Produktions-Build laeuft mit Platzhaltern fuer die oeffentlichen
+# Supabase-Variablen: Der Build braucht ihre Existenz, nicht ihre Gueltigkeit.
+# Echte Werte liegen nur bei Netlify.
+# ---------------------------------------------------------------------------
+name: Pruefen
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  pruefen:
+    name: Typecheck, Lint, Tests, Marken-Scan, Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Quellen holen
+        uses: actions/checkout@v4
+
+      - name: Node einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Abhaengigkeiten installieren
+        run: npm ci --no-audit --no-fund
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit- und Integrationstests
+        run: npm test
+
+      - name: Marken-Scan (Neutralitaets-Gate)
+        run: scripts/marken-scan.sh
+
+      - name: Produktions-Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://platzhalter.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: platzhalter
+          NEXT_TELEMETRY_DISABLED: "1"
+
+  datenbank:
+    name: Migrationen und Datenbank-Nachweise
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Quellen holen
+        uses: actions/checkout@v4
+
+      # Der Ubuntu-Runner bringt einen Postgres-Server mit. scripts/db-lokal.sh
+      # startet eine eigene Instanz, bildet die Supabase-Umgebung nach, spielt
+      # alle Migrationen ein und laesst jede Datei unter supabase/tests/ laufen —
+      # darunter die Nachweise zur Mandantentrennung (Gate B).
+      - name: Migrationen einspielen und Nachweise ausfuehren
+        run: scripts/db-lokal.sh

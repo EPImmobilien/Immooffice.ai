@@ -28,12 +28,10 @@ export interface BenutzerZeile {
 /**
  * Benutzer des Unternehmens.
  *
- * Was hier fehlt und bewusst fehlt: das Einladen weiterer Personen. Dafuer
- * braucht es einen eigenen Mailversand — der eingebaute Versand von Supabase
- * ist mengenbegrenzt und fuer Einladungen an Kunden nicht geeignet. Solange das
- * nicht steht, waere eine Einladungsschaltflaeche ein Versprechen, das die
- * Anwendung nicht haelt. Neue Zugaenge entstehen deshalb bis dahin ueber die
- * Registrierung.
+ * Das Einladen weiterer Personen steht in `Einladungen.tsx`: Der Link wird
+ * einmal angezeigt und kopiert, weil der eingebaute Mailversand von Supabase
+ * mengenbegrenzt und fuer Einladungen nicht geeignet ist. Ein automatischer
+ * Versand folgt mit dem Transaktionsmail-Dienst (docs/ZUGAENGE_FEHLEND.md).
  */
 export function Benutzerliste({
   benutzer,

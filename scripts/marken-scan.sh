@@ -29,7 +29,10 @@ MARKEN='engfer|engferundpartner|e&p ?world|ep-?world|epworld|epimmobilien'
 FREMD='yazwkzzjiquprtjpurur'
 
 # Module, die laut Abschnitt 2 ersatzlos entfallen.
-ENTFALLEN='onedrive|kundenportal|bewerbertest|bewerber_einladungen|shop-?tv|yodeck|onoffice|qonto|vivid'
+# onOffice steht seit docs/SCOPE.md (03.09.2026) als Connector im Scope und
+# deshalb nicht mehr hier. Kennungen oder Zugangsdaten der Referenz-Instanz
+# bleiben verboten — sie fallen unter die Altmarken oben.
+ENTFALLEN='onedrive|kundenportal|bewerbertest|bewerber_einladungen|shop-?tv|yodeck|qonto|vivid'
 
 fehler=0
 

@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { Inter, Poppins } from "next/font/google";
 
 import "./globals.css";
+import "./schriften.css";
 
 /**
  * Schriften werden ueber next/font zur Bauzeit heruntergeladen und danach vom
