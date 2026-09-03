@@ -1,56 +1,51 @@
 /**
- * Bildmarke „Schluesselloch-Turm“ als Komponente.
+ * Bildmarke „Schluesselloch im Goldkreis“ als Komponente.
  *
- * Bewusst inline und nicht als <img>: So folgt die Marke dem Farbmodus, laesst
- * sich in Kopfzeilen und Ladezustaenden einfaerben und verursacht keine
- * zusaetzliche Anfrage. Die Geometrie ist identisch mit assets/brand/ —
- * Aenderungen gehoeren in scripts/build-brand.py und dann hierher.
+ * Bewusst inline und nicht als <img>: So folgt die Marke dem Farbmodus und
+ * verursacht keine zusaetzliche Anfrage. Die Geometrie ist identisch mit
+ * public/marke/ — Aenderungen dort und hier gemeinsam pflegen.
  */
 export function Bildmarke({
   className,
-  turm = "var(--f-primaer)",
-  akzent = "var(--marke-gold)",
+  schluessel = "#FFFFFF",
 }: {
   className?: string;
-  turm?: string;
-  akzent?: string;
+  schluessel?: string;
 }) {
   return (
-    <svg
-      viewBox="0 0 64 64"
-      className={className}
-      role="img"
-      aria-label="ImmoOffice.ai"
-    >
-      <path fill={turm} d="M16 55V26a16 16 0 0 1 32 0v29Z" />
+    <svg viewBox="0 0 64 64" className={className} role="img" aria-label="ImmoOffice.ai">
+      <defs>
+        <linearGradient id="marke-gold" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0" stopColor="#B5934F" />
+          <stop offset="1" stopColor="#C9AE72" />
+        </linearGradient>
+      </defs>
+      <circle cx="32" cy="32" r="30" fill="url(#marke-gold)" />
       <path
-        fill={akzent}
-        d="M12 57h40a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2Z"
-      />
-      <path
-        fill={akzent}
-        d="M32 19a7.5 7.5 0 0 0-4.1 13.78L25.4 46h13.2l-2.5-13.22A7.5 7.5 0 0 0 32 19Z"
+        fill={schluessel}
+        d="M32 16.8a9.3 9.3 0 0 0-4.35 17.55L23.9 51.8h16.2l-3.75-17.45A9.3 9.3 0 0 0 32 16.8Z"
       />
     </svg>
   );
 }
 
 /**
- * Vollstaendige Sperrung aus Bildmarke und Wortmarke.
+ * Wortmarke: „immo“, die Bildmarke als O, „ffice“ und „.ai“ in Gold.
  *
- * Die Wortmarke wird hier als Text in Poppins gesetzt statt als Pfad: In der
- * Anwendung ist die Schrift ohnehin geladen, der Text bleibt so waehlbar,
- * durchsuchbar und skaliert mit den Systemeinstellungen. Die Pfadfassung in
- * assets/brand/ ist fuer alles ausserhalb der Anwendung gedacht — PDF, E-Mail,
- * Fremdsysteme.
+ * Der Text wird in Poppins gesetzt statt als Pfad: In der Anwendung ist die
+ * Schrift ohnehin geladen, der Text bleibt waehlbar und skaliert mit den
+ * Systemeinstellungen. Die Pfadfassung in public/marke/ ist fuer alles
+ * ausserhalb der Anwendung gedacht — PDF, E-Mail, Fremdsysteme.
  */
 export function Wortmarke({ className }: { className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-2.5 ${className ?? ""}`}>
-      <Bildmarke className="size-7 shrink-0" />
+    <span className={`inline-flex items-center ${className ?? ""}`}>
       <span className="font-titel text-[19px] leading-none font-semibold tracking-tight text-text">
-        ImmoOffice
-        <span className="text-akzent">.ai</span>
+        immo
+      </span>
+      <Bildmarke className="mx-[1px] size-[19px] shrink-0" />
+      <span className="font-titel text-[19px] leading-none font-semibold tracking-tight text-text">
+        ffice<span className="text-akzent">.ai</span>
       </span>
     </span>
   );

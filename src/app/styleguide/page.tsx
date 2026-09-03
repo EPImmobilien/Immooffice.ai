@@ -101,7 +101,7 @@ export default function StyleguideSeite() {
                 <Bildmarke className="size-6" />
               </div>
               <div className="rounded-[var(--radius)] bg-[#12203B] px-5 py-4">
-                <Bildmarke className="size-9" turm="#FFFFFF" akzent="#C9AE72" />
+                <Bildmarke className="size-9" schluessel="#1B2A47" />
               </div>
             </KarteInhalt>
           </Karte>

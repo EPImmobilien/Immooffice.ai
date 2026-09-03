@@ -15,6 +15,7 @@ import { nachrichtenUebernehmen } from "@/lib/postfach/abgleich";
 import { anbieterErzeugen } from "@/lib/postfach/anbieter";
 import { fehlerText } from "@/lib/postfach/oauth";
 import { istPostfachNutzlast, zugangParsen } from "@/lib/postfach/typen";
+import { rueckrufeZustellen } from "@/lib/schnittstelle/rueckruf";
 import { dienstClient } from "@/lib/supabase/dienst";
 import { befundBewerten, befundHash, befundText, mailEntscheiden, pruefungFaellig, type Befund, type WaechterZustand } from "@/lib/waechter";
 
@@ -125,6 +126,7 @@ export async function tagesarbeiten(): Promise<{
   postfaecher: number;
   aufgeraeumt: number;
   waechter: string | null;
+  rueckrufe: { zugestellt: number; gescheitert: number } | string;
 }> {
   const supabase = dienstClient();
   const [einplaner, abos, postfaecher, aufgeraeumt] = await Promise.all([
@@ -139,12 +141,19 @@ export async function tagesarbeiten(): Promise<{
   } catch (e) {
     waechter = `Waechter gescheitert: ${e instanceof Error ? e.message : "unbekannt"}`;
   }
+  let rueckrufe: { zugestellt: number; gescheitert: number } | string;
+  try {
+    rueckrufe = await rueckrufeZustellen(supabase, globalThis.fetch, { maxAnzahl: 20, zeitbudgetMs: 6_000 });
+  } catch (e) {
+    rueckrufe = `Rueckrufe gescheitert: ${e instanceof Error ? e.message : "unbekannt"}`;
+  }
   return {
     eingeplant: typeof einplaner.data === "number" ? einplaner.data : 0,
     abos: (abos.data as Record<string, unknown> | null) ?? {},
     postfaecher: typeof postfaecher.data === "number" ? postfaecher.data : 0,
     aufgeraeumt: typeof aufgeraeumt.data === "number" ? aufgeraeumt.data : 0,
     waechter,
+    rueckrufe,
   };
 }
 
