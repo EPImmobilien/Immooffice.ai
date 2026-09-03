@@ -126,16 +126,18 @@ export async function tagesarbeiten(): Promise<{
   postfaecher: number;
   aufgeraeumt: number;
   reservierungen: number;
+  akquiseLaeufe: number;
   waechter: string | null;
   rueckrufe: { zugestellt: number; gescheitert: number } | string;
 }> {
   const supabase = dienstClient();
-  const [einplaner, abos, postfaecher, aufgeraeumt, reservierungen] = await Promise.all([
+  const [einplaner, abos, postfaecher, aufgeraeumt, reservierungen, akquiseLaeufe] = await Promise.all([
     supabase.rpc("sync_faellige_einplanen"),
     supabase.rpc("abos_pruefen"),
     supabase.rpc("postfaecher_faellige_einplanen"),
     supabase.rpc("nachrichten_aufraeumen"),
     supabase.rpc("reservierungen_ablaufen"),
+    supabase.rpc("akquise_laeufe_ausfuehren"),
   ]);
   let waechter: string | null = null;
   try {
@@ -155,6 +157,7 @@ export async function tagesarbeiten(): Promise<{
     postfaecher: typeof postfaecher.data === "number" ? postfaecher.data : 0,
     aufgeraeumt: typeof aufgeraeumt.data === "number" ? aufgeraeumt.data : 0,
     reservierungen: typeof reservierungen.data === "number" ? reservierungen.data : 0,
+    akquiseLaeufe: typeof akquiseLaeufe.data === "number" ? akquiseLaeufe.data : 0,
     waechter,
     rueckrufe,
   };

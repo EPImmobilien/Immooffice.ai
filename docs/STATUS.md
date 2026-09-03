@@ -5,6 +5,61 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 04.09.2026 (Paket 9) — Akquise: Leads, Pipeline, Kampagnen, Quellen, Automationen, Preis-Finder, Radar, Auswertung
+
+**Branch:** `claude/autonomie-integrations-prompt-rl2qkr` · Referenz-Kachel „Akquise“ nach `docs/FUNKTIONSABGLEICH.md` (A1, A2)
+
+### Erledigt (Migration `20260904110000_akquise.sql`, im Projekt ausgerollt, 28 Nachweise grün)
+
+- **Leads** (`/akquise/leads`): manuell, aus Kontakt, aus Objekt, CSV-Import,
+  aus Postfach-Mail (Eigentümer-Parser), aus Objektaufnahme, aus Radar; Liste
+  und Kanban je Pipeline, Suche, Filter (Status, Nachfassen fällig), Stufe in
+  Zeile und Karte wechseln, Verlustgrund-Pflicht, Nachfasstermin automatisch.
+- **Dossier:** Info, Preis-Finder (Wertindikation aus eigenen verkauften
+  Objekten mit Rechenweg und Vergleichstabelle, Spanne, Startpreis,
+  Provisionserwartung nach Provisionsart mit Warnung bei doppelter Courtage,
+  Wertindikation als PDF/Word mit Pflichthinweis), Aktivitäten (Anruf,
+  Termin → Kalender, Aufgabe → Aufgaben, E-Mail aus Vorlage, WhatsApp-Text,
+  Notiz; Verlauf am Kontakt), Dossier (Kontakt anlegen, Objekt im Status
+  „Akquise“ anlegen, Wertermittlung verknüpfen, Maklervertrag, Matching,
+  Objektablage), Historie (Trigger-Protokoll).
+- **Kampagnen und Quellen** mit Art, Budget, Ausgaben, Laufzeit, Kampagne und
+  Ziel-Pipeline je Quelle; Lead-Zähler.
+- **Automationen** (Matrix Pipeline × Stufe × Quelle, Kanal, Vorlage,
+  Verzögerung), Vorlagen mit Platzhaltern, geplante Läufe mit Abbruch; Läufe
+  werden in der Datenbank geplant und vom Tagesjob ausgeführt (Aufgabe oder
+  Mail-Entwurf, kein Versand ohne Freigabe).
+- **Akquise-Radar:** Inserate erfassen, verwerfen, als Lead übernehmen —
+  manuell, mit rechtlichem Hinweis.
+- **Auswertung:** Marketing-Report je Zeitraum (Leads nach Quellenart,
+  gewonnen/verloren, erwartete Provision, Ausgaben, Kosten je Lead und je
+  Abschluss, ROAS, Conversion, Verlustgründe, Leads je Quelle) und
+  Pipeline-Prognose (roh und gewichtet, je Stufe).
+- **Einstellungen:** Pipelines und Stufen (Wahrscheinlichkeit, gewonnen/
+  verloren), Verlustgründe, Provisionssatz, Startpreis-Faktor, Spanne,
+  Nachfassfrist. Rechtemodul `akquise` in Matrix und Rechteverwaltung.
+- **Ende-zu-Ende gegen den lokalen Stack:** Standard-Stammdaten beim ersten
+  Aufruf, Automation angelegt, Lead angelegt (Titel aus Objektart und
+  Anschrift), Preis-Finder gespeichert (Provision-Marke), Wertindikation PDF
+  und Word 200, Anruf vermerkt, Mail-Entwurf mit Anrede und Anschrift,
+  Objekt aus Lead angelegt, Stufe „Verloren“ mit Grund, Historie, Kanban,
+  Radar → Lead, Kampagne, CSV-Import (2 Leads), Auswertung; Automationslauf
+  über die Datenbankfunktion (Aufgabe beim Zuständigen).
+- Prüfstand: Typecheck, Lint, 403 Unit-Tests, 422 Datenbank-Nachweise lokal,
+  Marken-Scan, Produktions-Build.
+
+### Nicht erledigt — und warum
+
+| Punkt | Grund |
+|---|---|
+| Automatischer Portal-Abgleich im Radar | rechtlich ungeklärt (Nutzungsbedingungen, § 7 UWG) — Eintrag in `docs/BLOCKER.md`; Erfassung manuell oder über die Schnittstelle |
+| Automatischer Mail-Versand aus Automationen | bewusst nicht: Entwurf am Lead, Versand nach Sichtkontrolle (E-43) |
+| WhatsApp-Versand | kein Anbieter angebunden; Text zum Kopieren |
+| KI-Aktivität (Textvorschlag für Vorlagen) | folgt mit dem KI-Assistenten-Paket (W2) |
+| Leads über die eigene Schnittstelle | Endpunkt `/api/v1/leads` folgt im Verwaltungs-Paket zusammen mit den übrigen neuen Ressourcen |
+
+---
+
 ## 04.09.2026 (Paket 8) — Vermietung: Mietanfragen, Selbstauskunft, Antwortvorlagen, Mietverträge, Reservierungen
 
 **Branch:** `claude/autonomie-integrations-prompt-rl2qkr` · Referenz-Kachel „Vermietung“ und „Reservierungen“ nach `docs/FUNKTIONSABGLEICH.md` (M1)

@@ -16,6 +16,7 @@ import {
   nachrichtZuordnen,
   type PostfachErgebnis,
 } from "@/server/postfach-aktionen";
+import { nachrichtAlsLead, type AkquiseErgebnis } from "@/server/akquise-aktionen";
 import { nachrichtAlsAnfrage, type VermietungErgebnis } from "@/server/vermietung-aktionen";
 
 import {
@@ -56,6 +57,7 @@ export function NachrichtDetail({ nachricht, anhaenge, objekt, kontakt, vorschla
   const [versand, senden, sendet] = useActionState<PostfachErgebnis, FormData>(nachrichtSenden, {});
   const [entwurf, entwerfen, entwirft] = useActionState<PostfachErgebnis, FormData>(antwortEntwerfen, {});
   const [anfrage, alsAnfrage, uebernimmt] = useActionState<VermietungErgebnis, FormData>(nachrichtAlsAnfrage, {});
+  const [lead, alsLead, uebernimmtLead] = useActionState<AkquiseErgebnis, FormData>(nachrichtAlsLead, {});
   const [antwortOffen, setAntwortOffen] = useState(false);
   // Ein neuer Entwurf oeffnet die Antwort und ersetzt den Text (Textarea wird per key neu aufgebaut).
   const antwortSichtbar = antwortOffen || Boolean(entwurf.entwurf);
@@ -110,6 +112,16 @@ export function NachrichtDetail({ nachricht, anhaenge, objekt, kontakt, vorschla
                 <input type="hidden" name="nachricht_id" value={nachricht.id} />
                 <Button type="submit" variante="leise" groesse="klein" laedt={uebernimmt}>Als Mietanfrage übernehmen</Button>
               </form>
+            )}
+            {nachricht.ordner === "eingang" && (
+              <form action={alsLead}>
+                <input type="hidden" name="nachricht_id" value={nachricht.id} />
+                <Button type="submit" variante="leise" groesse="klein" laedt={uebernimmtLead}>Als Akquise-Lead übernehmen</Button>
+              </form>
+            )}
+            {lead.fehler && <span className="text-[12px] text-fehler">{lead.fehler}</span>}
+            {lead.erfolg && lead.id && (
+              <Link href={`/akquise/leads/${lead.id}`} className="text-[12px] text-akzent hover:underline">{lead.erfolg} Zum Lead</Link>
             )}
             {anfrage.fehler && <span className="text-[12px] text-fehler">{anfrage.fehler}</span>}
             {anfrage.erfolg && anfrage.id && (

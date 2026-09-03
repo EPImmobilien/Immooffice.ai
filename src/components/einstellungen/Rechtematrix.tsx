@@ -42,6 +42,7 @@ const MODUL_BEZEICHNUNG: Record<Modul, string> = {
   einstellungen: "Einstellungen",
   abrechnung: "Abo und Credits",
   postfach: "Postfach",
+  akquise: "Akquise",
 };
 
 const AKTION_BEZEICHNUNG: Record<Aktion, string> = {

@@ -29,6 +29,7 @@ import {
   aufnahmeUebernehmen,
   aufnahmeVerwerfen,
 } from "@/server/aufnahme-aktionen";
+import { leadAusAufnahme } from "@/server/akquise-aktionen";
 
 export const metadata: Metadata = { title: "Objektaufnahme" };
 
@@ -135,6 +136,10 @@ export default async function AufnahmeSeite({
             <form action={aufnahmeUebernehmen}>
               <input type="hidden" name="aufnahme_id" value={daten.id} />
               <Button type="submit">Objekt daraus anlegen</Button>
+            </form>
+            <form action={leadAusAufnahme}>
+              <input type="hidden" name="aufnahme_id" value={daten.id} />
+              <Button type="submit" variante="sekundaer">Akquise-Lead daraus anlegen</Button>
             </form>
             <form action={aufnahmeVerwerfen}>
               <input type="hidden" name="aufnahme_id" value={daten.id} />

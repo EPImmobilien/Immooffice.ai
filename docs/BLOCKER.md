@@ -18,3 +18,17 @@ Blocker, sondern eine Wartestellung.
 ## Erledigt
 
 *Keine Einträge.*
+
+## Akquise-Radar: automatisches Auslesen von Immobilienportalen
+
+**Stand:** offen (rechtlich). **Betrifft:** Paket A2, `/akquise/radar`.
+
+Die Referenz liest Privatinserate aus Portalen. In ImmoOffice.ai bleibt das
+Radar eine manuelle Sammlung (Erfassung von Hand oder über die Schnittstelle),
+weil das automatisierte Auslesen in der Regel gegen die Nutzungsbedingungen
+der Portale verstößt und urheber-, datenbank- und wettbewerbsrechtlich nicht
+geklärt ist; die Ansprache von Privatanbietern unterliegt § 7 UWG.
+
+**Nötig zur Auflösung:** anwaltliche Bewertung je Portal oder ein
+lizenzierter Datenlieferant mit vertraglicher Erlaubnis. Erst danach wird ein
+Import-Connector gebaut.

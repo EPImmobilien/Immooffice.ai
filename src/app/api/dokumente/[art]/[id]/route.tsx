@@ -1,6 +1,10 @@
 import { renderToBuffer } from "@react-pdf/renderer";
 import { NextResponse } from "next/server";
 
+import { wertindikation } from "@/lib/akquise/preisfinder";
+import type { LeadZeile } from "@/lib/akquise/stammdaten";
+import { akquiseEinstellungenLaden, vergleichswerteLaden } from "@/lib/akquise/vergleichswerte";
+import { wertindikationAlsDokument } from "@/lib/akquise/wertindikation-dokument";
 import { rechtErzwingen } from "@/lib/auth/rechte";
 import { sitzungLaden } from "@/lib/auth/sitzung";
 import { DokumentPdf } from "@/lib/dokument/pdf";
@@ -27,7 +31,7 @@ export async function GET(anfrage: Request, { params }: { params: Promise<{ art:
   const { art, id } = await params;
   const sitzung = await sitzungLaden();
   if (!sitzung) return NextResponse.json({ fehler: "Nicht angemeldet." }, { status: 401 });
-  rechtErzwingen(sitzung.rolle, "vertraege", "lesen", sitzung.uebersteuerung);
+  rechtErzwingen(sitzung.rolle, art === "wertindikation" ? "akquise" : "vertraege", "lesen", sitzung.uebersteuerung);
   if (!/^[0-9a-f-]{36}$/.test(id)) return NextResponse.json({ fehler: "Nicht gefunden." }, { status: 404 });
 
   const url = new URL(anfrage.url);
@@ -87,6 +91,17 @@ export async function GET(anfrage: Request, { params }: { params: Promise<{ art:
     const d = mietvertragAusZeile(m as Record<string, unknown>);
     dokument = textZuDokument(mietvertragTitel(d), mietvertragText(d), m.status === "entwurf" ? "ENTWURF" : MUSTER_HINWEIS);
     dateiname = mietvertragTitel(d).replace(/[^a-zA-Z0-9äöüÄÖÜß._-]+/g, "_").slice(0, 80);
+  } else if (art === "wertindikation") {
+    const { data: l } = await supabase.from("akquise_leads").select("*, kontakt:kontakte!akquise_leads_kontakt_id_fkey(anrede, vorname, nachname, firma)").eq("id", id).maybeSingle();
+    if (!l) return NextResponse.json({ fehler: "Nicht gefunden." }, { status: 404 });
+    const lead = l as unknown as LeadZeile & { kontakt: { anrede: string | null; vorname: string | null; nachname: string | null; firma: string | null } | null };
+    const [einst, bestand] = await Promise.all([akquiseEinstellungenLaden(supabase), vergleichswerteLaden(supabase)]);
+    const k = lead.kontakt;
+    const eigentuemer = k ? [k.anrede, k.vorname, k.nachname].filter(Boolean).join(" ") || k.firma : null;
+    const zahl = (w: unknown) => (w === null || w === undefined ? null : Number(w));
+    const leadZeile: LeadZeile = { ...lead, wohnflaeche: zahl(lead.wohnflaeche), grundstueck: zahl(lead.grundstueck), wert_indikation: zahl(lead.wert_indikation), angebotspreis: zahl(lead.angebotspreis) };
+    dokument = wertindikationAlsDokument(leadZeile, wertindikation(leadZeile, bestand), einst, eigentuemer, new Date().toISOString().slice(0, 10));
+    dateiname = `Wertindikation_${lead.titel.replace(/[^a-zA-Z0-9äöüÄÖÜß._-]+/g, "_").slice(0, 60)}`;
   } else {
     return NextResponse.json({ fehler: "Unbekannte Dokumentart." }, { status: 404 });
   }

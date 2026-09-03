@@ -20,7 +20,7 @@ in `docs/STATUS.md`.
 | Terminbestätigung per Mail mit Kalenderdatei (ICS) | ✗ | K1 |
 | Erinnerung sechs Stunden vorher | ✗ | K1 |
 | Fahrzeit-Vorschau zwischen Terminen | ✗ | K1 |
-| Zuordnung Termin → Objektaufnahme/Lead („Aus der Aufnahme entsteht der Lead“) | ✗ | A1 |
+| Zuordnung Termin → Objektaufnahme/Lead („Aus der Aufnahme entsteht der Lead“) | ✓ (Objektaufnahme → „Akquise-Lead daraus anlegen“) | A1 |
 | Abgleich in beide Richtungen mit onOffice | ◐ (Objekte/Kontakte) | K2 |
 | Google-/Outlook-Kalender-Sync | ✗ | K2 |
 
@@ -60,14 +60,14 @@ in `docs/STATUS.md`.
 
 | Funktion | Stand | Paket |
 |---|---|---|
-| Leads (manuell, aus Kontakt, Objekt, Radar, CSV) | ✗ | A1 |
-| Pipeline-Stufen, Kanban, Verlustgrund | ✗ | A1 |
-| Aktivitäten planen, Dossier, Dokumente (Objektablage), Interessenten-Matching | ✗ | A1 |
-| Preis-Finder (Wertindikation aus eigenen Vergleichswerten), Wertindikations-PDF | ◐ (Wertermittlung) | A1 |
-| Kampagnen, Quellen, Automationen (Matrix Pipeline × Quelle × Stufe), Vorlagen, Läufe | ✗ | A2 |
-| Lead-Mails aus dem Posteingang übernehmen | ✗ | A2 |
-| Auswertung: Marketing-Report, Conversion | ✗ | A2 |
-| Akquise-Radar (Privatanbieter) | ✗ — rechtliche Prüfung offen, nur manuelle Erfassung | A2 |
+| Leads (manuell, aus Kontakt, Objekt, Radar, CSV) | ✓ | A1 |
+| Pipeline-Stufen, Kanban, Verlustgrund | ✓ | A1 |
+| Aktivitäten planen, Dossier, Dokumente (Objektablage), Interessenten-Matching | ✓ (Ablage und Matching über das Objekt aus dem Lead) | A1 |
+| Preis-Finder (Wertindikation aus eigenen Vergleichswerten), Wertindikations-PDF | ✓ | A1 |
+| Kampagnen, Quellen, Automationen (Matrix Pipeline × Quelle × Stufe), Vorlagen, Läufe | ✓ (Läufe erzeugen Aufgaben/Entwürfe, kein Auto-Versand) | A2 |
+| Lead-Mails aus dem Posteingang übernehmen | ✓ | A2 |
+| Auswertung: Marketing-Report, Conversion | ✓ | A2 |
+| Akquise-Radar (Privatanbieter) | ◐ manuelle Erfassung und Übernahme; kein Portal-Auslesen (rechtliche Prüfung offen) | A2 |
 
 ## Kachel 6 — Verkauf
 

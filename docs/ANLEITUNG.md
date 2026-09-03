@@ -461,6 +461,53 @@ das E-Mail-Programm. So arbeiten Kunden (Menü „Vermietung“):
    Grund. Alle Vertragstexte sind Muster ohne Rechtsberatung — der Hinweis auf
    die anwaltliche Prüfung steht im Text.
 
+## 10d. Akquise — Leads, Pipeline, Kampagnen, Automationen, Preis-Finder
+
+Keine Einrichtung nötig; beim ersten Öffnen entstehen eine Standard-Pipeline
+(Neuer Lead 10 % → Kontakt aufgenommen 25 % → Einwertung/Termin 50 % →
+Angebot 75 % → Gewonnen → Verloren), sechs Quellen und vier Vorlagen. So
+arbeiten Kunden (Menü „Akquise“):
+
+1. **Lead anlegen** (Akquise → Leads → „Lead anlegen“): manuell mit
+   Eigentümer, aus einem Kontakt, aus einem Objekt des Bestands (Anschrift,
+   Flächen und Eigentümer werden übernommen) oder per CSV-Import (Kopfzeile
+   mit Straße, PLZ, Ort, Objektart, Wohnfläche, Nachname, E-Mail, Telefon).
+   Weitere Wege: im Postfach „Als Akquise-Lead übernehmen“ (Website-Formulare
+   und freie Eigentümer-Mails werden erkannt), in der Objektaufnahme
+   „Akquise-Lead daraus anlegen“, im Akquise-Radar „Als Lead übernehmen“.
+2. **Pipeline:** Leads als Liste oder Kanban je Pipeline; Stufe direkt in der
+   Zeile oder Karte wechseln. Eine verlorene Stufe verlangt einen
+   Verlustgrund, eine gewonnene setzt Status und Zeitpunkt. Nachfasstermine
+   entstehen automatisch (Vorgabe sieben Tage) und stehen auf der
+   Akquise-Übersicht unter „Nachfassen“.
+3. **Dossier des Leads:** Reiter Info (alle Angaben), Preis-Finder
+   (Wertindikation aus den eigenen verkauften Objekten mit sichtbarem
+   Rechenweg, Spanne, Startpreis, Provisionserwartung nach Provisionsart und
+   Verhandlungsabschlag; Wertindikation als PDF oder Word mit Pflichthinweis),
+   Aktivitäten (Anruf, Termin im Kalender, Aufgabe beim Zuständigen, E-Mail
+   aus Vorlage, WhatsApp-Text, Notiz), Dossier (Eigentümer als Kontakt
+   anlegen, Objekt im Status „Akquise“ anlegen — danach laufen Unterlagen,
+   Interessenten-Matching und Maklervertrag über das Objekt; Wertermittlung als
+   offenes Rechenblatt), Historie (automatisch protokolliert).
+4. **Kampagnen und Quellen:** Kampagnen mit Art (online, offline, Netzwerk,
+   Tippgeber), Budget, Ausgaben und Laufzeit; Quellen mit Art, Kampagne und
+   Ziel-Pipeline. Die Auswertung rechnet daraus Kosten je Lead, Kosten je
+   Abschluss, ROAS und Conversion je Zeitraum, dazu die Pipeline-Prognose
+   (erwartete Provision, gewichtet nach Stufen-Wahrscheinlichkeit).
+5. **Automationen** (Verwaltung): Matrix aus Pipeline × Stufe × Quelle. Beim
+   Eintritt in die Stufe wird nach der Verzögerung ein Lauf geplant; der
+   Tagesjob erzeugt daraus eine Aufgabe beim Zuständigen oder einen
+   Mail-Entwurf am Lead. **Es wird nichts automatisch versendet** — der
+   Kunde prüft den Text und sendet über Postfach oder E-Mail-Programm. Läufe
+   sind unter „Geplante Läufe“ sichtbar und abbrechbar; ein Stufenwechsel
+   bricht offene Läufe ab.
+6. **Akquise-Radar:** Privatinserate von Hand erfassen (oder über die
+   Schnittstelle) und als Lead übernehmen. Kein automatisches Auslesen fremder
+   Portale — der Hinweis auf § 7 UWG und die Nutzungsbedingungen der Portale
+   steht auf der Seite (siehe `docs/BLOCKER.md`).
+7. **Einstellungen:** Pipelines und Stufen mit Wahrscheinlichkeiten,
+   Verlustgründe, Provisionssatz, Startpreis-Faktor, Spanne, Nachfassfrist.
+
 ## 11. Was Sie an Gate A und Gate B entscheiden
 
 - **Gate A** (bereits erreicht): Bestandsaufnahme, Funktionsmatrix, Architektur

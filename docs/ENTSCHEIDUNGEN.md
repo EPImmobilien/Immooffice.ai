@@ -542,6 +542,50 @@ Oberfläche (Masterprompt: Regeln serverseitig erzwingen). Ein zweiter
 Signaturweg wäre eine Insellösung; die Vertragsinfrastruktur (Textform,
 Signaturvorgänge, PDF) existiert bereits.
 
+### E-2026-09-03-43 — Akquise: eigenes Modul „akquise“, Automationen erzeugen Entwürfe und Aufgaben, kein Roboter-Versand
+
+**Frage:** Wie werden Eigentümer-Leads von Objekten und Kontakten getrennt,
+und dürfen Automationen selbständig E-Mails an Eigentümer senden?
+
+**Entscheidung:** Leads sind eine eigene Tabelle (`akquise_leads`) mit
+Pipeline, Stufe, Quelle, Kampagne, Zuständigem und Preis-Finder-Feldern; das
+Rechtemodul heißt `akquise` (Verwaltung für Pipelines, Stufen, Vorlagen,
+Automationen und Einstellungen; Makler und Assistenz für Leads, Kampagnen,
+Quellen, Radar). Status, Zeitpunkte, Verlustgrund-Pflicht, Historie und das
+Planen der Automationen laufen in Datenbank-Triggern. Ein Automationslauf
+erzeugt eine Aufgabe beim Zuständigen oder einen Mail-Entwurf am Lead — der
+Versand bleibt beim Menschen (Postfach oder E-Mail-Programm). Ein gewonnener
+Lead wird per Klick zum Objekt im Status „akquise“; Unterlagen, Matching und
+Maklervertrag laufen dann über das Objekt.
+
+**Begründung:** Objekt als Drehkreuz und verkettete Arbeitsschritte
+(Funktionsprompt, Grundprinzipien 1 und 2): Ein Lead ist noch kein Objekt und
+soll den Bestand nicht mit Absagen füllen. Automatischer Versand an
+Privatpersonen ohne Sichtkontrolle ist rechtlich heikel (§ 7 UWG, DSGVO) und
+widerspricht der Regel, dass jeder Text editierbar und freigabepflichtig
+bleibt; Datenbank-Trigger sorgen dafür, dass Leads aus Schnittstelle, CSV und
+Postfach dieselben Regeln durchlaufen wie Leads aus der Oberfläche.
+
+### E-2026-09-03-44 — Preis-Finder aus eigenen Vergleichswerten, Akquise-Radar nur manuell
+
+**Frage:** Woher kommt die Wertindikation im Preis-Finder, und liest das
+Radar Portale aus?
+
+**Entscheidung:** Die Wertindikation ist der Median der €/m² verkaufter
+Objekte des Mandanten (gleiche Objektkategorie, Eingrenzung PLZ → Ort →
+Bestand, jeweils nur bei mindestens drei Werten), multipliziert mit der
+Wohnfläche und auf Tausend gerundet; Spanne, Startpreis und Provisionssatz
+kommen aus den Akquise-Einstellungen und sind je Lead überschreibbar. Jeder
+Schritt und jeder Vergleichswert steht im Dossier und im PDF, zusammen mit
+dem Pflichthinweis. Das Radar ist eine manuelle Sammlung erfasster Inserate
+(oder Einträge über die Schnittstelle) ohne Portal-Auslesung.
+
+**Begründung:** Masterprompt: Wertermittlung ohne Blackbox, keine automatisch
+„ermittelten“ Werte; eigene Verkäufe sind die einzige Datenquelle, die dem
+Makler vorliegt und die er verantworten kann. Portal-Scraping verstößt in der
+Regel gegen Nutzungsbedingungen und ist wettbewerbs- und urheberrechtlich
+ungeklärt — ein rechtlicher Blocker, kein technischer.
+
 ### E-2026-09-03-13 — Credit-Werte bleiben die der Datenbank
 
 **Frage:** S4 nennt Startwerte (Exposétext 5, Kurztext 2, Bild 3 je Bild,
