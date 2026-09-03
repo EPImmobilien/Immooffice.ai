@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
-import { SozialAnmeldung, sozialeAnmeldung } from "@/components/SozialAnmeldung";
+import { SozialAnmeldung } from "@/components/SozialAnmeldung";
+import { sozialeAnmeldung } from "@/lib/auth/sozial";
 import { einladungAnsehen } from "@/lib/einladung";
 import { serverClient } from "@/lib/supabase/server";
 

@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 
 import { OnboardingFormular } from "@/components/onboarding/OnboardingFormular";
 import { Schrittleiste } from "@/components/onboarding/Schrittleiste";
-import { EINLADUNG_SPALTEN, type EinladungZeile } from "@/components/einstellungen/Einladungen";
+import { EINLADUNG_SPALTEN, type EinladungZeile } from "@/lib/einladung";
 import { Hinweis } from "@/components/ui/Status";
 import { hatRecht } from "@/lib/auth/rechte";
 import { sitzungErzwingen } from "@/lib/auth/sitzung";

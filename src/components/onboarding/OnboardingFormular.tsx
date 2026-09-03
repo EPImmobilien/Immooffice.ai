@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useActionState, useMemo, useRef, useState, useTransition } from "react";
 
-import { Einladungen, type EinladungZeile } from "@/components/einstellungen/Einladungen";
+import { Einladungen } from "@/components/einstellungen/Einladungen";
+import type { EinladungZeile } from "@/lib/einladung";
 import { Button } from "@/components/ui/Button";
 import { Auswahl, Eingabe, Feld, Textfeld } from "@/components/ui/Feld";
 import { Hinweis } from "@/components/ui/Status";

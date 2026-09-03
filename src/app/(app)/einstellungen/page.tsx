@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Benutzerliste, type BenutzerZeile } from "@/components/einstellungen/Benutzerliste";
-import { EINLADUNG_SPALTEN, Einladungen, type EinladungZeile } from "@/components/einstellungen/Einladungen";
+import { Einladungen } from "@/components/einstellungen/Einladungen";
+import { EINLADUNG_SPALTEN, type EinladungZeile } from "@/lib/einladung";
 import { Erscheinungsbild } from "@/components/einstellungen/Erscheinungsbild";
 import { Rechtstexte } from "@/components/einstellungen/Rechtstexte";
 import { Stammdaten, type Branding } from "@/components/einstellungen/Stammdaten";

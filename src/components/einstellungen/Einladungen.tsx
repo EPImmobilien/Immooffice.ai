@@ -6,21 +6,9 @@ import { Button } from "@/components/ui/Button";
 import { Auswahl, Eingabe, Feld } from "@/components/ui/Feld";
 import { Hinweis, Marke } from "@/components/ui/Status";
 import { ROLLEN, ROLLEN_BEZEICHNUNG, type Rolle } from "@/lib/auth/rechte";
+import type { EinladungZeile } from "@/lib/einladung";
 import { datum } from "@/lib/format";
 import { einladungErstellen, einladungZuruecknehmen } from "@/server/einladungs-aktionen";
-
-export interface EinladungZeile {
-  id: string;
-  email: string;
-  rolle: Rolle;
-  gueltig_bis: string;
-  eingeloest_am: string | null;
-  widerrufen_am: string | null;
-  erstellt_am: string;
-}
-
-/** Spalten und Filter fuer offene Einladungen — an einer Stelle, fuer alle Seiten. */
-export const EINLADUNG_SPALTEN = "id, email, rolle, gueltig_bis, eingeloest_am, widerrufen_am, erstellt_am";
 
 /**
  * Einladungen anlegen und zuruecknehmen.

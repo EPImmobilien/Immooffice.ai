@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
-import { SozialAnmeldung, sozialeAnmeldung } from "@/components/SozialAnmeldung";
+import { SozialAnmeldung } from "@/components/SozialAnmeldung";
+import { sozialeAnmeldung } from "@/lib/auth/sozial";
 import { Hinweis } from "@/components/ui/Status";
 
 import { AnmeldeFormular } from "./AnmeldeFormular";

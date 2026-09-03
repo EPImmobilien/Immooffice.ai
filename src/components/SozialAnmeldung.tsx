@@ -1,20 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
+import type { SozialeAnbieter } from "@/lib/auth/sozial";
 import { sozialAnmelden } from "@/server/auth-aktionen";
-
-export interface SozialeAnbieter {
-  google: boolean;
-  microsoft: boolean;
-}
-
-/** Welche Anbieter im Dashboard eingerichtet und per Umgebung freigeschaltet sind. */
-export function sozialeAnmeldung(umgebung: Record<string, string | undefined> = process.env): SozialeAnbieter {
-  return {
-    google: umgebung["NEXT_PUBLIC_ANMELDUNG_GOOGLE"] === "1",
-    microsoft: umgebung["NEXT_PUBLIC_ANMELDUNG_MICROSOFT"] === "1",
-  };
-}
 
 /**
  * Schaltflaechen „Anmelden mit Google/Microsoft“ (docs/AUTONOMIE.md Phase 4).
