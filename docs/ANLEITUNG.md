@@ -335,6 +335,51 @@ und welche fehlen. Sobald Sie einen Testzugang haben (siehe
 machen — Pfade und Feldnamen stehen je Anbieter an einer Stelle und sind
 schnell angepasst.
 
+## 10a. Eigene Schnittstelle — für Kunden mit eigener Website oder eigenem CRM
+
+Die Schnittstelle braucht keine Einrichtung durch Sie. Kunden verwalten sie
+selbst unter **Einstellungen → Schnittstelle** (nur Inhaber und
+Administratoren). Zum Verständnis, was dort passiert:
+
+1. **Schlüssel anlegen.** Bezeichnung eingeben, je Bereich (Objekte, Kontakte,
+   Termine) „kein Zugriff“, „nur lesen“ oder „lesen und schreiben“ wählen,
+   Anfragen je Minute (Vorgabe 600) — „Schlüssel anlegen“. Der Schlüssel
+   `io_…` erscheint **genau einmal**. Wer ihn verliert, widerruft ihn und legt
+   einen neuen an; gespeichert ist nur ein Hash.
+2. **Anfrage senden.** Beispiel für die Objektliste:
+
+   ```
+   curl -H "Authorization: Bearer io_…" \
+     "https://<ihre-domain>/api/v1/objekte?seite=1&groesse=50&geaendert_seit=2026-09-01T00:00:00Z"
+   ```
+
+   Antwort: `{ "daten": [...], "seite": 1, "groesse": 50, "gesamt": 123, "weitere": true }`.
+   Einzelne Datensätze unter `/api/v1/objekte/<id>`, Anlegen per `POST`, Ändern
+   per `PATCH`, Löschen per `DELETE` (Objekte und Kontakte werden nur als
+   gelöscht markiert). Gleiches für `/kontakte` und `/termine`. Die vollständige
+   Beschreibung liegt maschinenlesbar unter `/api/v1/openapi.json`.
+3. **Grenzen.** Jede Antwort trägt `X-RateLimit-Limit` und
+   `X-RateLimit-Remaining`. Bei Überschreitung kommt `429` mit `Retry-After`.
+   Ist das Unternehmen im Lesemodus (Testphase abgelaufen, kein Abo), lehnt die
+   Schnittstelle Schreibanfragen mit `403` ab — Lesen geht weiter.
+4. **Rückrufe einrichten.** Unter „Rückrufe“ eine https-Adresse des Kunden
+   eintragen und Ereignisse wählen (`objekt.angelegt`, `kontakt.angelegt`,
+   `termin.angelegt`). Das Geheimnis `whsec_…` erscheint einmal. ImmoOffice.ai
+   sendet je Ereignis eine `POST`-Anfrage mit JSON-Körper
+   `{ "id", "ereignis", "zeitpunkt", "daten" }` und den Kopfzeilen
+   `X-ImmoOffice-Ereignis`, `X-ImmoOffice-Lieferung`, `X-ImmoOffice-Signatur`.
+5. **Signatur prüfen** (beim Empfänger): Kopf `X-ImmoOffice-Signatur` hat die
+   Form `t=<unix-sekunden>,v1=<hex>`. Der Empfänger bildet
+   `HMAC-SHA256(geheimnis, "<t>.<roher körper>")`, vergleicht mit `v1` in
+   konstanter Zeit und verwirft Lieferungen, deren `t` mehr als fünf Minuten
+   abweicht. Antwortet der Empfänger nicht mit `2xx`, wiederholt ImmoOffice.ai
+   die Zustellung nach 2, 4, 8, 16, 32, 60, 60 Minuten — insgesamt acht
+   Versuche; danach steht die Lieferung als „gescheitert“ in der Liste und kann
+   mit „Erneut“ neu eingeplant werden.
+6. **Voraussetzung auf Ihrer Seite:** Die Zustellung läuft im Hintergrund-
+   Arbeiter (Abschnitt 6a). Ohne den minütlichen Aufruf bleiben Rückrufe
+   „offen“. Rückrufziele brauchen den Verschlüsselungsschlüssel aus Abschnitt 6.
+
 ## 11. Was Sie an Gate A und Gate B entscheiden
 
 - **Gate A** (bereits erreicht): Bestandsaufnahme, Funktionsmatrix, Architektur

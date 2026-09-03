@@ -17,7 +17,10 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
   Bereich, 600 Anfragen je Minute und Schlüssel, Lesemodus-Sperre, OpenAPI
   unter `/api/v1/openapi.json`, signierte Rückrufe `objekt.angelegt`,
   `kontakt.angelegt`, `termin.angelegt` mit Wiederholung (2^n Minuten, acht
-  Versuche). Oberfläche zur Schlüsselverwaltung folgt (Aufgabe #21).
+  Versuche). Oberfläche unter Einstellungen → Schnittstelle: Schlüssel anlegen
+  (einmalige Anzeige), Rechte und Limit ändern, widerrufen; Rückrufziele mit
+  Geheimnis, Ereignissen, Pause, Zustellprotokoll und „Erneut“. Anleitung
+  Abschnitt 10a, Entscheidungen E-37 und E-38.
 - **Bildmarke und Wortmarke** auf das Schlüsselloch im Goldkreis umgestellt
   (`public/marke/`, Komponente `Marke`, Favicon, Styleguide).
 - **Vollständiger Durchlauf des Produktionsbuilds** gegen eine lokale Datenbank
@@ -33,7 +36,6 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 | Punkt | Grund |
 |---|---|
-| Schnittstellen-Oberfläche, Anleitung, Nachweis-Zahlen im Status | folgt als nächstes Paket (#21), bevor die fehlenden Module der Referenz beginnen |
 | Supabase aus der Entwicklungsumgebung erreichbar | Netzwerkrichtlinie der Umgebung blockiert `*.supabase.co`; Migrationen und Nachweise laufen über die Verwaltungsschnittstelle, die Anwendung selbst gegen einen lokalen Stack |
 
 ### Wie es weitergeht

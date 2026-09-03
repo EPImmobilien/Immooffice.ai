@@ -208,6 +208,21 @@ export default async function EinstellungenSeite() {
 
         <Karte>
           <KarteKopf>
+            <KarteTitel>Schnittstelle</KarteTitel>
+            <KarteBeschreibung>
+              Eigene REST-Schnittstelle mit Schlüssel je Anbindung, OpenAPI-Beschreibung
+              und signierten Rückrufen bei neuen Objekten, Kontakten und Terminen.
+            </KarteBeschreibung>
+          </KarteKopf>
+          <KarteInhalt>
+            <Link href="/einstellungen/schnittstelle" className="text-[13px] font-medium text-akzent hover:underline">
+              Zur Schnittstelle
+            </Link>
+          </KarteInhalt>
+        </Karte>
+
+        <Karte>
+          <KarteKopf>
             <KarteTitel>Zugänge</KarteTitel>
             <KarteBeschreibung>
               Wer im Unternehmen mit welcher Rolle arbeitet. Rechte werden

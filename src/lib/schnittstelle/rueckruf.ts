@@ -10,13 +10,7 @@ import { entschluesseln } from "@/integrationen/kern/zugangsdaten";
  * `<zeit>.<koerper>` signiert; der Empfaenger prueft mit seinem Geheimnis.
  */
 
-export const RUECKRUF_EREIGNISSE = ["objekt.angelegt", "kontakt.angelegt", "termin.angelegt"] as const;
-export type RueckrufEreignis = (typeof RUECKRUF_EREIGNISSE)[number];
-export const EREIGNIS_BEZEICHNUNG: Record<RueckrufEreignis, string> = {
-  "objekt.angelegt": "Objekt angelegt",
-  "kontakt.angelegt": "Kontakt angelegt",
-  "termin.angelegt": "Termin angelegt",
-};
+export { EREIGNIS_BEZEICHNUNG, RUECKRUF_EREIGNISSE, type RueckrufEreignis } from "./ereignisse";
 
 export function geheimnisErzeugen(): string {
   return `whsec_${randomBytes(32).toString("base64url")}`;

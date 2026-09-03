@@ -429,6 +429,40 @@ serverseitig; alle KI-Auslesungen über editierbare Formulare.
 schützt davor, dass umstrittene Module Arbeitszeit vor den unstrittigen
 binden.
 
+### E-2026-09-03-37 — API-Schlüssel: Hash statt Klartext, Rechte je Bereich, Limit je Schlüssel
+
+**Frage:** Wie werden Schlüssel der eigenen Schnittstelle gespeichert, und wie
+fein sind die Rechte?
+
+**Entscheidung:** Der Schlüssel (`io_` + 32 Byte Zufall) wird nur als SHA-256
+gespeichert und beim Anlegen genau einmal gezeigt; die ersten elf Zeichen
+bleiben als Wiedererkennung lesbar. Rechte gelten je Bereich (Objekte,
+Kontakte, Termine) in drei Stufen. Das Ratenlimit (Vorgabe 600 je Minute,
+5.4 des Auftrags) ist je Schlüssel einstellbar und wird in der Datenbank
+je Minute gezählt. Die Route Handler arbeiten mit der Dienstrolle und filtern
+jede Abfrage nach dem Mandanten des Schlüssels; im Lesemodus des Mandanten
+sind nur Leseanfragen erlaubt.
+
+**Begründung:** Ein Schlüssel ist kein Supabase-Benutzer; die Mandantentrennung
+muss deshalb in der Serverschicht liegen und ist durch den Datenbank-Nachweis
+abgesichert (fremder Mandant sieht nichts, Hash nicht lesbar).
+
+### E-2026-09-03-38 — Rückrufe signiert, Wiederholung mit wachsendem Abstand
+
+**Frage:** Wie erfährt ein Fremdsystem von neuen Datensätzen, und wie sicher
+ist das?
+
+**Entscheidung:** Trigger auf `objekte`, `kontakte`, `termine` reihen je
+aktivem Ziel des Mandanten einen Rückruf ein. Der Hintergrund-Arbeiter stellt
+zu (zehn Sekunden Zeitlimit je Lieferung), signiert mit HMAC-SHA256 über
+`<zeit>.<körper>`, Geheimnis je Ziel verschlüsselt gespeichert. Fehlschläge
+werden mit 2^n Minuten (höchstens 60) bis zu acht Mal wiederholt, danach
+„gescheitert“ mit manueller Wiederholung. Ziele nur über https.
+
+**Begründung:** Signatur mit Zeitstempel verhindert Fälschung und
+Wiedereinspielung; die Wiederholung in der Datenbank überlebt Neustarts des
+Arbeiters.
+
 ### E-2026-09-03-13 — Credit-Werte bleiben die der Datenbank
 
 **Frage:** S4 nennt Startwerte (Exposétext 5, Kurztext 2, Bild 3 je Bild,
