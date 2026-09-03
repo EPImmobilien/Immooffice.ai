@@ -496,6 +496,52 @@ ungeprüft.
 Schlüssel), Grundprinzip 3 des Funktionsprompts wird eingehalten, und die
 Anwendung bleibt ohne Modellzugang benutzbar.
 
+### E-2026-09-03-41 — Mietanfragen als eigene Tabelle, Selbstauskunft ohne Konto über Token-Link
+
+**Frage:** Werden Mietinteressenten direkt als Kontakte angelegt, und wie
+kommt die Mieterselbstauskunft ins System?
+
+**Entscheidung:** Mietanfragen sind eine eigene Tabelle (`mietanfragen`) mit
+Quelle (manuell, Postfach/Portal, Selbstauskunft, Web-Exposé, Schnittstelle),
+Bewertung, Statusfolge und den Angaben der Selbstauskunft. Ein Kontakt
+entsteht erst auf Klick („Als Kontakt anlegen“) oder beim Mietvertrag. Die
+Selbstauskunft füllen Interessenten über einen öffentlichen Token-Link
+(`/selbstauskunft/<token>`, je Objekt oder allgemein, deaktivierbar) ohne
+Konto aus; die Verarbeitung läuft serverseitig mit Dienstrolle, geprüft gegen
+Token, Aktiv-Schalter und ein Ratenlimit je Absender. Antwortvorlagen liegen
+als Standard im Code und lassen sich je Mandant in `antwortvorlagen`
+überschreiben; Platzhalter werden serverseitig ersetzt.
+
+**Begründung:** Anfragen kommen zu Dutzenden je Objekt, die meisten enden mit
+einer Absage — sie würden die Kontaktliste verstopfen (Funktionsprompt:
+Objekt als Drehkreuz, keine Insellösungen; Referenz-Kachel Vermietung). Das
+Formular ohne Konto ist kein Kundenportal im Sinne der Abgrenzung: kein Login,
+kein Zugriff auf Mandantendaten, nur ein Einreichweg wie das Web-Exposé.
+Personenbezogene Angaben (Einkommen, Schufa) werden nur gespeichert, wenn der
+Interessent sie bestätigt; sie gehen nicht an KI-Anbieter.
+
+### E-2026-09-03-42 — Reservierung: Objektstatus per Datenbank-Trigger, eine aktive je Objekt, Vereinbarung als Vertrag
+
+**Frage:** Wie folgt der Objektstatus einer Reservierung, und wie wird die
+Reservierungsvereinbarung unterschrieben?
+
+**Entscheidung:** Ein Trigger auf `reservierungen` setzt das Objekt bei
+„aktiv“ auf `reserviert` und bei Ablauf/Aufhebung zurück auf `aktiv`; ein
+Teil-Unique-Index erlaubt nur eine aktive Reservierung je Objekt.
+„Abgeschlossen“ setzt das Objekt auf `verkauft` (Serveraktion). Abgelaufene
+Fristen schließt `reservierungen_ablaufen()` im Tagesjob. Die Vereinbarung
+entsteht als Vertrag der Art `reservierungsvereinbarung` und nutzt den
+vorhandenen Signaturlink; ihr Text warnt vor unangemessen hohen Gebühren
+(§ 307 BGB) und verlangt anwaltliche Prüfung. Mietverträge folgen demselben
+Muster: Formulardaten in `mietvertraege`, der erzeugte Text als Vertrag der
+Art `mietvertrag`; „unterzeichnet“ setzt das Objekt auf `vermietet`.
+
+**Begründung:** Der Status muss auch dann stimmen, wenn eine Reservierung über
+die Schnittstelle oder einen Connector entsteht — deshalb Datenbank statt
+Oberfläche (Masterprompt: Regeln serverseitig erzwingen). Ein zweiter
+Signaturweg wäre eine Insellösung; die Vertragsinfrastruktur (Textform,
+Signaturvorgänge, PDF) existiert bereits.
+
 ### E-2026-09-03-13 — Credit-Werte bleiben die der Datenbank
 
 **Frage:** S4 nennt Startwerte (Exposétext 5, Kurztext 2, Bild 3 je Bild,

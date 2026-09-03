@@ -36,6 +36,8 @@ const OEFFENTLICH = [
   // Die eigene Schnittstelle (docs/AUTONOMIE.md 5.4) prueft ihren Schluessel
   // selbst; eine Weiterleitung zur Anmeldung waere fuer ein Fremdsystem Unsinn.
   "/api/v1",
+  // Mieterselbstauskunft: Interessenten fuellen sie ohne Konto aus.
+  "/selbstauskunft",
 ];
 
 function istOeffentlich(pfad: string): boolean {

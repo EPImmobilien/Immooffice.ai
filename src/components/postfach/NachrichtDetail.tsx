@@ -16,6 +16,7 @@ import {
   nachrichtZuordnen,
   type PostfachErgebnis,
 } from "@/server/postfach-aktionen";
+import { nachrichtAlsAnfrage, type VermietungErgebnis } from "@/server/vermietung-aktionen";
 
 import {
   adresseAnzeigen,
@@ -54,6 +55,7 @@ export function NachrichtDetail({ nachricht, anhaenge, objekt, kontakt, vorschla
   const [zuordnung, zuordnen, ordnetZu] = useActionState<PostfachErgebnis, FormData>(nachrichtZuordnen, {});
   const [versand, senden, sendet] = useActionState<PostfachErgebnis, FormData>(nachrichtSenden, {});
   const [entwurf, entwerfen, entwirft] = useActionState<PostfachErgebnis, FormData>(antwortEntwerfen, {});
+  const [anfrage, alsAnfrage, uebernimmt] = useActionState<VermietungErgebnis, FormData>(nachrichtAlsAnfrage, {});
   const [antwortOffen, setAntwortOffen] = useState(false);
   // Ein neuer Entwurf oeffnet die Antwort und ersetzt den Text (Textarea wird per key neu aufgebaut).
   const antwortSichtbar = antwortOffen || Boolean(entwurf.entwurf);
@@ -95,13 +97,25 @@ export function NachrichtDetail({ nachricht, anhaenge, objekt, kontakt, vorschla
           <dd className="text-text">{zeitpunkt(nachricht.gesendet_am)}</dd>
         </dl>
         {darfAendern && (
-          <form action={nachrichtGelesen}>
-            <input type="hidden" name="nachricht_id" value={nachricht.id} />
-            <input type="hidden" name="gelesen" value={nachricht.gelesen ? "0" : "1"} />
-            <Button type="submit" variante="leise" groesse="klein">
-              {nachricht.gelesen ? "Als ungelesen markieren" : "Als gelesen markieren"}
-            </Button>
-          </form>
+          <div className="flex flex-wrap items-center gap-2">
+            <form action={nachrichtGelesen}>
+              <input type="hidden" name="nachricht_id" value={nachricht.id} />
+              <input type="hidden" name="gelesen" value={nachricht.gelesen ? "0" : "1"} />
+              <Button type="submit" variante="leise" groesse="klein">
+                {nachricht.gelesen ? "Als ungelesen markieren" : "Als gelesen markieren"}
+              </Button>
+            </form>
+            {nachricht.ordner === "eingang" && (
+              <form action={alsAnfrage}>
+                <input type="hidden" name="nachricht_id" value={nachricht.id} />
+                <Button type="submit" variante="leise" groesse="klein" laedt={uebernimmt}>Als Mietanfrage übernehmen</Button>
+              </form>
+            )}
+            {anfrage.fehler && <span className="text-[12px] text-fehler">{anfrage.fehler}</span>}
+            {anfrage.erfolg && anfrage.id && (
+              <Link href={`/vermietung/anfragen/${anfrage.id}`} className="text-[12px] text-akzent hover:underline">{anfrage.erfolg} Zur Anfrage</Link>
+            )}
+          </div>
         )}
       </header>
 

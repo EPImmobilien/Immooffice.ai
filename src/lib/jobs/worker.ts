@@ -125,15 +125,17 @@ export async function tagesarbeiten(): Promise<{
   abos: Record<string, unknown>;
   postfaecher: number;
   aufgeraeumt: number;
+  reservierungen: number;
   waechter: string | null;
   rueckrufe: { zugestellt: number; gescheitert: number } | string;
 }> {
   const supabase = dienstClient();
-  const [einplaner, abos, postfaecher, aufgeraeumt] = await Promise.all([
+  const [einplaner, abos, postfaecher, aufgeraeumt, reservierungen] = await Promise.all([
     supabase.rpc("sync_faellige_einplanen"),
     supabase.rpc("abos_pruefen"),
     supabase.rpc("postfaecher_faellige_einplanen"),
     supabase.rpc("nachrichten_aufraeumen"),
+    supabase.rpc("reservierungen_ablaufen"),
   ]);
   let waechter: string | null = null;
   try {
@@ -152,6 +154,7 @@ export async function tagesarbeiten(): Promise<{
     abos: (abos.data as Record<string, unknown> | null) ?? {},
     postfaecher: typeof postfaecher.data === "number" ? postfaecher.data : 0,
     aufgeraeumt: typeof aufgeraeumt.data === "number" ? aufgeraeumt.data : 0,
+    reservierungen: typeof reservierungen.data === "number" ? reservierungen.data : 0,
     waechter,
     rueckrufe,
   };

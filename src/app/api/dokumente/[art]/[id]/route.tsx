@@ -10,6 +10,7 @@ import { logoLaden } from "@/lib/expose/logo-laden";
 import { serverClient } from "@/lib/supabase/server";
 import { laufzettelAlsDokument, laufzettelAusDaten, type Anhang } from "@/lib/verkauf/laufzettel";
 import { protokollAlsDokument, protokollAusZeile, protokollTitel } from "@/lib/verkauf/uebergabe";
+import { mietvertragAusZeile, mietvertragText, mietvertragTitel } from "@/lib/vermietung/mietvertrag";
 import { MUSTER_HINWEIS, VERTRAGSARTEN, type Vertragsart } from "@/lib/vertraege";
 
 export const runtime = "nodejs";
@@ -80,6 +81,12 @@ export async function GET(anfrage: Request, { params }: { params: Promise<{ art:
     if (!l) return NextResponse.json({ fehler: "Nicht gefunden." }, { status: 404 });
     dokument = laufzettelAlsDokument(laufzettelAusDaten(l.daten), (Array.isArray(l.anhaenge) ? l.anhaenge : []) as Anhang[]);
     dateiname = `Notar-Laufzettel_${(l.bezeichnung as string).replace(/[^a-zA-Z0-9äöüÄÖÜß._-]+/g, "_").slice(0, 60)}`;
+  } else if (art === "mietvertrag") {
+    const { data: m } = await supabase.from("mietvertraege").select("*").eq("id", id).eq("mandant_id", sitzung.mandantId).maybeSingle();
+    if (!m) return NextResponse.json({ fehler: "Nicht gefunden." }, { status: 404 });
+    const d = mietvertragAusZeile(m as Record<string, unknown>);
+    dokument = textZuDokument(mietvertragTitel(d), mietvertragText(d), m.status === "entwurf" ? "ENTWURF" : MUSTER_HINWEIS);
+    dateiname = mietvertragTitel(d).replace(/[^a-zA-Z0-9äöüÄÖÜß._-]+/g, "_").slice(0, 80);
   } else {
     return NextResponse.json({ fehler: "Unbekannte Dokumentart." }, { status: 404 });
   }

@@ -80,7 +80,7 @@ in `docs/STATUS.md`.
 | Objektbewertung | ✓ (Wertermittlung) | — |
 | Objektaufnahme vor Ort | ✓ | — |
 | Übergabeprotokoll (Stammdaten, Schlüssel, Zähler mit KI-Auslesung, Räume mit Fotos, Sonstiges, Unterschriften, PDF) | ✓ (Raumfotos über Objektunterlagen) | V1 |
-| Reservierungen (Neubau) | ✗ | P2 |
+| Reservierungen (Neubau) | ✓ (Reservierungen mit Frist, Gebühr, Vereinbarung, Objektstatus) | M1 |
 | Notar-Laufzettel (8 Schritte: Immobilie, Verkäufer, Käufer, Kaufpreis, Sonstiges, Anhänge mit KI, Beauftragung, Abschluss PDF/Word/ZIP) | ✓ (PDF/Word; kein ZIP) | V2 |
 | Notar-Anschreiben, Behördenanfragen | ◐ (Anschreiben ✓, Behördenanfragen → R1) | V2 |
 | Maklervertrag aus PDF importieren (KI) | ✓ | V1 |
@@ -91,9 +91,9 @@ in `docs/STATUS.md`.
 
 | Funktion | Stand | Paket |
 |---|---|---|
-| Mietanfragen aus Portalen (Mail-Parser) und Selbstauskunft-Formular | ✗ | M1 |
-| Bewertung der Anfrage, Antwortvorlagen | ✗ | M1 |
-| Mietverträge inkl. Neubau-Klausel, PDF | ✗ | M1 |
+| Mietanfragen aus Portalen (Mail-Parser) und Selbstauskunft-Formular | ✓ (Parser auf Klick im Postfach; Selbstauskunft über Token-Link) | M1 |
+| Bewertung der Anfrage, Antwortvorlagen | ✓ | M1 |
+| Mietverträge inkl. Neubau-Klausel, PDF | ✓ (PDF, Word, Signaturlink) | M1 |
 | Übergabeprotokolle Ein-/Auszug | ✓ | V1 |
 
 ## Kachel 8 — Exposé-Schmiede
@@ -187,7 +187,7 @@ in `docs/STATUS.md`.
 | S1 | Schnittstellen-Oberfläche (Schlüssel, Rückrufe) | #21 |
 | V1 | Verkauf: Vollmacht, Word-Export, Objektnachweis, Übergabe-Assistent, Vertrag aus PDF, Vorunterzeichnung, Kontaktrollen | #22 |
 | V2 | Notar-Laufzettel, Notar-Anschreiben, Kaufabwicklung | #22 |
-| M1 | Vermietung: Mietanfragen, Selbstauskunft, Mietverträge | #23 |
+| M1 | Vermietung: Mietanfragen, Selbstauskunft, Mietverträge, Reservierungen | #23 |
 | A1/A2 | Akquise | #24 |
 | N1 | ToDos-Ausbau, Notizen-Dashboard, Checklisten, Tutorial, globale Suche, Profil, Korrektur | #25 |
 | R1 | Rechnungen, Geschäftsbriefe, Stammdaten-Ausbau | #26 |

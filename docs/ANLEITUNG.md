@@ -416,6 +416,51 @@ für die KI-Auslesungen — der Modellzugang (Abschnitt 7). So arbeiten Kunden:
    (5 Credits je Dokument). Status: Entwurf → Bereit → An Notar versendet →
    Abgeschlossen.
 
+## 10c. Vermietung — Mietanfragen, Selbstauskunft, Mietverträge, Reservierungen
+
+Keine Einrichtung nötig. Für den Versand der Antworten aus der Anwendung heraus
+braucht der Kunde ein Postfach (Abschnitt 9); ohne Postfach öffnet die Antwort
+das E-Mail-Programm. So arbeiten Kunden (Menü „Vermietung“):
+
+1. **Mietanfragen erfassen:** Telefonische Anfragen über „Anfrage erfassen“
+   (Name, E-Mail, Mietobjekt, Einzug ab). E-Mails aus Portalen übernimmt der
+   Kunde im Postfach mit „Als Mietanfrage übernehmen“ — Name, Telefon, Objekt
+   und Nachricht werden aus der Portal-Mail erkannt und bleiben editierbar.
+2. **Selbstauskunft-Formular:** Unter Mietanfragen → „Selbstauskunft-Formular“
+   einen Link je Objekt oder einen allgemeinen Link anlegen und an
+   Interessenten schicken (Vorlage „Selbstauskunft anfordern“ setzt den Link
+   automatisch ein). Interessenten füllen die Mieterselbstauskunft ohne Konto
+   aus; das Ergebnis erscheint als Anfrage mit Quelle „Selbstauskunft“. Links
+   lassen sich jederzeit deaktivieren.
+3. **Anfrage bearbeiten:** Bewertung (1–5 Sterne, Vorschlag aus Einkommen,
+   Schufa, Kaution), Status (Neu → In Prüfung → Besichtigung geplant →
+   Besichtigung erfolgt → Unterlagen angefordert → Zusage/Absage → Vertrag),
+   Notizen, „Als Kontakt anlegen“.
+4. **Antworten:** Vorlage wählen (Eingang, Besichtigung mit Termin,
+   Selbstauskunft, Unterlagen, Zusage, Absage), „Text erzeugen“, Text prüfen,
+   „Über Postfach senden“ oder im E-Mail-Programm öffnen und „Als gesendet
+   vermerken“. Der Status zieht nach (Termin → Besichtigung geplant). Vorlagen
+   passt der Administrator je Unternehmen an; Platzhalter stehen daneben.
+5. **Mietvertrag:** Aus der Anfrage („Mietvertrag erstellen“) oder unter
+   Mietverträge → „Anlegen“. Objekt, Miete, Kaution und Eigentümer (aus der
+   Objektakte) sind vorbelegt, der Mieter aus der Anfrage. Vermieter und Mieter
+   als Einzelperson, Eheleute, mehrere Personen, Erbengemeinschaft oder Firma;
+   Mietbeginn, Befristung, Kündigungsausschluss, Neubau-Klausel (§ 7,
+   Fertigstellungsvorbehalt), Bankverbindung, besondere Vereinbarungen. Die
+   Kaution ist auf drei Grundmieten begrenzt (§ 551 BGB). „Speichern“, dann
+   „Vertragstext erzeugen und zur Unterschrift“ — der Text wird als Vertrag
+   angelegt und über den Signaturlink unterschrieben. PDF und Word jederzeit.
+   „Als unterzeichnet markieren“ setzt das Objekt auf „Vermietet“.
+6. **Reservierungen** (auch für Kaufobjekte): Objekt und Interessent wählen,
+   Frist (Vorgabe vier Wochen), Gebühr und ob sie auf die Provision angerechnet
+   wird. Status „Aktiv“ setzt das Objekt sofort auf „Reserviert“; die
+   Reservierungsvereinbarung entsteht als Vertrag (Signaturlink). Je Objekt ist
+   nur eine aktive Reservierung möglich. Abgelaufene Fristen werden vom
+   Tagesjob auf „Abgelaufen“ gesetzt, das Objekt geht auf „Aktiv“ zurück.
+   „Abgeschlossen“ setzt das Objekt auf „Verkauft“, „Aufheben“ verlangt einen
+   Grund. Alle Vertragstexte sind Muster ohne Rechtsberatung — der Hinweis auf
+   die anwaltliche Prüfung steht im Text.
+
 ## 11. Was Sie an Gate A und Gate B entscheiden
 
 - **Gate A** (bereits erreicht): Bestandsaufnahme, Funktionsmatrix, Architektur

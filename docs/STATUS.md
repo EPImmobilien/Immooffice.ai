@@ -5,6 +5,56 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 04.09.2026 (Paket 8) — Vermietung: Mietanfragen, Selbstauskunft, Antwortvorlagen, Mietverträge, Reservierungen
+
+**Branch:** `claude/autonomie-integrations-prompt-rl2qkr` · Referenz-Kachel „Vermietung“ und „Reservierungen“ nach `docs/FUNKTIONSABGLEICH.md` (M1)
+
+### Erledigt (Migration `20260904100000_vermietung.sql`, im Projekt ausgerollt, 24 Nachweise grün)
+
+- **Mietanfragen** (`/vermietung/anfragen`): Erfassen von Hand, Übernahme aus
+  dem Postfach („Als Mietanfrage übernehmen“ mit Portal-Mail-Parser), Quelle,
+  Bewertung 1–5 mit Vorschlag, Statusfolge Neu → … → Zusage/Absage → Vertrag,
+  Notizen, „Als Kontakt anlegen“, Mietvertrag direkt aus der Anfrage.
+- **Selbstauskunft-Formular** ohne Konto über Token-Link je Objekt oder
+  allgemein (`/selbstauskunft/<token>`), deaktivierbar, Ratenlimit; Ergebnis
+  landet als Anfrage mit Quelle „Selbstauskunft“.
+- **Antwortvorlagen** (Eingang, Besichtigung mit Termin, Selbstauskunft mit
+  Link, Unterlagen, Zusage, Absage) mit Platzhaltern, je Mandant
+  überschreibbar; Versand über Postfach oder E-Mail-Programm, „Als gesendet
+  vermerken“ zieht den Status nach.
+- **Mietverträge** (`/vermietung/mietvertraege`): Vermieter/Mieter als
+  Einzelperson, Eheleute, mehrere, Erbengemeinschaft, Firma; Objektangaben,
+  Eigentümer und Miete aus der Objektakte, Mieter aus der Anfrage;
+  Befristung, Kündigungsausschluss, Neubau-Klausel, Kaution mit § 551-Grenze,
+  Bankverbindung, besondere Vereinbarungen; PDF und Word; Vertragstext als
+  Vertrag zur Unterschrift über den Signaturlink; „unterzeichnet“ setzt das
+  Objekt auf „Vermietet“.
+- **Reservierungen** (`/vermietung/reservierungen`): Objekt, Interessent,
+  Frist, Gebühr (anrechenbar/nicht, bezahlt am), Notiz; Objektstatus über
+  Datenbank-Trigger (reserviert ↔ aktiv), nur eine aktive je Objekt,
+  Vereinbarung als Vertrag, Ablauf im Tagesjob (`reservierungen_ablaufen`),
+  Abschluss setzt „Verkauft“, Aufhebung mit Grund.
+- **Ende-zu-Ende gegen den lokalen Stack:** Anfrage angelegt, Antwort mit
+  Termin erzeugt und vermerkt (Status „Besichtigung geplant“), Selbstauskunft-
+  Link angelegt und öffentlich ausgefüllt (Anfrage erscheint), Mietvertrag aus
+  der Anfrage mit Vorbelegung, gespeichert, PDF 200, Word 200, Vertragstext
+  erzeugt (Neubau-Klausel, Kündigungsausschluss), unterzeichnet → Objekt
+  „Vermietet“; Reservierung angelegt (Vereinbarung als Vertrag),
+  Doppelreservierung abgewiesen, Gebühr bezahlt, abgeschlossen → Objekt
+  „Verkauft“; Ablauffunktion setzt das Objekt zurück auf „Aktiv“.
+- Prüfstand: Typecheck, Lint, 389 Unit-Tests, 394 Datenbank-Nachweise lokal,
+  Marken-Scan, Produktions-Build.
+
+### Nicht erledigt — und warum
+
+| Punkt | Grund |
+|---|---|
+| Automatische Zuordnung eingehender Portal-Mails ohne Klick | der Parser läuft heute auf Klick im Postfach; eine Regel „Portal-Mails automatisch als Anfrage“ folgt mit den Automationen (A2) |
+| Mietvertrags-Prüfer (KI) | Werkzeuge-Paket W2 |
+| Web-Exposé-Anfrageformular als Quelle | Quelle ist vorgesehen (`web_expose`); das Formular im Web-Exposé kommt mit dem Exposé-Paket |
+
+---
+
 ## 04.09.2026 (Paket 7) — Verkauf: Vertragsvorlagen, Vollmacht, Objektnachweis, Übergabeprotokoll, Notar-Laufzettel, Vertragsimport
 
 **Branch:** `claude/autonomie-integrations-prompt-rl2qkr` · Referenz-Kachel „Verkauf“ nach `docs/FUNKTIONSABGLEICH.md` (V1, V2)
