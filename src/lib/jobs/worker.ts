@@ -9,6 +9,8 @@ import { syncAusfuehren, type LaufEingabe } from "@/integrationen/kern/lauf";
 import { connectorFinden } from "@/integrationen/kern/registry";
 import { SpeicherSupabase } from "@/integrationen/kern/speicher-supabase";
 import { objektEntschluesseln } from "@/integrationen/kern/zugangsdaten";
+import { mailSenden } from "@/lib/mail/versand";
+import { istVorlage, vorlage } from "@/lib/mail/vorlagen";
 import { dienstClient } from "@/lib/supabase/dienst";
 
 import { istSyncNutzlast, type JobZeile } from "./typen";
@@ -98,9 +100,57 @@ async function auftragAusfuehren(
   switch (job.art) {
     case "sync":
       return syncAuftrag(supabase, job, fetchFn);
+    case "mail":
+      return mailAuftrag(supabase, job, fetchFn);
     default:
       throw new Error(`Fuer Auftraege der Art „${job.art}" gibt es noch keinen Arbeiter.`);
   }
+}
+
+/**
+ * Tagesarbeiten vor dem Beanspruchen: faellige Abgleiche einplanen und die
+ * Abo-Zustaende pruefen (Lesemodus, Erinnerungen, Benutzerlimit). Beides
+ * ist idempotent und billig; ein Fehler hier haelt die Warteschlange nicht an.
+ */
+export async function tagesarbeiten(): Promise<{ eingeplant: number; abos: Record<string, unknown> }> {
+  const supabase = dienstClient();
+  const [einplaner, abos] = await Promise.all([
+    supabase.rpc("sync_faellige_einplanen"),
+    supabase.rpc("abos_pruefen"),
+  ]);
+  return {
+    eingeplant: typeof einplaner.data === "number" ? einplaner.data : 0,
+    abos: (abos.data as Record<string, unknown> | null) ?? {},
+  };
+}
+
+/** Erinnerungsmail (S2, S3): Vorlage rendern und versenden. */
+async function mailAuftrag(
+  supabase: SupabaseClient,
+  job: JobZeile,
+  fetchFn: typeof globalThis.fetch,
+): Promise<Record<string, unknown>> {
+  const n = job.nutzlast;
+  const an = typeof n["an"] === "string" ? n["an"] : null;
+  if (!an || !istVorlage(n["vorlage"])) throw new Error("Mail-Auftrag ohne Empfaenger oder mit unbekannter Vorlage.");
+
+  const { data: mandant } = await supabase
+    .from("mandanten")
+    .select("name, testphase_bis, loeschung_geplant_am")
+    .eq("id", job.mandant_id)
+    .maybeSingle();
+  if (!mandant) throw new Error("Mandant nicht gefunden.");
+
+  const basis = (process.env["NEXT_PUBLIC_APP_URL"] ?? "").replace(/\/+$/, "");
+  const inhalt = vorlage(n["vorlage"], {
+    unternehmen: mandant.name as string,
+    testphaseBis: (mandant.testphase_bis as string | null) ?? null,
+    loeschungAm: (mandant.loeschung_geplant_am as string | null) ?? null,
+    aboAdresse: `${basis}/credits`,
+  });
+
+  const ergebnis = await mailSenden({ an, betreff: inhalt.betreff, text: inhalt.text }, fetchFn);
+  return { vorlage: n["vorlage"], versand_id: ergebnis.id };
 }
 
 /**

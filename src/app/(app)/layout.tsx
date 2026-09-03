@@ -48,6 +48,14 @@ export default async function AppLayout({
     .maybeSingle();
   const stil = mandantenStil(marke?.farbe_primaer ?? null, marke?.farbe_akzent ?? null);
 
+  // Lesemodus (docs/AUTONOMIE.md S3): Die Datenbank erzwingt ihn; der Rahmen
+  // sagt nur, warum gerade nichts gespeichert werden kann.
+  const { data: zustandRoh } = await supabase.rpc("mandant_zustand");
+  const zustand = (Array.isArray(zustandRoh) ? zustandRoh[0] : null) as
+    | { schreibbar: boolean; loeschung_geplant_am: string | null }
+    | null;
+  const lesemodus = zustand ? !zustand.schreibbar : false;
+
   return (
     <div className="min-h-screen bg-grund" style={stil}>
       <header className="sticky top-0 z-20 border-b border-linie bg-flaeche">
@@ -87,7 +95,22 @@ export default async function AppLayout({
           </div>
         </aside>
 
-        <main className="min-w-0 flex-1">{children}</main>
+        <main className="min-w-0 flex-1">
+          {lesemodus && (
+            <div className="mb-5 rounded-[var(--radius)] border border-warnung/25 bg-warnung-schwach px-4 py-3 text-[13px] text-warnung">
+              <span className="font-medium">Lesemodus.</span> Ansehen und Exportieren
+              funktionieren; Anlegen und Ändern erst wieder mit einem Tarif
+              {zustand?.loeschung_geplant_am
+                ? ` — ohne Tarif werden die Daten am ${new Date(zustand.loeschung_geplant_am).toLocaleDateString("de-DE")} gelöscht`
+                : ""}
+              .{" "}
+              <Link href="/credits" className="underline underline-offset-2">
+                Tarif wählen
+              </Link>
+            </div>
+          )}
+          {children}
+        </main>
       </div>
     </div>
   );

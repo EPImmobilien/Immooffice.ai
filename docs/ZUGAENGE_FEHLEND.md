@@ -19,7 +19,7 @@ die Nachweise ausgeführt (`docs/STATUS.md`). Für alles andere gilt die Tabelle
 | `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD` | `supabase link`, `supabase db push` als Werkzeugkette des Auftraggebers | nichts Akutes — die Migrationen `20260903*` sind ausgerollt; die CLI-Kette bleibt für künftige Läufe einzurichten |
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anwendung gegen die Datenbank starten | lokaler Start, Endtest „Neuer Makler“ |
 | `SUPABASE_SERVICE_ROLE_KEY` | Einladung einlösen (Dienstrolle), Stripe-Rückrufe, Hintergrundjobs | Einlösen von Einladungen im Betrieb |
-| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Phase 3: Tarife, Kundenportal, Rückrufe im Testmodus | Modul Abo (Phase 3) |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Phase 3: Tarife, Abrechnungsportal, Rückrufe im Testmodus | Modul Abo (Phase 3) |
 | `OPENAI_API_KEY` bzw. `ANTHROPIC_API_KEY` | KI-Texte, Bildbearbeitung | KI-Erzeugung; die Anwendung kennzeichnet fehlende KI (`src/lib/ki/ohne-ki.ts`) |
 | `MAIL_API_KEY`, `MAIL_ABSENDER` | Transaktionsmails: Einladungen, Testphasen-Erinnerungen | automatischer Versand von Einladungslinks — bis dahin Link zum Kopieren (E-2026-09-03-07) |
 | `GOOGLE_CLIENT_ID/SECRET`, `MICROSOFT_CLIENT_ID/SECRET/TENANT_ID` | Phase 4: Postfächer, Kalender, Anmeldung über Google/Microsoft | Modul Postfächer (Phase 4) |

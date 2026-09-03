@@ -169,19 +169,42 @@ Netlify ruft den Arbeiter danach von selbst jede Minute auf
    „EU data residency" verfügbar ist, und es einschalten, falls ja.
 3. Optional dasselbe bei console.anthropic.com für `ANTHROPIC_API_KEY=`.
 
-## 8. Stripe — Abrechnung (erst Phase 3, im Testmodus)
+## 8. Stripe — Abrechnung (Phase 3, im Testmodus)
 
 1. Auf stripe.com ein Konto anlegen. Der Umschalter „Test mode" oben rechts
-   bleibt **eingeschaltet**, bis die Entwicklung Gate B meldet.
-2. **Developers** → **API keys**: „Secret key" hinter `STRIPE_SECRET_KEY=`,
-   „Publishable key" hinter `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=`.
-3. Alles Weitere (Produkte, Preise, Webhook, Kundenportal) legt die
-   Entwicklung im Testmodus an und trägt die Preis-IDs in `.env.local` ein.
-4. **Vor der Liveschaltung** (nach Gate B) müssen Sie selbst: **Settings** →
+   bleibt **eingeschaltet**, bis Gate B freigegeben ist.
+2. **Developers** → **API keys**: „Secret key" (beginnt mit `sk_test_`) hinter
+   `STRIPE_SECRET_KEY=`, „Publishable key" hinter
+   `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=`.
+3. **Steuer einschalten (Testmodus):** **Settings** → **Tax** → „Enable"; als
+   Ursprungsland Deutschland, Registrierung für Deutschland hinzufügen. Ohne
+   diesen Schritt lehnt Stripe den Checkout ab, weil die Anwendung Stripe Tax
+   verlangt (Umsatzsteuer 19 %, Reverse-Charge mit USt-IdNr.).
+4. Produkte, Preise und Abrechnungsportal (bei Stripe „Customer Portal“) legt ein Skript aus den Werten der
+   Datenbank an. In der Eingabeaufforderung im Projektordner:
+   `node --env-file=.env.local scripts/stripe-einrichten.mjs`
+   Das Skript ist wiederholbar; es legt nichts doppelt an.
+5. **Webhook:** **Developers** → **Webhooks** → **Add endpoint**. Endpoint URL:
+   `https://immooffice.ai/api/stripe/webhook` (für die Deploy-Vorschau die
+   jeweilige Vorschau-Adresse). Bei „Select events" diese fünf auswählen:
+   `checkout.session.completed`, `customer.subscription.created`,
+   `customer.subscription.updated`, `customer.subscription.deleted`,
+   `invoice.paid`, `invoice.payment_failed` → **Add endpoint**. Danach oben
+   „Signing secret" → **Reveal** → kopieren → hinter `STRIPE_WEBHOOK_SECRET=`
+   und ebenso bei Netlify als Umgebungsvariable.
+6. Bei Netlify außerdem `STRIPE_SECRET_KEY` und
+   `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` als Umgebungsvariablen eintragen
+   (Site configuration → Environment variables).
+7. **Probebuchung:** In der Anwendung unter „Abo und Credits" einen Tarif
+   buchen, bei Stripe die Testkarte `4242 4242 4242 4242` mit beliebigem
+   Datum in der Zukunft eingeben. Nach wenigen Sekunden zeigt die Seite den
+   Tarif als aktiv und das Monatskontingent als Gutschrift.
+8. **Vor der Liveschaltung** (nach Gate B) müssen Sie selbst: **Settings** →
    **Business** → alle Unternehmensangaben ausfüllen, ein Bankkonto für
-   Auszahlungen hinterlegen und unter **Settings** → **Tax** die
-   Steuererfassung aktivieren. Dann teilen Sie der Entwicklung mit, dass der
-   Livemodus freigegeben ist.
+   Auszahlungen hinterlegen, unter **Settings** → **Tax** die Steuererfassung
+   auch im Livemodus aktivieren, dann die Schritte 2, 4, 5 und 6 mit den
+   Live-Schlüsseln wiederholen. Dann teilen Sie mit, dass der Livemodus
+   freigegeben ist.
 
 ## 9. Postfächer und Kalender (Phase 4)
 

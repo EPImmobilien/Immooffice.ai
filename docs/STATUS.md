@@ -5,6 +5,102 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 03.09.2026 (Paket 3) — Phase 3: Abo, Testphase, Lesemodus, Stripe im Testmodus — **Gate B**
+
+**Branch:** `claude/autonomie-integrations-prompt-rl2qkr`
+
+Dieser Lauf endet hier: Gate B ist der zweite verbindliche Stopp (Masterprompt,
+`docs/AUTONOMIE.md` 0.4). Was der Auftraggeber prüfen und freigeben muss, steht
+unten unter „Gate B“.
+
+### Erledigt
+
+**Abo und Testphase (Migration `20260903150000_abo_und_stripe.sql`)**
+- Registrierung legt jetzt die Abo-Zeile (Testphase) und **100 Test-Credits**
+  an — bisher gab es beides nur auf dem Papier.
+- **Lesemodus** (S3): Nach der Testphase ohne Abo, bei Kündigung oder Sperre
+  erzwingt `intern.darf_schreiben()` das Lesen; Exportieren bleibt möglich.
+  Täglicher Lauf `abos_pruefen()` setzt Lesemodus, plant die Löschung (30 Tage)
+  und stellt die Erinnerungen als Mail-Aufträge ein (Tag 5, Tag 7, Tag 23, Tag 29).
+- **Benutzerlimit** (S1/S5): Testphase 1, sonst Tarif plus Zusatzbenutzer; beim
+  Einladen geprüft; nach einem Downgrade werden zum Abrechnungstag die zuletzt
+  angelegten Zugänge abgeschaltet — nie der Inhaber (Audit-Log).
+- Tabelle `preise` (Zusatzbenutzer, drei Credit-Pakete), Stripe-Preis-IDs in
+  der Datenbank statt in Umgebungsvariablen (E-20).
+- Getaktete Abgleiche: `sync_faellige_einplanen()` (Migration
+  `20260903140000`), vom Worker-Endpunkt bei jedem Aufruf ausgeführt.
+
+**Stripe (Testmodus)**
+- Webhook `POST /api/stripe/webhook`: Signaturprüfung, **Idempotenz** über
+  `stripe_ereignisse` (jedes Ereignis genau einmal; nach Fehlschlag erneut),
+  Ereignisse `checkout.session.completed`, `customer.subscription.*`,
+  `invoice.paid`, `invoice.payment_failed`. Zustandsübergänge ausschließlich in
+  Datenbankfunktionen; Inklusiv-Credits je Rechnung genau einmal, Pakete je
+  Zahlung genau einmal.
+- Checkout (Abo mit Zusatzbenutzern, Credit-Pakete) mit Stripe Tax, USt-IdNr.,
+  SEPA und Karte; Abrechnungsportal für Zahlungsmittel, Rechnungen, Tarifwechsel,
+  Kündigung (E-21). `scripts/stripe-einrichten.mjs` legt Produkte, Preise und
+  Portal aus den Datenbankwerten an.
+- Seite „Abo und Credits“ zeigt Zustand, Guthaben, Ledger, Tarife und Pakete;
+  ohne Stripe-Schlüssel bleiben die Schaltflächen mit Hinweis gesperrt.
+- Transaktionsmails (Erinnerungen) über die Resend-API; ohne `MAIL_API_KEY`
+  bleibt der Auftrag mit sprechendem Fehler sichtbar.
+
+**Nachweise**
+- `supabase/tests/abo.sql` (30 Prüfungen): Test-Credits, Schreiben in der
+  Testphase, Benutzerlimit, Idempotenz der Ereignisse, Abo-Übernahme,
+  Kontingent je Rechnung, Paket je Zahlung, Zahlung offen, Kündigung,
+  **Lesemodus wirkt in den Policies**, Tageslauf, Downgrade.
+- Unit-Tests für die Ereignisverarbeitung (10) und Mailvorlagen (3).
+- Lokal (`scripts/db-lokal.sh`): 31 Migrationen auf leerem Grund, **258 von
+  258 Nachweisen** bestanden; Typecheck, Lint, 294 Unit-Tests, Marken-Scan,
+  Produktions-Build grün.
+- Im Projekt `usguiggfciavwzkdfjgt`: beide Migrationen (`20260903140000`,
+  `20260903150000`) nach Trockenlauf mit Rollback ausgerollt und in
+  `schema_migrations` eingetragen; `abo.sql` dort **30 von 30** bestanden
+  (in einer zurückgerollten Transaktion).
+
+**Nachträge beim Abschluss**
+- Der Tageslauf konnte Zugänge nicht abschalten (Trigger gegen
+  Selbstermächtigung); gelöst über die Transaktionsmarke `intern.systemlauf`
+  (E-23).
+- Der vorhandene Mandant (angelegt 17.08.2026) hätte mit dem Lesemodus sofort
+  im Schreibschutz gestanden; Testphase bis 03.10.2026 verlängert (E-24).
+- „Kundenportal“ (Stripe) heißt im Code und in der Oberfläche jetzt
+  „Abrechnungsportal“, weil der Marken-Scan den Begriff als entfallenes Modul
+  meldet (E-25).
+
+### Gate B — bitte prüfen und freigeben
+
+1. **Kernflüsse vorführen** (Endtest „Neuer Makler“, Reihenfolge nach E-22):
+   Registrieren → Bestätigen → Onboarding → Tarif im Testmodus buchen →
+   Kollegin einladen → Erscheinungsbild → OpenImmo importieren → Exposé →
+   Web-Exposé. Dafür braucht es die Zugänge aus `docs/ANLEITUNG.md`
+   (Abschnitte 0–8) — insbesondere Netlify und die Stripe-Testschlüssel.
+2. **Cross-Tenant-Isolation:** Nachweise `rls-mandantentrennung.sql`,
+   `verweise-mandantenrein.sql`, `integrationen.sql`, `jobs.sql`,
+   `einladungen-und-audit.sql`, `abo.sql` — zusammen 258 Prüfungen, lokal und
+   gegen das Projekt bestanden (`scripts/db-lokal.sh`, GitHub Actions).
+3. **Preise freigeben:** Starter 29,99 / Professional 99,99 / Business 199,99 €
+   netto monatlich, Jahrespreis = zehn Monatsbeiträge, Zusatzbenutzer 14,99 €,
+   Pakete 250/1.000/3.000 Credits für 9,99/29,99/69,99 € — alles in `tarife`
+   und `preise` änderbar.
+4. **Rechtstexte:** AGB, Widerrufsbelehrung (Unternehmerkunden), Datenschutz-
+   erklärung, Auftragsverarbeitung, Vertragsmuster — **anwaltliche Prüfung
+   ist Pflicht** und von der Entwicklung nicht leistbar. Ohne diese Freigabe
+   bleibt Stripe im Testmodus.
+
+### Nicht erledigt — und warum
+
+| Punkt | Grund |
+|---|---|
+| Stripe-Produkte anlegen, Webhook registrieren, Probebuchung | kein Stripe-Testschlüssel in dieser Umgebung; Skript und Anleitung liegen bereit |
+| Endgültige Löschung nach 30 Tagen Lesemodus | Löschtermin und Warnmails sind gebaut; die Löschung selbst wird erst nach Gate B und mit dem Plattform-Admin (Abschnitt 15) freigeschaltet — ein automatischer Datenverlust ohne Betreiber-Einsicht wäre nicht vertretbar |
+| Gutscheine | Stripe-Promotion-Codes sind im Checkout erlaubt; eigene Gutscheinverwaltung folgt mit dem Plattform-Admin |
+| Missbrauchsschutz gegen Mehrfachregistrierung | E-Mail-Bestätigung ist Pflicht; Prüfung auf Wegwerfadressen und Ratenbegrenzung folgen in Phase 3 „Härtung“ |
+
+---
+
 ## 03.09.2026 (Paket 2) — Integrationen bedienbar, Auftragswarteschlange mit Wächter
 
 **Branch:** `claude/autonomie-integrations-prompt-rl2qkr`

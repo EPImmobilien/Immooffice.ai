@@ -152,6 +152,102 @@ sind keine Dublette. Ein automatisches Zusammenführen würde Datensätze
 verschmelzen, die nicht zusammengehören; die Entscheidung bleibt beim
 Nutzer, der die Liste vorher sieht.
 
+### E-2026-09-03-19 — Lesemodus wird in `intern.darf_schreiben()` erzwungen
+
+**Entscheidung:** Nach der Testphase ohne Abo (S3), bei Kündigung oder Sperre
+liefert `intern.darf_schreiben()` `false`. Damit greifen alle bestehenden
+Schreib-Policies ohne Änderung; `zahlung_offen` bleibt aus Kulanz schreibbar.
+Die Oberfläche zeigt nur noch, warum nichts gespeichert wird.
+
+**Begründung:** Rechte werden serverseitig und in der Datenbank erzwungen —
+ein Lesemodus, der nur Schaltflächen ausblendet, wäre kein Lesemodus.
+
+### E-2026-09-03-20 — Preise sind Daten: Tabelle `preise` plus Stripe-IDs in der Datenbank
+
+**Entscheidung:** Zusatzbenutzer und Credit-Pakete stehen in `preise`,
+Tarife in `tarife`; die Stripe-Preis-IDs stehen daneben und werden von
+`scripts/stripe-einrichten.mjs` angelegt und zurückgeschrieben. Die
+`STRIPE_PREIS_*`-Umgebungsvariablen entfallen.
+
+**Begründung:** Masterprompt Abschnitt 14: Preise, Limits und Credit-Werte
+müssen über den Plattform-Admin änderbar sein und dürfen nicht im Code
+verdrahtet werden. Umgebungsvariablen sind Code.
+
+### E-2026-09-03-21 — Tarifwechsel und Kündigung über das Stripe-Abrechnungsportal
+
+**Entscheidung:** Buchen läuft über Checkout, alles Weitere (Zahlungsmittel,
+Rechnungen, Tarifwechsel mit anteiliger Berechnung, Kündigung zum
+Periodenende) über das Abrechnungsportal. Die Anwendung erfährt jede Änderung nur
+über den Webhook.
+
+**Begründung:** S9 nennt das Abrechnungsportal ausdrücklich; eine eigene
+Wechsellogik würde die anteilige Berechnung und die Steuerlogik von Stripe
+nachbauen, ohne besser zu sein.
+
+### E-2026-09-03-22 — Testphase: ein Benutzer, Einladung erst mit Tarif
+
+**Frage:** Der Endtest in `docs/AUTONOMIE.md` Abschnitt 8 lädt „eine Kollegin
+ein“, bevor das Abo abgeschlossen wird; der Masterprompt begrenzt die
+Testphase auf einen Benutzer.
+
+**Entscheidung:** Das Benutzerlimit gilt beim Einladen (nicht erst beim
+Einlösen): In der Testphase ist kein zweiter Platz frei; die Meldung sagt, was
+zu tun ist. Der Endtest läuft in der Reihenfolge Tarif buchen → einladen.
+
+**Begründung:** Wer einladen kann, dessen Kollegin dann beim Einlösen
+abgewiesen wird, erlebt den Fehler an der schlimmsten Stelle. Die Zahl der
+Plätze ist eine Regel des Masterprompts.
+
+### E-2026-09-03-23 — Der Tageslauf schaltet Zugänge über eine Transaktionsmarke ab
+
+**Frage:** `abos_pruefen()` (Tageslauf, Dienstrolle) muss nach einem Downgrade
+überzählige Zugänge abschalten. Der Trigger `intern.pruefe_benutzer_aenderung()`
+erlaubt das nur Inhabern und Administratoren — der Tageslauf hat keine
+Benutzersitzung und scheiterte daran (Nachweis `abo.sql`, Prüfung 29).
+
+**Entscheidung:** `abos_pruefen()` setzt vor dem Abschalten die
+Transaktionsmarke `intern.systemlauf = 'ja'` (`set_config(…, true)`, gilt nur in
+dieser Transaktion) und löscht sie danach. Der Trigger lässt genau die Änderung
+von `aktiv` durch, wenn die Marke gesetzt ist; alle anderen Regeln (Rollen,
+Rechte, Inhaberschutz, eigener Zugang) bleiben unverändert.
+
+**Begründung:** Die Alternativen wären schlechter: den Trigger abschalten
+(Tabellensperre, Eigentümerrechte), die Dienstrolle pauschal freistellen (jeder
+Aufruf mit Service-Key dürfte dann Zugänge abschalten) oder das Abschalten in
+TypeScript nachbauen (Logik doppelt). Die Marke lässt sich über die API nicht
+setzen — sie entsteht nur in einer SQL-Funktion, die allein die Dienstrolle
+ausführen darf.
+
+### E-2026-09-03-24 — Testphase des vorhandenen Mandanten verlängert
+
+**Frage:** Im Projekt existiert ein Mandant, angelegt am 17.08.2026 vor dieser
+Phase; seine Testphase war am 24.08.2026 abgelaufen. Mit dem Lesemodus (E-19)
+wäre er beim Ausrollen sofort schreibgeschützt gewesen — ohne Möglichkeit, im
+Testmodus einen Tarif zu buchen, weil die Stripe-Schlüssel fehlen.
+
+**Entscheidung:** Die Testphase dieses einen Mandanten wurde beim Ausrollen um
+30 Tage verlängert (bis 03.10.2026). Keine weiteren Datenänderungen, keine
+Ausnahme im Code.
+
+**Begründung:** Die Abnahme an Gate B soll mit einem arbeitsfähigen Mandanten
+beginnen. Ein einmaliger, dokumentierter Eingriff in einen Datensatz ist
+kleiner als eine Ausnahme im Lesemodus.
+
+### E-2026-09-03-25 — „Abrechnungsportal“ statt „Kundenportal“
+
+**Frage:** S9 nennt das Stripe-Portal für Zahlungsmittel, Rechnungen und
+Tarifwechsel „Kundenportal“. Derselbe Begriff bezeichnet in `docs/SCOPE.md`
+ein ausgeschlossenes Modul; der Marken-Scan meldet ihn im Code als entfallenes
+Modul.
+
+**Entscheidung:** Im Code, in der Oberfläche und in den eigenen Dokumenten
+heißt das Stripe-Portal „Abrechnungsportal“ (bei Stripe „Customer Portal“).
+Der Auftragstext in `docs/AUTONOMIE.md` bleibt unverändert.
+
+**Begründung:** Ein Wort für zwei Dinge — eines davon ausdrücklich
+ausgeschlossen — verwirrt bei jeder Prüfung. Der Scan bleibt streng; die
+Umbenennung ist billig.
+
 ### E-2026-09-03-13 — Credit-Werte bleiben die der Datenbank
 
 **Frage:** S4 nennt Startwerte (Exposétext 5, Kurztext 2, Bild 3 je Bild,

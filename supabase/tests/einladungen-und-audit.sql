@@ -32,6 +32,12 @@ insert into public.benutzer (id,mandant_id,name,email,rolle) values
   ('11111111-1111-1111-1111-1111111e1111','aaaaaaaa-0000-0000-0000-0000000000e1','Inhaber','inhaber@test.invalid','inhaber'),
   ('22222222-2222-2222-2222-2222222e2222','aaaaaaaa-0000-0000-0000-0000000000e1','Makler','makler@test.invalid','makler'),
   ('55555555-5555-5555-5555-5555555e5555','bbbbbbbb-0000-0000-0000-0000000000e2','Chef B','chef-b@test.invalid','inhaber');
+-- Mandant E hat zwei Zugaenge, loest eine dritte Einladung ein und spricht
+-- danach weitere aus: Das geht nur mit einem Tarif, der genug Benutzer enthaelt
+-- (Benutzerlimit, docs/AUTONOMIE.md S5) — hier Business mit zehn Plaetzen.
+insert into public.abonnements (mandant_id, status, tarif_id)
+values ('aaaaaaaa-0000-0000-0000-0000000000e1', 'aktiv', (select id from public.tarife where schluessel = 'business'));
+update public.mandanten set abo_status = 'aktiv' where id = 'aaaaaaaa-0000-0000-0000-0000000000e1';
 
 do $$
 declare

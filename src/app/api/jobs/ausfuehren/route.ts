@@ -2,7 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 
 import { NextResponse } from "next/server";
 
-import { jobsAusfuehren } from "@/lib/jobs/worker";
+import { jobsAusfuehren, tagesarbeiten } from "@/lib/jobs/worker";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -34,8 +34,16 @@ export async function POST(anfrage: Request) {
   }
 
   try {
+    // Erst einplanen und pruefen, dann abarbeiten — so laufen faellige
+    // Abgleiche und Erinnerungen im selben Aufruf, in dem sie entstehen.
+    let vorarbeit: Record<string, unknown> = {};
+    try {
+      vorarbeit = await tagesarbeiten();
+    } catch (e) {
+      vorarbeit = { fehler: e instanceof Error ? e.message : "Tagesarbeiten gescheitert" };
+    }
     const ergebnis = await jobsAusfuehren({ zeitbudgetMs: 20_000, maxAnzahl: 5 });
-    return NextResponse.json(ergebnis);
+    return NextResponse.json({ ...ergebnis, vorarbeit });
   } catch (e) {
     return NextResponse.json(
       { fehler: e instanceof Error ? e.message : "Der Arbeiter ist gescheitert." },
