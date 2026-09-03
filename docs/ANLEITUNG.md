@@ -258,12 +258,27 @@ Anbietern ein App-Passwort). Die Verbindung wird vor dem Speichern geprüft;
 die Zugangsdaten liegen verschlüsselt (Abschnitt 6) und sind danach nicht mehr
 abrufbar.
 
-## 10. onOffice — für Kunden, die es nutzen
+## 10. onOffice, Propstack und FlowFact — für Kunden, die es nutzen
 
-Nichts für Sie zu tun: Jeder Kunde trägt seinen eigenen API-Token und sein
-Geheimnis in ImmoOffice.ai unter **Einstellungen → Integrationen** ein. Wo er
-die findet: In onOffice enterprise → **Marketplace** → **API-Zugang** (Token und
-Geheimnis werden dort je Benutzer erzeugt).
+Nichts für Sie einzurichten: Jeder Kunde trägt seine eigenen Zugangsdaten in
+ImmoOffice.ai unter **Einstellungen → Integrationen** ein und klickt
+„Verbindung prüfen".
+
+- **onOffice:** API-Token und Geheimnis aus onOffice enterprise →
+  **Marketplace** → **API-Zugang** (werden dort je Benutzer erzeugt).
+- **Propstack:** API-Schlüssel aus Propstack → **Einstellungen** → **API**
+  (Schlüssel erzeugen und kopieren).
+- **FlowFact:** Client-ID und Client-Geheimnis für die FLOWFACT-Schnittstelle
+  — die vergibt FlowFact über den Partnerzugang beziehungsweise den Support.
+  Weicht die Adresse der Schnittstelle von der Vorgabe ab, trägt der Kunde
+  Token- und Basisadresse in die beiden optionalen Feldern ein.
+
+**Für Sie wichtig:** Propstack und FlowFact sind ohne Testzugang gebaut. Die
+Verbindungsprüfung meldet deshalb, welche erwarteten Felder das Konto liefert
+und welche fehlen. Sobald Sie einen Testzugang haben (siehe
+`docs/ZUGAENGE_FEHLEND.md`), lassen Sie die Entwicklung einen ersten Lauf
+machen — Pfade und Feldnamen stehen je Anbieter an einer Stelle und sind
+schnell angepasst.
 
 ## 11. Was Sie an Gate A und Gate B entscheiden
 

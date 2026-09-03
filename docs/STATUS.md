@@ -5,6 +5,42 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 03.09.2026 (Paket 4b) — Phase 4: Connectoren Propstack und FlowFact
+
+**Branch:** `claude/autonomie-integrations-prompt-rl2qkr`
+
+### Erledigt
+
+- **Propstack** (`src/integrationen/propstack/`): API-Schlüssel im Kopf,
+  seitenweiser Abruf mit Zeitfilter, Objekte und Kontakte in beide Richtungen,
+  Bilder (Titelbild, Grundriss, Fotos) — Fähigkeiten `objekte_holen`,
+  `objekte_senden`, `kontakte_holen`, `kontakte_senden`, `bilder`.
+- **FlowFact** (`src/integrationen/flowfact/`): OAuth2 Client Credentials mit
+  Token-Zwischenspeicher im Arbeiter (kein Token in der Datenbank), Entitäten
+  mit `{ values: [...] }`-Feldern, Objekte und Kontakte holen, Objekte senden;
+  Token- und Basisadresse je Integration überschreibbar.
+- Beide Connectoren: Fehler in Nutzersprache ohne Rohantworten, ein
+  fehlerhafter Datensatz stoppt den Lauf nicht (5.3), Feldprüfung beim
+  „Verbindung prüfen“ mit Ergebnis in `konfig.felder_fehlend` und im Protokoll.
+  Oberfläche und Warteschlange brauchten keine Änderung — der Rahmen aus
+  Paket 2 trägt.
+- Anleitung Abschnitt 10 (Zugangsdaten je Anbieter), Entscheidung E-31,
+  `docs/ZUGAENGE_FEHLEND.md` um die Testzugänge ergänzt.
+
+**Nachweise:** 16 neue Unit-Tests mit Fetch-Attrappen (Anmeldung, Fehlerbilder,
+Mapping in beide Richtungen, Seiten und Zeitfilter, Senden mit Fehlerliste) —
+insgesamt 347; Typecheck, Lint, Marken-Scan, Produktions-Build grün.
+
+### Nicht erledigt — und warum
+
+| Punkt | Grund |
+|---|---|
+| Lauf gegen ein echtes Propstack- oder FlowFact-Konto | keine Testzugänge (`docs/ZUGAENGE_FEHLEND.md`); Pfade und Feldnamen sind als Annahme markiert und liegen je Anbieter an einer Stelle (E-31) |
+| Propstack-Aufgaben und Bild-Upload nach Propstack | der Connector-Rahmen kennt keine Aufgaben-Fähigkeit; Bilder werden geholt, nicht gesendet — beides nach dem ersten echten Lauf |
+| Rückrufe (Webhooks) der Anbieter | brauchen eine öffentliche Adresse; nach der Netlify-Einrichtung |
+
+---
+
 ## 03.09.2026 (Paket 4a) — Phase 4: Postfächer (Microsoft 365, Google, IMAP)
 
 **Branch:** `claude/autonomie-integrations-prompt-rl2qkr`

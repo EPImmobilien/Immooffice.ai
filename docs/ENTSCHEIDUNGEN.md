@@ -317,6 +317,26 @@ mit der Härtung, wenn Postfächer in Betrieb sind.
 **Begründung:** Für die Datenmengen der ersten Kunden reicht ILIKE; eine
 weitere Migration ohne Betriebserfahrung wäre Vorsorge ins Blaue.
 
+### E-2026-09-03-31 — Connectoren ohne Testzugang: Annahmen an einer Stelle, Diagnose beim Prüfen
+
+**Frage:** Propstack und FlowFact sind für Phase 4 vorgesehen; in dieser
+Umgebung gibt es weder Testzugänge noch die Möglichkeit, Feldnamen und Pfade
+gegen ein echtes Konto zu verifizieren. Bauen oder warten?
+
+**Entscheidung:** Bauen — vollständig gegen die öffentliche Beschreibung der
+Schnittstellen, mit Fetch-Attrappen getestet. Alles, was nicht verifiziert
+werden konnte, ist als ANNAHME markiert und liegt je Anbieter an einer Stelle
+(`api.ts`: Adressen und Pfade, `mapping.ts`: Feldnamen mit Kandidatenlisten).
+Bei FlowFact sind Token- und Basisadresse je Integration überschreibbar. Die
+Verbindungsprüfung vergleicht die erwarteten Felder mit einem echten Datensatz
+und schreibt fehlende nach `konfig.felder_fehlend` und ins Protokoll. Der
+Testzugang steht in `docs/ZUGAENGE_FEHLEND.md`.
+
+**Begründung:** Warten hieße, den Umfang von Phase 4 auf unbestimmte Zeit zu
+verschieben; unmarkierte Annahmen hießen, Kunden eine funktionierende
+Anbindung vorzuspiegeln. Der Mittelweg macht den ersten echten Lauf zu einer
+Sache von Minuten und lässt niemanden im Unklaren.
+
 ### E-2026-09-03-13 — Credit-Werte bleiben die der Datenbank
 
 **Frage:** S4 nennt Startwerte (Exposétext 5, Kurztext 2, Bild 3 je Bild,
