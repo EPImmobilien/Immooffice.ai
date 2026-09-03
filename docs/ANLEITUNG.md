@@ -145,6 +145,22 @@ gespeichert. Den Schlüssel dafür erzeugen Sie einmal selbst:
 (Passwort-Manager). Geht er verloren, müssen alle Kunden ihre Zugangsdaten zu
 Fremdsystemen neu eingeben.
 
+## 6a. Geheimnis für den Hintergrund-Arbeiter
+
+Abgleiche mit anderen Systemen und Importe laufen im Hintergrund. Damit
+niemand von außen diesen Arbeiter anstoßen kann, braucht er ein Geheimnis:
+
+1. Eingabeaufforderung öffnen und eingeben:
+   `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+2. Die Zeile kopieren und in `.env.local` hinter `JOB_GEHEIMNIS=` einfügen.
+3. Denselben Wert in Netlify eintragen: Ihre Site → **Site configuration** →
+   **Environment variables** → **Add a variable** → Key `JOB_GEHEIMNIS`, Value
+   einfügen → Create variable. Ohne diesen Wert werden Aufträge zwar
+   eingeplant, aber nicht ausgeführt.
+
+Netlify ruft den Arbeiter danach von selbst jede Minute auf
+(`netlify/functions/jobs-worker.mts`); Sie müssen nichts weiter einrichten.
+
 ## 7. KI-Anbieter
 
 1. Auf platform.openai.com → **API keys** → **Create new secret key** → Name

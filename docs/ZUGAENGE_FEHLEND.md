@@ -24,6 +24,7 @@ die Nachweise ausgeführt (`docs/STATUS.md`). Für alles andere gilt die Tabelle
 | `MAIL_API_KEY`, `MAIL_ABSENDER` | Transaktionsmails: Einladungen, Testphasen-Erinnerungen | automatischer Versand von Einladungslinks — bis dahin Link zum Kopieren (E-2026-09-03-07) |
 | `GOOGLE_CLIENT_ID/SECRET`, `MICROSOFT_CLIENT_ID/SECRET/TENANT_ID` | Phase 4: Postfächer, Kalender, Anmeldung über Google/Microsoft | Modul Postfächer (Phase 4) |
 | `VERSCHLUESSELUNG_SCHLUESSEL` | Zugangsdaten von Integrationen und Postfächern verschlüsseln | Speichern einer Integration mit Zugangsdaten; Erzeugen: `openssl rand -base64 32` |
+| `JOB_GEHEIMNIS` | Schutz des Worker-Endpunkts `/api/jobs/ausfuehren`, den Netlify minütlich aufruft | Hintergrundausführung von Abgleichen und Importen; bis dahin läuft nur der Sofortversuch aus der Server Action (Zeitbudget 8 s) — Erzeugen: `openssl rand -hex 32`, auch bei Netlify setzen |
 
 Sobald ein Wert vorliegt, wird die Zeile hier gestrichen und der zugehörige
 Schritt (Migration ausrollen, Deploy, Test) nachgeholt und in `docs/STATUS.md`

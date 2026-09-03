@@ -5,6 +5,60 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 03.09.2026 (Paket 2) — Integrationen bedienbar, Auftragswarteschlange mit Wächter
+
+**Branch:** `claude/autonomie-integrations-prompt-rl2qkr`
+
+### Erledigt
+
+**Auftragswarteschlange (Phase 2, ARCHITECTURE.md Abschnitt 3)**
+- Migration `20260903130000_jobs_und_importdateien.sql`: Tabelle `jobs` als
+  Warteschlange (`FOR UPDATE SKIP LOCKED`, Sichtbarkeitsfrist), Wächter für
+  verschwundene Arbeiter, Wiederholung mit wachsendem Abstand (1, 2, 4 …
+  Minuten), Verlauf je Versuch, Credits werden beim Erfolg eingelöst und beim
+  endgültigen Scheitern freigegeben — auch ohne Sitzung (`intern.credit_vorgang_beenden`).
+  Arbeiterfunktionen nur für die Dienstrolle. Bucket `importe` (privat) für
+  OpenImmo-Pakete. E-2026-09-03-16/17.
+- Arbeiter `src/lib/jobs/worker.ts`, Endpunkt `POST /api/jobs/ausfuehren`
+  (Bearer `JOB_GEHEIMNIS`, Zeitbudget 20 s), geplante Netlify-Funktion
+  `netlify/functions/jobs-worker.mts` (minütlich). Jede Server Action stößt
+  den Arbeiter nach dem Einstellen zusätzlich sofort an (8 s Budget).
+- Nachweis `supabase/tests/jobs.sql` (23 Prüfungen): Rechte, Sperre,
+  Wiederholung, endgültiges Scheitern mit Credit-Freigabe, Erfolg mit
+  Einlösung, Wächter, Abbruch durch den Mandanten.
+
+**Sync-Lauf (`src/integrationen/kern/lauf.ts`)**
+- Holen, senden, beide Richtungen; „letzte Änderung gewinnt“ mit
+  Konfliktliste; ein fehlerhafter Datensatz stoppt den Lauf nicht; Bilder nur
+  bei neuen Objekten und Objekten ohne Bilder; Kontakte ebenso. Läuft gegen
+  eine Speicherschnittstelle — sieben Unit-Tests mit Speicher im
+  Arbeitsspeicher, Supabase-Fassung setzt bei jeder Abfrage den Mandanten.
+
+**Oberfläche `/einstellungen/integrationen`**
+- OpenImmo-Datei: Upload direkt in den Bucket, Vorschau (Anzahl, Bilder,
+  zurückgezogene Objekte, mögliche Dubletten über die Anschrift, Hinweise),
+  dann Übernahme als Auftrag. E-2026-09-03-18.
+- Systeme verbinden: Formular aus der Registry (Anmeldefelder je Connector),
+  Verbindung wird vor dem Speichern geprüft, Zugangsdaten verschlüsselt.
+- Je Integration: Zustand, letzter Abgleich, „Verbindung prüfen“, „Jetzt
+  abgleichen“, Einstellungen (Bezeichnung, Richtung, Takt), Entfernen; die
+  letzten Läufe mit Zahlen, Fehlerliste und Konfliktliste.
+
+**Prüfung:** Typecheck, Lint, 281 Unit-Tests, Marken-Scan, Build; lokal 29
+Migrationen und **228 Datenbank-Nachweise**; Migration im Projekt ausgerollt
+(Trockenlauf, dann endgültig) und `jobs.sql` dort bestanden.
+
+### Nicht erledigt — und warum
+
+| Punkt | Grund |
+|---|---|
+| Automatische Läufe nach Takt (15 min / stündlich / täglich) | Der Takt ist gespeichert; der Einplaner, der fällige Integrationen als Aufträge einstellt, kommt mit dem nächsten Paket (eine Funktion `sync_faellige_einplanen()`, vom Worker-Endpunkt aufgerufen) |
+| Rückrufe (Webhooks) von Anbietern | kein Anbieter der Stufe 1 bietet sie ohne Partnerprogramm |
+| Termine abgleichen | onOffice-Kalender folgt mit dem Kalendermodul (Phase 2) |
+| Deploy-Vorschau, `JOB_GEHEIMNIS` bei Netlify | kein Netlify-Zugang (`ZUGAENGE_FEHLEND.md`) |
+
+---
+
 ## 03.09.2026 — Autonomie-Prompt aufgenommen, Onboarding/Team, Connector-Rahmen
 
 **Branch:** `claude/autonomie-integrations-prompt-rl2qkr`

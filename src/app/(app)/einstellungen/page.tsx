@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { Benutzerliste, type BenutzerZeile } from "@/components/einstellungen/Benutzerliste";
 import { EINLADUNG_SPALTEN, Einladungen, type EinladungZeile } from "@/components/einstellungen/Einladungen";
@@ -171,6 +172,21 @@ export default async function EinstellungenSeite() {
                   : "Es ist kein Impressum hinterlegt."}
               </p>
             )}
+          </KarteInhalt>
+        </Karte>
+
+        <Karte>
+          <KarteKopf>
+            <KarteTitel>Integrationen</KarteTitel>
+            <KarteBeschreibung>
+              OpenImmo-Dateien übernehmen und Systeme wie onOffice verbinden —
+              mit verschlüsselten Zugangsdaten und nachvollziehbaren Läufen.
+            </KarteBeschreibung>
+          </KarteKopf>
+          <KarteInhalt>
+            <Link href="/einstellungen/integrationen" className="text-[13px] font-medium text-akzent hover:underline">
+              Zu den Integrationen
+            </Link>
           </KarteInhalt>
         </Karte>
 

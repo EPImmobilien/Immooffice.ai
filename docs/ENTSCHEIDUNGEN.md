@@ -108,6 +108,50 @@ Nachbildung ist kein Supabase, aber sie fängt Reihenfolge-, Rechte- und
 RLS-Fehler, bevor sie das Projekt erreichen. Der letzte Nachweis läuft
 weiterhin gegen das echte Projekt.
 
+### E-2026-09-03-16 — Warteschlange als Tabelle mit `SKIP LOCKED`, nicht pgmq
+
+**Frage:** `ARCHITECTURE.md` Abschnitt 3 nennt pgmq als Warteschlange plus eine
+Job-Tabelle für den Zustand. pgmq ist im Projekt verfügbar, aber nicht
+installiert, und in der lokalen Prüfumgebung gar nicht zu haben.
+
+**Entscheidung:** Die Tabelle `jobs` ist die Warteschlange. Beanspruchen läuft
+über `FOR UPDATE SKIP LOCKED` mit Sichtbarkeitsfrist (`sperre_bis`); ein
+Wächter gibt liegen gebliebene Aufträge frei oder erklärt sie nach dem letzten
+Versuch für gescheitert. Wiederholung mit wachsendem Abstand, Verlauf je
+Versuch, Freigabe reservierter Credits beim Scheitern und Einlösen beim Erfolg
+— alles in denselben Funktionen.
+
+**Begründung:** Die drei Gründe der Architekturentscheidung (abfragbarer
+Zustand, Credits in derselben Transaktion, Historie je Versuch) sind mit einer
+Tabelle vollständig erfüllt; pgmq hätte den Zustand nur ein zweites Mal
+gehalten. Ohne Erweiterung läuft alles in `scripts/db-lokal.sh` und in GitHub
+Actions. Steigt das Volumen, lässt sich `jobs_beanspruchen()` auf pgmq
+umstellen, ohne dass Arbeiter oder Anwendung es merken.
+
+### E-2026-09-03-17 — Taktgeber ist eine geplante Netlify-Funktion
+
+**Entscheidung:** `netlify/functions/jobs-worker.mts` ruft minütlich
+`/api/jobs/ausfuehren` mit `JOB_GEHEIMNIS`. pg_cron + pg_net bleiben als
+Alternative möglich (gleicher Endpunkt), sind aber nicht eingerichtet.
+
+**Begründung:** Der Zeitplan lebt dann im Repository statt in einer
+Datenbankzeile mit Klartext-Adresse und -Geheimnis; und Netlify hält das
+Geheimnis ohnehin als Umgebungsvariable. Zusätzlich stößt jede Server Action
+nach dem Einstellen den Arbeiter sofort mit kleinem Zeitbudget an — der Nutzer
+wartet nicht auf die nächste Minute.
+
+### E-2026-09-03-18 — Import legt Dubletten als eigene Datensätze an
+
+**Entscheidung:** Die Vorschau vor der Übernahme zeigt Objekte mit gleicher
+Anschrift wie ein vorhandenes Objekt an; übernommen werden sie trotzdem als
+eigene Datensätze. Wiedererkennung läuft ausschließlich über die Zuordnung
+Fremd-ID ↔ lokale ID je Integration.
+
+**Begründung:** Zwei Wohnungen im selben Haus haben dieselbe Anschrift und
+sind keine Dublette. Ein automatisches Zusammenführen würde Datensätze
+verschmelzen, die nicht zusammengehören; die Entscheidung bleibt beim
+Nutzer, der die Liste vorher sieht.
+
 ### E-2026-09-03-13 — Credit-Werte bleiben die der Datenbank
 
 **Frage:** S4 nennt Startwerte (Exposétext 5, Kurztext 2, Bild 3 je Bild,
