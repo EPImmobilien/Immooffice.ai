@@ -61,14 +61,27 @@ export default async function PostfachSeite({ searchParams }: { searchParams: Pr
   if (p.postfach) parameter["postfach"] = p.postfach;
   if (p.ungelesen === "1") parameter["ungelesen"] = "1";
 
-  let abfrage = supabase.from("nachrichten").select(LISTEN_FELDER).order("gesendet_am", { ascending: false }).limit(100);
-  if (p.postfach) abfrage = abfrage.eq("postfach_id", p.postfach);
-  if (p.ungelesen === "1") abfrage = abfrage.eq("gelesen", false).eq("ordner", "eingang");
-  const suche = (p.suche ?? "").replace(/[%_,()"'\\]/g, " ").trim();
+  // Mit Suchbegriff laeuft die Volltextsuche in der Datenbank (Index, RLS des
+  // Aufrufers); ohne Begriff die einfache Liste.
+  const suche = (p.suche ?? "").trim().slice(0, 200);
+  let nachrichtenRoh: unknown[] | null = null;
   if (suche) {
-    abfrage = abfrage.or(`betreff.ilike.%${suche}%,von_adresse.ilike.%${suche}%,von_name.ilike.%${suche}%,text.ilike.%${suche}%`);
+    const { data } = await supabase
+      .rpc("nachrichten_suchen", {
+        p_suche: suche,
+        p_postfach: p.postfach || null,
+        p_nur_ungelesen: p.ungelesen === "1",
+        p_limit: 100,
+      })
+      .select(LISTEN_FELDER);
+    nachrichtenRoh = (data as unknown[] | null) ?? null;
+  } else {
+    let abfrage = supabase.from("nachrichten").select(LISTEN_FELDER).order("gesendet_am", { ascending: false }).limit(100);
+    if (p.postfach) abfrage = abfrage.eq("postfach_id", p.postfach);
+    if (p.ungelesen === "1") abfrage = abfrage.eq("gelesen", false).eq("ordner", "eingang");
+    const { data } = await abfrage;
+    nachrichtenRoh = data;
   }
-  const { data: nachrichtenRoh } = await abfrage;
   const nachrichten = (nachrichtenRoh ?? []) as NachrichtZeile[];
 
   const [{ data: objekteRoh }, { data: kontakteRoh }] = await Promise.all([

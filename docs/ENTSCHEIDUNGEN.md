@@ -370,6 +370,40 @@ voraus (Masterprompt, Gate B). Der zweite Schalter ist die Stelle, an der der
 Auftraggeber diese Voraussetzung bewusst bestätigt, statt dass ein Skript sie
 stillschweigend annimmt.
 
+### E-2026-09-03-34 — Missbrauchsschutz bei der Registrierung in der Datenbank
+
+**Frage:** Wie werden Mehrfach- und Wegwerf-Registrierungen gebremst, ohne
+einen weiteren Dienst einzuführen?
+
+**Entscheidung:** Drei Stufen, alle ohne Zusatzdienst: ein Honigtopf-Feld im
+Formular (Skripte füllen es, Menschen sehen es nicht), eine Sperrliste für
+Wegwerfdomains in der Datenbank (`registrierungs_sperrliste`, per Dienstrolle
+pflegbar) und eine Ratenbegrenzung je E-Mail-Adresse (3/h) und je Absender
+(5/h) über `registrierung_pruefen()`. Der Absender wird nur als gepfefferter
+Hash gespeichert und nach 24 Stunden gelöscht; die Limits stehen in
+`plattform_einstellungen`. Supabase Auth begrenzt zusätzlich auf seiner Seite.
+
+**Begründung:** Masterprompt 16 verlangt Missbrauchsschutz; Abschnitt 16 und
+die DSGVO verlangen Datensparsamkeit — ein Hash mit kurzer Frist genügt für
+die Begrenzung. Ein externer Dienst (Captcha) käme mit eigener
+Datenverarbeitung, die erst in die Datenschutzerklärung müsste.
+
+### E-2026-09-03-35 — Wächter meldet Befunde per Mail, gleiche Lage einmal je Tag
+
+**Frage:** Grundprinzip 4 des Funktionsprompts verlangt einen Wächter, der
+alle Ketten prüft und Befunde proaktiv mailt — mit Anti-Spam.
+
+**Entscheidung:** `waechter_befund()` liefert acht Kennzahlen (gescheiterte
+und hängende Aufträge, alte offene Aufträge, gestörte Integrationen und
+Postfächer, Stripe-Fehler; dazu Lesemodus und offene Zahlungen als Hinweise).
+Der Arbeiter bewertet stündlich, hasht nur die roten Kennzahlen und mailt an
+`WAECHTER_EMPFAENGER` (oder `plattform_einstellungen.waechter_empfaenger`):
+neue Lage sofort, gleiche Lage höchstens einmal je 24 Stunden, Entwarnung bei
+Grün. Der Zustand liegt in `plattform_einstellungen.waechter_zustand`.
+
+**Begründung:** Wörtlich nach Grundprinzip 4. Hinweise bleiben aus dem Hash
+heraus, damit ein Mandant im Lesemodus keine tägliche Alarmmail auslöst.
+
 ### E-2026-09-03-13 — Credit-Werte bleiben die der Datenbank
 
 **Frage:** S4 nennt Startwerte (Exposétext 5, Kurztext 2, Bild 3 je Bild,

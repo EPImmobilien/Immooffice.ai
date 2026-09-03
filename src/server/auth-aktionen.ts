@@ -1,5 +1,7 @@
 "use server";
 
+import { createHash } from "node:crypto";
+
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -39,6 +41,19 @@ const unternehmenSchema = z.object({
     .min(2, "Bitte Ihren Namen angeben.")
     .max(200, "Der Name ist zu lang."),
 });
+
+const REGISTRIERUNGS_HINWEIS =
+  "Ist diese Adresse noch nicht vergeben, haben wir Ihnen eine E-Mail zur " +
+  "Bestätigung geschickt — bitte sehen Sie auch im Spam-Ordner nach. " +
+  "Gehört die Adresse bereits zu einem Konto, melden Sie sich einfach an.";
+
+/** Absender als gepfefferter Hash — nie die Adresse selbst (Masterprompt 16). */
+function absenderHash(kopf: Headers): string {
+  const roh = kopf.get("x-nf-client-connection-ip") ?? kopf.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "";
+  if (!roh) return "";
+  const pfeffer = process.env["VERSCHLUESSELUNG_SCHLUESSEL"] ?? process.env["JOB_GEHEIMNIS"] ?? "";
+  return createHash("sha256").update(`${pfeffer}:${roh}`).digest("hex");
+}
 
 /** Übersetzt Supabase-Meldungen ins Deutsche, ohne Kontoexistenz zu verraten. */
 function meldung(text: string): string {
@@ -107,9 +122,34 @@ export async function registrieren(
   // entscheidet spaeter die Datenbank.
   const einladung = String(formular.get("einladung") ?? "").trim();
   const mitEinladung = /^[0-9a-f]{64}$/.test(einladung);
-  const basis = basisUrlErmitteln(await headers());
+  const kopf = await headers();
+  const basis = basisUrlErmitteln(kopf);
+
+  // Honigtopf: Das Feld ist fuer Menschen unsichtbar. Wer es fuellt, ist ein
+  // Skript — und bekommt dieselbe Antwort wie alle, nur ohne Wirkung.
+  if (String(formular.get("website") ?? "").trim() !== "") {
+    return { hinweis: REGISTRIERUNGS_HINWEIS };
+  }
 
   const supabase = await serverClient();
+
+  // Missbrauchsschutz (Masterprompt 16): Sperrliste fuer Wegwerfadressen und
+  // Ratenbegrenzung je Adresse und Absender. Der Absender wird nur als
+  // gepfefferter Hash gespeichert und nach 24 Stunden geloescht.
+  const { data: pruefung } = await supabase.rpc("registrierung_pruefen", {
+    p_email: geprueft.data.email,
+    p_ip_hash: absenderHash(kopf),
+  });
+  if (pruefung === "wegwerfadresse") {
+    return { fehler: "Bitte eine dauerhafte E-Mail-Adresse verwenden — Wegwerfadressen werden nicht angenommen." };
+  }
+  if (pruefung === "zu_viele") {
+    return { fehler: "Zu viele Registrierungsversuche. Bitte in einer Stunde erneut versuchen." };
+  }
+  if (pruefung === "ungueltig") {
+    return { fehler: "Bitte eine gültige E-Mail-Adresse angeben." };
+  }
+
   const { data, error } = await supabase.auth.signUp({
     email: geprueft.data.email,
     password: geprueft.data.passwort,
@@ -134,12 +174,7 @@ export async function registrieren(
   // unterschiedliche Texte wiederum wuerden verraten, was Supabase gerade
   // verbirgt.
   if (!data.session) {
-    return {
-      hinweis:
-        "Ist diese Adresse noch nicht vergeben, haben wir Ihnen eine E-Mail zur " +
-        "Bestätigung geschickt — bitte sehen Sie auch im Spam-Ordner nach. " +
-        "Gehört die Adresse bereits zu einem Konto, melden Sie sich einfach an.",
-    };
+    return { hinweis: REGISTRIERUNGS_HINWEIS };
   }
 
   redirect(mitEinladung ? `/einladung/${einladung}` : "/registrieren/unternehmen");

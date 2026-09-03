@@ -91,6 +91,13 @@ export function RegistrierFormular({
         </label>
       )}
 
+      {/* Honigtopf gegen Skripte: fuer Menschen unsichtbar, von Formularrobotern
+          gern ausgefuellt. Ein Wert hier beendet die Registrierung still. */}
+      <div className="hidden" aria-hidden="true">
+        <label htmlFor="website">Website</label>
+        <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+      </div>
+
       <Button type="submit" laedt={laeuft} className="w-full">
         {einladung ? "Konto anlegen und beitreten" : "Testphase starten"}
       </Button>

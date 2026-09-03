@@ -16,6 +16,7 @@ import { anbieterErzeugen } from "@/lib/postfach/anbieter";
 import { fehlerText } from "@/lib/postfach/oauth";
 import { istPostfachNutzlast, zugangParsen } from "@/lib/postfach/typen";
 import { dienstClient } from "@/lib/supabase/dienst";
+import { befundBewerten, befundHash, befundText, mailEntscheiden, pruefungFaellig, type Befund, type WaechterZustand } from "@/lib/waechter";
 
 import { istSyncNutzlast, type JobZeile } from "./typen";
 
@@ -123,6 +124,7 @@ export async function tagesarbeiten(): Promise<{
   abos: Record<string, unknown>;
   postfaecher: number;
   aufgeraeumt: number;
+  waechter: string | null;
 }> {
   const supabase = dienstClient();
   const [einplaner, abos, postfaecher, aufgeraeumt] = await Promise.all([
@@ -131,12 +133,70 @@ export async function tagesarbeiten(): Promise<{
     supabase.rpc("postfaecher_faellige_einplanen"),
     supabase.rpc("nachrichten_aufraeumen"),
   ]);
+  let waechter: string | null = null;
+  try {
+    waechter = await waechterMelden(supabase);
+  } catch (e) {
+    waechter = `Waechter gescheitert: ${e instanceof Error ? e.message : "unbekannt"}`;
+  }
   return {
     eingeplant: typeof einplaner.data === "number" ? einplaner.data : 0,
     abos: (abos.data as Record<string, unknown> | null) ?? {},
     postfaecher: typeof postfaecher.data === "number" ? postfaecher.data : 0,
     aufgeraeumt: typeof aufgeraeumt.data === "number" ? aufgeraeumt.data : 0,
+    waechter,
   };
+}
+
+/**
+ * Waechter (Funktionsprompt, Grundprinzip 4): stuendlich den Befund der
+ * Ketten holen, bewerten und den Betreiber per Mail informieren — gleiche
+ * Lage hoechstens einmal je 24 Stunden, neue Lage sofort, Entwarnung bei
+ * Gruen. Zustand liegt in plattform_einstellungen.waechter_zustand.
+ */
+export async function waechterMelden(
+  supabase: SupabaseClient,
+  fetchFn: typeof globalThis.fetch = globalThis.fetch,
+  jetzt: Date = new Date(),
+): Promise<string | null> {
+  const { data: zeilen } = await supabase
+    .from("plattform_einstellungen")
+    .select("schluessel, wert")
+    .in("schluessel", ["waechter_zustand", "waechter_empfaenger"]);
+  const einstellung = (schluessel: string): unknown => zeilen?.find((z) => z.schluessel === schluessel)?.wert;
+  const zustand = ((einstellung("waechter_zustand") as WaechterZustand | null) ?? {}) as WaechterZustand;
+  if (!pruefungFaellig(zustand, jetzt)) return null;
+
+  const { data: roh, error } = await supabase.rpc("waechter_befund");
+  if (error) throw new Error(error.message);
+  const bewertung = befundBewerten((roh as Befund | null) ?? {});
+  const hash = befundHash(bewertung);
+  const art = mailEntscheiden(zustand, bewertung, hash, jetzt);
+
+  const empfaengerEinstellung = einstellung("waechter_empfaenger");
+  const empfaenger = typeof empfaengerEinstellung === "string" && empfaengerEinstellung.includes("@")
+    ? empfaengerEinstellung
+    : (process.env["WAECHTER_EMPFAENGER"] ?? "");
+
+  let meldung: string | null = null;
+  const neuerZustand: WaechterZustand = { ...zustand, geprueft_am: jetzt.toISOString(), rot: bewertung.rot, hash };
+  if (art && empfaenger) {
+    const inhalt = befundText(bewertung, art, jetzt);
+    try {
+      await mailSenden({ an: empfaenger, betreff: inhalt.betreff, text: inhalt.text }, fetchFn);
+      neuerZustand.mail_am = jetzt.toISOString();
+      meldung = `${art} an Betreiber gesendet`;
+    } catch (e) {
+      meldung = `${art} faellig, Versand gescheitert: ${e instanceof Error ? e.message : "unbekannt"}`;
+    }
+  } else if (art) {
+    meldung = `${art} faellig, aber kein Empfaenger (WAECHTER_EMPFAENGER oder plattform_einstellungen.waechter_empfaenger)`;
+  }
+
+  await supabase
+    .from("plattform_einstellungen")
+    .upsert({ schluessel: "waechter_zustand", wert: neuerZustand, geaendert_am: jetzt.toISOString() }, { onConflict: "schluessel" });
+  return meldung;
 }
 
 /** Erinnerungsmail (S2, S3): Vorlage rendern und versenden. */

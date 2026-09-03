@@ -115,6 +115,26 @@ Das Projekt `usguiggfciavwzkdfjgt` in Frankfurt gibt es bereits. Es wird
    `https://*.netlify.app/auth/bestaetigen` und
    `http://localhost:3000/auth/bestaetigen`.
 
+### Sicherung und Wiederherstellung
+
+Supabase sichert das Projekt täglich (im Pro-Tarif sieben Tage rückwirkend;
+**Project Settings** → **Database** → **Backups**). Was Sie zusätzlich tun
+sollten:
+
+1. **Wiederherstellungspunkt (PITR)** im selben Bereich einschalten, sobald
+   echte Kundendaten im System sind — damit lässt sich jede Minute der letzten
+   Tage zurückholen, nicht nur der Tagesstand.
+2. **Eigene Sicherung** einmal im Monat: In der Eingabeaufforderung im
+   Projektordner `npx supabase db dump --db-url "<Verbindung>" -f sicherung.sql`
+   — die Verbindung finden Sie unter **Project Settings** → **Database** →
+   **Connection string**. Die Datei sicher ablegen (nicht im Projektordner,
+   nicht in E-Mails).
+3. **Wiederherstellungstest** einmal im Quartal — **nicht** im Projekt und
+   **ohne** ein neues Supabase-Projekt anzulegen: `scripts/db-lokal.sh` baut
+   eine lokale Datenbank auf; dort spielt die Entwicklung die Sicherung ein
+   und prüft, dass Objekte, Kontakte und Abos vollständig sind. Ergebnis mit
+   Datum in `docs/STATUS.md` vermerken.
+
 ## 5. E-Mail-Versand (Einladungen, Erinnerungen)
 
 1. Auf resend.com ein Konto anlegen.
@@ -129,6 +149,13 @@ Das Projekt `usguiggfciavwzkdfjgt` in Frankfurt gibt es bereits. Es wird
 Bis dieser Schritt erledigt ist, zeigt die Anwendung Einladungslinks zum
 Kopieren an, statt sie zu verschicken — das funktioniert, ist nur weniger
 bequem.
+
+**Wächter-Befunde:** Tragen Sie hinter `WAECHTER_EMPFAENGER=` Ihre eigene
+Adresse ein (auch bei Netlify). Der Wächter prüft stündlich alle
+Hintergrundketten — gescheiterte oder hängende Aufträge, gestörte Integrationen
+und Postfächer, Stripe-Fehler — und schreibt Ihnen bei einem Befund; dieselbe
+Lage höchstens einmal je 24 Stunden, eine neue Lage sofort, Entwarnung, sobald
+alles wieder grün ist.
 
 ## 6. Verschlüsselungsschlüssel für gespeicherte Zugangsdaten
 

@@ -5,6 +5,46 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 03.09.2026 (Paket 5) — Härtung: Volltextsuche, Missbrauchsschutz, Wächter, Sicherung
+
+**Branch:** `claude/autonomie-integrations-prompt-rl2qkr`
+
+### Erledigt (Migration `20260903170000_haertung.sql`, im Projekt ausgerollt)
+
+- **Volltextsuche im Postfach** über `nachrichten_suchen()` (security invoker,
+  RLS des Aufrufers, Index `german`, Filter Postfach und „nur ungelesene“);
+  die Oberfläche nutzt sie — E-30 ist damit abgelöst.
+- **Missbrauchsschutz bei der Registrierung** (E-34): Honigtopf-Feld,
+  Sperrliste für Wegwerfdomains (48 Einträge, per Dienstrolle erweiterbar),
+  Ratenbegrenzung je E-Mail-Adresse (3/h) und je Absender-Hash (5/h) mit
+  Limits in `plattform_einstellungen`; Versuche werden nach 24 Stunden gelöscht.
+- **Wächter** (E-35, Grundprinzip 4 des Funktionsprompts): `waechter_befund()`
+  liefert acht Kennzahlen; der Arbeiter prüft stündlich, mailt Befunde an
+  `WAECHTER_EMPFAENGER` — gleiche Lage höchstens einmal je 24 Stunden, neue
+  Lage sofort, Entwarnung bei Grün — und gibt den Befund im Antwortkörper des
+  Worker-Endpunkts aus.
+- **Plattform-Einstellungen** als Tabelle (nur Dienstrolle) — Vorstufe des
+  Plattform-Admins.
+- **Sicherung und Wiederherstellung** dokumentiert (Anleitung, Abschnitt 4):
+  tägliche Sicherung, PITR, monatlicher Dump, Wiederherstellungstest lokal —
+  ohne neues Supabase-Projekt.
+
+**Nachweise:** `supabase/tests/haertung.sql` (20 Prüfungen: Suche unter RLS,
+Sperrliste samt Unterdomains, Limits je Adresse und Absender, Limit aus den
+Plattform-Einstellungen, Befund) — lokal **323 von 323** und im Projekt
+bestanden; Wächter-Logik mit 6 Unit-Tests (insgesamt 353). Typecheck, Lint,
+Marken-Scan, Produktions-Build grün.
+
+### Nicht erledigt — und warum
+
+| Punkt | Grund |
+|---|---|
+| Last- und Sicherheitstests, Observability (Masterprompt Phase 3) | brauchen eine laufende Umgebung (Netlify) und Betriebsdaten; die Wächter-Kennzahlen sind die Grundlage |
+| Wiederherstellungstest tatsächlich durchführen | braucht eine Sicherung aus dem Projekt (Datenbankpasswort, `docs/ZUGAENGE_FEHLEND.md`) |
+| Plattform-Admin-Oberfläche für Sperrliste, Limits und Wächter | Abschnitt 15 des Masterprompts, eigenes Paket; bis dahin per Dienstrolle in der Datenbank |
+
+---
+
 ## 03.09.2026 (Paket 4c) — Phase 4: Anmeldung über Google/Microsoft, Stripe-Livevorbereitung
 
 **Branch:** `claude/autonomie-integrations-prompt-rl2qkr`

@@ -27,6 +27,7 @@ die Nachweise ausgeführt (`docs/STATUS.md`). Für alles andere gilt die Tabelle
 | `VERSCHLUESSELUNG_SCHLUESSEL` | Zugangsdaten von Integrationen und Postfächern verschlüsseln | Speichern einer Integration mit Zugangsdaten; Erzeugen: `openssl rand -base64 32` |
 | Propstack-Testzugang (API-Schlüssel eines Testkontos) | Phase 4: Pfade und Feldnamen des Propstack-Connectors gegen ein echtes Konto prüfen | den ersten Kundenlauf mit Propstack — der Connector ist gebaut und getestet, seine Feldnamen sind Annahmen nach der öffentlichen Dokumentation (E-31) |
 | FlowFact-Testzugang (Client-ID/-Geheimnis, aktuelle Schnittstellenbeschreibung) | Phase 4: Token-Adresse, Basisadresse, Pfade und Feldnamen des FlowFact-Connectors prüfen | den ersten Kundenlauf mit FlowFact (E-31) |
+| `WAECHTER_EMPFAENGER` | Empfänger der Wächter-Befunde (Hintergrundketten) | Benachrichtigung des Betreibers; der Befund wird trotzdem stündlich erhoben und im Antwortkörper des Worker-Endpunkts ausgegeben |
 | `JOB_GEHEIMNIS` | Schutz des Worker-Endpunkts `/api/jobs/ausfuehren`, den Netlify minütlich aufruft | Hintergrundausführung von Abgleichen und Importen; bis dahin läuft nur der Sofortversuch aus der Server Action (Zeitbudget 8 s) — Erzeugen: `openssl rand -hex 32`, auch bei Netlify setzen |
 
 Sobald ein Wert vorliegt, wird die Zeile hier gestrichen und der zugehörige
