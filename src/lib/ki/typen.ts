@@ -112,3 +112,45 @@ export interface TextAnbieter {
   texteErzeugen(auftrag: TextAuftrag): Promise<TextErgebnis>;
   antwortEntwerfen(auftrag: AntwortAuftrag): Promise<AntwortErgebnis>;
 }
+
+// ---------------------------------------------------------------------------
+// Auslesen von Dokumenten und Fotos (Vertragsimport, Laufzettel, Zaehler)
+// ---------------------------------------------------------------------------
+
+export interface AusleseFeld {
+  schluessel: string;
+  beschreibung: string;
+}
+
+export interface AusleseAuftrag {
+  zweck: "maklervertrag" | "objektnachweis" | "notar_anhang" | "energieausweis";
+  text: string;
+  felder: AusleseFeld[];
+  /** Credits laut Preistabelle — nur zur Anzeige; die Reservierung macht der Aufrufer. */
+  credits: number;
+}
+
+export interface AusleseErgebnis {
+  werte: Record<string, string | null>;
+  hinweis: string;
+  kiVerwendet: boolean;
+  quelle: string;
+  credits: number;
+  kostenCent: number;
+}
+
+export interface BildAusleseAuftrag {
+  zweck: "zaehlerstand" | "beleg";
+  bildBase64: string;
+  mime: string;
+  credits: number;
+}
+
+export interface BildAusleseErgebnis {
+  werte: Record<string, string | null>;
+  hinweis: string;
+  kiVerwendet: boolean;
+  quelle: string;
+  credits: number;
+  kostenCent: number;
+}

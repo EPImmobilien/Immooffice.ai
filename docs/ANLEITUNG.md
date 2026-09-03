@@ -380,6 +380,42 @@ Administratoren). Zum Verständnis, was dort passiert:
    Arbeiter (Abschnitt 6a). Ohne den minütlichen Aufruf bleiben Rückrufe
    „offen“. Rückrufziele brauchen den Verschlüsselungsschlüssel aus Abschnitt 6.
 
+## 10b. Verkauf — Verträge aus Vorlagen, Übergabeprotokoll, Notar-Laufzettel
+
+Keine Einrichtung nötig; nur der Verschlüsselungsschlüssel (Abschnitt 6) und —
+für die KI-Auslesungen — der Modellzugang (Abschnitt 7). So arbeiten Kunden:
+
+1. **Maklervertrag aus Vorlage** (Verträge → „Maklervertrag aus Vorlage“):
+   Objekt und Auftraggeber aus dem Bestand wählen, Verkäufertyp (Einzelperson,
+   Eheleute, mehrere, Erbengemeinschaft, Firma), Provision und Modell
+   (Teilung, nur Verkäufer, nur Käufer), Laufzeit. „Vollmacht mitgenerieren“
+   legt eine Vollmacht als zweiten Vertrag an; das PDF des Maklervertrags
+   trägt sie als Anlage. Bei Wohnungen und Einfamilienhäusern warnt die
+   Anwendung, wenn der Käufer allein zahlen soll (§ 656d BGB).
+2. **Bestehenden Vertrag einlesen:** Im selben Formular „Bestehenden Vertrag
+   aus PDF einlesen“. Mit Modellzugang kostet das 5 Credits, ohne läuft eine
+   einfache Mustererkennung. Das Ergebnis belegt nur das Formular vor — der
+   Kunde prüft jedes Feld. Das Original-PDF wird beim Vertrag abgelegt.
+3. **Objektnachweis** (Verträge → „Objektnachweis“): Interessent und Objekt
+   wählen, Provision in gleicher Höhe wie beim Verkäufer, Besichtigungsdatum;
+   Unterschrift über den Signaturlink wie bei jedem Vertrag.
+4. **PDF und Word:** Auf jeder Vertragsseite; Word für Anpassungen vor der
+   Unterschrift, PDF als feste Fassung. Beides kostet keine Credits.
+5. **Übergabeprotokoll** (Menü „Übergaben“): Bereich Verkauf (Übergabe,
+   Rückgabe) oder Vermietung (Einzug, Auszug), Objekt und Vertrag belegen
+   Adresse und Beteiligte vor. Sieben Schritte: Stammdaten, Schlüssel,
+   Zähler (Foto ablegen; mit Modellzugang Zählerstand auslesen, 1 Credit),
+   Räume mit Zustand, Sonstiges (Rauchmelder, Schimmel, Hausordnung),
+   Unterschriften auf dem Bildschirm, Abschluss. Nach dem Abschluss ist das
+   Protokoll unveränderlich; PDF und Word bleiben abrufbar.
+6. **Notar-Laufzettel** (Menü „Notar“): Objekt, Maklervertrag (Verkäufer) und
+   Objektnachweis (Käufer) wählen — die Angaben werden vorbelegt. Acht
+   Schritte bis zum Begleitschreiben an das Notariat (Text zum Kopieren oder
+   für das E-Mail-Programm), PDF und Word. Anhänge (Grundbuchauszug,
+   Flurkarte …) lassen sich hochladen und mit Modellzugang auswerten
+   (5 Credits je Dokument). Status: Entwurf → Bereit → An Notar versendet →
+   Abgeschlossen.
+
 ## 11. Was Sie an Gate A und Gate B entscheiden
 
 - **Gate A** (bereits erreicht): Bestandsaufnahme, Funktionsmatrix, Architektur

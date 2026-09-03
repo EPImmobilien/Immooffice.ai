@@ -34,6 +34,8 @@ const EINTRAEGE: Eintrag[] = [
   { modul: "objekte", pfad: "/portale", bezeichnung: "Portalexport" },
   { modul: "wertermittlung", pfad: "/wertermittlung", bezeichnung: "Wertermittlung" },
   { modul: "vertraege", pfad: "/vertraege", bezeichnung: "Verträge" },
+  { modul: "vertraege", pfad: "/uebergaben", bezeichnung: "Übergaben" },
+  { modul: "vertraege", pfad: "/notar", bezeichnung: "Notar" },
   { modul: "marketing", pfad: "/marketing", bezeichnung: "Marketing" },
   { modul: "kalender", pfad: "/kalender", bezeichnung: "Kalender" },
   { modul: "kalender", pfad: "/aufgaben", bezeichnung: "Aufgaben" },

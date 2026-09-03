@@ -463,6 +463,39 @@ werden mit 2^n Minuten (höchstens 60) bis zu acht Mal wiederholt, danach
 Wiedereinspielung; die Wiederholung in der Datenbank überlebt Neustarts des
 Arbeiters.
 
+### E-2026-09-03-39 — Vertragsvorlagen: Formulardaten plus erzeugter Text, Vollmacht als eigener Vertrag
+
+**Frage:** Wie bilden wir die strukturierten Verträge der Referenz (Verkäufertypen,
+Provisionsmodelle, Vollmacht) ab, ohne die bestehende Signaturlogik zu
+brechen?
+
+**Entscheidung:** Die Formulardaten liegen in `vertraege.daten` (JSON), der
+daraus erzeugte Text wie bisher in `inhalt` — er wird unterzeichnet und ist
+ab der ersten Unterschrift gesperrt. Die Vollmacht ist ein eigener Vertrag
+(Art `vollmacht`, Verweis `daten.zu_vertrag_id`); das PDF des Maklervertrags
+nimmt sie als Anlage auf. Word-Export entsteht aus derselben
+Dokumentstruktur wie das PDF.
+
+**Begründung:** Signatur, Hash und Widerrufsfrist funktionieren unverändert
+über den Text; die Daten bleiben für Folgedokumente (Laufzettel,
+Übergabe, Rechnung) auswertbar. Eine Vollmacht kann auch ohne Vertrag
+gebraucht werden.
+
+### E-2026-09-03-40 — Auslesungen (Vertrag, Anhänge, Zähler) über Funktionen statt neuer Anbieter-Klassen
+
+**Frage:** Wie kommen Dokument- und Bildauslesungen in den Provider-Layer?
+
+**Entscheidung:** `src/lib/ki/auslese.ts` bietet `strukturAuslesen` und
+`bildAuslesen`; ohne Modellzugang greifen Heuristiken (Muster im Text),
+gekennzeichnet als „ohne KI“ und ohne Credits. Preise `ki_dokument_import`
+(5) und `ki_bild_auslesen` (1) stehen in `credit_preise`. Jedes Ergebnis
+landet in einem editierbaren Formular; die Anwendung übernimmt nichts
+ungeprüft.
+
+**Begründung:** Der Provider-Layer bleibt austauschbar (ein Endpunkt, ein
+Schlüssel), Grundprinzip 3 des Funktionsprompts wird eingehalten, und die
+Anwendung bleibt ohne Modellzugang benutzbar.
+
 ### E-2026-09-03-13 — Credit-Werte bleiben die der Datenbank
 
 **Frage:** S4 nennt Startwerte (Exposétext 5, Kurztext 2, Bild 3 je Bild,

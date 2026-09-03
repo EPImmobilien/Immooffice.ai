@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Seitenkopf } from "@/components/Seitenkopf";
+import { buttonKlassen } from "@/components/ui/Button";
 import { VertragAnlegen } from "@/components/vertraege/VertragAnlegen";
 import { Karte, KarteBeschreibung, KarteKopf, KarteTitel } from "@/components/ui/Karte";
 import { Hinweis, Marke } from "@/components/ui/Status";
@@ -77,6 +78,15 @@ export default async function VertraegeSeite() {
       <Hinweis ton="warnung" className="mb-5" titel="Was diese Unterschrift ist">
         {SIGNATUR_EINORDNUNG}
       </Hinweis>
+
+      {darfAnlegen && (
+        <div className="mb-5 flex flex-wrap gap-2">
+          <Link href="/vertraege/vorlage/maklervertrag" className={buttonKlassen()}>Maklervertrag aus Vorlage</Link>
+          <Link href="/vertraege/vorlage/objektnachweis" className={buttonKlassen({ variante: "sekundaer" })}>Objektnachweis</Link>
+          <Link href="/uebergaben" className={buttonKlassen({ variante: "sekundaer" })}>Übergabeprotokolle</Link>
+          <Link href="/notar" className={buttonKlassen({ variante: "sekundaer" })}>Notar-Laufzettel</Link>
+        </div>
+      )}
 
       {darfAnlegen && (
         <div className="mb-5">

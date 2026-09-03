@@ -140,6 +140,17 @@ export default async function VertragSeite({
         </Hinweis>
       )}
 
+      <div className="mb-5 flex flex-wrap gap-2">
+        <a href={`/api/dokumente/vertrag/${data.id}?format=pdf${data.vollmacht_mitgenerieren ? "&vollmacht=1" : ""}`} target="_blank" rel="noreferrer" className={buttonKlassen({ variante: "sekundaer" })}>
+          PDF{data.vollmacht_mitgenerieren ? " mit Vollmacht" : ""}
+        </a>
+        <a href={`/api/dokumente/vertrag/${data.id}?format=docx`} className={buttonKlassen({ variante: "sekundaer" })}>Word</a>
+        {data.art === "maklervertrag" && (
+          <Link href={`/notar?vertrag=${data.id}`} className={buttonKlassen({ variante: "leise" })}>Notar-Laufzettel</Link>
+        )}
+        {data.original_pfad && <Marke>Original-PDF abgelegt</Marke>}
+      </div>
+
       <div className="space-y-5">
         <VertragBearbeiten
           vertragId={data.id}

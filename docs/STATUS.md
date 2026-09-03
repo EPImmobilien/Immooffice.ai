@@ -5,6 +5,50 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 04.09.2026 (Paket 7) — Verkauf: Vertragsvorlagen, Vollmacht, Objektnachweis, Übergabeprotokoll, Notar-Laufzettel, Vertragsimport
+
+**Branch:** `claude/autonomie-integrations-prompt-rl2qkr` · Referenz-Kachel „Verkauf“ nach `docs/FUNKTIONSABGLEICH.md` (V1, V2)
+
+### Erledigt (Migration `20260904090000_verkauf.sql`, im Projekt ausgerollt, 20 Nachweise grün)
+
+- **Maklervertrag aus Vorlage:** Verkäufertypen (Einzelperson, Eheleute, mehrere,
+  Erbengemeinschaft, Firma), Provisionsmodelle (Teilung, nur Verkäufer, nur
+  Käufer) mit § 656d-Warnung, Laufzeit, Verbraucher/Unternehmer, Vollmacht
+  mitgenerieren (eigener Vertrag, im PDF als Anlage), Untervollmacht. Objekt
+  und Kontakt belegen vor; Text bleibt bis zur Unterschrift bearbeitbar.
+- **Objektnachweis** mit Provisionsvereinbarung (§ 656c), Besichtigungsdatum,
+  Ausweisprüfung; Unterschrift über den vorhandenen Signaturlink.
+- **Vertrag aus PDF einlesen** (KI, 5 Credits; ohne KI Mustererkennung):
+  Textauslesung, Felder ins Formular, Original im Bucket abgelegt.
+- **PDF und Word** für Verträge, Protokolle und Laufzettel aus einer
+  Dokumentstruktur (`src/lib/dokument`), Briefkopf des Mandanten mit Logo.
+- **Übergabeprotokoll** als Assistent (7 Schritte): Stammdaten, Schlüssel,
+  Zähler mit Foto und KI-Auslesung (1 Credit), Räume mit Zustand, Sonstiges,
+  Unterschriften auf dem Bildschirm (Canvas), Abschluss; abgeschlossene
+  Protokolle sind in der Datenbank unveränderlich.
+- **Notar-Laufzettel** (8 Schritte): Immobilie, Verkäufer, Käufer, Kaufpreis
+  und Bank, Sonstiges, Anhänge mit KI-Auswertung, Beauftragung, Abschluss mit
+  Begleitschreiben an das Notariat, Statusfolge Entwurf → Bereit → Versendet →
+  Abgeschlossen. Maklervertrag und Objektnachweis belegen die Parteien vor.
+- **Ende-zu-Ende gegen den lokalen Stack:** Maklervertrag mit Vollmacht über die
+  Oberfläche angelegt (PDF 200, Word 200, Vollmacht-Anlage im Text),
+  Objektnachweis angelegt, Übergabeprotokoll mit Unterschriften gespeichert und
+  abgeschlossen, Laufzettel mit Vorbelegung, Begleitschreiben, PDF/Word,
+  Statuswechsel.
+- Prüfstand: Typecheck, Lint, 381 Unit-Tests, 370 Datenbank-Nachweise lokal,
+  Marken-Scan, Produktions-Build.
+
+### Nicht erledigt — und warum
+
+| Punkt | Grund |
+|---|---|
+| Fotos je Raum im Übergabeprotokoll | Ablage läuft über die Unterlagen des Objekts; ein Foto-Upload je Raum folgt mit dem Bild-Werkzeuge-Paket (W1) |
+| Behördenanfragen (Flurkarte, Altlasten) mit Vorlagen je Amt | gehört zu den Geschäftsbriefen (R1): gleiche Vorlagenlogik, Versand über das Postfach |
+| Vorunterzeichnung des Maklers per Signaturbild | kommt mit dem Profil (N1) |
+| Zählerstand-KI und Vertragsimport mit echtem Modell | kein Modellzugang in dieser Umgebung; Fehlerpfade und Credit-Freigabe sind getestet |
+
+---
+
 ## 03.09.2026 (Paket 6, Teil 1) — Schnittstelle, Bildmarke, Produktionsfehler, Funktionsabgleich
 
 **Branch:** `claude/autonomie-integrations-prompt-rl2qkr`

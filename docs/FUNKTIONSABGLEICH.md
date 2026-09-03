@@ -40,7 +40,7 @@ in `docs/STATUS.md`.
 | Funktion | Stand | Paket |
 |---|---|---|
 | Personen, Firmen, Anrede/Titel, Quelle, Einwilligung | ✓ | — |
-| Mehrfachrollen je Kontakt (Interessent, Eigentümer, Käufer, Mieter, Notar, Bank) | ◐ (Rolle je Objektbezug) | V1 |
+| Mehrfachrollen je Kontakt (Interessent, Eigentümer, Käufer, Mieter, Notar, Bank) | ✓ (kontakt_rollen) | — |
 | Suchprofil am Kontakt, Matching | ✓ | — |
 | Verknüpfte Objekte, Eigentümerzuordnung | ✓ | — |
 | E-Mail-Verlauf zur Adresse | ◐ (Postfach ordnet zu; Anzeige am Kontakt fehlt) | N1 |
@@ -74,16 +74,16 @@ in `docs/STATUS.md`.
 | Funktion | Stand | Paket |
 |---|---|---|
 | Maklervertrag (Verkäufertypen, Provisionsmodelle, § 656d) | ✓ | — |
-| Vollmacht mitgenerieren (PDF angehängt / Word zweite Datei) | ✗ | V1 |
-| Word-Export | ✗ (nur PDF) | V1 |
-| Objektnachweis (beidseitig, aus PDF einlesen) | ✗ | V1 |
+| Vollmacht mitgenerieren (PDF angehängt / Word zweite Datei) | ✓ | V1 |
+| Word-Export | ✓ | V1 |
+| Objektnachweis (beidseitig, aus PDF einlesen) | ◐ (Vorlage und Signatur; Einlesen nur für Maklerverträge) | V1 |
 | Objektbewertung | ✓ (Wertermittlung) | — |
 | Objektaufnahme vor Ort | ✓ | — |
-| Übergabeprotokoll (Stammdaten, Schlüssel, Zähler mit KI-Auslesung, Räume mit Fotos, Sonstiges, Unterschriften, PDF) | ◐ (Vertragsart vorhanden, Assistent fehlt) | V1 |
+| Übergabeprotokoll (Stammdaten, Schlüssel, Zähler mit KI-Auslesung, Räume mit Fotos, Sonstiges, Unterschriften, PDF) | ✓ (Raumfotos über Objektunterlagen) | V1 |
 | Reservierungen (Neubau) | ✗ | P2 |
-| Notar-Laufzettel (8 Schritte: Immobilie, Verkäufer, Käufer, Kaufpreis, Sonstiges, Anhänge mit KI, Beauftragung, Abschluss PDF/Word/ZIP) | ✗ | V2 |
-| Notar-Anschreiben, Behördenanfragen | ✗ | V2 |
-| Maklervertrag aus PDF importieren (KI) | ✗ | V1 |
+| Notar-Laufzettel (8 Schritte: Immobilie, Verkäufer, Käufer, Kaufpreis, Sonstiges, Anhänge mit KI, Beauftragung, Abschluss PDF/Word/ZIP) | ✓ (PDF/Word; kein ZIP) | V2 |
+| Notar-Anschreiben, Behördenanfragen | ◐ (Anschreiben ✓, Behördenanfragen → R1) | V2 |
+| Maklervertrag aus PDF importieren (KI) | ✓ | V1 |
 | Signatur-Vorgänge, öffentliche Signaturseite | ✓ | — |
 | Vorunterzeichnung des Maklers per Bild | ✗ | V1 |
 
@@ -94,7 +94,7 @@ in `docs/STATUS.md`.
 | Mietanfragen aus Portalen (Mail-Parser) und Selbstauskunft-Formular | ✗ | M1 |
 | Bewertung der Anfrage, Antwortvorlagen | ✗ | M1 |
 | Mietverträge inkl. Neubau-Klausel, PDF | ✗ | M1 |
-| Übergabeprotokolle Ein-/Auszug | ◐ | V1 |
+| Übergabeprotokolle Ein-/Auszug | ✓ | V1 |
 
 ## Kachel 8 — Exposé-Schmiede
 
