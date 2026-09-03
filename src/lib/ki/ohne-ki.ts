@@ -3,6 +3,8 @@ import { OBJEKTKATEGORIEN } from "@/lib/objekt-begriffe";
 
 import { lueckenErmitteln } from "./luecken";
 import type {
+  AntwortAuftrag,
+  AntwortErgebnis,
   TextAnbieter,
   TextAuftrag,
   TextErgebnis,
@@ -120,5 +122,21 @@ export class OhneKiAnbieter implements TextAnbieter {
       credits: 0,
       kostenCent: 0,
     };
+  }
+
+  /** Hoeflicher Rahmen ohne Modell: Dank, Stichpunkte des Nutzers, Gruss. */
+  async antwortEntwerfen(auftrag: AntwortAuftrag): Promise<AntwortErgebnis> {
+    const bezug = auftrag.betreff ? ` zu „${auftrag.betreff.replace(/^(re|aw|fwd?|wg):\s*/i, "")}“` : "";
+    const zeilen = [
+      "Guten Tag,",
+      "",
+      `vielen Dank für Ihre Nachricht${bezug}.`,
+      "",
+      ...(auftrag.stichpunkte ? [auftrag.stichpunkte.trim(), ""] : []),
+      "Mit freundlichen Grüßen",
+      auftrag.absenderName,
+      auftrag.unternehmen,
+    ];
+    return { text: zeilen.join("\n"), kiVerwendet: false, quelle: this.name, credits: 0, kostenCent: 0 };
   }
 }

@@ -5,7 +5,7 @@
  * genau einen Arbeiter in `src/lib/jobs/worker.ts`.
  */
 
-export const JOB_ARTEN = ["sync", "ki_text", "ki_bild", "mail", "export"] as const;
+export const JOB_ARTEN = ["sync", "ki_text", "ki_bild", "mail", "export", "postfach"] as const;
 export type JobArt = (typeof JOB_ARTEN)[number];
 
 export type JobStatus = "offen" | "laeuft" | "fertig" | "fehler" | "abgebrochen";

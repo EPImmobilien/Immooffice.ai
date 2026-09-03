@@ -5,6 +5,71 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 03.09.2026 (Paket 4a) — Phase 4: Postfächer (Microsoft 365, Google, IMAP)
+
+**Branch:** `claude/autonomie-integrations-prompt-rl2qkr`
+
+**Gate B ist freigegeben** (Auftraggeber, 03.09.2026: „b passt“). Damit beginnt
+Phase 4 nach `docs/AUTONOMIE.md` Abschnitt 7: Postfächer, Propstack, FlowFact,
+Anmeldung über Google/Microsoft. Der Stripe-Livebetrieb wartet auf
+Live-Schlüssel und anwaltlich geprüfte Rechtstexte (`docs/ZUGAENGE_FEHLEND.md`).
+
+### Erledigt
+
+**Datenmodell (Migration `20260903160000_postfaecher.sql`, im Projekt ausgerollt)**
+- `postfaecher` (persönlich oder Unternehmen; Zugangsdaten verschlüsselt und
+  für Benutzer nicht lesbar), `postfach_freigaben`, `nachrichten` (nur
+  Kopfdaten und Text, P4), `nachricht_anhaenge` (Kennung, Name, Größe — der
+  Inhalt bleibt beim Anbieter).
+- RLS: persönliche Postfächer sieht nur der verbundene Benutzer;
+  Unternehmenspostfächer die Verwaltung und freigegebene Kollegen (P1).
+  Benutzer ändern an Nachrichten nur Lesestatus und Zuordnung (Spaltenrechte);
+  den Eingang schreibt allein der Arbeiter.
+- Einplaner alle fünf Minuten mit Rückzug nach Fehlern, Aufbewahrung 24 Monate
+  je Unternehmen (P7), Trennen mit Anonymisierung, Löschen erst danach;
+  Volltextindex (`german`).
+
+**Anbieter-Schicht (`src/lib/postfach/`)**
+- IMAP/SMTP (imapflow, nodemailer, mailparser) mit UIDVALIDITY/UIDNEXT-
+  Abgleich und Ablage in „Gesendet“ (P5); Microsoft Graph mit Delta-Abfrage,
+  Text statt HTML, Antworten über createReply; Gmail mit History-API und
+  Versand im selben Thread. OAuth2 mit Aktualisierungstoken; der Zustand ist
+  signiert und an Benutzer und Mandant gebunden (E-27).
+- Zuordnung (P3): Absender → Kontakt, Objektnummer oder Anschrift → Objekt;
+  ab 90 % automatisch und gekennzeichnet, darunter als Vorschlag. Jede
+  Zuordnung erscheint im Objekt- und Kontaktverlauf.
+- Job-Art `postfach` im Arbeiter; die Tagesarbeiten planen Abrufe ein und
+  räumen nach der Aufbewahrungsfrist auf.
+
+**Oberfläche**
+- `/postfach`: Eingang, Suche, Filter, Detail, Zuordnung mit Vorschlag,
+  Anhänge in die Unterlagen eines Objekts übernehmen, Antworten und neue
+  Nachrichten, KI-Antwortentwurf (Credits nach `credit_preise.ki_text_einzeln`,
+  gekennzeichnet, editierbar; ohne KI-Zugang ein Rahmen aus Stichpunkten).
+- `/einstellungen/postfaecher`: Microsoft/Google verbinden (sobald Client-IDs
+  vorliegen), IMAP/SMTP mit Verbindungsprüfung, Unternehmenspostfächer und
+  Freigaben, Abrufabstand, Signatur (P6), Trennen und Entfernen.
+- Rechte-Modul `postfach`, Navigationseintrag, Einstellungskarte.
+
+**Nachweise**
+- `supabase/tests/postfaecher.sql` (45 Prüfungen): Sichtbarkeit je Benutzer,
+  Freigaben, Spaltenrechte, mandantenreine Zuordnung, Senderecht, Einplaner,
+  Aufbewahrung, Trennen — lokal (**303 von 303** insgesamt) und im Projekt
+  `usguiggfciavwzkdfjgt` bestanden (Migration nach Trockenlauf ausgerollt).
+- Unit-Tests: Texthelfer, Zuordnung, MIME, OAuth, Microsoft, Google, Übernahme
+  (37 neue) — insgesamt 331. Typecheck, Lint, Marken-Scan, Produktions-Build grün.
+
+### Nicht erledigt — und warum
+
+| Punkt | Grund |
+|---|---|
+| Verbindung mit einem echten Microsoft- oder Google-Konto | keine Client-IDs in dieser Umgebung (`docs/ZUGAENGE_FEHLEND.md`); die Anbieter sind gegen Fetch-Attrappen getestet, IMAP/SMTP gegen MIME-Fixtures — der erste Lauf gegen ein echtes Konto ist der nächste Schritt, sobald Zugänge vorliegen |
+| Push-Benachrichtigungen der Anbieter (P4, „wo verfügbar“) | der Abgleich läuft im Fünf-Minuten-Takt; Graph-Subscriptions und Gmail-Pub/Sub brauchen eine öffentliche Adresse — nach der Netlify-Einrichtung |
+| Suche über den Volltextindex | vorerst ILIKE über Betreff, Absender und Text (E-30) |
+| Aufbewahrungsfrist in der Oberfläche einstellen | Spalte und Aufräumlauf stehen; die Einstellung kommt mit dem Plattform-Admin |
+
+---
+
 ## 03.09.2026 (Paket 3) — Phase 3: Abo, Testphase, Lesemodus, Stripe im Testmodus — **Gate B**
 
 **Branch:** `claude/autonomie-integrations-prompt-rl2qkr`

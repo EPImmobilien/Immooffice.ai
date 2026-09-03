@@ -248,6 +248,75 @@ Der Auftragstext in `docs/AUTONOMIE.md` bleibt unverändert.
 ausgeschlossen — verwirrt bei jeder Prüfung. Der Scan bleibt streng; die
 Umbenennung ist billig.
 
+### E-2026-09-03-26 — Postfach spiegelt nur Text, Anhänge bleiben beim Anbieter
+
+**Frage:** Was von einer E-Mail wird in ImmoOffice.ai gespeichert?
+
+**Entscheidung:** Kopfdaten und Text (HTML wird beim Abruf in Text überführt),
+Anhänge nur als Kennung, Name, Typ und Größe. Der Inhalt eines Anhangs wird
+erst geholt, wenn jemand ihn in die Unterlagen eines Objekts übernimmt. Nach
+der Aufbewahrungsfrist (Vorgabe 24 Monate, je Unternehmen einstellbar) bleibt
+nur die Verknüpfung; beim Trennen werden nicht zugeordnete Nachrichten
+gelöscht, zugeordnete anonymisiert.
+
+**Begründung:** P4 und P7 des Auftragstexts, und Datensparsamkeit: Ein
+Mail-Archiv wäre ein zweiter Client — genau das schließt P8 aus.
+
+### E-2026-09-03-27 — OAuth-Rückruf an Benutzer und Mandant gebunden
+
+**Frage:** Wie verhindert die Anwendung, dass ein Microsoft- oder Google-Konto
+im falschen Mandanten oder bei einem fremden Benutzer landet?
+
+**Entscheidung:** Der Zustand (`state`) des OAuth-Ablaufs trägt Benutzer,
+Mandant, Anbieter und die Absicht (persönlich oder Unternehmen), ist mit dem
+Verschlüsselungsschlüssel signiert und 15 Minuten gültig. Der Rückruf prüft
+Signatur, Ablauf und die angemeldete Sitzung. Dauerhaft gespeichert wird nur
+das Aktualisierungstoken — verschlüsselt, für Benutzer unlesbar.
+
+**Begründung:** Der Rückruf kommt von außen; ohne Bindung an die Sitzung wäre
+er eine Tür in fremde Mandanten.
+
+### E-2026-09-03-28 — Antworten laufen über den Anbieter, nicht über den Plattformversand
+
+**Frage:** Wie werden Antworten versendet, damit sie beim Absender im Ordner
+„Gesendet“ liegen (P5)?
+
+**Entscheidung:** Microsoft: `createReply` → Text setzen → `send` (Graph legt
+die Nachricht ab und hält den Verlauf). Google: Versand als RFC-822-Quelltext
+im selben Thread mit `In-Reply-To`. IMAP: Versand über SMTP und Ablage per
+IMAP-APPEND im Ordner „Gesendet“. Vor jedem Versand entsteht erst die Zeile in
+`nachrichten` — die Policy entscheidet, ob über das Postfach gesendet werden
+darf, bevor etwas rausgeht.
+
+**Begründung:** P5 wörtlich; und die Reihenfolge „erst Datenbank, dann
+Versand“ macht das Senderecht in der Datenbank zur letzten Instanz.
+
+### E-2026-09-03-29 — KI-Antwortentwurf nutzt den Preis „ki_text_einzeln“
+
+**Frage:** Was kostet ein KI-Antwortentwurf, und wie wird er abgerechnet?
+
+**Entscheidung:** Der Entwurf ist ein einzelner KI-Text und läuft über den
+bestehenden Preisschlüssel `ki_text_einzeln` aus `credit_preise` (2 Credits,
+im Plattform-Admin änderbar): Reservierung vor dem Aufruf, Einlösen nach
+Erfolg, Freigabe bei Fehler. Ohne KI-Zugang entsteht ein Rahmen aus den
+Stichpunkten — ohne Kennzeichnung als KI und ohne Credits. An den Anbieter
+gehen nur Betreff, Text ohne Zitate und Stichpunkte, keine Adressen.
+
+**Begründung:** Kein neuer Preis im Code (Masterprompt 14), und Abschnitt 16:
+personenbezogene Daten auf das Minimum.
+
+### E-2026-09-03-30 — Suche im Postfach vorerst per ILIKE
+
+**Frage:** Der Volltextindex (`german`) liegt in der Datenbank; die
+Datenzugriffsschicht kann ihn ohne eigene Funktion nicht nutzen.
+
+**Entscheidung:** Die Oberfläche sucht in Betreff, Absender und Text per
+ILIKE (bis 100 Treffer). Eine Datenbankfunktion für die Volltextsuche folgt
+mit der Härtung, wenn Postfächer in Betrieb sind.
+
+**Begründung:** Für die Datenmengen der ersten Kunden reicht ILIKE; eine
+weitere Migration ohne Betriebserfahrung wäre Vorsorge ins Blaue.
+
 ### E-2026-09-03-13 — Credit-Werte bleiben die der Datenbank
 
 **Frage:** S4 nennt Startwerte (Exposétext 5, Kurztext 2, Bild 3 je Bild,

@@ -1,6 +1,6 @@
 import { lueckenErmitteln } from "./luecken";
 import { TEXTARTEN, TEXTSTILE } from "./typen";
-import type { TextAnbieter, TextAuftrag, TextErgebnis } from "./typen";
+import type { AntwortAuftrag, AntwortErgebnis, TextAnbieter, TextAuftrag, TextErgebnis } from "./typen";
 
 /**
  * Textanbieter auf Basis der OpenAI-API.
@@ -147,6 +147,85 @@ export class OpenAiAnbieter implements TextAnbieter {
       // Abschnitt 14: vollstaendige Exposé-Texterstellung kostet 10 Credits,
       // ein einzelner Text 2. Zentral konfigurierbar ab Phase 1.
       credits: auftrag.arten.length >= 4 ? 10 : auftrag.arten.length * 2,
+      kostenCent: Math.round(kostenCent * 100) / 100,
+    };
+  }
+
+  async antwortEntwerfen(auftrag: AntwortAuftrag): Promise<AntwortErgebnis> {
+    const anweisung = [
+      "Du entwirfst Antwort-E-Mails für einen deutschen Immobilienmakler.",
+      "",
+      "Verbindliche Regeln:",
+      "1. Verwende AUSSCHLIESSLICH die übergebene Nachricht, die Stichpunkte und die Objektdaten.",
+      "2. Erfinde keine Termine, Preise, Zusagen, Ausstattungsmerkmale oder Rechtsaussagen.",
+      "3. Fehlt eine Information, die zur Antwort nötig wäre, stelle eine höfliche Rückfrage.",
+      "4. Sprich die Person nur mit Namen an, wenn der Name in der Nachricht steht; sonst „Guten Tag“.",
+      "5. Sachlich, freundlich, kurz. Deutsch. Sie-Form.",
+      `6. Schließe mit „Mit freundlichen Grüßen“, dann „${auftrag.absenderName}“ und „${auftrag.unternehmen}“.`,
+      "",
+      "Antworte nur mit dem Text der E-Mail, ohne Betreffzeile und ohne Erklärungen.",
+    ].join("\n");
+
+    const objektdaten = auftrag.objekt
+      ? JSON.stringify(
+          {
+            art: auftrag.objekt.objektart ?? auftrag.objekt.objektkategorie,
+            vermarktung: auftrag.objekt.vermarktungsart,
+            ort: auftrag.objekt.ort,
+            wohnflaeche_qm: auftrag.objekt.wohnflaeche,
+            zimmer: auftrag.objekt.zimmer,
+            baujahr: auftrag.objekt.baujahr,
+            kaufpreis_eur: auftrag.objekt.kaufpreis,
+            kaltmiete_eur: auftrag.objekt.kaltmiete,
+          },
+          null,
+          1,
+        )
+      : "keine";
+
+    const antwort = await fetch(`${this.basisUrl}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.schluessel}` },
+      body: JSON.stringify({
+        model: this.modell,
+        messages: [
+          { role: "system", content: anweisung },
+          {
+            role: "user",
+            content: [
+              `Betreff: ${auftrag.betreff ?? "(ohne Betreff)"}`,
+              "",
+              "Eingegangene Nachricht:",
+              auftrag.text.slice(0, 4000),
+              "",
+              `Stichpunkte für die Antwort: ${auftrag.stichpunkte?.trim() || "keine — freundlich bestätigen und nächste Schritte anbieten"}`,
+              "",
+              `Objektdaten: ${objektdaten}`,
+            ].join("\n"),
+          },
+        ],
+      }),
+    });
+
+    if (!antwort.ok) {
+      throw new Error(`Der Antwortentwurf ist fehlgeschlagen (${antwort.status}).`);
+    }
+    const ergebnis = (await antwort.json()) as {
+      choices?: { message?: { content?: string } }[];
+      usage?: { prompt_tokens?: number; completion_tokens?: number };
+    };
+    const text = ergebnis.choices?.[0]?.message?.content?.trim();
+    if (!text) throw new Error("Das Modell hat keinen Entwurf geliefert.");
+
+    const eingabe = ergebnis.usage?.prompt_tokens ?? 0;
+    const ausgabe = ergebnis.usage?.completion_tokens ?? 0;
+    const kostenCent = (eingabe / 1_000_000) * PREIS_EINGABE_JE_MIO + (ausgabe / 1_000_000) * PREIS_AUSGABE_JE_MIO;
+    return {
+      text,
+      kiVerwendet: true,
+      quelle: `${this.name} (${this.modell})`,
+      // Ein einzelner KI-Text (credit_preise: ki_text_einzeln); der Wert hier dient nur der Anzeige.
+      credits: 2,
       kostenCent: Math.round(kostenCent * 100) / 100,
     };
   }

@@ -213,16 +213,22 @@ Netlify ruft den Arbeiter danach von selbst jede Minute auf
 1. Auf portal.azure.com anmelden → **App registrations** → **New registration**.
 2. Name `ImmoOffice.ai`. Bei „Supported account types": **Accounts in any
    organizational directory (Any Microsoft Entra ID tenant)**.
-   Bei „Redirect URI": Web, `https://immooffice.ai/api/auth/microsoft/callback`
-   → Register.
+   Bei „Redirect URI": Web, `https://immooffice.ai/api/postfach/oauth/rueckruf`
+   → Register. (Für die Anmeldung über Microsoft kommt später eine zweite
+   Adresse dazu: `https://usguiggfciavwzkdfjgt.supabase.co/auth/v1/callback`
+   — unter **Authentication** → **Add a platform** → Web.)
 3. Auf der Übersichtsseite „Application (client) ID" kopieren →
    `MICROSOFT_CLIENT_ID=`.
 4. **Certificates & secrets** → **New client secret** → Beschreibung
    `immooffice`, Ablauf 24 Monate → Add. Den Wert unter „Value" (nicht „Secret
    ID") sofort kopieren → `MICROSOFT_CLIENT_SECRET=`.
 5. **API permissions** → **Add a permission** → Microsoft Graph → Delegated →
-   `Mail.ReadWrite`, `Mail.Send`, `Calendars.ReadWrite`, `offline_access`,
-   `User.Read` → Add permissions.
+   `Mail.ReadWrite`, `Mail.Send`, `offline_access`, `User.Read` (für den
+   Kalender später `Calendars.ReadWrite`) → Add permissions.
+6. In `.env.local` bleibt `MICROSOFT_TENANT_ID="common"`, damit Kunden aus
+   jedem Microsoft-Konto verbinden können. Danach in ImmoOffice.ai unter
+   **Einstellungen → Postfächer** auf „Microsoft 365 verbinden" klicken — die
+   Anwendung leitet zu Microsoft, fragt den Zugriff ab und zurück.
 
 ### Google Workspace / Gmail
 
@@ -235,11 +241,22 @@ Netlify ruft den Arbeiter danach von selbst jede Minute auf
    solange die App nicht von Google geprüft ist, können nur diese sie nutzen.
 4. **Credentials** → **Create credentials** → OAuth client ID → Web application
    → Name `ImmoOffice.ai` → bei „Authorized redirect URIs":
-   `https://immooffice.ai/api/auth/google/callback` → Create.
+   `https://immooffice.ai/api/postfach/oauth/rueckruf` (Postfach) und
+   `https://usguiggfciavwzkdfjgt.supabase.co/auth/v1/callback` (Anmeldung über
+   Google, später) → Create.
 5. „Client ID" → `GOOGLE_CLIENT_ID=`, „Client secret" → `GOOGLE_CLIENT_SECRET=`.
 6. Die Google-Prüfung („Verification") beantragen Sie, sobald die Anbindung
    fertig ist — das dauert mehrere Wochen und braucht eine öffentliche
-   Datenschutzerklärung unter `https://immooffice.ai/datenschutz`.
+   Datenschutzerklärung unter `https://immooffice.ai/datenschutz`. Bis dahin
+   verbinden nur die eingetragenen Testnutzer.
+
+### Andere Anbieter (IMAP/SMTP)
+
+Nichts vorzubereiten: Jeder Benutzer trägt unter **Einstellungen → Postfächer**
+→ „Anderer Anbieter" Server, Benutzername und Passwort ein (bei vielen
+Anbietern ein App-Passwort). Die Verbindung wird vor dem Speichern geprüft;
+die Zugangsdaten liegen verschlüsselt (Abschnitt 6) und sind danach nicht mehr
+abrufbar.
 
 ## 10. onOffice — für Kunden, die es nutzen
 

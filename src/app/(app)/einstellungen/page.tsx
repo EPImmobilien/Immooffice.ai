@@ -192,6 +192,21 @@ export default async function EinstellungenSeite() {
 
         <Karte>
           <KarteKopf>
+            <KarteTitel>Postfächer</KarteTitel>
+            <KarteBeschreibung>
+              Microsoft 365, Google oder IMAP verbinden — Eingang lesen, zuordnen,
+              antworten. Kein Mail-Client: Ordner und Regeln bleiben beim Anbieter.
+            </KarteBeschreibung>
+          </KarteKopf>
+          <KarteInhalt>
+            <Link href="/einstellungen/postfaecher" className="text-[13px] font-medium text-akzent hover:underline">
+              Zu den Postfächern
+            </Link>
+          </KarteInhalt>
+        </Karte>
+
+        <Karte>
+          <KarteKopf>
             <KarteTitel>Zugänge</KarteTitel>
             <KarteBeschreibung>
               Wer im Unternehmen mit welcher Rolle arbeitet. Rechte werden

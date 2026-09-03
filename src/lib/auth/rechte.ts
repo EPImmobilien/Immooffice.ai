@@ -40,6 +40,7 @@ export const MODULE = [
   "auswertungen",
   "einstellungen",
   "abrechnung",
+  "postfach",
 ] as const;
 
 export type Modul = (typeof MODULE)[number];
@@ -77,6 +78,7 @@ const MATRIX: Record<Rolle, Rechte> = {
     auswertungen: ALLE,
     einstellungen: ALLE,
     abrechnung: ALLE,
+    postfach: ALLE,
   },
   administrator: {
     objekte: ALLE,
@@ -89,6 +91,7 @@ const MATRIX: Record<Rolle, Rechte> = {
     auswertungen: ALLE,
     einstellungen: ALLE,
     abrechnung: LESEN,
+    postfach: ALLE,
   },
   makler: {
     objekte: BEARBEITEN,
@@ -99,6 +102,7 @@ const MATRIX: Record<Rolle, Rechte> = {
     marketing: BEARBEITEN,
     kalender: ALLE,
     auswertungen: LESEN,
+    postfach: BEARBEITEN,
   },
   assistenz: {
     objekte: BEARBEITEN,
@@ -108,6 +112,7 @@ const MATRIX: Record<Rolle, Rechte> = {
     vertraege: LESEN,
     marketing: BEARBEITEN,
     kalender: ALLE,
+    postfach: BEARBEITEN,
   },
   marketing: {
     objekte: LESEN,
@@ -125,6 +130,7 @@ const MATRIX: Record<Rolle, Rechte> = {
     marketing: LESEN,
     kalender: LESEN,
     auswertungen: LESEN,
+    postfach: LESEN,
   },
 };
 

@@ -80,8 +80,35 @@ export interface TextAuftrag {
   arten: Textart[];
 }
 
+/**
+ * Antwortentwurf auf eine E-Mail (Postfach, docs/AUTONOMIE.md P3).
+ *
+ * Uebergeben werden nur Betreff, Text und Stichpunkte — keine Adressen
+ * (Abschnitt 16: personenbezogene Daten auf das Minimum).
+ */
+export interface AntwortAuftrag {
+  betreff: string | null;
+  /** Text der eingegangenen Nachricht ohne zitierte Vorgaenger. */
+  text: string;
+  /** Was die Antwort sagen soll — Stichpunkte des Nutzers, optional. */
+  stichpunkte: string | null;
+  /** Objektdaten, falls die Nachricht einem Objekt zugeordnet ist. */
+  objekt: ObjektKontext | null;
+  absenderName: string;
+  unternehmen: string;
+}
+
+export interface AntwortErgebnis {
+  text: string;
+  kiVerwendet: boolean;
+  quelle: string;
+  credits: number;
+  kostenCent: number;
+}
+
 export interface TextAnbieter {
   readonly name: string;
   readonly istKi: boolean;
   texteErzeugen(auftrag: TextAuftrag): Promise<TextErgebnis>;
+  antwortEntwerfen(auftrag: AntwortAuftrag): Promise<AntwortErgebnis>;
 }

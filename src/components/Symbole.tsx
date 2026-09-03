@@ -23,7 +23,8 @@ export type SymbolName =
   | "einstellungen"
   | "abrechnung"
   | "portale"
-  | "dokumente";
+  | "dokumente"
+  | "postfach";
 
 const PFADE: Record<SymbolName, React.ReactNode> = {
   objekte: (
@@ -122,6 +123,12 @@ const PFADE: Record<SymbolName, React.ReactNode> = {
     <>
       <path d="M4.5 6.5h5l2 2.5h8v11h-15Z" />
       <path d="M4.5 6.5V4.5h5l2 2.5" />
+    </>
+  ),
+  postfach: (
+    <>
+      <rect x="3" y="5.5" width="18" height="13" rx="2" />
+      <path d="m3.5 7 8.5 6 8.5-6" />
     </>
   ),
 };

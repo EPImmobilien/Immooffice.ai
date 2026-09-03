@@ -8,9 +8,13 @@ import { kontextErzeugen, type Connector } from "@/integrationen/kern/connector"
 import { syncAusfuehren, type LaufEingabe } from "@/integrationen/kern/lauf";
 import { connectorFinden } from "@/integrationen/kern/registry";
 import { SpeicherSupabase } from "@/integrationen/kern/speicher-supabase";
-import { objektEntschluesseln } from "@/integrationen/kern/zugangsdaten";
+import { entschluesseln, objektEntschluesseln, verschluesseln } from "@/integrationen/kern/zugangsdaten";
 import { mailSenden } from "@/lib/mail/versand";
 import { istVorlage, vorlage } from "@/lib/mail/vorlagen";
+import { nachrichtenUebernehmen } from "@/lib/postfach/abgleich";
+import { anbieterErzeugen } from "@/lib/postfach/anbieter";
+import { fehlerText } from "@/lib/postfach/oauth";
+import { istPostfachNutzlast, zugangParsen } from "@/lib/postfach/typen";
 import { dienstClient } from "@/lib/supabase/dienst";
 
 import { istSyncNutzlast, type JobZeile } from "./typen";
@@ -102,6 +106,8 @@ async function auftragAusfuehren(
       return syncAuftrag(supabase, job, fetchFn);
     case "mail":
       return mailAuftrag(supabase, job, fetchFn);
+    case "postfach":
+      return postfachAuftrag(supabase, job, fetchFn);
     default:
       throw new Error(`Fuer Auftraege der Art „${job.art}" gibt es noch keinen Arbeiter.`);
   }
@@ -112,15 +118,24 @@ async function auftragAusfuehren(
  * Abo-Zustaende pruefen (Lesemodus, Erinnerungen, Benutzerlimit). Beides
  * ist idempotent und billig; ein Fehler hier haelt die Warteschlange nicht an.
  */
-export async function tagesarbeiten(): Promise<{ eingeplant: number; abos: Record<string, unknown> }> {
+export async function tagesarbeiten(): Promise<{
+  eingeplant: number;
+  abos: Record<string, unknown>;
+  postfaecher: number;
+  aufgeraeumt: number;
+}> {
   const supabase = dienstClient();
-  const [einplaner, abos] = await Promise.all([
+  const [einplaner, abos, postfaecher, aufgeraeumt] = await Promise.all([
     supabase.rpc("sync_faellige_einplanen"),
     supabase.rpc("abos_pruefen"),
+    supabase.rpc("postfaecher_faellige_einplanen"),
+    supabase.rpc("nachrichten_aufraeumen"),
   ]);
   return {
     eingeplant: typeof einplaner.data === "number" ? einplaner.data : 0,
     abos: (abos.data as Record<string, unknown> | null) ?? {},
+    postfaecher: typeof postfaecher.data === "number" ? postfaecher.data : 0,
+    aufgeraeumt: typeof aufgeraeumt.data === "number" ? aufgeraeumt.data : 0,
   };
 }
 
@@ -277,6 +292,70 @@ async function syncAuftrag(
       .update({ status: "fehler", fehler_text: text.slice(0, 500) })
       .eq("id", integration.id)
       .eq("mandant_id", integration.mandant_id);
+    throw e;
+  }
+}
+
+/**
+ * Ein Postfach abgleichen (docs/AUTONOMIE.md P4): Zugangsdaten entschluesseln,
+ * neue Nachrichten holen, mit Zuordnung speichern, Abgleichzustand und ggf.
+ * erneuerte Tokens zurueckschreiben. Fehler zaehlen hoch — der Einplaner
+ * streckt dann den Abstand.
+ */
+async function postfachAuftrag(
+  supabase: SupabaseClient,
+  job: JobZeile,
+  fetchFn: typeof globalThis.fetch,
+): Promise<Record<string, unknown>> {
+  if (!istPostfachNutzlast(job.nutzlast)) throw new Error("Die Nutzlast des Postfach-Auftrags ist unvollstaendig.");
+
+  const { data: postfach, error } = await supabase
+    .from("postfaecher")
+    .select("id, mandant_id, benutzer_id, anbieter, adresse, anzeigename, zugangsdaten, sync_zustand, status, fehler_zaehler")
+    .eq("id", job.nutzlast.postfach_id)
+    .eq("mandant_id", job.mandant_id)
+    .maybeSingle();
+  if (error || !postfach) throw new Error("Das Postfach wurde nicht gefunden.");
+  if (postfach.status === "getrennt" || !postfach.zugangsdaten) throw new Error("Das Postfach ist getrennt.");
+
+  const mandantId = postfach.mandant_id as string;
+  const zugang = zugangParsen(entschluesseln(postfach.zugangsdaten as string, mandantId));
+  const absender = {
+    adresse: postfach.adresse as string,
+    ...(postfach.anzeigename ? { name: postfach.anzeigename as string } : {}),
+  };
+  const anbieter = anbieterErzeugen(zugang, absender, fetchFn);
+  const jetzt = new Date().toISOString();
+
+  try {
+    const ergebnis = await anbieter.abrufen((postfach.sync_zustand as Record<string, unknown> | null) ?? {}, { maxAnzahl: 50 });
+    const uebernommen = await nachrichtenUebernehmen(supabase, { id: postfach.id as string, mandant_id: mandantId }, ergebnis.nachrichten);
+
+    const erneuert = anbieter.aktualisierterZugang?.() ?? null;
+    await supabase
+      .from("postfaecher")
+      .update({
+        sync_zustand: ergebnis.zustand,
+        letzter_abruf_am: jetzt,
+        status: "aktiv",
+        fehler_text: null,
+        fehler_zaehler: 0,
+        ...(erneuert ? { zugangsdaten: verschluesseln(JSON.stringify(erneuert), mandantId) } : {}),
+      })
+      .eq("id", postfach.id);
+
+    return { ...uebernommen, vollstaendig: ergebnis.vollstaendig };
+  } catch (e) {
+    const text = fehlerText(e);
+    await supabase
+      .from("postfaecher")
+      .update({
+        status: "fehler",
+        fehler_text: text.slice(0, 500),
+        fehler_zaehler: ((postfach.fehler_zaehler as number | null) ?? 0) + 1,
+        letzter_abruf_am: jetzt,
+      })
+      .eq("id", postfach.id);
     throw e;
   }
 }
