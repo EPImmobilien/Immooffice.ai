@@ -5,6 +5,68 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 04.09.2026 (Paket 12) — Kalender-Ausbau: Ansichten, Serien, Erinnerungen, Fahrzeiten, Bestätigung, Abo, Abgleich
+
+**Branch:** `claude/autonomie-integrations-prompt-rl2qkr` · Referenz-Kachel „Kalender“ nach `docs/FUNKTIONSABGLEICH.md` (K1, K2)
+
+### Erledigt (Migration `20260904140000_kalender.sql`, im Projekt ausgerollt, 23 Nachweise grün)
+
+- **Ansichten:** Tag, Woche, Monat, Liste; Farbe je Mitarbeiter (eigene
+  Farbe einstellbar), Personenfilter, Ganztagszeile, überlappende Termine
+  nebeneinander, Klick in eine Stunde öffnet das Formular mit Datum und Zeit.
+- **Termin:** Anlass, Art, Zeit oder ganztägig (mehrtägig), Ort (leer =
+  Objektanschrift), Objekt, Kontakt, Zuständiger, Teilnehmer (Zuständiger
+  automatisch dabei), Erinnerung (30 Min bis 2 Tage, Standard 6 h),
+  Nachfassen nach Besichtigung, privat (nur Beteiligte und Verwaltung sehen
+  ihn — Policies getrennt), Notiz; Detailseite mit Absage, Löschen,
+  Kalenderdatei.
+- **Serien:** täglich, wöchentlich (mit Wochentagen), alle 2 Wochen,
+  monatlich, vierteljährlich, jährlich, eigener Turnus; Ende nach Anzahl
+  oder Datum; Vorschau; Ändern und Löschen „nur dieser“ oder „alle
+  folgenden“ (`termin_loeschen`, weiches Löschen).
+- **Erinnerungen und Nachfassen:** `termine_erinnerungen_faellig` +
+  Mailversand an Zuständigen und Teilnehmer in den Tagesarbeiten, Vermerk am
+  Termin; `besichtigungen_nachfassen` legt am Folgetag eine Aufgabe mit
+  Terminbezug an.
+- **Fahrzeiten:** Anfahrt ab Vortermin (≤ 4 h Abstand) oder Startadresse,
+  Rückfahrt zum Folgetermin oder zur Startadresse, Puffer je Fahrt;
+  Geokodierung über OpenStreetMap mit Cache (`geokodierung`, nur über
+  Funktionen), Route über OpenRouteService mit `ROUTING_API_KEY`, sonst
+  gekennzeichnete Schätzung; Schraffur vor und nach dem Termin im Kalender.
+- **Terminbestätigung:** Text nach Referenz (Anrede, Art, Objekt, Zeit,
+  Ort), Betreff, Kalenderdatei als Anhang — über das Postfach; Versand
+  wird am Termin vermerkt; Häkchen schon beim Anlegen.
+- **Kalender-Abo (ICS):** `/api/kalender/<token>` je Benutzer (Token nur
+  über Funktion lesbar, erneuerbar, unbekannt = leerer Kalender), Termine
+  ±90/400 Tage, webcal-Link.
+- **Abgleich Google/Microsoft:** `src/lib/kalender/sync.ts` über die
+  OAuth-Verbindung des Postfachs (neue Berechtigungen `Calendars.ReadWrite`,
+  `calendar.events`): eigene Termine hinaus (anlegen/aktualisieren/löschen,
+  Kennung in der Beschreibung), fremde herein als „Sonstiges“; Schalter und
+  „Jetzt abgleichen“ in den Kalender-Einstellungen; läuft mit jedem
+  Postfach-Abruf.
+- **Einstellungen je Benutzer:** Startadresse, Besichtigungsdauer, Puffer,
+  Fahrzeiten an/aus, Farbe.
+- **Ende-zu-Ende gegen den lokalen Stack:** Einstellungen; Formular über
+  Stundenklick; Serie „wöchentlich“ mit 10 Terminen; Detail mit Serienmarke,
+  Fahrzeit-Berechnung, Änderung „alle folgenden“; ICS-Download; Abo-Feed;
+  Bestätigung öffnet Postfach mit Text und Anhang; Löschen „alle folgenden“;
+  Monats- und Tagesansicht.
+- Prüfstand: Typecheck, Lint, 422 Unit-Tests (Zeitzonen, Serien, ICS,
+  Fahrzeit, Bestätigung), 501 Datenbank-Nachweise lokal, Marken-Scan,
+  Produktions-Build.
+
+### Nicht erledigt — und warum
+
+| Punkt | Grund |
+|---|---|
+| Live-Abgleich gegen echte Google-/Microsoft-Kalender | keine OAuth-Zugänge (`docs/ZUGAENGE_FEHLEND.md`); Aufrufe nach Schnittstellenbeschreibung, Fehlerpfade abgefangen |
+| Fahrzeit aus der Straßenroute | ohne `ROUTING_API_KEY` Schätzung aus der Luftlinie, sichtbar gekennzeichnet |
+| Drag-and-drop zum Verschieben | Verschieben über das Formular; folgt mit dem Werkzeuge-Paket |
+| Abgleich mit onOffice-Terminen | Connector-Paket (Phase 2, Objekte/Kontakte) — Termine folgen dort |
+
+---
+
 ## 04.09.2026 (Paket 11) — Rechnungen (GoBD) und Geschäftsbriefe
 
 **Branch:** `claude/autonomie-integrations-prompt-rl2qkr` · Referenz-Kacheln „Rechnungen“ und „Dokumente → Geschäftsbriefe“ nach `docs/FUNKTIONSABGLEICH.md` (R1)

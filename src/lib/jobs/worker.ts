@@ -9,11 +9,13 @@ import { syncAusfuehren, type LaufEingabe } from "@/integrationen/kern/lauf";
 import { connectorFinden } from "@/integrationen/kern/registry";
 import { SpeicherSupabase } from "@/integrationen/kern/speicher-supabase";
 import { entschluesseln, objektEntschluesseln, verschluesseln } from "@/integrationen/kern/zugangsdaten";
+import { terminErinnerungenSenden } from "@/lib/kalender/erinnerungen";
+import { kalenderAbgleichen, kalenderAnbieterErzeugen } from "@/lib/kalender/sync";
 import { mailSenden } from "@/lib/mail/versand";
 import { istVorlage, vorlage } from "@/lib/mail/vorlagen";
 import { nachrichtenUebernehmen } from "@/lib/postfach/abgleich";
 import { anbieterErzeugen } from "@/lib/postfach/anbieter";
-import { fehlerText } from "@/lib/postfach/oauth";
+import { fehlerText, oauthKonfig } from "@/lib/postfach/oauth";
 import { istPostfachNutzlast, zugangParsen } from "@/lib/postfach/typen";
 import { rueckrufeZustellen } from "@/lib/schnittstelle/rueckruf";
 import { dienstClient } from "@/lib/supabase/dienst";
@@ -127,18 +129,27 @@ export async function tagesarbeiten(): Promise<{
   aufgeraeumt: number;
   reservierungen: number;
   akquiseLaeufe: number;
+  nachfassen: number;
+  erinnerungen: { gesendet: number; fehler: string | null };
   waechter: string | null;
   rueckrufe: { zugestellt: number; gescheitert: number } | string;
 }> {
   const supabase = dienstClient();
-  const [einplaner, abos, postfaecher, aufgeraeumt, reservierungen, akquiseLaeufe] = await Promise.all([
+  const [einplaner, abos, postfaecher, aufgeraeumt, reservierungen, akquiseLaeufe, nachfassen] = await Promise.all([
     supabase.rpc("sync_faellige_einplanen"),
     supabase.rpc("abos_pruefen"),
     supabase.rpc("postfaecher_faellige_einplanen"),
     supabase.rpc("nachrichten_aufraeumen"),
     supabase.rpc("reservierungen_ablaufen"),
     supabase.rpc("akquise_laeufe_ausfuehren"),
+    supabase.rpc("besichtigungen_nachfassen"),
   ]);
+  let erinnerungen: { gesendet: number; fehler: string | null };
+  try {
+    erinnerungen = await terminErinnerungenSenden(supabase, globalThis.fetch);
+  } catch (e) {
+    erinnerungen = { gesendet: 0, fehler: e instanceof Error ? e.message : "unbekannt" };
+  }
   let waechter: string | null = null;
   try {
     waechter = await waechterMelden(supabase);
@@ -158,6 +169,8 @@ export async function tagesarbeiten(): Promise<{
     aufgeraeumt: typeof aufgeraeumt.data === "number" ? aufgeraeumt.data : 0,
     reservierungen: typeof reservierungen.data === "number" ? reservierungen.data : 0,
     akquiseLaeufe: typeof akquiseLaeufe.data === "number" ? akquiseLaeufe.data : 0,
+    nachfassen: typeof nachfassen.data === "number" ? nachfassen.data : 0,
+    erinnerungen,
     waechter,
     rueckrufe,
   };
@@ -386,7 +399,7 @@ async function postfachAuftrag(
 
   const { data: postfach, error } = await supabase
     .from("postfaecher")
-    .select("id, mandant_id, benutzer_id, anbieter, adresse, anzeigename, zugangsdaten, sync_zustand, status, fehler_zaehler")
+    .select("id, mandant_id, benutzer_id, anbieter, adresse, anzeigename, zugangsdaten, sync_zustand, status, fehler_zaehler, kalender_sync, kalender_zustand")
     .eq("id", job.nutzlast.postfach_id)
     .eq("mandant_id", job.mandant_id)
     .maybeSingle();
@@ -406,11 +419,27 @@ async function postfachAuftrag(
     const ergebnis = await anbieter.abrufen((postfach.sync_zustand as Record<string, unknown> | null) ?? {}, { maxAnzahl: 50 });
     const uebernommen = await nachrichtenUebernehmen(supabase, { id: postfach.id as string, mandant_id: mandantId }, ergebnis.nachrichten);
 
+    // Kalender-Abgleich (K2) haengt am selben Zugang — nur bei OAuth-Postfaechern und wenn eingeschaltet.
+    let kalender: Record<string, unknown> | null = null;
+    if (postfach.kalender_sync && postfach.benutzer_id) {
+      const erneuertMail = anbieter.aktualisierterZugang?.() ?? zugang;
+      const kalenderAnbieter = erneuertMail.art === "imap" ? null : kalenderAnbieterErzeugen(erneuertMail, fetchFn, oauthKonfig(erneuertMail.art));
+      if (kalenderAnbieter) {
+        try {
+          const lauf = await kalenderAbgleichen(supabase, { id: postfach.id as string, mandant_id: mandantId, benutzer_id: postfach.benutzer_id as string, kalender_zustand: (postfach.kalender_zustand as Record<string, unknown> | null) ?? null }, kalenderAnbieter);
+          kalender = lauf.zustand;
+        } catch (e) {
+          kalender = { letzter_abgleich: jetzt, fehler: [fehlerText(e).slice(0, 300)] };
+        }
+      }
+    }
+
     const erneuert = anbieter.aktualisierterZugang?.() ?? null;
     await supabase
       .from("postfaecher")
       .update({
         sync_zustand: ergebnis.zustand,
+        ...(kalender ? { kalender_zustand: kalender } : {}),
         letzter_abruf_am: jetzt,
         status: "aktiv",
         fehler_text: null,
@@ -419,7 +448,7 @@ async function postfachAuftrag(
       })
       .eq("id", postfach.id);
 
-    return { ...uebernommen, vollstaendig: ergebnis.vollstaendig };
+    return { ...uebernommen, vollstaendig: ergebnis.vollstaendig, ...(kalender ? { kalender } : {}) };
   } catch (e) {
     const text = fehlerText(e);
     await supabase

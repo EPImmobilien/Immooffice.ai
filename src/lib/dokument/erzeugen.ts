@@ -3,6 +3,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createElement, type ReactElement } from "react";
 
 import { DOKUMENT_BUCKET } from "@/lib/dokumente";
+import { icsKalender } from "@/lib/kalender/ics";
+import { terminOrtText } from "@/lib/kalender/bestaetigung";
+import { TERMINARTEN, type Terminart } from "@/lib/arbeitsmittel";
 import { logoLaden } from "@/lib/expose/logo-laden";
 import { briefAlsDokument, rechnungAlsDokument, type Absender, type Brief, type Position, type Rechnung } from "@/lib/rechnungen";
 
@@ -79,7 +82,11 @@ export async function briefDokumentLaden(supabase: SupabaseClient, mandantId: st
  * PDF einer Rechnung oder eines Briefs als Anhang: Liegt eine festgeschriebene
  * Datei im Storage, wird genau diese verwendet — nie eine neue Fassung.
  */
-export async function anhangPdf(supabase: SupabaseClient, mandantId: string, mandantName: string, art: "rechnung" | "brief", id: string): Promise<{ dateiname: string; mime: string; inhalt: Buffer; bezeichnung: string } | null> {
+export async function anhangPdf(supabase: SupabaseClient, mandantId: string, mandantName: string, art: "rechnung" | "brief" | "termin", id: string): Promise<{ dateiname: string; mime: string; inhalt: Buffer; bezeichnung: string } | null> {
+  if (art === "termin") {
+    const t = await terminIcsLaden(supabase, mandantId, id, mandantName);
+    return t ? { dateiname: t.dateiname, mime: "text/calendar", inhalt: Buffer.from(t.ics, "utf8"), bezeichnung: t.bezeichnung } : null;
+  }
   const geladen = art === "rechnung" ? await rechnungDokumentLaden(supabase, mandantId, id) : await briefDokumentLaden(supabase, mandantId, id);
   if (!geladen) return null;
   const pfad = "rechnung" in geladen ? geladen.rechnung.pdf_pfad : geladen.brief.pdf_pfad;
@@ -104,4 +111,24 @@ export async function pdfFestschreiben(supabase: SupabaseClient, mandantId: stri
     // Ohne erreichbaren Storage bleibt die Rechnung gestellt; das PDF wird dann bei jedem Abruf aus dem eingefrorenen Snapshot gerendert.
     return null;
   }
+}
+
+/** Termin als Kalenderdatei (.ics) — fuer Terminbestaetigungen und den Download. */
+export async function terminIcsLaden(supabase: SupabaseClient, mandantId: string, id: string, mandantName: string): Promise<{ ics: string; dateiname: string; bezeichnung: string } | null> {
+  const { data: t } = await supabase.from("termine").select("id, titel, art, beginnt_am, endet_am, ganztags, ort, notiz, abgesagt_am, geaendert_am, objekt:objekte(objektnummer, bezeichnung, strasse, hausnummer, plz, ort)").eq("id", id).eq("mandant_id", mandantId).maybeSingle();
+  if (!t) return null;
+  const objekt = t.objekt as unknown as { objektnummer: string; bezeichnung: string; strasse: string | null; hausnummer: string | null; plz: string | null; ort: string | null } | null;
+  const artText = TERMINARTEN[t.art as Terminart] ?? "Termin";
+  const ics = icsKalender([{
+    id: t.id as string,
+    titel: `${t.titel as string} – ${mandantName}`,
+    beginnt_am: t.beginnt_am as string,
+    endet_am: t.endet_am as string,
+    ganztags: Boolean(t.ganztags),
+    ort: terminOrtText({ ort: (t.ort as string | null) ?? null }, objekt) || null,
+    beschreibung: [artText, objekt ? `${objekt.objektnummer} · ${objekt.bezeichnung}` : null].filter(Boolean).join(" · "),
+    abgesagt: Boolean(t.abgesagt_am),
+    geaendert_am: (t.geaendert_am as string | null) ?? null,
+  }], mandantName);
+  return { ics, dateiname: `Termin_${dateinameSicher(t.titel as string, 60)}.ics`, bezeichnung: `Termin „${t.titel as string}“` };
 }

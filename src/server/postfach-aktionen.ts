@@ -374,8 +374,8 @@ export async function nachrichtSenden(_vorher: PostfachErgebnis, formular: FormD
   const supabase = await serverClient();
   // Rechnung oder Brief als PDF anhaengen: gestellte Rechnungen kommen als festgeschriebene Datei.
   let anhang: Awaited<ReturnType<typeof anhangPdf>> = null;
-  if ((anhangArt === "rechnung" || anhangArt === "brief") && /^[0-9a-f-]{36}$/.test(anhangId)) {
-    rechtErzwingen(sitzung.rolle, "rechnungen", "lesen", sitzung.uebersteuerung);
+  if ((anhangArt === "rechnung" || anhangArt === "brief" || anhangArt === "termin") && /^[0-9a-f-]{36}$/.test(anhangId)) {
+    rechtErzwingen(sitzung.rolle, anhangArt === "termin" ? "kalender" : "rechnungen", "lesen", sitzung.uebersteuerung);
     anhang = await anhangPdf(supabase, sitzung.mandantId, sitzung.mandantName, anhangArt, anhangId);
     if (!anhang) return { fehler: "Der Anhang wurde nicht gefunden." };
   }
@@ -457,6 +457,7 @@ export async function nachrichtSenden(_vorher: PostfachErgebnis, formular: FormD
     await supabase.from("nachricht_anhaenge").insert({ mandant_id: sitzung.mandantId, nachricht_id: zeile.id, dateiname: anhang.dateiname, mime: anhang.mime, bytes: anhang.inhalt.byteLength });
     await supabase.from("nachrichten").update({ hat_anhaenge: true }).eq("id", zeile.id);
     if (anhangArt === "brief") await supabase.from("briefe").update({ status: "versendet", versendet_am: new Date().toISOString() }).eq("id", anhangId).eq("mandant_id", sitzung.mandantId);
+    if (anhangArt === "termin") await supabase.from("termine").update({ bestaetigt_am: new Date().toISOString(), bestaetigung_nachricht_id: zeile.id }).eq("id", anhangId).eq("mandant_id", sitzung.mandantId);
   }
 
   const objektId = original?.["objekt_id"] as string | null | undefined;

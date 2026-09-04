@@ -15,14 +15,14 @@ in `docs/STATUS.md`.
 | Funktion der Referenz | Stand | Paket |
 |---|---|---|
 | Termine anlegen, Besichtigung/Übergabe/Notar, Objekt- und Kontaktbezug | ✓ | — |
-| Wochen-, Monats-, Tagesansicht, farbig je Mitarbeiter | ◐ (Listenansicht) | K1 |
-| Serientermine (Besichtigungsserien) | ✗ | K1 |
-| Terminbestätigung per Mail mit Kalenderdatei (ICS) | ✗ | K1 |
-| Erinnerung sechs Stunden vorher | ✗ | K1 |
-| Fahrzeit-Vorschau zwischen Terminen | ✗ | K1 |
+| Wochen-, Monats-, Tagesansicht, farbig je Mitarbeiter | ✓ (Tag/Woche/Monat/Liste, Farbe je Mitarbeiter, Personenfilter, Klick in Stunde legt an) | K1 |
+| Serientermine (Besichtigungsserien) | ✓ (täglich/wöchentlich mit Wochentagen/monatlich/jährlich/eigener Turnus, Ende nach Anzahl oder Datum; ändern und löschen „nur dieser“/„alle folgenden“) | K1 |
+| Terminbestätigung per Mail mit Kalenderdatei (ICS) | ✓ (Postfach mit Text und .ics-Anhang, Versand am Termin vermerkt; Kalenderdatei auch als Download) | K1 |
+| Erinnerung sechs Stunden vorher | ✓ (wählbar 30 Min bis 2 Tage, Mail an Zuständigen und Teilnehmer über die Tagesarbeiten; dazu Nachfass-Aufgabe am Tag nach der Besichtigung) | K1 |
+| Fahrzeit-Vorschau zwischen Terminen | ✓ (Anfahrt/Rückfahrt ab Vortermin oder Startadresse, Schraffur im Kalender; Routendienst mit Schlüssel, sonst gekennzeichnete Schätzung) | K1 |
 | Zuordnung Termin → Objektaufnahme/Lead („Aus der Aufnahme entsteht der Lead“) | ✓ (Objektaufnahme → „Akquise-Lead daraus anlegen“) | A1 |
 | Abgleich in beide Richtungen mit onOffice | ◐ (Objekte/Kontakte) | K2 |
-| Google-/Outlook-Kalender-Sync | ✗ | K2 |
+| Google-/Outlook-Kalender-Sync | ✓ (über das verbundene Microsoft-365-/Google-Postfach, beide Richtungen, plus ICS-Abo je Benutzer für jede Kalender-App) — Live-Lauf offen bis OAuth-Zugänge vorliegen | K2 |
 
 ## Kachel 2 — ToDos (Aufgaben)
 

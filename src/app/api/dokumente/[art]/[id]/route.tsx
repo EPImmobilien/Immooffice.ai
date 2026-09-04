@@ -7,7 +7,7 @@ import { akquiseEinstellungenLaden, vergleichswerteLaden } from "@/lib/akquise/v
 import { wertindikationAlsDokument } from "@/lib/akquise/wertindikation-dokument";
 import { rechtErzwingen } from "@/lib/auth/rechte";
 import { sitzungLaden } from "@/lib/auth/sitzung";
-import { briefDokumentLaden, briefkopfLaden, rechnungDokumentLaden } from "@/lib/dokument/erzeugen";
+import { briefDokumentLaden, briefkopfLaden, rechnungDokumentLaden, terminIcsLaden } from "@/lib/dokument/erzeugen";
 import { DokumentPdf } from "@/lib/dokument/pdf";
 import { textZuDokument, type Briefkopf, type Dokument } from "@/lib/dokument/struktur";
 import { dokumentAlsWord } from "@/lib/dokument/word";
@@ -35,12 +35,18 @@ export async function GET(anfrage: Request, { params }: { params: Promise<{ art:
   const { art, id } = await params;
   const sitzung = await sitzungLaden();
   if (!sitzung) return NextResponse.json({ fehler: "Nicht angemeldet." }, { status: 401 });
-  rechtErzwingen(sitzung.rolle, art === "wertindikation" ? "akquise" : art === "rechnung" || art === "brief" ? "rechnungen" : "vertraege", "lesen", sitzung.uebersteuerung);
+  rechtErzwingen(sitzung.rolle, art === "wertindikation" ? "akquise" : art === "rechnung" || art === "brief" ? "rechnungen" : art === "termin" ? "kalender" : "vertraege", "lesen", sitzung.uebersteuerung);
   if (!/^[0-9a-f-]{36}$/.test(id)) return NextResponse.json({ fehler: "Nicht gefunden." }, { status: 404 });
 
   const url = new URL(anfrage.url);
   const format = url.searchParams.get("format") === "docx" ? "docx" : "pdf";
   const supabase = await serverClient();
+
+  if (art === "termin") {
+    const t = await terminIcsLaden(supabase, sitzung.mandantId, id, sitzung.mandantName);
+    if (!t) return NextResponse.json({ fehler: "Nicht gefunden." }, { status: 404 });
+    return new NextResponse(t.ics, { headers: { "Content-Type": "text/calendar; charset=utf-8", "Content-Disposition": `attachment; filename="${t.dateiname}"`, "Cache-Control": "no-store" } });
+  }
 
   let absender: Partial<Absender> | null = null;
   let dokument: Dokument | null = null;

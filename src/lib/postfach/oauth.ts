@@ -17,8 +17,8 @@ export interface OAuthKonfig {
   tenant: string;
 }
 
-export const MICROSOFT_SCOPES = ["offline_access", "User.Read", "Mail.ReadWrite", "Mail.Send"];
-export const GOOGLE_SCOPES = ["https://www.googleapis.com/auth/gmail.modify", "https://www.googleapis.com/auth/userinfo.email"];
+export const MICROSOFT_SCOPES = ["offline_access", "User.Read", "Mail.ReadWrite", "Mail.Send", "Calendars.ReadWrite"];
+export const GOOGLE_SCOPES = ["https://www.googleapis.com/auth/gmail.modify", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/calendar.events"];
 
 export type Umgebung = Record<string, string | undefined>;
 

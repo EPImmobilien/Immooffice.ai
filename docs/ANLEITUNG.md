@@ -592,6 +592,47 @@ Assistenz bearbeiten, Nur-Lesen sehen).
    gewählten Absenders; „Word“ liefert eine bearbeitbare Fassung. Versand
    per Post vermerken oder „Per E-Mail senden“ mit dem PDF als Anhang.
 
+## 10g. Kalender — Ansichten, Serien, Erinnerungen, Fahrzeiten, Abo, Abgleich
+
+Menü **Kalender**. Rechte über das Modul „Kalender“.
+
+1. **Ansichten:** Tag, Woche, Monat, Liste; „Heute“ und Pfeile zum Blättern.
+   Jeder Mitarbeiter hat eine Farbe; die Personen-Chips filtern. Ein Klick
+   in eine Stunde der Wochen- oder Tagesansicht öffnet das Formular mit
+   Datum und Uhrzeit.
+2. **Termin anlegen:** Anlass, Art, Zeit und Dauer oder „Ganztägig“
+   (auch mehrtägig), Ort (leer = Anschrift des Objekts), Objekt, Kontakt,
+   Zuständiger und Teilnehmer, Erinnerung (Standard 6 Stunden vorher, per
+   E-Mail an alle Beteiligten), bei Besichtigungen „Nachfassen“ (am
+   Folgetag entsteht eine Aufgabe), „Privat“ (nur Beteiligte und Verwaltung
+   sehen den Termin). Hat der Kontakt eine E-Mail-Adresse, kann die
+   **Terminbestätigung** gleich mit angehakt werden: Das Postfach öffnet sich
+   mit fertigem Text und Kalenderdatei.
+3. **Serien:** „Wiederholung“ wählen (täglich, wöchentlich mit Wochentagen,
+   alle 2 Wochen, monatlich, vierteljährlich, jährlich, eigener Turnus) und
+   Ende nach Anzahl oder Datum; die Vorschau zeigt die Zahl der Termine.
+   Beim Bearbeiten eines Serientermins wählen Sie „nur diesen“ oder „diesen
+   und alle folgenden“; zum Löschen gibt es beide Knöpfe.
+4. **Fahrzeit:** Auf der Terminseite „Fahrzeit berechnen“ — Anfahrt vom
+   vorherigen Termin des Tages (höchstens vier Stunden Abstand) oder von der
+   Startadresse, Rückfahrt zum nächsten Termin oder zurück. Im Kalender
+   erscheint die Fahrt als Schraffur vor und nach dem Termin. Ohne
+   Routendienst (`ROUTING_API_KEY`, OpenRouteService) wird aus der Luftlinie
+   geschätzt und das gekennzeichnet. Startadresse, Puffer und Standarddauer
+   stehen in **Kalender → Einstellungen**.
+5. **Kalender-Abo:** In den Einstellungen steht Ihre persönliche Abo-Adresse
+   (ICS). Tragen Sie sie in Apple Kalender, Google Kalender oder Outlook als
+   Abonnement ein — schreibgeschützt, aktualisiert sich selbst. Die Adresse
+   ist ein Geheimnis; „Adresse erneuern“ sperrt die alte.
+6. **Abgleich mit Google Kalender / Outlook:** Voraussetzung ist ein
+   verbundenes Microsoft-365- oder Google-Postfach (Abschnitt 9); beim
+   Verbinden wird die Kalender-Berechtigung mit angefragt (bestehende
+   Verbindungen einmal neu verbinden). In den Kalender-Einstellungen
+   „Einschalten“ und bei Bedarf „Jetzt abgleichen“. Ihre Termine wandern in
+   den dortigen Kalender, dort angelegte Termine erscheinen hier als
+   „Sonstiges“ und werden dort gepflegt. Der Abgleich läuft mit jedem
+   Postfach-Abruf.
+
 ## 11. Was Sie an Gate A und Gate B entscheiden
 
 - **Gate A** (bereits erreicht): Bestandsaufnahme, Funktionsmatrix, Architektur

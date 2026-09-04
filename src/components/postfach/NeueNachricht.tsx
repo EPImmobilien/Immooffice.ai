@@ -10,7 +10,7 @@ import { nachrichtSenden, type PostfachErgebnis } from "@/server/postfach-aktion
 import type { PostfachZeile } from "./typen";
 
 /** Neue Nachricht ueber ein verbundenes Postfach (P5). */
-export function NeueNachricht({ postfaecher, an, betreff, text, anhang }: { postfaecher: PostfachZeile[]; an?: string | undefined; betreff?: string | undefined; text?: string | undefined; anhang?: { art: "rechnung" | "brief"; id: string; bezeichnung: string } | undefined }) {
+export function NeueNachricht({ postfaecher, an, betreff, text, anhang }: { postfaecher: PostfachZeile[]; an?: string | undefined; betreff?: string | undefined; text?: string | undefined; anhang?: { art: "rechnung" | "brief" | "termin"; id: string; bezeichnung: string } | undefined }) {
   const [zustand, aktion, laeuft] = useActionState<PostfachErgebnis, FormData>(nachrichtSenden, {});
   const sendbar = postfaecher.filter((p) => p.status !== "getrennt");
   if (sendbar.length === 0) return <Hinweis ton="warnung">Kein sendefähiges Postfach verbunden.</Hinweis>;
@@ -21,7 +21,7 @@ export function NeueNachricht({ postfaecher, an, betreff, text, anhang }: { post
       {zustand.fehler && <Hinweis ton="fehler">{zustand.fehler}</Hinweis>}
       {zustand.erfolg && <Hinweis ton="erfolg">{zustand.erfolg}</Hinweis>}
       {anhang && !zustand.erfolg && (
-        <Hinweis ton="info">Anhang: {anhang.bezeichnung} (PDF) wird mitgesendet.<input type="hidden" name="anhang_art" value={anhang.art} /><input type="hidden" name="anhang_id" value={anhang.id} /></Hinweis>
+        <Hinweis ton="info">Anhang: {anhang.bezeichnung}{anhang.art === "termin" ? "" : " (PDF)"} wird mitgesendet.<input type="hidden" name="anhang_art" value={anhang.art} /><input type="hidden" name="anhang_id" value={anhang.id} /></Hinweis>
       )}
       <div className="grid gap-3 sm:grid-cols-2">
         <Feld beschriftung="Über Postfach" id="n-postfach">

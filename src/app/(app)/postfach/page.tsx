@@ -115,9 +115,12 @@ export default async function PostfachSeite({ searchParams }: { searchParams: Pr
   const neuParameter = new URLSearchParams({ ...parameter, neu: "1" });
 
   // Rechnung oder Brief als Anhang (Link aus der Rechnungs-/Briefseite)
-  let anhang: { art: "rechnung" | "brief"; id: string; bezeichnung: string } | undefined;
-  if (p.neu === "1" && (p.anhang_art === "rechnung" || p.anhang_art === "brief") && p.anhang_id && /^[0-9a-f-]{36}$/.test(p.anhang_id)) {
-    if (p.anhang_art === "rechnung") {
+  let anhang: { art: "rechnung" | "brief" | "termin"; id: string; bezeichnung: string } | undefined;
+  if (p.neu === "1" && (p.anhang_art === "rechnung" || p.anhang_art === "brief" || p.anhang_art === "termin") && p.anhang_id && /^[0-9a-f-]{36}$/.test(p.anhang_id)) {
+    if (p.anhang_art === "termin") {
+      const { data: t } = await supabase.from("termine").select("titel").eq("id", p.anhang_id).maybeSingle();
+      if (t) anhang = { art: "termin", id: p.anhang_id, bezeichnung: `Kalenderdatei „${t.titel as string}“ (.ics)` };
+    } else if (p.anhang_art === "rechnung") {
       const { data: r } = await supabase.from("rechnungen").select("rechnungsnummer").eq("id", p.anhang_id).maybeSingle();
       if (r) anhang = { art: "rechnung", id: p.anhang_id, bezeichnung: `Rechnung ${(r.rechnungsnummer as string | null) ?? "(Entwurf)"}` };
     } else {

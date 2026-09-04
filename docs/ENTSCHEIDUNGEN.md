@@ -676,6 +676,49 @@ Referenz kennt persönliche Absender mit eigener Startnummer — das ist die
 Struktur, nicht eine Kennung. Maklerverträge nennen die Provision nach
 Handelsbrauch inklusive Umsatzsteuer.
 
+### E-2026-09-04-49 — Serien werden ausgeschrieben, Termine bleiben eigene Zeilen; Erinnerungen laufen über die Tagesarbeiten
+
+**Frage:** Wie werden Serientermine gespeichert, und woher kommen Erinnerungen
+und das Nachfassen nach Besichtigungen?
+
+**Entscheidung:** Eine Serie wird beim Anlegen ausgeschrieben (höchstens 200
+Termine, höchstens drei Jahre); jeder Termin ist eine Zeile mit `serie_id`
+und der Regel als JSON. Ändern und Löschen fragen „nur dieser“ oder „dieser
+und alle folgenden“. Erinnerungen (Standard sechs Stunden, wählbar) und die
+Nachfass-Aufgabe am Tag nach einer Besichtigung erzeugt der Arbeiter in den
+Tagesarbeiten aus Datenbankfunktionen; Löschen ist weich (`geloescht_am`),
+damit der Kalender-Abgleich die Löschung weitergeben kann. Private Termine
+sieht nur, wer beteiligt ist — die frühere Schreib-Policy „for all“ wirkte
+auch beim Lesen und wurde in Anlegen/Ändern/Löschen getrennt.
+
+**Begründung:** Ausgeschriebene Termine lassen sich einzeln verschieben,
+absagen und mit fremden Kalendern abgleichen; eine Regel-Auswertung zur
+Laufzeit könnte das nicht. Die Referenz arbeitet ebenso (Edge Function
+„termin-serie“). Erinnerungen über die vorhandene Job-Kette mit Wächter
+statt einer zweiten Zeitsteuerung (Grundprinzip 4).
+
+### E-2026-09-04-50 — Fahrzeiten mit OpenStreetMap-Geokodierung und optionalem Routendienst; Kalender-Abgleich über das Postfach-OAuth, ICS-Abo für alle
+
+**Frage:** Welche Dienste dürfen für Fahrzeiten und Kalender-Abgleich
+angebunden werden, und was funktioniert ohne Zugangsdaten?
+
+**Entscheidung:** Adressen werden über Nominatim (OpenStreetMap) geokodiert,
+sparsam und mit Cache in der Datenbank (nur Adresse → Koordinate, kein
+Personenbezug). Die Route kommt von OpenRouteService, wenn
+`ROUTING_API_KEY` gesetzt ist; sonst wird aus der Luftlinie geschätzt und
+das in Kalender und Termin sichtbar gekennzeichnet. Der Abgleich mit Google
+Kalender und Outlook nutzt die OAuth-Verbindung des Postfachs (zusätzliche
+Kalender-Berechtigung beim Verbinden) und läuft mit jedem Postfach-Abruf;
+Konfliktregel: der ImmoOffice-Datensatz gewinnt, fremde Termine kommen als
+„Sonstiges“ herein. Unabhängig davon gibt es je Benutzer ein ICS-Abo mit
+geheimem, erneuerbarem Link.
+
+**Begründung:** Keine Geheimnisse im Code; jede Anbindung muss ohne
+Schlüssel degradieren statt zu blockieren (`docs/AUTONOMIE.md`). Das ICS-Abo
+deckt Apple, Google und Outlook ohne jede Freigabe ab. Der OAuth-Abgleich
+ist gebaut, aber ohne Testzugänge nicht live geprüft — vermerkt in
+`docs/ZUGAENGE_FEHLEND.md`.
+
 ### E-2026-09-03-13 — Credit-Werte bleiben die der Datenbank
 
 **Frage:** S4 nennt Startwerte (Exposétext 5, Kurztext 2, Bild 3 je Bild,
