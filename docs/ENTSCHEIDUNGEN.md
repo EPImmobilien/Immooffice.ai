@@ -586,6 +586,47 @@ Makler vorliegt und die er verantworten kann. Portal-Scraping verstößt in der
 Regel gegen Nutzungsbedingungen und ist wettbewerbs- und urheberrechtlich
 ungeklärt — ein rechtlicher Blocker, kein technischer.
 
+### E-2026-09-04-45 — Aufgaben bleiben eine Tabelle, Notizen sind Aufgaben vom Typ „notiz“; Checklisten erledigen sich über Unterlagen
+
+**Frage:** Braucht es für Notizen, Schritte, Kommentare und Checklisten neue
+Module oder eigene Datenmodelle?
+
+**Entscheidung:** Die Tabelle `aufgaben` wird erweitert (Status mit fünf
+Stufen, Typ Aufgabe/Notiz, Tags, Wiederholung, Erinnerung, Quelle,
+Sichtbarkeit, Verknüpfungen zu Lead, Termin, Nachricht und Vertrag); Schritte
+und Kommentare sind Kindtabellen, Kommentare unveränderlich. Status und
+Erledigt-Zeitpunkt gleicht ein Trigger ab, Statuswechsel und Übergaben
+protokolliert die Datenbank als Systemkommentar, Wiederholungen erzeugen beim
+Erledigen die nächste Aufgabe. Checklisten haben Vorlagen mit Punkten
+(Pflicht, Unterlagenart, Frist); ein Punkt mit Unterlagenart wird automatisch
+erledigt, sobald die Unterlage am Objekt liegt, und der Abschluss ergibt sich
+aus den Pflichtpunkten. Rechte laufen weiter über das Modul `kalender`.
+
+**Begründung:** Die Referenz führt Notizen ebenfalls als ToDos mit Tags; ein
+zweites Modell hätte die Verkettung (Objekt, Kontakt, Lead, Postfach)
+doppelt gebraucht. Regeln in der Datenbank gelten für alle Wege — Oberfläche,
+Schnittstelle, Connectoren (Masterprompt: serverseitig erzwingen; Funktions-
+prompt: verkettete Arbeitsschritte). Die Unterlage als Auslöser macht die
+Checkliste zur echten Vollständigkeitsprüfung statt zu einer Liste, die
+jemand parallel pflegen muss.
+
+### E-2026-09-04-46 — Schnelleingabe ohne KI, Rechtschreibkorrektur mit KI (1 Credit), Spracheingabe nur im Browser
+
+**Frage:** Wie entstehen Aufgaben „in Sekunden“, und wo kommt KI ins Spiel?
+
+**Entscheidung:** Die Schnelleingabe ist ein deterministischer Parser (Frist,
+Priorität, Tags, Wiederholung, Notiz) mit sichtbarer Vorschau — keine KI,
+keine Credits. Diktat nutzt die Spracherkennung des Browsers, falls
+vorhanden, ohne Audio an einen Anbieter zu senden. Die
+Rechtschreibkorrektur ist eine KI-Funktion (`ki_text_korrektur`, 1 Credit)
+mit strenger Anweisung „nur korrigieren, nichts umformulieren“; ohne
+Modellzugang bleibt der Text unverändert und die Oberfläche sagt das.
+
+**Begründung:** Ein Parser ist prüfbar (Unit-Tests) und kostet nichts;
+Masterprompt: kostenpflichtig ist nur KI-Erstellung, und jede KI-Ausgabe
+bleibt editierbar. Audio-Verarbeitung im Browser hält personenbezogene
+Daten weg von Anbietern (Abschnitt 16).
+
 ### E-2026-09-03-13 — Credit-Werte bleiben die der Datenbank
 
 **Frage:** S4 nennt Startwerte (Exposétext 5, Kurztext 2, Bild 3 je Bild,

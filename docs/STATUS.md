@@ -5,6 +5,55 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 04.09.2026 (Paket 10) — ToDos-Ausbau, Notizen, Checklisten, Heute-Zone, Rundgang
+
+**Branch:** `claude/autonomie-integrations-prompt-rl2qkr` · Referenz-Kacheln „ToDos“ und „Erinnerungen & Arbeitsketten“ nach `docs/FUNKTIONSABGLEICH.md` (N1)
+
+### Erledigt (Migration `20260904120000_aufgaben_checklisten.sql`, im Projekt ausgerollt, 29 Nachweise grün)
+
+- **Aufgaben:** Status (Offen, Läuft, Wartet, Erledigt, Verworfen) im
+  Abgleich mit dem Erledigt-Zeitpunkt, Typ Aufgabe/Notiz, Tags je Mandant,
+  Wiederholung (nächste Aufgabe beim Erledigen), Erinnerung, Sichtbarkeit
+  Team/privat, Verknüpfungen zu Lead, Termin, E-Mail, Vertrag; Schritte mit
+  Fortschritt; Kommentare mit Systemverlauf (Statuswechsel, Übergabe an
+  Kollegen), unveränderlich.
+- **Schnelleingabe** mit Parser (heute/morgen/Wochentage/„in 2 Wochen“/
+  Datum, „!!“, #Tags, Wiederholung, „Notiz:“) und Vorschau; Diktat über die
+  Browser-Spracherkennung; Liste mit Filtern, Kanban nach Status,
+  Notizen-Ansicht; Aufgabe im Detail; „Als Aufgabe übernehmen“ im Postfach
+  (Betreff, Frist aus dem Text, Verknüpfung).
+- **Rechtschreibkorrektur** der Beschreibung per KI (`ki_text_korrektur`,
+  1 Credit, Anbieter-Schnittstelle `textKorrigieren`), ohne KI unverändert.
+- **Checklisten:** Vorlagen mit Punkten (Pflicht, Unterlagenart, Frist), vier
+  Standardvorlagen je Mandant; laufende Checklisten an Objekt, Kontakt, Lead
+  oder Vertrag; Punkte abhaken, „nicht nötig“, als Aufgabe; Unterlage am
+  Objekt erledigt den Punkt (auch rückwirkend); Abschluss über Pflichtpunkte;
+  Karte auf der Objektseite, Menüpunkt „Checklisten“.
+- **Startseite:** Heute-Zone (Termine heute, fällige Aufgaben, „Wartet auf
+  Sie“ mit Unterschriften, Mietanfragen, Nachfassen, Treffern, Aufnahmen),
+  Notizen-Karte, Kacheln Akquise, Vermietung und Checklisten; **Rundgang**
+  beim ersten Anmelden (8 Schritte, hervorgehobene Bereiche), Merker am
+  Konto, Neustart über die Startseite.
+- **Ende-zu-Ende gegen den lokalen Stack:** Rundgang gestartet, weiter,
+  übersprungen; Heute-Zone; Schnelleingabe mit Vorschau (Frist, Hoch,
+  #unterlagen, wöchentlich) und Notiz; Detail mit zwei Schritten (1 von 2),
+  Kommentar, Statuswechsel im Verlauf, Erledigen mit Wiederholung; Kanban;
+  Notizen; Standardvorlagen; Checkliste am Objekt gestartet, Punkt erledigt,
+  „nicht nötig“, Punkt als Aufgabe.
+- Prüfstand: Typecheck, Lint, 407 Unit-Tests, 451 Datenbank-Nachweise lokal,
+  Marken-Scan, Produktions-Build.
+
+### Nicht erledigt — und warum
+
+| Punkt | Grund |
+|---|---|
+| Erinnerungen als Push/E-Mail zum Zeitpunkt | Feld `erinnerung_am` ist da; Versand folgt mit dem Kalender-Paket (K1, Erinnerung sechs Stunden vorher) über dieselbe Mail-Schiene |
+| Globale Suche, Profil (Foto, Signatur), Bausteine | Verwaltungs-Paket (#30) |
+| ToDo aus Mail per KI-Erkennung mehrerer Aufgaben | heute: eine Aufgabe je Mail mit erkannter Frist; Mehrfach-Erkennung mit dem KI-Assistenten-Paket (W2) |
+| Kanban per Drag-and-drop | Verschieben über Schaltflächen — funktional gleich, ohne zusätzliche Bibliothek; Drag-and-drop folgt mit dem Werkzeuge-Paket |
+
+---
+
 ## 04.09.2026 (Paket 9) — Akquise: Leads, Pipeline, Kampagnen, Quellen, Automationen, Preis-Finder, Radar, Auswertung
 
 **Branch:** `claude/autonomie-integrations-prompt-rl2qkr` · Referenz-Kachel „Akquise“ nach `docs/FUNKTIONSABGLEICH.md` (A1, A2)

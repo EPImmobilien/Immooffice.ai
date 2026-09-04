@@ -1,6 +1,6 @@
 import { lueckenErmitteln } from "./luecken";
 import { TEXTARTEN, TEXTSTILE } from "./typen";
-import type { AntwortAuftrag, AntwortErgebnis, TextAnbieter, TextAuftrag, TextErgebnis } from "./typen";
+import type { AntwortAuftrag, AntwortErgebnis, KorrekturErgebnis, TextAnbieter, TextAuftrag, TextErgebnis } from "./typen";
 
 /**
  * Textanbieter auf Basis der OpenAI-API.
@@ -228,5 +228,37 @@ export class OpenAiAnbieter implements TextAnbieter {
       credits: 2,
       kostenCent: Math.round(kostenCent * 100) / 100,
     };
+  }
+
+  /** Rechtschreibung und Grammatik: nur korrigieren, nichts umformulieren, nichts ergaenzen. */
+  async textKorrigieren(text: string): Promise<KorrekturErgebnis> {
+    const antwort = await fetch(`${this.basisUrl}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.schluessel}` },
+      body: JSON.stringify({
+        model: this.modell,
+        temperature: 0,
+        messages: [
+          {
+            role: "system",
+            content: [
+              "Du korrigierst deutsche Texte eines Immobilienmaklers.",
+              "Korrigiere ausschließlich Rechtschreibung, Grammatik, Zeichensetzung und offensichtliche Tippfehler.",
+              "Ändere weder Inhalt noch Ton noch Reihenfolge; füge nichts hinzu und lasse nichts weg. Zeilenumbrüche bleiben erhalten.",
+              "Antworte nur mit dem korrigierten Text, ohne Erklärungen.",
+            ].join("\n"),
+          },
+          { role: "user", content: text.slice(0, 8000) },
+        ],
+      }),
+    });
+    if (!antwort.ok) throw new Error(`Die Korrektur ist fehlgeschlagen (${antwort.status}).`);
+    const ergebnis = (await antwort.json()) as { choices?: { message?: { content?: string } }[]; usage?: { prompt_tokens?: number; completion_tokens?: number } };
+    const korrigiert = ergebnis.choices?.[0]?.message?.content?.replace(/\s+$/, "") ?? "";
+    if (!korrigiert) throw new Error("Das Modell hat keinen Text geliefert.");
+    const eingabe = ergebnis.usage?.prompt_tokens ?? 0;
+    const ausgabe = ergebnis.usage?.completion_tokens ?? 0;
+    const kostenCent = (eingabe / 1_000_000) * PREIS_EINGABE_JE_MIO + (ausgabe / 1_000_000) * PREIS_AUSGABE_JE_MIO;
+    return { text: korrigiert, geaendert: korrigiert.trim() !== text.trim(), kiVerwendet: true, quelle: `${this.name} (${this.modell})`, credits: 1, kostenCent: Math.round(kostenCent * 100) / 100 };
   }
 }

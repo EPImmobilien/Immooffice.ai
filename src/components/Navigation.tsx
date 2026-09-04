@@ -41,6 +41,7 @@ const EINTRAEGE: Eintrag[] = [
   { modul: "marketing", pfad: "/marketing", bezeichnung: "Marketing" },
   { modul: "kalender", pfad: "/kalender", bezeichnung: "Kalender" },
   { modul: "kalender", pfad: "/aufgaben", bezeichnung: "Aufgaben" },
+  { modul: "kalender", pfad: "/checklisten", bezeichnung: "Checklisten" },
   { modul: "auswertungen", pfad: "/auswertungen", bezeichnung: "Auswertungen" },
   { modul: "einstellungen", pfad: "/einstellungen", bezeichnung: "Einstellungen" },
   { modul: "abrechnung", pfad: "/credits", bezeichnung: "Abo und Credits" },

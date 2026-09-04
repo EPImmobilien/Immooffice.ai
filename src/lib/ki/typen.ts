@@ -106,11 +106,22 @@ export interface AntwortErgebnis {
   kostenCent: number;
 }
 
+export interface KorrekturErgebnis {
+  text: string;
+  geaendert: boolean;
+  kiVerwendet: boolean;
+  quelle: string;
+  credits: number;
+  kostenCent: number;
+}
+
 export interface TextAnbieter {
   readonly name: string;
   readonly istKi: boolean;
   texteErzeugen(auftrag: TextAuftrag): Promise<TextErgebnis>;
   antwortEntwerfen(auftrag: AntwortAuftrag): Promise<AntwortErgebnis>;
+  /** Rechtschreibung und Grammatik korrigieren — Inhalt und Ton bleiben (Referenz „text-korrigieren"). */
+  textKorrigieren(text: string): Promise<KorrekturErgebnis>;
 }
 
 // ---------------------------------------------------------------------------

@@ -17,6 +17,7 @@ import {
   type PostfachErgebnis,
 } from "@/server/postfach-aktionen";
 import { nachrichtAlsLead, type AkquiseErgebnis } from "@/server/akquise-aktionen";
+import { aufgabeAusNachricht, type ArbeitsErgebnis } from "@/server/arbeitsmittel-aktionen";
 import { nachrichtAlsAnfrage, type VermietungErgebnis } from "@/server/vermietung-aktionen";
 
 import {
@@ -58,6 +59,7 @@ export function NachrichtDetail({ nachricht, anhaenge, objekt, kontakt, vorschla
   const [entwurf, entwerfen, entwirft] = useActionState<PostfachErgebnis, FormData>(antwortEntwerfen, {});
   const [anfrage, alsAnfrage, uebernimmt] = useActionState<VermietungErgebnis, FormData>(nachrichtAlsAnfrage, {});
   const [lead, alsLead, uebernimmtLead] = useActionState<AkquiseErgebnis, FormData>(nachrichtAlsLead, {});
+  const [aufgabe, alsAufgabe, uebernimmtAufgabe] = useActionState<ArbeitsErgebnis, FormData>(aufgabeAusNachricht, {});
   const [antwortOffen, setAntwortOffen] = useState(false);
   // Ein neuer Entwurf oeffnet die Antwort und ersetzt den Text (Textarea wird per key neu aufgebaut).
   const antwortSichtbar = antwortOffen || Boolean(entwurf.entwurf);
@@ -118,6 +120,16 @@ export function NachrichtDetail({ nachricht, anhaenge, objekt, kontakt, vorschla
                 <input type="hidden" name="nachricht_id" value={nachricht.id} />
                 <Button type="submit" variante="leise" groesse="klein" laedt={uebernimmtLead}>Als Akquise-Lead übernehmen</Button>
               </form>
+            )}
+            {nachricht.ordner === "eingang" && (
+              <form action={alsAufgabe}>
+                <input type="hidden" name="nachricht_id" value={nachricht.id} />
+                <Button type="submit" variante="leise" groesse="klein" laedt={uebernimmtAufgabe}>Als Aufgabe übernehmen</Button>
+              </form>
+            )}
+            {aufgabe.fehler && <span className="text-[12px] text-fehler">{aufgabe.fehler}</span>}
+            {aufgabe.erfolg && aufgabe.id && (
+              <Link href={`/aufgaben/${aufgabe.id}`} className="text-[12px] text-akzent hover:underline">{aufgabe.erfolg} Zur Aufgabe</Link>
             )}
             {lead.fehler && <span className="text-[12px] text-fehler">{lead.fehler}</span>}
             {lead.erfolg && lead.id && (

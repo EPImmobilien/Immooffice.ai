@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { AufgabeAnlegen } from "@/components/AufgabeAnlegen";
 import { Aufgabenliste } from "@/components/Aufgabenliste";
+import { ChecklisteKarte } from "@/components/checklisten/ChecklisteKarte";
 import {
   Beteiligte,
   type Beteiligung,
@@ -421,6 +422,15 @@ export default async function ObjektSeite({
                 mitBezug={false}
               />
               {darfTermine && <AufgabeAnlegen objektId={objekt.id} />}
+            </KarteInhalt>
+          </Karte>
+
+          <Karte>
+            <KarteKopf>
+              <KarteTitel>Checklisten</KarteTitel>
+            </KarteKopf>
+            <KarteInhalt>
+              <ChecklisteKarte bezug={{ objekt_id: objekt.id }} darfAnlegen={darfTermine} heute={heute.slice(0, 10)} />
             </KarteInhalt>
           </Karte>
 

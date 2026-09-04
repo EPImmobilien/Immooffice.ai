@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { aufgabenSortieren, fristlage, kontaktname } from "./arbeitsmittel";
+import { aufgabenSortieren, fristlage, kontaktname, naechsteFaelligkeit, schnelleingabeParsen } from "./arbeitsmittel";
 
 const HEUTE = new Date("2026-08-17T10:30:00Z");
 
@@ -73,5 +73,29 @@ describe("Kontaktname", () => {
   it("liefert null ohne Kontakt", () => {
     expect(kontaktname(null)).toBeNull();
     expect(kontaktname(undefined)).toBeNull();
+  });
+});
+
+describe("Schnelleingabe", () => {
+  const heute = new Date("2026-09-03T09:00:00Z"); // Donnerstag
+  it("liest Frist, Priorität, Tags und Wiederholung aus einem Satz", () => {
+    const e = schnelleingabeParsen("Energieausweis anfordern morgen !! #unterlagen #eigentümer wöchentlich", heute);
+    expect(e).toEqual({ titel: "Energieausweis anfordern", faellig_am: "2026-09-04", prioritaet: "hoch", tags: ["unterlagen", "eigentümer"], wiederholung: "woechentlich", typ: "aufgabe" });
+  });
+  it("versteht Wochentage, relative Angaben und Daten", () => {
+    expect(schnelleingabeParsen("Rückruf Familie Sommer am Montag", heute).faellig_am).toBe("2026-09-07");
+    expect(schnelleingabeParsen("Grundbuch bestellen in 2 Wochen", heute).faellig_am).toBe("2026-09-17");
+    expect(schnelleingabeParsen("Notartermin 12.10.", heute).faellig_am).toBe("2026-10-12");
+    expect(schnelleingabeParsen("Rückblick 01.02.", heute).faellig_am).toBe("2027-02-01");
+    expect(schnelleingabeParsen("Exposé prüfen heute", heute)).toMatchObject({ titel: "Exposé prüfen", faellig_am: "2026-09-03" });
+  });
+  it("erkennt Notizen und lässt Text ohne Marker unverändert", () => {
+    expect(schnelleingabeParsen("Notiz: Flyer-Idee für Nordend", heute)).toMatchObject({ typ: "notiz", titel: "Flyer-Idee für Nordend", faellig_am: null });
+    expect(schnelleingabeParsen("Einfach nur ein Titel", heute)).toMatchObject({ titel: "Einfach nur ein Titel", faellig_am: null, prioritaet: "mittel", tags: [], wiederholung: null });
+  });
+  it("rechnet die nächste Fälligkeit einer Wiederholung", () => {
+    expect(naechsteFaelligkeit("2026-01-31", "monatlich")).toBe("2026-03-03");
+    expect(naechsteFaelligkeit("2026-09-03", "woechentlich")).toBe("2026-09-10");
+    expect(naechsteFaelligkeit("2026-02-28", "jaehrlich")).toBe("2027-02-28");
   });
 });

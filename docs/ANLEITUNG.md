@@ -508,6 +508,47 @@ arbeiten Kunden (Menü „Akquise“):
 7. **Einstellungen:** Pipelines und Stufen mit Wahrscheinlichkeiten,
    Verlustgründe, Provisionssatz, Startpreis-Faktor, Spanne, Nachfassfrist.
 
+## 10e. Aufgaben, Notizen, Checklisten und der Rundgang
+
+Keine Einrichtung nötig. Für die Rechtschreibkorrektur braucht es den
+Modellzugang (Abschnitt 7, 1 Credit je Prüfung); ohne Modellzugang bleibt der
+Text unverändert. So arbeiten Kunden:
+
+1. **Schnelleingabe** (Menü „Aufgaben“): ein Satz genügt — „Energieausweis
+   anfordern morgen !! #unterlagen wöchentlich“. Erkannt werden heute, morgen,
+   übermorgen, Wochentage, „in 2 Wochen“, Daten wie 12.10., „!!“ für hohe
+   Priorität, #Tags, täglich/wöchentlich/monatlich/jährlich und „Notiz:“ für
+   eine Notiz ohne Frist. Die Vorschau zeigt, was erkannt wurde; alles bleibt
+   danach editierbar. Wo der Browser es kann, steht „Diktieren“ bereit.
+2. **Liste, Kanban, Notizen:** Liste mit Filtern (Meine/Team, Status, Tag,
+   Suche); Kanban nach Status (Offen, Läuft, Wartet, Erledigt, Verworfen) mit
+   Verschieben per Schaltfläche; Notizen als Kacheln mit Tags — die eigenen
+   Notizen erscheinen auch auf der Startseite.
+3. **Aufgabe im Detail:** Felder, Status, Fälligkeit, Erinnerung, Wiederholung
+   (beim Erledigen entsteht die nächste), Zuständigkeit (Wechsel = Übergabe,
+   im Verlauf vermerkt), Sichtbarkeit (Team oder nur ich), Objekt, Kontakt,
+   Tags. Schritte als Teilaufgaben mit Fortschritt, Kommentare mit
+   automatischem Systemverlauf (Statuswechsel, Übergaben), Verknüpfungen zu
+   Objekt, Kontakt, Lead, Termin, E-Mail und Vertrag. „Rechtschreibung
+   prüfen“ korrigiert die Beschreibung per KI, ohne den Inhalt zu ändern.
+4. **Aufgabe aus E-Mail:** Im Postfach „Als Aufgabe übernehmen“ — Betreff
+   wird Titel, eine Frist wie „bis Freitag“ oder „bis 12.10.“ wird erkannt,
+   die E-Mail bleibt verknüpft.
+5. **Checklisten** (Menü „Checklisten“): Vorlagen je Bereich (Unterlagen
+   Verkauf, Unterlagen Vermietung, Akquise bis Auftrag, Objektaufnahme vor
+   Ort) mit Punkten — Pflicht oder optional, Unterlagenart, Frist in Tagen.
+   Eine Checkliste starten Sie auf der Objekt-, Kontakt- oder Lead-Seite oder
+   unter Checklisten. Punkte abhaken, als „nicht nötig“ markieren oder in eine
+   Aufgabe für den Zuständigen verwandeln. **Liegt die passende Unterlage am
+   Objekt, ist der Punkt automatisch erledigt** — auch rückwirkend beim
+   Anlegen. Sind alle Pflichtpunkte erledigt, gilt die Liste als
+   abgeschlossen.
+6. **Startseite:** Die Heute-Zone zeigt Termine des Tages, fällige Aufgaben
+   und was wartet (Unterschriften, neue Mietanfragen, Leads zum Nachfassen,
+   Treffer, Objektaufnahmen). Beim ersten Anmelden führt ein Rundgang durch
+   die Startseite; er lässt sich unten auf der Startseite jederzeit neu
+   starten.
+
 ## 11. Was Sie an Gate A und Gate B entscheiden
 
 - **Gate A** (bereits erreicht): Bestandsaufnahme, Funktionsmatrix, Architektur

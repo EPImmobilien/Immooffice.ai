@@ -9,6 +9,7 @@ import type {
   TextAuftrag,
   TextErgebnis,
   ObjektKontext,
+  KorrekturErgebnis,
 } from "./typen";
 
 /**
@@ -138,5 +139,10 @@ export class OhneKiAnbieter implements TextAnbieter {
       auftrag.unternehmen,
     ];
     return { text: zeilen.join("\n"), kiVerwendet: false, quelle: this.name, credits: 0, kostenCent: 0 };
+  }
+
+  /** Ohne Modell keine Korrektur — der Text kommt unveraendert zurueck. */
+  async textKorrigieren(text: string): Promise<KorrekturErgebnis> {
+    return { text, geaendert: false, kiVerwendet: false, quelle: this.name, credits: 0, kostenCent: 0 };
   }
 }

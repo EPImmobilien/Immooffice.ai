@@ -2,13 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Kachelgruppe, type KachelDaten } from "@/components/Kachel";
+import { Tutorial, type TutorialSchritt } from "@/components/Tutorial";
 import { Seitenkopf } from "@/components/Seitenkopf";
 import { buttonKlassen } from "@/components/ui/Button";
 import { Karte, KarteInhalt, KarteKopf, KarteTitel } from "@/components/ui/Karte";
 import { Hinweis, Marke } from "@/components/ui/Status";
 import { hatRecht, type Modul } from "@/lib/auth/rechte";
 import { sitzungErzwingen } from "@/lib/auth/sitzung";
-import { datum } from "@/lib/format";
+import { datum, uhrzeit } from "@/lib/format";
+import { tutorialGesehen } from "@/server/arbeitsmittel-aktionen";
 import { OBJEKTSTATUS, statusTon } from "@/lib/objekt-begriffe";
 import { serverClient } from "@/lib/supabase/server";
 
@@ -25,8 +27,19 @@ function verbleibendeTage(bis: string): number {
   return Math.max(0, Math.ceil((ziel - Date.now()) / 86_400_000));
 }
 
-export default async function UebersichtSeite() {
-  const sitzung = await sitzungErzwingen();
+const TUTORIAL: TutorialSchritt[] = [
+  { id: "intro", ziel: null, titel: "Willkommen in ImmoOffice.ai", text: "In zwei Minuten gehen wir über die Startseite: Was heute ansteht, die Arbeitsbereiche als Kacheln und wo Sie was finden. Jederzeit überspringen — der Rundgang lässt sich unten auf der Startseite neu starten." },
+  { id: "heute", ziel: "heute", titel: "Heute-Zone", text: "Links die Termine des Tages, in der Mitte fällige und überfällige Aufgaben, rechts alles, was auf Sie wartet: Unterschriften, Mietanfragen, Leads zum Nachfassen, Treffer und Objektaufnahmen. Ein Klick führt direkt hin." },
+  { id: "tagesgeschaeft", ziel: "tagesgeschaeft", titel: "Tagesgeschäft", text: "Objektaufnahmen vor Ort, der Objektbestand, Kontakte mit Suchprofilen, die Akquise-Pipeline, Aufgaben und Termine. Die Zahl auf jeder Kachel zeigt, wo etwas liegt — betont, wenn es dringend ist." },
+  { id: "vermarktung", ziel: "vermarktung", titel: "Vermarktung", text: "Exposés mit KI-Texten und PDF, der Portalexport nach OpenImmo, Marketing-Vorlagen und die offene Wertermittlung als Akquise-Werkzeug." },
+  { id: "abwicklung", ziel: "abwicklung", titel: "Abwicklung", text: "Verträge aus Vorlagen mit Signaturlink, Übergaben und Notar-Laufzettel, Vermietung mit Anfragen und Mietverträgen, Checklisten als Arbeitsketten, Auswertungen." },
+  { id: "verwaltung", ziel: "verwaltung", titel: "Verwaltung", text: "Unternehmen, Erscheinungsbild, Rechtstexte, Team und Rechte, Postfächer, Integrationen und die eigene Schnittstelle — sowie Abo und Credits. Credits kosten nur KI-Erstellungen; Exporte sind kostenlos." },
+  { id: "notizen", ziel: "notizen", titel: "Notizen und Schnelleingabe", text: "Unter Aufgaben legen Sie mit einem Satz Aufgaben oder Notizen an: „Energieausweis anfordern morgen !! #unterlagen“. Ihre Notizen erscheinen hier auf der Startseite." },
+  { id: "ende", ziel: null, titel: "Los geht's", text: "Fragen beantwortet die Anleitung im Menü unter Einstellungen. Viel Erfolg!" },
+];
+
+export default async function UebersichtSeite({ searchParams }: { searchParams: Promise<{ tutorial?: string }> }) {
+  const [p, sitzung] = await Promise.all([searchParams, sitzungErzwingen()]);
   const supabase = await serverClient();
 
   const [objekteAntwort, kontakteAntwort, letzteAntwort, guthaben, trefferAntwort] =
@@ -77,6 +90,19 @@ export default async function UebersichtSeite() {
       .select("id", { count: "exact", head: true })
       .eq("status", "offen"),
   ]);
+
+  // Heute-Zone (Referenz): Termine des Tages, faellige Aufgaben, was wartet
+  const tagesende = new Date(tagesbeginn.getTime() + 86_400_000);
+  const [heuteTermine, heuteAufgaben, notizen, signaturen, anfragen, nachfassen, konto] = await Promise.all([
+    supabase.from("termine").select("id, titel, art, beginnt_am, ort").is("abgesagt_am", null).gte("beginnt_am", tagesbeginn.toISOString()).lt("beginnt_am", tagesende.toISOString()).order("beginnt_am").limit(8),
+    supabase.from("aufgaben").select("id, titel, faellig_am, prioritaet").eq("typ", "aufgabe").not("status", "in", "(erledigt,verworfen)").lte("faellig_am", heuteDatum).or(`zustaendig_id.eq.${sitzung.benutzerId},erstellt_von.eq.${sitzung.benutzerId}`).order("faellig_am").limit(8),
+    supabase.from("aufgaben").select("id, titel, tags, erstellt_am").eq("typ", "notiz").not("status", "in", "(erledigt,verworfen)").or(`zustaendig_id.eq.${sitzung.benutzerId},erstellt_von.eq.${sitzung.benutzerId}`).order("erstellt_am", { ascending: false }).limit(6),
+    supabase.from("vertraege").select("id", { count: "exact", head: true }).eq("status", "versendet"),
+    supabase.from("mietanfragen").select("id", { count: "exact", head: true }).eq("status", "neu"),
+    supabase.from("akquise_leads").select("id", { count: "exact", head: true }).eq("status", "offen").eq("nachfassen", true).lte("nachfassen_am", heuteDatum),
+    supabase.from("benutzer").select("tutorial_gesehen_am").eq("id", sitzung.benutzerId).maybeSingle(),
+  ]);
+  const tutorialStarten = p.tutorial === "1" || (konto.data ? konto.data.tutorial_gesehen_am === null : false);
 
   const faellig = faelligAntwort.count ?? 0;
   const offeneAufnahmen = aufnahmenAntwort.count ?? 0;
@@ -131,6 +157,15 @@ export default async function UebersichtSeite() {
       pfad: "/suchprofile",
       zahl: offeneTreffer,
       zahlHinweis: offeneTreffer === 1 ? "offener Treffer" : "offene Treffer",
+    },
+    darf("akquise") && {
+      titel: "Akquise",
+      hinweis: "Eigentümer-Leads, Pipeline, Nachfassen, Kampagnen",
+      symbol: "kontakte" as const,
+      pfad: "/akquise",
+      zahl: nachfassen.count ?? 0,
+      zahlHinweis: "nachzufassen",
+      betont: (nachfassen.count ?? 0) > 0,
     },
     darf("kalender") && {
       titel: "Aufgaben",
@@ -192,6 +227,21 @@ export default async function UebersichtSeite() {
       symbol: "vertraege" as const,
       pfad: "/vertraege",
     },
+    darf("vertraege") && {
+      titel: "Vermietung",
+      hinweis: "Mietanfragen, Mietverträge, Reservierungen",
+      symbol: "vertraege" as const,
+      pfad: "/vermietung",
+      zahl: anfragen.count ?? 0,
+      zahlHinweis: "neue Anfragen",
+      betont: (anfragen.count ?? 0) > 0,
+    },
+    darf("kalender") && {
+      titel: "Checklisten",
+      hinweis: "Arbeitsketten aus Vorlagen — Unterlagen, Akquise, Aufnahme",
+      symbol: "aufgaben" as const,
+      pfad: "/checklisten",
+    },
     darf("auswertungen") && {
       titel: "Auswertungen",
       hinweis: "Bestand, Vermarktungsdauer, Abschlüsse",
@@ -240,13 +290,65 @@ export default async function UebersichtSeite() {
         </Hinweis>
       )}
 
-      <Kachelgruppe titel="Tagesgeschäft" kacheln={tagesgeschaeft} />
-      <Kachelgruppe titel="Vermarktung" kacheln={vermarktung} />
-      <Kachelgruppe titel="Abwicklung" kacheln={abwicklung} />
-      <Kachelgruppe titel="Verwaltung" kacheln={verwaltung} />
+      <section data-tutorial="heute" className="mb-7 grid gap-4 lg:grid-cols-3">
+        <Karte>
+          <KarteKopf><KarteTitel>Heute</KarteTitel></KarteKopf>
+          <KarteInhalt>
+            {(heuteTermine.data ?? []).length === 0 ? <p className="text-[13px] text-gedaempft">Keine Termine heute.</p> : (
+              <ul className="divide-y divide-linie text-[13px]">{(heuteTermine.data ?? []).map((t) => <li key={t.id} className="flex gap-2 py-1.5"><span className="w-12 shrink-0 text-gedaempft">{uhrzeit(t.beginnt_am)}</span><Link href="/kalender" className="min-w-0 truncate text-text hover:underline">{t.titel}</Link></li>)}</ul>
+            )}
+          </KarteInhalt>
+        </Karte>
+        <Karte>
+          <KarteKopf><KarteTitel>Fällige Aufgaben</KarteTitel></KarteKopf>
+          <KarteInhalt>
+            {(heuteAufgaben.data ?? []).length === 0 ? <p className="text-[13px] text-gedaempft">Nichts fällig.</p> : (
+              <ul className="divide-y divide-linie text-[13px]">{(heuteAufgaben.data ?? []).map((a) => <li key={a.id} className="flex items-center gap-2 py-1.5"><Link href={`/aufgaben/${a.id}`} className="min-w-0 flex-1 truncate text-text hover:underline">{a.titel}</Link><Marke ton={a.faellig_am && a.faellig_am < heuteDatum ? "fehler" : "warnung"}>{a.faellig_am && a.faellig_am < heuteDatum ? "überfällig" : "heute"}</Marke></li>)}</ul>
+            )}
+            <Link href="/aufgaben" className="mt-2 block text-[12px] text-akzent hover:underline">Alle Aufgaben</Link>
+          </KarteInhalt>
+        </Karte>
+        <Karte>
+          <KarteKopf><KarteTitel>Wartet auf Sie</KarteTitel></KarteKopf>
+          <KarteInhalt>
+            <ul className="space-y-1.5 text-[13px]">
+              <li className="flex justify-between"><Link href="/vertraege" className="text-text hover:underline">Offene Unterschriften</Link><Marke ton={(signaturen.count ?? 0) > 0 ? "warnung" : "neutral"}>{signaturen.count ?? 0}</Marke></li>
+              <li className="flex justify-between"><Link href="/vermietung/anfragen?status=neu" className="text-text hover:underline">Neue Mietanfragen</Link><Marke ton={(anfragen.count ?? 0) > 0 ? "warnung" : "neutral"}>{anfragen.count ?? 0}</Marke></li>
+              <li className="flex justify-between"><Link href="/akquise/leads?nachfassen=1" className="text-text hover:underline">Leads nachfassen</Link><Marke ton={(nachfassen.count ?? 0) > 0 ? "warnung" : "neutral"}>{nachfassen.count ?? 0}</Marke></li>
+              <li className="flex justify-between"><Link href="/suchprofile" className="text-text hover:underline">Offene Treffer</Link><Marke ton={offeneTreffer > 0 ? "warnung" : "neutral"}>{offeneTreffer}</Marke></li>
+              <li className="flex justify-between"><Link href="/aufnahmen" className="text-text hover:underline">Offene Objektaufnahmen</Link><Marke ton={offeneAufnahmen > 0 ? "warnung" : "neutral"}>{offeneAufnahmen}</Marke></li>
+            </ul>
+          </KarteInhalt>
+        </Karte>
+      </section>
+
+      <div data-tutorial="tagesgeschaeft"><Kachelgruppe titel="Tagesgeschäft" kacheln={tagesgeschaeft} /></div>
+      <div data-tutorial="vermarktung"><Kachelgruppe titel="Vermarktung" kacheln={vermarktung} /></div>
+      <div data-tutorial="abwicklung"><Kachelgruppe titel="Abwicklung" kacheln={abwicklung} /></div>
+      <div data-tutorial="verwaltung"><Kachelgruppe titel="Verwaltung" kacheln={verwaltung} /></div>
+
+      {(notizen.data ?? []).length > 0 && (
+        <Karte className="mt-2" data-tutorial="notizen">
+          <KarteKopf><KarteTitel>Notizen</KarteTitel></KarteKopf>
+          <KarteInhalt>
+            <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {(notizen.data ?? []).map((n) => (
+                <li key={n.id}><Link href={`/aufgaben/${n.id}`} className="block rounded-[var(--radius)] border border-linie bg-flaeche-gedaempft px-3 py-2 text-[13px] text-text hover:border-akzent/50"><span className="block truncate">{n.titel}</span><span className="text-[11px] text-gedaempft">{((n.tags as string[] | null) ?? []).map((t) => `#${t}`).join(" ")} {datum(n.erstellt_am)}</span></Link></li>
+              ))}
+            </ul>
+            <Link href="/aufgaben?ansicht=notizen" className="mt-2 block text-[12px] text-akzent hover:underline">Alle Notizen</Link>
+          </KarteInhalt>
+        </Karte>
+      )}
+
+      <Tutorial starten={tutorialStarten} schritte={TUTORIAL} />
+      <form action={tutorialGesehen} className="mt-6 text-[12px] text-gedaempft">
+        <input type="hidden" name="zuruecksetzen" value="1" />
+        <button type="submit" className="text-akzent hover:underline">Rundgang durch die Startseite erneut starten</button>
+      </form>
 
       {(letzteAntwort.data ?? []).length > 0 && (
-        <Karte className="mt-2">
+        <Karte className="mt-2" data-tutorial="zuletzt">
           <KarteKopf>
             <KarteTitel>Zuletzt bearbeitet</KarteTitel>
           </KarteKopf>

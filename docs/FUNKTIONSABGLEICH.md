@@ -29,11 +29,11 @@ in `docs/STATUS.md`.
 | Funktion | Stand | Paket |
 |---|---|---|
 | Aufgaben mit Fälligkeit, Priorität, Objekt/Kontakt, Zuständigkeit | ✓ | — |
-| Tags, Wiederholungen | ✗ | N1 |
-| Schritte (Teilaufgaben), Kommentare, Verknüpfungen (Mail, Termin) | ✗ | N1 |
-| Übergabe an Kollegen, Kanban-Ansicht | ✗ | N1 |
-| Arbeitsketten (Vorgänge) mit Checklisten-Vorlagen | ✗ | N1 |
-| ToDo aus Mail (KI-Erkennung) und per Spracheingabe | ◐ (Postfach: Anhang übernehmen) | N1 |
+| Tags, Wiederholungen | ✓ | N1 |
+| Schritte (Teilaufgaben), Kommentare, Verknüpfungen (Mail, Termin) | ✓ (+ Lead, Vertrag) | N1 |
+| Übergabe an Kollegen, Kanban-Ansicht | ✓ (Kanban per Schaltfläche) | N1 |
+| Arbeitsketten (Vorgänge) mit Checklisten-Vorlagen | ✓ (Checklisten mit Unterlagen-Abgleich) | N1 |
+| ToDo aus Mail (KI-Erkennung) und per Spracheingabe | ◐ (Aufgabe aus Mail mit Fristerkennung; Diktat im Browser; KI-Mehrfacherkennung → W2) | N1 |
 
 ## Kachel 3 — Adressbuch (Kontakte)
 
@@ -102,7 +102,7 @@ in `docs/STATUS.md`.
 |---|---|---|
 | KI-Texte je Baustein, Übernahme ins Objekt, Exposé | ✓ | — |
 | Notizen der Schmiede auslesen (parse-schmiede-notizen) | ✗ | W1 |
-| Rechtschreibkorrektur (text-korrigieren) | ✗ | N1 |
+| Rechtschreibkorrektur (text-korrigieren) | ✓ (Aufgabenbeschreibung, 1 Credit) | N1 |
 
 ## Kachel 9 — Marketing
 
@@ -178,7 +178,7 @@ in `docs/STATUS.md`.
 | Aktivitäts-Log (Chef-Ansicht) | ◐ (Audit-Tabelle ohne Oberfläche) | F1 |
 | Bewerber-Modul, Einstellungstest | ✗ — laut Masterprompt ersatzlos, am Ende | F1 |
 | Globale Suche über alle Bereiche | ✗ | N1 |
-| Tutorial/Erstlogin, Schnellaktionen, Heute-Zone, Warnzone | ◐ (Onboarding) | N1 |
+| Tutorial/Erstlogin, Schnellaktionen, Heute-Zone, Warnzone | ✓ (Rundgang, Heute-Zone, „Wartet auf Sie“) | N1 |
 
 ## Paketplan (Reihenfolge)
 

@@ -100,14 +100,19 @@ export function Aufgabenliste({
 
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <span
+                <Link
+                  href={`/aufgaben/${aufgabe.id}`}
                   className={cn(
-                    "text-[14px]",
+                    "text-[14px] hover:underline",
                     erledigt ? "text-gedaempft line-through" : "text-text",
                   )}
                 >
                   {aufgabe.titel}
-                </span>
+                </Link>
+                {"status" in aufgabe && (aufgabe as { status?: string }).status && !["offen", "erledigt"].includes((aufgabe as { status: string }).status) && (
+                  <Marke ton="info">{(aufgabe as { status: string }).status === "laeuft" ? "Läuft" : (aufgabe as { status: string }).status === "wartet" ? "Wartet" : "Verworfen"}</Marke>
+                )}
+                {"tags" in aufgabe && Array.isArray((aufgabe as { tags?: string[] }).tags) && (aufgabe as { tags: string[] }).tags.map((t) => <Marke key={t}>#{t}</Marke>)}
 
                 {!erledigt && aufgabe.faellig_am && lage !== "spaeter" && (
                   <Marke ton={FRIST_TON[lage]}>{FRISTLAGE_BEZEICHNUNG[lage]}</Marke>
