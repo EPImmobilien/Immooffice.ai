@@ -87,6 +87,13 @@ Auftraggeber: „mehr an der Referenz halten und Kacheln bauen". Umsetzung
 
 ## 04.09.2026 — Inbetriebnahme: Demo-Zugang und Netlify-Anleitung
 
+- **Site des Auftraggebers:** `https://immoofficeeai.netlify.app` (aus dem
+  Branch `claude/autonomie-integrations-prompt-rl2qkr`). Erster
+  Anmeldeversuch lief über „Registrieren" statt „Anmelden" (Auth-Log:
+  `user_repeated_signup`); Startseite zeigt „Anmelden" jetzt als
+  Hauptschaltfläche. Für Registrierung/Passwort-vergessen fehlt noch die
+  Redirect-URL in der Supabase-Auth-Konfiguration (Anleitung 3a, Punkt 7).
+
 - Auftraggeber möchte den Stand selbst bedienen, nicht nur Bildschirmfotos
   sehen. Die Anwendung ist eine Server-Anwendung (Next.js mit Server Actions)
   und läuft nicht als einzelne `index.html`; der Weg ist der Bau aus GitHub auf

@@ -28,22 +28,23 @@ export default function Startseite() {
         </p>
 
         <div className="mt-7 flex flex-wrap gap-3">
-          <Link href="/registrieren" className={buttonKlassen({ groesse: "gross" })}>
-            7 Tage kostenlos testen
+          <Link href="/anmelden" className={buttonKlassen({ groesse: "gross" })}>
+            Anmelden
           </Link>
           <Link
-            href="/anmelden"
+            href="/registrieren"
             className={buttonKlassen({ variante: "sekundaer", groesse: "gross" })}
           >
-            Anmelden
+            Neues Unternehmen: 7 Tage kostenlos testen
           </Link>
         </div>
 
         <div className="mt-8">
-          <Hinweis ton="info" titel="Stand: Durchstich v0.1">
-            Verfügbar sind Registrierung, Mandant und Rollen, Objekte, Kontakte,
-            Exposé mit Textentwurf und PDF-Export. Kalender, Suchprofile,
-            Portalexport und Abrechnung folgen im weiteren Verlauf von Phase 1.
+          <Hinweis ton="info" titel="Stand: Abnahmefassung">
+            Immobilien, Adressbuch, Termine, ToDos, Verkauf, Vermietung,
+            Exposé-Schmiede, Marketing, Werkzeuge, Akquise, Postfach,
+            Kundenbereich, Rechnungen, Arbeitszeit und Admin sind bedienbar.
+            Bereits registrierte Adressen melden sich über „Anmelden" an.
           </Hinweis>
         </div>
 

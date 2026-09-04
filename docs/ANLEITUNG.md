@@ -110,15 +110,18 @@ Sie brauchen nur Ihr GitHub- und Ihr Netlify-Konto.
    Danach zeigt Netlify eine Adresse wie `https://<zufallsname>.netlify.app`.
    Unter **Site configuration → Site details → Change site name** lässt sie
    sich in `immooffice` oder Ähnliches umbenennen.
-6. Adresse öffnen → **Anmelden** → Demo-Zugang:
+6. Adresse öffnen (aktuell `https://immoofficeeai.netlify.app`) → Schaltfläche
+   **Anmelden** (nicht „Registrieren" — die legt ein neues Konto an; bei einer
+   schon vergebenen Adresse passiert dort absichtlich nichts) → Demo-Zugang:
    `demo-makler@example.com` / `Demo-Portal-2026!`. Sie landen direkt auf der
    Übersicht des Mandanten „Demo Immobilien GmbH" (drei Objekte, vier Kontakte,
    Aufgaben, Termine; Testphase bis 31.12.2026). Ihr eigenes Konto funktioniert
    ebenfalls.
 7. Damit auch Registrierung, E-Mail-Bestätigung und „Passwort vergessen"
    laufen: in Supabase → **Authentication → URL Configuration** die
-   Netlify-Adresse als Site URL und `https://<name>.netlify.app/auth/bestaetigen`
-   als Redirect URL eintragen (Abschnitt 4, Punkt 6).
+   Netlify-Adresse als Site URL und
+   `https://immoofficeeai.netlify.app/auth/bestaetigen` als Redirect URL
+   eintragen (Abschnitt 4, Punkt 6).
 
 Was ohne weitere Schlüssel **nicht** geht und statt eines Fehlers einen Hinweis
 zeigt: KI-Erzeugung (Abschnitt 7), Mailversand (Abschnitt 5), Integrationen und
