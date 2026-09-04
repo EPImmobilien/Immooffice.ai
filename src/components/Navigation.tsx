@@ -33,6 +33,7 @@ const EINTRAEGE: Eintrag[] = [
   { modul: "postfach", pfad: "/postfach", bezeichnung: "Postfach" },
   { modul: "exposes", pfad: "/exposes", bezeichnung: "Exposés" },
   { modul: "objekte", pfad: "/portale", bezeichnung: "Portalexport" },
+  { modul: "objekte", pfad: "/werkzeuge", bezeichnung: "Werkzeuge" },
   { modul: "wertermittlung", pfad: "/wertermittlung", bezeichnung: "Wertermittlung" },
   { modul: "vertraege", pfad: "/vertraege", bezeichnung: "Verträge" },
   { modul: "vertraege", pfad: "/uebergaben", bezeichnung: "Übergaben" },

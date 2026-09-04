@@ -5,6 +5,61 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 04.09.2026 (Paket 13) — Werkzeuge: Bild-Editor mit RAW und KI, PDF-Werkzeuge, Grundriss-Editor/-Aufbereiter, Raumscan, Wohnflächenrechner, Energieausweis, Entfernungen
+
+**Branch:** `claude/autonomie-integrations-prompt-rl2qkr` · Referenz-Kacheln „Werkzeuge“ und „Bild-Editor“ nach `docs/FUNKTIONSABGLEICH.md` (W1)
+
+### Erledigt (Migration `20260904150000_werkzeuge.sql`, im Projekt ausgerollt, 11 Nachweise grün)
+
+- **Bild-Editor** (`/werkzeuge/bild-editor`, im Browser): Datei oder
+  Objektbild laden, Zuschnitt mit Seitenverhältnis, Zielbreite, Drehen,
+  Spiegeln, Helligkeit/Kontrast/Sättigung, Verpixeln/Weichzeichnen von
+  Bereichen, Text, Firmenlogo, Vorher/Nachher-Regler, JPG/PNG-Download,
+  **Speichern als neue Version** am Objekt (Original bleibt, Beschreibung
+  der Bearbeitung); **RAW-Entwicklung** (ARW, CR2, CR3, NEF, DNG, RAF, RW2,
+  ORF …) über LibRaw-WASM, ersatzweise eingebettete Vorschau.
+- **KI-Bildbearbeitung:** Himmel, Störendes entfernen, Home Staging,
+  Optimierung über `src/lib/ki/bild.ts` (Bild-Endpunkt des Anbieters, je 3
+  Credits, Reservierung/Einlösung/Freigabe), gekennzeichnete Version.
+- **PDF-Werkzeuge** (`/werkzeuge/pdf`, im Browser): Zusammenfügen mit
+  Reihenfolge, Teilen (Bereich oder jede Seite als ZIP — eigener
+  ZIP-Schreiber), Seiten drehen/löschen/umsortieren mit Vorschau,
+  Komprimieren (leicht/stark), Schwärzen (automatisch IBAN, Telefon,
+  E-Mail, eigene Begriffe; Rechtecke von Hand; unwiderruflich).
+- **Grundriss-Editor & Aufbereiter** (`/werkzeuge/grundriss`): Wände am
+  Raster, Türen mit Anschlag, Fenster, Räume mit Fläche, Möbel (12 Typen),
+  Maßketten, Text, Undo, Zoom; Vorlage (Plan hinterlegen, Maßstab,
+  Deckkraft); **Raumscan-Import** (RoomPlan-JSON); PNG/SVG-Export; Ablage
+  als Objektbild (Art Grundriss); Räume in den Wohnflächenrechner.
+- **Wohnflächenrechner** (`/werkzeuge/wohnflaeche`): WoFlV-Anrechnung,
+  Geschosse/Räume/Teilflächen, Abzüge, Schnellräume, PDF/Word, Übernahme
+  ins Objekt, gespeicherte Berechnungen.
+- **Objektseite:** Energieausweis hochladen und auslesen (PDF-Text oder
+  Foto, 2 Credits; Werte im Bestätigungsformular), Infrastruktur und
+  Entfernungen (OpenStreetMap/Overpass, Luftlinie mit Gehminuten, am Objekt
+  gespeichert), Karte „Werkzeuge“ mit Sprüngen.
+- Prüfstand: Typecheck, Lint, 432 Unit-Tests (WoFlV, Grundriss/SVG/Scan,
+  Infrastruktur, RAW-Vorschau, ZIP), 512 Datenbank-Nachweise lokal,
+  Marken-Scan, Produktions-Build; Ende-zu-Ende gegen den lokalen Stack
+  (Wohnfläche anlegen/PDF/übernehmen, Grundriss zeichnen/speichern/Räume in
+  den Rechner, PDF zusammenfügen/teilen/ZIP/Seiten drehen/schwärzen mit
+  IBAN-Prüfung, Bild-Editor Bereich/Drehen/Speichern, Objektseite mit
+  Energieausweis- und Infrastruktur-Karten). Ablage im Bucket und
+  Geokodierung sind lokal nicht erreichbar und melden das sauber.
+- Build-Erkenntnis: libraw-wasm läuft zur Laufzeit aus `public/werkzeuge/libraw`,
+  CSP mit `'wasm-unsafe-eval'`, Server-Actions bis 12 MB (E-53).
+
+### Nicht erledigt — und warum
+
+| Punkt | Grund |
+|---|---|
+| Live-Lauf der KI-Bildbearbeitung und des Energieausweis-Auslesens | kein `OPENAI_API_KEY` (`docs/ZUGAENGE_FEHLEND.md`); ohne Schlüssel sagt es die Oberfläche, Credits werden nicht berührt |
+| Overpass/Nominatim aus der Entwicklungsumgebung | kein Netzzugang im Prüfstand; Aufruf und Auswertung sind durch Unit-Tests abgedeckt, Fehlerpfad meldet „nicht erreichbar“ |
+| Personalausweis-Scanner, Dateinamen/Objektwissen per KI, Notizen-Auslese | KI-Assistenten-Paket (W2, mit Exposé-Prüfer) |
+| Raumscan mit eigener App (LiDAR) | laut Funktionsabgleich bewusst nur Import einer Scan-Datei |
+
+---
+
 ## 04.09.2026 (Paket 12) — Kalender-Ausbau: Ansichten, Serien, Erinnerungen, Fahrzeiten, Bestätigung, Abo, Abgleich
 
 **Branch:** `claude/autonomie-integrations-prompt-rl2qkr` · Referenz-Kachel „Kalender“ nach `docs/FUNKTIONSABGLEICH.md` (K1, K2)

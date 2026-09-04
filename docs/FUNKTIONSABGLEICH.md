@@ -110,9 +110,9 @@ in `docs/STATUS.md`.
 |---|---|---|
 | Social-Media-Vorlagen mit Branding | ✓ | — |
 | Marketing-Ablage | ✗ | D1 |
-| KI-Bildbearbeitung (Retusche, Himmel, Home Staging, Vorher/Nachher, Historie) | ✗ | W1 |
+| KI-Bildbearbeitung (Retusche, Himmel, Home Staging, Vorher/Nachher, Historie) | ✓ (Bild-Editor → KI: Himmel, Störendes entfernen, Home Staging, Optimierung; Vorher/Nachher-Regler; Versionen mit Kennzeichnung am Objekt; je 3 Credits) | W1 |
 | Print-Materialien (Visitenkarten, Flyer, Vorlagenverwaltung, Bestellung) | ◐ (Flyer/Postkarte) | D1 |
-| Bild-Editor mit Zuschnitt und RAW-Entwickler | ✗ | W1 |
+| Bild-Editor mit Zuschnitt und RAW-Entwickler | ✓ (Zuschnitt mit Seitenverhältnis, Größe, Drehen/Spiegeln, Farben, Verpixeln/Weichzeichnen, Text, Logo, JPG/PNG; RAW über LibRaw-WASM im Browser, ersatzweise eingebettete Vorschau) | W1 |
 | Standortkarte (Kartenkachel), Schaufenster-Kachel, Verkauft-/Reserviert-Banner, Energieskala | ◐ (Aushang) | D1 |
 | Web-Fassung von Objektbildern | ✓ | — |
 | News-Briefing, Caption-Generator, News-Posts | ✗ | D1 |
@@ -138,10 +138,10 @@ in `docs/STATUS.md`.
 
 | Funktion | Stand | Paket |
 |---|---|---|
-| PDF zusammenfügen, teilen, komprimieren, Seiten bearbeiten, schwärzen | ✗ | W1 |
-| Grundriss-Editor (Wände, Türen, Maße, Möbel), Grundriss-Aufbereiter | ✗ | W1 |
-| Raumscan (aus App-Datei) | ✗ — Import einer Scan-Datei, keine eigene App | W1 |
-| Wohnflächenrechner nach WoFlV mit PDF | ✗ | W1 |
+| PDF zusammenfügen, teilen, komprimieren, Seiten bearbeiten, schwärzen | ✓ (im Browser: pdf-lib/pdf.js; Teilen als Bereich oder ZIP; Schwärzen automatisch für IBAN/Telefon/E-Mail/Begriffe plus Rechtecke, Seiten werden unwiderruflich neu aufgebaut) | W1 |
+| Grundriss-Editor (Wände, Türen, Maße, Möbel), Grundriss-Aufbereiter | ✓ (SVG-Editor mit Raster, Wände, Türen mit Anschlag, Fenster, Räume mit Fläche, Möbel, Maßketten, Text, Undo; Aufbereiter: Plan hinterlegen, Maßstab, nachzeichnen; Export PNG/SVG, Ablage als Objektbild, Räume in den Wohnflächenrechner) | W1 |
+| Raumscan (aus App-Datei) | ✓ (Import RoomPlan-JSON: Wände, Türen, Fenster, Möbel, Räume → Grundriss-Editor); keine eigene App | W1 |
+| Wohnflächenrechner nach WoFlV mit PDF | ✓ (Geschosse, Räume, Teilflächen, Anrechnung voll/halb/nicht/Balkon/Wintergarten/Zubehör, Abzüge; PDF/Word; Übernahme ins Objekt) | W1 |
 
 ## Kachel 13 — OneDrive
 

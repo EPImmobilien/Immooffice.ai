@@ -633,6 +633,49 @@ Menü **Kalender**. Rechte über das Modul „Kalender“.
    „Sonstiges“ und werden dort gepflegt. Der Abgleich läuft mit jedem
    Postfach-Abruf.
 
+## 10h. Werkzeuge — Bild-Editor, PDF, Grundriss, Wohnfläche, Energieausweis, Entfernungen
+
+Menü **Werkzeuge** (Rechte wie Objekte). Bild- und PDF-Bearbeitung laufen im
+Browser; die Dateien verlassen Ihren Rechner nicht.
+
+1. **Bild-Editor:** Datei laden (auch RAW: ARW, CR2, NEF, DNG …) oder
+   Objekt und Objektbild wählen. Werkzeuge: Zuschnitt (Rechteck aufziehen,
+   Seitenverhältnis), Größe & Drehen, Farben, Weichzeichnen/Verpixeln
+   (Bereich aufziehen — Nummernschilder, Gesichter), Text, Logo. Der
+   Vorher/Nachher-Regler vergleicht. **KI:** Himmel ersetzen, Störendes
+   entfernen, Home Staging, Optimierung (je 3 Credits, braucht den
+   KI-Schlüssel) — das Ergebnis ist als KI-bearbeitet gekennzeichnet.
+   „Als neue Version speichern“ legt das Ergebnis am Objekt ab; das
+   Original bleibt unverändert und erscheint in der Galerie weiter.
+2. **PDF-Werkzeuge:** Zusammenfügen (Reihenfolge mit Pfeilen), Teilen
+   (Bereich „1-3,5“ oder jede Seite einzeln als ZIP), Seiten bearbeiten
+   (drehen, löschen, umsortieren), Komprimieren (leicht = Text bleibt
+   durchsuchbar; stark = Seiten als Bild), Schwärzen („Automatisch finden“
+   für IBAN, Telefon, E-Mail und eigene Begriffe, zusätzlich Rechtecke mit
+   der Maus; markierte Seiten werden neu aufgebaut, der Text ist danach
+   unwiderruflich weg).
+3. **Grundriss-Editor:** Wand (Klick–Klick, am Raster), Tür (Klick auf die
+   Wand; erneuter Klick dreht den Anschlag), Fenster, Raum (Ecken anklicken,
+   erste Ecke schließt; Name eingeben — die Fläche wird berechnet), Möbel,
+   Maß, Text, Löschen. **Vorlage:** vorhandenen Plan (Foto/Scan) hinterlegen,
+   „cm je Pixel“ an einer bekannten Wand justieren und nachzeichnen
+   (Aufbereiter); **Raumscan** als JSON (RoomPlan-Export) importieren.
+   Speichern, PNG/SVG herunterladen, „Als Objektbild ablegen“ (Art
+   Grundriss), „Räume in den Wohnflächenrechner“.
+4. **Wohnflächenrechner:** Geschosse und Räume anlegen (Schnellknöpfe),
+   je Teilfläche Länge × Breite oder direkt m², Anrechnung nach WoFlV (voll,
+   halb bei 1–2 m, nicht unter 1 m, Balkon ¼, Wintergarten ½, Zubehörraum 0)
+   und Abzüge (Schornstein, Pfeiler). Ergebnis live; „Berechnung anlegen“,
+   dann PDF/Word und „Wohnfläche ins Objekt übernehmen“.
+5. **Energieausweis** (Objektseite, Karte Energieausweis): PDF oder Foto
+   hochladen — wird als Unterlage abgelegt und ausgelesen (2 Credits mit KI).
+   Die erkannten Werte prüfen Sie im Formular und übernehmen sie.
+6. **Entfernungen** (Objektseite, Karte Infrastruktur): „Entfernungen
+   ermitteln“ verortet die Anschrift und holt die nächsten Einrichtungen
+   (Kita, Schule, Supermarkt, Bäcker, Apotheke, Arzt, Krankenhaus,
+   Haltestelle, Bahnhof, Autobahn, Park, Spielplatz) aus OpenStreetMap —
+   mit Luftlinie und Gehminuten.
+
 ## 11. Was Sie an Gate A und Gate B entscheiden
 
 - **Gate A** (bereits erreicht): Bestandsaufnahme, Funktionsmatrix, Architektur

@@ -5,6 +5,10 @@ import { notFound } from "next/navigation";
 import { AufgabeAnlegen } from "@/components/AufgabeAnlegen";
 import { Aufgabenliste } from "@/components/Aufgabenliste";
 import { ChecklisteKarte } from "@/components/checklisten/ChecklisteKarte";
+import { EnergieausweisKarte } from "@/components/werkzeuge/EnergieausweisKarte";
+import { InfrastrukturKarte } from "@/components/werkzeuge/InfrastrukturKarte";
+import { kiVerfuegbar } from "@/lib/ki";
+import type { Infrastruktur } from "@/lib/werkzeuge/infrastruktur";
 import {
   Beteiligte,
   type Beteiligung,
@@ -491,6 +495,28 @@ export default async function ObjektSeite({
                   wert={datum(objekt.energie_gueltig_bis)}
                 />
               </dl>
+              <EnergieausweisKarte objektId={objekt.id} darfAendern={darfAendern} kiVerfuegbar={kiVerfuegbar()} />
+            </KarteInhalt>
+          </Karte>
+
+          <Karte>
+            <KarteKopf>
+              <KarteTitel>Infrastruktur und Entfernungen</KarteTitel>
+            </KarteKopf>
+            <KarteInhalt>
+              <InfrastrukturKarte objektId={objekt.id} infrastruktur={(objekt.infrastruktur as Infrastruktur | null) ?? null} darfAendern={darfAendern} />
+            </KarteInhalt>
+          </Karte>
+
+          <Karte>
+            <KarteKopf>
+              <KarteTitel>Werkzeuge</KarteTitel>
+            </KarteKopf>
+            <KarteInhalt className="flex flex-wrap gap-2 text-[13px]">
+              <Link href={`/werkzeuge/wohnflaeche?objekt=${objekt.id}`} className="text-akzent hover:underline">Wohnfläche berechnen</Link>
+              <Link href={`/werkzeuge/grundriss?objekt=${objekt.id}`} className="text-akzent hover:underline">Grundriss zeichnen</Link>
+              <Link href={`/werkzeuge/bild-editor?objekt=${objekt.id}`} className="text-akzent hover:underline">Bild-Editor</Link>
+              <Link href="/werkzeuge/pdf" className="text-akzent hover:underline">PDF-Werkzeuge</Link>
             </KarteInhalt>
           </Karte>
 

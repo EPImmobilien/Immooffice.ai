@@ -18,6 +18,8 @@ import { laufzettelAlsDokument, laufzettelAusDaten, type Anhang } from "@/lib/ve
 import { protokollAlsDokument, protokollAusZeile, protokollTitel } from "@/lib/verkauf/uebergabe";
 import { mietvertragAusZeile, mietvertragText, mietvertragTitel } from "@/lib/vermietung/mietvertrag";
 import { MUSTER_HINWEIS, VERTRAGSARTEN, type Vertragsart } from "@/lib/vertraege";
+import { blattLesen } from "@/lib/werkzeuge/wohnflaeche";
+import { wohnflaecheAlsDokument } from "@/lib/werkzeuge/wohnflaeche-dokument";
 
 export const runtime = "nodejs";
 
@@ -35,7 +37,7 @@ export async function GET(anfrage: Request, { params }: { params: Promise<{ art:
   const { art, id } = await params;
   const sitzung = await sitzungLaden();
   if (!sitzung) return NextResponse.json({ fehler: "Nicht angemeldet." }, { status: 401 });
-  rechtErzwingen(sitzung.rolle, art === "wertindikation" ? "akquise" : art === "rechnung" || art === "brief" ? "rechnungen" : art === "termin" ? "kalender" : "vertraege", "lesen", sitzung.uebersteuerung);
+  rechtErzwingen(sitzung.rolle, art === "wertindikation" ? "akquise" : art === "rechnung" || art === "brief" ? "rechnungen" : art === "termin" ? "kalender" : art === "wohnflaeche" ? "objekte" : "vertraege", "lesen", sitzung.uebersteuerung);
   if (!/^[0-9a-f-]{36}$/.test(id)) return NextResponse.json({ fehler: "Nicht gefunden." }, { status: 404 });
 
   const url = new URL(anfrage.url);
@@ -103,6 +105,11 @@ export async function GET(anfrage: Request, { params }: { params: Promise<{ art:
     const g = await rechnungDokumentLaden(supabase, sitzung.mandantId, id);
     if (!g) return NextResponse.json({ fehler: "Nicht gefunden." }, { status: 404 });
     dokument = g.dokument; dateiname = g.dateiname; absender = g.absender; festgeschrieben = g.rechnung.pdf_pfad;
+  } else if (art === "wohnflaeche") {
+    const { data: b } = await supabase.from("wohnflaechen_berechnungen").select("blatt, bezeichnung, erstellt_am").eq("id", id).eq("mandant_id", sitzung.mandantId).maybeSingle();
+    if (!b) return NextResponse.json({ fehler: "Nicht gefunden." }, { status: 404 });
+    dokument = wohnflaecheAlsDokument(blattLesen(b.blatt), new Date().toLocaleDateString("de-DE"), sitzung.name);
+    dateiname = `Wohnflaeche_${(b.bezeichnung as string).replace(/[^a-zA-Z0-9äöüÄÖÜß._-]+/g, "_").slice(0, 60)}`;
   } else if (art === "brief") {
     const g = await briefDokumentLaden(supabase, sitzung.mandantId, id);
     if (!g) return NextResponse.json({ fehler: "Nicht gefunden." }, { status: 404 });

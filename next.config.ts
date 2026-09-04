@@ -22,6 +22,12 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
 
+  // Der Bild-Editor schickt bearbeitete Bilder (bis 4000 px, JPEG) als
+  // Server-Action; die Vorgabe von 1 MB reicht dafuer nicht.
+  experimental: {
+    serverActions: { bodySizeLimit: "12mb" },
+  },
+
   // Deutsch ist die Ausgangssprache. Die Struktur bleibt fuer eine spaetere
   // Internationalisierung offen (Abschnitt 3), ohne sie jetzt zu aktivieren.
   env: {

@@ -719,6 +719,72 @@ deckt Apple, Google und Outlook ohne jede Freigabe ab. Der OAuth-Abgleich
 ist gebaut, aber ohne Testzugänge nicht live geprüft — vermerkt in
 `docs/ZUGAENGE_FEHLEND.md`.
 
+### E-2026-09-04-51 — PDF-Werkzeuge und Bild-Editor laufen im Browser; Bearbeitungen werden Versionen am Objekt
+
+**Frage:** Wo werden PDFs und Bilder bearbeitet, und wie bleibt das Original
+erhalten?
+
+**Entscheidung:** PDF-Werkzeuge (zusammenfügen, teilen, Seiten, komprimieren,
+schwärzen) und der Bild-Editor (Zuschnitt, Größe, Farben, Verpixeln, Text,
+Logo, RAW-Entwicklung) laufen vollständig im Browser mit pdf-lib, pdf.js
+(Worker unter `public/werkzeuge/`) und Canvas; keine Datei verlässt den
+Rechner, kein Server-Upload zum Bearbeiten. Ein bearbeitetes Bild wird auf
+Wunsch als **neue Version** am Objekt gespeichert (`objekt_bilder.original_id`,
+`bearbeitung`, `ki_bearbeitet`); das Original bleibt unverändert. Schwärzen
+baut markierte Seiten als Bild neu auf — der Text darunter ist unwiderruflich
+entfernt, nicht nur überdeckt. RAW-Dateien werden über LibRaw (WASM) im
+Browser entwickelt; ist der Decoder nicht ladbar, dient die eingebettete
+Kamera-Vorschau als Grundlage und der Editor sagt das.
+
+**Begründung:** Datenschutz (Unterlagen mit personenbezogenen Daten bleiben
+lokal), keine Serverlast für Bildarbeit, und die Masterprompt-Regeln zur
+Bildpipeline (Originale unverändert, jede Bearbeitung eine Version,
+Vorher/Nachher, Kennzeichnung) lassen sich so direkt umsetzen.
+
+### E-2026-09-04-52 — KI-Bildbearbeitung über den Provider-Layer mit festen Schutzanweisungen; Infrastruktur aus OpenStreetMap; Energieausweis nur über Bestätigungsformular
+
+**Frage:** Welche KI-Bildfunktionen sind erlaubt, woher kommen Entfernungen,
+und wie landen ausgelesene Energiewerte im Objekt?
+
+**Entscheidung:** Vier KI-Bearbeitungen (Himmel, Störendes entfernen,
+virtuelles Home Staging, Optimierung) laufen über `src/lib/ki/bild.ts` mit
+festen Anweisungen, die Architektur, Raumgeometrie, Fenster und Türen
+unverändert lassen; je 3 Credits, Ergebnis mit Vorher/Nachher-Regler,
+gespeichert nur als gekennzeichnete Version. Entfernungen (Kita, Schule,
+Supermarkt, Bäcker, Apotheke, Arzt, Krankenhaus, Haltestelle, Bahnhof,
+Autobahn, Park, Spielplatz) kommen aus OpenStreetMap (Overpass, Luftlinie
+mit Gehminuten) und werden am Objekt gespeichert. Der Energieausweis wird als
+Unterlage abgelegt und ausgelesen (PDF-Text oder Foto, 2 Credits); die Werte
+gehen in ein editierbares Formular und erst nach Bestätigung ins Objekt.
+
+**Begründung:** Masterprompt: Bildbearbeitung darf Architektur nicht
+unbemerkt verfälschen; Home Staging bleibt erkennbar virtuell. OpenStreetMap
+braucht keinen Schlüssel und keine personenbezogenen Daten. KI-Auslese
+immer über ein editierbares Formular (Grundprinzip 3).
+
+### E-2026-09-04-53 — RAW-Entwickler lädt libraw zur Laufzeit aus dem eigenen Ursprung; CSP erlaubt WebAssembly; Server-Actions bis 12 MB
+
+**Frage:** Der Produktions-Build blieb ohne Meldung beim Übersetzen stehen.
+Ursache war der dynamische Import von `libraw-wasm`: Das Paket startet einen
+Worker mit WebAssembly, und der Bundler hängt beim Analysieren dieses
+Worker-Graphen. Außerdem sperrte die Content-Security-Policy zwei Dinge, die im
+Entwicklungsmodus unbemerkt blieben: das Übersetzen von WebAssembly und
+`fetch()` auf Daten-URLs (PDF-Werkzeuge beim Zusammenbauen geschwärzter Seiten).
+
+**Entscheidung:** Die vier Laufzeitdateien von libraw-wasm liegen unverändert
+unter `public/werkzeuge/libraw/` (gleiche Version wie in `package.json`) und
+werden im Bild-Editor erst beim ersten RAW-Bild aus dem eigenen Ursprung
+geladen; der Bundler lässt diesen Import unangetastet. Die CSP erhält
+`'wasm-unsafe-eval'` — das erlaubt ausschließlich WebAssembly, kein `eval()`.
+Daten-URLs werden im Browser selbst dekodiert statt per `fetch()`. Bearbeitete
+Bilder gehen als Server-Action zum Server; dafür ist die Grenze auf 12 MB
+gesetzt (Vorgabe 1 MB). Versteckte Formularfelder mit Bilddaten werden im
+Absende-Ereignis synchron gefüllt — ein React-Zustand käme erst nach dem
+Einsammeln des Formulars an.
+
+**Folge:** Beim Aktualisieren von libraw-wasm sind die Dateien in
+`public/werkzeuge/libraw/` mitzuziehen (Hinweis im Quelltext).
+
 ### E-2026-09-03-13 — Credit-Werte bleiben die der Datenbank
 
 **Frage:** S4 nennt Startwerte (Exposétext 5, Kurztext 2, Bild 3 je Bild,

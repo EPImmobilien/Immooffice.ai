@@ -26,7 +26,9 @@ export async function middleware(request: NextRequest) {
     "default-src 'self'",
     // 'strict-dynamic' laesst Skripte zu, die von einem erlaubten Skript
     // geladen werden; 'self' bleibt als Rueckfallebene fuer aeltere Browser.
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${produktion ? "" : " 'unsafe-eval'"}`,
+    // 'wasm-unsafe-eval' erlaubt nur das Uebersetzen von WebAssembly (RAW-
+    // Entwickler im Bild-Editor), nicht eval() fuer JavaScript.
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'wasm-unsafe-eval'${produktion ? "" : " 'unsafe-eval'"}`,
     // Tailwind liefert eine externe Datei aus; Next setzt jedoch weiterhin
     // einzelne Stile inline. Fuer Stile ist das Risiko deutlich geringer.
     "style-src 'self' 'unsafe-inline'",
