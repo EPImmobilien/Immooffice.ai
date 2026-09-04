@@ -427,6 +427,16 @@ export default async function ObjektSeite({
 
           <Karte>
             <KarteKopf>
+              <KarteTitel>Rechnungen und Briefe</KarteTitel>
+            </KarteKopf>
+            <KarteInhalt className="flex flex-wrap gap-2 text-[13px]">
+              <Link href={`/rechnungen?objekt=${objekt.id}`} className="text-akzent hover:underline">Rechnungen zum Objekt</Link>
+              <Link href={`/briefe?objekt=${objekt.id}`} className="text-akzent hover:underline">Behörden- und Eigentümerbriefe</Link>
+            </KarteInhalt>
+          </Karte>
+
+          <Karte>
+            <KarteKopf>
               <KarteTitel>Checklisten</KarteTitel>
             </KarteKopf>
             <KarteInhalt>

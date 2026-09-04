@@ -24,6 +24,10 @@ interface Parameter {
   ungelesen?: string;
   neu?: string;
   an?: string;
+  betreff?: string;
+  text?: string;
+  anhang_art?: string;
+  anhang_id?: string;
 }
 
 const POSTFACH_FELDER = "id, adresse, anzeigename, anbieter, status, benutzer_id, intervall_minuten, signatur_anhaengen, letzter_abruf_am, fehler_text, fehler_zaehler";
@@ -110,6 +114,18 @@ export default async function PostfachSeite({ searchParams }: { searchParams: Pr
 
   const neuParameter = new URLSearchParams({ ...parameter, neu: "1" });
 
+  // Rechnung oder Brief als Anhang (Link aus der Rechnungs-/Briefseite)
+  let anhang: { art: "rechnung" | "brief"; id: string; bezeichnung: string } | undefined;
+  if (p.neu === "1" && (p.anhang_art === "rechnung" || p.anhang_art === "brief") && p.anhang_id && /^[0-9a-f-]{36}$/.test(p.anhang_id)) {
+    if (p.anhang_art === "rechnung") {
+      const { data: r } = await supabase.from("rechnungen").select("rechnungsnummer").eq("id", p.anhang_id).maybeSingle();
+      if (r) anhang = { art: "rechnung", id: p.anhang_id, bezeichnung: `Rechnung ${(r.rechnungsnummer as string | null) ?? "(Entwurf)"}` };
+    } else {
+      const { data: b } = await supabase.from("briefe").select("betreff").eq("id", p.anhang_id).maybeSingle();
+      if (b) anhang = { art: "brief", id: p.anhang_id, bezeichnung: `Brief „${b.betreff as string}“` };
+    }
+  }
+
   return (
     <>
       <Seitenkopf titel="Postfach" beschreibung="Eingang lesen, Nachrichten Objekten und Kontakten zuordnen, aus der Anwendung antworten.">
@@ -154,7 +170,7 @@ export default async function PostfachSeite({ searchParams }: { searchParams: Pr
 
         <Karte className="p-5">
           {p.neu === "1" && darfSenden ? (
-            <NeueNachricht postfaecher={postfaecher} an={p.an} />
+            <NeueNachricht postfaecher={postfaecher} an={p.an} betreff={p.betreff} text={p.text} anhang={anhang} />
           ) : detail ? (
             <NachrichtDetail
               nachricht={detail}

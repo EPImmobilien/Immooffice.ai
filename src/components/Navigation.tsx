@@ -38,6 +38,8 @@ const EINTRAEGE: Eintrag[] = [
   { modul: "vertraege", pfad: "/uebergaben", bezeichnung: "Übergaben" },
   { modul: "vertraege", pfad: "/notar", bezeichnung: "Notar" },
   { modul: "vertraege", pfad: "/vermietung", bezeichnung: "Vermietung" },
+  { modul: "rechnungen", pfad: "/rechnungen", bezeichnung: "Rechnungen" },
+  { modul: "rechnungen", pfad: "/briefe", bezeichnung: "Briefe" },
   { modul: "marketing", pfad: "/marketing", bezeichnung: "Marketing" },
   { modul: "kalender", pfad: "/kalender", bezeichnung: "Kalender" },
   { modul: "kalender", pfad: "/aufgaben", bezeichnung: "Aufgaben" },

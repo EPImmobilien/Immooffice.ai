@@ -5,6 +5,60 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 04.09.2026 (Paket 11) — Rechnungen (GoBD) und Geschäftsbriefe
+
+**Branch:** `claude/autonomie-integrations-prompt-rl2qkr` · Referenz-Kacheln „Rechnungen“ und „Dokumente → Geschäftsbriefe“ nach `docs/FUNKTIONSABGLEICH.md` (R1)
+
+### Erledigt (Migration `20260904130000_rechnungen_briefe.sql`, im Projekt ausgerollt, 27 Nachweise grün)
+
+- **Absender:** Firmen- und persönliche Absender (je Benutzer) mit Anschrift,
+  Steuernummer/USt-IdNr., Kleinunternehmer-Regel, Bankverbindung,
+  Nummernkreis (Präfix, Jahr, Startnummer, Vorschau), Zahlungsziel,
+  Standardtexte; Startnummer gesperrt, sobald eine Rechnung gestellt ist.
+- **Kunden:** eigener Rechnungsstamm, optional an Kontakt gebunden, beim
+  Anlegen aus einem Kontakt automatisch.
+- **Rechnungen:** Entwurf mit Positionen (Menge, Einheit, Netto, Steuersatz
+  0/7/19, Brutto→Netto-Umrechnung, Summen je Steuersatz), Empfänger,
+  Leistungszeitraum, Zahlungsziel; **Stellen** vergibt die fortlaufende
+  Nummer, friert Inhalt und Absender ein und legt das PDF im Bucket ab;
+  **Storno** als Gegenrechnung mit eigener Nummer; **Zahlungseingang** mit
+  Datum und Betrag; Notiz; Testrechnungen außerhalb des Nummernkreises;
+  Provisionsrechnung aus dem Maklervertrag (Prozentsatz, Kaufpreis) vorbelegt;
+  Übersicht mit offenen und überfälligen Posten und Filtern; Links von
+  Vertrags- und Objektseite.
+- **Versand:** Mail-Vorlagen (Standard, Zusammenarbeit, Verkauf, Erinnerung)
+  öffnen das Postfach mit Empfänger, Text und der Rechnung als PDF-Anhang;
+  Anhänge über IMAP/SMTP, Gmail (MIME) und Microsoft Graph; der Anhang wird
+  an der gesendeten Nachricht vermerkt.
+- **Geschäftsbriefe:** Vorlagen für Flurkarte, Grundbuch, Altlasten,
+  Baulasten, Eigentümer-Unterlagen und -Bericht, Dankschreiben, freier Brief;
+  Platzhalter aus Objekt (Adresse, Eigentümer) und Kontakt; Anschrift, Betreff,
+  Anrede, Text, Gruß, Unterzeichner; PDF und Word auf Briefpapier
+  (Absender überschreibt den Kopf); „PDF erstellen und ablegen“, Versand per
+  Post vermerken oder aus dem Postfach senden (setzt „versendet“).
+- **Dokumente:** gemeinsamer Erzeuger `src/lib/dokument/erzeugen.ts`
+  (Briefkopf laden, PDF rendern, festschreiben, Anhang holen); Download-Route
+  liefert gestellte Rechnungen aus dem Storage.
+- **Ende-zu-Ende gegen den lokalen Stack:** Absender mit Startnummer 100;
+  Rechnung aus Kontakt und Objekt; Brutto 11.900,00 → Netto 10.000,00; zweite
+  Position 7 %; Entwurf-PDF; Stellen (RE-2026-100, Felder gesperrt, PDF
+  festgeschrieben); Mail-Link mit Anhang; Nummernkreis gesperrt; bezahlt;
+  Storno (RE-2026-101, negative Beträge); Brief aus Vorlage „Grundbuch“ mit
+  Objektadresse, PDF/Word, als versendet vermerkt.
+- Prüfstand: Typecheck, Lint, 412 Unit-Tests, 478 Datenbank-Nachweise lokal,
+  Marken-Scan, Produktions-Build.
+
+### Nicht erledigt — und warum
+
+| Punkt | Grund |
+|---|---|
+| E-Rechnung (XRechnung/ZUGFeRD) | ab 2025 nur Empfangspflicht für Unternehmen; Ausstellungspflicht für kleine Unternehmen erst 2028 — vorgemerkt, Datenmodell (Positionen, Steuersätze, Absender-Snapshot) trägt es |
+| Vollständige GoBD-Konformität behaupten | nicht behauptet; Aufbewahrung, Verfahrensdokumentation und Export für die Betriebsprüfung sind offene Punkte in `docs/BLOCKER.md` |
+| Mahnwesen mit Stufen und Gebühren | heute: Filter „Überfällig“ und Erinnerungs-Mail-Vorlage; Mahnstufen folgen mit dem Finanz-Paket (F1) |
+| Versand mit Anhang gegen echte Postfächer geprüft | Aufbau der MIME-Nachricht ist durch Unit-Tests abgedeckt; ein Live-Versand braucht die Zugänge aus `docs/ZUGAENGE_FEHLEND.md` |
+
+---
+
 ## 04.09.2026 (Paket 10) — ToDos-Ausbau, Notizen, Checklisten, Heute-Zone, Rundgang
 
 **Branch:** `claude/autonomie-integrations-prompt-rl2qkr` · Referenz-Kacheln „ToDos“ und „Erinnerungen & Arbeitsketten“ nach `docs/FUNKTIONSABGLEICH.md` (N1)

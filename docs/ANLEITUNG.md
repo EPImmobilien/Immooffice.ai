@@ -549,6 +549,49 @@ Text unverändert. So arbeiten Kunden:
    die Startseite; er lässt sich unten auf der Startseite jederzeit neu
    starten.
 
+## 10f. Rechnungen und Geschäftsbriefe
+
+Menü **Rechnungen** und **Briefe**. Rechte über das Modul „Rechnungen und
+Briefe“ (Inhaber und Administratoren alles, Makler anlegen/ändern/stellen,
+Assistenz bearbeiten, Nur-Lesen sehen).
+
+1. **Absender anlegen:** Rechnungen → „Absender & Nummernkreis“. Der erste
+   Firmenabsender entsteht automatisch aus den Firmendaten; ergänzen Sie
+   Steuernummer oder USt-IdNr., Bankverbindung und die **Startnummer**
+   (Vorschau z. B. `RE-2026-100`). Persönliche Absender (Art „Persönlich“)
+   gehören einem Mitarbeiter und haben einen eigenen Nummernkreis.
+   **Wichtig:** Sobald über einen Absender eine Rechnung gestellt ist, lässt
+   sich der Nummernkreis nicht mehr ändern.
+2. **Rechnung anlegen:** Rechnungen → Absender, Empfänger (aus dem
+   Kundenstamm oder aus einem Kontakt — der Kunde entsteht dann automatisch),
+   Objekt und Maklervertrag wählen. Aus dem Maklervertrag wird die
+   Provisionsposition mit Prozentsatz und Kaufpreis vorbelegt. Auf der
+   Vertragsseite gibt es dafür den Knopf „Provisionsrechnung“.
+3. **Positionen:** Beschreibung, Menge, Einheit, Einzelpreis netto,
+   Steuersatz. Wer einen Bruttobetrag kennt, trägt ihn in „Brutto“ ein — der
+   Nettopreis wird zurückgerechnet. Summen je Steuersatz stehen darunter.
+   „Entwurf speichern“, dann „PDF-Vorschau“ prüfen.
+4. **Stellen:** vergibt die nächste Nummer, friert die Rechnung ein und legt
+   das PDF ab. Danach ist nichts mehr änderbar — nur Zahlungseingang, Notiz
+   und Storno. Zum Ausprobieren dient das Häkchen **Testrechnung**: Nummer
+   `TEST-…`, zählt nicht mit, lässt sich löschen.
+5. **Versand:** Mail-Vorlage wählen (Standard, gute Zusammenarbeit, nach
+   Verkauf, freundliche Erinnerung) und „Per E-Mail senden“ — das Postfach
+   öffnet sich mit Empfänger, Text und der Rechnung als PDF-Anhang. Der
+   Anhang wird an der gesendeten Nachricht vermerkt.
+6. **Bezahlt / Storno:** Zahlungseingang mit Datum und Betrag vermerken.
+   Falsche Rechnung? „Storno-Rechnung erzeugen“ mit Grund — es entsteht eine
+   Gegenrechnung mit eigener Nummer und negativen Beträgen, das Original
+   bleibt erhalten und ist als storniert markiert. Die Übersicht zeigt
+   offene, überfällige und im Jahr bezahlte Beträge.
+7. **Geschäftsbriefe:** Briefe → Vorlage wählen (Flurkarte, Grundbuch,
+   Altlasten, Baulasten, Unterlagen vom Eigentümer, Vermarktungsbericht,
+   Dankschreiben, freier Brief), Kontakt und Objekt angeben — Adresse und
+   Eigentümer werden eingesetzt, Platzhalter „…“ ergänzen Sie im Text.
+   „PDF erstellen und ablegen“ erzeugt den Brief auf dem Briefpapier des
+   gewählten Absenders; „Word“ liefert eine bearbeitbare Fassung. Versand
+   per Post vermerken oder „Per E-Mail senden“ mit dem PDF als Anhang.
+
 ## 11. Was Sie an Gate A und Gate B entscheiden
 
 - **Gate A** (bereits erreicht): Bestandsaufnahme, Funktionsmatrix, Architektur

@@ -10,7 +10,7 @@ import { nachrichtSenden, type PostfachErgebnis } from "@/server/postfach-aktion
 import type { PostfachZeile } from "./typen";
 
 /** Neue Nachricht ueber ein verbundenes Postfach (P5). */
-export function NeueNachricht({ postfaecher, an }: { postfaecher: PostfachZeile[]; an?: string | undefined }) {
+export function NeueNachricht({ postfaecher, an, betreff, text, anhang }: { postfaecher: PostfachZeile[]; an?: string | undefined; betreff?: string | undefined; text?: string | undefined; anhang?: { art: "rechnung" | "brief"; id: string; bezeichnung: string } | undefined }) {
   const [zustand, aktion, laeuft] = useActionState<PostfachErgebnis, FormData>(nachrichtSenden, {});
   const sendbar = postfaecher.filter((p) => p.status !== "getrennt");
   if (sendbar.length === 0) return <Hinweis ton="warnung">Kein sendefähiges Postfach verbunden.</Hinweis>;
@@ -20,6 +20,9 @@ export function NeueNachricht({ postfaecher, an }: { postfaecher: PostfachZeile[
       <h2 className="font-titel text-[17px] font-semibold text-text">Neue Nachricht</h2>
       {zustand.fehler && <Hinweis ton="fehler">{zustand.fehler}</Hinweis>}
       {zustand.erfolg && <Hinweis ton="erfolg">{zustand.erfolg}</Hinweis>}
+      {anhang && !zustand.erfolg && (
+        <Hinweis ton="info">Anhang: {anhang.bezeichnung} (PDF) wird mitgesendet.<input type="hidden" name="anhang_art" value={anhang.art} /><input type="hidden" name="anhang_id" value={anhang.id} /></Hinweis>
+      )}
       <div className="grid gap-3 sm:grid-cols-2">
         <Feld beschriftung="Über Postfach" id="n-postfach">
           <Auswahl name="postfach_id" defaultValue={sendbar[0]?.id}>
@@ -36,10 +39,10 @@ export function NeueNachricht({ postfaecher, an }: { postfaecher: PostfachZeile[
         <Eingabe name="cc" />
       </Feld>
       <Feld beschriftung="Betreff" id="n-betreff" pflicht>
-        <Eingabe name="betreff" required maxLength={500} />
+        <Eingabe name="betreff" required maxLength={500} defaultValue={betreff ?? ""} />
       </Feld>
       <Feld beschriftung="Text" id="n-text" pflicht>
-        <Textfeld name="text" rows={10} required />
+        <Textfeld name="text" rows={10} required defaultValue={text ?? ""} />
       </Feld>
       <Button type="submit" disabled={laeuft}>{laeuft ? "Wird gesendet …" : "Senden"}</Button>
     </form>

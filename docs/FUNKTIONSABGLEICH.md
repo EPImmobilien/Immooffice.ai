@@ -123,7 +123,7 @@ in `docs/STATUS.md`.
 | Funktion | Stand | Paket |
 |---|---|---|
 | Zentrale Ablage nach Kategorien | ◐ (Unterlagen je Objekt) | D1 |
-| Geschäftsbriefe im Briefpapier, PDF, versenden, ablegen | ✗ | R1 |
+| Geschäftsbriefe im Briefpapier, PDF, versenden, ablegen | ✓ (Vorlagen Behörden/Eigentümer, PDF/Word, Versand aus dem Postfach, PDF im Bucket) | R1 |
 | Dateinamen per KI, Objektwissen auslesen | ✗ | W1 |
 
 ## Kachel 11 — KI-Agenten
@@ -153,9 +153,9 @@ in `docs/STATUS.md`.
 
 | Funktion | Stand | Paket |
 |---|---|---|
-| Entwurf, Festschreiben mit fortlaufender Nummer, Storno, bezahlt, PDF | ✗ | R1 |
-| Positionen, Kunden, persönliche Absender, Startnummer | ✗ | R1 |
-| Provisionsrechnung aus Maklervertrag vorbelegen | ✗ | R1 |
+| Entwurf, Festschreiben mit fortlaufender Nummer, Storno, bezahlt, PDF | ✓ (GoBD-Regeln in der Datenbank, PDF festgeschrieben im Storage) | R1 |
+| Positionen, Kunden, persönliche Absender, Startnummer | ✓ (Brutto→Netto, Steuersätze 0/7/19, § 19 UStG, Nummernkreis je Absender, Testrechnungen) | R1 |
+| Provisionsrechnung aus Maklervertrag vorbelegen | ✓ (Prozentsatz und Kaufpreis aus Vertrag/Objekt, Mail-Vorlagen inkl. Erinnerung) | R1 |
 
 ## Kachel 15 — Finanzen (Chef)
 

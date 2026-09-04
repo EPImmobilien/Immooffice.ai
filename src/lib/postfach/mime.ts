@@ -95,6 +95,7 @@ export async function rohNachricht(absender: Adresse, auftrag: Sendeauftrag): Pr
     text: auftrag.text,
     ...(auftrag.inReplyTo ? { inReplyTo: auftrag.inReplyTo } : {}),
     ...(auftrag.references && auftrag.references.length > 0 ? { references: auftrag.references.join(" ") } : {}),
+    ...(auftrag.anhaenge && auftrag.anhaenge.length > 0 ? { attachments: auftrag.anhaenge.map((a) => ({ filename: a.dateiname, content: a.inhalt, contentType: a.mime })) } : {}),
   });
   const knoten = composer.compile();
   const messageId = knoten.messageId();

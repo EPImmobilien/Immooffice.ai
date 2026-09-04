@@ -32,3 +32,18 @@ geklärt ist; die Ansprache von Privatanbietern unterliegt § 7 UWG.
 **Nötig zur Auflösung:** anwaltliche Bewertung je Portal oder ein
 lizenzierter Datenlieferant mit vertraglicher Erlaubnis. Erst danach wird ein
 Import-Connector gebaut.
+
+## Rechnungen: GoBD-Konformität als Ganzes
+
+**Stand:** offen (rechtlich/organisatorisch). **Betrifft:** Paket R1, `/rechnungen`.
+
+Die Software erzwingt Unveränderlichkeit, fortlaufende Nummern, Storno als
+Gegenrechnung und legt das gestellte PDF ab (E-2026-09-04-47). Vollständige
+GoBD-Konformität wird **nicht** behauptet: Sie umfasst auch Aufbewahrung
+über zehn Jahre, eine Verfahrensdokumentation des Mandanten, einen
+Datenzugriff für die Betriebsprüfung (Z3-Export) und ab 2028 die
+Ausstellungspflicht für E-Rechnungen (XRechnung/ZUGFeRD).
+
+**Nötig zur Auflösung:** steuerberaterliche Prüfung des Ablaufs je Mandant;
+danach Export für die Betriebsprüfung und E-Rechnungsformat als eigenes
+Paket.

@@ -146,7 +146,10 @@ export default async function VertragSeite({
         </a>
         <a href={`/api/dokumente/vertrag/${data.id}?format=docx`} className={buttonKlassen({ variante: "sekundaer" })}>Word</a>
         {data.art === "maklervertrag" && (
-          <Link href={`/notar?vertrag=${data.id}`} className={buttonKlassen({ variante: "leise" })}>Notar-Laufzettel</Link>
+          <>
+            <Link href={`/notar?vertrag=${data.id}`} className={buttonKlassen({ variante: "leise" })}>Notar-Laufzettel</Link>
+            <Link href={`/rechnungen?vertrag=${data.id}${data.objekt_id ? `&objekt=${data.objekt_id}` : ""}`} className={buttonKlassen({ variante: "leise" })}>Provisionsrechnung</Link>
+          </>
         )}
         {data.original_pfad && <Marke>Original-PDF abgelegt</Marke>}
       </div>

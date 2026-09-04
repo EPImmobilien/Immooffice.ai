@@ -182,6 +182,7 @@ export class MicrosoftAnbieter extends OAuthAnbieterBasis implements PostfachAnb
 
   async senden(auftrag: Sendeauftrag): Promise<Sendeergebnis> {
     const json = { "Content-Type": "application/json" };
+    const graphAnhaenge = (a: NonNullable<Sendeauftrag["anhaenge"]>) => a.map((x) => ({ "@odata.type": "#microsoft.graph.fileAttachment", name: x.dateiname, contentType: x.mime, contentBytes: x.inhalt.toString("base64") }));
     if (auftrag.antwortAufExternId) {
       const entwurf = await this.anfrage<{ id: string }>(
         `${GRAPH_BASIS}/me/messages/${encodeURIComponent(auftrag.antwortAufExternId)}/createReply`,
@@ -195,6 +196,7 @@ export class MicrosoftAnbieter extends OAuthAnbieterBasis implements PostfachAnb
           body: { contentType: "Text", content: auftrag.text },
           toRecipients: empfaenger(auftrag.an),
           ccRecipients: empfaenger(auftrag.cc ?? []),
+          ...(auftrag.anhaenge && auftrag.anhaenge.length > 0 ? { attachments: graphAnhaenge(auftrag.anhaenge) } : {}),
         }),
       });
       await this.anfrage<undefined>(`${GRAPH_BASIS}/me/messages/${encodeURIComponent(entwurf.id)}/send`, {
@@ -213,6 +215,7 @@ export class MicrosoftAnbieter extends OAuthAnbieterBasis implements PostfachAnb
           body: { contentType: "Text", content: auftrag.text },
           toRecipients: empfaenger(auftrag.an),
           ccRecipients: empfaenger(auftrag.cc ?? []),
+          ...(auftrag.anhaenge && auftrag.anhaenge.length > 0 ? { attachments: graphAnhaenge(auftrag.anhaenge) } : {}),
         },
         saveToSentItems: true,
       }),

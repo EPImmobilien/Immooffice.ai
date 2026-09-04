@@ -7,10 +7,12 @@ import { akquiseEinstellungenLaden, vergleichswerteLaden } from "@/lib/akquise/v
 import { wertindikationAlsDokument } from "@/lib/akquise/wertindikation-dokument";
 import { rechtErzwingen } from "@/lib/auth/rechte";
 import { sitzungLaden } from "@/lib/auth/sitzung";
+import { briefDokumentLaden, briefkopfLaden, rechnungDokumentLaden } from "@/lib/dokument/erzeugen";
 import { DokumentPdf } from "@/lib/dokument/pdf";
 import { textZuDokument, type Briefkopf, type Dokument } from "@/lib/dokument/struktur";
 import { dokumentAlsWord } from "@/lib/dokument/word";
-import { logoLaden } from "@/lib/expose/logo-laden";
+import { DOKUMENT_BUCKET } from "@/lib/dokumente";
+import type { Absender } from "@/lib/rechnungen";
 import { serverClient } from "@/lib/supabase/server";
 import { laufzettelAlsDokument, laufzettelAusDaten, type Anhang } from "@/lib/verkauf/laufzettel";
 import { protokollAlsDokument, protokollAusZeile, protokollTitel } from "@/lib/verkauf/uebergabe";
@@ -26,35 +28,24 @@ export const runtime = "nodejs";
  *   /api/dokumente/vertrag/<id>?format=pdf|docx&vollmacht=1
  *   /api/dokumente/uebergabe/<id>?format=pdf|docx
  *   /api/dokumente/laufzettel/<id>?format=pdf|docx
+ *   /api/dokumente/rechnung/<id>           — gestellte Rechnungen: die festgeschriebene Datei
+ *   /api/dokumente/brief/<id>?format=pdf|docx
  */
 export async function GET(anfrage: Request, { params }: { params: Promise<{ art: string; id: string }> }) {
   const { art, id } = await params;
   const sitzung = await sitzungLaden();
   if (!sitzung) return NextResponse.json({ fehler: "Nicht angemeldet." }, { status: 401 });
-  rechtErzwingen(sitzung.rolle, art === "wertindikation" ? "akquise" : "vertraege", "lesen", sitzung.uebersteuerung);
+  rechtErzwingen(sitzung.rolle, art === "wertindikation" ? "akquise" : art === "rechnung" || art === "brief" ? "rechnungen" : "vertraege", "lesen", sitzung.uebersteuerung);
   if (!/^[0-9a-f-]{36}$/.test(id)) return NextResponse.json({ fehler: "Nicht gefunden." }, { status: 404 });
 
   const url = new URL(anfrage.url);
   const format = url.searchParams.get("format") === "docx" ? "docx" : "pdf";
   const supabase = await serverClient();
 
-  const { data: branding } = await supabase
-    .from("mandant_branding")
-    .select("firmenname, strasse, hausnummer, plz, ort, telefon, email, web, logo_pfad, farbe_primaer, farbe_akzent")
-    .eq("mandant_id", sitzung.mandantId)
-    .maybeSingle();
-  const logo = await logoLaden(supabase, branding?.logo_pfad as string | null);
-  const kopf: Briefkopf = {
-    firmenname: (branding?.firmenname as string | null) ?? sitzung.mandantName,
-    zeile2: [[branding?.strasse, branding?.hausnummer].filter(Boolean).join(" "), [branding?.plz, branding?.ort].filter(Boolean).join(" ")].filter(Boolean).join(" · "),
-    zeile3: [branding?.telefon, branding?.email, branding?.web].filter(Boolean).join(" · "),
-    logo: logo ? `data:image/${logo.format === "jpg" ? "jpeg" : "png"};base64,${logo.daten.toString("base64")}` : null,
-    farbePrimaer: (branding?.farbe_primaer as string | null) ?? "#1B2A47",
-    farbeAkzent: (branding?.farbe_akzent as string | null) ?? "#B5934F",
-  };
-
+  let absender: Partial<Absender> | null = null;
   let dokument: Dokument | null = null;
   let dateiname = "dokument";
+  let festgeschrieben: string | null = null;
 
   if (art === "vertrag") {
     const { data: v } = await supabase.from("vertraege").select("*").eq("id", id).eq("mandant_id", sitzung.mandantId).maybeSingle();
@@ -102,9 +93,28 @@ export async function GET(anfrage: Request, { params }: { params: Promise<{ art:
     const leadZeile: LeadZeile = { ...lead, wohnflaeche: zahl(lead.wohnflaeche), grundstueck: zahl(lead.grundstueck), wert_indikation: zahl(lead.wert_indikation), angebotspreis: zahl(lead.angebotspreis) };
     dokument = wertindikationAlsDokument(leadZeile, wertindikation(leadZeile, bestand), einst, eigentuemer, new Date().toISOString().slice(0, 10));
     dateiname = `Wertindikation_${lead.titel.replace(/[^a-zA-Z0-9äöüÄÖÜß._-]+/g, "_").slice(0, 60)}`;
+  } else if (art === "rechnung") {
+    const g = await rechnungDokumentLaden(supabase, sitzung.mandantId, id);
+    if (!g) return NextResponse.json({ fehler: "Nicht gefunden." }, { status: 404 });
+    dokument = g.dokument; dateiname = g.dateiname; absender = g.absender; festgeschrieben = g.rechnung.pdf_pfad;
+  } else if (art === "brief") {
+    const g = await briefDokumentLaden(supabase, sitzung.mandantId, id);
+    if (!g) return NextResponse.json({ fehler: "Nicht gefunden." }, { status: 404 });
+    dokument = g.dokument; dateiname = g.dateiname; absender = g.absender; festgeschrieben = g.brief.pdf_pfad;
   } else {
     return NextResponse.json({ fehler: "Unbekannte Dokumentart." }, { status: 404 });
   }
+
+  // GoBD: Eine gestellte Rechnung wird nie neu gerendert, sondern aus dem Storage geliefert.
+  if (festgeschrieben && format === "pdf") {
+    const { data } = await supabase.storage.from(DOKUMENT_BUCKET).download(festgeschrieben).catch(() => ({ data: null }));
+    if (data) {
+      return new NextResponse(new Uint8Array(await data.arrayBuffer()), {
+        headers: { "Content-Type": "application/pdf", "Content-Disposition": `inline; filename="${dateiname}.pdf"`, "Cache-Control": "no-store" },
+      });
+    }
+  }
+  const kopf: Briefkopf = await briefkopfLaden(supabase, sitzung.mandantId, sitzung.mandantName, absender);
 
   if (format === "docx") {
     const puffer = await dokumentAlsWord(dokument, kopf);

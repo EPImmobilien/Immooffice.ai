@@ -17,6 +17,7 @@ import { autorisierungsUrl, fehlerText, oauthKonfig, stateErzeugen, type OAuthAr
 import { vorschau, zitatAbschneiden } from "@/lib/postfach/text";
 import { adressenJson, imapZugangSchema, zugangParsen, type Adresse } from "@/lib/postfach/typen";
 import { dienstClient } from "@/lib/supabase/dienst";
+import { anhangPdf } from "@/lib/dokument/erzeugen";
 import { serverClient } from "@/lib/supabase/server";
 
 /**
@@ -367,8 +368,17 @@ export async function nachrichtSenden(_vorher: PostfachErgebnis, formular: FormD
   if (!cc) return { fehler: "Eine Kopie-Adresse ist ungültig." };
   if (!betreff) return { fehler: "Bitte einen Betreff angeben." };
   if (!inhalt) return { fehler: "Die Nachricht ist leer." };
+  const anhangArt = text(formular, "anhang_art");
+  const anhangId = text(formular, "anhang_id");
 
   const supabase = await serverClient();
+  // Rechnung oder Brief als PDF anhaengen: gestellte Rechnungen kommen als festgeschriebene Datei.
+  let anhang: Awaited<ReturnType<typeof anhangPdf>> = null;
+  if ((anhangArt === "rechnung" || anhangArt === "brief") && /^[0-9a-f-]{36}$/.test(anhangId)) {
+    rechtErzwingen(sitzung.rolle, "rechnungen", "lesen", sitzung.uebersteuerung);
+    anhang = await anhangPdf(supabase, sitzung.mandantId, sitzung.mandantName, anhangArt, anhangId);
+    if (!anhang) return { fehler: "Der Anhang wurde nicht gefunden." };
+  }
   let original: Record<string, unknown> | null = null;
   if (antwortAuf) {
     const { data } = await supabase
@@ -425,6 +435,7 @@ export async function nachrichtSenden(_vorher: PostfachErgebnis, formular: FormD
       ...(messageId ? { references: [messageId] } : {}),
       antwortAufExternId: original && original["postfach_id"] === postfachId ? ((original["extern_id"] as string | null) ?? null) : null,
       threadId: (original?.["thread_id"] as string | null) ?? null,
+      ...(anhang ? { anhaenge: [{ dateiname: anhang.dateiname, mime: anhang.mime, inhalt: anhang.inhalt }] } : {}),
     });
     await geladen.dienst
       .from("nachrichten")
@@ -442,6 +453,12 @@ export async function nachrichtSenden(_vorher: PostfachErgebnis, formular: FormD
     return { fehler: `Der Versand ist fehlgeschlagen — ${fehlerText(e)}` };
   }
 
+  if (anhang) {
+    await supabase.from("nachricht_anhaenge").insert({ mandant_id: sitzung.mandantId, nachricht_id: zeile.id, dateiname: anhang.dateiname, mime: anhang.mime, bytes: anhang.inhalt.byteLength });
+    await supabase.from("nachrichten").update({ hat_anhaenge: true }).eq("id", zeile.id);
+    if (anhangArt === "brief") await supabase.from("briefe").update({ status: "versendet", versendet_am: new Date().toISOString() }).eq("id", anhangId).eq("mandant_id", sitzung.mandantId);
+  }
+
   const objektId = original?.["objekt_id"] as string | null | undefined;
   const kontaktId = original?.["kontakt_id"] as string | null | undefined;
   if (objektId || kontaktId) {
@@ -457,7 +474,7 @@ export async function nachrichtSenden(_vorher: PostfachErgebnis, formular: FormD
   }
 
   revalidatePath("/postfach");
-  return { erfolg: "Nachricht gesendet." };
+  return { erfolg: anhang ? `Nachricht mit Anhang „${anhang.bezeichnung}“ gesendet.` : "Nachricht gesendet." };
 }
 
 export async function anhangUebernehmen(_vorher: PostfachErgebnis, formular: FormData): Promise<PostfachErgebnis> {

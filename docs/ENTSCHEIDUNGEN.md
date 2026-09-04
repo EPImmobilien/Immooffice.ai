@@ -627,6 +627,55 @@ Masterprompt: kostenpflichtig ist nur KI-Erstellung, und jede KI-Ausgabe
 bleibt editierbar. Audio-Verarbeitung im Browser hält personenbezogene
 Daten weg von Anbietern (Abschnitt 16).
 
+### E-2026-09-04-47 — GoBD-Regeln für Rechnungen liegen in der Datenbank, das PDF wird festgeschrieben
+
+**Frage:** Wo werden Unveränderlichkeit, fortlaufende Nummern und Storno
+erzwungen — in der Oberfläche, im Server-Code oder in der Datenbank?
+
+**Entscheidung:** In der Datenbank. Trigger verhindern jede inhaltliche
+Änderung einer gestellten Rechnung (auch der Positionen), das Löschen
+gestellter Rechnungen und das Verstellen des Nummernkreises, sobald über
+einen Absender eine Rechnung gestellt wurde. `rechnung_stellen` vergibt die
+Nummer (`PRÄFIX-JJJJ-NNN`) in einer Transaktion mit Zeilensperre und friert
+den Absender als Snapshot ein; `rechnung_stornieren` erzeugt eine
+Storno-Rechnung mit eigener Nummer und negativen Positionen, das Original
+bleibt unverändert. Beim Stellen wird das PDF erzeugt und im
+Unterlagen-Bucket abgelegt; die Download-Route liefert für gestellte
+Rechnungen immer diese Datei und rendert nie neu. Testrechnungen
+(`ist_test`) laufen außerhalb des Nummernkreises (`TEST-…`) und sind
+löschbar.
+
+**Begründung:** Rechte werden serverseitig und in der Datenbank erzwungen
+(Masterprompt). Ein Trigger gilt für jede Schreibstelle — Oberfläche,
+Schnittstelle, Import — und lässt sich in SQL-Nachweisen prüfen. Ein
+festgeschriebenes PDF ist die einzige Fassung, die dem Kunden vorlag; ein
+späteres Rendern mit geändertem Briefkopf wäre ein anderer Beleg. Keine
+Aussage zur vollständigen GoBD-Konformität — Aufbewahrung und
+Verfahrensdokumentation bleiben Sache des Mandanten (offener Punkt,
+`docs/BLOCKER.md`).
+
+### E-2026-09-04-48 — Rechnungskunden sind ein eigener Stamm; persönliche Absender je Mitarbeiter
+
+**Frage:** Reicht der Kontaktstamm als Rechnungsempfänger? Und wie werden
+„persönliche Rechnungen“ der Referenz (freie Handelsvertreter) abgebildet?
+
+**Entscheidung:** Rechnungskunden sind eine eigene Tabelle mit
+Rechnungsanschrift und USt-IdNr., optional an einen Kontakt gebunden; beim
+Anlegen einer Rechnung aus einem Kontakt entsteht der Kunde automatisch. Die
+Anschrift wird beim Stellen in die Rechnung kopiert. Absender gibt es als
+Firma und als „persönlich“ (an einen Benutzer gebunden, eigener
+Nummernkreis, eigene Bankverbindung); Makler dürfen ihre persönlichen
+Absender selbst pflegen, Firmenabsender nur Inhaber und Administratoren.
+Die Provisionsrechnung aus dem Maklervertrag rechnet den im Vertrag
+vereinbarten Bruttosatz (inkl. USt) auf den Nettopreis zurück.
+
+**Begründung:** Rechnungen gehen oft an Hausverwaltungen, Firmen oder
+Erbengemeinschaften, die im Kontaktstamm nicht als Person geführt werden;
+eine spätere Änderung am Kontakt darf einen Beleg nicht verändern. Die
+Referenz kennt persönliche Absender mit eigener Startnummer — das ist die
+Struktur, nicht eine Kennung. Maklerverträge nennen die Provision nach
+Handelsbrauch inklusive Umsatzsteuer.
+
 ### E-2026-09-03-13 — Credit-Werte bleiben die der Datenbank
 
 **Frage:** S4 nennt Startwerte (Exposétext 5, Kurztext 2, Bild 3 je Bild,

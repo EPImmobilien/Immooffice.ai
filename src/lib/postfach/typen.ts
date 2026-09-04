@@ -63,6 +63,8 @@ export interface Sendeauftrag {
   /** Kennung der beantworteten Nachricht beim Anbieter (Threading bei Microsoft/Google). */
   antwortAufExternId?: string | null | undefined;
   threadId?: string | null | undefined;
+  /** Dateianhaenge (z. B. Rechnungs-PDF) */
+  anhaenge?: Array<{ dateiname: string; mime: string; inhalt: Buffer }> | undefined;
 }
 
 export interface Sendeergebnis {
