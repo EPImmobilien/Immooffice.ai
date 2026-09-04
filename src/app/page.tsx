@@ -44,7 +44,7 @@ export default function Startseite() {
             Immobilien, Adressbuch, Termine, ToDos, Verkauf, Vermietung,
             Exposé-Schmiede, Marketing, Werkzeuge, Akquise, Postfach,
             Kundenbereich, Rechnungen, Arbeitszeit und Admin sind bedienbar.
-            Bereits registrierte Adressen melden sich über „Anmelden" an.
+            Bereits registrierte Adressen melden sich über „Anmelden“ an.
           </Hinweis>
         </div>
 
