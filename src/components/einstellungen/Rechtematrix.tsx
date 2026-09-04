@@ -44,6 +44,7 @@ const MODUL_BEZEICHNUNG: Record<Modul, string> = {
   postfach: "Postfach",
   akquise: "Akquise",
   rechnungen: "Rechnungen und Briefe",
+  portal: "Neubauprojekte und Kundenbereich",
 };
 
 const AKTION_BEZEICHNUNG: Record<Aktion, string> = {

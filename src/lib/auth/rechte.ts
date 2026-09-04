@@ -43,6 +43,8 @@ export const MODULE = [
   "postfach",
   "akquise",
   "rechnungen",
+  // Neubau-Projekte und Kundenbereich (Eigentuemer, Kaeufer, Interessenten)
+  "portal",
 ] as const;
 
 export type Modul = (typeof MODULE)[number];
@@ -70,6 +72,7 @@ const BEARBEITEN: readonly Aktion[] = ["lesen", "anlegen", "aendern"];
  */
 const MATRIX: Record<Rolle, Rechte> = {
   inhaber: {
+    portal: ALLE,
     rechnungen: ALLE,
     akquise: ALLE,
     objekte: ALLE,
@@ -85,6 +88,7 @@ const MATRIX: Record<Rolle, Rechte> = {
     postfach: ALLE,
   },
   administrator: {
+    portal: ALLE,
     rechnungen: ALLE,
     akquise: ALLE,
     objekte: ALLE,
@@ -100,6 +104,7 @@ const MATRIX: Record<Rolle, Rechte> = {
     postfach: ALLE,
   },
   makler: {
+    portal: ["lesen", "anlegen", "aendern", "loeschen"],
     rechnungen: ["lesen", "anlegen", "aendern", "freigeben"],
     akquise: ["lesen", "anlegen", "aendern", "loeschen"],
     objekte: BEARBEITEN,
@@ -113,6 +118,7 @@ const MATRIX: Record<Rolle, Rechte> = {
     postfach: BEARBEITEN,
   },
   assistenz: {
+    portal: BEARBEITEN,
     rechnungen: BEARBEITEN,
     akquise: BEARBEITEN,
     objekte: BEARBEITEN,
@@ -133,6 +139,7 @@ const MATRIX: Record<Rolle, Rechte> = {
     kalender: BEARBEITEN,
   },
   nur_lesen: {
+    portal: LESEN,
     rechnungen: LESEN,
     akquise: LESEN,
     objekte: LESEN,

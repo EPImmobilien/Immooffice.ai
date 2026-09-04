@@ -38,6 +38,10 @@ const OEFFENTLICH = [
   "/api/v1",
   // Mieterselbstauskunft: Interessenten fuellen sie ohne Konto aus.
   "/selbstauskunft",
+  // Kundenbereich (Eigentuemer, Kaeufer, Projekt-Interessenten) und oeffentliche
+  // Projektseite: Zugang ueber Link mit Token, kein Konto.
+  "/kunde",
+  "/projekt",
 ];
 
 function istOeffentlich(pfad: string): boolean {

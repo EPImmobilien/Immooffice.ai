@@ -676,6 +676,57 @@ Browser; die Dateien verlassen Ihren Rechner nicht.
    Haltestelle, Bahnhof, Autobahn, Park, Spielplatz) aus OpenStreetMap —
    mit Luftlinie und Gehminuten.
 
+## 10i. Neubauprojekte und Kundenbereich — Eigentümer, Käufer, Interessenten
+
+Hinweis: Dieses Paket widerspricht dem Masterprompt (Kundenportal
+ausgeschlossen) und ist auf Ihre Weisung „1:1“ gebaut. Es lässt sich als
+Ganzes streichen.
+
+1. **Projekt anlegen:** Navigation → **Neubauprojekte** → **+ Neues Projekt**.
+   Name, Vermarktung (Verkauf/Vermietung), Status „Im Vertrieb“, Ort,
+   Beschreibung → **Projekt anlegen**. Sie landen in der Projektakte.
+2. **Einheiten:** Reiter **Einheiten** → **+ Einheit** → WE-Nr., Geschoss,
+   Zimmer, Fläche, Preis → **Einheit anlegen**. Ein Klick auf den Status schaltet
+   verfügbar → reserviert → verkauft/vermietet.
+3. **Dateien und Ordner:** Reiter **Dateien**. Beim Hochladen wählen Sie die
+   Sichtbarkeit: *Nur intern*, *Alle Kunden des Projekts*, *Nur Käufer*,
+   *Öffentliche Projektseite*. Ordner gliedern die Kundensicht.
+4. **Baufortschritt:** Reiter **Baufortschritt** → Titel, Text, Fotos →
+   **Meldung veröffentlichen**. Kunden sehen sie sofort.
+5. **Gewerke:** Reiter **Gewerke** → **+ Gewerk** → Häkchen „Für Kunden
+   sichtbar“ zeigt den Ansprechpartner im Kundenbereich (z. B. Bemusterung).
+6. **Zugang einladen:** Reiter **Zugänge** → **+ Zugang einladen** → Name,
+   E-Mail, Rolle (Interessent/Käufer), Wohnung → **Zugang anlegen und
+   einladen**. Mit Mail-Dienst geht die Einladung automatisch; sonst kopieren
+   Sie den angezeigten Zugangslink und geben ihn weiter.
+7. **Öffentliche Projektseite:** Reiter **Übersicht** → **Seite
+   veröffentlichen** → Link kopieren. Interessenten sehen Einheiten,
+   öffentliche Dateien und Baufortschritte und können anfragen; dabei entsteht
+   ihr Zugang samt Link per Mail.
+8. **Anfragen bearbeiten:** Reiter **Anfragen** → Antwort eintippen →
+   **Reservierung bestätigen** (Einheit wird reserviert, Kunde auf Stufe 2)
+   oder **Ablehnen**. Der Kunde bekommt eine Nachricht.
+9. **Eigentümer oder Käufer einladen:** **Kundenbereich** → Reiter
+   **Eigentümer-Bereich** oder **Käufer-Bereich** → **+ … einladen** → Name,
+   E-Mail, Objekte anhaken. Oder direkt am Kontakt: Karte **Kundenbereich** →
+   **Als Eigentümer einladen** (Objekte laut Kontaktrolle).
+10. **Kundenakte:** In der Liste auf den Namen klicken. Reiter **Objekte**
+    (Zuordnung, Maklervertrag), **Unterlagen** (persönliche Dokumente ablegen,
+    Kunden-Uploads sehen), **Nachrichten** (Chat), **Anträge**
+    (Verbrauchsausweis: „Als erledigt“), **Aktivitäten**, **Zugang** (Stufe
+    der Kaufabwicklung und nächster Schritt, sperren, Passwort zurücksetzen,
+    **Login-Link neu senden**).
+11. **Glocke:** Die vier Kacheln oben auf **Kundenbereich** zählen ungelesene
+    Nachrichten, offene Anfragen, neue Uploads und eingereichte Anträge.
+12. **So sieht es der Kunde:** Er öffnet seinen Link (`/kunde/…`). Unter
+    **Zugang** kann er ein Passwort setzen; danach fragt der Link es ab.
+    Eigentümer sehen unter **Meine Immobilie** Stand, Exposé-Aufrufe, Anfragen,
+    Besichtigungen, Dokumente mit Sichtbarkeit „Kunde“, die
+    Unterlagen-Checkliste und den Verlauf; unter **Energieausweis** füllen sie
+    den Verbrauchsausweis-Antrag aus. Käufer sehen die **Kaufabwicklung** in
+    sieben Stufen. Projekt-Kunden sehen Wohnungen mit Merkliste, Anfragen und
+    Baufortschritt.
+
 ## 11. Was Sie an Gate A und Gate B entscheiden
 
 - **Gate A** (bereits erreicht): Bestandsaufnahme, Funktionsmatrix, Architektur

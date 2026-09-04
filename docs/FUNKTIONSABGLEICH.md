@@ -44,17 +44,17 @@ in `docs/STATUS.md`.
 | Suchprofil am Kontakt, Matching | ✓ | — |
 | Verknüpfte Objekte, Eigentümerzuordnung | ✓ | — |
 | E-Mail-Verlauf zur Adresse | ◐ (Postfach ordnet zu; Anzeige am Kontakt fehlt) | N1 |
-| Eigentümer-Portalzugang, Einladung | ✗ | P1 |
+| Eigentümer-Portalzugang, Einladung | ✓ (Kundenbereich: Zugang am Kontakt, Objekte, Login-Link) | P1 |
 | Personalausweis-Scanner (Daten aus Ausweisfoto) | ✗ | W1 |
 
-## Kachel 4 — Kundenportal (Eigentümer- und Käuferbereich)
+## Kachel 4 — Kundenbereich (Eigentümer- und Käuferbereich)
 
 | Funktion | Stand | Paket |
 |---|---|---|
-| Eigentümer-Portal: Vermarktungsstand, Dokumente, Nachrichten, Checkliste Unterlagen | ✗ | P1 |
-| Käuferportal: Kaufabwicklung mit Unterlagen | ✗ | P1 |
-| Einladung, Zugänge, Passwort setzen, Benachrichtigungsglocke | ✗ | P1 |
-| Neubau-Projektportal (Projekte, Einheiten, Merkliste, Anfragen, Nachrichten) | ✗ | P2 |
+| Eigentümer-Portal: Vermarktungsstand, Dokumente, Nachrichten, Checkliste Unterlagen | ✓ (Kundenbereich `/kunde/[token]`: Stand, Aufrufe, Anfragen, Besichtigungen, Verlauf, Kundendokumente, Checkliste, Uploads, Nachrichten, Verbrauchsausweis-Antrag) | P1 |
+| Käuferportal: Kaufabwicklung mit Unterlagen | ✓ (sieben Stufen mit nächstem Schritt, persönliche Unterlagen, Nachrichten) | P1 |
+| Einladung, Zugänge, Passwort setzen, Benachrichtigungsglocke | ✓ (Zugangslink mit Hash, optionales Passwort, Sperren, Link erneuern, Glocke auf `/kundenbereich`) | P1 |
+| Neubau-Projektportal (Projekte, Einheiten, Merkliste, Anfragen, Nachrichten) | ✓ (`/projekte`: Einheiten mit Statuszyklus, Ordner/Dateien mit Sichtbarkeit, Baufortschritt, Gewerke, Zugänge, Anfragen mit Reservierung, Merkliste, Nachrichten, Aktivitäten; öffentliche Projektseite `/projekt/[token]` mit Anfrage) | P2 |
 
 ## Kachel 5 — Akquise
 
@@ -194,7 +194,7 @@ in `docs/STATUS.md`.
 | K1/K2 | Kalender-Ausbau und Sync | #27 |
 | W1/W2 | Werkzeuge, Bildbearbeitung, KI-Agenten | #28 |
 | D1 | Dokumente-Ablage, Marketing-Ausbau | #28 |
-| P1/P2 | Kundenportal, Neubau-Projekte | #29 |
+| P1/P2 | Kundenbereich, Neubau-Projekte — erledigt (Paket 14) | #29 |
 | F1 | Finanzen, Urlaub/Arbeitszeit, Aktivitäts-Log, Bewerber | #30 |
 
 Jedes Paket endet mit Migration im Projekt, Datenbank-Nachweis, Unit-Tests,

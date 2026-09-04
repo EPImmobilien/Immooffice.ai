@@ -785,6 +785,40 @@ Einsammeln des Formulars an.
 **Folge:** Beim Aktualisieren von libraw-wasm sind die Dateien in
 `public/werkzeuge/libraw/` mitzuziehen (Hinweis im Quelltext).
 
+### E-2026-09-04-54 — Kundenbereich ohne Konto: Zugangslink mit Hash, optionales Passwort, Datenbankfunktionen statt Dienstrolle
+
+**Frage:** Die Referenz führt Eigentümer, Käufer und Neubau-Interessenten als
+eigene Konten (Magic-Link) in einem separaten Portal. Wie bilden wir das ab,
+ohne die Mandantentrennung zu schwächen — und obwohl der Masterprompt ein
+Kundenportal ausschließt?
+
+**Entscheidung:** Der Auftraggeber hat die funktionale 1:1-Übernahme angeordnet
+(E-2026-09-03-36); das Paket heißt „Kundenbereich“, ist als Widerspruch zum
+Masterprompt gekennzeichnet und hängt an keiner anderen Funktion — es lässt sich
+als Ganzes streichen (`docs/SCOPE.md` bleibt unverändert: NEIN laut Masterprompt).
+Technisch: Ein Zugang ist ein Datensatz `portal_kunden` mit Rolle (Eigentümer,
+Käufer, Interessent), ohne Benutzerkonto. Der Zugangslink trägt ein 48-stelliges
+Token; in der Datenbank liegt nur der SHA-256-Hash. Der Kunde kann zusätzlich
+ein Passwort setzen (Hash mit Salz je Zugang); es wird wie beim Web-Exposé in
+einem pfadgebundenen Cookie für acht Stunden gemerkt und bei jedem Aufruf neu
+geprüft. Alle Kundenaktionen laufen über `security definer`-Funktionen, die
+Token und Passwort prüfen und nur die Daten dieses einen Zugangs herausgeben
+(`portal_daten`, `portal_nachricht_senden`, `portal_merkliste_schalten`,
+`portal_anfrage_senden`, `portal_dokument_eintragen`, `portal_antrag_speichern`,
+`portal_datei`). Die Dienstrolle wird nur für den Bucket gebraucht (signierte
+Adressen, Ablage von Kunden-Uploads) — nachdem die Datenbank den Zugriff bejaht
+hat. Sichtbarkeit von Projektdateien: intern · alle Kunden des Projekts · nur
+Käufer · öffentlich; „nur Käufer“ sieht ausschließlich die Rolle Käufer.
+Einladungs- und Benachrichtigungsmails gehen über die Job-Warteschlange mit der
+freien Vorlage; ohne Mail-Dienst zeigt die Oberfläche den Link zum Weitergeben.
+Eine öffentliche Projektseite (`/projekt/[token]`) zeigt Einheiten, öffentliche
+Dateien und Baufortschritte; eine Anfrage legt den Interessenten-Zugang an.
+
+**Folge:** Das Rechtemodul „portal“ steuert Neubauprojekte und Kundenbereich
+(Inhaber/Admin alles, Makler inkl. Löschen, Assistenz bearbeiten, Nur-Lesen
+lesen). `scripts/marken-scan.sh` behält die Regel gegen das Wort „Kundenportal“;
+Code und Texte sprechen vom Kundenbereich.
+
 ### E-2026-09-03-13 — Credit-Werte bleiben die der Datenbank
 
 **Frage:** S4 nennt Startwerte (Exposétext 5, Kurztext 2, Bild 3 je Bild,

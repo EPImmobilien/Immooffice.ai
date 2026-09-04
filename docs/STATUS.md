@@ -5,6 +5,48 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 04.09.2026 (Paket 14) — Neubauprojekte und Kundenbereich (Eigentümer, Käufer, Interessenten)
+
+**Widerspruch zum Masterprompt, bewusst:** Der Masterprompt schließt ein
+Kundenportal aus (`docs/SCOPE.md`: NEIN). Auf Weisung des Auftraggebers
+(1:1-Übernahme, E-2026-09-03-36) ist es als letztes Fachpaket gebaut; es hängt
+an keiner anderen Funktion und lässt sich als Ganzes streichen (Migration
+`20260904160000`, Rechtemodul `portal`, Routen `/projekte`, `/kundenbereich`,
+`/kunde/[token]`, `/projekt/[token]`). Entscheidung E-54.
+
+- Migration `20260904160000_portal_projekte.sql` (im Projekt eingespielt):
+  Projekte, Einheiten, Ordner, Dateien, Baufortschritt, Gewerke, Kundenzugänge
+  (Token-Hash, Passwort mit Salz, Fortschritt 1–7), Objektzuordnung, Nachrichten,
+  persönliche Unterlagen, Aktivitäten, Anfragen, Merkliste,
+  Verbrauchsausweis-Anträge; RLS je Mandant, Verweise mandantenrein;
+  Kundenfunktionen mit Token (`portal_*`), öffentliche Projektseite
+  (`projekt_oeffentlich`, `projekt_anfrage_oeffentlich`), Glocke (`portal_glocke`).
+- Maklerseite: `/projekte` (Liste, Anlegen), Projektakte mit zehn Reitern
+  (Übersicht mit öffentlicher Projektseite, Einheiten mit Statuszyklus,
+  Dateien mit Sichtbarkeit und Ordnern, Baufortschritt mit Fotos, Zugänge mit
+  Fortschritt/Wohnung/Sperren/Link erneuern, Anfragen bestätigen → Einheit
+  reserviert und Stufe 2, Merkliste, Gewerke, Nachrichten, Aktivitäten);
+  `/kundenbereich` mit Glocke und Rollenfilter, Kundenakte (Objekte mit
+  Maklervertrag, Unterlagen, Nachrichten, Anträge, Aktivitäten, Zugang);
+  Einladung vom Kontakt aus (Objekte laut Kontaktrolle).
+- Kundenseite `/kunde/[token]`: Projekt, Wohnungen mit Merkliste und Anfrage,
+  Baufortschritt, „Meine Immobilie“ (Stand, Exposé-Aufrufe, Anfragen,
+  Besichtigungen, Kundendokumente, Checkliste, Verlauf), Kaufabwicklung in
+  sieben Stufen, Unterlagen mit Upload, Nachrichten, Verbrauchsausweis-Antrag
+  (Zwischenstand/Einreichen mit Pflichtprüfung), Passwort setzen.
+- Mail: Einladung, Antwort, Bestätigung über die Job-Warteschlange (freie
+  Vorlage); ohne Mail-Dienst zeigt die Oberfläche den Link (ZUGAENGE_FEHLEND).
+- Prüfstand: Typecheck, Lint, 435 Unit-Tests (Token/Hash, Slug, Statuszyklus,
+  Sichtbarkeit, Antrag), 546 Datenbank-Nachweise lokal (34 neu:
+  Sichtbarkeit je Rolle, Passwortabfrage, Anfrage → Reservierung, Glocke,
+  Mandantentrennung), Marken-Scan, Produktions-Build; Ende-zu-Ende gegen den
+  lokalen Stack (Projekt, Einheiten, Gewerk, Baufortschritt, Zugang, Kunde:
+  Merkliste/Anfrage/Nachricht/Passwort/Passwortabfrage, Makler bestätigt,
+  Projektseite mit Anfrage, Eigentümer-Bereich mit Antrag).
+- Offen: Verbrauchsausweis-Antrag als PDF an einen Aussteller (kein Anbieter
+  festgelegt), Push-Benachrichtigungen (Referenz nutzt E-Mail), Datei-Vorschau
+  im Kundenbereich (Download über signierte Adresse).
+
 ## 04.09.2026 (Paket 13) — Werkzeuge: Bild-Editor mit RAW und KI, PDF-Werkzeuge, Grundriss-Editor/-Aufbereiter, Raumscan, Wohnflächenrechner, Energieausweis, Entfernungen
 
 **Branch:** `claude/autonomie-integrations-prompt-rl2qkr` · Referenz-Kacheln „Werkzeuge“ und „Bild-Editor“ nach `docs/FUNKTIONSABGLEICH.md` (W1)

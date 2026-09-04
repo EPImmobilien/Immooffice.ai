@@ -39,6 +39,8 @@ const EINTRAEGE: Eintrag[] = [
   { modul: "vertraege", pfad: "/uebergaben", bezeichnung: "Übergaben" },
   { modul: "vertraege", pfad: "/notar", bezeichnung: "Notar" },
   { modul: "vertraege", pfad: "/vermietung", bezeichnung: "Vermietung" },
+  { modul: "portal", pfad: "/projekte", bezeichnung: "Neubauprojekte" },
+  { modul: "portal", pfad: "/kundenbereich", bezeichnung: "Kundenbereich" },
   { modul: "rechnungen", pfad: "/rechnungen", bezeichnung: "Rechnungen" },
   { modul: "rechnungen", pfad: "/briefe", bezeichnung: "Briefe" },
   { modul: "marketing", pfad: "/marketing", bezeichnung: "Marketing" },

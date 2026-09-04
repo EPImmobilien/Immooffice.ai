@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AufgabeAnlegen } from "@/components/AufgabeAnlegen";
+import { KontaktZugang } from "@/components/portal/KontaktZugang";
 import { Aufgabenliste } from "@/components/Aufgabenliste";
 import { Seitenkopf } from "@/components/Seitenkopf";
 import { Terminliste } from "@/components/Terminliste";
@@ -110,6 +111,14 @@ export default async function KontaktSeite({
         .select("id, bezeichnung, aktiv")
         .eq("kontakt_id", id),
     ]);
+
+  const { data: zugaenge } = await supabase
+    .from("portal_kunden")
+    .select("id, art, aktiv, angenommen_am, eingeladen_am")
+    .eq("kontakt_id", id)
+    .is("geloescht_am", null)
+    .order("erstellt_am", { ascending: false });
+  const darfPortal = hatRecht(sitzung.rolle, "portal", "anlegen", sitzung.uebersteuerung);
 
   const heute = new Date().toISOString();
   const darfAendern = hatRecht(sitzung.rolle, "kontakte", "aendern", sitzung.uebersteuerung);
@@ -230,6 +239,21 @@ export default async function KontaktSeite({
         </div>
 
         <div className="space-y-5">
+          <Karte>
+            <KarteKopf>
+              <KarteTitel>Kundenbereich</KarteTitel>
+              <KarteBeschreibung>Eigentümer- oder Käufer-Zugang mit Vermarktungsstand, Unterlagen und Nachrichten.</KarteBeschreibung>
+            </KarteKopf>
+            <KarteInhalt>
+              <KontaktZugang
+                kontaktId={id}
+                zugaenge={(zugaenge ?? []) as Array<{ id: string; art: "eigentuemer" | "kaeufer" | "interessent"; aktiv: boolean; angenommen_am: string | null; eingeladen_am: string }>}
+                hatEmail={Boolean(kontakt.email)}
+                darfAendern={darfPortal}
+              />
+            </KarteInhalt>
+          </Karte>
+
           <Karte>
             <KarteKopf>
               <KarteTitel>Kontaktdaten</KarteTitel>

@@ -235,7 +235,18 @@ async function mailAuftrag(
 ): Promise<Record<string, unknown>> {
   const n = job.nutzlast;
   const an = typeof n["an"] === "string" ? n["an"] : null;
-  if (!an || !istVorlage(n["vorlage"])) throw new Error("Mail-Auftrag ohne Empfaenger oder mit unbekannter Vorlage.");
+  if (!an) throw new Error("Mail-Auftrag ohne Empfaenger.");
+  // Freie Mail (Kundenbereich: Einladung, Antwort, Bestaetigung) — Betreff und
+  // Text stehen fertig in der Nutzlast, der Absendername kommt vom Mandanten.
+  if (n["vorlage"] === "frei") {
+    const betreff = typeof n["betreff"] === "string" ? n["betreff"] : "";
+    const text = typeof n["text"] === "string" ? n["text"] : "";
+    if (!betreff || !text) throw new Error("Freie Mail ohne Betreff oder Text.");
+    const antwortAn = typeof n["antwort_an"] === "string" ? n["antwort_an"] : undefined;
+    const ergebnis = await mailSenden({ an, betreff, text, ...(antwortAn ? { antwortAn } : {}) }, fetchFn);
+    return { vorlage: "frei", versand_id: ergebnis.id };
+  }
+  if (!istVorlage(n["vorlage"])) throw new Error("Mail-Auftrag mit unbekannter Vorlage.");
 
   const { data: mandant } = await supabase
     .from("mandanten")
