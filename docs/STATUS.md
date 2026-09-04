@@ -5,6 +5,39 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 04.09.2026 (Paket 15) — Verwaltung: Profil, Arbeitszeit, Urlaub, Kennzahlen, Bewerber, Protokoll, Plattform, Datenexport, Kündigung, PWA, Suche
+
+- Migration `20260904170000_verwaltung.sql` (im Projekt eingespielt): Profilfelder
+  (Titel, Signaturbild, Eintritt, Urlaubskontingent, Staffel, Bundesland),
+  Arbeitszeit (Wochenmodelle, Stempel, Tage, `stempeln()`), Urlaub (Anträge mit
+  Entscheidungs-Trigger, Hinweise), Firmenkennzahlen, Finanzierungsannahmen,
+  Bewerbungen mit Token-Funktionen, Selbstkündigung (`mandant_kuendigen`,
+  Zurücknahme), globale Suche (`global_suche`, RLS-treu).
+- Oberfläche: `/einstellungen/profil` (Foto, Signaturbild), Stempeluhr auf der
+  Übersicht mit Nachtrag vergessener Feierabende, `/arbeitszeit` (Monat, Soll/Ist,
+  Nachtragen, Wochenmodelle, Teamwahl), `/urlaub` (Bilanz, Antrag, Genehmigung
+  mit Überschneidungen, Kontingente, Resturlaub-Hinweis → Aufgabe/Mail),
+  `/einstellungen/kennzahlen`, `/einstellungen/bewerber` mit Test
+  `/bewerbung/[token]`, `/einstellungen/protokoll` (Audit-Log, Verlauf),
+  `/plattform` (Mandanten mit Sperren/Reaktivieren, Tarife/Preise/Credit-Werte,
+  Limits und Schalter, fehlgeschlagene Jobs/Rückrufe mit Neustart,
+  Stripe-Ereignisse, Supportfreigaben, Audit, Systemzustand mit API-Kosten und
+  Deckungsbeitrag), Datenexport `/api/export` (ZIP mit CSV, OpenImmo, optional
+  Dateien), Kündigungskarte unter Abo und Credits, Suche mit Strg+K im Kopf,
+  PWA (Manifest, Icons, Service Worker, Offline-Seite).
+- **Widerspruch zum Masterprompt, bewusst:** Bewerber-Modul (ersatzlos laut
+  Masterprompt) auf Weisung 1:1 gebaut, gekennzeichnet, streichbar. Liquidität
+  und Provisionsrechner bleiben ausgeschlossen.
+- Prüfstand: Typecheck, Lint, 442 Unit-Tests (Feiertage/Ostern, Urlaubsbilanz,
+  Arbeitszeit, Bewerber-Auswertung), 572 Datenbank-Nachweise lokal (26 neu),
+  Marken-Scan, Produktions-Build; Ende-zu-Ende gegen den lokalen Stack
+  (Stempeluhr, Suche, Profil, Wochenmodell, Nachtragen, Antrag → Genehmigung →
+  Kalender, Kontingent, Kennzahlen, Bewerber-Test als Anon mit Auswertung,
+  Protokoll, Export-ZIP, Kündigung und Zurücknahme, Plattformbereich, Manifest).
+- Offen: Plattform-Administratoren werden per SQL eingetragen (kein UI dafür,
+  absichtlich); Push-Benachrichtigungen der PWA; Signaturbild noch nicht in
+  PDF-Dokumente eingebunden (Übergabeprotokoll/Briefe nutzen Textsignatur).
+
 ## 04.09.2026 (Paket 14) — Neubauprojekte und Kundenbereich (Eigentümer, Käufer, Interessenten)
 
 **Widerspruch zum Masterprompt, bewusst:** Der Masterprompt schließt ein

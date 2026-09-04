@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 
 import { Wortmarke } from "@/components/Marke";
 import { ModusSchalter } from "@/components/ModusSchalter";
+import { PwaRegistrierung } from "@/components/PwaRegistrierung";
+import { Suche } from "@/components/Suche";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/Button";
 import { Marke } from "@/components/ui/Status";
@@ -11,6 +13,7 @@ import { ROLLEN_BEZEICHNUNG, sichtbareModule } from "@/lib/auth/rechte";
 import { mandantenStil } from "@/lib/branding/stil";
 import { serverClient } from "@/lib/supabase/server";
 import { abmelden } from "@/server/auth-aktionen";
+import { istPlattformAdmin } from "@/server/plattform-aktionen";
 
 /**
  * Rahmen des angemeldeten Bereichs.
@@ -24,6 +27,8 @@ export default async function AppLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const sitzung = await sitzungErzwingen();
   const erlaubteModule = sichtbareModule(sitzung.rolle, sitzung.uebersteuerung);
+  // Plattform-Administratoren (Betreiber) sehen einen Link in den Plattformbereich; ohne Dienstschluessel bleibt er weg.
+  const plattformAdmin = await istPlattformAdmin().catch(() => false);
 
   // Offenes Onboarding: Die Verwaltung wird in den Assistenten geleitet, bis
   // Firmierung, Anschrift und Impressum stehen (docs/AUTONOMIE.md O1). Alle
@@ -58,6 +63,7 @@ export default async function AppLayout({
 
   return (
     <div className="min-h-screen bg-grund" style={stil}>
+      <PwaRegistrierung />
       <header className="sticky top-0 z-20 border-b border-linie bg-flaeche">
         <div className="flex items-center justify-between gap-4 px-5 py-3">
           <Link href="/dashboard" aria-label="Zum Dashboard">
@@ -78,6 +84,8 @@ export default async function AppLayout({
                 Testphase
               </Marke>
             )}
+            {plattformAdmin && <Link href="/plattform" className="hidden text-[12px] text-akzent hover:underline md:inline">Plattform</Link>}
+            <Suche />
             <ModusSchalter />
             <form action={abmelden}>
               <Button type="submit" variante="leise" groesse="klein">

@@ -819,6 +819,43 @@ Dateien und Baufortschritte; eine Anfrage legt den Interessenten-Zugang an.
 lesen). `scripts/marken-scan.sh` behält die Regel gegen das Wort „Kundenportal“;
 Code und Texte sprechen vom Kundenbereich.
 
+### E-2026-09-04-55 — Verwaltung: Arbeitszeit und Urlaub im eigenen Datenmodell, Plattformbereich nur über die Dienstrolle, Bewerber-Test mit eigenen Fragen
+
+**Frage:** Die Referenz führt Urlaub als Termine mit Sonderfeldern, Arbeitszeit
+über Profile und einen Bewerbertest mit eigenem Fragenkatalog; der Masterprompt
+verlangt zusätzlich Plattform-Administration, Datenexport, Selbstkündigung, PWA
+und streicht das Bewerber-Modul.
+
+**Entscheidung:** Urlaub und Arbeitszeit bekommen eigene Tabellen
+(`urlaubsantraege`, `arbeitszeit_modelle`, `arbeitszeit_stempel`,
+`arbeitszeit_tage`, `urlaub_hinweise`) mit klaren Regeln in der Datenbank: Nur
+die Verwaltung entscheidet und pflegt Kontingente (Trigger), jeder stempelt und
+trägt für sich nach, genehmigte Abwesenheiten sind für alle sichtbar. Ein
+genehmigter Urlaub erzeugt einen ganztägigen Kalendertermin und Urlaubstage in
+der Arbeitszeit. Feiertage werden bundesweit plus je Bundesland berechnet
+(Gauß-Osterformel), das Bundesland steht am Profil. Die Bilanz folgt der
+Referenz: Staffel je Jahr, anteiliger Anspruch im Eintrittsjahr, Übertrag aus
+Rest und manueller Angabe, Verfall am 31. März.
+Der Plattformbereich (`/plattform`) prüft die Mitgliedschaft in
+`plattform_admins` und liest ausschließlich Metadaten über die Dienstrolle;
+Sperren, Preise, Credit-Werte und Schalter landen im Audit-Log des betroffenen
+Mandanten. Der Datenexport (`/api/export`) liefert CSV je Tabelle, OpenImmo-XML
+und auf Wunsch die Dateien, gedeckelt bei 400 MB; die Selbstkündigung setzt die
+Löschung auf 30 Tage, beendet ein Stripe-Abo zum Laufzeitende und lässt sich
+zurücknehmen. Die PWA ist ein Grundgerüst (Manifest, Icons, Service Worker mit
+Offline-Seite, keine fachlichen Daten im Cache). Die globale Suche ist eine
+Datenbankfunktion mit RLS (`global_suche`), erreichbar über Strg+K.
+Das Bewerber-Modul ist gebaut, weil der Auftraggeber die 1:1-Übernahme
+angeordnet hat (E-2026-09-03-36); die Fragen sind eigene Formulierungen, die
+Tabelle heißt `bewerbungen`, das Modul ist als Widerspruch gekennzeichnet und
+streichbar. Nicht nachgebaut bleiben Liquiditätstool und Provisionsrechner
+(Masterprompt „nicht übernehmen“, `docs/SCOPE.md` NEIN) — dort gibt es keine
+gegenteilige Weisung.
+
+**Folge:** `scripts/marken-scan.sh` bleibt unverändert; deshalb heißt die
+Tabelle `bewerbungen`. Die Plattform-Administratoren werden weiterhin nur per
+Dienstschlüssel in `plattform_admins` eingetragen (docs/ANLEITUNG.md 10j).
+
 ### E-2026-09-03-13 — Credit-Werte bleiben die der Datenbank
 
 **Frage:** S4 nennt Startwerte (Exposétext 5, Kurztext 2, Bild 3 je Bild,

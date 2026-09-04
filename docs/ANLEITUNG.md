@@ -727,6 +727,53 @@ Ganzes streichen.
     sieben Stufen. Projekt-Kunden sehen Wohnungen mit Merkliste, Anfragen und
     Baufortschritt.
 
+## 10j. Verwaltung — Profil, Stempeluhr, Urlaub, Kennzahlen, Bewerber, Protokoll, Plattform, Export, Kündigung
+
+1. **Mein Profil:** Navigation → **Mein Profil** → Titel, Funktion, Telefon,
+   Bundesland (für Feiertage), Profilfoto und Signaturbild hochladen →
+   **Profil speichern**.
+2. **Stempeluhr:** Auf der **Übersicht** ganz oben: **Kommen** beim Start,
+   **Gehen** zum Feierabend. Vergessene Feierabende der letzten Tage erscheinen
+   dort mit Vorschlag → **Nachtragen** oder **verwerfen**.
+3. **Arbeitszeit:** Navigation → **Arbeitszeit**. Monat blättern, je Tag Soll,
+   Ist, Art. **Nachtragen** öffnet die Zeile (Von/Bis oder Stunden, Urlaub,
+   Krank, Fortbildung …). Die Verwaltung wählt oben den Mitarbeiter und pflegt
+   unten das **Wochenmodell** (Sollstunden je Wochentag ab Datum).
+4. **Urlaub beantragen:** Navigation → **Urlaub** → Von/Bis → Arbeitstage werden
+   gezählt → **Antrag stellen**. Die Verwaltung bekommt eine Aufgabe.
+5. **Urlaub genehmigen (Verwaltung):** **Urlaub** → **Offene Anträge** →
+   Antwort eintippen → **Genehmigen** oder **Ablehnen**. Genehmigter Urlaub
+   steht im Kalender (ganztags) und in der Arbeitszeit. **Kontingent** je
+   Mitarbeiter: Eintritt, Tage/Jahr, Übertrag, Staffel, Bundesland.
+   **Hinweis senden** legt eine Resturlaub-Aufgabe an (und Mail, wenn
+   eingerichtet); Übertrag verfällt am 31. März.
+6. **Kennzahlen:** **Einstellungen** → **Kennzahlen und Finanzierung** → Jahr
+   wählen oder **+ Jahr**, Werte und Fakten (je Zeile) → **Speichern**;
+   darunter die Finanzierungsannahmen.
+7. **Bewerber:** **Einstellungen** → **Bewerber** → Name, E-Mail, Position →
+   **Zum Test einladen** → Link kopieren (oder Mail). Der Bewerber füllt den
+   Test ohne Konto aus; danach sehen Sie Punkte je Kategorie, Empfehlung, den
+   Freitext und tragen Note und Kommentar ein.
+8. **Aktivitätsprotokoll:** **Einstellungen** → **Aktivitätsprotokoll**:
+   links das unveränderbare Audit-Log, rechts der fachliche Verlauf.
+9. **Datenexport:** **Einstellungen** → **Datenexport (ZIP)** (Tabellen als CSV
+   und OpenImmo-XML). Mit allen Dokumenten und Bildern: **Abo und Credits** →
+   Karte **Datenexport und Kündigung** → zweiter Link.
+10. **Kündigen:** **Abo und Credits** → **Unternehmen kündigen** → Grund,
+    KÜNDIGEN eintippen → **Kündigen**. Daten werden nach 30 Tagen gelöscht,
+    das Abo endet zum Laufzeitende; **Kündigung zurücknehmen** ist bis dahin
+    möglich.
+11. **Suche:** Oben rechts **Suchen** oder Strg+K → tippen → Pfeiltasten, Enter.
+12. **App installieren (PWA):** Im Browser „Zum Startbildschirm hinzufügen“
+    bzw. „App installieren“. Ohne Netz erscheint eine Offline-Seite; Daten
+    liegen nie auf dem Gerät.
+13. **Plattformbereich (Betreiber):** Ein Betreiberkonto wird einmalig per SQL
+    in `plattform_admins` eingetragen (Dienstschlüssel, kein UI). Danach
+    erscheint oben **Plattform**: Mandanten sperren/reaktivieren, Tarife und
+    Preise, Credit-Werte, Limits und Feature-Schalter, fehlgeschlagene Jobs und
+    Rückrufe neu starten, Supportfreigaben, Audit, Systemzustand. Inhalte der
+    Mandanten sind dort nie sichtbar.
+
 ## 11. Was Sie an Gate A und Gate B entscheiden
 
 - **Gate A** (bereits erreicht): Bestandsaufnahme, Funktionsmatrix, Architektur

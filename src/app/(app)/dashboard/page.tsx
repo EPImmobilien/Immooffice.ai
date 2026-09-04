@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Kachelgruppe, type KachelDaten } from "@/components/Kachel";
 import { Tutorial, type TutorialSchritt } from "@/components/Tutorial";
 import { Seitenkopf } from "@/components/Seitenkopf";
+import { Stempeluhr } from "@/components/verwaltung/Stempeluhr";
 import { buttonKlassen } from "@/components/ui/Button";
 import { Karte, KarteInhalt, KarteKopf, KarteTitel } from "@/components/ui/Karte";
 import { Hinweis, Marke } from "@/components/ui/Status";
@@ -13,6 +14,8 @@ import { datum, uhrzeit } from "@/lib/format";
 import { tutorialGesehen } from "@/server/arbeitsmittel-aktionen";
 import { OBJEKTSTATUS, statusTon } from "@/lib/objekt-begriffe";
 import { serverClient } from "@/lib/supabase/server";
+import { soll, stundenAusStempeln, type Stempel, type Wochenmodell } from "@/lib/verwaltung/arbeitszeit";
+import { heuteBerlin, tagPlus } from "@/lib/kalender/zeit";
 
 export const metadata: Metadata = { title: "Übersicht" };
 
@@ -269,6 +272,21 @@ export default async function UebersichtSeite({ searchParams }: { searchParams: 
 
   const testTage = verbleibendeTage(sitzung.testphaseBis);
 
+  // Stempeluhr: heutige Stempel, Soll laut Wochenmodell, vergessene Feierabende der letzten 7 Tage
+  const heuteIso = heuteBerlin();
+  const [stempelAntwort, modelleAntwort] = await Promise.all([
+    supabase.from("arbeitszeit_stempel").select("id, benutzer_id, datum, richtung, zeitpunkt, quelle").eq("benutzer_id", sitzung.benutzerId).gte("datum", tagPlus(heuteIso, -7)).order("zeitpunkt"),
+    supabase.from("arbeitszeit_modelle").select("*").eq("benutzer_id", sitzung.benutzerId),
+  ]);
+  const alleStempel = (stempelAntwort.data ?? []) as Stempel[];
+  const modelle = (modelleAntwort.data ?? []) as Wochenmodell[];
+  const stempelHeute = alleStempel.filter((x) => x.datum === heuteIso);
+  const sollHeute = soll(modelle, heuteIso);
+  const vergessen = Array.from(new Set(alleStempel.filter((x) => x.datum < heuteIso).map((x) => x.datum)))
+    .map((d) => ({ datum: d, offen: stundenAusStempeln(alleStempel.filter((x) => x.datum === d)).offen }))
+    .filter((x): x is { datum: string; offen: string } => Boolean(x.offen))
+    .map((x) => { const s = soll(modelle, x.datum) || 8; const v = new Date(new Date(x.offen).getTime() + s * 3600000); return { ...x, vorschlag: v.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin" }) }; });
+
   return (
     <>
       <Seitenkopf
@@ -289,6 +307,13 @@ export default async function UebersichtSeite({ searchParams }: { searchParams: 
           Tarif ausgewählt wurde.
         </Hinweis>
       )}
+
+      <section className="mb-5">
+        <Karte>
+          <KarteKopf><KarteTitel>Stempeluhr</KarteTitel></KarteKopf>
+          <KarteInhalt><Stempeluhr heute={stempelHeute} sollHeute={sollHeute} vergessen={vergessen} /></KarteInhalt>
+        </Karte>
+      </section>
 
       <section data-tutorial="heute" className="mb-7 grid gap-4 lg:grid-cols-3">
         <Karte>

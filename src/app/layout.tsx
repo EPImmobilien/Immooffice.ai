@@ -36,8 +36,11 @@ export const metadata: Metadata = {
     "Maklersoftware für Immobilienmakler und Immobiliensachverständige: Objekte, " +
     "Kontakte, Exposés, Wertermittlung und Portalexport in einer Anwendung.",
   applicationName: "ImmoOffice.ai",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "ImmoOffice" },
   icons: {
     icon: "/marke/immooffice-icon-dunkel.svg",
+    apple: "/marke/app-icon-192.png",
   },
   // Standardmaessig nicht indexieren: die Anwendung ist ein geschlossener
   // Arbeitsbereich. Oeffentliche Web-Exposés setzen ihre Robots-Angabe selbst.

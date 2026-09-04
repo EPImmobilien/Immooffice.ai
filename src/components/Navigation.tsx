@@ -47,9 +47,12 @@ const EINTRAEGE: Eintrag[] = [
   { modul: "kalender", pfad: "/kalender", bezeichnung: "Kalender" },
   { modul: "kalender", pfad: "/aufgaben", bezeichnung: "Aufgaben" },
   { modul: "kalender", pfad: "/checklisten", bezeichnung: "Checklisten" },
+  { modul: "kalender", pfad: "/arbeitszeit", bezeichnung: "Arbeitszeit" },
+  { modul: "kalender", pfad: "/urlaub", bezeichnung: "Urlaub" },
   { modul: "auswertungen", pfad: "/auswertungen", bezeichnung: "Auswertungen" },
   { modul: "einstellungen", pfad: "/einstellungen", bezeichnung: "Einstellungen" },
   { modul: "abrechnung", pfad: "/credits", bezeichnung: "Abo und Credits" },
+  { modul: null, pfad: "/einstellungen/profil", bezeichnung: "Mein Profil" },
 ];
 
 export function Navigation({ erlaubteModule }: { erlaubteModule: Modul[] }) {

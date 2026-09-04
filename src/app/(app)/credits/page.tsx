@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { TarifWahl, type PreisZeile, type TarifZeile } from "@/components/abo/TarifWahl";
 import { Seitenkopf } from "@/components/Seitenkopf";
+import { KuendigungKarte } from "@/components/verwaltung/KuendigungKarte";
 import { Karte, KarteBeschreibung, KarteInhalt, KarteKopf, KarteTitel } from "@/components/ui/Karte";
 import { Hinweis, Marke } from "@/components/ui/Status";
 import { hatRecht } from "@/lib/auth/rechte";
@@ -97,6 +98,8 @@ export default async function CreditsSeite({ searchParams }: { searchParams: Pro
     credits: (p.credits as number | null) ?? null,
     buchbar: Boolean(p.stripe_preis_id),
   }));
+
+  const { data: kuendigung } = await supabase.from("mandanten").select("gekuendigt_am, loeschung_geplant_am").eq("id", sitzung.mandantId).maybeSingle();
 
   return (
     <>
@@ -224,6 +227,10 @@ export default async function CreditsSeite({ searchParams }: { searchParams: Pro
             </p>
           )}
         </KarteInhalt>
+      </Karte>
+      <Karte className="mt-5">
+        <KarteKopf><KarteTitel>Datenexport und Kündigung</KarteTitel><KarteBeschreibung>Sie kündigen selbst — vorher steht der vollständige Export bereit (Tabellen als CSV, OpenImmo-XML, Dokumente und Bilder).</KarteBeschreibung></KarteKopf>
+        <KarteInhalt><KuendigungKarte gekuendigtAm={(kuendigung?.gekuendigt_am as string | null) ?? null} loeschungAm={(kuendigung?.loeschung_geplant_am as string | null) ?? null} istInhaber={sitzung.rolle === "inhaber"} /></KarteInhalt>
       </Karte>
     </>
   );

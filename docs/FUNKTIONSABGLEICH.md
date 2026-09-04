@@ -170,14 +170,14 @@ in `docs/STATUS.md`.
 | Funktion | Stand | Paket |
 |---|---|---|
 | Mitarbeiter einladen, Stufen und Rechte je Modul | ✓ | — |
-| Firmen-Stammdaten, Kennzahlen, Finanzierungsannahmen | ◐ | R1 |
+| Firmen-Stammdaten, Kennzahlen, Finanzierungsannahmen | ✓ (Stammdaten unter Einstellungen; Kennzahlen je Jahr und Finanzierungsannahmen unter `/einstellungen/kennzahlen`) | R1 |
 | onOffice-Import steuern | ✓ | — |
 | Bausteine (Textbausteine) verwalten | ◐ (Wertermittlung) | N1 |
-| Urlaub (Anträge, Bilanz, Hinweise), Arbeitszeit (Stempeluhr, Wochenmodell, Nachtragen) | ✗ | F1 |
-| Profil: Foto, Funktion, Telefon, Signatur, Postfächer | ◐ | N1 |
-| Aktivitäts-Log (Chef-Ansicht) | ◐ (Audit-Tabelle ohne Oberfläche) | F1 |
-| Bewerber-Modul, Einstellungstest | ✗ — laut Masterprompt ersatzlos, am Ende | F1 |
-| Globale Suche über alle Bereiche | ✗ | N1 |
+| Urlaub (Anträge, Bilanz, Hinweise), Arbeitszeit (Stempeluhr, Wochenmodell, Nachtragen) | ✓ (`/urlaub`: Anspruch mit Staffel, anteilig, Übertrag bis 31.3., Antrag → Aufgabe, Genehmigung → Kalender und Arbeitszeit, Resturlaub-Hinweis; `/arbeitszeit`: Stempeluhr auf der Übersicht, Monat mit Soll/Ist, Nachtragen, vergessene Feierabende, Wochenmodelle) | F1 |
+| Profil: Foto, Funktion, Telefon, Signatur, Postfächer | ✓ (`/einstellungen/profil`: Titel, Funktion, Telefon, Foto, Signaturbild, Bundesland) | N1 |
+| Aktivitäts-Log (Chef-Ansicht) | ✓ (`/einstellungen/protokoll`: Audit-Log und fachlicher Verlauf) | F1 |
+| Bewerber-Modul, Einstellungstest | ✓ (`/einstellungen/bewerber`, Test `/bewerbung/[token]` mit eigenen Fragen, Auswertung, Empfehlung, Bewertung) — Widerspruch zum Masterprompt, streichbar | F1 |
+| Globale Suche über alle Bereiche | ✓ (Strg+K: Objekte, Kontakte, Projekte, Verträge, Aufgaben, Termine, Rechnungen, Kundenzugänge) | N1 |
 | Tutorial/Erstlogin, Schnellaktionen, Heute-Zone, Warnzone | ✓ (Rundgang, Heute-Zone, „Wartet auf Sie“) | N1 |
 
 ## Paketplan (Reihenfolge)
@@ -195,7 +195,7 @@ in `docs/STATUS.md`.
 | W1/W2 | Werkzeuge, Bildbearbeitung, KI-Agenten | #28 |
 | D1 | Dokumente-Ablage, Marketing-Ausbau | #28 |
 | P1/P2 | Kundenbereich, Neubau-Projekte — erledigt (Paket 14) | #29 |
-| F1 | Finanzen, Urlaub/Arbeitszeit, Aktivitäts-Log, Bewerber | #30 |
+| F1 | Urlaub/Arbeitszeit, Aktivitäts-Log, Bewerber, Plattform-Admin, Datenexport, Selbstkündigung, PWA, Suche — erledigt (Paket 15); Liquidität und Provisionsrechner bleiben ausgeschlossen | #30 |
 
 Jedes Paket endet mit Migration im Projekt, Datenbank-Nachweis, Unit-Tests,
 Marken-Scan, Commit und Push; Fortschritt in `docs/STATUS.md`.

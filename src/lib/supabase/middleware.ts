@@ -42,6 +42,11 @@ const OEFFENTLICH = [
   // Projektseite: Zugang ueber Link mit Token, kein Konto.
   "/kunde",
   "/projekt",
+  // Einstellungstest fuer Bewerber (Token), Offline-Seite und PWA-Dateien
+  "/bewerbung",
+  "/offline",
+  "/sw.js",
+  "/manifest.webmanifest",
 ];
 
 function istOeffentlich(pfad: string): boolean {

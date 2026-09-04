@@ -223,6 +223,20 @@ export default async function EinstellungenSeite() {
 
         <Karte>
           <KarteKopf>
+            <KarteTitel>Verwaltung</KarteTitel>
+            <KarteBeschreibung>Kennzahlen und Finanzierungsannahmen, Arbeitszeit und Urlaub, Bewerber, Aktivitätsprotokoll, Datenexport.</KarteBeschreibung>
+          </KarteKopf>
+          <KarteInhalt className="grid gap-2 text-[13px] sm:grid-cols-2">
+            <Link href="/einstellungen/kennzahlen" className="rounded-[var(--radius)] border border-linie p-3 hover:border-akzent"><p className="font-medium">Kennzahlen und Finanzierung</p><p className="text-[12px] text-gedaempft">Jahreskennzahlen für Wertindikation und Exposé, Finanzierungsannahmen.</p></Link>
+            <Link href="/urlaub" className="rounded-[var(--radius)] border border-linie p-3 hover:border-akzent"><p className="font-medium">Urlaub und Arbeitszeit</p><p className="text-[12px] text-gedaempft">Anträge, Kontingente, Wochenmodelle, Stempeluhr.</p></Link>
+            <Link href="/einstellungen/bewerber" className="rounded-[var(--radius)] border border-linie p-3 hover:border-akzent"><p className="font-medium">Bewerber</p><p className="text-[12px] text-gedaempft">Einstellungstest per Link, Auswertung, Bewertung.</p></Link>
+            <Link href="/einstellungen/protokoll" className="rounded-[var(--radius)] border border-linie p-3 hover:border-akzent"><p className="font-medium">Aktivitätsprotokoll</p><p className="text-[12px] text-gedaempft">Wer hat wann was geändert — unveränderbares Audit-Log.</p></Link>
+            <a href="/api/export" className="rounded-[var(--radius)] border border-linie p-3 hover:border-akzent"><p className="font-medium">Datenexport (ZIP)</p><p className="text-[12px] text-gedaempft">Alle Tabellen als CSV und OpenImmo-XML; <span className="text-akzent">mit Dokumenten</span> über die Kündigungskarte unter Abo.</p></a>
+          </KarteInhalt>
+        </Karte>
+
+        <Karte>
+          <KarteKopf>
             <KarteTitel>Zugänge</KarteTitel>
             <KarteBeschreibung>
               Wer im Unternehmen mit welcher Rolle arbeitet. Rechte werden
