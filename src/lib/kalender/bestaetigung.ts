@@ -47,3 +47,18 @@ export function terminErinnerungMail(t: { titel: string; art: string; beginnt_am
     text: `Erinnerung an Ihren Termin:\n\n${t.titel} (${terminArtText(t.art)})\n${wann}${t.ort ? `\nOrt: ${t.ort}` : ""}${t.notiz ? `\n\n${t.notiz}` : ""}\n\nZum Termin: ${link}`,
   };
 }
+
+/**
+ * Erinnerung an den Kunden (Referenz: „Etwa 6 Stunden vorher automatisch
+ * erinnern"): kurz, mit Ort und Ansprechpartner — ohne Notiz, die ist intern.
+ */
+export function terminKundenErinnerungMail(t: { art: string; beginnt_am: string; endet_am: string; ganztags: boolean; ort: string | null }, kontakt: { anrede?: string | null; vorname?: string | null; nachname?: string | null }, objekt: { strasse?: string | null; hausnummer?: string | null; plz?: string | null; ort?: string | null } | null, maklerName: string, firma: string): { betreff: string; text: string } {
+  const b = berlin(t.beginnt_am);
+  const art = terminArtText(t.art);
+  const wann = t.ganztags ? datumLang(b.datum) : `${datumLang(b.datum)} um ${b.zeit} Uhr`;
+  const ort = terminOrtText(t, objekt);
+  return {
+    betreff: `Erinnerung: ${art} ${t.ganztags ? "am" : "am"} ${b.datum.split("-").reverse().join(".")}${t.ganztags ? "" : ` um ${b.zeit} Uhr`}`,
+    text: `${terminAnrede(kontakt)}\n\nich erinnere kurz an unseren Termin:\n\n${art}\n${wann}${ort ? `\nOrt: ${ort}` : ""}\n\nSollte etwas dazwischenkommen, geben Sie mir bitte kurz Bescheid.\n\nBis dahin – ich freue mich auf Sie!\n\nMit freundlichen Grüßen\n${maklerName}\n${firma}`,
+  };
+}

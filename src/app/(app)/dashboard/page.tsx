@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Startkacheln, type StartkachelAnzeige } from "@/components/Startkacheln";
+import { NachfassKarte, type NachfassZeile } from "@/components/kalender/NachfassKarte";
 import { Tutorial, type TutorialSchritt } from "@/components/Tutorial";
 import { Seitenkopf } from "@/components/Seitenkopf";
 import { Stempeluhr } from "@/components/verwaltung/Stempeluhr";
@@ -105,12 +106,15 @@ export default async function UebersichtSeite({ searchParams }: { searchParams: 
     supabase.from("benutzer").select("tutorial_gesehen_am, kacheln").eq("id", sitzung.benutzerId).maybeSingle(),
   ]);
   const vor14Tagen = new Date(tagesbeginn.getTime() - 14 * 86_400_000).toISOString();
-  const [ungelesen, ueberfaellig, anfragen14, projekte] = await Promise.all([
+  const [ungelesen, ueberfaellig, anfragen14, projekte, nachfassVorschlaege] = await Promise.all([
     supabase.from("nachrichten").select("id", { count: "exact", head: true }).eq("gelesen", false).eq("ordner", "eingang"),
     supabase.from("aufgaben").select("id", { count: "exact", head: true }).eq("typ", "aufgabe").not("status", "in", "(erledigt,verworfen)").lt("faellig_am", heuteDatum),
     supabase.from("mietanfragen").select("id", { count: "exact", head: true }).gte("erstellt_am", vor14Tagen),
     supabase.from("projekte").select("id", { count: "exact", head: true }),
+    supabase.from("nachfass_vorschlaege").select("id, termin_id, betreff, text, faellig_am, zustaendig_id, kontakt:kontakte(vorname, nachname, email), objekt:objekte(objektnummer, bezeichnung), termin:termine(titel, beginnt_am)").eq("status", "offen").order("faellig_am").limit(20),
   ]);
+  const nachfassZeilen = ((nachfassVorschlaege.data ?? []) as unknown as Array<NachfassZeile & { zustaendig_id: string | null }>)
+    .filter((z) => !z.zustaendig_id || z.zustaendig_id === sitzung.benutzerId || sitzung.rolle === "inhaber" || sitzung.rolle === "administrator");
   const tutorialStarten = p.tutorial === "1" || (konto.data ? konto.data.tutorial_gesehen_am === null : false);
 
   const faellig = faelligAntwort.count ?? 0;
@@ -211,6 +215,8 @@ export default async function UebersichtSeite({ searchParams }: { searchParams: 
           </KarteInhalt>
         </Karte>
       </section>
+
+      <NachfassKarte zeilen={nachfassZeilen} />
 
       <Startkacheln kacheln={startkacheln} einstellung={kachelEinstellung} />
 

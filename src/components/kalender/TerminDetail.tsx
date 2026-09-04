@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { Button, buttonKlassen } from "@/components/ui/Button";
 import { Karte, KarteBeschreibung, KarteInhalt, KarteKopf, KarteTitel } from "@/components/ui/Karte";
@@ -13,15 +13,22 @@ import { serieText } from "@/lib/kalender/serie";
 import type { KalenderTermin, Mitarbeiter } from "@/lib/kalender/typen";
 import { berlin } from "@/lib/kalender/zeit";
 import { terminAbsagen } from "@/server/arbeitsmittel-aktionen";
-import { fahrzeitBerechnen, terminBestaetigungVorbereiten, terminLoeschen, type KalenderErgebnis } from "@/server/kalender-aktionen";
+import { fahrzeitBerechnen, terminBestaetigungVorbereiten, terminBestaetigungVorlage, terminBestaetigungVorschlag, terminLoeschen, type KalenderErgebnis } from "@/server/kalender-aktionen";
+import { Textfeld } from "@/components/ui/Feld";
+import { KiKennzeichen } from "@/components/ui/Status";
 
 import { TerminFormular, terminStart } from "./TerminFormular";
 
 /** Detailseite eines Termins: bearbeiten, Serie, Fahrzeit, Bestaetigung, Absage, Loeschen. */
-export function TerminDetail({ termin, mitarbeiter, objekte, kontakte, benutzerId, standardDauer, darfAendern, fahrzeitAktiv }: { termin: KalenderTermin; mitarbeiter: Mitarbeiter[]; objekte: Array<{ id: string; bezeichnung: string }>; kontakte: Array<{ id: string; bezeichnung: string; email: string | null }>; benutzerId: string; standardDauer: number; darfAendern: boolean; fahrzeitAktiv: boolean }) {
+export function TerminDetail({ termin, mitarbeiter, objekte, kontakte, benutzerId, standardDauer, darfAendern, fahrzeitAktiv, kiVerfuegbar = false }: { termin: KalenderTermin; mitarbeiter: Mitarbeiter[]; objekte: Array<{ id: string; bezeichnung: string }>; kontakte: Array<{ id: string; bezeichnung: string; email: string | null }>; benutzerId: string; standardDauer: number; darfAendern: boolean; fahrzeitAktiv: boolean; kiVerfuegbar?: boolean }) {
   const t = termin;
   const [fz, fzAktion, rechnet] = useActionState<KalenderErgebnis, FormData>(fahrzeitBerechnen, {});
   const [best, bestAktion, bereitet] = useActionState<KalenderErgebnis, FormData>(terminBestaetigungVorbereiten, {});
+  const [vorschlag, vorschlagAktion, erzeugt] = useActionState<KalenderErgebnis, FormData>(terminBestaetigungVorschlag, {});
+  const [vorlage, vorlageAktion, laedtVorlage] = useActionState<KalenderErgebnis, FormData>(terminBestaetigungVorlage, {});
+  const [textOffen, setTextOffen] = useState(Boolean(t.bestaetigung_text));
+  const bestText = vorschlag.text ?? vorlage.text ?? t.bestaetigung_text ?? "";
+  const ersteller = mitarbeiter.find((m) => m.id === t.erstellt_von)?.name ?? null;
   const fahrzeit = fz.fahrzeit ?? t.fahrzeit;
   const b = berlin(t.beginnt_am);
   const e = berlin(t.endet_am);
@@ -37,7 +44,10 @@ export function TerminDetail({ termin, mitarbeiter, objekte, kontakte, benutzerI
         {t.extern_quelle && <Marke ton="info">Aus {t.extern_quelle === "google" ? "Google Kalender" : "Outlook"}</Marke>}
         {t.bestaetigt_am && <Marke ton="erfolg">Bestätigung gesendet {datumFormat(t.bestaetigt_am)}</Marke>}
         {t.erinnert_am && <Marke ton="info">Erinnert {zeitpunkt(t.erinnert_am)}</Marke>}
-        {t.nachgefasst_am && <Marke ton="info">Nachfass-Aufgabe angelegt</Marke>}
+        {t.nachgefasst_am && <Marke ton="info">Nachfass-Vorschlag erzeugt</Marke>}
+        {t.erinnerung_kunde_am && <Marke ton={t.erinnerung_kunde_grund ? "neutral" : "erfolg"}>{t.erinnerung_kunde_grund ? `Kundenerinnerung übersprungen: ${t.erinnerung_kunde_grund}` : `Kunde erinnert ${zeitpunkt(t.erinnerung_kunde_am)}`}</Marke>}
+        {t.lead_id && <Link href={`/akquise/leads/${t.lead_id}`} className="text-[12px] text-akzent hover:underline">Akquise-Lead</Link>}
+        {ersteller && <span className="text-[12px] text-gedaempft">Erstellt von {ersteller}</span>}
         <span className="text-[13px] text-gedaempft">{t.ganztags ? `${b.datum.split("-").reverse().join(".")} ganztägig` : `${b.datum.split("-").reverse().join(".")}, ${b.zeit}–${e.zeit} Uhr`}</span>
       </div>
       <div className="flex flex-wrap gap-2">
@@ -75,11 +85,30 @@ export function TerminDetail({ termin, mitarbeiter, objekte, kontakte, benutzerI
         </Karte>
 
         <Karte>
-          <KarteKopf><KarteTitel>Terminbestätigung</KarteTitel><KarteBeschreibung>Öffnet das Postfach mit fertigem Text und der Kalenderdatei als Anhang; der Versand wird am Termin vermerkt.</KarteBeschreibung></KarteKopf>
+          <KarteKopf><KarteTitel>Terminbestätigung</KarteTitel><KarteBeschreibung>Text prüfen oder per KI formulieren lassen, dann öffnet das Postfach mit Text und Kalenderdatei; der Versand wird am Termin vermerkt.</KarteBeschreibung></KarteKopf>
           <KarteInhalt className="space-y-2 text-[13px]">
             {best.fehler && <Hinweis ton="fehler">{best.fehler}</Hinweis>}
+            {vorschlag.fehler && <Hinweis ton="fehler">{vorschlag.fehler}</Hinweis>}
             {t.bestaetigt_am ? <p className="text-gedaempft">Gesendet am {zeitpunkt(t.bestaetigt_am)}.</p> : kontaktMail ? <p className="text-gedaempft">An {kontaktMail}.</p> : <p className="text-gedaempft">Der Termin hat keinen Kontakt mit E-Mail-Adresse.</p>}
-            {kontaktMail && !t.abgesagt_am && <form action={bestAktion}><input type="hidden" name="id" value={t.id} /><Button type="submit" variante="sekundaer" groesse="klein" disabled={bereitet}>{t.bestaetigt_am ? "Erneut senden" : "Bestätigung vorbereiten"}</Button></form>}
+            {kontaktMail && !t.abgesagt_am && (
+              <form action={bestAktion} className="space-y-2">
+                <input type="hidden" name="id" value={t.id} />
+                {textOffen && (
+                  <>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {(vorschlag.kiVerwendet || (!vorschlag.text && !vorlage.text && t.bestaetigung_text)) && <KiKennzeichen art="erzeugt" />}
+                      {vorschlag.hinweis && <span className="text-[12px] text-gedaempft">{vorschlag.hinweis}</span>}
+                    </div>
+                    <Textfeld name="text" rows={9} key={bestText} defaultValue={bestText} aria-label="Text der Bestätigung" />
+                  </>
+                )}
+                <div className="flex flex-wrap items-center gap-2">
+                  {!textOffen && <Button type="submit" variante="leise" groesse="klein" formAction={vorlageAktion} disabled={laedtVorlage} onClick={() => setTextOffen(true)}>Text ansehen</Button>}
+                  {darfAendern && <Button type="submit" variante="sekundaer" groesse="klein" formAction={vorschlagAktion} onClick={() => setTextOffen(true)} disabled={erzeugt}>{erzeugt ? "Formuliert …" : textOffen ? `Vorschlag neu erzeugen${kiVerfuegbar ? " (KI, 1 Credit)" : ""}` : `Text per KI formulieren${kiVerfuegbar ? " (1 Credit)" : ""}`}</Button>}
+                  <Button type="submit" variante="sekundaer" groesse="klein" disabled={bereitet}>{t.bestaetigt_am ? "Erneut senden" : "Bestätigung vorbereiten"}</Button>
+                </div>
+              </form>
+            )}
           </KarteInhalt>
         </Karte>
       </div>

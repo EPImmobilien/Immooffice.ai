@@ -17,7 +17,7 @@ import {
   type PostfachErgebnis,
 } from "@/server/postfach-aktionen";
 import { nachrichtAlsLead, type AkquiseErgebnis } from "@/server/akquise-aktionen";
-import { aufgabeAusNachricht, type ArbeitsErgebnis } from "@/server/arbeitsmittel-aktionen";
+import { aufgabeAusNachricht, terminAusNachricht, type ArbeitsErgebnis } from "@/server/arbeitsmittel-aktionen";
 import { nachrichtAlsAnfrage, type VermietungErgebnis } from "@/server/vermietung-aktionen";
 
 import {
@@ -125,6 +125,13 @@ export function NachrichtDetail({ nachricht, anhaenge, objekt, kontakt, vorschla
               <form action={alsAufgabe}>
                 <input type="hidden" name="nachricht_id" value={nachricht.id} />
                 <Button type="submit" variante="leise" groesse="klein" laedt={uebernimmtAufgabe}>Als Aufgabe übernehmen</Button>
+              </form>
+            )}
+            {nachricht.ordner === "eingang" && (
+              <form action={terminAusNachricht} onSubmit={(e) => { const m = window.getSelection()?.toString().trim() ?? ""; (e.currentTarget.elements.namedItem("markiert") as HTMLInputElement).value = m; }}>
+                <input type="hidden" name="nachricht_id" value={nachricht.id} />
+                <input type="hidden" name="markiert" value="" />
+                <Button type="submit" variante="leise" groesse="klein" title="Datum und Uhrzeit werden aus der markierten Textstelle oder dem ganzen Text erkannt">Als Termin übernehmen</Button>
               </form>
             )}
             {aufgabe.fehler && <span className="text-[12px] text-fehler">{aufgabe.fehler}</span>}

@@ -69,7 +69,7 @@ export function Terminliste({
                             abgesagt ? "text-gedaempft line-through" : "text-text",
                           )}
                         >
-                          <Link href={`/kalender/${termin.id}`} className="hover:text-akzent hover:underline">{termin.titel}</Link>
+                          <Link href={(termin as { link?: string }).link ?? `/kalender/${termin.id}`} className="hover:text-akzent hover:underline">{termin.titel}</Link>
                         </span>
                         <Marke>{TERMINARTEN[termin.art]}</Marke>
                         {abgesagt && <Marke ton="fehler">Abgesagt</Marke>}

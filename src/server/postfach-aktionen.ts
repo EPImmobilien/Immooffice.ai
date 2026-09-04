@@ -368,10 +368,44 @@ export async function nachrichtSenden(_vorher: PostfachErgebnis, formular: FormD
   if (!cc) return { fehler: "Eine Kopie-Adresse ist ungültig." };
   if (!betreff) return { fehler: "Bitte einen Betreff angeben." };
   if (!inhalt) return { fehler: "Die Nachricht ist leer." };
-  const anhangArt = text(formular, "anhang_art");
-  const anhangId = text(formular, "anhang_id");
+  let anhangArt = text(formular, "anhang_art");
+  let anhangId = text(formular, "anhang_id");
+  const nachfassId = text(formular, "nachfass_id");
 
   const supabase = await serverClient();
+
+  // „Termin einfügen" (Referenz): Datum/Uhrzeit stehen als Text in der Mail;
+  // auf Wunsch entsteht gleich der Kalendereintrag mit Kontakt aus dem
+  // Empfaenger und Objekt aus der Zuordnung, die Kalenderdatei haengt an.
+  const terminDatum = text(formular, "termin_datum");
+  const terminZeit = text(formular, "termin_zeit");
+  if (text(formular, "termin_eintragen") === "1" && /^\d{4}-\d{2}-\d{2}$/.test(terminDatum) && /^\d{2}:\d{2}$/.test(terminZeit)) {
+    rechtErzwingen(sitzung.rolle, "kalender", "anlegen", sitzung.uebersteuerung);
+    const { ausBerlin } = await import("@/lib/kalender/zeit");
+    const beginn = ausBerlin(terminDatum, terminZeit);
+    const dauer = Math.max(15, Math.min(480, Number(text(formular, "termin_dauer")) || 60));
+    let kontaktId: string | null = null;
+    const ersteAdresse = an[0]?.adresse;
+    if (ersteAdresse) {
+      const { data: k } = await supabase.from("kontakte").select("id").ilike("email", ersteAdresse).is("geloescht_am", null).limit(1).maybeSingle();
+      kontaktId = (k?.id as string | undefined) ?? null;
+    }
+    let objektId: string | null = null;
+    if (antwortAuf) {
+      const { data: o } = await supabase.from("nachrichten").select("objekt_id, kontakt_id").eq("id", antwortAuf).maybeSingle();
+      objektId = (o?.objekt_id as string | null) ?? null;
+      kontaktId = kontaktId ?? ((o?.kontakt_id as string | null) ?? null);
+    }
+    const { data: t, error: tf } = await supabase.from("termine").insert({
+      mandant_id: sitzung.mandantId, titel: (text(formular, "termin_titel") || betreff).slice(0, 300), art: text(formular, "termin_art") || "besichtigung",
+      beginnt_am: beginn.toISOString(), endet_am: new Date(beginn.getTime() + dauer * 60_000).toISOString(),
+      kontakt_id: kontaktId, objekt_id: objektId, zustaendig_id: sitzung.benutzerId, teilnehmer: [sitzung.benutzerId], erstellt_von: sitzung.benutzerId,
+    }).select("id").single();
+    if (tf || !t) return { fehler: `Der Termin konnte nicht in den Kalender übernommen werden: ${tf?.message ?? "unbekannt"}` };
+    anhangArt = "termin";
+    anhangId = t.id as string;
+    revalidatePath("/kalender");
+  }
   // Rechnung oder Brief als PDF anhaengen: gestellte Rechnungen kommen als festgeschriebene Datei.
   let anhang: Awaited<ReturnType<typeof anhangPdf>> = null;
   if ((anhangArt === "rechnung" || anhangArt === "brief" || anhangArt === "termin") && /^[0-9a-f-]{36}$/.test(anhangId)) {
@@ -458,6 +492,10 @@ export async function nachrichtSenden(_vorher: PostfachErgebnis, formular: FormD
     await supabase.from("nachrichten").update({ hat_anhaenge: true }).eq("id", zeile.id);
     if (anhangArt === "brief") await supabase.from("briefe").update({ status: "versendet", versendet_am: new Date().toISOString() }).eq("id", anhangId).eq("mandant_id", sitzung.mandantId);
     if (anhangArt === "termin") await supabase.from("termine").update({ bestaetigt_am: new Date().toISOString(), bestaetigung_nachricht_id: zeile.id }).eq("id", anhangId).eq("mandant_id", sitzung.mandantId);
+  }
+  if (/^[0-9a-f-]{36}$/.test(nachfassId)) {
+    await supabase.from("nachfass_vorschlaege").update({ status: "gesendet", nachricht_id: zeile.id, entschieden_am: new Date().toISOString(), entschieden_von: sitzung.benutzerId }).eq("id", nachfassId).eq("mandant_id", sitzung.mandantId).eq("status", "offen");
+    revalidatePath("/dashboard");
   }
 
   const objektId = original?.["objekt_id"] as string | null | undefined;

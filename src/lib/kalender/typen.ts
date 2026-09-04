@@ -28,8 +28,16 @@ export interface KalenderTermin {
   fahrzeit: Fahrzeiten | null;
   bestaetigt_am: string | null;
   extern_quelle: "google" | "microsoft" | null;
+  lead_id?: string | null;
+  erinnerung_kunde?: boolean;
+  erinnerung_kunde_am?: string | null;
+  erinnerung_kunde_grund?: string | null;
+  bestaetigung_text?: string | null;
+  erstellt_von?: string | null;
+  /** Eigener Zielpfad (z. B. beantragter Urlaub → /urlaub); sonst /kalender/[id]. */
+  link?: string;
   objekt?: { objektnummer: string; bezeichnung: string; strasse?: string | null; hausnummer?: string | null; plz?: string | null; ort?: string | null } | null;
-  kontakt?: { vorname: string | null; nachname: string; email?: string | null } | null;
+  kontakt?: { vorname: string | null; nachname: string; email?: string | null; anrede?: string | null } | null;
 }
 
 export interface Mitarbeiter { id: string; name: string; farbe: string | null }
@@ -53,5 +61,5 @@ export function mitarbeiterFarbe(m: Mitarbeiter | undefined, index: number): str
 
 /** Spalten, die Kalender und Detailseite laden. */
 export const TERMIN_FELDER =
-  "id, titel, art, notiz, beginnt_am, endet_am, ganztags, ort, abgesagt_am, objekt_id, kontakt_id, zustaendig_id, teilnehmer, privat, serie_id, serie_regel, erinnerung_minuten, erinnert_am, nachfassen, nachgefasst_am, fahrzeit, bestaetigt_am, extern_quelle, " +
-  "objekt:objekte(objektnummer, bezeichnung, strasse, hausnummer, plz, ort), kontakt:kontakte(vorname, nachname, email)";
+  "id, titel, art, notiz, beginnt_am, endet_am, ganztags, ort, abgesagt_am, objekt_id, kontakt_id, zustaendig_id, teilnehmer, privat, serie_id, serie_regel, erinnerung_minuten, erinnert_am, nachfassen, nachgefasst_am, fahrzeit, bestaetigt_am, extern_quelle, lead_id, erinnerung_kunde, erinnerung_kunde_am, erinnerung_kunde_grund, bestaetigung_text, erstellt_von, " +
+  "objekt:objekte(objektnummer, bezeichnung, strasse, hausnummer, plz, ort), kontakt:kontakte(vorname, nachname, email, anrede)";

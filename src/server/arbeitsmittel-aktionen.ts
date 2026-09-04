@@ -484,6 +484,50 @@ export async function aufgabeAusNachricht(_vorher: ArbeitsErgebnis, formular: Fo
   return { erfolg: geparst.faellig_am ? `Aufgabe angelegt, fällig ${geparst.faellig_am}.` : "Aufgabe angelegt.", id: neu.id as string };
 }
 
+/**
+ * Termin aus einer E-Mail (Referenz: „ToDo oder Termin anlegen" aus dem
+ * Posteingang): erkennt Datum und Uhrzeit im Text („am 12.10. um 14:30",
+ * „Montag 10 Uhr") und oeffnet den Kalenderdialog vorbelegt mit Kontakt,
+ * Objekt und Betreff — angelegt wird erst nach Bestaetigung im Dialog.
+ */
+export async function terminAusNachricht(formular: FormData): Promise<void> {
+  const sitzung = await sitzungErzwingen();
+  rechtErzwingen(sitzung.rolle, "kalender", "anlegen", sitzung.uebersteuerung);
+  const id = String(formular.get("nachricht_id") ?? "").trim();
+  if (!id) return;
+  const supabase = await serverClient();
+  const { data: n } = await supabase.from("nachrichten").select("id, betreff, text, objekt_id, kontakt_id").eq("id", id).eq("mandant_id", sitzung.mandantId).maybeSingle();
+  if (!n) return;
+  const markiert = String(formular.get("markiert") ?? "").trim();
+  const quelle = (markiert || ((n.text as string | null) ?? "")).replace(/\r/g, "");
+  const heute = new Date();
+  let datum = "";
+  let zeit = "";
+  const d = /(\d{1,2})\.(\d{1,2})\.(\d{4}|\d{2})?/.exec(quelle);
+  if (d) {
+    const jahr = d[3] ? (d[3].length === 2 ? 2000 + Number(d[3]) : Number(d[3])) : heute.getFullYear();
+    datum = `${jahr}-${String(Number(d[2])).padStart(2, "0")}-${String(Number(d[1])).padStart(2, "0")}`;
+  } else {
+    const tage = ["sonntag", "montag", "dienstag", "mittwoch", "donnerstag", "freitag", "samstag"];
+    const w = /\b(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag|morgen|übermorgen)\b/i.exec(quelle);
+    if (w) {
+      const wort = w[1]!.toLowerCase();
+      const ziel = new Date(heute);
+      if (wort === "morgen") ziel.setDate(ziel.getDate() + 1);
+      else if (wort === "übermorgen") ziel.setDate(ziel.getDate() + 2);
+      else { const idx = tage.indexOf(wort); let diff = (idx - ziel.getDay() + 7) % 7; if (diff === 0) diff = 7; ziel.setDate(ziel.getDate() + diff); }
+      datum = ziel.toISOString().slice(0, 10);
+    }
+  }
+  // Uhrzeit: „14:30", „14.30 Uhr", „14 Uhr" — Datumsangaben (12.10.) sind hier keine Uhrzeit
+  const ohneDatum = quelle.replace(/\d{1,2}\.\d{1,2}\.(?:\d{2,4})?/g, " ");
+  const z = /(\d{1,2}):(\d{2})|(\d{1,2})\.(\d{2})\s*Uhr|(\d{1,2})\s*Uhr/i.exec(ohneDatum);
+  if (z) zeit = z[1] ? `${z[1].padStart(2, "0")}:${z[2]}` : z[3] ? `${z[3].padStart(2, "0")}:${z[4]}` : `${z[5]!.padStart(2, "0")}:00`;
+  const betreff = ((n.betreff as string | null) ?? "").replace(/^(re|aw|fwd?|wg):\s*/i, "").trim();
+  const p = new URLSearchParams({ neu: "1", titel: (markiert.split("\n")[0]?.slice(0, 120) || betreff || "Termin aus E-Mail"), ...(datum ? { datum } : {}), ...(zeit ? { zeit } : {}), ...(n.kontakt_id ? { kontakt: n.kontakt_id as string } : {}), ...(n.objekt_id ? { objekt: n.objekt_id as string } : {}) });
+  redirect(`/kalender?${p.toString()}`);
+}
+
 /** Rechtschreib- und Grammatikkorrektur (Referenz „text-korrigieren"), 1 Credit mit KI; ohne KI unveraendert. */
 export async function textKorrigieren(_vorher: ArbeitsErgebnis, formular: FormData): Promise<ArbeitsErgebnis> {
   await sitzungErzwingen();

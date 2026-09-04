@@ -5,6 +5,50 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 04.09.2026 (Paket 16b) — Kachel Termine: Lücken der Referenz geschlossen
+
+Nach `docs/FUNKTIONSINVENTAR.md`, Kachel Termine (E-2026-09-04-57):
+
+- **Nachfassen mit Freigabe:** Drei Tage nach einer Besichtigung entsteht ein
+  Nachfass-Vorschlag mit fertigem Mailentwurf (Anrede, Objektanschrift,
+  Makler, Firma) auf der Startseite — „Ansehen und senden" öffnet das Postfach,
+  der Versand erledigt den Vorschlag; „Überspringen (Kunde hat sich
+  gemeldet)", „Verwerfen". Hat der Kontakt seit dem Termin per Mail
+  geschrieben, wird der Vorschlag automatisch übersprungen. Ohne Kontakt
+  entsteht wie bisher eine Aufgabe. Tabelle `nachfass_vorschlaege`, Funktion
+  `besichtigungen_nachfassen()` (Migration `20260904190000`, im Projekt).
+- **Kundenerinnerung:** Mail an den Kontakt etwa sechs Stunden vorher, bei
+  Terminen vor 12 Uhr am Vorabend ab 18 Uhr, entfällt bei kurzfristiger
+  Vereinbarung (Grund am Termin), nie bei privaten oder ganztägigen Terminen;
+  je Termin abschaltbar. Läuft in den Tagesarbeiten des Arbeiters
+  (`kundenErinnerungenSenden`), braucht `MAIL_API_KEY`.
+- **Lead aus Termin:** Häkchen „In der Akquise als Lead anlegen" — Kontakt
+  und Objekt aus dem Termin, Adresse aus Objekt oder Ortsfeld; gibt es zu der
+  Adresse schon einen Lead, wird nur verknüpft. Lead-Link am Termin.
+- **Bestätigungstext:** am Termin editierbar, „Text per KI formulieren" /
+  „Vorschlag neu erzeugen" (1 Credit, Preis `ki_terminbestaetigung`), ohne
+  Modellzugang die Vorlage; gespeichert und beim Öffnen des Postfachs
+  verwendet.
+- **Dublettenwarnung** beim Anlegen (gleicher Kontakt bzw. gleiches Objekt,
+  gleiche Art, gleicher Tag) mit Rückfrage „Wirklich ein zweites Mal anlegen?".
+- **Urlaub aus dem Kalenderdialog** (Art „Urlaub (Antrag)"), beantragter
+  Urlaub bis zur Entscheidung im Kalender als „beantragt" sichtbar, Info-Mail
+  an den Mitarbeiter über die Entscheidung.
+- **Personenfilter mit Mehrfachauswahl**, „Erstellt von" am Termin.
+- **Posteingang:** „📅 Termin einfügen" im Editor (Datum/Uhrzeit als Text,
+  optional gleich als Kalendereintrag mit Kalenderdatei im Anhang, Kontakt aus
+  dem Empfänger, Objekt aus der Zuordnung); „Als Termin übernehmen" an der
+  Nachricht — Datum und Uhrzeit aus der markierten Textstelle oder dem ganzen
+  Text erkannt, Kalenderdialog vorbelegt.
+- Prüfstand: Typecheck, Lint, Nachweis `supabase/tests/kalender-nachfass.sql`
+  (18), Produktions-Build, Ende-zu-Ende (Lead aus Termin, Dublette,
+  Bestätigungstext, Personenfilter, Urlaub aus Kalender, Nachfass-Vorschlag
+  auf der Startseite mit Überspringen).
+- **Offen (bewusst):** onOffice-Terminabgleich gehört in das
+  Integrationspaket (Connector kennt bisher Objekte, Kontakte, Bilder);
+  Fahrzeit-Vorschau live im Dialog; Termin-Vorschläge mit Alternativen in der
+  Mietanfrage-Antwort (Kachel Vermietung); Echtzeit-Aktualisierung.
+
 ## 04.09.2026 (Paket 16a) — Startseite und Modulseiten 1:1 als Kacheln
 
 Auftraggeber: „mehr an der Referenz halten und Kacheln bauen". Umsetzung

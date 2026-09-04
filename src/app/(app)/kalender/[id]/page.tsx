@@ -8,6 +8,7 @@ import { hatRecht, rechtErzwingen } from "@/lib/auth/rechte";
 import { sitzungErzwingen } from "@/lib/auth/sitzung";
 import { TERMIN_FELDER, type KalenderTermin, type Mitarbeiter } from "@/lib/kalender/typen";
 import { serverClient } from "@/lib/supabase/server";
+import { kiVerfuegbar } from "@/lib/ki";
 
 export const metadata: Metadata = { title: "Termin" };
 
@@ -40,7 +41,7 @@ export default async function TerminSeite({ params }: { params: Promise<{ id: st
         benutzerId={sitzung.benutzerId}
         standardDauer={Number(ich?.besichtigung_dauer_min ?? 60)}
         darfAendern={hatRecht(sitzung.rolle, "kalender", "aendern", sitzung.uebersteuerung)}
-        fahrzeitAktiv={ich?.fahrzeit_aktiv !== false}
+        kiVerfuegbar={kiVerfuegbar()} fahrzeitAktiv={ich?.fahrzeit_aktiv !== false}
       />
     </>
   );

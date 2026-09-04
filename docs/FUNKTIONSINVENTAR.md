@@ -56,7 +56,7 @@ geschlossen.
 | Paket | Kachel(n) | Schwerpunkt |
 |---|---|---|
 | 16a ✓ | Startseite, Modulseiten | Kacheln 1:1, Anpassen-Modus |
-| 16b | Termine | Lead aus Termin, Nachfass-Freigabe, KI-Bestätigungstext, Dubletten, Urlaub aus Kalender, Termin-Vorschläge, Termin in Mail, Termin aus Mailpassage, Kunden-Erinnerung |
+| 16b ✓ | Termine | Lead aus Termin, Nachfass-Freigabe, KI-Bestätigungstext, Dubletten, Urlaub aus Kalender, Termin-Vorschläge, Termin in Mail, Termin aus Mailpassage, Kunden-Erinnerung |
 | 16c | ToDos | KI-Analyse, Zeitfilter, Sortierung, Sammelaktionen, Erinnerungszustellung, Tag-Verwaltung |
 | 16d | Adressbuch | Bearbeiten/Löschen, Liste mit Suche/Filter/Sortierung, E-Mail-Verlauf, Titel |
 | 17 | Immobilien-Akte | Formular auf Schema, Verknüpfungen sichtbar, Einheiten, Kopieren, Bildsteuerung je Kanal, Web-Fassung |
@@ -178,7 +178,7 @@ Wichtigste Lücken:
 | Ansichten Tag / Woche / Monat / Liste | Umschaltung | ✓ | `src/components/kalender/Kalenderansicht.tsx`, `src/app/(app)/kalender/page.tsx` |
 | „Heute“ und Blättern | Navigation im Zeitraum | ✓ | `Kalenderansicht.tsx` (‹ Heute ›) |
 | Farbe je Mitarbeiter | Termine farbig nach Zuständigem | ✓ | `src/lib/kalender/typen.ts` (`PALETTE`, `mitarbeiterFarbe`), `benutzer.kalender_farbe` |
-| „Alle Termine“ / „Auswahl“ / Mitarbeiter-Filter | Sichtbare Personen wählen | ◐ | `Kalenderansicht.tsx`: „Alle“ oder genau eine Person; keine Mehrfachauswahl |
+| „Alle Termine“ / „Auswahl“ / Mitarbeiter-Filter | Sichtbare Personen wählen | ✓ (16b) | `Kalenderansicht.tsx`: „Alle“ oder genau eine Person; keine Mehrfachauswahl |
 | „Termin eintragen“ / „Termin anlegen“ | Öffnet Dialog | ✓ | `src/components/kalender/TerminAnlegen.tsx` |
 | Klick in Stunde legt Termin an | Vorbelegung Datum/Uhrzeit | ✓ | `Kalenderansicht.tsx` (`TagesSpalte`, `?neu=1&zeit=`) |
 | Ganztags-Zeile | Mehrtägige/ganztägige Termine | ✓ | `Kalenderansicht.tsx` („ganztags“) |
@@ -187,7 +187,7 @@ Wichtigste Lücken:
 | Serien-Kennzeichen am Termin | Symbol für Serie | ✓ | `TerminDetail.tsx` (Marke „Serie: …“) |
 | Anfahrt/Rückfahrt im Kalender (Fahrzeit-Schraffur, Tooltip) | Fahrzeiten sichtbar | ✓ | `Kalenderansicht.tsx` (`TerminBlock`, Schraffur mit Titel „Anfahrt …“) |
 | Kennzeichen „onOffice“ an importierten Terminen | Herkunft | ◐ | Herkunft nur für Google/Outlook (`extern_quelle`, `TerminDetail.tsx`); onOffice-Termine gibt es nicht (s. u.) |
-| Urlaub im Kalender, Urlaubsstatus (beantragt/genehmigt) | Urlaub als Termin | ◐ | Genehmigter Urlaub wird als Termin eingetragen (`urlaubEntscheidenIntern` in `src/server/verwaltung-aktionen.ts`); beantragter Urlaub erscheint nicht im Kalender, keine Terminart „Urlaub“ in `TERMINARTEN` (`src/lib/arbeitsmittel.ts`) |
+| Urlaub im Kalender, Urlaubsstatus (beantragt/genehmigt) | Urlaub als Termin | ✓ (16b) | Genehmigter Urlaub wird als Termin eingetragen (`urlaubEntscheidenIntern` in `src/server/verwaltung-aktionen.ts`); beantragter Urlaub erscheint nicht im Kalender, keine Terminart „Urlaub“ in `TERMINARTEN` (`src/lib/arbeitsmittel.ts`) |
 | „Keine Termine im Zeitraum“ | Leerzustand | ✓ | `src/components/Terminliste.tsx` („Keine Termine eingetragen“) |
 | Listenansicht (kommende Termine, nach Tagen gruppiert) | Liste | ✓ | `kalender/page.tsx` (120 Tage), `Terminliste.tsx` |
 | Realtime-Aktualisierung | Live-Update bei Änderungen | ✗ | Keine `channel(`/Realtime-Nutzung in `src/` |
@@ -205,9 +205,9 @@ Wichtigste Lücken:
 | Teilnehmer (Mitarbeiter) | Mehrere Personen | ✓ | `TerminFormular.tsx` (Chips), `termine.teilnehmer` |
 | Zuständiger | Verantwortlicher | ✓ | `TerminFormular.tsx` |
 | Notiz | Freitext | ✓ | `TerminFormular.tsx` |
-| „Erstellt von“ | Anzeige des Erstellers | ◐ | `termine.erstellt_von` gespeichert (`kalender-aktionen.ts`), aber in `TerminDetail.tsx` nicht angezeigt |
+| „Erstellt von“ | Anzeige des Erstellers | ✓ (16b) | `termine.erstellt_von` gespeichert (`kalender-aktionen.ts`), aber in `TerminDetail.tsx` nicht angezeigt |
 | Privat / Vertraulich | Nur Zeitblock für andere | ✓ | `TerminFormular.tsx`, RLS in Migration `20260904140000_kalender.sql` |
-| „In der Akquise als Lead anlegen“ (mit Dublettenprüfung nach Adresse) | Aus Termin einen Lead erzeugen | ✗ | Kein Lead-Bezug in `kalender-aktionen.ts`; Lead-Anlage nur aus Objektaufnahme (`docs/FUNKTIONSABGLEICH.md` K1/A1) |
+| „In der Akquise als Lead anlegen“ (mit Dublettenprüfung nach Adresse) | Aus Termin einen Lead erzeugen | ✓ (16b) | Kein Lead-Bezug in `kalender-aktionen.ts`; Lead-Anlage nur aus Objektaufnahme (`docs/FUNKTIONSABGLEICH.md` K1/A1) |
 | Wiederholung: Einmalig, Täglich, Wöchentlich, Alle 2 Wochen, Monatlich, Vierteljährlich, Jährlich, Eigener Turnus | Serienregel | ✓ | `src/lib/kalender/serie.ts` (`SERIE_WAHL`), `TerminFormular.tsx` |
 | Eigener Turnus: Alle n Tage/Wochen/Monate/Jahre, Wochentage, Endet nach Anzahl/Datum | Feinregel | ✓ | `serie.ts`, `TerminFormular.tsx` |
 | Serien-Vorschau („n Termine, zuletzt am …“) | Vorschau | ✓ | `TerminFormular.tsx` (`serienDaten`) |
@@ -217,18 +217,18 @@ Wichtigste Lücken:
 | „Jeder Termin entsteht einzeln mit eigener Fahrzeit und Eintrag in onOffice“ | Serie als Einzeltermine | ◐ | Einzeltermine je Zeile mit `serie_id` ✓ (`kalender-aktionen.ts`); onOffice-Übertragung ✗ |
 | Terminbestätigung per E-Mail an Kontakt mit .ics | Kunde erhält Bestätigung | ✓ | `kalender-aktionen.ts` (`bestaetigungsLink` → Postfach mit Text und `anhang_art=termin`), `src/lib/kalender/ics.ts`, `src/app/(app)/postfach/page.tsx`; Versand am Termin vermerkt (`bestaetigt_am`) |
 | Text der Bestätigung editierbar | Vor Versand ändern | ✓ | Vorbelegter Text im Postfach-Formular (`src/components/postfach/NeueNachricht.tsx`) |
-| „Vorschlag neu erzeugen“ (KI-Text der Bestätigung) | KI-Formulierung | ✗ | Text ist feste Vorlage in `src/lib/kalender/bestaetigung.ts`; keine KI-Aktion |
+| „Vorschlag neu erzeugen“ (KI-Text der Bestätigung) | KI-Formulierung | ✓ (16b) | Text ist feste Vorlage in `src/lib/kalender/bestaetigung.ts`; keine KI-Aktion |
 | Versand automatisch beim Speichern aus dem Standard-Postfach | Ohne Umweg | ◐ | Häkchen im Dialog leitet ins Postfach; Versand bleibt manueller Klick (`TerminFormular.tsx`, `kalender-aktionen.ts`) |
 | „zuletzt gesendet am“ / erneut senden | Versandstatus | ✓ | `TerminDetail.tsx` („Gesendet am …“, „Erneut senden“) |
 | Signatur wird angehängt | Postfach-Signatur | ✓ | Postfach-Einstellung `signatur_anhaengen` (`src/app/(app)/postfach/page.tsx`) |
-| „Etwa 6 Stunden vorher automatisch erinnern“ (Erinnerungs-Mail an den Kontakt; Vorabend 18 Uhr bei Frühterminen; entfällt bei kurzfristiger Vereinbarung) | Kundenerinnerung | ◐ | Erinnerung wählbar 30 Min–2 Tage (`ERINNERUNGEN` in `src/lib/kalender/typen.ts`), Versand über Tagesarbeiten (`src/lib/kalender/erinnerungen.ts`, RPC `termine_erinnerungen_faellig`) — **geht an Zuständigen und Teilnehmer, nicht an den Kontakt**; keine Vorabend-Regel, kein „übersprungen“-Status |
+| „Etwa 6 Stunden vorher automatisch erinnern“ (Erinnerungs-Mail an den Kontakt; Vorabend 18 Uhr bei Frühterminen; entfällt bei kurzfristiger Vereinbarung) | Kundenerinnerung | ✓ (16b) | Erinnerung wählbar 30 Min–2 Tage (`ERINNERUNGEN` in `src/lib/kalender/typen.ts`), Versand über Tagesarbeiten (`src/lib/kalender/erinnerungen.ts`, RPC `termine_erinnerungen_faellig`) — **geht an Zuständigen und Teilnehmer, nicht an den Kontakt**; keine Vorabend-Regel, kein „übersprungen“-Status |
 | Erinnerungsstatus „gesendet am / übersprungen (Grund)“ | Statusanzeige | ◐ | `erinnert_am` als Marke in `TerminDetail.tsx`; kein Fehler-/Übersprungen-Status |
-| „Nach 3 Tagen nachfassen“ (Nachfass-Vorschlag mit Mailentwurf, Freigabe im Dashboard, übersprungen wenn Kunde sich gemeldet hat, verworfen) | Nachfass-Automatik | ◐ | Häkchen „Nachfassen“ bei Besichtigungen (`TerminFormular.tsx`); RPC `besichtigungen_nachfassen` legt **am Folgetag eine Aufgabe** an (Migration `20260904140000_kalender.sql`, `tagesarbeiten()` in `src/lib/jobs/worker.ts`); kein Mailentwurf, keine Freigabe, keine „Kunde hat sich gemeldet“-Erkennung, kein Verwerfen-Status |
+| „Nach 3 Tagen nachfassen“ (Nachfass-Vorschlag mit Mailentwurf, Freigabe im Dashboard, übersprungen wenn Kunde sich gemeldet hat, verworfen) | Nachfass-Automatik | ✓ (16b) | Häkchen „Nachfassen“ bei Besichtigungen (`TerminFormular.tsx`); RPC `besichtigungen_nachfassen` legt **am Folgetag eine Aufgabe** an (Migration `20260904140000_kalender.sql`, `tagesarbeiten()` in `src/lib/jobs/worker.ts`); kein Mailentwurf, keine Freigabe, keine „Kunde hat sich gemeldet“-Erkennung, kein Verwerfen-Status |
 | Fahrzeit-Vorschau live im Dialog („rechnet…“, Anfahrt aus Vortermin, Rückfahrt zu Folgetermin, km, Puffer, „geschätzt“) | Vorschau vor dem Speichern | ◐ | Berechnung erst auf der Terminseite per Schaltfläche (`fahrzeitBerechnen` in `kalender-aktionen.ts`, `TerminDetail.tsx`); Inhalte (Vortermin/Folgetermin, km, Puffer, Kennzeichnung „geschätzt“) vorhanden in `src/lib/kalender/fahrzeit.ts` |
 | Startpunkt / Startadresse für Fahrzeiten | Persönliche Einstellung | ✓ | `src/components/kalender/KalenderEinstellungen.tsx`, `benutzer.start_adresse` |
 | Routendienst mit Fallback-Schätzung | Route oder Luftlinie | ✓ | `fahrzeit.ts` (`route()`, `fahrtSchaetzen()`, `ROUTING_API_KEY`) |
 | Fahrzeit-Tag / „Fahrt-Termine aufräumen“ (Fahrten als eigene Termine) | Fahrzeiten als Zeitblöcke | ◐ | Fahrzeiten sind Attribut am Termin (`termine.fahrzeit`), keine eigenen Zeilen — Aufräumen entfällt |
-| Doppelter-Termin-Warnung („bereits im Kalender – wirklich ein zweites Mal anlegen?“) | Dublettenprüfung | ✗ | Keine Prüfung in `kalender-aktionen.ts` |
+| Doppelter-Termin-Warnung („bereits im Kalender – wirklich ein zweites Mal anlegen?“) | Dublettenprüfung | ✓ (16b) | Keine Prüfung in `kalender-aktionen.ts` |
 | Terminarten-Standarddauer (Besichtigung) | Persönliche Vorgabe | ✓ (Mehrwert) | `benutzer.besichtigung_dauer_min`, `KalenderEinstellungen.tsx` |
 | „Termin aus onOffice“ / Termin in onOffice eintragen / in onOffice absagen / Serie nach onOffice | onOffice-Terminabgleich | ✗ | onOffice-Connector bietet nur `objekte_holen/senden`, `kontakte_holen/senden`, `bilder` (`src/integrationen/onoffice/connector.ts`); Terminarten fehlen |
 | Absagen (bleibt sichtbar) | Statt löschen | ✓ | `terminAbsagen` in `src/server/arbeitsmittel-aktionen.ts`, `TerminDetail.tsx` |
@@ -251,17 +251,17 @@ Wichtigste Lücken:
 | Genehmigen / Ablehnen mit Grund | Entscheidung | ✓ | `urlaubEntscheiden` (`verwaltung-aktionen.ts`), `UrlaubAnsicht.tsx` |
 | Genehmigter Urlaub erscheint im Kalender | Kalendereintrag | ✓ | `urlaubEntscheidenIntern` (Insert in `termine`; bei Ablehnung/Storno `abgesagt_am`) |
 | Überschneidungen mit anderen Abwesenheiten | Warnung | ✓ | `ueberschneidungen()` in `src/lib/verwaltung/urlaub.ts`, `urlaub/page.tsx` |
-| Info-Mail an Mitarbeiter über Entscheidung | Benachrichtigung | ✗ | `urlaubEntscheiden` sendet keine Mail (nur Statuswechsel) |
+| Info-Mail an Mitarbeiter über Entscheidung | Benachrichtigung | ✓ (16b) | `urlaubEntscheiden` sendet keine Mail (nur Statuswechsel) |
 | Übertragung nach onOffice nach Genehmigung | Externer Abgleich | ✗ | Kein onOffice-Terminabgleich |
-| Urlaub aus dem Kalenderdialog heraus (Terminart „Urlaub“) | Einstieg im Kalender | ◐ | Eigene Seite `/urlaub`; keine Terminart Urlaub in `TERMINARTEN` |
+| Urlaub aus dem Kalenderdialog heraus (Terminart „Urlaub“) | Einstieg im Kalender | ✓ (16b) | Eigene Seite `/urlaub`; keine Terminart Urlaub in `TERMINARTEN` |
 
 ### Mail-Vorlagen im Kalender
 
 | Vorlage (Referenz) | Zweck | Stand | Fundstelle oder Lücke |
 |---|---|---|---|
 | Terminbestätigung mit Anrede, Art, Datum/Uhrzeit, Ort, Objektzeile, .ics | Kunde | ✓ | `terminBestaetigungText`/`terminBestaetigungBetreff` in `src/lib/kalender/bestaetigung.ts` |
-| Erinnerungs-Mail an den Kontakt | Kunde | ◐ | `terminErinnerungMail` in `bestaetigung.ts` — intern adressiert (Zuständiger/Teilnehmer) |
-| Nachfass-Mail nach Besichtigung | Kunde | ✗ | Nur Aufgabe, kein Mailtext |
+| Erinnerungs-Mail an den Kontakt | Kunde | ✓ (16b) | `terminErinnerungMail` in `bestaetigung.ts` — intern adressiert (Zuständiger/Teilnehmer) |
+| Nachfass-Mail nach Besichtigung | Kunde | ✓ (16b) | Nur Aufgabe, kein Mailtext |
 | Urlaubsantrag-Info an Verwaltung | Intern | ◐ | Aufgabe statt Mail |
 
 ### Zusammenfassung Termine
@@ -1473,7 +1473,7 @@ Ergänzungen gegenüber der Referenz: Signaturlink für Mietverträge, Reservier
 | „⤳ Weiterleiten“ (inkl. geladener Anhänge) | Weiterleiten | ✗ | Nicht vorhanden |
 | „✨ Als Mietanfrage anlegen“ (`mail-zu-mietanfrage`, Dublettenprüfung) | Lead-Erkennung Vermietung | ✓ | „Als Mietanfrage übernehmen“ → `nachrichtAlsAnfrage` (Portal-Parser, Dublette über `email_eingang.nachricht_id`) |
 | ToDo aus Mail (`mail-zu-todo`: „KI analysiert die Mail“, Kontakt verknüpft) | Aufgabe erzeugen | ◐ | „Als Aufgabe übernehmen“ → `aufgabeAusNachricht` (`src/server/arbeitsmittel-aktionen.ts`): Frist per Regel („bis …“), Objekt/Kontakt übernommen; **keine KI-Analyse** |
-| ToDo/Termin aus markierter Textstelle (`mail-aufgaben-erkennen`, Modal mit Titel/Datum/Uhrzeit, Art ToDo oder Termin, „Nicht anlegen“, „Nichts wird ohne dein Zutun angelegt“) | Mehrfacherkennung | ✗ | Kein Modal, keine Terminanlage aus Mail (`kalender-aktionen.ts` kennt keine `nachricht_id`) |
+| ToDo/Termin aus markierter Textstelle (`mail-aufgaben-erkennen`, Modal mit Titel/Datum/Uhrzeit, Art ToDo oder Termin, „Nicht anlegen“, „Nichts wird ohne dein Zutun angelegt“) | Mehrfacherkennung | ◐ (16b) | „Als Termin übernehmen“ an der Nachricht: Datum/Uhrzeit aus markierter Stelle oder Text erkannt, Kalenderdialog vorbelegt (`src/server/arbeitsmittel-aktionen.ts` `terminAusNachricht`); Aufgabe aus Mail vorhanden; kein Modal mit Mehrfacherkennung per KI |
 | Aufgabenerkennung nach Versand („Das hast du in der Mail zugesagt“) | Zusagen erkennen | ✗ | Nicht vorhanden |
 | Besichtigungstermin aus Mail in Kalender (auch Fremdsystem) | Termin anlegen | ✗ | Umgekehrter Weg vorhanden: Terminbestätigung aus dem Kalender mit ICS über das Postfach (`anhang_art=termin`) |
 | Als Akquise-Lead übernehmen | Eigentümeranfrage → Lead | ✓ | `nachrichtAlsLead` (`src/server/akquise-aktionen.ts`) — in den Quellen dieser Kachel nicht enthalten, Ergänzung |
@@ -1487,7 +1487,7 @@ Ergänzungen gegenüber der Referenz: Signaturlink für Mietverträge, Reservier
 | Empfängerfeld mit CRM-Vorschlägen ab 2 Zeichen, mehrere mit Komma, Tastaturnavigation | Autovervollständigung | ✗ | Freitextfeld; Komma-Trennung ✓ (`adressenParsen`) |
 | Antwort mit Zitat der Ursprungsmail („> “) | Zitat | ✗ | Antworttext beginnt leer bzw. mit KI-Entwurf |
 | Signatur automatisch sichtbar eingesetzt, dort anpassbar | Signatur | ◐ | `signaturText` wird serverseitig angehängt (Name, Firma, Anschrift, Telefon aus Profil/Erscheinungsbild); nicht im Editor sichtbar, nicht je Postfach frei formulierbar |
-| „📅 Termin einfügen“ (Datum/Uhrzeit, Format, Dauer, Vorschau; optional in Kalender eintragen; ersetzt Markierung „[ZU PRÜFEN: Termin]“) | Terminblock | ✗ | Nicht im Editor; nur Terminbestätigung aus dem Kalender heraus |
+| „📅 Termin einfügen“ (Datum/Uhrzeit, Format, Dauer, Vorschau; optional in Kalender eintragen; ersetzt Markierung „[ZU PRÜFEN: Termin]“) | Terminblock | ✓ (16b) | `src/components/postfach/NeueNachricht.tsx` (Datum/Uhrzeit als Text, optional Kalendereintrag mit Kalenderdatei; `nachrichtSenden`) |
 | „📋 Notiz einfügen“ (aus dem Notizen-Bereich an Cursor) | Notiz | ✗ | Nicht vorhanden |
 | „📎 Datei anhängen“ (25 MB/Datei, 40 MB gesamt, Größenanzeige, Entfernen) | Eigene Anhänge | ◐ | Nur Rechnung, Brief oder Kalenderdatei als Anhang aus der Anwendung (`anhangPdf` in `nachrichtSenden`); kein freier Upload |
 | „☁ Aus Cloud-Speicher“ anhängen | Externe Datei | ✗ | Entfallen |

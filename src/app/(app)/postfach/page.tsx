@@ -28,6 +28,7 @@ interface Parameter {
   text?: string;
   anhang_art?: string;
   anhang_id?: string;
+  nachfass_id?: string;
 }
 
 const POSTFACH_FELDER = "id, adresse, anzeigename, anbieter, status, benutzer_id, intervall_minuten, signatur_anhaengen, letzter_abruf_am, fehler_text, fehler_zaehler";
@@ -173,7 +174,7 @@ export default async function PostfachSeite({ searchParams }: { searchParams: Pr
 
         <Karte className="p-5">
           {p.neu === "1" && darfSenden ? (
-            <NeueNachricht postfaecher={postfaecher} an={p.an} betreff={p.betreff} text={p.text} anhang={anhang} />
+            <NeueNachricht postfaecher={postfaecher} an={p.an} betreff={p.betreff} text={p.text} anhang={anhang} nachfassId={p.nachfass_id && /^[0-9a-f-]{36}$/.test(p.nachfass_id) ? p.nachfass_id : undefined} />
           ) : detail ? (
             <NachrichtDetail
               nachricht={detail}

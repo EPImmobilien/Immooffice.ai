@@ -1005,3 +1005,27 @@ Termine, ToDos, Adressbuch, Immobilien-Akte, dann die übrigen Kacheln.
 **Folgen:** Erwartungen des Auftraggebers und Oberfläche decken sich; der
 Umfang der verbleibenden Arbeit ist sichtbar und zählbar. Kosten: Umbau von
 Startseite und Menü (Paket 16a), Pflege des Inventars je Paket.
+
+### E-2026-09-04-57 — Nachfassen als Vorschlag mit Freigabe statt stiller Aufgabe; Kundenerinnerung mit Vorabend-Regel; Lead aus Termin ohne Dubletten
+
+**Frage:** Die Referenz fasst drei Tage nach der Besichtigung mit einem
+Mailentwurf nach, den der Makler auf der Startseite freigibt, erinnert den
+Kunden selbst etwa sechs Stunden vorher und legt aus dem Termin einen
+Akquise-Lead an. ImmoOffice.ai hatte dafür eine Aufgabe am Folgetag, eine
+interne Erinnerung und keinen Lead-Bezug.
+
+**Entscheidung:** Nachfassen wird ein eigener Datensatz
+(`nachfass_vorschlaege`) mit Entwurf, Status und Grund; die Entscheidung
+(senden, überspringen, verwerfen) bleibt beim Menschen, der Versand läuft
+über das verbundene Postfach und schließt den Vorschlag. Antworten des
+Kontakts (Posteingang seit dem Termin) überspringen automatisch. Die
+Kundenerinnerung folgt den Regeln der Referenz (6 h, Vorabend 18 Uhr bei
+Frühterminen, nicht bei kurzfristiger Vereinbarung) und ist je Termin
+abschaltbar; sie geht nur an Kontakte mit E-Mail, nie bei privaten Terminen.
+Der Lead aus dem Termin prüft die Adresse gegen bestehende Leads und
+verknüpft statt zu doppeln. Der KI-Bestätigungstext läuft über den
+Provider-Layer mit Credit-Reservierung; ohne Modell steht die Vorlage.
+
+**Folgen:** Kein automatischer Mailversand an Kunden ohne Freigabe, außer der
+angekündigten Erinnerung; alle Automatiken hinterlassen Status und Grund am
+Termin. Kosten: eine Tabelle, zwei Datenbankfunktionen, Tagesarbeit im Worker.

@@ -14,6 +14,13 @@ const START_STUNDE = 7;
 const ENDE_STUNDE = 20;
 const TAGE_KURZ = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 
+/** Person an- oder abwaehlen (Mehrfachauswahl, Referenz „Auswahl"). */
+function personenWahl(aktuell: string, id: string): string {
+  const liste = aktuell === "alle" ? [] : aktuell.split(",").filter(Boolean);
+  const neu = liste.includes(id) ? liste.filter((x) => x !== id) : [...liste, id];
+  return neu.length === 0 ? "alle" : neu.join(",");
+}
+
 function link(ansicht: Ansicht, datum: string, person: string): string {
   return `/kalender?${new URLSearchParams({ ansicht, datum, ...(person !== "alle" ? { person } : {}) }).toString()}`;
 }
@@ -53,7 +60,7 @@ function TerminBlock({ t, farbe, fahrzeit, spalte, anzahl, von, bis }: { t: Kale
     <>
       {hin > 0 && <div className="absolute rounded-t border-x border-t border-dashed" style={{ ...schraffur, borderColor: `${farbe}66`, top: oben - (hin / 60) * STUNDE_PX, height: (hin / 60) * STUNDE_PX, left: `${spalte * breite}%`, width: `calc(${breite}% - 2px)` }} title={`Anfahrt ${fahrzeitText(hin)}`} />}
       <Link
-        href={`/kalender/${t.id}`}
+        href={t.link ?? `/kalender/${t.id}`}
         className={`absolute overflow-hidden rounded-[var(--radius)] border px-1.5 py-0.5 text-[11px] leading-tight text-white shadow-sm transition-opacity hover:opacity-90 ${t.abgesagt_am ? "line-through opacity-50" : ""}`}
         style={{ top: oben, height: hoehe, left: `${spalte * breite}%`, width: `calc(${breite}% - 2px)`, background: t.extern_quelle ? "#7A828C" : farbe, borderColor: "rgba(255,255,255,.35)" }}
         title={`${t.titel} · ${berlin(t.beginnt_am).zeit}–${berlin(t.endet_am).zeit}${t.ort ? ` · ${t.ort}` : ""}`}
@@ -112,7 +119,7 @@ export function Kalenderansicht({ ansicht, datum, termine, mitarbeiter, person, 
       <div className="flex flex-wrap gap-1.5">
         <Link href={link(ansicht, datum, "alle")} className={`rounded-[var(--radius)] border px-2.5 py-0.5 text-[12px] ${person === "alle" ? "border-akzent bg-akzent-schwach text-akzent" : "border-linie bg-flaeche text-gedaempft"}`}>Alle</Link>
         {mitarbeiter.map((m, i) => (
-          <Link key={m.id} href={link(ansicht, datum, m.id)} className={`flex items-center gap-1.5 rounded-[var(--radius)] border px-2.5 py-0.5 text-[12px] ${person === m.id ? "border-akzent bg-akzent-schwach text-akzent" : "border-linie bg-flaeche text-gedaempft"}`}>
+          <Link key={m.id} href={link(ansicht, datum, personenWahl(person, m.id))} title="Klick wählt an oder ab — mehrere Personen möglich" className={`flex items-center gap-1.5 rounded-[var(--radius)] border px-2.5 py-0.5 text-[12px] ${person.split(",").includes(m.id) ? "border-akzent bg-akzent-schwach text-akzent" : "border-linie bg-flaeche text-gedaempft"}`}>
             <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: mitarbeiterFarbe(m, i) }} aria-hidden="true" />{m.name}
           </Link>
         ))}
@@ -132,7 +139,7 @@ export function Kalenderansicht({ ansicht, datum, termine, mitarbeiter, person, 
               {tage.map((tag) => (
                 <div key={`g-${tag}`} className="min-h-[26px] space-y-0.5 border-b border-l border-linie p-0.5">
                   {jeTag(tag).filter((t) => t.ganztags).map((t) => (
-                    <Link key={t.id} href={`/kalender/${t.id}`} className={`block truncate rounded px-1.5 py-0.5 text-[11px] text-white ${t.abgesagt_am ? "line-through opacity-50" : ""}`} style={{ background: farbeVon(t, mitarbeiter) }}>{t.titel}</Link>
+                    <Link key={t.id} href={t.link ?? `/kalender/${t.id}`} className={`block truncate rounded px-1.5 py-0.5 text-[11px] text-white ${t.abgesagt_am ? "line-through opacity-50" : ""}`} style={{ background: farbeVon(t, mitarbeiter) }}>{t.titel}</Link>
                   ))}
                 </div>
               ))}
@@ -161,7 +168,7 @@ export function Kalenderansicht({ ansicht, datum, termine, mitarbeiter, person, 
                     <Link href={link("tag", tag, person)} className={`block text-right text-[11px] ${tag === heute ? "font-semibold text-akzent" : imMonat ? "text-text" : "text-gedaempft"}`}>{Number(tag.slice(8, 10))}</Link>
                     <div className="mt-0.5 space-y-0.5">
                       {liste.slice(0, 3).map((t) => (
-                        <Link key={t.id} href={`/kalender/${t.id}`} className={`block truncate rounded px-1 py-0.5 text-[10.5px] text-white ${t.abgesagt_am ? "line-through opacity-50" : ""}`} style={{ background: t.extern_quelle ? "#7A828C" : farbeVon(t, mitarbeiter) }}>{t.ganztags ? "" : `${berlin(t.beginnt_am).zeit} `}{t.titel}</Link>
+                        <Link key={t.id} href={t.link ?? `/kalender/${t.id}`} className={`block truncate rounded px-1 py-0.5 text-[10.5px] text-white ${t.abgesagt_am ? "line-through opacity-50" : ""}`} style={{ background: t.extern_quelle ? "#7A828C" : farbeVon(t, mitarbeiter) }}>{t.ganztags ? "" : `${berlin(t.beginnt_am).zeit} `}{t.titel}</Link>
                       ))}
                       {liste.length > 3 && <Link href={link("tag", tag, person)} className="block text-[10.5px] text-gedaempft hover:text-akzent">+ {liste.length - 3} weitere</Link>}
                     </div>

@@ -21,7 +21,7 @@ export const metadata: Metadata = { title: "Kalender" };
  * Stunde legt einen Termin an. Serien, Erinnerungen, Bestaetigung und
  * Abgleich haengen am Termin bzw. in den Einstellungen.
  */
-export default async function KalenderSeite({ searchParams }: { searchParams: Promise<{ ansicht?: string; datum?: string; person?: string; neu?: string; zeit?: string }> }) {
+export default async function KalenderSeite({ searchParams }: { searchParams: Promise<{ ansicht?: string; datum?: string; person?: string; neu?: string; zeit?: string; titel?: string; kontakt?: string; objekt?: string; art?: string }> }) {
   const [p, sitzung] = await Promise.all([searchParams, sitzungErzwingen()]);
   rechtErzwingen(sitzung.rolle, "kalender", "lesen", sitzung.uebersteuerung);
   const darfAnlegen = hatRecht(sitzung.rolle, "kalender", "anlegen", sitzung.uebersteuerung);
@@ -30,7 +30,9 @@ export default async function KalenderSeite({ searchParams }: { searchParams: Pr
   const heute = heuteBerlin();
   const ansicht: Ansicht = (["tag", "woche", "monat", "liste"] as Ansicht[]).includes(p.ansicht as Ansicht) ? (p.ansicht as Ansicht) : "woche";
   const datum = p.datum && /^\d{4}-\d{2}-\d{2}$/.test(p.datum) ? p.datum : heute;
-  const person = p.person && /^[0-9a-f-]{36}$/.test(p.person) ? p.person : "alle";
+  // Personenfilter: eine oder mehrere Personen (Referenz: Auswahl), sonst alle
+  const personen = (p.person ?? "").split(",").filter((x) => /^[0-9a-f-]{36}$/.test(x));
+  const person = personen.length > 0 ? personen.join(",") : "alle";
 
   // Sichtbereich
   let von: string;
@@ -41,7 +43,7 @@ export default async function KalenderSeite({ searchParams }: { searchParams: Pr
   else { von = heute; bis = tagPlus(heute, 120); }
 
   let abfrage = supabase.from("termine").select(TERMIN_FELDER).is("geloescht_am", null).lt("beginnt_am", ausBerlin(bis, "00:00").toISOString()).gt("endet_am", ausBerlin(von, "00:00").toISOString()).order("beginnt_am");
-  if (person !== "alle") abfrage = abfrage.or(`zustaendig_id.eq.${person},teilnehmer.cs.{${person}}`);
+  if (personen.length > 0) abfrage = abfrage.or(`zustaendig_id.in.(${personen.join(",")}),teilnehmer.ov.{${personen.join(",")}}`);
   const [{ data: termine }, { data: benutzer }, { data: objekte }, { data: kontakte }, { data: ich }] = await Promise.all([
     abfrage,
     supabase.from("benutzer").select("id, name, kalender_farbe").eq("mandant_id", sitzung.mandantId).eq("aktiv", true).order("name"),
@@ -49,8 +51,18 @@ export default async function KalenderSeite({ searchParams }: { searchParams: Pr
     supabase.from("kontakte").select("id, vorname, nachname, firma, email").is("geloescht_am", null).order("nachname").limit(500),
     supabase.from("benutzer").select("besichtigung_dauer_min, fahrzeit_aktiv").eq("id", sitzung.benutzerId).maybeSingle(),
   ]);
+  // Beantragter Urlaub erscheint bis zur Entscheidung als „beantragt" (Referenz)
+  const { data: antraege } = await supabase.from("urlaubsantraege").select("id, benutzer_id, von, bis, status, benutzer:benutzer!urlaubsantraege_benutzer_id_fkey(name)").eq("status", "beantragt").lte("von", bis).gte("bis", von);
   const mitarbeiter: Mitarbeiter[] = (benutzer ?? []).map((b) => ({ id: b.id as string, name: b.name as string, farbe: (b.kalender_farbe as string | null) ?? null }));
-  const liste = (termine ?? []) as unknown as KalenderTermin[];
+  const urlaube: KalenderTermin[] = ((antraege ?? []) as Array<Record<string, unknown>>)
+    .filter((a) => personen.length === 0 || personen.includes(a["benutzer_id"] as string))
+    .map((a) => ({
+      id: a["id"] as string, titel: `Urlaub (beantragt): ${((a["benutzer"] as { name?: string } | null)?.name) ?? ""}`, art: "sonstiges" as const, notiz: null,
+      beginnt_am: ausBerlin(a["von"] as string, "00:00").toISOString(), endet_am: ausBerlin(tagPlus(a["bis"] as string, 1), "00:00").toISOString(), ganztags: true, ort: null, abgesagt_am: null,
+      objekt_id: null, kontakt_id: null, zustaendig_id: a["benutzer_id"] as string, teilnehmer: [], privat: false, serie_id: null, serie_regel: null, erinnerung_minuten: null, erinnert_am: null,
+      nachfassen: false, nachgefasst_am: null, fahrzeit: null, bestaetigt_am: null, extern_quelle: null, link: "/urlaub",
+    }));
+  const liste = ([...((termine ?? []) as unknown as KalenderTermin[]), ...urlaube]).sort((a, b) => a.beginnt_am.localeCompare(b.beginnt_am));
   const zeit = p.zeit && /^\d{2}:\d{2}$/.test(p.zeit) ? p.zeit : "10:00";
 
   return (
@@ -62,7 +74,13 @@ export default async function KalenderSeite({ searchParams }: { searchParams: Pr
       {darfAnlegen && (
         <TerminAnlegen
           offen={p.neu === "1"}
-          start={{ datum, zeit, zustaendig_id: sitzung.benutzerId, teilnehmer: [sitzung.benutzerId] }}
+          start={{
+            datum, zeit, zustaendig_id: sitzung.benutzerId, teilnehmer: [sitzung.benutzerId],
+            ...(p.titel ? { titel: p.titel.slice(0, 300) } : {}),
+            ...(p.kontakt && /^[0-9a-f-]{36}$/.test(p.kontakt) ? { kontakt_id: p.kontakt } : {}),
+            ...(p.objekt && /^[0-9a-f-]{36}$/.test(p.objekt) ? { objekt_id: p.objekt } : {}),
+            ...(p.art && ["besichtigung", "beratung", "objektaufnahme", "notartermin", "uebergabe", "telefonat", "sonstiges"].includes(p.art) ? { art: p.art as KalenderTermin["art"] } : {}),
+          }}
           mitarbeiter={mitarbeiter}
           objekte={(objekte ?? []).map((o) => ({ id: o.id as string, bezeichnung: `${o.objektnummer as string} · ${o.bezeichnung as string}` }))}
           kontakte={(kontakte ?? []).map((k) => ({ id: k.id as string, bezeichnung: [k.vorname, k.nachname].filter(Boolean).join(" ") + (k.firma ? ` (${k.firma as string})` : ""), email: (k.email as string | null) ?? null }))}

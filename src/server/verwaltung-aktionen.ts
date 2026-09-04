@@ -274,6 +274,12 @@ async function urlaubEntscheidenIntern(supabase: Awaited<ReturnType<typeof serve
   } else if (a.termin_id) {
     await supabase.from("termine").update({ abgesagt_am: new Date().toISOString() }).eq("id", a.termin_id as string);
   }
+  // Info an den Mitarbeiter (Referenz): Entscheidung per Mail, wenn Versand eingerichtet
+  const { data: e } = await supabase.from("benutzer").select("email").eq("id", a.benutzer_id as string).maybeSingle();
+  if (e?.email && a.benutzer_id !== sitzung.benutzerId) {
+    const zeitraum = `${(a.von as string).split("-").reverse().join(".")} bis ${(a.bis as string).split("-").reverse().join(".")}`;
+    await supabase.rpc("job_einstellen", { p_art: "mail", p_nutzlast: { vorlage: "frei", an: e.email as string, betreff: `Urlaubsantrag ${zeitraum}: ${status === "genehmigt" ? "genehmigt" : "abgelehnt"}`, text: `Guten Tag ${(b?.name as string) ?? ""},\n\nIhr Urlaubsantrag für ${zeitraum} wurde ${status === "genehmigt" ? "genehmigt" : "abgelehnt"}.${antwort ? `\n\nAnmerkung: ${antwort}` : ""}\n\nViele Grüße\n${sitzung.name}` } }).then(() => null, () => null);
+  }
   return null;
 }
 

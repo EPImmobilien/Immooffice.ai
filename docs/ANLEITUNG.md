@@ -675,6 +675,39 @@ Menü **Kalender**. Rechte über das Modul „Kalender“.
    „Sonstiges“ und werden dort gepflegt. Der Abgleich läuft mit jedem
    Postfach-Abruf.
 
+### 10g-2. Nachfassen, Kundenerinnerung, Lead aus Termin (Paket 16b)
+
+1. **Nachfassen:** Bei einer Besichtigung bleibt „Nach 3 Tagen nachfassen"
+   angehakt. Drei Tage später steht auf der Startseite die Karte „Nachfassen
+   nach Besichtigung" mit dem fertigen Mailentwurf („Entwurf ansehen").
+   **Ansehen und senden** öffnet das Postfach mit Text und Empfänger; nach dem
+   Senden verschwindet der Vorschlag. Hat sich der Kunde von selbst gemeldet:
+   **Überspringen**. Kam seit dem Termin schon eine Mail des Kontakts ins
+   Postfach, überspringt das Programm von allein.
+2. **Kundenerinnerung:** Häkchen „Kontakt etwa 6 Stunden vorher automatisch
+   erinnern" im Termin (nur mit Kontakt, der eine E-Mail-Adresse hat). Bei
+   Terminen vor 12 Uhr geht die Mail am Vorabend ab 18 Uhr; bei kurzfristig
+   vereinbarten Terminen entfällt sie, der Grund steht am Termin. Braucht den
+   Mailversand aus Abschnitt 5.
+3. **Lead aus Termin:** Häkchen „In der Akquise als Lead anlegen" beim
+   Anlegen. Gibt es zur Adresse schon einen Lead, wird nur verknüpft.
+4. **Bestätigungstext:** Auf der Terminseite unter „Terminbestätigung" →
+   **Text ansehen**, bei Bedarf **Vorschlag neu erzeugen** (KI, 1 Credit) und
+   anpassen, dann **Bestätigung vorbereiten**.
+5. **Doppelte Termine:** Gleicher Kontakt (oder gleiches Objekt) am selben Tag
+   mit gleicher Art → Rückfrage „Wirklich ein zweites Mal anlegen?".
+6. **Urlaub aus dem Kalender:** Im Termin-Dialog Art „Urlaub (Antrag)" wählen
+   — der Antrag geht an die Verwaltung, erscheint bis zur Entscheidung als
+   „Urlaub (beantragt)" im Kalender; der Mitarbeiter bekommt die Entscheidung
+   per Mail.
+7. **Personen:** Über dem Kalender mehrere Personen anklicken, um deren
+   Termine gemeinsam zu sehen.
+8. **Postfach:** Beim Schreiben **📅 Termin einfügen** — Datum und Uhrzeit
+   landen als Text in der Mail, mit Häkchen gleich als Kalendereintrag samt
+   Kalenderdatei. An einer eingegangenen Mail **Als Termin übernehmen**:
+   markieren Sie vorher die Textstelle mit Datum und Uhrzeit, dann ist der
+   Kalenderdialog vorbelegt.
+
 ## 10h. Werkzeuge — Bild-Editor, PDF, Grundriss, Wohnfläche, Energieausweis, Entfernungen
 
 Menü **Werkzeuge** (Rechte wie Objekte). Bild- und PDF-Bearbeitung laufen im

@@ -10,7 +10,7 @@ import { entschluesseln, verschluesseln } from "@/integrationen/kern/zugangsdate
 import { TERMINARTEN, type Terminart } from "@/lib/arbeitsmittel";
 import { rechtErzwingen } from "@/lib/auth/rechte";
 import { sitzungErzwingen, type Sitzung } from "@/lib/auth/sitzung";
-import { terminBestaetigungBetreff, terminBestaetigungText, terminOrtText } from "@/lib/kalender/bestaetigung";
+import { terminArtText, terminBestaetigungBetreff, terminBestaetigungText, terminOrtText } from "@/lib/kalender/bestaetigung";
 import { fahrtenPlanen, geokodieren, route, type Fahrt, type Fahrzeiten, type Koordinate, type Nachbar } from "@/lib/kalender/fahrzeit";
 import { regelAusWahl, serienDaten, type SerienRegel, type SerieTakt, type SerieWahl, SERIE_WAHL } from "@/lib/kalender/serie";
 import { kalenderAbgleichen, kalenderAnbieterErzeugen } from "@/lib/kalender/sync";
@@ -19,6 +19,7 @@ import { oauthKonfig } from "@/lib/postfach/oauth";
 import { zugangParsen } from "@/lib/postfach/typen";
 import { dienstClient } from "@/lib/supabase/dienst";
 import { serverClient } from "@/lib/supabase/server";
+import { kiVerfuegbar, textAnbieter } from "@/lib/ki";
 
 /**
  * Kalender (docs/FUNKTIONSABGLEICH.md K1/K2): Termine mit Teilnehmern,
@@ -34,6 +35,12 @@ export interface KalenderErgebnis {
   anzahl?: number;
   fahrzeit?: Fahrzeiten;
   token?: string;
+  /** Dublettenwarnung: gleicher Termin existiert schon — Rueckfrage im Dialog. */
+  doppelt?: string;
+  /** Bestaetigungstext (KI-Vorschlag oder Vorlage). */
+  text?: string;
+  kiVerwendet?: boolean;
+  hinweis?: string;
 }
 
 function text(formular: FormData, feld: string): string {
@@ -74,6 +81,7 @@ interface TerminFelder {
   privat: boolean;
   erinnerung_minuten: number | null;
   nachfassen: boolean;
+  erinnerung_kunde: boolean;
 }
 
 function terminFelder(formular: FormData, sitzung: Sitzung): { felder: TerminFelder; datum: string; zeit: string; dauer: number } | { fehler: string } {
@@ -114,6 +122,7 @@ function terminFelder(formular: FormData, sitzung: Sitzung): { felder: TerminFel
       privat: text(formular, "privat") === "1",
       erinnerung_minuten: erinnerung,
       nachfassen: text(formular, "nachfassen") !== "0",
+      erinnerung_kunde: text(formular, "erinnerung_kunde") !== "0",
     },
   };
 }
@@ -175,6 +184,18 @@ export async function terminSpeichern(_vorher: KalenderErgebnis, formular: FormD
     return { erfolg: anzahl > 1 ? `Termin und ${anzahl - 1} folgende gespeichert.` : "Termin gespeichert.", id, anzahl };
   }
 
+  // Dublettenwarnung (Referenz: „bereits im Kalender – wirklich ein zweites Mal anlegen?")
+  if (text(formular, "doppelt_bestaetigt") !== "1" && (felder.kontakt_id || felder.objekt_id)) {
+    let dq = supabase.from("termine").select("id, titel, beginnt_am").eq("mandant_id", sitzung.mandantId).is("geloescht_am", null).is("abgesagt_am", null).eq("art", felder.art)
+      .gte("beginnt_am", ausBerlin(datum, "00:00").toISOString()).lt("beginnt_am", ausBerlin(tagPlus(datum, 1), "00:00").toISOString());
+    dq = felder.kontakt_id ? dq.eq("kontakt_id", felder.kontakt_id) : dq.eq("objekt_id", felder.objekt_id as string);
+    const { data: gleich } = await dq.limit(1);
+    if (gleich && gleich.length > 0) {
+      const g = gleich[0]!;
+      return { doppelt: `„${g.titel as string}“ steht am ${datum.split("-").reverse().join(".")} um ${berlin(g.beginnt_am as string).zeit} Uhr bereits im Kalender${felder.kontakt_id ? " mit demselben Kontakt" : " für dasselbe Objekt"}. Wirklich ein zweites Mal anlegen?` };
+    }
+  }
+
   const regel = serieAusFormular(formular);
   const tage = regel ? serienDaten(datum, regel) : [datum];
   const serieId = regel && tage.length > 1 ? randomUUID() : null;
@@ -187,10 +208,12 @@ export async function terminSpeichern(_vorher: KalenderErgebnis, formular: FormD
   const { data, error } = await supabase.from("termine").insert(zeilen).select("id, beginnt_am").order("beginnt_am");
   if (error || !data || data.length === 0) return { fehler: "Der Termin konnte nicht gespeichert werden." };
   const erster = data[0]?.id as string;
+  let leadHinweis = "";
+  if (text(formular, "lead_anlegen") === "1") leadHinweis = await leadAusTermin(supabase, sitzung, erster, felder);
   await seiten(felder.objekt_id, felder.kontakt_id);
   if (bestaetigen) redirect(await bestaetigungsLink(supabase, sitzung, erster));
   if (text(formular, "weiter") === "detail") redirect(`/kalender/${erster}`);
-  return { erfolg: data.length > 1 ? `Serie mit ${data.length} Terminen angelegt.` : "Termin angelegt.", id: erster, anzahl: data.length };
+  return { erfolg: (data.length > 1 ? `Serie mit ${data.length} Terminen angelegt.` : "Termin angelegt.") + leadHinweis, id: erster, anzahl: data.length };
 }
 
 export async function terminLoeschen(formular: FormData): Promise<void> {
@@ -210,7 +233,7 @@ export async function terminLoeschen(formular: FormData): Promise<void> {
 // ---------------------------------------------------------------------------
 
 async function bestaetigungsLink(supabase: Supabase, sitzung: Sitzung, terminId: string): Promise<string> {
-  const { data: t } = await supabase.from("termine").select("id, art, beginnt_am, ganztags, ort, kontakt:kontakte(anrede, vorname, nachname, firma, email), objekt:objekte(objektnummer, bezeichnung, strasse, hausnummer, plz, ort)").eq("id", terminId).maybeSingle();
+  const { data: t } = await supabase.from("termine").select("id, art, beginnt_am, ganztags, ort, bestaetigung_text, kontakt:kontakte(anrede, vorname, nachname, firma, email), objekt:objekte(objektnummer, bezeichnung, strasse, hausnummer, plz, ort)").eq("id", terminId).maybeSingle();
   const { data: branding } = await supabase.from("mandant_branding").select("firmenname").eq("mandant_id", sitzung.mandantId).maybeSingle();
   if (!t) return `/kalender/${terminId}`;
   const k = t.kontakt as unknown as { anrede: string | null; vorname: string | null; nachname: string | null; firma: string | null; email: string | null } | null;
@@ -220,7 +243,7 @@ async function bestaetigungsLink(supabase: Supabase, sitzung: Sitzung, terminId:
     neu: "1",
     an: k?.email ?? "",
     betreff: terminBestaetigungBetreff(termin),
-    text: terminBestaetigungText(termin, k ?? {}, o, sitzung.name, (branding?.firmenname as string | null) ?? sitzung.mandantName),
+    text: (t.bestaetigung_text as string | null) || terminBestaetigungText(termin, k ?? {}, o, sitzung.name, (branding?.firmenname as string | null) ?? sitzung.mandantName),
     anhang_art: "termin",
     anhang_id: terminId,
   });
@@ -233,7 +256,149 @@ export async function terminBestaetigungVorbereiten(_vorher: KalenderErgebnis, f
   const id = uuid(formular, "id");
   if (!id) return { fehler: "Unbekannter Termin." };
   const supabase = await serverClient();
+  const eigener = String(formular.get("text") ?? "").trim();
+  if (eigener) await supabase.from("termine").update({ bestaetigung_text: eigener.slice(0, 8000) }).eq("id", id).eq("mandant_id", sitzung.mandantId);
   redirect(await bestaetigungsLink(supabase, sitzung, id));
+}
+
+// ---------------------------------------------------------------------------
+// Lead aus Termin (Referenz: „In der Akquise als Lead anlegen")
+// ---------------------------------------------------------------------------
+
+/**
+ * Legt zum Termin einen Akquise-Lead an — mit Kontakt und Objekt aus dem Termin.
+ * Gibt es zu der Adresse schon einen Lead, passiert nichts (Referenz).
+ * Rueckgabe: Zusatz fuer die Erfolgsmeldung.
+ */
+async function leadAusTermin(supabase: Supabase, sitzung: Sitzung, terminId: string, felder: TerminFelder): Promise<string> {
+  try { rechtErzwingen(sitzung.rolle, "akquise", "anlegen", sitzung.uebersteuerung); } catch { return " Lead nicht angelegt: kein Akquise-Recht."; }
+  let adresse: { strasse: string | null; hausnummer: string | null; plz: string | null; ort: string | null; titel: string; objektart: string | null } = { strasse: null, hausnummer: null, plz: null, ort: null, titel: felder.titel, objektart: null };
+  if (felder.objekt_id) {
+    const { data: o } = await supabase.from("objekte").select("bezeichnung, strasse, hausnummer, plz, ort, objektart").eq("id", felder.objekt_id).maybeSingle();
+    if (o) adresse = { strasse: (o.strasse as string | null) ?? null, hausnummer: (o.hausnummer as string | null) ?? null, plz: (o.plz as string | null) ?? null, ort: (o.ort as string | null) ?? null, titel: (o.bezeichnung as string) || felder.titel, objektart: (o.objektart as string | null) ?? null };
+  } else if (felder.ort) {
+    // „Musterstraße 12, 60311 Frankfurt" grob zerlegen
+    const m = /^(.*?)\s*(\d{1,4}\s?[a-zA-Z]?)?\s*,\s*(\d{5})?\s*(.*)$/.exec(felder.ort);
+    adresse = { ...adresse, strasse: m?.[1]?.trim() || felder.ort, hausnummer: m?.[2]?.replace(/\s+/g, "") ?? null, plz: m?.[3] ?? null, ort: m?.[4]?.trim() || null };
+  }
+  if (adresse.strasse) {
+    let dq = supabase.from("akquise_leads").select("id").eq("mandant_id", sitzung.mandantId).ilike("strasse", adresse.strasse);
+    if (adresse.hausnummer) dq = dq.ilike("hausnummer", adresse.hausnummer);
+    if (adresse.plz) dq = dq.eq("plz", adresse.plz);
+    const { data: vorhanden } = await dq.limit(1);
+    if (vorhanden && vorhanden.length > 0) {
+      await supabase.from("termine").update({ lead_id: vorhanden[0]!.id as string }).eq("id", terminId);
+      return " Zu der Adresse gibt es schon einen Lead — er ist mit dem Termin verknüpft.";
+    }
+  }
+  const { data: pipeline } = await supabase.from("akquise_pipelines").select("id").order("ist_standard", { ascending: false }).order("sortierung").limit(1).maybeSingle();
+  let pipelineId = (pipeline?.id as string | undefined) ?? null;
+  if (!pipelineId) { const { data } = await supabase.rpc("akquise_standard_anlegen"); pipelineId = typeof data === "string" ? data : null; }
+  if (!pipelineId) return " Lead nicht angelegt: keine Akquise-Pipeline.";
+  const { data: stufe } = await supabase.from("akquise_stufen").select("id").eq("pipeline_id", pipelineId).eq("ist_gewonnen", false).eq("ist_verloren", false).order("sortierung").limit(1).maybeSingle();
+  if (!stufe?.id) return " Lead nicht angelegt: Pipeline ohne offene Stufe.";
+  const { data: lead, error } = await supabase.from("akquise_leads").insert({
+    mandant_id: sitzung.mandantId, pipeline_id: pipelineId, stufe_id: stufe.id as string, titel: adresse.titel.slice(0, 200),
+    strasse: adresse.strasse, hausnummer: adresse.hausnummer, plz: adresse.plz, ort: adresse.ort, objektart: adresse.objektart,
+    kontakt_id: felder.kontakt_id, objekt_id: felder.objekt_id, zustaendig_id: felder.zustaendig_id, erstellt_von: sitzung.benutzerId,
+    notiz: `Aus dem Termin „${felder.titel}“ am ${berlin(felder.beginnt_am).datum.split("-").reverse().join(".")} angelegt.`,
+  }).select("id").single();
+  if (error || !lead) return " Lead nicht angelegt: " + (error?.message ?? "unbekannt");
+  await supabase.from("termine").update({ lead_id: lead.id as string }).eq("id", terminId);
+  revalidatePath("/akquise/leads");
+  return felder.kontakt_id ? " Akquise-Lead angelegt." : " Akquise-Lead angelegt — ohne Kontakt laufen Automationen und Terminbestätigungen nicht; später am Lead nachtragen.";
+}
+
+// ---------------------------------------------------------------------------
+// Bestaetigungstext: Vorlage oder KI-Vorschlag, editierbar, am Termin gespeichert
+// ---------------------------------------------------------------------------
+
+async function terminMitBezug(supabase: Supabase, sitzung: Sitzung, terminId: string) {
+  const { data: t } = await supabase.from("termine").select("id, titel, art, beginnt_am, endet_am, ganztags, ort, notiz, bestaetigung_text, kontakt:kontakte(anrede, vorname, nachname, firma, email), objekt:objekte(objektnummer, bezeichnung, objektart, objektkategorie, vermarktungsart, nutzungsart, strasse, hausnummer, plz, ort, wohnflaeche, zimmer, baujahr, kaufpreis, kaltmiete)").eq("id", terminId).eq("mandant_id", sitzung.mandantId).maybeSingle();
+  const { data: branding } = await supabase.from("mandant_branding").select("firmenname").eq("mandant_id", sitzung.mandantId).maybeSingle();
+  return { t, firma: (branding?.firmenname as string | null) ?? sitzung.mandantName };
+}
+
+/** Vorlagentext (ohne KI) fuer den Termin. */
+export async function terminBestaetigungVorlage(_vorher: KalenderErgebnis, formular: FormData): Promise<KalenderErgebnis> {
+  const sitzung = await sitzungErzwingen();
+  const id = uuid(formular, "id");
+  if (!id) return { fehler: "Unbekannter Termin." };
+  const supabase = await serverClient();
+  const { t, firma } = await terminMitBezug(supabase, sitzung, id);
+  if (!t) return { fehler: "Unbekannter Termin." };
+  const k = t.kontakt as unknown as { anrede: string | null; vorname: string | null; nachname: string | null; firma: string | null } | null;
+  const o = t.objekt as unknown as { objektnummer: string; bezeichnung: string; strasse: string | null; hausnummer: string | null; plz: string | null; ort: string | null } | null;
+  return { text: terminBestaetigungText({ art: t.art as string, beginnt_am: t.beginnt_am as string, ganztags: Boolean(t.ganztags), ort: (t.ort as string | null) ?? null }, k ?? {}, o, sitzung.name, firma), kiVerwendet: false };
+}
+
+/**
+ * „Vorschlag neu erzeugen" (Referenz): Der KI-Anbieter formuliert die
+ * Bestaetigung aus Termin- und Objektdaten plus Stichpunkten; 1 Credit,
+ * reserviert vor dem Aufruf, freigegeben bei Fehler. Ohne Modellzugang die
+ * Vorlage. Der Text ist editierbar und wird am Termin gespeichert.
+ */
+export async function terminBestaetigungVorschlag(_vorher: KalenderErgebnis, formular: FormData): Promise<KalenderErgebnis> {
+  const sitzung = await sitzungErzwingen();
+  rechtErzwingen(sitzung.rolle, "kalender", "aendern", sitzung.uebersteuerung);
+  const id = uuid(formular, "id");
+  if (!id) return { fehler: "Unbekannter Termin." };
+  const supabase = await serverClient();
+  const { t, firma } = await terminMitBezug(supabase, sitzung, id);
+  if (!t) return { fehler: "Unbekannter Termin." };
+  const k = t.kontakt as unknown as { anrede: string | null; vorname: string | null; nachname: string | null; firma: string | null } | null;
+  const o = t.objekt as unknown as Record<string, unknown> | null;
+  const termin = { art: t.art as string, beginnt_am: t.beginnt_am as string, ganztags: Boolean(t.ganztags), ort: (t.ort as string | null) ?? null };
+  const vorlage = terminBestaetigungText(termin, k ?? {}, o as { objektnummer: string; bezeichnung: string; strasse: string | null; hausnummer: string | null; plz: string | null; ort: string | null } | null, sitzung.name, firma);
+  if (!kiVerfuegbar()) {
+    await supabase.from("termine").update({ bestaetigung_text: vorlage }).eq("id", id);
+    return { text: vorlage, kiVerwendet: false, hinweis: "Ohne Modellzugang: Vorlagentext eingesetzt." };
+  }
+  const { data: vorgang, error } = await supabase.rpc("credits_reservieren", { p_aktion: "ki_terminbestaetigung", p_referenz_art: "termin", p_referenz_id: id });
+  if (error) return { fehler: `Keine KI-Formulierung möglich: ${error.message}` };
+  try {
+    const stichpunkte = text(formular, "stichpunkte").slice(0, 1000) || null;
+    const objektKontext = o ? {
+      objektkategorie: String(o["objektkategorie"] ?? ""), objektart: (o["objektart"] as string | null) ?? null, vermarktungsart: String(o["vermarktungsart"] ?? "kauf"), nutzungsart: String(o["nutzungsart"] ?? "wohnen"),
+      ort: (o["ort"] as string | null) ?? null, ortsteil: null, wohnflaeche: (o["wohnflaeche"] as number | null) ?? null, nutzflaeche: null, grundstuecksflaeche: null, zimmer: (o["zimmer"] as number | null) ?? null, baujahr: (o["baujahr"] as number | null) ?? null,
+      kaufpreis: (o["kaufpreis"] as number | null) ?? null, kaltmiete: (o["kaltmiete"] as number | null) ?? null, energie_klasse: null, energie_kennwert: null, stichpunkte: null,
+    } : null;
+    const e = await textAnbieter().antwortEntwerfen({
+      betreff: terminBestaetigungBetreff(termin),
+      text: `Bitte eine freundliche, kurze Terminbestätigung schreiben (kein Antwortbezug). Termin: ${terminArtText(t.art as string)} ${vorlage.split("\n").slice(2, 6).join(" ").trim()}. Der Kalendereintrag hängt als Datei an. Anrede exakt so: ${vorlage.split("\n")[0]}`,
+      stichpunkte, objekt: objektKontext, absenderName: sitzung.name, unternehmen: firma,
+    });
+    await supabase.rpc("credits_einloesen", { p_vorgang: vorgang as string, p_kosten_cent: e.kostenCent });
+    const ergebnis = e.text.trim() || vorlage;
+    await supabase.from("termine").update({ bestaetigung_text: ergebnis }).eq("id", id);
+    return { text: ergebnis, kiVerwendet: e.kiVerwendet, hinweis: e.kiVerwendet ? "KI-Vorschlag — bitte prüfen, dann senden." : "Ohne Modell: Vorlage." };
+  } catch (e) {
+    await supabase.rpc("credits_freigeben", { p_vorgang: vorgang as string, p_grund: (e instanceof Error ? e.message : "Fehler").slice(0, 200) });
+    return { fehler: `Vorschlag fehlgeschlagen — ${e instanceof Error ? e.message : "unbekannt"}` };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Nachfass-Vorschlaege (Referenz: Freigabe im Dashboard)
+// ---------------------------------------------------------------------------
+
+export async function nachfassEntscheiden(formular: FormData): Promise<void> {
+  const sitzung = await sitzungErzwingen();
+  rechtErzwingen(sitzung.rolle, "kalender", "aendern", sitzung.uebersteuerung);
+  const id = uuid(formular, "id");
+  const aktion = text(formular, "aktion");
+  if (!id) return;
+  const supabase = await serverClient();
+  const { data: v } = await supabase.from("nachfass_vorschlaege").select("id, betreff, text, status, kontakt:kontakte(email)").eq("id", id).eq("mandant_id", sitzung.mandantId).maybeSingle();
+  if (!v || v.status !== "offen") return;
+  if (aktion === "senden") {
+    const k = v.kontakt as unknown as { email: string | null } | null;
+    const p = new URLSearchParams({ neu: "1", an: k?.email ?? "", betreff: v.betreff as string, text: text(formular, "text").slice(0, 8000) || (v.text as string), nachfass_id: id });
+    redirect(`/postfach?${p.toString()}`);
+  }
+  const status = aktion === "ueberspringen" ? "uebersprungen" : "verworfen";
+  await supabase.from("nachfass_vorschlaege").update({ status, grund: aktion === "ueberspringen" ? "Kunde hat sich gemeldet o. ä." : "verworfen", entschieden_am: new Date().toISOString(), entschieden_von: sitzung.benutzerId }).eq("id", id);
+  revalidatePath("/dashboard");
 }
 
 // ---------------------------------------------------------------------------

@@ -9,7 +9,7 @@ import { syncAusfuehren, type LaufEingabe } from "@/integrationen/kern/lauf";
 import { connectorFinden } from "@/integrationen/kern/registry";
 import { SpeicherSupabase } from "@/integrationen/kern/speicher-supabase";
 import { entschluesseln, objektEntschluesseln, verschluesseln } from "@/integrationen/kern/zugangsdaten";
-import { terminErinnerungenSenden } from "@/lib/kalender/erinnerungen";
+import { kundenErinnerungenSenden, terminErinnerungenSenden } from "@/lib/kalender/erinnerungen";
 import { kalenderAbgleichen, kalenderAnbieterErzeugen } from "@/lib/kalender/sync";
 import { mailSenden } from "@/lib/mail/versand";
 import { istVorlage, vorlage } from "@/lib/mail/vorlagen";
@@ -131,6 +131,7 @@ export async function tagesarbeiten(): Promise<{
   akquiseLaeufe: number;
   nachfassen: number;
   erinnerungen: { gesendet: number; fehler: string | null };
+  kundenErinnerungen: { gesendet: number; uebersprungen: number; fehler: string | null };
   waechter: string | null;
   rueckrufe: { zugestellt: number; gescheitert: number } | string;
 }> {
@@ -149,6 +150,12 @@ export async function tagesarbeiten(): Promise<{
     erinnerungen = await terminErinnerungenSenden(supabase, globalThis.fetch);
   } catch (e) {
     erinnerungen = { gesendet: 0, fehler: e instanceof Error ? e.message : "unbekannt" };
+  }
+  let kundenErinnerungen: { gesendet: number; uebersprungen: number; fehler: string | null };
+  try {
+    kundenErinnerungen = await kundenErinnerungenSenden(supabase, globalThis.fetch);
+  } catch (e) {
+    kundenErinnerungen = { gesendet: 0, uebersprungen: 0, fehler: e instanceof Error ? e.message : "unbekannt" };
   }
   let waechter: string | null = null;
   try {
@@ -171,6 +178,7 @@ export async function tagesarbeiten(): Promise<{
     akquiseLaeufe: typeof akquiseLaeufe.data === "number" ? akquiseLaeufe.data : 0,
     nachfassen: typeof nachfassen.data === "number" ? nachfassen.data : 0,
     erinnerungen,
+    kundenErinnerungen,
     waechter,
     rueckrufe,
   };
