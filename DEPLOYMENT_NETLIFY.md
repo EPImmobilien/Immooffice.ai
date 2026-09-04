@@ -93,21 +93,42 @@ Credits doppelt gutgeschrieben.
 
 ### Erstes Deployment — Reihenfolge
 
-1. Repository verbinden, **Branch `claude/immooffice-master-prompt-v2-2zci7y`**
-   als zu bauenden Branch wählen (oder vorher nach `main` mergen).
-2. `NEXT_PUBLIC_SUPABASE_URL` und `NEXT_PUBLIC_SUPABASE_ANON_KEY` setzen —
-   ohne sie schlägt bereits die Middleware fehl und **jede** Seite antwortet
-   mit HTTP 500.
+1. Repository verbinden, **Branch `claude/autonomie-integrations-prompt-rl2qkr`**
+   als zu bauenden Branch wählen (das ist der aktuelle Stand mit allen
+   Arbeitspaketen; `docs/STATUS.md`). Klick-für-Klick: `docs/ANLEITUNG.md`,
+   Abschnitt 3a.
+2. `NEXT_PUBLIC_SUPABASE_URL` und `NEXT_PUBLIC_SUPABASE_ANON_KEY` stehen in
+   `netlify.toml` — nichts zu tun. Ohne sie schlägt bereits die Middleware fehl
+   und **jede** Seite antwortet mit HTTP 500.
 3. Deployment starten und die vergebene Adresse notieren.
-4. In Supabase unter *Authentication → URL Configuration* die Adresse als
-   *Site URL* und als *Redirect URL* eintragen. Ohne diesen Schritt schlägt die
-   Anmeldung ohne sichtbare Meldung fehl.
-5. Entscheiden, ob die **E-Mail-Bestätigung** aktiv sein soll. Ist sie aktiv,
+4. **Sofort nutzbar:** Anmeldung mit dem Demo-Zugang
+   `demo-makler@example.com` / `Demo-Portal-2026!` (Mandant „Demo Immobilien
+   GmbH", Testphase bis 31.12.2026, Onboarding abgeschlossen) oder mit dem
+   eigenen Konto des Auftraggebers. Die Anmeldung mit Passwort braucht keine
+   Weiterleitungsadresse.
+5. In Supabase unter *Authentication → URL Configuration* die Adresse als
+   *Site URL* und als *Redirect URL* eintragen. Ohne diesen Schritt schlagen
+   Registrierung mit E-Mail-Bestätigung und „Passwort vergessen" ohne sichtbare
+   Meldung fehl.
+6. Entscheiden, ob die **E-Mail-Bestätigung** aktiv sein soll. Ist sie aktiv,
    entsteht bei der Registrierung noch keine Sitzung; die Anwendung zeigt dann
    den Hinweis, die Adresse zuerst zu bestätigen. Für einen schnellen Test ist
    sie einfacher abgeschaltet, für den Produktivbetrieb gehört sie an.
-6. *Authentication → Policies*: **Schutz gegen bekannte geleakte Passwörter
+7. *Authentication → Policies*: **Schutz gegen bekannte geleakte Passwörter
    aktivieren** (Abschnitt 16 fordert ihn).
+8. Danach nach Bedarf die serverseitigen Schlüssel in Netlify setzen
+   (*Site configuration → Environment variables*), jeweils mit neuem Build:
+   `SUPABASE_SERVICE_ROLE_KEY` (Betreiberbereich `/plattform`, Einladungen,
+   Stripe-Rückrufe, Hintergrundjobs), `OPENAI_API_KEY` (KI-Texte, Auslesen,
+   Bild-KI), `MAIL_API_KEY`/`MAIL_ABSENDER` (Versand), `VERSCHLUESSELUNG_SCHLUESSEL`
+   (Integrationen, Postfächer), `JOB_GEHEIMNIS` (Hintergrund-Arbeiter),
+   Stripe-Testschlüssel (Abo). Ohne diese Werte läuft alles Übrige; die
+   betroffenen Stellen zeigen einen Hinweis statt eines Fehlers.
+
+**Grenzen auf Netlify:** Anfragen an Server Actions sind auf 6 MB begrenzt.
+Uploads über dieser Größe (RAW-Fotos, große PDFs) schlagen dort fehl, obwohl die
+Anwendung 12 MB zulässt — für große Dateien den Upload direkt in den Speicher
+(Storage) vorsehen, sobald der Betrieb es braucht.
 
 ## 3. Betrieb
 

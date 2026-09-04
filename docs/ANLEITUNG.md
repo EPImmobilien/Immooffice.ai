@@ -88,6 +88,48 @@ Domain** eintragen:
    `immooffice.ai` eingeben → Verify → Add domain. Das Zertifikat für HTTPS
    entsteht danach automatisch (kann bis zu einer Stunde dauern).
 
+## 3a. Die Anwendung aus GitHub auf Netlify bauen — Klick für Klick
+
+So kommen Sie ohne Werkzeuge auf dem eigenen Rechner in das laufende Programm.
+Sie brauchen nur Ihr GitHub- und Ihr Netlify-Konto.
+
+1. Auf netlify.com anmelden → **Add new site** (oben rechts bzw. auf der
+   Team-Übersicht) → **Import an existing project**.
+2. **GitHub** wählen. Beim ersten Mal fragt GitHub, für welche Repositories
+   Netlify zugreifen darf: `Immooffice.ai` freigeben.
+3. In der Liste das Repository **Immooffice.ai** anklicken.
+4. Im Formular „Site settings":
+   - **Branch to deploy:** `claude/autonomie-integrations-prompt-rl2qkr`
+     (das ist der aktuelle Stand — nicht den vorgeschlagenen Standard-Branch
+     lassen).
+   - **Build command:** `npm run build` (steht schon so in `netlify.toml`).
+   - **Publish directory:** `.next`.
+   - Umgebungsvariablen: **keine** nötig. Die Verbindung zur Datenbank steht
+     in `netlify.toml`.
+5. **Deploy** klicken. Der erste Bau dauert etwa fünf bis zehn Minuten.
+   Danach zeigt Netlify eine Adresse wie `https://<zufallsname>.netlify.app`.
+   Unter **Site configuration → Site details → Change site name** lässt sie
+   sich in `immooffice` oder Ähnliches umbenennen.
+6. Adresse öffnen → **Anmelden** → Demo-Zugang:
+   `demo-makler@example.com` / `Demo-Portal-2026!`. Sie landen direkt auf der
+   Übersicht des Mandanten „Demo Immobilien GmbH" (drei Objekte, vier Kontakte,
+   Aufgaben, Termine; Testphase bis 31.12.2026). Ihr eigenes Konto funktioniert
+   ebenfalls.
+7. Damit auch Registrierung, E-Mail-Bestätigung und „Passwort vergessen"
+   laufen: in Supabase → **Authentication → URL Configuration** die
+   Netlify-Adresse als Site URL und `https://<name>.netlify.app/auth/bestaetigen`
+   als Redirect URL eintragen (Abschnitt 4, Punkt 6).
+
+Was ohne weitere Schlüssel **nicht** geht und statt eines Fehlers einen Hinweis
+zeigt: KI-Erzeugung (Abschnitt 7), Mailversand (Abschnitt 5), Integrationen und
+Postfächer (Abschnitte 6 und 9), Abo-Kasse (Abschnitt 8), Betreiberbereich
+`/plattform` (braucht `SUPABASE_SERVICE_ROLE_KEY`, Abschnitt 4). Jeden Wert
+tragen Sie unter **Site configuration → Environment variables → Add a
+variable** ein und stoßen unter **Deploys → Trigger deploy** einen neuen Bau
+an.
+
+Jeder weitere Push auf den Branch baut die Site automatisch neu.
+
 ## 4. Supabase — die Datenbank
 
 Das Projekt `usguiggfciavwzkdfjgt` in Frankfurt gibt es bereits. Es wird

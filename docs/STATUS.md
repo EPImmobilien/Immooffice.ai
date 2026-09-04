@@ -5,6 +5,22 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 04.09.2026 — Inbetriebnahme: Demo-Zugang und Netlify-Anleitung
+
+- Auftraggeber möchte den Stand selbst bedienen, nicht nur Bildschirmfotos
+  sehen. Die Anwendung ist eine Server-Anwendung (Next.js mit Server Actions)
+  und läuft nicht als einzelne `index.html`; der Weg ist der Bau aus GitHub auf
+  Netlify (`docs/ANLEITUNG.md`, Abschnitt 3a; `DEPLOYMENT_NETLIFY.md`).
+  Ein Netlify-Token liegt nicht vor (`docs/ZUGAENGE_FEHLEND.md`), darum kann
+  die Entwicklung die Site nicht selbst anlegen.
+- Im Projekt `usguiggfciavwzkdfjgt` vorbereitet: Demo-Mandant „Demo Immobilien
+  GmbH" mit Onboarding abgeschlossen, Testphase bis 31.12.2026, Impressum,
+  Start-Credits; Passwort des Demo-Zugangs gegen den gespeicherten Hash
+  geprüft. Das Konto des Auftraggebers ist als Plattform-Administrator
+  eingetragen (`/plattform`, sobald der Dienstschlüssel gesetzt ist).
+- `/plattform` zeigt ohne `SUPABASE_SERVICE_ROLE_KEY` einen Hinweis statt
+  eines Serverfehlers.
+
 ## 04.09.2026 (Paket 15) — Verwaltung: Profil, Arbeitszeit, Urlaub, Kennzahlen, Bewerber, Protokoll, Plattform, Datenexport, Kündigung, PWA, Suche
 
 - Migration `20260904170000_verwaltung.sql` (im Projekt eingespielt): Profilfelder

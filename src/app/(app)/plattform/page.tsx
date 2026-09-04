@@ -19,6 +19,14 @@ export default async function PlattformSeite() {
   await sitzungErzwingen();
   const admin = await istPlattformAdmin().catch(() => false);
   if (!admin) notFound();
+  if (!process.env["SUPABASE_SERVICE_ROLE_KEY"]) {
+    return (
+      <>
+        <Seitenkopf titel="Plattform" beschreibung="Betreiberbereich: Mandanten, Tarife, Credits, Limits, Jobs, Support, Audit, Systemzustand." />
+        <Hinweis ton="warnung">Der Betreiberbereich liest Metadaten aller Mandanten und braucht dafür den Dienstschlüssel der Datenbank. Bitte <code>SUPABASE_SERVICE_ROLE_KEY</code> als Umgebungsvariable hinterlegen (nur serverseitig, siehe <code>docs/ANLEITUNG.md</code>, Abschnitt 4) und neu bauen.</Hinweis>
+      </>
+    );
+  }
   const dienst = dienstClient();
   const monat = new Date().toISOString().slice(0, 7);
   const [mandanten, benutzer, abos, tarife, preise, creditPreise, einstellungen, jobs, rueckrufe, stripe, support, audit, konten, buchungen, integrationen, jobsFehler, aktivitaet] = await Promise.all([
