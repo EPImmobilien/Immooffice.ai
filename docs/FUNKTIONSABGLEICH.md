@@ -1,5 +1,7 @@
 # Funktionsabgleich — Referenz 1:1 gegen ImmoOffice.ai
 
+> **Überholt (04.09.2026):** Dieses Dokument bewertet je Funktionsfamilie und ist zu grob. Maßgeblich ist jetzt [`docs/FUNKTIONSINVENTAR.md`](FUNKTIONSINVENTAR.md) — Stand je Bedienelement mit Fundstelle (E-2026-09-04-56).
+
 **Stand:** 03.09.2026 · Grundlage: Vorgabe des Auftraggebers vom 03.09.2026
 („es soll eine 1:1-Kopie der Referenz werden“), festgehalten als
 [E-2026-09-03-36](ENTSCHEIDUNGEN.md). Inventar der Referenz aus der Analyse auf
