@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Kachelgruppe, type KachelDaten } from "@/components/Kachel";
+import { Startkacheln, type StartkachelAnzeige } from "@/components/Startkacheln";
 import { Tutorial, type TutorialSchritt } from "@/components/Tutorial";
 import { Seitenkopf } from "@/components/Seitenkopf";
 import { Stempeluhr } from "@/components/verwaltung/Stempeluhr";
 import { buttonKlassen } from "@/components/ui/Button";
 import { Karte, KarteInhalt, KarteKopf, KarteTitel } from "@/components/ui/Karte";
 import { Hinweis, Marke } from "@/components/ui/Status";
-import { hatRecht, type Modul } from "@/lib/auth/rechte";
+import { hatRecht, ROLLEN_BEZEICHNUNG } from "@/lib/auth/rechte";
+import { kachelEinstellungLesen, STARTKACHELN } from "@/lib/kacheln";
 import { sitzungErzwingen } from "@/lib/auth/sitzung";
 import { datum, uhrzeit } from "@/lib/format";
 import { tutorialGesehen } from "@/server/arbeitsmittel-aktionen";
@@ -31,15 +32,18 @@ function verbleibendeTage(bis: string): number {
 }
 
 const TUTORIAL: TutorialSchritt[] = [
-  { id: "intro", ziel: null, titel: "Willkommen in ImmoOffice.ai", text: "In zwei Minuten gehen wir über die Startseite: Was heute ansteht, die Arbeitsbereiche als Kacheln und wo Sie was finden. Jederzeit überspringen — der Rundgang lässt sich unten auf der Startseite neu starten." },
-  { id: "heute", ziel: "heute", titel: "Heute-Zone", text: "Links die Termine des Tages, in der Mitte fällige und überfällige Aufgaben, rechts alles, was auf Sie wartet: Unterschriften, Mietanfragen, Leads zum Nachfassen, Treffer und Objektaufnahmen. Ein Klick führt direkt hin." },
-  { id: "tagesgeschaeft", ziel: "tagesgeschaeft", titel: "Tagesgeschäft", text: "Objektaufnahmen vor Ort, der Objektbestand, Kontakte mit Suchprofilen, die Akquise-Pipeline, Aufgaben und Termine. Die Zahl auf jeder Kachel zeigt, wo etwas liegt — betont, wenn es dringend ist." },
-  { id: "vermarktung", ziel: "vermarktung", titel: "Vermarktung", text: "Exposés mit KI-Texten und PDF, der Portalexport nach OpenImmo, Marketing-Vorlagen und die offene Wertermittlung als Akquise-Werkzeug." },
-  { id: "abwicklung", ziel: "abwicklung", titel: "Abwicklung", text: "Verträge aus Vorlagen mit Signaturlink, Übergaben und Notar-Laufzettel, Vermietung mit Anfragen und Mietverträgen, Checklisten als Arbeitsketten, Auswertungen." },
-  { id: "verwaltung", ziel: "verwaltung", titel: "Verwaltung", text: "Unternehmen, Erscheinungsbild, Rechtstexte, Team und Rechte, Postfächer, Integrationen und die eigene Schnittstelle — sowie Abo und Credits. Credits kosten nur KI-Erstellungen; Exporte sind kostenlos." },
-  { id: "notizen", ziel: "notizen", titel: "Notizen und Schnelleingabe", text: "Unter Aufgaben legen Sie mit einem Satz Aufgaben oder Notizen an: „Energieausweis anfordern morgen !! #unterlagen“. Ihre Notizen erscheinen hier auf der Startseite." },
-  { id: "ende", ziel: null, titel: "Los geht's", text: "Fragen beantwortet die Anleitung im Menü unter Einstellungen. Viel Erfolg!" },
+  { id: "intro", ziel: null, titel: "Willkommen in ImmoOffice.ai", text: "In zwei Minuten gehen wir über die Startseite: Was heute ansteht und die Arbeitsbereiche als Kacheln. Jederzeit überspringen — der Rundgang lässt sich unten auf der Startseite neu starten." },
+  { id: "heute", ziel: "heute", titel: "Heute-Zone", text: "Links die Termine des Tages, in der Mitte fällige und überfällige ToDos, rechts alles, was auf Sie wartet: Unterschriften, Mietanfragen, Leads zum Nachfassen, Treffer und Objektaufnahmen. Ein Klick führt direkt hin." },
+  { id: "kacheln", ziel: "kacheln", titel: "Arbeitsbereiche als Kacheln", text: "Jede Kachel öffnet einen Bereich mit seinen Unterkacheln: Immobilien, Adressbuch, Marketing, Verkauf, Vermietung, Exposé-Schmiede, KI-Agenten, Dokumente, Termine, Kundenbereich, ToDos, Arbeitszeit, Werkzeuge, Akquise, Admin, Finanzen, Rechnungen, Posteingang. Die Zahl auf der Kachel zeigt, wo etwas liegt. Mit „Anpassen“ ordnen Sie die Kacheln per Ziehen um oder blenden welche aus — je Benutzer gespeichert." },
+  { id: "notizen", ziel: "notizen", titel: "Notizen und Schnelleingabe", text: "Unter ToDos legen Sie mit einem Satz Aufgaben oder Notizen an: „Energieausweis anfordern morgen !! #unterlagen“. Ihre Notizen erscheinen hier auf der Startseite." },
+  { id: "ende", ziel: null, titel: "Los geht's", text: "Fragen beantwortet die Anleitung im Menü unter Admin. Viel Erfolg!" },
 ];
+
+/** Begruessung nach Tageszeit in Deutschland (Referenz: Guten Morgen / Tag / Abend). */
+function begruessung(): string {
+  const stunde = Number(new Intl.DateTimeFormat("de-DE", { hour: "numeric", hour12: false, timeZone: "Europe/Berlin" }).format(new Date()));
+  return stunde < 11 ? "Guten Morgen" : stunde < 18 ? "Guten Tag" : "Guten Abend";
+}
 
 export default async function UebersichtSeite({ searchParams }: { searchParams: Promise<{ tutorial?: string }> }) {
   const [p, sitzung] = await Promise.all([searchParams, sitzungErzwingen()]);
@@ -77,17 +81,12 @@ export default async function UebersichtSeite({ searchParams }: { searchParams: 
   );
   const heuteDatum = tagesbeginn.toISOString().slice(0, 10);
 
-  const [faelligAntwort, termineAntwort, aufnahmenAntwort] = await Promise.all([
+  const [faelligAntwort, aufnahmenAntwort] = await Promise.all([
     supabase
       .from("aufgaben")
       .select("id", { count: "exact", head: true })
       .is("erledigt_am", null)
       .lte("faellig_am", heuteDatum),
-    supabase
-      .from("termine")
-      .select("id", { count: "exact", head: true })
-      .is("abgesagt_am", null)
-      .gte("beginnt_am", tagesbeginn.toISOString()),
     supabase
       .from("objektaufnahmen")
       .select("id", { count: "exact", head: true })
@@ -103,172 +102,45 @@ export default async function UebersichtSeite({ searchParams }: { searchParams: 
     supabase.from("vertraege").select("id", { count: "exact", head: true }).eq("status", "versendet"),
     supabase.from("mietanfragen").select("id", { count: "exact", head: true }).eq("status", "neu"),
     supabase.from("akquise_leads").select("id", { count: "exact", head: true }).eq("status", "offen").eq("nachfassen", true).lte("nachfassen_am", heuteDatum),
-    supabase.from("benutzer").select("tutorial_gesehen_am").eq("id", sitzung.benutzerId).maybeSingle(),
+    supabase.from("benutzer").select("tutorial_gesehen_am, kacheln").eq("id", sitzung.benutzerId).maybeSingle(),
+  ]);
+  const vor14Tagen = new Date(tagesbeginn.getTime() - 14 * 86_400_000).toISOString();
+  const [ungelesen, ueberfaellig, anfragen14, projekte] = await Promise.all([
+    supabase.from("nachrichten").select("id", { count: "exact", head: true }).eq("gelesen", false).eq("ordner", "eingang"),
+    supabase.from("aufgaben").select("id", { count: "exact", head: true }).eq("typ", "aufgabe").not("status", "in", "(erledigt,verworfen)").lt("faellig_am", heuteDatum),
+    supabase.from("mietanfragen").select("id", { count: "exact", head: true }).gte("erstellt_am", vor14Tagen),
+    supabase.from("projekte").select("id", { count: "exact", head: true }),
   ]);
   const tutorialStarten = p.tutorial === "1" || (konto.data ? konto.data.tutorial_gesehen_am === null : false);
 
   const faellig = faelligAntwort.count ?? 0;
   const offeneAufnahmen = aufnahmenAntwort.count ?? 0;
-  const naechsteTermine = termineAntwort.count ?? 0;
 
   const objekte = objekteAntwort.data ?? [];
   const aktiv = objekte.filter((o) =>
     ["aktiv", "reserviert"].includes(o.status),
   ).length;
-  const inArbeit = objekte.filter((o) =>
-    ["akquise", "vorbereitung"].includes(o.status),
-  ).length;
-  const ohneTexte = 0; // wird mit der Exposé-Auswertung gefüllt
-  const kontakteAnzahl = kontakteAntwort.count ?? 0;
+    const kontakteAnzahl = kontakteAntwort.count ?? 0;
   const offeneTreffer = trefferAntwort.count ?? 0;
   const credits = typeof guthaben.data === "number" ? guthaben.data : 0;
 
-  const darf = (modul: Modul) =>
-    hatRecht(sitzung.rolle, modul, "lesen", sitzung.uebersteuerung);
-
-  const tagesgeschaeft: KachelDaten[] = [
-    darf("objekte") && {
-      titel: "Objektaufnahmen",
-      hinweis: "Der Vor-Ort-Termin, bevor ein Objekt entsteht",
-      symbol: "objekte" as const,
-      pfad: "/aufnahmen",
-      zahl: offeneAufnahmen,
-      zahlHinweis: "offen",
-      betont: offeneAufnahmen > 0,
-    },
-    darf("objekte") && {
-      titel: "Objekte",
-      hinweis: "Bestand, Neubau und Vermarktung",
-      symbol: "objekte" as const,
-      pfad: "/objekte",
-      zahl: aktiv,
-      zahlHinweis: inArbeit > 0 ? `${inArbeit} in Vorbereitung` : "aktiv",
-      betont: true,
-    },
-    darf("kontakte") && {
-      titel: "Kontakte",
-      hinweis: "Eigentümer, Interessenten, Dienstleister",
-      symbol: "kontakte" as const,
-      pfad: "/kontakte",
-      zahl: kontakteAnzahl,
-      zahlHinweis: "erfasst",
-    },
-    darf("kontakte") && {
-      titel: "Suchprofile",
-      hinweis: "Gesuche der Interessenten gegen den Bestand",
-      symbol: "suchprofile" as const,
-      pfad: "/suchprofile",
-      zahl: offeneTreffer,
-      zahlHinweis: offeneTreffer === 1 ? "offener Treffer" : "offene Treffer",
-    },
-    darf("akquise") && {
-      titel: "Akquise",
-      hinweis: "Eigentümer-Leads, Pipeline, Nachfassen, Kampagnen",
-      symbol: "kontakte" as const,
-      pfad: "/akquise",
-      zahl: nachfassen.count ?? 0,
-      zahlHinweis: "nachzufassen",
-      betont: (nachfassen.count ?? 0) > 0,
-    },
-    darf("kalender") && {
-      titel: "Aufgaben",
-      hinweis: "Was ansteht, mit Bezug zu Objekt und Kontakt",
-      symbol: "aufgaben" as const,
-      pfad: "/aufgaben",
-      zahl: faellig,
-      // „Fällig" statt „offen": Die Zahl soll den Blick auf das lenken, was
-      // heute liegen bleibt, nicht auf die Gesamtmenge.
-      zahlHinweis: "heute fällig",
-      betont: faellig > 0,
-    },
-    darf("kalender") && {
-      titel: "Termine",
-      hinweis: "Besichtigungen, Übergaben, Notartermine",
-      symbol: "kalender" as const,
-      pfad: "/kalender",
-      zahl: naechsteTermine,
-      zahlHinweis: "anstehend",
-    },
-  ].filter(Boolean) as KachelDaten[];
-
-  const vermarktung: KachelDaten[] = [
-    darf("exposes") && {
-      titel: "Exposés",
-      hinweis: "KI-Texte, fünf Vorlagen, PDF und Web",
-      symbol: "expose" as const,
-      pfad: "/exposes",
-      zahl: objekte.length,
-      zahlHinweis: "Objekte",
-      betont: true,
-    },
-    darf("objekte") && {
-      titel: "Portalexport",
-      hinweis: "OpenImmo für ImmoScout24, Immowelt, Kleinanzeigen",
-      symbol: "portale" as const,
-      pfad: "/portale",
-      zahl: ohneTexte > 0 ? ohneTexte : "—",
-      zahlHinweis: "bereit",
-    },
-    darf("marketing") && {
-      titel: "Marketing",
-      hinweis: "Social Media, Flyer, Schilder, Anschreiben",
-      symbol: "marketing" as const,
-      pfad: "/marketing",
-    },
-    darf("wertermittlung") && {
-      titel: "Wertermittlung",
-      hinweis: "Offene Rechenblätter nach ImmoWertV, als Akquiseinstrument",
-      symbol: "wertermittlung" as const,
-      pfad: "/wertermittlung",
-    },
-  ].filter(Boolean) as KachelDaten[];
-
-  const abwicklung: KachelDaten[] = [
-    darf("vertraege") && {
-      titel: "Verträge",
-      hinweis: "Aufträge, Reservierungen, Protokolle mit Signatur",
-      symbol: "vertraege" as const,
-      pfad: "/vertraege",
-    },
-    darf("vertraege") && {
-      titel: "Vermietung",
-      hinweis: "Mietanfragen, Mietverträge, Reservierungen",
-      symbol: "vertraege" as const,
-      pfad: "/vermietung",
-      zahl: anfragen.count ?? 0,
-      zahlHinweis: "neue Anfragen",
-      betont: (anfragen.count ?? 0) > 0,
-    },
-    darf("kalender") && {
-      titel: "Checklisten",
-      hinweis: "Arbeitsketten aus Vorlagen — Unterlagen, Akquise, Aufnahme",
-      symbol: "aufgaben" as const,
-      pfad: "/checklisten",
-    },
-    darf("auswertungen") && {
-      titel: "Auswertungen",
-      hinweis: "Bestand, Vermarktungsdauer, Abschlüsse",
-      symbol: "auswertungen" as const,
-      pfad: "/auswertungen",
-    },
-  ].filter(Boolean) as KachelDaten[];
-
-  const verwaltung: KachelDaten[] = [
-    darf("einstellungen") && {
-      titel: "Einstellungen",
-      hinweis: "Unternehmen, Erscheinungsbild, Rechtstexte, Zugänge",
-      symbol: "einstellungen" as const,
-      pfad: "/einstellungen",
-    },
-    darf("abrechnung") && {
-      titel: "Abo und Credits",
-      hinweis: "Tarif, Zusatznutzer, Guthaben",
-      symbol: "abrechnung" as const,
-      pfad: "/credits",
-      zahl: credits,
-      zahlHinweis: "Credits",
-    },
-  ].filter(Boolean) as KachelDaten[];
+  const verwaltung = sitzung.rolle === "inhaber" || sitzung.rolle === "administrator";
+  const kennzahlen: Record<string, { zahl: number; zahlHinweis: string; betont?: boolean }> = {
+    immobilien: { zahl: aktiv, zahlHinweis: `in Vermarktung bzw. reserviert${(projekte.count ?? 0) > 0 ? ` · ${projekte.count} Projekte` : ""}` },
+    kontakte: { zahl: kontakteAnzahl, zahlHinweis: "Kontakte" },
+    verkauf: { zahl: signaturen.count ?? 0, zahlHinweis: (signaturen.count ?? 0) === 1 ? "Unterschrift ausstehend" : "Unterschriften ausstehend", betont: (signaturen.count ?? 0) > 0 },
+    vermietung: { zahl: anfragen14.count ?? 0, zahlHinweis: `neue Mietanfrage${(anfragen14.count ?? 0) === 1 ? "" : "n"} (14 Tage)`, betont: (anfragen.count ?? 0) > 0 },
+    kalender: { zahl: (heuteTermine.data ?? []).length, zahlHinweis: (heuteTermine.data ?? []).length === 1 ? "Termin heute" : "Termine heute", betont: (heuteTermine.data ?? []).length > 0 },
+    todos: { zahl: faellig, zahlHinweis: (ueberfaellig.count ?? 0) > 0 ? `fällig, ${ueberfaellig.count} überfällig` : "heute fällig", betont: faellig > 0 },
+    akquise: { zahl: nachfassen.count ?? 0, zahlHinweis: "nachzufassen", betont: (nachfassen.count ?? 0) > 0 },
+    posteingang: { zahl: ungelesen.count ?? 0, zahlHinweis: (ungelesen.count ?? 0) === 1 ? "ungelesene Mail" : "ungelesene Mails", betont: (ungelesen.count ?? 0) > 0 },
+    finanzen: { zahl: credits, zahlHinweis: "Credits" },
+    immobilien_aufnahmen: { zahl: offeneAufnahmen, zahlHinweis: "offene Aufnahmen" },
+  };
+  const startkacheln: StartkachelAnzeige[] = STARTKACHELN
+    .filter((k) => (k.modul === null || hatRecht(sitzung.rolle, k.modul, "lesen", sitzung.uebersteuerung)) && (!k.nurVerwaltung || verwaltung))
+    .map((k) => ({ id: k.id, titel: k.titel, untertitel: k.untertitel, pfad: k.pfad, symbol: k.symbol, ...(kennzahlen[k.id] ?? {}) }));
+  const kachelEinstellung = kachelEinstellungLesen(konto.data?.kacheln);
 
   const testTage = verbleibendeTage(sitzung.testphaseBis);
 
@@ -290,8 +162,8 @@ export default async function UebersichtSeite({ searchParams }: { searchParams: 
   return (
     <>
       <Seitenkopf
-        titel={`Willkommen, ${sitzung.name.split(" ")[0]}`}
-        beschreibung={sitzung.mandantName}
+        titel={`${begruessung()}, ${sitzung.name.split(" ")[0]}`}
+        beschreibung={`Angemeldet als ${sitzung.name} · ${ROLLEN_BEZEICHNUNG[sitzung.rolle]} · ${sitzung.mandantName}`}
       >
         {hatRecht(sitzung.rolle, "objekte", "anlegen", sitzung.uebersteuerung) && (
           <Link href="/objekte/neu" className={buttonKlassen()}>
@@ -308,13 +180,6 @@ export default async function UebersichtSeite({ searchParams }: { searchParams: 
         </Hinweis>
       )}
 
-      <section className="mb-5">
-        <Karte>
-          <KarteKopf><KarteTitel>Stempeluhr</KarteTitel></KarteKopf>
-          <KarteInhalt><Stempeluhr heute={stempelHeute} sollHeute={sollHeute} vergessen={vergessen} /></KarteInhalt>
-        </Karte>
-      </section>
-
       <section data-tutorial="heute" className="mb-7 grid gap-4 lg:grid-cols-3">
         <Karte>
           <KarteKopf><KarteTitel>Heute</KarteTitel></KarteKopf>
@@ -325,12 +190,12 @@ export default async function UebersichtSeite({ searchParams }: { searchParams: 
           </KarteInhalt>
         </Karte>
         <Karte>
-          <KarteKopf><KarteTitel>Fällige Aufgaben</KarteTitel></KarteKopf>
+          <KarteKopf><KarteTitel>Fällige ToDos</KarteTitel></KarteKopf>
           <KarteInhalt>
             {(heuteAufgaben.data ?? []).length === 0 ? <p className="text-[13px] text-gedaempft">Nichts fällig.</p> : (
               <ul className="divide-y divide-linie text-[13px]">{(heuteAufgaben.data ?? []).map((a) => <li key={a.id} className="flex items-center gap-2 py-1.5"><Link href={`/aufgaben/${a.id}`} className="min-w-0 flex-1 truncate text-text hover:underline">{a.titel}</Link><Marke ton={a.faellig_am && a.faellig_am < heuteDatum ? "fehler" : "warnung"}>{a.faellig_am && a.faellig_am < heuteDatum ? "überfällig" : "heute"}</Marke></li>)}</ul>
             )}
-            <Link href="/aufgaben" className="mt-2 block text-[12px] text-akzent hover:underline">Alle Aufgaben</Link>
+            <Link href="/aufgaben" className="mt-2 block text-[12px] text-akzent hover:underline">Alle ToDos</Link>
           </KarteInhalt>
         </Karte>
         <Karte>
@@ -347,10 +212,14 @@ export default async function UebersichtSeite({ searchParams }: { searchParams: 
         </Karte>
       </section>
 
-      <div data-tutorial="tagesgeschaeft"><Kachelgruppe titel="Tagesgeschäft" kacheln={tagesgeschaeft} /></div>
-      <div data-tutorial="vermarktung"><Kachelgruppe titel="Vermarktung" kacheln={vermarktung} /></div>
-      <div data-tutorial="abwicklung"><Kachelgruppe titel="Abwicklung" kacheln={abwicklung} /></div>
-      <div data-tutorial="verwaltung"><Kachelgruppe titel="Verwaltung" kacheln={verwaltung} /></div>
+      <Startkacheln kacheln={startkacheln} einstellung={kachelEinstellung} />
+
+      <section className="mb-5 mt-2">
+        <Karte>
+          <KarteKopf><KarteTitel>Stempeluhr</KarteTitel></KarteKopf>
+          <KarteInhalt><Stempeluhr heute={stempelHeute} sollHeute={sollHeute} vergessen={vergessen} /></KarteInhalt>
+        </Karte>
+      </section>
 
       {(notizen.data ?? []).length > 0 && (
         <Karte className="mt-2" data-tutorial="notizen">

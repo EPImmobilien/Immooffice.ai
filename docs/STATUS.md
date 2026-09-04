@@ -5,6 +5,42 @@ Abschnitt 0.4 und 0.6. Neueste Einträge oben.
 
 ---
 
+## 04.09.2026 (Paket 16a) — Startseite und Modulseiten 1:1 als Kacheln
+
+Auftraggeber: „mehr an der Referenz halten und Kacheln bauen". Umsetzung
+(E-2026-09-04-56):
+
+- **Startseite** = Kachel-Raster in der Reihenfolge der Referenz (Immobilien,
+  Adressbuch, Marketing, Verkauf, Vermietung, Exposé-Schmiede, KI-Agenten,
+  Dokumente, Termine, Kundenbereich, ToDos, Arbeitszeit, Werkzeuge, Akquise,
+  Admin-Bereich, Finanzen, Rechnungen, Posteingang, Bewerber — ohne die
+  gestrichene Firmen-Cloud-Ablage). Begrüßung nach Tageszeit, „Angemeldet als",
+  Heute-Zone (Termine, fällige ToDos, „Wartet auf Sie"), Kennzahlen auf den
+  Kacheln (in Vermarktung, Unterschriften ausstehend, Mietanfragen 14 Tage,
+  Termine heute, fällig/überfällig, nachzufassen, ungelesene Mails, Credits).
+- **Anpassen-Modus** wie in der Referenz: Kacheln per Drag-and-drop
+  verschieben, mit ✕ ausblenden, Liste „Ausgeblendete Kacheln — wieder
+  einblenden", „Standard wiederherstellen" mit Rückfrage; je Benutzer
+  gespeichert (`benutzer.kacheln`, Migration `20260904180000`, im Projekt
+  eingespielt).
+- **Modulseiten mit Unterkacheln** (`src/lib/kacheln.ts`): `/immobilien`,
+  `/verkauf` (sieben Unterkacheln der Referenz), `/vermietung` (plus
+  Posteingang), `/marketing` (sechs Unterkacheln; Ablage und Print
+  gekennzeichnet), `/ki-agenten` (Exposé-Prüfer, Mietvertrags-Prüfer,
+  Assistent — „in Vorbereitung"), `/dokumente`, `/finanzen` (Liquidität und
+  Provisionen „nicht im Umfang"), `/admin` (elf Unterkacheln). Kacheln ohne
+  Gegenstück zeigen ihren Hinweis, nichts wird versteckt.
+- **Menü** in Reihenfolge und Wortwahl der Referenz (Termine, ToDos,
+  Adressbuch, Exposé-Schmiede, Admin …); Unterseiten markieren ihren
+  Modulpunkt als aktiv.
+- Prüfstand: Typecheck, Lint, Produktions-Build, Ende-zu-Ende gegen den
+  lokalen Stack (19 Kacheln, Ausblenden + Verschieben + Speichern + Neuladen,
+  Standard wiederherstellen, acht Modulseiten, Unterkachel → Zielseite,
+  Menü-Hervorhebung).
+- **Parallel:** Funktionsinventar der Referenz auf Ebene der Bedienelemente
+  (`docs/FUNKTIONSINVENTAR.md`, folgt im nächsten Commit). Es ersetzt den zu
+  groben `docs/FUNKTIONSABGLEICH.md` als Arbeitsliste.
+
 ## 04.09.2026 — Inbetriebnahme: Demo-Zugang und Netlify-Anleitung
 
 - Auftraggeber möchte den Stand selbst bedienen, nicht nur Bildschirmfotos

@@ -816,6 +816,27 @@ Ganzes streichen.
     Rückrufe neu starten, Supportfreigaben, Audit, Systemzustand. Inhalte der
     Mandanten sind dort nie sichtbar.
 
+## 10k. Startseite — Kacheln, Anpassen-Modus, Modulseiten
+
+Die Startseite zeigt oben die Heute-Zone (Termine des Tages, fällige ToDos,
+„Wartet auf Sie") und darunter die Arbeitsbereiche als Kacheln in derselben
+Reihenfolge wie in der Referenz. Die Zahl auf einer Kachel sagt, wo Arbeit
+liegt (zum Beispiel „2 Unterschriften ausstehend", „3 ungelesene Mails").
+
+1. **Kachel öffnen:** Klick → Modulseite mit Unterkacheln (Verkauf zum Beispiel:
+   Maklerverträge, Reservierungen, Objektnachweise, Objektbewertung,
+   Objektaufnahme, Übergabeprotokolle, Notar-Laufzettel). Unten auf jeder
+   Modulseite: „← Zurück zur Übersicht".
+2. **Anpassen:** Rechts über den Kacheln auf **✎ Anpassen**. Jetzt lassen sich
+   Kacheln mit gedrückter Maustaste verschieben und mit **✕** ausblenden.
+   Ausgeblendete Kacheln erscheinen darunter mit „wieder einblenden".
+   **✓ Fertig** speichert — nur für Sie, Kollegen behalten ihre Anordnung.
+3. **Standard wiederherstellen** setzt Reihenfolge und Ausblendungen zurück
+   (mit Rückfrage).
+4. Kacheln, deren Funktion noch fehlt oder laut Rahmen nicht übernommen
+   wird, tragen einen Hinweis („in Vorbereitung", „nicht im Umfang") statt
+   eines Links — so sehen Sie den Stand ohne Suchen.
+
 ## 11. Was Sie an Gate A und Gate B entscheiden
 
 - **Gate A** (bereits erreicht): Bestandsaufnahme, Funktionsmatrix, Architektur

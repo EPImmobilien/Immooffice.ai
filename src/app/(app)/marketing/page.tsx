@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { Modulkacheln, ZurueckZurUebersicht } from "@/components/Modulkacheln";
 import { Seitenkopf } from "@/components/Seitenkopf";
+import { MODULSEITEN } from "@/lib/kacheln";
 import { buttonKlassen } from "@/components/ui/Button";
 import { Karte, KarteInhalt } from "@/components/ui/Karte";
 import { Hinweis } from "@/components/ui/Status";
@@ -35,6 +37,8 @@ export default async function MarketingSeite({
         titel="Marketing"
         beschreibung="Motive entstehen aus den Objektdaten und Ihrem Branding — ohne Gestaltungsaufwand."
       />
+      <div className="mb-8"><Modulkacheln kacheln={MODULSEITEN["marketing"]!.kacheln} /></div>
+      <h2 id="vorlagen" className="mb-3 text-[12px] font-semibold tracking-wide text-gedaempft uppercase">Vorlagen</h2>
 
       {liste.length === 0 ? (
         <Karte>
@@ -119,6 +123,7 @@ export default async function MarketingSeite({
           </Hinweis>
         </>
       )}
+      <ZurueckZurUebersicht />
     </>
   );
 }

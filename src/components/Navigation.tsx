@@ -12,45 +12,36 @@ interface Eintrag {
   bezeichnung: string;
   /** In v0.1 noch nicht umgesetzt — sichtbar, aber als geplant gekennzeichnet. */
   geplant?: boolean;
+  /** Weitere Pfade, bei denen der Eintrag als aktiv gilt (Unterseiten des Moduls). */
+  auch?: string[];
 }
 
 /**
- * Hauptnavigation nach Abschnitt 6.
- *
- * Noch nicht umgesetzte Module bleiben sichtbar, sind aber deutlich als
- * geplant markiert. Das ist ehrlicher als eine kurze Liste, die den Umfang
- * verschweigt — und macht den Stand des Durchstichs sofort erkennbar.
+ * Hauptnavigation — Reihenfolge und Bezeichnungen wie das Menue der Referenz
+ * (E-2026-09-04-56). Die Kacheln der Startseite sind der eigentliche Einstieg;
+ * das Menue ist der schnelle Seitenwechsel.
  */
 const EINTRAEGE: Eintrag[] = [
   { modul: null, pfad: "/dashboard", bezeichnung: "Übersicht" },
-  // Vor den Objekten, weil die Aufnahme dem Objekt vorausgeht: erst der Termin
-  // beim Eigentuemer, dann — bei Auftrag — der Datensatz im Bestand.
-  { modul: "objekte", pfad: "/aufnahmen", bezeichnung: "Objektaufnahmen" },
-  { modul: "objekte", pfad: "/objekte", bezeichnung: "Objekte" },
-  { modul: "kontakte", pfad: "/kontakte", bezeichnung: "Kontakte" },
-  { modul: "kontakte", pfad: "/suchprofile", bezeichnung: "Suchprofile" },
-  { modul: "akquise", pfad: "/akquise", bezeichnung: "Akquise" },
-  { modul: "postfach", pfad: "/postfach", bezeichnung: "Postfach" },
-  { modul: "exposes", pfad: "/exposes", bezeichnung: "Exposés" },
-  { modul: "objekte", pfad: "/portale", bezeichnung: "Portalexport" },
-  { modul: "objekte", pfad: "/werkzeuge", bezeichnung: "Werkzeuge" },
-  { modul: "wertermittlung", pfad: "/wertermittlung", bezeichnung: "Wertermittlung" },
-  { modul: "vertraege", pfad: "/vertraege", bezeichnung: "Verträge" },
-  { modul: "vertraege", pfad: "/uebergaben", bezeichnung: "Übergaben" },
-  { modul: "vertraege", pfad: "/notar", bezeichnung: "Notar" },
-  { modul: "vertraege", pfad: "/vermietung", bezeichnung: "Vermietung" },
-  { modul: "portal", pfad: "/projekte", bezeichnung: "Neubauprojekte" },
-  { modul: "portal", pfad: "/kundenbereich", bezeichnung: "Kundenbereich" },
-  { modul: "rechnungen", pfad: "/rechnungen", bezeichnung: "Rechnungen" },
-  { modul: "rechnungen", pfad: "/briefe", bezeichnung: "Briefe" },
+  { modul: "objekte", pfad: "/immobilien", bezeichnung: "Immobilien", auch: ["/objekte", "/projekte", "/aufnahmen", "/portale", "/suchprofile"] },
+  { modul: "postfach", pfad: "/postfach", bezeichnung: "Posteingang" },
+  { modul: "kalender", pfad: "/aufgaben", bezeichnung: "ToDos", auch: ["/checklisten"] },
+  { modul: null, pfad: "/arbeitszeit", bezeichnung: "Arbeitszeit", auch: ["/urlaub"] },
+  { modul: "kalender", pfad: "/kalender", bezeichnung: "Termine" },
   { modul: "marketing", pfad: "/marketing", bezeichnung: "Marketing" },
-  { modul: "kalender", pfad: "/kalender", bezeichnung: "Kalender" },
-  { modul: "kalender", pfad: "/aufgaben", bezeichnung: "Aufgaben" },
-  { modul: "kalender", pfad: "/checklisten", bezeichnung: "Checklisten" },
-  { modul: "kalender", pfad: "/arbeitszeit", bezeichnung: "Arbeitszeit" },
-  { modul: "kalender", pfad: "/urlaub", bezeichnung: "Urlaub" },
-  { modul: "auswertungen", pfad: "/auswertungen", bezeichnung: "Auswertungen" },
-  { modul: "einstellungen", pfad: "/einstellungen", bezeichnung: "Einstellungen" },
+  { modul: "vertraege", pfad: "/verkauf", bezeichnung: "Verkauf", auch: ["/vertraege", "/uebergaben", "/notar"] },
+  { modul: "vertraege", pfad: "/vermietung", bezeichnung: "Vermietung" },
+  { modul: "wertermittlung", pfad: "/wertermittlung", bezeichnung: "Bewertung" },
+  { modul: "exposes", pfad: "/exposes", bezeichnung: "Exposé-Schmiede" },
+  { modul: "exposes", pfad: "/ki-agenten", bezeichnung: "KI-Agenten" },
+  { modul: "kontakte", pfad: "/kontakte", bezeichnung: "Adressbuch" },
+  { modul: "akquise", pfad: "/akquise", bezeichnung: "Akquise" },
+  { modul: "portal", pfad: "/kundenbereich", bezeichnung: "Kundenbereich" },
+  { modul: "objekte", pfad: "/dokumente", bezeichnung: "Dokumente", auch: ["/briefe"] },
+  { modul: "objekte", pfad: "/werkzeuge", bezeichnung: "Werkzeuge" },
+  { modul: "rechnungen", pfad: "/rechnungen", bezeichnung: "Rechnungen" },
+  { modul: "rechnungen", pfad: "/finanzen", bezeichnung: "Finanzen", auch: ["/auswertungen"] },
+  { modul: "einstellungen", pfad: "/admin", bezeichnung: "Admin", auch: ["/einstellungen"] },
   { modul: "abrechnung", pfad: "/credits", bezeichnung: "Abo und Credits" },
   { modul: null, pfad: "/einstellungen/profil", bezeichnung: "Mein Profil" },
 ];
@@ -67,8 +58,11 @@ export function Navigation({ erlaubteModule }: { erlaubteModule: Modul[] }) {
     <nav aria-label="Hauptnavigation" className="p-3">
       <ul className="space-y-0.5">
         {sichtbar.map((eintrag) => {
-          const aktiv =
-            pfad === eintrag.pfad || pfad.startsWith(`${eintrag.pfad}/`);
+          const trifft = (p: string) => pfad === p || pfad.startsWith(`${p}/`);
+          const profil = pfad.startsWith("/einstellungen/profil");
+          const aktiv = eintrag.pfad === "/einstellungen/profil"
+            ? profil
+            : !profil && (trifft(eintrag.pfad) || (eintrag.auch ?? []).some(trifft));
 
           return (
             <li key={eintrag.pfad}>

@@ -25,15 +25,17 @@ export default async function VermietungSeite() {
   return (
     <>
       <Seitenkopf titel="Vermietung" beschreibung="Mietanfragen mit Antwortvorlagen, Selbstauskunft, Mietverträge mit Unterschrift, Reservierungen und Übergaben." />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         <Kachel daten={{ titel: "Mietanfragen", hinweis: "Aus Portalen, dem Web-Exposé und dem Selbstauskunft-Formular — mit Bewertung und Antwortvorlagen", pfad: "/vermietung/anfragen", zahl: neu.count ?? 0, zahlHinweis: `neu von ${anfragen.count ?? 0}`, symbol: "kontakte" }} />
         <Kachel daten={{ titel: "Mietverträge", hinweis: "Wohnraummietvertrag aus Vorlage, Neubau-Klausel, PDF und Word, Unterschrift über den Signaturlink", pfad: "/vermietung/mietvertraege", zahl: mietvertraege.count ?? 0, zahlHinweis: "Verträge", symbol: "vertraege" }} />
         <Kachel daten={{ titel: "Reservierungen", hinweis: "Bestand reservieren, Vereinbarung erzeugen, Objektstatus folgt automatisch", pfad: "/vermietung/reservierungen", zahl: reservierungen.count ?? 0, zahlHinweis: "aktiv", symbol: "objekte" }} />
-        <Kachel daten={{ titel: "Übergaben", hinweis: "Einzug und Auszug mit Zählerständen, Schlüsseln und Unterschriften", pfad: "/uebergaben", zahl: uebergaben.count ?? 0, zahlHinweis: "Protokolle", symbol: "aufgaben" }} />
+        <Kachel daten={{ titel: "Übergabeprotokolle", hinweis: "Ein- und Auszug mit Zählerständen, Schlüsseln und Unterschriften", pfad: "/uebergaben", zahl: uebergaben.count ?? 0, zahlHinweis: "Protokolle", symbol: "aufgaben" }} />
+        <Kachel daten={{ titel: "Posteingang", hinweis: "E-Mails aus dem Postfach — Anfragen direkt zuordnen und beantworten", pfad: "/postfach", symbol: "postfach" }} />
       </div>
       <p className="mt-6 text-[12px] text-gedaempft">
         Selbstauskunft-Links und Antwortvorlagen verwalten Sie unter <Link href="/vermietung/anfragen" className="text-akzent hover:underline">Mietanfragen</Link>.
       </p>
+      <p className="mt-4 text-[13px]"><Link href="/dashboard" className="text-akzent hover:underline">← Zurück zur Übersicht</Link></p>
     </>
   );
 }

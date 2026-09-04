@@ -978,3 +978,30 @@ OpenImmo — Phase 2. Stripe (Phase 3), weitere Connectoren und Postfächer
 **Begründung:** Die Phasenordnung des Masterprompts, und OpenImmo hat dort
 ausdrücklich Vorrang vor allem anderen. Module vorzuziehen, deren Zugangsdaten
 noch fehlen, hieße, sie ungetestet zu bauen.
+
+### E-2026-09-04-56 — Kachel-Struktur 1:1 nach der Referenz; Funktionsinventar auf Bedienelement-Ebene ersetzt den groben Funktionsabgleich
+
+**Frage:** Der Auftraggeber sieht die Anwendung nicht als Abbild der Referenz:
+„mehr an der Referenz halten und Kacheln bauen, dutzende Funktionen fehlen".
+Der bisherige `docs/FUNKTIONSABGLEICH.md` setzte Haken je Funktionsfamilie,
+nicht je Schaltfläche; die Anwendung war über eine Seitenleiste und anders
+geschnittene Seiten organisiert.
+
+**Entscheidung:** (1) Die Startseite wird ein Kachel-Raster in der
+Reihenfolge und Wortwahl der Referenz, mit Anpassen-Modus je Benutzer
+(`benutzer.kacheln`); jede Kachel öffnet eine Modulseite mit denselben
+Unterkacheln (`src/lib/kacheln.ts`). Kacheln ohne Gegenstück zeigen „in
+Vorbereitung" oder „nicht im Umfang" statt zu fehlen. Das Menü folgt der
+Referenz; die eigene Gestaltung (Raster, Symbole, Farben) bleibt. Die laut
+Masterprompt gestrichenen Module (Firmen-Cloud-Ablage, Bürobildschirm,
+Liquidität, Provisionsrechner) erscheinen nur als Hinweis. (2) Die Referenz
+wird auf Ebene der Bedienelemente inventarisiert (`docs/FUNKTIONSINVENTAR.md`,
+Quelle: extrahierte Oberflächentexte je Komponente, nie die Referenzdatei als
+Ganzes). Jede Zeile trägt Stand ✓/◐/✗ mit Fundstelle; ein ✓ ohne Fundstelle
+gibt es nicht. Das Inventar ist ab jetzt die Arbeitsliste; der alte Abgleich
+bleibt als historisches Dokument stehen. (3) Reihenfolge der Lückenschließung:
+Termine, ToDos, Adressbuch, Immobilien-Akte, dann die übrigen Kacheln.
+
+**Folgen:** Erwartungen des Auftraggebers und Oberfläche decken sich; der
+Umfang der verbleibenden Arbeit ist sichtbar und zählbar. Kosten: Umbau von
+Startseite und Menü (Paket 16a), Pflege des Inventars je Paket.

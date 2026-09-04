@@ -24,7 +24,15 @@ export type SymbolName =
   | "abrechnung"
   | "portale"
   | "dokumente"
-  | "postfach";
+  | "postfach"
+  | "ki"
+  | "uhr"
+  | "werkzeuge"
+  | "kunden"
+  | "akquise"
+  | "bewerber"
+  | "finanzen"
+  | "schluessel";
 
 const PFADE: Record<SymbolName, React.ReactNode> = {
   objekte: (
@@ -129,6 +137,62 @@ const PFADE: Record<SymbolName, React.ReactNode> = {
     <>
       <rect x="3" y="5.5" width="18" height="13" rx="2" />
       <path d="m3.5 7 8.5 6 8.5-6" />
+    </>
+  ),
+  ki: (
+    <>
+      <path d="M12 3.5 13.8 9l5.7 1.8-5.7 1.8L12 18l-1.8-5.4L4.5 10.8 10.2 9Z" />
+      <path d="M19 16.5v3.5M17.3 18.3h3.4" />
+      <path d="M5 4v3M3.5 5.5h3" />
+    </>
+  ),
+  uhr: (
+    <>
+      <circle cx="12" cy="12.5" r="8" />
+      <path d="M12 8v5l3 2" />
+      <path d="M9.5 3h5" />
+    </>
+  ),
+  werkzeuge: (
+    <>
+      <path d="M14.5 6.5a4 4 0 0 1 5 5l-8.2 8.2a2 2 0 0 1-2.8-2.8L16.7 8.7" />
+      <path d="M14.5 6.5 12 4l-1.5 1.5L13 8" />
+      <path d="M4.5 19.5 8 16" />
+    </>
+  ),
+  kunden: (
+    <>
+      <path d="M3.5 11 12 4.5l8.5 6.5" />
+      <path d="M6 9.5V20h12V9.5" />
+      <circle cx="12" cy="13" r="2" />
+      <path d="M9 20c.4-2 1.5-3 3-3s2.6 1 3 3" />
+    </>
+  ),
+  akquise: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <circle cx="12" cy="12" r="4.5" />
+      <path d="M12 3.5v3M12 17.5v3M3.5 12h3M17.5 12h3" />
+    </>
+  ),
+  bewerber: (
+    <>
+      <circle cx="10" cy="8" r="3.3" />
+      <path d="M4 19.5c.5-3.2 3-5.2 6-5.2 1.3 0 2.5.4 3.5 1" />
+      <path d="m14.5 17.5 2 2 3.5-3.8" />
+    </>
+  ),
+  finanzen: (
+    <>
+      <ellipse cx="12" cy="7" rx="7" ry="3" />
+      <path d="M5 7v5c0 1.7 3.1 3 7 3s7-1.3 7-3V7" />
+      <path d="M5 12v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5" />
+    </>
+  ),
+  schluessel: (
+    <>
+      <circle cx="8" cy="12" r="4" />
+      <path d="M12 12h8.5M17.5 12v3M20.5 12v2.5" />
     </>
   ),
 };
