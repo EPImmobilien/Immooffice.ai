@@ -72,10 +72,10 @@ Ansprechpartner, Beispieldaten, Metadaten, Seitentitel, Open-Graph-Daten, Datein
 Variablenname, Kommentar, Seed-Datensatz, Standardwert, API-Payload, PDF-Metadatum oder
 E-Mail-Vorlage.
 
-- Prüfung: `npm run neutral` gegen die Blockliste in
+- Prüfung: `npm run neutral` (`scripts/neutral.sh`) gegen die Blockliste in
   [`docs/NEUTRALITAET.md`](docs/NEUTRALITAET.md) — Teil von `npm run check` und
-  damit Bedingung für jeden Commit. `scripts/marken-scan.sh` ist der Vorläufer
-  und bleibt bis zur Umstellung nutzbar.
+  damit Bedingung für jeden Commit. Es hat `scripts/marken-scan.sh` ersetzt;
+  zwei Gates mit derselben Aufgabe sind ein Gate zu viel.
 - `reference/` ist **nicht versioniert** und niemals Produktbestandteil.
 - Das Supabase-Projekt der Vorlage wird **nur lesend** und **nur für den
   Schema-Export in Phase 0** angefasst. Danach nicht mehr — kein Schreibzugriff,

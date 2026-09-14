@@ -223,22 +223,25 @@ Supabase-Projekt, oder ausdrückliche Freigabe zum Löschen.
       Auftrag widersprachen (Gate A/B, Modul-Streichungen, OpenImmo-Vorrang,
       eigenständiges Layout), sind korrigiert statt stehen gelassen
 - [x] Wortlaut aller 166 Migrationen der Vorlage als Exportweg gesichert
-      (Abschnitt 2.1)
+      (Abschnitt 2.1) — und dann als untauglich erkannt, siehe Abschnitt 7
+- [x] **Schema der Vorlage vollständig übernommen**, jede Sektion über eine
+      Prüfsumme gegen das Quellprojekt abgeglichen (Abschnitt 7)
+- [x] Neutralisierung als nachlesbares Skript: `scripts/neutralisieren.py`
+- [x] `npm run neutral` und `npm run check` eingerichtet, beide grün
+- [x] `tests/vorlage-vollstaendig.sql` — 15 Kennzahlen, alle gleich wie im
+      Quellprojekt
 
 ## 5. Als Nächstes
 
-1. Schema der Vorlage als Migrationen übernehmen — 166 Migrationen wörtlich,
-   in neue Zeitstempel umnummeriert, gegen die lokale Instanz geprüft und
-   gegen das Inventar der Vorlage abgeglichen (167 Tabellen, 320 Richtlinien,
-   84 Funktionen, 54 Trigger, 4 Sichten). Läuft ohne Ihre Mitwirkung.
-2. Buckets und Cron-Jobs übernehmen, Bearer auf den anon-Key von immooffice.
-   Die drei Schrift-Buckets mit Leerzeichen im Namen werden zu `schriften`
-   zusammengelegt.
-3. Neutralisierung und `npm run neutral` gegen die Blockliste.
-4. **Ihre Entscheidung** zu Abschnitt 3 (Altbestand) — nötig, bevor
+1. **Ihre Entscheidung** zu Abschnitt 3 (Altbestand) — nötig, bevor
    irgendetwas in das Projekt eingespielt wird. Bis dahin entsteht alles als
-   Datei, nichts in der Datenbank.
-5. Edge Functions: wartet auf Abschnitt 2.2.
+   Datei, nichts in der Datenbank. Der Rest von Phase 0 ist fertig.
+2. Zwei Vault-Einträge (`projekt_url`, `anon_key`) — `docs/OFFEN.md`, Punkt 1.
+   Ohne sie laufen die Cron-Jobs ins Leere.
+3. Edge Functions: wartet auf Abschnitt 2.2.
+4. Phase 1: `reference/epworld-src.html` in `src/` zerlegen, CDN-Versionen
+   festnageln, neutralisieren, `dist/index.html` bauen. Läuft ohne Ihre
+   Mitwirkung; danach **Gate 1**.
 
 ## 6. Sicherheitsbefund im Referenzprojekt
 
@@ -254,3 +257,79 @@ alter table public.suchkriterien_lauf enable row level security;
 
 Ohne passende Policy sperrt das anschließend **jeden** Zugriff, auch den der
 Anwendung. Erst Policy formulieren, dann aktivieren.
+
+---
+
+## 7. Der Schema-Export — was daraus geworden ist
+
+### Die Migrationsgeschichte war die falsche Quelle
+
+Der erste Plan war, die 166 Migrationen der Vorlage wörtlich zu übernehmen. Das
+wäre falsch gewesen: **64 der 167 Tabellen haben in diesen Migrationen kein
+`create table`.** Darunter sind die zentralen — `immobilien`, `profiles`,
+`firma_stammdaten`, `eigentuemer`, `dokumente`, `termine`, `vertraege`,
+`rechnungen`, alle `mail_*` und alle `liquid_*`. Sie sind älter als die
+Migrationsverwaltung des Projekts. Ein Nachspielen hätte ein Schema ergeben,
+dem ein Drittel fehlt — und das wäre erst beim ersten Start aufgefallen.
+
+Übernommen ist deshalb der **heutige Stand**, gelesen aus dem Systemkatalog.
+
+### Was übernommen ist
+
+| Gegenstand | Anzahl | Datei |
+|---|---|---|
+| Tabellen (2538 Spalten) | 167 | `20260915000100_vorlage_tabellen.sql` |
+| Sequenzen | 5 | dieselbe |
+| Primär-/Eindeutigkeitsschlüssel | 211 | `…000200_vorlage_schluessel.sql` |
+| Prüfbedingungen | 94 | dieselbe |
+| Fremdschlüssel | 273 | dieselbe |
+| Indizes | 243 | `…000300_vorlage_indizes.sql` |
+| Funktionen | 84 + 1 eigene | `…000400_vorlage_funktionen.sql` |
+| Sichten | 4 | `…000500_vorlage_sichten.sql` |
+| Trigger | 54 | `…000600_vorlage_trigger.sql` |
+| RLS und Rechte | 166 Tabellen | `…000700_vorlage_rls_und_rechte.sql` |
+| Richtlinien | 320 | `…000800_vorlage_richtlinien.sql` |
+| Buckets / Storage-Richtlinien | 22 / 59 | `…000900_vorlage_storage.sql` |
+| Cron-Jobs | 33 | `…001000_vorlage_cron.sql` |
+
+Aufzählungstypen hat die Vorlage keine — alles ist `text` mit Prüfbedingung.
+
+### Woran man erkennt, dass nichts verloren ging
+
+Zwei Prüfungen, keine Behauptung:
+
+1. **Prüfsumme je Sektion.** Das Quellprojekt hat für jede Sektion die
+   MD5-Summe über genau den Text gebildet, der geschrieben werden sollte;
+   nach dem Schreiben wurde sie lokal nachgerechnet. Keine Datei gilt als
+   exportiert, bevor sie stimmt. Drei Abweichungen sind dabei aufgefallen und
+   korrigiert — zwei Zeilenumbrüche in einem Standardwert, ein doppelter
+   Backslash, eine Escape-Folge in einem `E'…'`-Literal. Keine davon hätte
+   man beim Lesen gefunden.
+2. **`tests/vorlage-vollstaendig.sql`.** Spielt alle Migrationen auf eine leere
+   Instanz und vergleicht 15 Kennzahlen mit dem Quellprojekt. Alle 15 stimmen.
+
+Was das **nicht** zeigt: dass sich alles gleich verhält. Dafür fehlen die
+Oberfläche und die Edge Functions. Der Export beweist Vollständigkeit, nicht
+Gleichheit.
+
+### Was am Schema geändert wurde — und warum
+
+Vollständig und je Stelle begründet in `scripts/neutralisieren.py`. In Summe:
+
+- **22 Kennzeichen** des Referenzunternehmens aus Standardwerten und drei
+  Funktionskörpern entfernt. Wo es keine sinnvolle Vorbelegung gibt —
+  Anschrift, Bankverbindung, Steuernummern — entfällt der Standardwert, statt
+  eine Fantasieangabe einzusetzen.
+- **Projekt-URL und anon-Schlüssel** kommen aus dem Vault statt aus dem Code.
+  In der Vorlage steht der Schlüssel 33-mal im Klartext im Cron-Kommando.
+- **Drei Funktionen** lesen ihren Wert jetzt aus der Datenbank statt aus dem
+  Code — eigene Maildomain, Kleinanzeigen-Anbieternummer, Auswahl des
+  Absenders. Gleiche Absicht, nur mandantenfähig.
+- **Phase 1.4:** Bucket `shop-tv` samt vier Richtlinien und der Cron-Job
+  `jotform-sync-5min` entfallen. Sonst nichts.
+- **Drei Schrift-Buckets** mit Leerzeichen im Namen zu `schriften`
+  zusammengelegt.
+
+Nicht geändert: kein Tabellen- oder Spaltenname, keine Richtlinie, kein
+Trigger, keine Prüfbedingung. Auch nicht das `signatur_*`-Loch — das gehört
+in Phase 2.3.

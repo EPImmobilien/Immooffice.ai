@@ -41,7 +41,11 @@ Sachverständigen-Registriernummer.
 ```
 sipgate        Telefonie der Referenz — entfällt
 Yodeck         Shop-TV der Referenz — entfällt
-JotForm        Formular-Sync der Referenz — entfällt
+JotForm        kein Kennzeichen der Referenz, sondern ein Fremdprodukt
+               wie onOffice. Nur der Sync auf das Konto der Referenz
+               entfällt (Cron-Job, zwei Edge Functions). Tabelle
+               jotform_formulare und die Spalten in mietanfragen
+               bleiben — Phase 9 verbietet das Entfernen.
 Sprengnetter   Bewertungsschnittstelle der Referenz — entfällt
 ```
 
@@ -100,3 +104,26 @@ npm run check        # Build + Syntax + Smoke + Gate + tests/mandant.sql
 ```
 
 Das Gate ist Teil von `npm run check`. Kein Commit ohne grünes `check`.
+
+
+## Nachtrag 14.09.2026 — was der Schema-Export konkret ergeben hat
+
+Die Blockliste ist keine Vorsichtsmaßnahme; im Schema der Vorlage standen
+tatsächlich Kennzeichen. Gefunden und ersetzt (vollständige Liste mit Begründung
+je Stelle in `scripts/neutralisieren.py`):
+
+| Ort | Art |
+|---|---|
+| `firma_stammdaten` | 13 Spalten-Standardwerte: Firmenname, Anschrift, E-Mail, Registergericht, HRB, Geschäftsführer, Steuernummer, USt-IdNr., Bank, IBAN, BIC, Grußformel |
+| `kosten_saetze` | Büroanschrift und Bürokoordinaten als Standardwert |
+| `provision_tracker` | Vorname eines Mitarbeiters als Standardwert |
+| `vertraege`, `objektnachweise`, `reservierungen_neubau` | Standort der Referenz als Standardwert |
+| `mail_eingang_anfrage_vorfilter()` | Maildomain der Referenz fest im Code |
+| `portal_importbericht_auswerten()` | Anzeigen-Pfad des Kleinanzeigen-Kontos der Referenz |
+| `rechnung_vorlage_aus_objektnachweis()` | Auswahl des Absenders über den Firmennamen |
+| drei Funktionen, 33 Cron-Jobs | URL des fremden Supabase-Projekts, dazu dessen anon-Schlüssel im Klartext |
+
+**Keine erfundenen Ersatzdaten.** Wo es keine sinnvolle Vorbelegung gibt —
+Anschrift, Bankverbindung, Steuernummern —, entfällt der Standardwert, statt
+eine Musteradresse oder eine Fantasie-IBAN einzusetzen. Nur beim Firmennamen
+steht ein erkennbarer Platzhalter, weil die Spalte `not null` ist.
