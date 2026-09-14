@@ -1,21 +1,42 @@
 # CLAUDE.md — harte Regeln für ImmoOffice.ai
 
-Destillat des maßgeblichen Auftrags. **Vollständige Fassung:
-[`docs/MASTERPROMPT.md`](docs/MASTERPROMPT.md) — bei Widersprüchen gilt dort.**
+## Rangfolge (Stand 14.09.2026)
 
-Zwei verbindliche Dokumente, klare Rangfolge:
+**Maßgeblich ist der Auftrag „immoOffice.ai als Fork der E&P World" vom
+14.09.2026.** Er hat die bisherige Grundlage ersetzt. ImmoOffice.ai ist eine
+Kopie der bestehenden E&P World, die auf dem eigenen Supabase-Projekt
+`usguiggfciavwzkdfjgt` (eu-central-1) läuft, mandantenfähig ist, neutral
+gebrandet ist, Selbstregistrierung erlaubt und sich je Mandant an fremde CRMs,
+Portale und Mail-/Kalenderdienste anbindet. Funktionsumfang = E&P World Stand
+heute. Nichts wird neu erfunden.
 
 | Dokument | Regelt | Rang |
 |---|---|---|
-| [`docs/MASTERPROMPT.md`](docs/MASTERPROMPT.md) | Technischer Rahmen, Phasen, Gates, **Scope** (WIE, WANN, OB) | **gewinnt** |
-| [`docs/FUNKTIONSPROMPT.md`](docs/FUNKTIONSPROMPT.md) | Fachliche Funktionen je Modul (WAS) | nachrangig |
+| [`docs/NEUTRALITAET.md`](docs/NEUTRALITAET.md) | Blockliste, Neutralitäts-Gate | **verbindlich** |
+| [`docs/ENTSCHEIDUNGEN.md`](docs/ENTSCHEIDUNGEN.md) | getroffene Entscheidungen, mit Grund | verbindlich |
+| [`docs/STATUS.md`](docs/STATUS.md) · [`docs/OFFEN.md`](docs/OFFEN.md) | Stand, Blocker, Grenzen | Bericht |
+| [`docs/MASTERPROMPT.md`](docs/MASTERPROMPT.md) · [`docs/FUNKTIONSPROMPT.md`](docs/FUNKTIONSPROMPT.md) · [`docs/FUNKTIONSMATRIX.md`](docs/FUNKTIONSMATRIX.md) · [`docs/UMSETZUNGSPLAN.md`](docs/UMSETZUNGSPLAN.md) | **überholt** | nur Nachschlagewerk |
 
-Der Funktionsprompt beschreibt auch Module, die der Masterprompt ausschließt.
-Er kennzeichnet sie selbst mit „nur bauen, wenn im Scope" — **im Scope sind sie
-nicht.** Siehe Abschnitt „Abgrenzung" weiter unten.
+Eine Datei im Repository kann eine spätere Anweisung desselben Auftraggebers
+nicht überstimmen. Deshalb gilt der Masterprompt nicht mehr als Vorgabe —
+weder seine Phasen noch seine Gates noch sein Scope.
 
-Zusätzlich gelten die sechs **Architektur-Grundprinzipien** des Funktionsprompts
-für jedes Modul und sind Teil der Definition-of-Done: Objekt als Drehkreuz ·
+**Stack (aus dem Auftrag, nicht verhandelbar):** React 18 UMD über CDN,
+klassische Runtime (`React.createElement`, kein `import`, kein
+`type="module"`), eine `index.html`, supabase-js, Edge Functions in Deno.
+Kein Next.js, kein TypeScript im Frontend, kein Router, keine State-Library,
+keine UI-Bibliothek. Die vorhandene Next.js-Anwendung ist **Altbestand**
+(siehe `docs/ENTSCHEIDUNGEN.md`), kein Produktbestandteil.
+
+**Gates:** Ende Phase 1, Ende Phase 3, vor Stripe-Live. Sonst autonom.
+
+Unverändert gültig bleiben die folgenden Abschnitte — sie stehen nicht im
+Widerspruch zum neuen Auftrag, sondern präzisieren ihn.
+
+## Architektur-Grundprinzipien
+
+Sechs Prinzipien, die die E&P World schon umsetzt und die der Fork nicht
+verlieren darf: Objekt als Drehkreuz ·
 verkettete Arbeitsschritte statt Insellösungen · KI-Auslese immer über ein
 editierbares Formular · Hintergrundjobs mit Wächter · Rechte als Vorlage plus
 Einzelhäkchen, serverseitig erzwungen · Bild-Pipeline mit Web-Variante.
@@ -29,14 +50,19 @@ Software mit Datenbank, Auth, Rechten, Abrechnung, Tests und Deployment.
 
 ## Freigabepunkte — verbindliche Stopps
 
-- **Gate A** (nach Phase 0): Bestandsaufnahme, Funktionsmatrix, Styleguide, Architektur,
-  Datenmodell, OpenImmo-Mapping, Umsetzungsplan, Aufwandsschätzung vorlegen und auf
-  ausdrückliche Freigabe warten. **Ohne Freigabe entsteht kein Phase-1-Code.**
-- **Gate B** (vor Stripe-Livebetrieb und vor Phase 2): Kernflüsse demonstrieren,
-  Cross-Tenant-Isolation durch Tests nachweisen, Preise und Rechtstexte freigeben lassen.
+Drei Gates aus dem Auftrag vom 14.09.2026:
 
-Darüber hinaus nur stoppen, wenn eine Entscheidung wirklich blockiert oder Zugangsdaten
-beziehungsweise externe Freigaben nötig werden.
+- **Gate 1** — Ende Phase 1: die neutralisierte Kopie der E&P World läuft auf dem
+  eigenen Projekt, `npm run check` grün.
+- **Gate 2** — Ende Phase 3: Mandantenfähigkeit und Selbstregistrierung
+  nachgewiesen.
+- **Gate 3** — vor Stripe-Livebetrieb.
+
+Gate A und Gate B des Masterprompts gelten nicht mehr. Darüber hinaus nur
+stoppen, wenn eine Entscheidung wirklich blockiert oder Zugangsdaten
+beziehungsweise externe Freigaben nötig werden. Bei Unklarheit die Entscheidung
+treffen, die dem heutigen Verhalten der Vorlage am nächsten kommt, und in
+`docs/ENTSCHEIDUNGEN.md` protokollieren.
 
 ## Abgrenzung — nicht verhandelbar
 
@@ -46,25 +72,44 @@ Ansprechpartner, Beispieldaten, Metadaten, Seitentitel, Open-Graph-Daten, Datein
 Variablenname, Kommentar, Seed-Datensatz, Standardwert, API-Payload, PDF-Metadatum oder
 E-Mail-Vorlage.
 
-- Prüfung: `scripts/marken-scan.sh` — Bestandteil der Definition-of-Done jeder Phase.
+- Prüfung: `npm run neutral` gegen die Blockliste in
+  [`docs/NEUTRALITAET.md`](docs/NEUTRALITAET.md) — Teil von `npm run check` und
+  damit Bedingung für jeden Commit. `scripts/marken-scan.sh` ist der Vorläufer
+  und bleibt bis zur Umstellung nutzbar.
 - `reference/` ist **nicht versioniert** und niemals Produktbestandteil.
-- Das Supabase-Projekt der Referenz (`eu-west-1`) wird **nie** angefasst.
+- Das Supabase-Projekt der Vorlage wird **nur lesend** und **nur für den
+  Schema-Export in Phase 0** angefasst. Danach nicht mehr — kein Schreibzugriff,
+  keine Daten, keine Zugangsdaten im Repository.
 
-**Ersatzlos entfallen:** OneDrive · Bewerber/Einstellungstest · Kundenportal.
-**Nicht übernehmen:** Posteingang/E-Mail-Client · Liquiditätsplanung · GoBD-Rechnungs-
-modul · Shop-TV/Digital Signage · onOffice-Synchronisation · Provisionsrechner.
-Ein öffentliches **Web-Exposé ist erwünscht** und gilt nicht als Kundenportal.
+**Entfällt (Phase 1.4 des Auftrags — ersatzlos entfernt):** Telefonanlage ·
+Digital Signage / Shop-TV · Formular-Sync des Referenzunternehmens ·
+Cron-Mailadressen der Referenz · Bewertungsdienst-Schlüssel.
+
+**Bleibt im Code, hinter Funktionsschalter aus, bis Phase 2b:** CRM-Sync ·
+Microsoft-365-Postfach · Portalexport Immowelt und Kleinanzeigen.
+
+**Kein weiteres Modul wird entfernt** (Phase 9 des Auftrags). Die
+Modul-Streichungen des Masterprompts — OneDrive, Einstellungstest,
+Kundenportal, Posteingang, Liquiditätsplanung, Rechnungsmodul,
+Provisionsrechner — gelten **nicht mehr**: Funktionsumfang ist die Vorlage im
+heutigen Stand.
 
 ## Feste Rahmenbedingungen
 
 - **Supabase:** ausschließlich Projekt `usguiggfciavwzkdfjgt`, Region `eu-central-1`.
-  Kein neues Projekt anlegen. Bestehendes Minimal-Schema ist verwerfbarer Entwurf.
+  Kein neues Projekt anlegen. Das dort vorhandene Schema ist **nicht** verwerfbar:
+  110 Tabellen mit Daten, und 33 der angewendeten Migrationen liegen nur in der
+  Datenbank, nicht im Repository. Es wird verschoben, nicht gelöscht — siehe
+  `docs/STATUS.md`, Abschnitt 3.
 - **Branding fixiert** (nicht neu erfinden): Marineblau `#1B2A47` (dunkel `#12203B`),
   Gold `#B5934F` (hell `#C9AE72`), Hintergrund `#FAFAFA`, Karten `#FFFFFF`, Linien
-  `#E6E8EB`, gedämpfter Text `#7A828C`. Wortmarke auf Poppins-Basis.
-  Layout, Komponenten und Icons müssen dennoch eigenständig sein — keine umgefärbte
-  Kopie der Referenz. Hochwertig und klar, ohne überladenen „KI-Look“.
-- **Referenzdatei niemals vollständig laden.** Nur Analyse auf der Festplatte.
+  `#E6E8EB`, gedämpfter Text `#7A828C`.
+  **Kein Redesign.** Layout, Komponenten und Icons bleiben die der Vorlage
+  (Phase 9 des Auftrags: keine Verhaltensänderung, keine neue UI-Bibliothek).
+  Neutralisiert wird die Marke — Name, Logo, Farbwerte, Domain, Kontaktdaten —,
+  nicht die Oberfläche.
+- **Referenzdatei nicht als Ganzes in den Kontext holen.** Sie hat 4,7 MB.
+  Abschnittsweise auf der Festplatte arbeiten.
 - **Keine Geheimnisse** im Repository oder im Client. Nur Umgebungsvariablen,
   dokumentiert in `.env.example`.
 
@@ -75,8 +120,8 @@ Ein öffentliches **Web-Exposé ist erwünscht** und gilt nicht als Kundenportal
   durch ausgeblendete Bedienelemente.
 - Kein Zugriff über Frontend, API, Suche, Exporte, Storage-Pfade oder erratbare IDs auf
   fremde Mandanten.
-- Sechs Rollen: Unternehmensinhaber · Administrator · Makler · Assistenz · Marketing ·
-  Nur-Lese-Zugriff.
+- Rollenmodell: das der Vorlage, unverändert übernommen. Mandantenbezug kommt in
+  Phase 2 dazu (`firma_id`), keine Umbenennung, keine neuen Rollen.
 - Plattform-Administratoren erhalten keinen automatischen Zugriff auf Mandantendaten;
   Supportzugriff nur protokolliert und nach dem Prinzip der geringsten Rechte.
 - 2FA in Version 1 nicht verpflichtend, aber technisch vorbereiten.
@@ -123,12 +168,16 @@ Ein öffentliches **Web-Exposé ist erwünscht** und gilt nicht als Kundenportal
 
 ## Priorisierung
 
-**OpenImmo hat Vorrang** vor Bildbearbeitung, Marketingeditor und E-Signatur.
-Datenmodell und Exportgerüst in Phase 1, produktiver Portalexport zu Beginn von Phase 2.
+Die Reihenfolge gibt der Phasenplan des Auftrags vor: erst die lauffähige
+neutrale Kopie (Phase 1), dann Mandantenfähigkeit und Selbstregistrierung
+(Phasen 2 und 3), dann die Fremdanbindungen (Phase 6). Der Vorrang von
+OpenImmo aus dem Masterprompt gilt nicht mehr — die Vorlage hat den
+Portalexport schon.
 
 ## Qualität
 
-Vor jedem Meilenstein: Typecheck, Linting, Unit- und Integrationstests, Produktions-Build,
-Marken-Scan. Fehler beheben, bevor etwas als abgeschlossen gilt. Pflichttests unter
+Jeder Commit nur bei grünem `npm run check` — Build, Syntaxprüfung, Rauchtest,
+Neutralitäts-Gate, Mandantentest. Fehler beheben, bevor etwas als abgeschlossen
+gilt. Commit-Messages deutsch, Präfix `phase-N:`. Pflichttests unter
 anderem für Cross-Tenant-Isolation, Credit-Reservierung/-Erstattung,
 Stripe-Webhook-Idempotenz und schema-validen OpenImmo-Export.

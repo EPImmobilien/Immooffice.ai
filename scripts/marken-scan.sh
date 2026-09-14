@@ -28,8 +28,14 @@ MARKEN='engfer|engferundpartner|e&p ?world|ep-?world|epworld|epimmobilien'
 # Fremdes Supabase-Projekt der Referenz (eu-west-1) — darf nie referenziert werden.
 FREMD='yazwkzzjiquprtjpurur'
 
-# Module, die laut Abschnitt 2 ersatzlos entfallen.
-ENTFALLEN='onedrive|kundenportal|bewerbertest|bewerber_einladungen|shop-?tv|yodeck|onoffice|qonto|vivid'
+# Module, die laut Phase 1.4 des Auftrags vom 14.09.2026 ersatzlos entfallen.
+#
+# Kuerzer als die frueherer Fassung, und das ist Absicht: OneDrive,
+# Kundenportal, Einstellungstest und onOffice standen hier wegen der
+# Streichliste des Masterprompts. Der Auftrag vom 14.09.2026 streicht nur die
+# fuenf unten genannten Punkte und verbietet in Phase 9 jede weitere
+# Entfernung. onOffice bleibt hinter einem Funktionsschalter im Code.
+ENTFALLEN='sipgate|shop-?tv|yodeck|jotform|sprengnetter'
 
 fehler=0
 
