@@ -32,17 +32,16 @@ Einspielen des E&P-Schemas. Drei Wege in `docs/STATUS.md` Abschnitt 3.
 
 ### Ihre Mitwirkung nötig
 
-1. **Zwei Vault-Einträge im Projekt `usguiggfciavwzkdfjgt`.** Ohne sie laufen
-   die 33 Cron-Jobs und drei Trigger ins Leere, weil sie die Adresse der
-   eigenen Edge Functions nicht kennen:
+1. ~~**Zwei Vault-Einträge im Projekt `usguiggfciavwzkdfjgt`.**~~ **Erledigt
+   am 15.09.2026.** `projekt_url` und `anon_key` liegen im Vault und lassen
+   sich lesen. Der anon-Schlüssel ist öffentlich (er steht auch in
+   `netlify.toml`); er gehört nur nicht in eine Migration, deshalb der Vault.
 
-   ```sql
-   select vault.create_secret('https://usguiggfciavwzkdfjgt.supabase.co', 'projekt_url');
-   select vault.create_secret('<anon-Schlüssel des Projekts>', 'anon_key');
-   ```
-
-   Der anon-Schlüssel ist öffentlich (er steht auch in `netlify.toml`), er
-   gehört aber nicht in eine Migration.
+   Dabei aufgefallen: dem Zielprojekt fehlten **pg_cron und pg_net**. Ohne die
+   beiden laufen weder die 33 Jobs noch die drei Trigger, die
+   `net.http_post` aufrufen. Nachgezogen in
+   `supabase/migrations/20260915000050_erweiterungen.sql` — als Migration, nicht
+   als Klickarbeit, damit ein zweites Projekt genauso aufgesetzt werden kann.
 
 2. **Eigene Maildomain hinterlegen.** Der Anfrage-Vorfilter erkennt interne
    Weiterleitungen an der Absenderdomain. Er liest sie jetzt aus
