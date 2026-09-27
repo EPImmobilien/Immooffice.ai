@@ -230,3 +230,66 @@ ausdrücklich hin, was noch nicht abgedeckt ist und wann es dazukommt.
 
 **Grund:** Ein Gate, das grün leuchtet und dabei verschweigt, dass es vier von
 fünf Teilen nicht prüft, ist schlimmer als keins.
+
+## 27.09.2026 — Rückstand als Ergänzung, nicht als Neufassung
+
+**Frage:** Die Vorlage ist in zwölf Tagen um 20 Tabellen, 253 Spalten und 19
+Funktionen gewachsen. Den Export vom 14.09. neu ziehen oder den Unterschied
+nachtragen?
+
+**Entscheidung:** Nachtragen. Sieben Migrationen `20260927100100` bis
+`20260927100700`, jede mit `add column if not exists`, `create` und
+`alter table … enable row level security`. Der Export vom 14.09. bleibt, wie er
+ist.
+
+**Grund:** Ein neuer Vollexport würde die 22 Marken-Ersetzungen und die drei
+Phase-1.4-Streichungen aus `scripts/neutralisieren.py` überschreiben und müsste
+von Hand wieder eingearbeitet werden — genau die Stelle, an der ein Kennzeichen
+der Referenz zurück ins Repository rutscht. Der Nachtrag ist reine Ergänzung:
+in der Vorlage ist zwischen dem 14. und dem 26.09. nichts entfernt und nichts
+umbenannt worden, nur hinzugekommen.
+
+## 27.09.2026 — Ein Fingerabdruck über neutralisierten Code taugt nicht zum Vergleich
+
+**Frage:** Der Vergleich meldete neun geänderte Funktionen und 27 geänderte
+Cron-Jobs. Alle nachziehen?
+
+**Entscheidung:** Nein. Vor dem Vergleich werden dieselben Ersetzungen, die
+`scripts/neutralisieren.py` macht, auf den heutigen Stand der Vorlage angewendet;
+verglichen wird erst danach. Übrig bleiben **drei** geänderte Funktionen und
+**kein** geänderter Cron-Job.
+
+**Grund:** Projekt-URL, eigene Mail-Domain, Kleinanzeigen-Kennung und
+Firmenname sind im Fork absichtlich anders. Ein Hash über diese Stellen meldet
+immer einen Unterschied. Wer dem folgt, überschreibt bei jedem Abgleich die
+Neutralisierung und trägt die Kennzeichen der Referenz wieder ein. Festgehalten
+in `docs/ABGLEICH.md`, Abschnitt 2, damit der nächste Abgleich nicht in dieselbe
+Falle läuft.
+
+## 27.09.2026 — `newsletter_anmeldungen` behält zwei gleiche Indexe
+
+**Frage:** Die Vorlage hat auf `newsletter_anmeldungen(kontakt_id)` zwei Indexe
+mit identischer Definition: `..._kontakt_id_idx` und `..._kontakt_idx`.
+
+**Entscheidung:** Beide übernehmen.
+
+**Grund:** „Funktionsumfang = Vorlage Stand heute." Einen davon zu streichen
+wäre eine Verbesserung — und damit eine Abweichung, die beim nächsten Abgleich
+wieder als Unterschied auftaucht und jedes Mal neu begründet werden müsste.
+Wenn die Vorlage einen löscht, folgt der Fork.
+
+## 27.09.2026 — Storage-Reste des Altbestands bleiben stehen
+
+**Frage:** Die lokale Instanz hat drei Buckets und dreizehn
+Storage-Richtlinien mehr als die Vorlage: `marke`, `objektbilder`,
+`objektdokumente`. Sie stammen aus der Next.js-Anwendung und wandern beim
+Verschieben nicht nach `altbestand`, weil `storage` ein eigenes Schema ist.
+
+**Entscheidung:** Stehen lassen, nicht löschen. `tests/vorlage-vollstaendig.sql`
+zählt sie ausdrücklich heraus, damit der Test auf einer Instanz mit Altbestand
+dasselbe Ergebnis liefert wie auf einer ohne.
+
+**Grund:** In den Buckets können Dateien der alten Anwendung liegen. Der Auftrag
+sagt „es wird verschoben, nicht gelöscht"; für Storage gibt es kein
+Verschieben, also bleibt Stehenlassen. Zu entscheiden nach Gate 1, vermerkt in
+`docs/OFFEN.md`, Punkt 9.

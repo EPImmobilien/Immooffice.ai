@@ -1,6 +1,6 @@
 -- Ist die Vorlage vollstaendig uebernommen?
 --
--- Die Zahlen rechts sind im Quellprojekt gemessen (Stand 14.09.2026). Der Test
+-- Die Zahlen rechts sind im Quellprojekt gemessen (Stand 26.09.2026). Der Test
 -- vergleicht sie mit dem, was die Migrationen auf einer leeren Instanz
 -- tatsaechlich erzeugen. Er sagt nichts darueber, ob das Verhalten stimmt —
 -- nur, dass nichts auf dem Weg verloren gegangen ist. Das ist genau die Frage,
@@ -9,8 +9,11 @@
 -- Abweichungen, die so gewollt sind:
 --   Buckets 25 -> 22   drei Schrift-Buckets zu einem, shop-tv entfaellt
 --   Storage-Richtlinien 63 -> 59   vier fuer shop-tv entfallen
---   Cron-Jobs 34 -> 33   jotform-sync entfaellt
---   Funktionen 84 -> 85   eigene_funktions_url kommt hinzu
+--   Cron-Jobs 43 -> 42   jotform-sync entfaellt
+--   Funktionen 103 -> 104  eigene_funktions_url kommt hinzu
+--
+-- Tabellen mit RLS ist von 166 auf 187 gestiegen: alle 20 neuen Tabellen haben
+-- RLS, und der Befund suchkriterien_lauf ist in der Vorlage behoben.
 --
 -- Storage gehoert nicht zum Schema public und wandert beim Verschieben des
 -- Altbestands nicht mit. Deshalb zaehlen die beiden Storage-Zeilen die drei
@@ -22,12 +25,12 @@
 
 -- Einfacher und lesbarer als eine Prozedur: eine Tabelle mit Soll und Ist.
 with soll(bereich, soll) as (values
-  ('Tabellen', 167), ('Sichten', 4), ('Sequenzen', 5),
-  ('Funktionen', 85), ('Trigger', 54), ('Richtlinien', 320),
-  ('Primaer- und Eindeutigkeitsschluessel', 211), ('Pruefbedingungen', 94),
-  ('Fremdschluessel', 273), ('Indizes ohne Constraint', 243),
-  ('Tabellen mit RLS', 166), ('Buckets', 22), ('Storage-Richtlinien', 59),
-  ('Cron-Jobs', 33), ('Spalten', 2538)
+  ('Tabellen', 187), ('Sichten', 5), ('Sequenzen', 6),
+  ('Funktionen', 104), ('Trigger', 64), ('Richtlinien', 344),
+  ('Primaer- und Eindeutigkeitsschluessel', 232), ('Pruefbedingungen', 98),
+  ('Fremdschluessel', 302), ('Indizes ohne Constraint', 266),
+  ('Tabellen mit RLS', 187), ('Buckets', 22), ('Storage-Richtlinien', 59),
+  ('Cron-Jobs', 42), ('Spalten', 2791)
 ), ist(bereich, ist) as (values
   ('Tabellen', (select count(*) from pg_class c join pg_namespace n on n.oid=c.relnamespace
                  where n.nspname='public' and c.relkind='r')),
@@ -85,21 +88,21 @@ declare abweichungen int;
 begin
   select count(*) into abweichungen from (
     select 1 where (select count(*) from pg_class c join pg_namespace n on n.oid=c.relnamespace
-                     where n.nspname='public' and c.relkind='r') <> 167
+                     where n.nspname='public' and c.relkind='r') <> 187
     union all
     select 1 where (select count(*) from pg_policy pol join pg_class c on c.oid=pol.polrelid
-                     join pg_namespace n on n.oid=c.relnamespace where n.nspname='public') <> 320
+                     join pg_namespace n on n.oid=c.relnamespace where n.nspname='public') <> 344
     union all
     select 1 where (select count(*) from pg_proc p join pg_namespace n on n.oid=p.pronamespace
-                     where n.nspname='public' and p.prokind in ('f','p')) <> 85
+                     where n.nspname='public' and p.prokind in ('f','p')) <> 104
     union all
-    select 1 where (select count(*) from information_schema.columns where table_schema='public') <> 2538
+    select 1 where (select count(*) from information_schema.columns where table_schema='public') <> 2791
     union all
     select 1 where (select count(*) from pg_constraint con join pg_class r on r.oid=con.conrelid
                      join pg_namespace n on n.oid=r.relnamespace
-                     where n.nspname='public' and con.contype='f') <> 273
+                     where n.nspname='public' and con.contype='f') <> 302
     union all
-    select 1 where (select count(*) from cron.job) <> 33
+    select 1 where (select count(*) from cron.job) <> 42
   ) x;
   if abweichungen > 0 then
     raise exception 'Vorlage nicht vollstaendig: % Kennzahl(en) weichen ab', abweichungen;

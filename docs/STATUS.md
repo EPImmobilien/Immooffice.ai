@@ -243,20 +243,26 @@ Supabase-Projekt, oder ausdrückliche Freigabe zum Löschen.
    festnageln, neutralisieren, `dist/index.html` bauen. Läuft ohne Ihre
    Mitwirkung; danach **Gate 1**.
 
-## 6. Sicherheitsbefund im Referenzprojekt
+## 6. Sicherheitsbefund im Referenzprojekt — **behoben**
 
-`public.suchkriterien_lauf` hat **kein Row-Level-Security**. Mit dem
-öffentlichen anon-Key ist die Tabelle für jeden lesbar **und schreibbar**. Das
-betrifft Ihr Produktivsystem, nicht den Fork — ich habe dort nichts verändert.
+`public.suchkriterien_lauf` hatte **kein Row-Level-Security**: mit dem
+öffentlichen anon-Key war die Tabelle für jeden lesbar **und schreibbar**.
 
-Abhilfe (von Ihnen zu entscheiden, Policies müssen dazu passen):
+**Erledigt.** Sie haben RLS in der Vorlage eingeschaltet und die Richtlinie
+`suchkriterien_lauf_team` angelegt (Lesen und Schreiben nur für `chef` und
+`mitarbeiter`). Nachgeprüft am 27.09.: `relrowsecurity = true`, Richtlinie
+vorhanden. Der nächtliche Lauf funktioniert weiter, weil
+`suchkriterien_abgleich_lauf()` `security definer` ist und die Richtlinie
+deshalb nicht passieren muss.
 
-```sql
-alter table public.suchkriterien_lauf enable row level security;
-```
+Der Fork zieht mit: `20260927100600_abgleich_rls_und_richtlinien.sql` schaltet
+RLS ein und legt dieselbe Richtlinie an. Damit haben **alle 187 Tabellen** RLS —
+keine Ausnahme mehr.
 
-Ohne passende Policy sperrt das anschließend **jeden** Zugriff, auch den der
-Anwendung. Erst Policy formulieren, dann aktivieren.
+Ein neuer Befund ist dazugekommen: der Cron-Job `onoffice-expose-abgleich-2h`
+ruft seine Edge Function **ohne Authorization-Kopf** auf, die Funktion ist also
+ohne JWT-Prüfung erreichbar. Unverändert übernommen, vermerkt in
+`docs/OFFEN.md`.
 
 ---
 

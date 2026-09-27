@@ -45,13 +45,28 @@ Objekt bildet die lokale Instanz (die den Stand 14.09. exakt reproduziert) einen
 kurzen Hash, das Quellprojekt bildet denselben Hash, verglichen wird im
 Quellprojekt. Nur was sich unterscheidet, wird im Volltext geholt.
 
-**Ein Messfehler, der erst beim zweiten Blick auffiel:** Der erste Durchlauf
-meldete **45 geänderte Funktionen**. Tatsächlich geändert sind **drei**. Die
-anderen 42 unterscheiden sich nur darin, dass ich beim Export die
-Wagenrückläufe (CR) aus den Funktionskörpern entfernt hatte — der Hash sah
-Unterschiede, wo keine Verhaltensänderung ist. Nach `replace(…, E'\r', '')` auf
-beiden Seiten blieb die richtige Zahl übrig. Wer nur die erste Zahl gelesen
-hätte, hätte 42 Funktionen ohne Grund angefasst.
+**Zwei Messfehler, beide in derselben Zahl.** Der erste Durchlauf meldete
+**45 geänderte Funktionen**, der zweite **9**, tatsächlich geändert sind
+**3**. Beide Male lag der Fehler nicht in der Vorlage, sondern im Vergleich:
+
+1. *Wagenrückläufe.* Beim Export vom 14.09. habe ich CR aus den
+   Funktionskörpern entfernt. Der Hash sah damit Unterschiede, wo keine
+   Verhaltensänderung ist. `replace(…, E'\r', '')` auf beiden Seiten: 45 → 9.
+2. *Meine eigene Neutralisierung.* Sechs der restlichen neun unterscheiden sich
+   nur da, wo in `20260915000400_vorlage_funktionen.sql` Projekt-URL, eigene
+   Mail-Domain, Kleinanzeigen-Kennung und Firmenname ersetzt sind
+   (`mail_eingang_push`, `push_termin_erinnerungen_senden`,
+   `suchkriterien_abgleich_lauf`, `portal_importbericht_auswerten`,
+   `rechnung_vorlage_aus_objektnachweis`, `mail_eingang_anfrage_vorfilter`).
+   Gegenprobe: dieselben Ersetzungen auf den heutigen Stand der Vorlage
+   angewendet und erneut verglichen — sechs Funktionen waren danach Zeichen für
+   Zeichen gleich. 9 → 3.
+
+Daraus folgt eine Regel für jeden weiteren Abgleich: **ein Fingerabdruck über
+neutralisierten Code kann nie gleich sein.** Vergleichbar wird er erst, wenn die
+Neutralisierung auf beide Seiten angewendet wird. Dasselbe gilt für die
+Cron-Jobs — dort melden alle 27 vorhandenen Jobs einen Unterschied, und keiner
+ist einer.
 
 ## 3. Was sich wirklich geändert hat
 
@@ -163,6 +178,65 @@ Variablennamen **innerhalb** der Funktionen.
    gibt, arbeite ich mit dem Bauergebnis weiter; es geht, nur bleibt ein Teil
    des Codes schwer lesbar.
 
-Beides blockiert nicht: ich ziehe das Schema auf den 26.09. nach und zerlege die
-Oberfläche nach den 101 Abschnitten. Die Antworten ändern nur, wie gut das
-Ergebnis wird und wie oft es wiederholt werden muss.
+Beides blockiert nicht: das Schema ist auf den 26.09. nachgezogen (Abschnitt 6),
+als nächstes wird die Oberfläche nach den 101 Abschnitten zerlegt. Die Antworten
+ändern nur, wie gut das Ergebnis wird und wie oft es wiederholt werden muss.
+
+---
+
+## 6. Was nachgezogen wurde — Stand 27.09.2026
+
+Sieben Migrationen, jede einzeln gegen das Quellprojekt geprüft:
+
+| Datei | Inhalt |
+|---|---|
+| `20260927100100_abgleich_tabellen.sql` | 1 Sequenz, 20 Tabellen, 46 Spalten |
+| `20260927100200_abgleich_schluessel.sql` | 19 Primärschlüssel, 2 Eindeutigkeiten, 4 neue und 3 erweiterte Prüfbedingungen, 29 Fremdschlüssel |
+| `20260927100300_abgleich_indexe.sql` | 23 Indexe |
+| `20260927100400_abgleich_funktionen.sql` | 19 neue, 3 geänderte Funktionen |
+| `20260927100500_abgleich_sichten_und_trigger.sql` | 1 Sicht, 10 Trigger |
+| `20260927100600_abgleich_rls_und_richtlinien.sql` | RLS für 21 Tabellen, 31 Richtlinien, 1 Rechte-Korrektur |
+| `20260927100700_abgleich_cron.sql` | 9 Cron-Jobs |
+
+**Wie geprüft wurde:** nach jedem Schritt bildet die lokale Instanz einen
+Gesamt-Hash über alle Objekte der Art (Name plus Definition, sortiert), das
+Quellprojekt bildet denselben Hash. Tabellen, Spalten, Schlüssel,
+Prüfbedingungen, Fremdschlüssel, Indexe, Sichten, Trigger, Richtlinien und
+RLS-Zustand stimmen danach **zeichengleich** — nicht nur in der Anzahl.
+`npm run check` läuft die ganze Kette auf einer leeren Instanz durch; alle 15
+Kennzahlen von `tests/vorlage-vollstaendig.sql` stehen auf dem Stand 26.09.
+
+**Absichtliche Abweichungen, unverändert vier:** `eigene_funktions_url` kommt
+hinzu (Projekt-URL aus dem Vault statt im Klartext), `jotform-sync-5min`
+entfällt (Phase 1.4), `shop-tv` entfällt samt vier Storage-Richtlinien
+(Phase 1.4), die drei Schrift-Buckets sind zu `schriften` zusammengelegt.
+
+**Zwei Lücken im eigenen Vorgehen, beide gefunden und geschlossen:**
+
+- Die sechs neutralisierten Tabellen hatte ich aus dem Spaltenvergleich
+  ausgeschlossen. Dort fehlten trotzdem **sieben Spalten**
+  (`firma_stammdaten.marken_name`, `.fax`, `.kammer`, `.aufsichtsbehoerde`,
+  `.rechtshinweis`, `reservierungen_neubau.immobilie_id`,
+  `.kaeufer_kontakt_ids`). Aufgefallen ist es an einem Fremdschlüssel, der auf
+  eine Spalte zeigte, die es lokal nicht gab.
+- Beim Übertragen eines Blocks habe ich ein Leerzeichen verloren. Der
+  Blockvergleich hat es gefunden, weil die Länge gleich, der Hash aber anders
+  war. Deshalb wird jeder Block einzeln geprüft und nicht nur die Datei als
+  Ganzes.
+
+**Storage braucht keinen Nachtrag.** Die drei Buckets `marke`, `objektbilder`,
+`objektdokumente` und dreizehn Storage-Richtlinien, die die lokale Instanz mehr
+hat als die Vorlage, stammen aus dem **Altbestand** der Next.js-Anwendung. Sie
+wandern beim Verschieben nach `altbestand` nicht mit, weil `storage` ein eigenes
+Schema ist. Gelöscht wird nichts — vermerkt in `docs/OFFEN.md`.
+
+**Ein Sicherheitsbefund ist behoben.** `suchkriterien_lauf` hatte in der Vorlage
+kein RLS; im Export vom 14.09. stand die Zeile deshalb auskommentiert. Die
+Vorlage hat den Befund inzwischen behoben, der Fork zieht nach: RLS an,
+Richtlinie `suchkriterien_lauf_team`. Damit haben **alle 187 Tabellen** RLS.
+
+**Ein neuer Befund kommt dazu.** Der Job `onoffice-expose-abgleich-2h` ruft die
+Funktion `onoffice-expose-abgleich` **ohne Authorization-Kopf** auf. Das
+funktioniert nur, wenn die Funktion ohne JWT-Prüfung läuft, also öffentlich
+erreichbar ist. Übernommen wie in der Vorlage, aber vermerkt in
+`docs/OFFEN.md`.

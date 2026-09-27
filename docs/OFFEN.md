@@ -73,16 +73,36 @@ Einspielen des E&P-Schemas. Drei Wege in `docs/STATUS.md` Abschnitt 3.
    geflickt — der Fork soll zuerst nachweisbar dasselbe tun wie die Vorlage.
    Geschlossen wird das in Phase 2.3, wie im Auftrag verlangt.
 
-7. **`suchkriterien_lauf` ohne RLS.** Siehe `docs/STATUS.md`, Abschnitt 6. Die
-   Zeile steht in der Migration auskommentiert, weil Einschalten ohne passende
-   Richtlinie jeden Zugriff sperrt.
+7. ~~**`suchkriterien_lauf` ohne RLS.**~~ **Erledigt am 27.09.2026.** In der
+   Vorlage ist RLS eingeschaltet und die Richtlinie `suchkriterien_lauf_team`
+   angelegt; der Fork zieht in
+   `20260927100600_abgleich_rls_und_richtlinien.sql` mit. Siehe
+   `docs/STATUS.md`, Abschnitt 6.
+
+8. **`onoffice-expose-abgleich` ohne JWT-Prüfung.** Der Cron-Job
+   `onoffice-expose-abgleich-2h` schickt nur `Content-Type`, keinen
+   `Authorization`-Kopf. Das geht nur, wenn die Edge Function ohne
+   JWT-Prüfung läuft — sie ist dann von außen aufrufbar, ohne Anmeldung.
+   Unverändert aus der Vorlage übernommen, wie der Auftrag es verlangt. Zu
+   entscheiden, sobald die Edge Functions vorliegen: entweder JWT-Prüfung
+   einschalten und den Job mit Schlüssel versehen, oder ein eigenes Geheimnis
+   wie bei `x-diagnose-secret`.
+
+9. **Storage-Reste des Altbestands.** Die Buckets `marke`, `objektbilder`,
+   `objektdokumente` und dreizehn Storage-Richtlinien stammen aus der
+   Next.js-Anwendung. Beim Verschieben des Altbestands wandern sie nicht mit,
+   weil `storage` ein eigenes Schema ist und
+   `alter table … set schema altbestand` dort nicht greift. Sie enthalten
+   möglicherweise Dateien; gelöscht wird nichts. Zu entscheiden nach Gate 1:
+   Dateien sichern und Buckets entfernen, oder behalten. Bis dahin zählt
+   `tests/vorlage-vollstaendig.sql` sie ausdrücklich heraus.
 
 ### Nicht prüfbar in dieser Umgebung
 
-8. **Edge Functions.** 130 Stück, Quelltext nicht über diese Schnittstelle
+10. **Edge Functions.** 130 Stück, Quelltext nicht über diese Schnittstelle
    erreichbar. Siehe `docs/STATUS.md`, Abschnitt 2.2.
 
-9. **Verhalten.** Der Export ist vollständig — 15 Kennzahlen stimmen mit dem
+11. **Verhalten.** Der Export ist vollständig — 15 Kennzahlen stimmen mit dem
    Quellprojekt überein. Das beweist, dass nichts verloren ging, nicht dass
    sich alles gleich verhält. Ein Verhaltensvergleich braucht die Oberfläche
    und die Edge Functions.
