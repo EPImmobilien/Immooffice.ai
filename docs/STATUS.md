@@ -216,7 +216,12 @@ Supabase-Projekt, oder ausdrückliche Freigabe zum Löschen.
 - [x] `docs/EDGE_FUNCTIONS.md` — alle 130 Funktionen mit `verify_jwt`
 - [x] `docs/SECRETS.md` — Inventar der Secret-Namen
 - [x] Kollision mit dem Altbestand erkannt und Migration vorbereitet
-- [x] Migration gegen eine lokale Instanz geprüft, nicht angewendet
+- [x] Migration gegen eine lokale Instanz geprüft
+- [x] **Am 27.09.2026 angewendet.** Nachweis in `docs/ALTBESTAND.md`, Abschnitt 4:
+      110 Tabellen, 1 Sequenz, 93 Funktionen, 34 Typen und 120 Zeilen in 22
+      Tabellen sind vollständig in `altbestand` angekommen, `public` war danach
+      leer. Die Netlify-Anwendung arbeitet seitdem nicht mehr — vorhergesagt
+      und gewollt.
 - [x] `scripts/lokale-db.sh` und `tests/supabase-nachbau.sql` — Migrationen sind
       ab jetzt vor dem Anwenden prüfbar
 - [x] `CLAUDE.md` auf die neue Rangfolge umgestellt; die Stellen, die dem

@@ -166,11 +166,12 @@ Variablennamen **innerhalb** der Funktionen.
 
 ## 5. Zwei Fragen, die den Fork sonst einholen
 
-1. **Stichtag.** Bei vier Migrationen pro Tag in der Vorlage: soll
-   ImmoOffice.ai auf den Stand **26.09.2026** eingefroren und fertiggebaut
-   werden, und spätere Änderungen der Vorlage kommen als eigener, bewusster
-   Abgleich dazu? Alles andere führt zu einem Fork, der dauerhaft hinterherläuft
-   und nie fertig wird.
+1. ~~**Stichtag.**~~ **Entschieden am 27.09.2026: laufend nachziehen.** Kein
+   Stichtag. Der Fork wird bei jeder Sitzung neu abgeglichen. Das ist die
+   teurere Variante, und sie ist bewusst gewählt: der Fork soll dicht an der
+   Vorlage bleiben. Was das kostet, steht in `docs/ENTSCHEIDUNGEN.md` unter
+   dem 27.09. — und es bedeutet, dass dieses Dokument bei jedem Abgleich eine
+   neue Zeile in der Tabelle oben bekommt.
 
 2. **Quelltext statt Bauergebnis.** Die eingekürzten Variablennamen entstehen in
    einem Bauschritt. Wenn es die Datei **vor** diesem Schritt gibt, ist sie die

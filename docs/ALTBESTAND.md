@@ -141,3 +141,41 @@ from z;
 ```
 
 Erwartet: `120`, `22`, `110`, `8552b8acff52`.
+
+---
+
+## 5. Durchgeführt am 27.09.2026
+
+Verschoben und nachgewiesen. Die Abfragen aus Abschnitt 4 liefern:
+
+| | erwartet | gemessen |
+|---|---|---|
+| Tabellen in `altbestand` | 110, `9e5221ad5dde` | **110, `9e5221ad5dde`** |
+| Sequenzen | 1, `64d9a2025817` | **1, `64d9a2025817`** |
+| Typen | 34, `1e961d4ac296` | **34, `1e961d4ac296`** |
+| Funktionen | 93 | **93** |
+| Zeilen | 120 in 22 von 110, `8552b8acff52` | **120 in 22 von 110, `8552b8acff52`** |
+| `public` danach | leer | **0 Relationen, 0 Funktionen** |
+
+Eine Zahl ist nicht vergleichbar, und das ist kein Befund: der Fingerabdruck
+über die **Funktionssignaturen** ändert sich zwangsläufig. Zwei Funktionen
+nehmen einen Aufzählungstyp als Parameter (`credits_gutschreiben`,
+`einladung_erstellen`); der Typ liegt jetzt in `altbestand` und wird deshalb
+schemaqualifiziert geschrieben. Die Vollständigkeit ist über die Anzahl
+belegt — 93 vorher in `public`, 93 nachher in `altbestand`, 0 übrig.
+
+Anschließend eingespielt: `20260915000050_erweiterungen.sql` (pgcrypto,
+uuid-ossp, pg_net, pg_cron, Vault) und die Tabellen der Vorlage. Stand:
+167 Tabellen, 5 Sequenzen, 2455 Spalten.
+
+**Ein Befund während des Einspielens, sofort behoben.** Zwischen „Tabellen
+angelegt" und „Richtlinien angelegt" liegen mehrere Migrationen. In dieser
+Zeit hatte `anon` durch die Vorgaben des Projekts volle Tabellenrechte auf
+allen 167 Tabellen, und RLS war noch aus — die Tabellen waren also mit dem
+öffentlichen Schlüssel lesbar und schreibbar. Sie waren leer, aber offen.
+Deshalb wurde RLS für alle 167 Tabellen sofort eingeschaltet, bevor die
+weiteren Abschnitte folgten (Migration `rls_sofort_an_bis_richtlinien_folgen`
+im Projekt, nicht im Repository — die spätere
+`20260915000700_vorlage_rls_und_rechte.sql` stellt denselben Zustand her).
+Daraus folgt eine Regel für jedes weitere Projekt: **Tabellen und RLS gehören
+in denselben Schritt**, nicht in zwei.

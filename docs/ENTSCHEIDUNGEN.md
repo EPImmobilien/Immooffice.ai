@@ -293,3 +293,42 @@ dasselbe Ergebnis liefert wie auf einer ohne.
 sagt „es wird verschoben, nicht gelöscht"; für Storage gibt es kein
 Verschieben, also bleibt Stehenlassen. Zu entscheiden nach Gate 1, vermerkt in
 `docs/OFFEN.md`, Punkt 9.
+
+## 27.09.2026 — Kein Stichtag: laufend nachziehen
+
+**Frage:** Die Vorlage legt rund vier Migrationen pro Tag zu. Fork auf den
+26.09. einfrieren und fertigbauen, oder bei jeder Sitzung neu abgleichen?
+
+**Entscheidung des Auftraggebers:** Laufend nachziehen. Kein Stichtag.
+
+**Was das heisst, damit es niemanden ueberrascht:** Jeder Abgleich kostet Arbeit,
+die nicht in Mandantenfaehigkeit, Selbstregistrierung oder Abrechnung fliesst.
+Der Fork erreicht damit keinen Zustand „fertig gegenueber der Vorlage" — er
+erreicht bestenfalls „gleich wie die Vorlage an Tag X". Die Gates 1 bis 3 des
+Auftrags bleiben davon unberuehrt: sie bemessen sich am Fork, nicht am Abstand
+zur Vorlage.
+
+**Was daraus folgt:** Der Abgleich muss billig bleiben, sonst frisst er die
+Phasen. Deshalb bleibt es beim Fingerabdruck-Verfahren (`docs/ABGLEICH.md`,
+Abschnitt 2) und nicht beim Vollexport: nur was sich unterscheidet, wird
+geholt. Und deshalb ist die Regel aus derselben Sitzung wichtig, dass die
+Neutralisierung vor dem Vergleich auf beide Seiten angewendet wird — ohne sie
+melden bei jedem Durchlauf 27 Cron-Jobs und sechs Funktionen einen Unterschied,
+den es nicht gibt.
+
+## 27.09.2026 — Schema ueber die Verwaltungsschnittstelle statt ueber die CLI
+
+**Frage:** Die 507 kB Fork-Schema muessen in das Projekt. Ueber `supabase db
+push` von einem Rechner mit dem Repository, oder ueber die
+Verwaltungsschnittstelle?
+
+**Entscheidung des Auftraggebers:** Ueber die Verwaltungsschnittstelle, von mir.
+
+**Grund und Risiko, ausgesprochen:** Der Weg ueber die CLI uebertraegt Dateien
+als Dateien; ueber die Verwaltungsschnittstelle muss ich den Inhalt wortgetreu
+abschreiben. Beim Sichern der alten Migrationen ist mir das bei 17 kB an einem
+verlorenen Leerzeichen gescheitert. Deshalb wird jeder Abschnitt nach dem
+Anwenden gegengeprueft: Supabase legt den angewendeten Text in
+`supabase_migrations.schema_migrations.statements` ab, und dessen Pruefsumme
+muss mit der Pruefsumme des Abschnitts auf der Platte uebereinstimmen. Zusaetzlich
+wird am Ende jedes Objekt gegen das Quellprojekt verglichen, wie beim Abgleich.

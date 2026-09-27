@@ -12,11 +12,14 @@
 -- die konfigurierten Schemata (`public`, `graphql_public`) — `altbestand` steht
 -- dort nicht.
 --
--- WICHTIG — noch nicht angewendet.
--- Sobald diese Migration laeuft, hoert die auf Netlify veroeffentlichte
--- Next.js-Anwendung sofort auf zu arbeiten, weil sie ihre Tabellen unter
--- `public` sucht. Deshalb wird sie erst nach ausdruecklicher Freigabe
--- angewendet. Siehe docs/STATUS.md, Abschnitt 3.
+-- ANGEWENDET am 27.09.2026 nach Freigabe des Auftraggebers ("erst sichern und
+-- dann verschieben"). Seitdem arbeitet die auf Netlify veroeffentlichte
+-- Next.js-Anwendung nicht mehr — sie sucht ihre Tabellen unter `public`. Das
+-- war so vorhergesagt und ist gewollt.
+-- Die Bestandsaufnahme davor steht in docs/ALTBESTAND.md, der Nachweis danach
+-- ebenfalls: 110 Tabellen, 1 Sequenz, 93 Funktionen, 34 Typen und 120 Zeilen
+-- in 22 Tabellen sind vollstaendig in `altbestand` angekommen, `public` war
+-- danach leer.
 --
 -- Das Schema `intern` bleibt unberuehrt. Es enthaelt die Hilfsfunktionen des
 -- Altbestands, kollidiert mit dem Fork nicht (der bringt seine Helfer in
