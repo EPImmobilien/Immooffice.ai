@@ -37,6 +37,24 @@ comment on schema altbestand is
 revoke all on schema altbestand from anon, authenticated;
 grant usage on schema altbestand to postgres, service_role;
 
+-- Dasselbe fuer `intern`. Das Schema bleibt stehen (siehe Kopf), aber seine 74
+-- Funktionen greifen nach dem Verschieben auf Tabellen, die es in `public`
+-- nicht mehr gibt. Aufrufbar muessen sie nicht sein: was sie braucht, steht in
+-- `altbestand` und ist eingefroren. Deshalb wird der Zugriff entzogen, statt
+-- ihn offen zu lassen.
+-- Bedingt, weil `intern` erst durch eine der Migrationen entsteht, die nur in
+-- der Datenbank liegen: auf einer leeren Instanz aus dem Repository gibt es das
+-- Schema in kleinerem Umfang, auf einer frischen Instanz gar nicht.
+do $$
+begin
+  if exists (select 1 from pg_namespace where nspname = 'intern') then
+    revoke all on schema intern from anon, authenticated;
+    revoke all on all functions in schema intern from anon, authenticated;
+    grant usage on schema intern to postgres, service_role;
+  end if;
+end;
+$$;
+
 do $$
 declare
   eintrag record;
