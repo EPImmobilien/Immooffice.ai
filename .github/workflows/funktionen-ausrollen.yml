@@ -26,7 +26,7 @@ on:
         required: false
         default: ''
       loeschen:
-        description: 'Diese Funktion vom Projekt ENTFERNEN (Name genau wie im Projekt). Nur von Hand, nie automatisch.'
+        description: 'Diese Funktion(en) vom Projekt ENTFERNEN, durch Komma oder Leerzeichen getrennt. Nur von Hand, nie automatisch.'
         required: false
         default: ''
   push:
@@ -72,15 +72,43 @@ jobs:
       # "Nachzaehlen" — entfernt wird es von Hand, mit Blick auf den Namen.
       - name: Funktion entfernen
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.loeschen != ''
+        env:
+          LOESCHEN: ${{ github.event.inputs.loeschen }}
         run: |
           set -euo pipefail
-          name='${{ github.event.inputs.loeschen }}'
-          if [ -d "supabase/functions/$name" ]; then
-            echo "::error::$name liegt im Repository. Erst dort entfernen, sonst rollt der naechste Lauf sie wieder aus."
+          # Mehrere Namen sind erlaubt, durch Komma oder Leerzeichen getrennt:
+          # nach dem Ausbau von onOffice lagen 21 gestrichene Funktionen auf
+          # dem Projekt. Einundzwanzig Laeufe von Hand waeren die Art Arbeit,
+          # bei der man beim achtzehnten aufhoert. Die Schranke bleibt
+          # dieselbe — von Hand angestossen, und was im Repository liegt,
+          # wird nicht entfernt.
+          #
+          # Der Name kommt ueber die Umgebung, nicht ueber ${{ }} in die
+          # Zeile: sonst schriebe GitHub die Eingabe woertlich in das Skript,
+          # und wer den Lauf starten darf, koennte Befehle einschleusen.
+          namen="$(printf '%s' "$LOESCHEN" | tr ',' ' ')"
+          for name in $namen; do
+            case "$name" in
+              */*|.*|*' '*) echo "::error::Unzulaessiger Name: $name"; exit 1 ;;
+            esac
+            if [ -d "supabase/functions/$name" ]; then
+              echo "::error::$name liegt im Repository. Erst dort entfernen, sonst rollt der naechste Lauf sie wieder aus."
+              exit 1
+            fi
+          done
+          set +e
+          schlecht=""
+          for name in $namen; do
+            if supabase functions delete "$name" --project-ref "$PROJEKT" --yes; then
+              echo "$name vom Projekt entfernt."
+            else
+              schlecht="$schlecht $name"
+            fi
+          done
+          if [ -n "$schlecht" ]; then
+            echo "::error::Nicht entfernt:$schlecht"
             exit 1
           fi
-          supabase functions delete "$name" --project-ref "$PROJEKT"
-          echo "$name vom Projekt entfernt."
 
       - name: Ausrollen
         if: github.event.inputs.loeschen == ''
