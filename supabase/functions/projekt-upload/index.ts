@@ -41,13 +41,16 @@ async function entschluessele(verschluesseltesBase64: string): Promise<string> {
   return new TextDecoder().decode(plaintext);
 }
 
-async function sendeTeamMail(admin: ReturnType<typeof createClient>, an: string, betreff: string, text: string) {
+async function sendeTeamMail(admin: ReturnType<typeof createClient>, mandant: string | null, an: string, betreff: string, text: string) {
   try {
+    // Wie im uebrigen Neubauportal: das Postfach des eigenen Mandanten
+    // oder keines.
+    if (!mandant) { console.warn("Team-Mail: kein Mandant angegeben, kein Versand."); return; }
     let { data: postfach } = await admin.from("mail_postfaecher")
-      .select("*").eq("email_adresse", STANDARD_MAIL).eq("aktiv", true).limit(1).maybeSingle();
+      .select("*").eq("mandant_id", mandant).eq("email_adresse", STANDARD_MAIL).eq("aktiv", true).limit(1).maybeSingle();
     if (!postfach) {
       const { data: alle } = await admin.from("mail_postfaecher")
-        .select("*").eq("aktiv", true)
+        .select("*").eq("mandant_id", mandant).eq("aktiv", true)
         .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false }).limit(1);
       postfach = (alle || [])[0] || null;
     }
@@ -91,7 +94,7 @@ Deno.serve(async (req) => {
     if (!session) throw new Error("Nicht angemeldet.");
 
     const { data: z } = await admin.from("projekt_zugaenge")
-      .select("id, projekt_id, anzeigename, email, aktiv, session_gueltig_bis, ansprechpartner_id")
+      .select("id, projekt_id, anzeigename, email, aktiv, session_gueltig_bis, ansprechpartner_id, mandant_id")
       .eq("session_token", session).maybeSingle();
     if (!z || !z.aktiv || !z.session_gueltig_bis || new Date(z.session_gueltig_bis).getTime() <= Date.now()) {
       return jsonResponse({ ok: false, error: "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an." });
@@ -124,7 +127,7 @@ Deno.serve(async (req) => {
 
       const { data: projekt } = await admin.from("projekte").select("name").eq("id", z.projekt_id).maybeSingle();
       const an = await teamEmpfaenger(admin, z.ansprechpartner_id || null);
-      await sendeTeamMail(admin, an,
+      await sendeTeamMail(admin, z.mandant_id, an,
         `Kunden-Upload \u2013 ${projekt?.name || "Projekt"}`,
         `${z.anzeigename || z.email} hat eine Unterlage eingereicht:\n\n`
         + `  \u2022  ${dateiname}\n\n`

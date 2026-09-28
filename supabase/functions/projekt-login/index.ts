@@ -90,12 +90,14 @@ async function entschluessele(verschluesseltesBase64: string): Promise<string> {
   return new TextDecoder().decode(plaintext);
 }
 
-async function holePostfach(admin: ReturnType<typeof createClient>) {
+async function holePostfach(admin: ReturnType<typeof createClient>, mandant: string | null) {
+  // Das Postfach muss dem Mandanten des Projekts gehoeren.
+  if (!mandant) { console.warn("Postfach: kein Mandant angegeben, kein Versand."); return null; }
   const { data: pf } = await admin.from("mail_postfaecher")
-    .select("*").eq("email_adresse", STANDARD_MAIL).eq("aktiv", true).limit(1).maybeSingle();
+    .select("*").eq("mandant_id", mandant).eq("email_adresse", STANDARD_MAIL).eq("aktiv", true).limit(1).maybeSingle();
   if (pf) return pf;
   const { data: alle } = await admin.from("mail_postfaecher")
-    .select("*").eq("aktiv", true)
+    .select("*").eq("mandant_id", mandant).eq("aktiv", true)
     .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false }).limit(1);
   return (alle || [])[0] || null;
 }
@@ -211,11 +213,11 @@ Deno.serve(async (req) => {
       const email = (body.email || "").toString().trim().toLowerCase();
       if (!slug || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Bitte geben Sie Ihre E-Mail-Adresse an.");
       const { data: projekt } = await admin.from("projekte")
-        .select("id, name, oeffentliche_url").eq("slug", slug).maybeSingle();
+        .select("id, name, oeffentliche_url, mandant_id").eq("slug", slug).maybeSingle();
       if (!projekt) return jsonResponse({ ok: true });
 
       const { data: z } = await admin.from("projekt_zugaenge")
-        .select("id, anzeigename, aktiv, reset_gueltig_bis")
+        .select("id, anzeigename, aktiv, reset_gueltig_bis, mandant_id")
         .eq("projekt_id", projekt.id).eq("email", email).maybeSingle();
       if (!z || !z.aktiv) return jsonResponse({ ok: true });
 
@@ -231,7 +233,7 @@ Deno.serve(async (req) => {
       await logAktivitaet(admin, projekt.id, z.id, "passwort_reset_angefordert");
 
       try {
-        const postfach = await holePostfach(admin);
+        const postfach = await holePostfach(admin, projekt.mandant_id);
         const basis = (projekt.oeffentliche_url || "").replace(/\/+$/, "");
         const link = basis ? `${basis}/?reset=${resetToken}` : `?reset=${resetToken}`;
         await sendeMail(postfach, email, z.anzeigename || "",

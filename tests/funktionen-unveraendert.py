@@ -82,6 +82,12 @@ for _f in ('signatur-token-validieren', 'bewerbertest-abgeben',
            'expose-freigabe', 'news-briefing-erstellen', 'portal-ftp-diagnose'):
     ERWEITERT[_f] = ('Schreibt mit Mandanten statt ohne (Phase 2)')
 
+# Neubauportal: das Postfach gehoert dem Mandanten des Projekts, nicht dem
+# erstbesten aktiven. Sonst ginge die Einladung des einen Bautraegers ueber
+# den SMTP-Zugang des anderen hinaus.
+for _f in ('projekt-interaktion', 'projekt-login', 'projekt-upload'):
+    ERWEITERT[_f] = 'Versendet ueber das Postfach des eigenen Mandanten (Phase 2)'
+
 BLOCKZEILEN = {
     'mpe-pdf-erzeugen': {
         'const pins: Array<[number, number, string, string, string]> = [',

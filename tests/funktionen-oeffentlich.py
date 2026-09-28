@@ -69,10 +69,17 @@ NOCH_OFFEN = {
     'ki-bildbearbeitung': 'Schreibt Bilder, 44 kB, ungelesen.',
     'news-briefing-erstellen': 'Erzeugt Briefings.',
     'portal-ftp-diagnose': 'Diagnose.',
-    'projekt-daten': 'Neubauportal.',
-    'projekt-interaktion': 'Neubauportal.',
-    'projekt-login': 'Neubauportal, Anmeldung.',
-    'projekt-upload': 'Neubauportal, Dateien.',
+    # Neubauportal. Der Postfach-Griff ist geschlossen (28.09.2026): die
+    # drei versendenden Funktionen nehmen das Postfach des eigenen
+    # Mandanten oder gar keines. Offen bleibt der Zugang ueber den Slug —
+    # seit fork_17 ist er nur noch JE MANDANT eindeutig, und die
+    # oeffentliche Projektadresse traegt nichts Mandantenspezifisches.
+    # Zwei Bautraeger mit einem Projekt "am-park" waeren nicht zu
+    # unterscheiden. Steht in tests/mandant-nachzug.py.
+    'projekt-daten': 'Neubauportal; Zugang ueber den Slug ungeklaert.',
+    'projekt-interaktion': 'Neubauportal; Zugang ueber den Slug ungeklaert.',
+    'projekt-login': 'Neubauportal, Anmeldung; Zugang ueber den Slug ungeklaert.',
+    'projekt-upload': 'Neubauportal, Dateien; Postfach begrenzt.',
     'projekt-wohnungen': 'Neubauportal.',
     'push-antworten': 'Push.',
     'push-senden': 'Push — verschickt an Geraete.',

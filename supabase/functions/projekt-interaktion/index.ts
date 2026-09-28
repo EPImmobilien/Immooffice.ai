@@ -36,12 +36,14 @@ async function entschluessele(verschluesseltesBase64: string): Promise<string> {
   return new TextDecoder().decode(plaintext);
 }
 
-async function holePostfach(admin: ReturnType<typeof createClient>) {
+async function holePostfach(admin: ReturnType<typeof createClient>, mandant: string | null) {
+  // Das Postfach muss dem Mandanten des Projekts gehoeren.
+  if (!mandant) { console.warn("Postfach: kein Mandant angegeben, kein Versand."); return null; }
   const { data: pf } = await admin.from("mail_postfaecher")
-    .select("*").eq("email_adresse", STANDARD_MAIL).eq("aktiv", true).limit(1).maybeSingle();
+    .select("*").eq("mandant_id", mandant).eq("email_adresse", STANDARD_MAIL).eq("aktiv", true).limit(1).maybeSingle();
   if (pf) return pf;
   const { data: alle } = await admin.from("mail_postfaecher")
-    .select("*").eq("aktiv", true)
+    .select("*").eq("mandant_id", mandant).eq("aktiv", true)
     .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false }).limit(1);
   return (alle || [])[0] || null;
 }
@@ -111,7 +113,7 @@ Deno.serve(async (req) => {
         throw new Error("Bitte Name und eine g\u00fcltige E-Mail-Adresse angeben.");
       }
       const { data: projekt } = await admin.from("projekte")
-        .select("id, name, oeffentliche_url").eq("slug", slug).eq("status", "aktiv").maybeSingle();
+        .select("id, name, oeffentliche_url, mandant_id").eq("slug", slug).eq("status", "aktiv").maybeSingle();
       if (!projekt) throw new Error("Projekt nicht gefunden.");
 
       const { count } = await admin.from("projekt_zugaenge")
@@ -123,7 +125,7 @@ Deno.serve(async (req) => {
       }
 
       const basis = (projekt.oeffentliche_url || "").replace(/\/+$/, "");
-      const postfach = await holePostfach(admin);
+      const postfach = await holePostfach(admin, projekt.mandant_id);
 
       const { data: vorhanden } = await admin.from("projekt_zugaenge")
         .select("id, token, anzeigename, aktiv, passwort_gesetzt_am")
@@ -166,7 +168,7 @@ Deno.serve(async (req) => {
     const session = (body.session || "").toString().trim();
     if (!session) throw new Error("Nicht angemeldet.");
     const { data: z } = await admin.from("projekt_zugaenge")
-      .select("id, projekt_id, anzeigename, email, rolle, einheit_id, aktiv, session_gueltig_bis, ansprechpartner_id")
+      .select("id, projekt_id, anzeigename, email, rolle, einheit_id, aktiv, session_gueltig_bis, ansprechpartner_id, mandant_id")
       .eq("session_token", session).maybeSingle();
     if (!z || !z.aktiv || !z.session_gueltig_bis || new Date(z.session_gueltig_bis).getTime() <= Date.now()) {
       return jsonResponse({ ok: false, error: "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an." });
@@ -215,8 +217,8 @@ Deno.serve(async (req) => {
       await admin.from("projekt_aktivitaeten").insert({
         projekt_id: z.projekt_id, zugang_id: z.id, typ: "reservierungsanfrage", details: { name: e.we_nr },
       });
-      const { data: projekt } = await admin.from("projekte").select("name").eq("id", z.projekt_id).maybeSingle();
-      const postfach = await holePostfach(admin);
+      const { data: projekt } = await admin.from("projekte").select("name, mandant_id").eq("id", z.projekt_id).maybeSingle();
+      const postfach = await holePostfach(admin, z.mandant_id);
       try {
         await sendeMail(postfach, STANDARD_MAIL, "",
           `Reservierungsanfrage ${e.we_nr} \u2013 ${projekt?.name || "Projekt"}`,
@@ -246,8 +248,8 @@ Deno.serve(async (req) => {
       await admin.from("projekt_aktivitaeten").insert({
         projekt_id: z.projekt_id, zugang_id: z.id, typ: "mangel_gemeldet", details: { name: titel },
       });
-      const { data: projekt } = await admin.from("projekte").select("name").eq("id", z.projekt_id).maybeSingle();
-      const postfach = await holePostfach(admin);
+      const { data: projekt } = await admin.from("projekte").select("name, mandant_id").eq("id", z.projekt_id).maybeSingle();
+      const postfach = await holePostfach(admin, z.mandant_id);
       try {
         await sendeMail(postfach, STANDARD_MAIL, "",
           `M\u00e4ngelmeldung \u2013 ${projekt?.name || "Projekt"}`,
@@ -285,7 +287,7 @@ Deno.serve(async (req) => {
           const { data: ap } = await admin.from("profiles").select("email").eq("id", z.ansprechpartner_id).maybeSingle();
           if (ap?.email) empfaenger = ap.email;
         }
-        const postfach = await holePostfach(admin);
+        const postfach = await holePostfach(admin, z.mandant_id);
         await sendeMail(postfach, empfaenger, "",
           `Neue Kundennachricht \u2013 ${projekt?.name || "Projekt"}`,
           `${z.anzeigename || z.email} schreibt im Kundenportal:\n\n\u201e${text}\u201c\n\nAntworten im ImmoOffice Portal unter Immobilien \u2192 Neubauprojekte \u2192 Kunden-Zug\u00e4nge \u2192 \u{1F4AC} Nachrichten beim Kunden.`);

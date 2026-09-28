@@ -616,6 +616,112 @@ ERSETZUNGEN = [
      'Portal-Diagnose: der Eintrag traegt den Mandanten des Zugangs.',
      {'portal-ftp-diagnose'}),
 
+    # =====================================================================
+    # FORK — das Neubauportal verschickte Post ueber ein fremdes Postfach
+    #
+    # holePostfach() nahm "das erste aktive Postfach". Mit einem Mandanten
+    # faellt das nicht auf; ab dem zweiten geht die Einladung zum
+    # Kundenbereich des einen Bautraegers ueber den SMTP-Zugang des anderen
+    # hinaus — mit dessen Absenderadresse im Von. Das ist kein
+    # Schoenheitsfehler: der Empfaenger sieht einen fremden Absender, und der
+    # fremde Mandant sieht den Versand in seinem Postfach.
+    #
+    # Ohne Mandanten lieber GAR KEIN Postfach. Eine Mail, die nicht rausgeht
+    # und im Protokoll steht, ist besser als eine mit falschem Absender.
+    # =====================================================================
+    ('FORK',
+     r'async function holePostfach\(admin: ReturnType<typeof createClient>\) \{\n'
+     r'  const \{ data: pf \} = await admin\.from\("mail_postfaecher"\)\n'
+     r'    \.select\("\*"\)\.eq\("email_adresse", STANDARD_MAIL\)\.eq\("aktiv", true\)\.limit\(1\)\.maybeSingle\(\);\n'
+     r'  if \(pf\) return pf;\n'
+     r'  const \{ data: alle \} = await admin\.from\("mail_postfaecher"\)\n'
+     r'    \.select\("\*"\)\.eq\("aktiv", true\)\n',
+     'async function holePostfach(admin: ReturnType<typeof createClient>, mandant: string | null) {\n'
+     '  // Das Postfach muss dem Mandanten des Projekts gehoeren.\n'
+     '  if (!mandant) { console.warn("Postfach: kein Mandant angegeben, kein Versand."); return null; }\n'
+     '  const { data: pf } = await admin.from("mail_postfaecher")\n'
+     '    .select("*").eq("mandant_id", mandant).eq("email_adresse", STANDARD_MAIL).eq("aktiv", true).limit(1).maybeSingle();\n'
+     '  if (pf) return pf;\n'
+     '  const { data: alle } = await admin.from("mail_postfaecher")\n'
+     '    .select("*").eq("mandant_id", mandant).eq("aktiv", true)\n',
+     'Neubauportal: das Postfach gehoert dem Mandanten des Projekts.',
+     {'projekt-interaktion', 'projekt-login'}),
+
+    # Damit die Aufrufer den Mandanten weiterreichen koennen, muss er in den
+    # geladenen Zeilen stehen.
+    ('FORK',
+     r'\.select\("id, name, oeffentliche_url"\)\.eq\("slug", slug\)',
+     '.select("id, name, oeffentliche_url, mandant_id").eq("slug", slug)',
+     'Neubauportal: das Projekt bringt seinen Mandanten mit.',
+     {'projekt-interaktion', 'projekt-login'}),
+    ('FORK',
+     r'\.select\("id, projekt_id, anzeigename, email, rolle, einheit_id, aktiv, session_gueltig_bis, ansprechpartner_id"\)',
+     '.select("id, projekt_id, anzeigename, email, rolle, einheit_id, aktiv, session_gueltig_bis, ansprechpartner_id, mandant_id")',
+     'Neubauportal: der Zugang bringt seinen Mandanten mit.',
+     {'projekt-interaktion'}),
+    # projekt-upload laedt eine kuerzere Spaltenliste.
+    ('FORK',
+     r'\.select\("id, projekt_id, anzeigename, email, aktiv, session_gueltig_bis, ansprechpartner_id"\)',
+     '.select("id, projekt_id, anzeigename, email, aktiv, session_gueltig_bis, ansprechpartner_id, mandant_id")',
+     'Neubauportal: der Zugang beim Hochladen bringt seinen Mandanten mit.',
+     {'projekt-upload'}),
+    # Die Nachricht an den Ansprechpartner: hier steht kein "projekt"-Laden
+    # davor, deshalb eine eigene Regel.
+    ('FORK',
+     r'        const postfach = await holePostfach\(admin\);\n        await sendeMail\(postfach, empfaenger, "",',
+     '        const postfach = await holePostfach(admin, z.mandant_id);\n        await sendeMail(postfach, empfaenger, "",',
+     'Neubauportal: die Nachricht an den Ansprechpartner ebenso.',
+     {'projekt-interaktion'}),
+    ('FORK',
+     r'\.select\("id, anzeigename, aktiv, reset_gueltig_bis"\)',
+     '.select("id, anzeigename, aktiv, reset_gueltig_bis, mandant_id")',
+     'Neubauportal: der Zugang beim Passwort-Reset bringt seinen Mandanten mit.',
+     {'projekt-login'}),
+
+    # Die Registrierung kennt das Projekt, alles Weitere kennt den Zugang.
+    ('FORK',
+     r'      const postfach = await holePostfach\(admin\);\n\n      const \{ data: vorhanden \}',
+     '      const postfach = await holePostfach(admin, projekt.mandant_id);\n\n      const { data: vorhanden }',
+     'Neubauportal: die Selbstregistrierung nimmt das Postfach des Projekts.',
+     {'projekt-interaktion'}),
+    ('FORK',
+     r'(const \{ data: projekt \} = await admin\.from\("projekte"\)\.select\(")name("\)\.eq\("id", z\.projekt_id\)\.maybeSingle\(\);\n(\s*)const postfach = await holePostfach\(admin)\);',
+     r'\1name, mandant_id\2, z.mandant_id);',
+     'Neubauportal: die uebrigen Mails nehmen das Postfach des Zugangs.',
+     {'projekt-interaktion'}),
+    ('FORK',
+     r'        const postfach = await holePostfach\(admin\);\n        const basis = \(projekt\.oeffentliche_url',
+     '        const postfach = await holePostfach(admin, projekt.mandant_id);\n        const basis = (projekt.oeffentliche_url',
+     'Neubauportal: auch die Passwort-Mail nimmt das Postfach des Projekts.',
+     {'projekt-login'}),
+
+    # projekt-upload hat dieselbe Auswahl inline.
+    ('FORK',
+     r'async function sendeTeamMail\(admin: ReturnType<typeof createClient>, an: string, betreff: string, text: string\) \{\n'
+     r'  try \{\n'
+     r'    let \{ data: postfach \} = await admin\.from\("mail_postfaecher"\)\n'
+     r'      \.select\("\*"\)\.eq\("email_adresse", STANDARD_MAIL\)\.eq\("aktiv", true\)\.limit\(1\)\.maybeSingle\(\);\n'
+     r'    if \(!postfach\) \{\n'
+     r'      const \{ data: alle \} = await admin\.from\("mail_postfaecher"\)\n'
+     r'        \.select\("\*"\)\.eq\("aktiv", true\)\n',
+     'async function sendeTeamMail(admin: ReturnType<typeof createClient>, mandant: string | null, an: string, betreff: string, text: string) {\n'
+     '  try {\n'
+     '    // Wie im uebrigen Neubauportal: das Postfach des eigenen Mandanten\n'
+     '    // oder keines.\n'
+     '    if (!mandant) { console.warn("Team-Mail: kein Mandant angegeben, kein Versand."); return; }\n'
+     '    let { data: postfach } = await admin.from("mail_postfaecher")\n'
+     '      .select("*").eq("mandant_id", mandant).eq("email_adresse", STANDARD_MAIL).eq("aktiv", true).limit(1).maybeSingle();\n'
+     '    if (!postfach) {\n'
+     '      const { data: alle } = await admin.from("mail_postfaecher")\n'
+     '        .select("*").eq("mandant_id", mandant).eq("aktiv", true)\n',
+     'Neubauportal: die Team-Mail beim Hochladen nimmt das eigene Postfach.',
+     {'projekt-upload'}),
+    ('FORK',
+     r'      await sendeTeamMail\(admin, an,',
+     '      await sendeTeamMail(admin, z.mandant_id, an,',
+     'Neubauportal: die Team-Mail bekommt den Mandanten des Zugangs.',
+     {'projekt-upload'}),
+
     # --- FREMD: Verweise auf das Supabase-Projekt der Vorlage
     ('FREMD', r'yazwkzzjiquprtjpurur', 'usguiggfciavwzkdfjgt',
      'Projektkennung der Vorlage durch die eigene ersetzt.'),

@@ -2026,3 +2026,33 @@ Durchsicht nicht vor.
 **Für Gate 2 ist dieser Punkt damit erfüllt.** Offen bleiben die
 19 öffentlichen Endpunkte, die beim **Lesen** noch nicht begrenzen —
 `tests/funktionen-oeffentlich.py` führt darüber Buch.
+
+---
+
+## Das Neubauportal verschickte Post über ein fremdes Postfach (28.09.2026)
+
+Beim Durchgehen der 19 öffentlichen Endpunkte gefunden. `holePostfach()` nahm
+**„das erste aktive Postfach"** — und dieselbe Auswahl steht in
+`projekt-interaktion`, `projekt-login` und `projekt-upload`.
+
+Mit einem Mandanten fällt das nicht auf. Ab dem zweiten geht die Einladung zum
+Kundenbereich des einen Bauträgers über den **SMTP-Zugang des anderen** hinaus,
+mit dessen Absenderadresse im Von. Das ist kein Schönheitsfehler: der Empfänger
+sieht einen fremden Absender, und der fremde Mandant sieht den Versand in
+seinem Postfach.
+
+Alle drei nehmen jetzt das Postfach des eigenen Mandanten — und **ohne
+Mandanten gar keines**. Eine Mail, die nicht rausgeht und im Protokoll steht,
+ist besser als eine mit falschem Absender.
+
+Damit der Mandant an den Aufrufstellen überhaupt zur Hand ist, bringen ihn
+jetzt auch die geladenen Zeilen mit: das Projekt bei der Selbstregistrierung,
+der Zugang bei allem Weiteren.
+
+**Offen bleibt der Zugang über den Slug.** Seit `fork_17` ist
+`projekte.slug` nur noch **je Mandant** eindeutig, und die öffentliche
+Projektadresse trägt nichts Mandantenspezifisches. Zwei Bauträger mit einem
+Projekt „am-park" wären nicht zu unterscheiden — `maybeSingle()` bricht dann
+ab, was immerhin laut ist statt falsch. Die saubere Lösung wäre eine Adresse,
+die den Mandanten mitführt; das ist eine Produktentscheidung, keine
+Reparatur. Steht in `tests/mandant-nachzug.py`.
