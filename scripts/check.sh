@@ -78,6 +78,13 @@ else
   fehler=1
 fi
 
+abschnitt "Vorlagen: markierte Felder"
+if scripts/lokale-db.sh psql -q -f tests/vorlagen-felder.sql; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Vorlagen: Laufzeit, Provision, Fristen"
 if scripts/lokale-db.sh psql -q -f tests/vorlagen-vorgaben.sql; then
   :

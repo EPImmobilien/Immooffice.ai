@@ -143,14 +143,14 @@ begin
           n is null, coalesce(n, 'null'));
 end $$;
 
-select nr, case when bestanden then 'ok  ' else 'FEHL' end as ergebnis, pruefung, bemerkung
+select nr, case when bestanden is true then 'ok  ' else 'FEHL' end as ergebnis, pruefung, bemerkung
   from befund order by nr;
 
 do $$
 declare n int; liste text;
 begin
   select count(*), string_agg(pruefung || ' (' || bemerkung || ')', '; ')
-    into n, liste from befund where not bestanden;
+    into n, liste from befund where bestanden is not true;
   if n > 0 then
     raise exception 'Belegnummern stimmen nicht: % von % — %',
       n, (select count(*) from befund), liste;

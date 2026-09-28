@@ -170,14 +170,14 @@ select 'Ohne Anmeldung kein Objekt sichtbar', count(*) = 0,
 reset role;
 drop policy if exists "pruefeimer_offen" on storage.objects;
 
-select nr, case when bestanden then 'ok  ' else 'FEHL' end as ergebnis, pruefung, bemerkung
+select nr, case when bestanden is true then 'ok  ' else 'FEHL' end as ergebnis, pruefung, bemerkung
   from befund order by nr;
 
 do $$
 declare n int; liste text;
 begin
   select count(*), string_agg(pruefung || ' (' || bemerkung || ')', '; ')
-    into n, liste from befund where not bestanden;
+    into n, liste from befund where bestanden is not true;
   if n > 0 then
     raise exception 'Mandantentrennung nicht dicht: % von % Pruefungen gescheitert — %',
       n, (select count(*) from befund), liste;

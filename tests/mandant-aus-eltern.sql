@@ -153,17 +153,17 @@ end $$;
 
 -- --- 6) Haengen die Wachposten ueberall, wo sie sollen? --------------------
 insert into befund (pruefung, bestanden, bemerkung)
-select 'Sechzehn Tabellen tragen den Wachposten', count(*) = 16, count(*)::text
+select 'Siebzehn Tabellen tragen den Wachposten', count(*) = 17, count(*)::text
   from pg_trigger where tgname = 'mandant_aus_eltern' and not tgisinternal;
 
-select nr, case when bestanden then 'ok  ' else 'FEHL' end as ergebnis, pruefung, bemerkung
+select nr, case when bestanden is true then 'ok  ' else 'FEHL' end as ergebnis, pruefung, bemerkung
   from befund order by nr;
 
 do $$
 declare n int; liste text;
 begin
   select count(*), string_agg(pruefung || ' (' || bemerkung || ')', '; ')
-    into n, liste from befund where not bestanden;
+    into n, liste from befund where bestanden is not true;
   if n > 0 then
     raise exception 'Der Mandant vom Elternsatz stimmt nicht: % von % — %',
       n, (select count(*) from befund), liste;

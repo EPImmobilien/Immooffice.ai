@@ -1712,3 +1712,62 @@ Eindeutigkeitsregeln. Ein Primärschlüssel ist `contype = 'p'` und ist ihm
 durchgegangen. Beides ist nachgezogen; der Wachposten sieht jetzt beide
 Arten, mit fünfzehn benannten Ausnahmen (Schlüssel auf einer bereits
 mandantengebundenen Elterntabelle, und die leeren onOffice-Tabellen).
+
+---
+
+## Markierte Felder statt Platzhalter-Syntax (28.09.2026)
+
+**Frage:** „Können wir das so konzipieren, dass die Kunden eine Word- oder
+eine PDF-Vorlage hochladen und dann in einem gesonderten Feld die Flächen
+oder Bereiche markieren, die zu dem jeweiligen Eingabefeld gehören?"
+
+**Ja — und den Mechanismus gibt es hier schon einmal.** Das Signaturverfahren
+legt in `signatur_vorgaenge.unterschrift_positionen` genau solche Rechtecke
+ab (Seite, x, y, Breite, Höhe) und stempelt die Unterschrift beim Abschluss
+hinein. `fork_24` verallgemeinert das: nicht nur die Unterschrift, sondern
+jedes Feld — und nicht vom Programm gerechnet, sondern vom Makler markiert.
+
+**Zwei Zeiger-Arten, weil die Formate verschieden sind.**
+
+| | |
+|---|---|
+| `rechteck` | **PDF.** Seite und Koordinaten. Der Makler zieht das Rechteck auf der angezeigten Seite auf. |
+| `textstelle` | **Word.** Eine `.docx` hat keine Koordinaten, sie ist XML; wo ein Absatz auf der Seite landet, entscheidet erst Word beim Umbrechen. Ein aufgezogenes Rechteck ließe sich nicht zurückrechnen. Stattdessen markiert der Makler die Stelle im Text, und gespeichert wird Suchtext plus Nummer des Vorkommens. |
+
+Das zweite ist genau das, was die Erzeugung heute tut — nur waren die
+Suchtexte fest auf den Mustervertrag der Referenz verdrahtet, samt Namen,
+Anschriften und Ausweisnummern echter Vertragsparteien (`docs/OFFEN.md`).
+Sie zu Daten zu machen löst beides auf einmal.
+
+**Überlauf:** Passt ein Wert nicht ins Rechteck, wird die Schrift
+verkleinert, bis er passt (Entscheidung des Auftraggebers). Deshalb gibt es
+`schriftgroesse` als Ausgangswert und keine Abschneide-Einstellung — ein
+abgeschnittener Wert in einem Vertrag wäre schlimmer als eine kleinere
+Schrift.
+
+**Der Katalog der Felder steht in der Datenbank** (`vorlagen_feld_katalog`),
+nicht in der Oberfläche: Markierung und Erzeugung müssen dieselbe Liste
+sehen. Ein Feldname, den die Art nicht kennt, wird beim Speichern abgewiesen
+statt still geschluckt — eine Markierung, die nichts tut, vermisst niemand.
+
+### Zwei Löcher, die dabei aufgefallen sind
+
+**Eine Markierung an der Vorlage eines fremden Mandanten ging durch.** Der
+Grund ist lehrreich: `mandant_id` trägt den Standardwert
+`aktuelle_mandant_id()`, ist beim Einfügen also schon mit dem **eigenen**
+Mandanten gefüllt. Der Wachposten aus `fork_22` lässt sie deshalb in Ruhe,
+und die restriktive Richtlinie sieht den eigenen Mandanten und ist zufrieden
+— während `vorlage_id` auf eine fremde Vorlage zeigt. Der Wachposten
+vergleicht jetzt beide.
+
+**Ein NULL-Befund galt in zehn Prüfungen als bestanden.** `where not
+bestanden` schließt NULL aus, und `case when bestanden then 'ok'` zeigte
+zwar „FEHL" an — gezählt wurde es trotzdem nicht. Aufgefallen an einer
+Prüfung, die unter RLS einen Wert nicht mehr lesen konnte und deshalb NULL
+lieferte. Alle zehn Dateien prüfen jetzt `bestanden is not true`;
+nachgewiesen an einem absichtlich unklaren Befund.
+
+**Dieselbe Prüfung lief außerdem gar nicht unter RLS** — sie setzte zwar
+`request.jwt.claims`, aber nie `set local role authenticated`, und
+`aktuelle_mandant_id()` liest ohnehin über `auth.uid()` aus `profiles`. Sie
+war grün, weil sonst nichts in der Tabelle stand.

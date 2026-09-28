@@ -154,7 +154,19 @@ zuwachs(bereich, mehr, grund) as (values
   -- fork_23: die Vorgaben an der Vorlage (Laufzeit, Provision, Fristen).
   ('Spalten', 1, 'fork_23: vertragsvorlagen.vorgaben'),
   ('Pruefbedingungen', 1, 'fork_23: erlaubte Schluessel je Vorlagenart'),
-  ('Funktionen', 1, 'fork_23: vorlage_vorgaben()')
+  ('Funktionen', 1, 'fork_23: vorlage_vorgaben()'),
+  -- fork_24: markierte Felder in der eigenen Vorlage — Rechteck im PDF,
+  -- Textstelle im Word.
+  ('Tabellen', 1, 'fork_24: vorlagen_felder'),
+  ('Tabellen mit RLS', 1, 'fork_24: vorlagen_felder'),
+  ('Spalten', 17, 'fork_24: vorlagen_felder (16) und vertragsvorlagen.dateiformat'),
+  ('Funktionen', 2, 'fork_24: vorlagen_feld_katalog(), vorlagen_feld_bekannt()'),
+  ('Trigger', 2, 'fork_24: mandant_aus_eltern und vorlagen_feld_bekannt'),
+  ('Richtlinien', 3, 'fork_24: lesen, pflegen, mandant_trennung'),
+  ('Primaer- und Eindeutigkeitsschluessel', 1, 'fork_24: ein Feld je Vorlage einmal'),
+  ('Pruefbedingungen', 5, 'fork_24: Zeiger, Ausrichtung, Vollstaendigkeit, Schriftgroesse, Dateiformat'),
+  ('Fremdschluessel', 2, 'fork_24: vorlage_id und mandant_id'),
+  ('Indizes ohne Constraint', 2, 'fork_24: je Vorlage und je Mandant')
 ),
 soll(bereich, soll) as (
   select v.bereich,

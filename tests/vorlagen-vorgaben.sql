@@ -14,6 +14,7 @@
 \pset pager off
 
 delete from public.mandanten where slug in ('vg-a', 'vg-b');
+delete from auth.users where email like '%@vorgaben.example';
 
 create temporary table befund (nr int generated always as identity, pruefung text,
                                bestanden boolean, bemerkung text);
@@ -22,12 +23,15 @@ create temporary table wer (was text primary key, wert uuid);
 grant all on wer to public;
 
 do $$
-declare m_a uuid; m_b uuid; g_a uuid;
+declare m_a uuid; m_b uuid; g_a uuid; u_a uuid := gen_random_uuid();
 begin
   insert into public.mandanten (name, slug) values ('Alpha GmbH', 'vg-a') returning id into m_a;
   insert into public.mandanten (name, slug) values ('Beta GmbH',  'vg-b') returning id into m_b;
   insert into public.gesellschaften (mandant_id, name) values (m_a, 'Alpha Nord') returning id into g_a;
-  insert into wer values ('m_a', m_a), ('m_b', m_b), ('g_a', g_a);
+  insert into auth.users (id, email) values (u_a, 'a@vorgaben.example');
+  insert into public.profiles (id, name, email, role, mandant_id)
+    values (u_a, 'Alpha Chefin', 'a@vorgaben.example', 'chef', m_a);
+  insert into wer values ('m_a', m_a), ('m_b', m_b), ('g_a', g_a), ('u_a', u_a);
 end $$;
 
 -- --- 1) Ohne alles gilt das eingebaute Verhalten ---------------------------
@@ -50,8 +54,14 @@ insert into public.portal_einstellungen (mandant_id, schluessel, wert) values
 do $$
 declare v jsonb;
 begin
+  -- Unter RLS, nicht daneben: sonst saehe vorlage_vorgaben die Vorlagen
+  -- ALLER Mandanten und suchte sich die hoechste Fassung daraus. Genau das
+  -- ist am 28.09.2026 passiert, als eine zweite Pruefung Zeilen anderer
+  -- Mandanten hinterliess — die Pruefung war bis dahin gruen, weil nichts
+  -- anderes in der Tabelle stand.
   perform set_config('request.jwt.claims',
-    json_build_object('role','authenticated','mandant_id',(select wert from wer where was='m_a'))::text, true);
+    json_build_object('role','authenticated','sub',(select wert from wer where was='u_a'))::text, true);
+  set local role authenticated;
   v := public.vorlage_vorgaben('maklervertrag');
   insert into befund (pruefung, bestanden, bemerkung)
   values ('Vorgaben des Mandanten stechen das Eingebaute',
@@ -67,8 +77,14 @@ insert into public.portal_einstellungen (mandant_id, schluessel, wert) values
 do $$
 declare v jsonb;
 begin
+  -- Unter RLS, nicht daneben: sonst saehe vorlage_vorgaben die Vorlagen
+  -- ALLER Mandanten und suchte sich die hoechste Fassung daraus. Genau das
+  -- ist am 28.09.2026 passiert, als eine zweite Pruefung Zeilen anderer
+  -- Mandanten hinterliess — die Pruefung war bis dahin gruen, weil nichts
+  -- anderes in der Tabelle stand.
   perform set_config('request.jwt.claims',
-    json_build_object('role','authenticated','mandant_id',(select wert from wer where was='m_a'))::text, true);
+    json_build_object('role','authenticated','sub',(select wert from wer where was='u_a'))::text, true);
+  set local role authenticated;
   v := public.vorlage_vorgaben('reservierung');
   insert into befund (pruefung, bestanden, bemerkung)
   values ('Reservierung: Gebuehr und Dauer aus den Vorgaben, Frist eingebaut',
@@ -85,8 +101,14 @@ values ((select wert from wer where was='m_a'), 'maklervertrag', 'vorlagen/mv.do
 do $$
 declare v jsonb;
 begin
+  -- Unter RLS, nicht daneben: sonst saehe vorlage_vorgaben die Vorlagen
+  -- ALLER Mandanten und suchte sich die hoechste Fassung daraus. Genau das
+  -- ist am 28.09.2026 passiert, als eine zweite Pruefung Zeilen anderer
+  -- Mandanten hinterliess — die Pruefung war bis dahin gruen, weil nichts
+  -- anderes in der Tabelle stand.
   perform set_config('request.jwt.claims',
-    json_build_object('role','authenticated','mandant_id',(select wert from wer where was='m_a'))::text, true);
+    json_build_object('role','authenticated','sub',(select wert from wer where was='u_a'))::text, true);
+  set local role authenticated;
   v := public.vorlage_vorgaben('maklervertrag');
   insert into befund (pruefung, bestanden, bemerkung)
   values ('Die Vorlage sticht die Vorgaben — aber nur in ihrem Feld',
@@ -101,8 +123,14 @@ values ((select wert from wer where was='m_a'), (select wert from wer where was=
 do $$
 declare v jsonb; ohne jsonb;
 begin
+  -- Unter RLS, nicht daneben: sonst saehe vorlage_vorgaben die Vorlagen
+  -- ALLER Mandanten und suchte sich die hoechste Fassung daraus. Genau das
+  -- ist am 28.09.2026 passiert, als eine zweite Pruefung Zeilen anderer
+  -- Mandanten hinterliess — die Pruefung war bis dahin gruen, weil nichts
+  -- anderes in der Tabelle stand.
   perform set_config('request.jwt.claims',
-    json_build_object('role','authenticated','mandant_id',(select wert from wer where was='m_a'))::text, true);
+    json_build_object('role','authenticated','sub',(select wert from wer where was='u_a'))::text, true);
+  set local role authenticated;
   v    := public.vorlage_vorgaben('maklervertrag', (select wert from wer where was='g_a'));
   ohne := public.vorlage_vorgaben('maklervertrag');
   insert into befund (pruefung, bestanden, bemerkung)
@@ -117,11 +145,13 @@ end $$;
 insert into public.portal_einstellungen (mandant_id, schluessel, wert) values
   ((select wert from wer where was='m_b'), 'laufzeit_monate_standard', '"24"'::jsonb);
 
+-- Gelesen wird hier OHNE Mandantenbrille: die Frage ist, ob beide Zeilen
+-- nebeneinander existieren, nicht ob Alpha die von Beta sehen darf. Das
+-- darf Alpha ausdruecklich nicht — Pruefung 7 in tests/vorlagen-felder.sql
+-- haelt das fest.
 do $$
 declare a text; b text;
 begin
-  perform set_config('request.jwt.claims',
-    json_build_object('role','authenticated','mandant_id',(select wert from wer where was='m_a'))::text, true);
   a := (select wert #>> '{}' from public.portal_einstellungen
          where mandant_id = (select wert from wer where was='m_a')
            and schluessel = 'laufzeit_monate_standard');
@@ -175,14 +205,14 @@ begin
   end;
 end $$;
 
-select nr, case when bestanden then 'ok  ' else 'FEHL' end as ergebnis, pruefung, bemerkung
+select nr, case when bestanden is true then 'ok  ' else 'FEHL' end as ergebnis, pruefung, bemerkung
   from befund order by nr;
 
 do $$
 declare n int; liste text;
 begin
   select count(*), string_agg(pruefung || ' (' || bemerkung || ')', '; ')
-    into n, liste from befund where not bestanden;
+    into n, liste from befund where bestanden is not true;
   if n > 0 then
     raise exception 'Die Vorgaben der Vorlagen stimmen nicht: % von % — %',
       n, (select count(*) from befund), liste;
