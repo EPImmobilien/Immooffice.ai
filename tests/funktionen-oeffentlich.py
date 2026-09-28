@@ -49,6 +49,17 @@ ABGESICHERT = {
         'und die Zustimmung am Kontakt. Vorher liefen fuenf davon ueber den '
         'Slug "standard" oder ueber die E-Mail-Adresse — beides gibt es bei '
         'mehreren Maklern.'),
+    'eigentuemer-zugang-anfordern': ('profRolle?.mandant_id',
+        'Selbsthilfe ueber die E-Mail-Adresse — und die gilt bei mehreren '
+        'Maklern. Eindeutig ist nur das KONTO: erst das Konto, daraus der '
+        'Mandant, dann Anrede, Ansprechpartner, Aktivitaet, Einladung und '
+        'das Stundenkontingent nur darin. Der Rueckfall auf "irgendeinen '
+        'Chef" traf vorher die ganze Plattform.'),
+    'signatur-token-validieren': ('vorgang.mandant_id',
+        'Token-gebunden, und der Vorgang bringt den Mandanten mit. Das '
+        'Dokument muss ihm gehoeren — die blosse Kennung ist kein Nachweis —, '
+        'und das PDF wird ueber die Storage-Huelle gelesen, also unter '
+        'demselben Pfad, unter dem es geschrieben wurde.'),
     'web-lead': ('immoMandantAusAnfrage',
         'Eingang fuer Bewertungsanfragen. Mandant aus der Anfrage, Chef und '
         'Empfaenger aus dem Mandanten; Kontaktsuche und beide inserts sind '
@@ -80,7 +91,6 @@ NOCH_OFFEN = {
     # KI-Auswertung keine fremden Daten mitschickt.
     'bewerbertest-abgeben': 'Token-gebunden; KI-Auswertung ungelesen.',
     'eigentuemer-benachrichtigungen-versenden': 'Versendet aus einer Warteschlange ohne mandant_id.',
-    'eigentuemer-zugang-anfordern': 'Legt Zugaenge an.',
     'ki-bildbearbeitung': 'Schreibt Bilder, 44 kB, ungelesen.',
     'news-briefing-erstellen': 'Erzeugt Briefings.',
     'portal-ftp-diagnose': 'Diagnose.',
@@ -98,7 +108,6 @@ NOCH_OFFEN = {
     'projekt-wohnungen': 'Neubauportal.',
     'push-antworten': 'Push.',
     'push-senden': 'Push — verschickt an Geraete.',
-    'signatur-token-validieren': 'Token-gebunden, aber ungelesen.',
     'suchkriterien-newsletter': 'Verschickt Newsletter — nach fork_16 gepruefte '
                                 'Quelle, der Versandweg selbst aber ungelesen.',
     'upload-benachrichtigung-versenden': 'Versendet Benachrichtigungen.',

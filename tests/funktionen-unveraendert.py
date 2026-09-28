@@ -93,6 +93,18 @@ for _f in ('projekt-interaktion', 'projekt-login', 'projekt-upload'):
 # ueber die E-Mail-Adresse; beides gibt es bei mehreren Maklern.
 ERWEITERT['expose-freigabe'] = ('Alles am Mandanten des Objekts (Phase 2)')
 
+# Der Anmeldelink des Eigentuemers: die E-Mail-Adresse gilt quer durch alle
+# Mandanten, das Konto nicht. Also erst das Konto, daraus der Mandant, und
+# Anrede, Ansprechpartner, Aktivitaet und Einladung bleiben darin. Der
+# Rueckfall "irgendein Chef" traf vorher die ganze Plattform.
+ERWEITERT['eigentuemer-zugang-anfordern'] = (
+    'Mandant aus dem Konto, alles Weitere darin (Phase 2)')
+
+# Der Signaturlink las das PDF ohne Mandantenpfad — geschrieben wird es mit —
+# und nahm das Dokument allein ueber seine Kennung.
+ERWEITERT['signatur-token-validieren'] = (
+    'Storage-Huelle und Dokument nur aus demselben Mandanten (Phase 2)')
+
 BLOCKZEILEN = {
     'mpe-pdf-erzeugen': {
         'const pins: Array<[number, number, string, string, string]> = [',

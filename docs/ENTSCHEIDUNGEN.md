@@ -2093,3 +2093,51 @@ Kennung gefiltert; lieber kein Impressum als ein fremdes.
 Durchlesen als **unbedenklich** herausgefallen: sie geben nur heraus, was
 am mitgebrachten Token hängt, und lesen nichts daneben. Bleiben
 **16 offene** Endpunkte.
+
+---
+
+## Zwei tokengebundene Endpunkte, zwei verschiedene Lücken (28.09.2026)
+
+**`signatur-token-validieren`** war die harmlosere von beiden — und trotzdem
+seit `fork_08` schlicht kaputt. Geschrieben wird das Vertrags-PDF von
+`signatur-vorgang-starten` und `signatur-unterschreiben`, beide mit der
+Storage-Hülle, also unter `{mandant}/…`. Gelesen wurde es hier ohne Hülle,
+unter dem nackten Pfad. Der signierte Link zeigte auf eine Datei, die es an
+dieser Stelle nicht gibt. Die Funktion bekommt jetzt dieselbe Hülle und den
+Mandanten aus dem Vorgang.
+
+Dazu die zweite Hälfte: der Vertrag hing am Vorgang über eine bloße Kennung.
+Ein Vorgang, der auf ein fremdes Dokument zeigt, hätte dessen Adresse und
+Bezeichnung an jeden mit dem Token herausgegeben. Eine Kennung ist kein
+Nachweis; jetzt muss der Mandant übereinstimmen.
+
+**`eigentuemer-zugang-anfordern`** war das Gegenteil: er fängt mit einer
+E-Mail-Adresse an, und die gilt quer durch alle Mandanten. Gesucht wurde
+damit alles — der Eigentümersatz, die Person, der Ansprechpartner. Und als
+Rückfall, wenn kein Ansprechpartner hinterlegt war: `.eq("role", "chef")
+.limit(1)`, über die ganze Plattform. Name, E-Mail-Adresse und Telefonnummer
+eines wildfremden Geschäftsführers standen dann in der Mail an einen
+Eigentümer, der ihn nie beauftragt hat.
+
+Eindeutig ist genau eine Sache: das **Konto**. Eine Adresse, ein Login.
+Also wird jetzt zuerst das Konto gesucht, daraus der Mandant gelesen, und
+alles Weitere bleibt darin — Anrede, Ansprechpartner, Aktivität,
+Einladungsvermerk. Findet sich kein Mandant, wird nichts versendet; die
+Antwort ist ohnehin immer `{ ok: true }`, der Anfragende merkt keinen
+Unterschied.
+
+Das Stundenkontingent von 30 Versendungen war ebenfalls plattformweit. Das
+ist keine Drosselung mehr, sondern eine Sperre, die ein Mandant dem anderen
+zuziehen kann, ohne es zu merken — es zählt jetzt je Mandant und steht
+deshalb hinter der Mandantenbestimmung. Die Grenze je Adresse (zehn Minuten)
+bleibt, wo sie war: sie schützt die betroffene Person, und die ist dieselbe,
+egal bei welchem Makler.
+
+**Nebenbefund im Erzeuger.** Die Zeilenbremse in
+`scripts/neutralisieren-funktionen.py` erlaubt einer FORK-Regel, die Vorlage
+zu erweitern — aber das Kennzeichen `erweitert` wurde nur in der Schleife
+über `ERSETZUNGEN` gesetzt, nicht in der über `NACHBESSERN`. Solange jede
+erweiterte Funktion ohnehin eine Regel aus der ersten Liste abbekam, fiel es
+nicht auf. Jetzt setzen beide Schleifen es.
+
+Damit: **abgesichert 11, unbedenklich 3, noch offen 14.**

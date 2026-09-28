@@ -446,7 +446,8 @@ ERSETZUNGEN = [
       'mail-anhaenge-diagnose', 'brief-pdf-erzeugen', 'web-asset-kopieren',
       'bild-empfang', 'eigentuemer-report-pdf', 'signatur-vorgang-starten',
       'rechnung-pdf-erzeugen', 'vertrag-pdf', 'mietvertrag-pdf',
-      'reservierung-pdf-erzeugen', 'reservierung-word-erzeugen'}),
+      'reservierung-pdf-erzeugen', 'reservierung-word-erzeugen',
+      'signatur-token-validieren'}),
 
     # =====================================================================
     # FORK — oeffentliche Endpunkte schrieben Zeilen ohne Mandanten
@@ -1678,6 +1679,83 @@ NACHBESSERN = [
      f'const OBJEKT_BASIS = (Deno.env.get("PORTAL_URL") || "https://{HOST}")'
      f'.replace(/\\/?$/, "") + "/objekt.html?t=";',
      'wie oben'),
+
+    # =====================================================================
+    # FORK — der Anmeldelink des Eigentuemers kannte seinen Mandanten nicht
+    #
+    # eigentuemer-zugang-anfordern beginnt mit einer E-Mail-Adresse, und die
+    # gilt quer durch alle Mandanten. Gesucht wurde damit alles: der
+    # Eigentuemersatz, die Person, der Ansprechpartner — und als Rueckfall
+    # "irgendein Chef", .eq("role","chef").limit(1), ueber die ganze
+    # Plattform. Dessen Name, Adresse und Telefonnummer standen dann in der
+    # Mail an einen Eigentuemer, der ihn nie beauftragt hat.
+    #
+    # Eindeutig ist genau eine Sache: das KONTO. Eine Adresse, ein Login.
+    # Also wird zuerst das Konto gesucht, daraus der Mandant gelesen, und
+    # alles Weitere bleibt darin. Findet sich kein Mandant, wird nichts
+    # versendet — die Antwort ist ohnehin immer { ok: true }, der Anfragende
+    # merkt keinen Unterschied.
+    # =====================================================================
+    ('FORK',
+     '    const seitStunde = new Date(Date.now() - 3600e3).toISOString();\n    const { count: nGesamt } = await admin.from("mail_versendet").select("id", { count: "exact", head: true })\n      .ilike("betreff", BETREFF_MUSTER).eq("status", "gesendet").gte("gesendet_am", seitStunde);\n    if ((nGesamt || 0) >= JE_STUNDE_GESAMT) return still("Stundenkontingent erschöpft");',
+     '    // Das Stundenkontingent steht weiter unten — es wird je Mandant gezaehlt,\n    // und der steht erst fest, wenn das Konto gefunden ist.',
+     'Zugang anfordern: das Stundenkontingent wandert hinter die Mandantenbestimmung.',
+     {'eigentuemer-zugang-anfordern'}),
+    ('FORK',
+     '    // Konto finden: Profil mit Rolle eigentuemer, sonst Eigentuemer/Person mit verknuepftem Konto\n    let userId: string | null = null;\n    const { data: prof } = await admin.from("profiles").select("id, role").eq("email", email).eq("role", "eigentuemer").limit(1).maybeSingle();\n    if (prof?.id) userId = prof.id;\n    const { data: eig } = await admin.from("eigentuemer").select("id, anrede, titel, vorname, nachname, user_id, aktiv").eq("email", email).order("created_at", { ascending: false }).limit(1).maybeSingle();\n    const { data: pers } = await admin.from("eigentuemer_personen").select("id, anrede, vorname, nachname, user_id, eigentuemer_id").eq("email", email).order("created_at", { ascending: false }).limit(1).maybeSingle();\n    if (!userId) userId = eig?.user_id || pers?.user_id || null;\n    if (!userId) return still("kein Eigentümer-Zugang zu dieser Adresse");\n    if (eig && eig.aktiv === false && !pers) return still("Eigentümer inaktiv");\n    const { data: profRolle } = await admin.from("profiles").select("role").eq("id", userId).maybeSingle();\n    if (profRolle && profRolle.role !== "eigentuemer") return still("Konto ist kein Eigentümer-Konto");',
+     '    // Konto finden: Profil mit Rolle eigentuemer, sonst Eigentuemer/Person mit verknuepftem Konto.\n    // Die Adresse ist der einzige Anhaltspunkt, und sie gilt mandantenuebergreifend. Deshalb wird\n    // zuerst das KONTO gesucht — das gibt es je Adresse nur einmal — und aus ihm der Mandant\n    // bestimmt. Alles Weitere bleibt in diesem Mandanten.\n    let userId: string | null = null;\n    const { data: prof } = await admin.from("profiles").select("id, role").eq("email", email).eq("role", "eigentuemer").limit(1).maybeSingle();\n    if (prof?.id) userId = prof.id;\n    if (!userId) {\n      const { data: eigKonto } = await admin.from("eigentuemer").select("user_id").eq("email", email).not("user_id", "is", null).order("created_at", { ascending: false }).limit(1).maybeSingle();\n      const { data: persKonto } = await admin.from("eigentuemer_personen").select("user_id").eq("email", email).not("user_id", "is", null).order("created_at", { ascending: false }).limit(1).maybeSingle();\n      userId = eigKonto?.user_id || persKonto?.user_id || null;\n    }\n    if (!userId) return still("kein Eigentümer-Zugang zu dieser Adresse");\n    const { data: profRolle } = await admin.from("profiles").select("role, mandant_id").eq("id", userId).maybeSingle();\n    if (profRolle && profRolle.role !== "eigentuemer") return still("Konto ist kein Eigentümer-Konto");\n    const mandant = profRolle?.mandant_id || null;\n    if (!mandant) return still("Konto ohne Mandanten");\n\n    // Stundenkontingent je Mandant. Global waere es eine Sperre, die ein\n    // Mandant dem anderen zuziehen kann, ohne es zu merken.\n    const seitStunde = new Date(Date.now() - 3600e3).toISOString();\n    const { count: nGesamt } = await admin.from("mail_versendet").select("id", { count: "exact", head: true })\n      .eq("mandant_id", mandant).ilike("betreff", BETREFF_MUSTER).eq("status", "gesendet").gte("gesendet_am", seitStunde);\n    if ((nGesamt || 0) >= JE_STUNDE_GESAMT) return still("Stundenkontingent erschöpft");\n\n    // Ab hier nur noch der Mandant des Kontos: Anrede, Ansprechpartner,\n    // Aktivitaet und Einladung gehoeren dorthin, wo das Konto zu Hause ist.\n    const { data: eig } = await admin.from("eigentuemer").select("id, anrede, titel, vorname, nachname, user_id, aktiv").eq("mandant_id", mandant).eq("email", email).order("created_at", { ascending: false }).limit(1).maybeSingle();\n    const { data: pers } = await admin.from("eigentuemer_personen").select("id, anrede, vorname, nachname, user_id, eigentuemer_id").eq("mandant_id", mandant).eq("email", email).order("created_at", { ascending: false }).limit(1).maybeSingle();\n    if (eig && eig.aktiv === false && !pers) return still("Eigentümer inaktiv");',
+     'Zugang anfordern: erst das Konto, daraus der Mandant, dann alles Weitere darin.',
+     {'eigentuemer-zugang-anfordern'}),
+    ('FORK',
+     '      const { data: eigA } = await admin.from("eigentuemer").select("anrede, titel").eq("id", pers.eigentuemer_id).maybeSingle();',
+     '      const { data: eigA } = await admin.from("eigentuemer").select("anrede, titel").eq("mandant_id", mandant).eq("id", pers.eigentuemer_id).maybeSingle();',
+     'Zugang anfordern: die Anrede aus dem eigenen Mandanten.',
+     {'eigentuemer-zugang-anfordern'}),
+    ('FORK',
+     'await admin.from("eigentuemer_objekte").select("ansprechpartner_id").eq("eigentuemer_id", eigentuemerId)',
+     'await admin.from("eigentuemer_objekte").select("ansprechpartner_id").eq("mandant_id", mandant).eq("eigentuemer_id", eigentuemerId)',
+     'Zugang anfordern: der Ansprechpartner kommt aus dem eigenen Mandanten.',
+     {'eigentuemer-zugang-anfordern'}),
+    ('FORK',
+     'const { data: ap } = await admin.from("profiles").select("id, name, email, telefon").eq("id", eo.ansprechpartner_id).maybeSingle();',
+     'const { data: ap } = await admin.from("profiles").select("id, name, email, telefon").eq("mandant_id", mandant).eq("id", eo.ansprechpartner_id).maybeSingle();',
+     'Zugang anfordern: auch sein Profil nur im eigenen Mandanten.',
+     {'eigentuemer-zugang-anfordern'}),
+    ('FORK',
+     'const { data: chef } = await admin.from("profiles").select("id, name, email, telefon").eq("role", "chef").limit(1).maybeSingle();',
+     'const { data: chef } = await admin.from("profiles").select("id, name, email, telefon").eq("mandant_id", mandant).eq("role", "chef").limit(1).maybeSingle();',
+     'Zugang anfordern: der Rueckfall auf den Chef bleibt im eigenen Mandanten.',
+     {'eigentuemer-zugang-anfordern'}),
+    ('FORK',
+     'await admin.from("eigentuemer_einladungen").update({ erinnert_am: new Date().toISOString(), versandweg: erg.versandweg, letzter_fehler: null }).eq("eigentuemer_id", eigentuemerId).eq("status", "offen")',
+     'await admin.from("eigentuemer_einladungen").update({ erinnert_am: new Date().toISOString(), versandweg: erg.versandweg, letzter_fehler: null }).eq("mandant_id", mandant).eq("eigentuemer_id", eigentuemerId).eq("status", "offen")',
+     'Zugang anfordern: die Einladung des eigenen Mandanten nachfuehren.',
+     {'eigentuemer-zugang-anfordern'}),
+
+    # =====================================================================
+    # FORK — der Signaturlink las am Mandanten vorbei
+    #
+    # Zwei Dinge. Erstens: das PDF. Geschrieben wird es von
+    # signatur-vorgang-starten und signatur-unterschreiben, beide mit der
+    # Storage-Huelle — also unter {mandant}/…. Gelesen wurde es hier ohne,
+    # also unter dem nackten Pfad. Der signierte Link zeigte damit auf eine
+    # Datei, die es an dieser Stelle nicht gibt.
+    #
+    # Zweitens: der Vertrag haengt am Vorgang ueber eine blosse Kennung. Ein
+    # Vorgang, der auf ein fremdes Dokument zeigt, haette dessen Adresse und
+    # Bezeichnung an jeden mit dem Token herausgegeben. Die Kennung allein
+    # ist kein Nachweis; der Mandant muss uebereinstimmen.
+    # =====================================================================
+    ('FORK',
+     '    if (!vorgang) throw new Error("Signatur-Vorgang nicht gefunden.");',
+     '    if (!vorgang) throw new Error("Signatur-Vorgang nicht gefunden.");\n    immoSetzeMandant(vorgang.mandant_id);',
+     'Mandant aus dem Signaturvorgang: signatur-token-validieren.',
+     {'signatur-token-validieren'}),
+    ('FORK',
+     'const { data } = await admin.from(quelltabelle).select("*").eq("id", vorgang.vertrag_id).maybeSingle();',
+     'const { data } = await admin.from(quelltabelle).select("*").eq("id", vorgang.vertrag_id).eq("mandant_id", vorgang.mandant_id).maybeSingle();',
+     'Signaturlink: das Dokument muss demselben Mandanten gehoeren wie der Vorgang.',
+     {'signatur-token-validieren'}),
 ]
 
 
@@ -1743,6 +1821,12 @@ def main():
                 if n:
                     inhalt = inhalt.replace(muster, ersatz)
                     zaehler[(grund, muster)] = zaehler.get((grund, muster), 0) + n
+                    # Auch eine NACHBESSERN-Regel darf die Vorlage erweitern.
+                    # Das stand bisher nur an der Schleife darueber — solange
+                    # jede betroffene Funktion ohnehin eine FORK-Regel aus
+                    # ERSETZUNGEN abbekam, fiel es nicht auf.
+                    if grund == 'FORK':
+                        erweitert = True
             # Zweite Notbremse: eine NEUTRALISIERUNG fuegt keine Zeilen hinzu
             # und entfernt hoechstens die beiden Standortzeilen. Eine
             # FORK-Regel erweitert die Vorlage und darf das sehr wohl —
