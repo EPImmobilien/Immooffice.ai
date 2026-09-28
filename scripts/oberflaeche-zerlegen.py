@@ -2231,6 +2231,32 @@ ERSETZUNGEN = [
      r'\1',
      'Vertragsvorlagen: der Knopf zum Markieren.'),
 
+    # =====================================================================
+    # FORK — ein leergefallener Anker zerlegte das Dokument in Einzelzeichen
+    #
+    # GEFUNDEN am 28.09.2026 beim Lesen von fillMaklervertrag. Die
+    # Neutralisierung ersetzt die Anschrift der Referenz durch "" — auch
+    # dort, wo sie als SUCHTEXT stand:
+    #
+    #     r = r.split("Am Voegenteich 26 R, 18055 Rostock").join(strasse)
+    #  wurde zu
+    #     r = r.split("").join(strasse)
+    #
+    # "abc".split("").join("X") ergibt "aXbXc". Der Ausdruck haette also
+    # zwischen JEDES Zeichen der Datei word/document.xml die eigene
+    # Strassenangabe geschrieben — aus dem Vertrag waere Buchstabensalat
+    # geworden, und zwar ohne Fehlermeldung.
+    #
+    # Zwei Fundstellen: Maklervertrag und Objektnachweis. Der Ausdruck faellt
+    # ersatzlos weg; die Strasse setzt ohnehin die Zeile darunter ueber den
+    # Platzhalter {strasse}. tests/oberflaeche-rauchtest.py haelt fest, dass
+    # kein leerer Anker zurueckkommt.
+    # =====================================================================
+    ('FORK',
+     r'r = r\.split\(""\)\.join\(escapeXml\(i\.strasse\)\), ',
+     '',
+     'Leergefallener Anker: split("") haette das Dokument zerlegt.'),
+
     ('MARKE', r'\bEP_', 'IMMO_', 'Vorsatz EP_ in Bezeichnern der Oberflaeche.'),
 
     # --- MARKE: das Kuerzel in der Erkennung interner Umbuchungen.

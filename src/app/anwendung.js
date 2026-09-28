@@ -1422,7 +1422,7 @@ async function fillMaklervertrag(e) {
     const t = "eheleute" === e.verkaeufer_typ ? "Eheleute" : "herr" === e.verkaeufer_typ ? "Herr" : "frau" === e.verkaeufer_typ ? "Frau" : "Eheleute";
     r = r.split("Eheleute").join(escapeXml(t)), r = r.split("Anke &amp; Erich Stecker").join(escapeXml(e.verkaeufer_name || "")), r = r.split("Dorfstraße 17").join(escapeXml(e.verkaeufer_strasse || "")), r = r.split("19386 Werder").join(escapeXml(`${e.verkaeufer_plz||""} ${e.verkaeufer_ort||""}`.trim()))
   }
-  r = r.split("Musterhaus Immobilien GmbH").join(escapeXml(i.name)), r = r.split("ImmoOffice Immobilien GmbH").join(escapeXml(i.firma)), r = r.split("").join(escapeXml(i.strasse)), r = r.split("12345 Musterstadt").join(escapeXml(i.plz_ort)), r = r.split("Einfamilienhaus mit Nebengelass - ").join(epVertragObjektKopf(e, escapeXml));
+  r = r.split("Musterhaus Immobilien GmbH").join(escapeXml(i.name)), r = r.split("ImmoOffice Immobilien GmbH").join(escapeXml(i.firma)), r = r.split("12345 Musterstadt").join(escapeXml(i.plz_ort)), r = r.split("Einfamilienhaus mit Nebengelass - ").join(epVertragObjektKopf(e, escapeXml));
   const s = epVertragObjektAdresse(e);
   r = r.split("Louis-Fürnberg-Straße 38, 18356 Barth").join(escapeXml(s || "")), "vermietung" === e.vertragsart && (r = r.split("Vermittlung der Immobilie:").join("Vermittlung der Vermietung der Immobilie:")), r = r.split("Musterstadt, 11.05.2026").join(`${escapeXml(i.stadt)}, ${escapeXml(o)}`);
   const c = e.angebotspreis ? formatMoneyDE(e.angebotspreis) : "____________________________",
@@ -1742,7 +1742,7 @@ async function fillObjektnachweis(e) {
     staat: "Deutsch",
     ausweis: ""
   }]);
-  r = flattenParagraphs(r, ["Kaufangebotes vom", "Name/Vorname:", "Anschrift:", "Ort und Datum der Geburt:", "Staatsangehörigkeit:", "Ausweis- oder Reisepassnummer:", "Provision in Höhe von", "Einfamilienhaus mit Einliegerwohnung", "Sehr geehrte Frau Schellhorn", "Notariat", "{strasse}", "vertreten durch {geschaeftsfuehrer}", "12345"]), r = r.split("Musterhaus Immobilien GmbH").join(escapeXml(i.name)), r = r.split("ImmoOffice Immobilien GmbH").join(escapeXml(i.firma)), r = r.split("").join(escapeXml(i.strasse)), r = r.split("12345 Musterstadt").join(escapeXml(i.plz_ort)), r = r.split("Musterstadt, 01.05.2026").join(`${escapeXml(i.stadt)}, ${escapeXml(o)}`), r = r.split("Kaufangebotes vom 30.04.2026").join(`Kaufangebotes vom ${escapeXml(s)}`);
+  r = flattenParagraphs(r, ["Kaufangebotes vom", "Name/Vorname:", "Anschrift:", "Ort und Datum der Geburt:", "Staatsangehörigkeit:", "Ausweis- oder Reisepassnummer:", "Provision in Höhe von", "Einfamilienhaus mit Einliegerwohnung", "Sehr geehrte Frau Schellhorn", "Notariat", "{strasse}", "vertreten durch {geschaeftsfuehrer}", "12345"]), r = r.split("Musterhaus Immobilien GmbH").join(escapeXml(i.name)), r = r.split("ImmoOffice Immobilien GmbH").join(escapeXml(i.firma)), r = r.split("12345 Musterstadt").join(escapeXml(i.plz_ort)), r = r.split("Musterstadt, 01.05.2026").join(`${escapeXml(i.stadt)}, ${escapeXml(o)}`), r = r.split("Kaufangebotes vom 30.04.2026").join(`Kaufangebotes vom ${escapeXml(s)}`);
   const d = formatMoneyDE(e.kaufpreis);
   r = r.split("Einfamilienhaus mit Einliegerwohnung – Mittelweg 36B in 19386 Passow zu einem Kaufpreis von 395.000€.").join(`${escapeXml(e.objekt_bezeichnung||"")} – ${escapeXml(e.objekt_adresse||"")} zu einem Kaufpreis von ${escapeXml(d)}.`);
   const u = c[0],

@@ -1846,3 +1846,35 @@ Hochladen aus der Dateiendung bestimmt und entscheidet, welcher Weg gilt.
 Rückstrich eine Anweisung, kein Zeichen. Das `\s` in einem regulären Ausdruck
 des eingefügten JavaScript ließ den Generator mit „bad escape" abbrechen. Im
 Ersatz müssen Rückstriche verdoppelt stehen.
+
+---
+
+## Ein leergefallener Suchtext hätte jeden Vertrag zerlegt (28.09.2026)
+
+Beim Lesen von `fillMaklervertrag` gefunden, bevor ich die Erzeugung umbaue.
+Die Neutralisierung ersetzt die Anschrift der Referenz durch `""` — auch
+dort, wo sie als **Suchtext** stand:
+
+```js
+r = r.split("<Anschrift der Referenz>").join(strasse)   // vorher
+r = r.split("").join(strasse)                           // nachher
+```
+
+`"abc".split("").join("X")` ergibt `"aXbXc"`. Der Ausdruck hätte also
+zwischen **jedes Zeichen** von `word/document.xml` die eigene Straßenangabe
+geschrieben. Aus dem Vertrag wäre Buchstabensalat geworden — ohne
+Fehlermeldung, ohne Absturz, mit einer Datei, die sich herunterladen lässt.
+
+Zwei Fundstellen: Maklervertrag und Objektnachweis. Der Ausdruck fällt
+ersatzlos weg; die Straße setzt ohnehin die Zeile darunter über den
+Platzhalter `{strasse}`.
+
+**Warum es niemandem aufgefallen ist:** die beiden eingebauten Word-Dateien
+sind seit `fork_12` geleert, und ohne Vorlage kommt die Funktion nie so weit.
+Der Fehler hätte genau dann zugeschlagen, wenn der erste Makler seine eigene
+Vorlage hochlädt.
+
+`tests/oberflaeche-rauchtest.py` hält jetzt fest, dass kein leerer Suchtext
+zurückkommt — mit einer erlaubten Ausnahme, dem Alphabet der
+Buchstabenhäufigkeit, das absichtlich in Einzelzeichen zerfällt.
+Nachgewiesen an einem eingefügten zweiten Vorkommen.

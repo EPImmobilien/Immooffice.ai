@@ -35,6 +35,20 @@ def pruefungen(html):
         (ja if bedingung else nein).append((text, hinweis))
 
     pruefe(html.startswith('<!DOCTYPE html>'), 'Beginnt mit einer Doctype-Angabe')
+
+    # Ein leergefallener Suchtext. Die Neutralisierung ersetzt Kennzeichen der
+    # Referenz durch "" — steht so eines als SUCHTEXT in einem split(), bleibt
+    # split("") stehen, und das zerlegt die Zeichenkette in Einzelzeichen:
+    # "abc".split("").join("X") ergibt "aXbXc". Am 28.09.2026 stand genau das
+    # in fillMaklervertrag und fillObjektnachweis und haette aus jedem Vertrag
+    # Buchstabensalat gemacht — ohne Fehlermeldung.
+    #
+    # Eine Fundstelle ist erlaubt und gewollt: das Alphabet der
+    # Buchstabenhaeufigkeit, das absichtlich in Einzelzeichen zerfaellt.
+    leere_anker = len(re.findall(r'\.split\(""\)', html))
+    pruefe(leere_anker <= 1,
+           'Kein leergefallener Suchtext in einem split()',
+           f'gefunden: {leere_anker} (erlaubt: 1, die Buchstabenhaeufigkeit)')
     pruefe(html.count('<div id="root">') == 1,
            'Genau ein Wurzelelement fuer React',
            f'gefunden: {html.count(chr(60) + "div id=" + chr(34) + "root" + chr(34) + chr(62))}')
