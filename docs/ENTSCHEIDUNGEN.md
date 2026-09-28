@@ -1316,3 +1316,39 @@ zunächst nicht. Dort stand dann die E-Mail-Adresse an der Stelle des
 Mandanten — die Benachrichtigung wäre gar nicht mehr rausgegangen. Aufgefallen
 beim Lesen des erzeugten Ergebnisses, nicht beim Schreiben der Regel. Deshalb
 gehört der Blick auf das Erzeugte zum Vorgang, nicht ans Ende.
+
+## 2026-09-28 · Belegnummern: neuer Kreis neben dem alten, nicht darüber
+
+**Angefordert:** „auch die Rechnungsnummer varianten müssen wie bei onoffice
+irgendwie gepflegt werden." Abschnitt 3c nennt es genauer: ein Muster aus
+Präfix, Jahr, Monat, fortlaufender Zahl mit n Stellen, Trennzeichen und
+optionalem Standort-Kürzel, Live-Vorschau, eigener Kreis für Gutschriften,
+Rücksetzung jährlich/monatlich/nie.
+
+**Was die Vorlage kann:** `rechnung_nummer_praefix` und
+`rechnung_nummer_mit_jahr`. Das Ergebnis ist immer `PRÄFIX-JAHR-001` mit drei
+Stellen. Kein Muster, kein Monat, kein zweiter Kreis.
+
+**Entscheidung:** `rechnung_nummern_sequence` wird **nicht angefasst**. Dort
+stehen bereits vergebene Nummern; ein Umbau daran wäre ein Eingriff in eine
+Folge, die nach GoBD lückenlos sein muss. Der neue Kreis steht daneben.
+`naechste_rechnungsnummer()` benutzt ihn, **sobald einer eingerichtet ist**,
+und verhält sich sonst wie bisher. Wer nichts einstellt, merkt nichts.
+
+**Zähler und Konfiguration stehen in einer Zeile.** Das ist kein
+Schönheitsfehler, sondern der Grund für die Lückenlosigkeit: die Vergabe ist
+ein einziges `update … returning`, kein Lesen-dann-Rechnen-dann-Schreiben.
+Dazwischen passt ein zweiter Aufruf.
+
+**Die Vorschau rechnet nicht in der Oberfläche.** Sie ruft dieselbe
+Datenbankfunktion, die später die echte Nummer erzeugt. Zwei Fassungen
+derselben Regel laufen auseinander — bei `hat_recht()` ist genau das schon
+einmal aufgefallen.
+
+**Was der Test NICHT beweist:** Der Auftrag verlangt einen Lasttest mit 50
+gleichzeitigen Anlagen. Echte Gleichzeitigkeit lässt sich in einer psql-Sitzung
+nicht herstellen. Geprüft ist, dass 200 Vergaben 200 verschiedene, lückenlos
+aufsteigende Nummern ergeben. Der Aufbau als ein `update … returning` ist das,
+was auch unter Gleichzeitigkeit trägt — aber ein Lesen-dann-Schreiben wäre in
+diesem Test ebenfalls grün und im Betrieb trotzdem falsch. Vermerkt in
+`docs/OFFEN.md`.

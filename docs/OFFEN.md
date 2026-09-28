@@ -573,3 +573,21 @@ abfragen — das braucht einen eigenen, systematischen Durchgang.
 
 **Vor Gate 2 (Ende Phase 3) ist das zu erledigen.** Ein zweiter Mandant darf
 erst auf ein System, bei dem auch dieser Teil durchgesehen ist.
+
+## Belegnummern: was der Test nicht beweist
+
+`tests/belegnummern.sql` prüft 200 aufeinanderfolgende Vergaben. Der Auftrag
+(Abschnitt 5) verlangt einen **Lasttest mit 50 gleichzeitigen Anlagen**. Das
+geht in einer psql-Sitzung nicht — und der Unterschied ist genau der, auf den
+es ankommt: ein `select` gefolgt von einem `update` wäre in diesem Test
+ebenfalls grün und im Betrieb trotzdem falsch.
+
+Gebaut ist die sichere Form (ein `update … returning`). **Nachgewiesen ist sie
+nicht.** Dafür braucht es einen Lauf mit echten parallelen Verbindungen, etwa
+über `pgbench` oder mehrere Edge-Function-Aufrufe gleichzeitig. Vor Gate 3
+(Stripe-Live) nachzuholen, weil dann Rechnungen im Echtbetrieb entstehen.
+
+**Ebenfalls offen aus Abschnitt 3c:** Zahlungsziele und Skonto,
+Rechnungsfreigabe mit Verantwortlichem, Mahnstufen, Buchungskonten (SKR03/04),
+Steuersätze und Reverse Charge, SEPA-Gläubiger-ID, DATEV-Export, ZUGFeRD und
+XRechnung. Gebaut ist bisher nur der Nummernkreis.

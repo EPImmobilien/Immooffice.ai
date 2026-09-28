@@ -132873,7 +132873,7 @@ function EinstellungenPage({ user }) {
   const knopf = (aktiv) => ({ background: "transparent", border: "none", padding: "10px 16px", fontSize: 14,
     fontWeight: aktiv ? 600 : 400, color: aktiv ? CI.blau : CI.muted,
     borderBottom: aktiv ? `2px solid ${CI.blau}` : "2px solid transparent", cursor: "pointer", fontFamily: FONT });
-  const reiterListe = [["firma", "Firma & Impressum"], ["gesellschaften", "Gesellschaften"], ["standorte", "Standorte"], ["signatur", "Signatur & Texte"], ["vorgaben", "Vorgaben"], ["vertragsvorlagen", "Vertragsvorlagen"]];
+  const reiterListe = [["firma", "Firma & Impressum"], ["gesellschaften", "Gesellschaften"], ["standorte", "Standorte"], ["belegnummern", "Belegnummern"], ["signatur", "Signatur & Texte"], ["vorgaben", "Vorgaben"], ["vertragsvorlagen", "Vertragsvorlagen"]];
   return React.createElement(React.Fragment, null,
     React.createElement("div", { style: { display: "flex", borderBottom: `1px solid ${CI.border}`, marginBottom: 24, flexWrap: "wrap" } },
       reiterListe.map(([id, label]) => React.createElement("button", { key: id, "data-einst-reiter": id,
@@ -132881,10 +132881,147 @@ function EinstellungenPage({ user }) {
     !geladen ? React.createElement("div", { style: { padding: 24, color: CI.muted } }, "Lade Einstellungen …")
       : reiter === "firma" ? React.createElement(AdminGmbHStammdaten, { user })
       : reiter === "gesellschaften" ? React.createElement(EinstGesellschaften, { user })
+      : reiter === "belegnummern" ? React.createElement(EinstBelegnummern, { user })
       : reiter === "standorte" ? React.createElement(EinstStandorte, null)
       : reiter === "signatur" ? React.createElement(EinstSignatur, { user })
       : reiter === "vertragsvorlagen" ? React.createElement(EinstVertragsvorlagen, { user })
       : React.createElement(EinstVorgaben, null));
+}
+
+// Belegnummern je Gesellschaft. Muster mit Platzhaltern, Vorschau aus
+// derselben Datenbankfunktion, die spaeter die echte Nummer erzeugt.
+//
+// Warum nicht in der Oberflaeche gerechnet: dann gaebe es die Regel
+// zweimal, und die beiden Fassungen laufen auseinander. Die Vorschau ist
+// hier nur Anzeige, die Wahrheit steht in der Datenbank.
+const IMMO_BELEGARTEN = [
+  ["rechnung", "Rechnung", "RE-{JJJJ}-{MM}-{#####}"],
+  ["gutschrift", "Gutschrift / Korrektur", "GS-{JJJJ}-{MM}-{#####}"]
+];
+const IMMO_RUECKSETZUNG = [
+  ["jaehrlich", "jährlich"], ["monatlich", "monatlich"], ["nie", "nie"]
+];
+
+function EinstBelegnummern({ user }) {
+  const [kreise, setKreise] = useState([]);
+  const [gesellschaften, setGesellschaften] = useState([]);
+  const [laedt, setLaedt] = useState(true);
+  const [meldung, setMeldung] = useState("");
+  const [fehler, setFehler] = useState("");
+  const [vorschau, setVorschau] = useState({});
+  const [entwurf, setEntwurf] = useState({});
+  const [speichert, setSpeichert] = useState(null);
+  const darfAendern = hatRecht(user, "rechnungen") || hatRecht(user, "admin");
+  const laden = async () => {
+    setLaedt(true);
+    try {
+      const [k, g] = await Promise.all([
+        window._sb.from("belegnummernkreise").select("*"),
+        window._sb.from("gesellschaften").select("id, name, aktiv").order("sortierung").order("name")
+      ]);
+      if (k.error) throw k.error;
+      if (g.error) throw g.error;
+      setKreise(k.data || []);
+      setGesellschaften(g.data || []);
+    } catch (f) {
+      setFehler("Belegnummern konnten nicht geladen werden: " + (f.message || f));
+    }
+    setLaedt(false);
+  };
+  useEffect(() => { laden(); }, []);
+  // Die Vorschau kommt aus der Datenbank, mit der Beispielnummer 1.
+  const vorschauHolen = async (schluessel, muster) => {
+    try {
+      const { data } = await window._sb.rpc("belegnummer_aus_muster", {
+        p_muster: muster, p_nummer: 1, p_standort: "NORD"
+      });
+      setVorschau((v) => ({ ...v, [schluessel]: data || "" }));
+    } catch (f) {
+      setVorschau((v) => ({ ...v, [schluessel]: "(Vorschau nicht möglich)" }));
+    }
+  };
+  const kreisVon = (gid, art) => kreise.filter(
+    (k) => k.art === art && (k.gesellschaft_id || null) === (gid || null))[0] || null;
+  const sichern = async (gid, art, felder) => {
+    setFehler(""); setMeldung(""); setSpeichert(gid + art);
+    try {
+      const vorhanden = kreisVon(gid, art);
+      if (vorhanden) {
+        const { error } = await window._sb.from("belegnummernkreise")
+          .update({ ...felder, geaendert_am: new Date().toISOString() }).eq("id", vorhanden.id);
+        if (error) throw error;
+      } else {
+        const { error } = await window._sb.from("belegnummernkreise")
+          .insert({ gesellschaft_id: gid || null, art, ...felder });
+        if (error) throw error;
+      }
+      await logAction("update", "belegnummernkreis", gid || "", art, felder);
+      setMeldung("Gespeichert.");
+      await laden();
+    } catch (f) {
+      setFehler("Speichern fehlgeschlagen: " + (f.message || f));
+    }
+    setSpeichert(null);
+  };
+  if (laedt) return React.createElement("div", { style: { padding: 24, color: CI.muted } }, "Lade Belegnummern …");
+  // Ohne Gesellschaft ein Kreis fuer das ganze Konto — der Einzelmakler
+  // richtet einen ein und ist fertig.
+  const zeilen = gesellschaften.length
+    ? gesellschaften.map((g) => ({ id: g.id, name: g.name }))
+    : [{ id: null, name: "Ganzes Konto" }];
+  return React.createElement("div", null,
+    React.createElement("div", { style: { fontSize: 13, color: CI.muted, marginBottom: 16, lineHeight: 1.6 } },
+      "Jede Gesellschaft stellt eigene Belege und hat deshalb einen eigenen Nummernkreis. ",
+      "Die Nummer wird in der Datenbank vergeben, lückenlos und auch dann eindeutig, ",
+      "wenn zwei Rechnungen gleichzeitig entstehen."),
+    React.createElement("div", { style: { padding: "12px 14px", background: `${CI.blau}0e`,
+      borderLeft: `3px solid ${CI.blau}`, fontSize: 12.5, color: CI.blau, lineHeight: 1.6, marginBottom: 20 } },
+      React.createElement("strong", null, "Platzhalter: "),
+      "{JJJJ} Jahr vierstellig · {JJ} zweistellig · {MM} Monat · {TT} Tag · ",
+      "{STANDORT} Kürzel des Standorts · {#} bis {##########} die fortlaufende Zahl, ",
+      "eine Raute je Stelle."),
+    React.createElement(ErrorBox, null, fehler),
+    React.createElement(SuccessBox, null, meldung),
+    !darfAendern ? React.createElement("div", { style: { fontSize: 12.5, color: CI.muted, marginBottom: 16 } },
+      "Zum Ändern fehlt dir das Recht „Rechnungen“ — du siehst hier nur, was eingerichtet ist.") : null,
+    React.createElement("div", { style: { display: "grid", gap: 16 } },
+      zeilen.map((g) => React.createElement("div", { key: g.id || "konto", "data-belegkreis": g.id || "konto",
+        style: { ...cardStyle, padding: 16 } },
+        React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: CI.blau, marginBottom: 12 } }, g.name),
+        IMMO_BELEGARTEN.map(([art, label, standard]) => {
+          const k = kreisVon(g.id, art);
+          const schluessel = (g.id || "konto") + "-" + art;
+          const wert = entwurf[schluessel] !== undefined
+            ? entwurf[schluessel] : (k ? k.muster : standard);
+          return React.createElement("div", { key: art, style: { marginBottom: 14 } },
+            React.createElement("label", { style: labelStyle }, label),
+            React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" } },
+              React.createElement("input", { style: { ...inputStyle, flex: "2 1 220px", fontFamily: "monospace" },
+                value: wert, disabled: !darfAendern,
+                onChange: (ev) => { const w = ev.target.value;
+                  setEntwurf((e) => ({ ...e, [schluessel]: w })); vorschauHolen(schluessel, w); },
+                onFocus: () => vorschauHolen(schluessel, wert) }),
+              React.createElement("select", { style: { ...inputStyle, flex: "1 1 140px" },
+                value: k ? k.zuruecksetzen : "jaehrlich", disabled: !darfAendern,
+                onChange: (ev) => sichern(g.id, art, { muster: wert, zuruecksetzen: ev.target.value }) },
+                IMMO_RUECKSETZUNG.map(([w, l]) => React.createElement("option", { key: w, value: w },
+                  "zurücksetzen: " + l))),
+              darfAendern ? React.createElement("button", {
+                onClick: () => sichern(g.id, art, { muster: wert,
+                  zuruecksetzen: k ? k.zuruecksetzen : "jaehrlich" }),
+                disabled: speichert === (g.id || "") + art,
+                style: { ...secondaryBtn, padding: "8px 14px", fontSize: 12.5 } },
+                speichert === (g.id || "") + art ? "Speichert …" : "Speichern") : null),
+            React.createElement("div", { style: { fontSize: 12, color: CI.muted, marginTop: 6 } },
+              "Vorschau: ",
+              React.createElement("span", { style: { fontFamily: "monospace", color: CI.blau, fontWeight: 600 } },
+                vorschau[schluessel] || (k ? "—" : "noch nicht eingerichtet")),
+              k ? ("  ·  zuletzt vergeben: " + (k.letzte_nummer || 0)
+                   + (k.periode ? " in " + k.periode : "")) : ""));
+        })))),
+    React.createElement("div", { style: { fontSize: 12, color: CI.muted, marginTop: 20, lineHeight: 1.6 } },
+      "Solange kein Kreis eingerichtet ist, gilt der bisherige Weg aus den Firmendaten ",
+      "(Präfix und „mit Jahr“). Bereits vergebene Nummern bleiben unberührt."));
 }
 
 // Die Gesellschaften eines Mandanten. Zwischen Konto und Standort: ein

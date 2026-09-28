@@ -1121,6 +1121,172 @@ ERSETZUNGEN = [
      '// Vertragsvorlagen je Mandant. Hochladen darf nur, wer das Modul "admin"',
      'Einstellungen: die Seite EinstGesellschaften.'),
 
+    # =====================================================================
+    # FORK — Abschnitt 3c: Belegnummern pflegen
+    #
+    # Angefordert am 28.09.2026. Die Vorlage kann Praefix und "mit Jahr", das
+    # Ergebnis ist immer PRAEFIX-JAHR-001. Der Auftrag will ein frei
+    # gestaltbares Muster mit Live-Vorschau, einen eigenen Kreis fuer
+    # Gutschriften und eine Ruecksetzung jaehrlich, monatlich oder nie.
+    #
+    # Die Vorschau rechnet NICHT in der Oberflaeche, sondern ruft dieselbe
+    # Datenbankfunktion, die spaeter die echte Nummer erzeugt
+    # (belegnummer_aus_muster). Zwei Fassungen derselben Regel laufen sonst
+    # auseinander — bei hat_recht() ist genau das schon einmal aufgefallen.
+    # =====================================================================
+    ('FORK',
+     r'  const reiterListe = \[\["firma", "Firma & Impressum"\], \["gesellschaften", "Gesellschaften"\], \["standorte", "Standorte"\], \["signatur", "Signatur & Texte"\], \["vorgaben", "Vorgaben"\], \["vertragsvorlagen", "Vertragsvorlagen"\]\];',
+     '  const reiterListe = [["firma", "Firma & Impressum"], ["gesellschaften", "Gesellschaften"], ["standorte", "Standorte"], ["belegnummern", "Belegnummern"], ["signatur", "Signatur & Texte"], ["vorgaben", "Vorgaben"], ["vertragsvorlagen", "Vertragsvorlagen"]];',
+     'Einstellungen: siebter Reiter fuer die Belegnummern.'),
+
+    ('FORK',
+     r'      : reiter === "gesellschaften" \? React\.createElement\(EinstGesellschaften, \{ user \}\)',
+     '      : reiter === "gesellschaften" ? React.createElement(EinstGesellschaften, { user })\n'
+     '      : reiter === "belegnummern" ? React.createElement(EinstBelegnummern, { user })',
+     'Einstellungen: der Reiter zeigt EinstBelegnummern.'),
+
+    ('FORK',
+     r'\n// Die Gesellschaften eines Mandanten\. Zwischen Konto und Standort: ein',
+     '\n'
+     '// Belegnummern je Gesellschaft. Muster mit Platzhaltern, Vorschau aus\n'
+     '// derselben Datenbankfunktion, die spaeter die echte Nummer erzeugt.\n'
+     '//\n'
+     '// Warum nicht in der Oberflaeche gerechnet: dann gaebe es die Regel\n'
+     '// zweimal, und die beiden Fassungen laufen auseinander. Die Vorschau ist\n'
+     '// hier nur Anzeige, die Wahrheit steht in der Datenbank.\n'
+     'const IMMO_BELEGARTEN = [\n'
+     '  ["rechnung", "Rechnung", "RE-{JJJJ}-{MM}-{#####}"],\n'
+     '  ["gutschrift", "Gutschrift / Korrektur", "GS-{JJJJ}-{MM}-{#####}"]\n'
+     '];\n'
+     'const IMMO_RUECKSETZUNG = [\n'
+     '  ["jaehrlich", "jährlich"], ["monatlich", "monatlich"], ["nie", "nie"]\n'
+     '];\n'
+     '\n'
+     'function EinstBelegnummern({ user }) {\n'
+     '  const [kreise, setKreise] = useState([]);\n'
+     '  const [gesellschaften, setGesellschaften] = useState([]);\n'
+     '  const [laedt, setLaedt] = useState(true);\n'
+     '  const [meldung, setMeldung] = useState("");\n'
+     '  const [fehler, setFehler] = useState("");\n'
+     '  const [vorschau, setVorschau] = useState({});\n'
+     '  const [entwurf, setEntwurf] = useState({});\n'
+     '  const [speichert, setSpeichert] = useState(null);\n'
+     '  const darfAendern = hatRecht(user, "rechnungen") || hatRecht(user, "admin");\n'
+     '  const laden = async () => {\n'
+     '    setLaedt(true);\n'
+     '    try {\n'
+     '      const [k, g] = await Promise.all([\n'
+     '        window._sb.from("belegnummernkreise").select("*"),\n'
+     '        window._sb.from("gesellschaften").select("id, name, aktiv").order("sortierung").order("name")\n'
+     '      ]);\n'
+     '      if (k.error) throw k.error;\n'
+     '      if (g.error) throw g.error;\n'
+     '      setKreise(k.data || []);\n'
+     '      setGesellschaften(g.data || []);\n'
+     '    } catch (f) {\n'
+     '      setFehler("Belegnummern konnten nicht geladen werden: " + (f.message || f));\n'
+     '    }\n'
+     '    setLaedt(false);\n'
+     '  };\n'
+     '  useEffect(() => { laden(); }, []);\n'
+     '  // Die Vorschau kommt aus der Datenbank, mit der Beispielnummer 1.\n'
+     '  const vorschauHolen = async (schluessel, muster) => {\n'
+     '    try {\n'
+     '      const { data } = await window._sb.rpc("belegnummer_aus_muster", {\n'
+     '        p_muster: muster, p_nummer: 1, p_standort: "NORD"\n'
+     '      });\n'
+     '      setVorschau((v) => ({ ...v, [schluessel]: data || "" }));\n'
+     '    } catch (f) {\n'
+     '      setVorschau((v) => ({ ...v, [schluessel]: "(Vorschau nicht möglich)" }));\n'
+     '    }\n'
+     '  };\n'
+     '  const kreisVon = (gid, art) => kreise.filter(\n'
+     '    (k) => k.art === art && (k.gesellschaft_id || null) === (gid || null))[0] || null;\n'
+     '  const sichern = async (gid, art, felder) => {\n'
+     '    setFehler(""); setMeldung(""); setSpeichert(gid + art);\n'
+     '    try {\n'
+     '      const vorhanden = kreisVon(gid, art);\n'
+     '      if (vorhanden) {\n'
+     '        const { error } = await window._sb.from("belegnummernkreise")\n'
+     '          .update({ ...felder, geaendert_am: new Date().toISOString() }).eq("id", vorhanden.id);\n'
+     '        if (error) throw error;\n'
+     '      } else {\n'
+     '        const { error } = await window._sb.from("belegnummernkreise")\n'
+     '          .insert({ gesellschaft_id: gid || null, art, ...felder });\n'
+     '        if (error) throw error;\n'
+     '      }\n'
+     '      await logAction("update", "belegnummernkreis", gid || "", art, felder);\n'
+     '      setMeldung("Gespeichert.");\n'
+     '      await laden();\n'
+     '    } catch (f) {\n'
+     '      setFehler("Speichern fehlgeschlagen: " + (f.message || f));\n'
+     '    }\n'
+     '    setSpeichert(null);\n'
+     '  };\n'
+     '  if (laedt) return React.createElement("div", { style: { padding: 24, color: CI.muted } }, "Lade Belegnummern …");\n'
+     '  // Ohne Gesellschaft ein Kreis fuer das ganze Konto — der Einzelmakler\n'
+     '  // richtet einen ein und ist fertig.\n'
+     '  const zeilen = gesellschaften.length\n'
+     '    ? gesellschaften.map((g) => ({ id: g.id, name: g.name }))\n'
+     '    : [{ id: null, name: "Ganzes Konto" }];\n'
+     '  return React.createElement("div", null,\n'
+     '    React.createElement("div", { style: { fontSize: 13, color: CI.muted, marginBottom: 16, lineHeight: 1.6 } },\n'
+     '      "Jede Gesellschaft stellt eigene Belege und hat deshalb einen eigenen Nummernkreis. ",\n'
+     '      "Die Nummer wird in der Datenbank vergeben, lückenlos und auch dann eindeutig, ",\n'
+     '      "wenn zwei Rechnungen gleichzeitig entstehen."),\n'
+     '    React.createElement("div", { style: { padding: "12px 14px", background: `${CI.blau}0e`,\n'
+     '      borderLeft: `3px solid ${CI.blau}`, fontSize: 12.5, color: CI.blau, lineHeight: 1.6, marginBottom: 20 } },\n'
+     '      React.createElement("strong", null, "Platzhalter: "),\n'
+     '      "{JJJJ} Jahr vierstellig · {JJ} zweistellig · {MM} Monat · {TT} Tag · ",\n'
+     '      "{STANDORT} Kürzel des Standorts · {#} bis {##########} die fortlaufende Zahl, ",\n'
+     '      "eine Raute je Stelle."),\n'
+     '    React.createElement(ErrorBox, null, fehler),\n'
+     '    React.createElement(SuccessBox, null, meldung),\n'
+     '    !darfAendern ? React.createElement("div", { style: { fontSize: 12.5, color: CI.muted, marginBottom: 16 } },\n'
+     '      "Zum Ändern fehlt dir das Recht „Rechnungen“ — du siehst hier nur, was eingerichtet ist.") : null,\n'
+     '    React.createElement("div", { style: { display: "grid", gap: 16 } },\n'
+     '      zeilen.map((g) => React.createElement("div", { key: g.id || "konto", "data-belegkreis": g.id || "konto",\n'
+     '        style: { ...cardStyle, padding: 16 } },\n'
+     '        React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: CI.blau, marginBottom: 12 } }, g.name),\n'
+     '        IMMO_BELEGARTEN.map(([art, label, standard]) => {\n'
+     '          const k = kreisVon(g.id, art);\n'
+     '          const schluessel = (g.id || "konto") + "-" + art;\n'
+     '          const wert = entwurf[schluessel] !== undefined\n'
+     '            ? entwurf[schluessel] : (k ? k.muster : standard);\n'
+     '          return React.createElement("div", { key: art, style: { marginBottom: 14 } },\n'
+     '            React.createElement("label", { style: labelStyle }, label),\n'
+     '            React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" } },\n'
+     '              React.createElement("input", { style: { ...inputStyle, flex: "2 1 220px", fontFamily: "monospace" },\n'
+     '                value: wert, disabled: !darfAendern,\n'
+     '                onChange: (ev) => { const w = ev.target.value;\n'
+     '                  setEntwurf((e) => ({ ...e, [schluessel]: w })); vorschauHolen(schluessel, w); },\n'
+     '                onFocus: () => vorschauHolen(schluessel, wert) }),\n'
+     '              React.createElement("select", { style: { ...inputStyle, flex: "1 1 140px" },\n'
+     '                value: k ? k.zuruecksetzen : "jaehrlich", disabled: !darfAendern,\n'
+     '                onChange: (ev) => sichern(g.id, art, { muster: wert, zuruecksetzen: ev.target.value }) },\n'
+     '                IMMO_RUECKSETZUNG.map(([w, l]) => React.createElement("option", { key: w, value: w },\n'
+     '                  "zurücksetzen: " + l))),\n'
+     '              darfAendern ? React.createElement("button", {\n'
+     '                onClick: () => sichern(g.id, art, { muster: wert,\n'
+     '                  zuruecksetzen: k ? k.zuruecksetzen : "jaehrlich" }),\n'
+     '                disabled: speichert === (g.id || "") + art,\n'
+     '                style: { ...secondaryBtn, padding: "8px 14px", fontSize: 12.5 } },\n'
+     '                speichert === (g.id || "") + art ? "Speichert …" : "Speichern") : null),\n'
+     '            React.createElement("div", { style: { fontSize: 12, color: CI.muted, marginTop: 6 } },\n'
+     '              "Vorschau: ",\n'
+     '              React.createElement("span", { style: { fontFamily: "monospace", color: CI.blau, fontWeight: 600 } },\n'
+     '                vorschau[schluessel] || (k ? "—" : "noch nicht eingerichtet")),\n'
+     '              k ? ("  ·  zuletzt vergeben: " + (k.letzte_nummer || 0)\n'
+     '                   + (k.periode ? " in " + k.periode : "")) : ""));\n'
+     '        })))),\n'
+     '    React.createElement("div", { style: { fontSize: 12, color: CI.muted, marginTop: 20, lineHeight: 1.6 } },\n'
+     '      "Solange kein Kreis eingerichtet ist, gilt der bisherige Weg aus den Firmendaten ",\n'
+     '      "(Präfix und „mit Jahr“). Bereits vergebene Nummern bleiben unberührt."));\n'
+     '}\n'
+     '\n'
+     '// Die Gesellschaften eines Mandanten. Zwischen Konto und Standort: ein',
+     'Einstellungen: die Seite EinstBelegnummern mit Live-Vorschau.'),
+
     ('MARKE', r'\bEP_', 'IMMO_', 'Vorsatz EP_ in Bezeichnern der Oberflaeche.'),
 ]
 

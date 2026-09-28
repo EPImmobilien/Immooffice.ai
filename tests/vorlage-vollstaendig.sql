@@ -115,7 +115,17 @@ zuwachs(bereich, mehr, grund) as (values
   -- Regel verschwindet (und mit ihr ihr Index), ein eigener Index kommt.
   ('Primaer- und Eindeutigkeitsschluessel', -10, 'fork_17: zehn Regeln '
      'ersetzt durch Indizes ueber (mandant_id, Spalte)'),
-  ('Indizes ohne Constraint', 10, 'fork_17: dieselben zehn als eigener Index')
+  ('Indizes ohne Constraint', 10, 'fork_17: dieselben zehn als eigener Index'),
+  -- fork_18: frei gestaltbare Belegnummern.
+  ('Tabellen', 1, 'fork_18: belegnummernkreise'),
+  ('Tabellen mit RLS', 1, 'dieselbe'),
+  ('Spalten', 10, 'belegnummernkreise: zehn Spalten'),
+  ('Primaer- und Eindeutigkeitsschluessel', 1, 'belegnummernkreise.id'),
+  ('Pruefbedingungen', 2, 'art und zuruecksetzen'),
+  ('Fremdschluessel', 2, 'mandant_id, gesellschaft_id'),
+  ('Indizes ohne Constraint', 2, 'belegnummernkreise: eindeutig und mandant_id'),
+  ('Richtlinien', 3, 'fork_18: lesen, pflegen, mandant_trennung'),
+  ('Funktionen', 2, 'fork_18: belegnummer_aus_muster(), naechste_belegnummer()')
 ),
 soll(bereich, soll) as (
   select v.bereich,
