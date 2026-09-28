@@ -36,6 +36,13 @@ else
   fehler=1
 fi
 
+abschnitt "Mandantentrennung: haelt sie einem Angriff stand?"
+if scripts/lokale-db.sh psql -q -f tests/mandant.sql; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Oberflaeche: Zerlegung verliert nichts"
 if [[ -f reference/epworld-src.html ]]; then
   roh="$(mktemp -d)"
@@ -102,7 +109,6 @@ cat <<'ENDE'
 - Syntaxpruefung der Edge Functions  — kein Deno und kein TypeScript in dieser
                                        Umgebung; geprueft wird nur, dass die
                                        Neutralisierung nichts anderes anfasst
-- tests/mandant.sql                  — kommt mit Phase 2 (firma_id existiert noch nicht)
 ENDE
 
 printf '\n'

@@ -60,6 +60,9 @@ zuwachs(bereich, mehr, grund) as (values
   ('Tabellen', 3, 'mandanten, gesellschaften, mandanten_einstufung'),
   ('Tabellen mit RLS', 3, 'dieselben drei'),
   ('Richtlinien', 7, 'amt_vorlage 2, mandanten 2, gesellschaften 2, einstufung 1'),
+  ('Richtlinien', 174, 'fork_07: eine restriktive Mandantentrennung je '
+                       'MANDANT-Tabelle (171), dazu gesellschaften, '
+                       'firma_stammdaten und profiles'),
   ('Funktionen', 1, 'aktuelle_mandant_id()'),
   ('Spalten', 199, 'mandanten 11, gesellschaften 10, mandanten_einstufung 3, '
                    'firma_stammdaten +mandant_id +gesellschaft_id +bundesland, '

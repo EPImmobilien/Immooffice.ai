@@ -767,3 +767,64 @@ hinzu") gilt für sie nicht — für alle anderen unverändert.
 nicht gesetzt; bis dahin rechnet sie mit den neun bundesweiten Feiertagen.
 Die Zuordnung Mitarbeiter → Standort kommt mit Abschnitt 1b, und dann gehört
 das Land an den Mitarbeiter, nicht an den ersten gefundenen Standort.
+
+## 28.09.2026 — Mandantentrennung: eine restriktive Richtlinie statt 351 Umschreibungen
+
+**Frage:** Die Vorlage hat 351 Richtlinien. Sie prüfen die *Rolle* —
+`ist_team()`, `ist_chef()`, „gehört mir" — und sind darin richtig. Was ihnen
+fehlt, ist der Mandant. Wie kommt er hinein?
+
+**Der naheliegende Weg wäre der falsche.** Alle 351 umzuschreiben und jeder ein
+`and mandant_id = aktuelle_mandant_id()` anzuhängen, wäre 351 Gelegenheiten,
+sich zu vertun — und es fasste die Rollenlogik der Vorlage an, die nicht
+angefasst werden soll.
+
+**Entscheidung:** Je Mandantentabelle **eine** Richtlinie `as restrictive`.
+Restriktive Richtlinien werden mit UND verknüpft, nicht mit ODER. Sie ist
+damit nicht zu umgehen: keine noch so großzügige permissive Richtlinie kann
+sie aufheben.
+
+| | Frage | Verknüpfung |
+|---|---|---|
+| permissiv (Vorlage, 351) | darf ich das überhaupt? | ODER |
+| restriktiv (Fork, 174) | ist es mein Mandant? | UND |
+
+`to public` statt `to authenticated`: die Trennung gilt für jede Rolle, auch
+für eine, die später hinzukommt. `service_role` umgeht RLS ohnehin — das ist
+der Weg der Edge Functions und bleibt es.
+
+**Nachgewiesen, nicht behauptet.** `tests/mandant.sql` legt zwei Mandanten mit
+je einem Nutzer und einem Objekt an, gibt sich als der eine aus und versucht,
+an die Daten des anderen zu kommen — lesen, einfügen, ändern, löschen, und
+einmal ohne Anmeldung. Sieben Prüfungen, alle bestanden:
+
+```
+1 ok  Alpha liest nur eigene Objekte        gesehen: Objekt Alpha
+2 ok  Alpha kann nicht fuer Beta einfuegen  abgewiesen: new row violates
+                                            row-level security policy
+3 ok  Alpha aendert keine Zeile von Beta    0 Zeile(n) getroffen
+4 ok  Alpha loescht keine Zeile von Beta    0 Zeile(n) getroffen
+5 ok  Alpha sieht nur eigene Profile        gesehen: chef@alpha.example
+6 ok  Beta liest nur eigene Objekte         gesehen: Objekt Beta
+7 ok  Ohne Anmeldung kein Objekt sichtbar   0 Zeile(n) sichtbar
+```
+
+Geprüft wird per SQL, nicht über die Oberfläche: ein ausgeblendetes
+Bedienelement ist keine Trennung.
+
+**Der Test hat sich beim ersten Lauf selbst bewährt.** Er meldete fünf von
+sieben Prüfungen gescheitert — weil ich `fork_07` auf das Projekt angewendet,
+die Migrationsdatei aber noch nicht geschrieben hatte. Die lokale Instanz
+kannte die Richtlinien nicht. Genau dafür läuft der Test gegen eine leere
+Instanz und nicht gegen das laufende Projekt.
+
+**Was offen bleibt:**
+
+- `NOT NULL` auf `mandant_id`. Der Vorgabewert greift nur bei angemeldetem
+  Nutzer; Edge Functions arbeiten mit `service_role`, dort ist `auth.uid()`
+  null. Erst wenn die 139 Funktionen durchgesehen sind.
+- Storage. Die Trennung deckt bisher die Tabellen ab, nicht die Buckets. Ein
+  Pfad wie `objektbilder/{immobilie_id}/…` trägt keinen Mandanten.
+- Der Sichtbarkeitsbereich je Mitarbeiter (nur eigene / Standort /
+  Gesellschaft / Mandant) aus Abschnitt 1b. Die harte Grenze steht; die feine
+  Abstufung darin kommt mit der Rechte-Matrix.
