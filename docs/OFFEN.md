@@ -440,3 +440,30 @@ die Funktion beim ersten Postfach und ist damit **nicht mandantenfähig**.
 
 Dasselbe gilt für jeden weiteren öffentlichen Endpunkt, der später dazukommt.
 Es lohnt, das einmal zu entscheiden und dann überall gleich zu machen.
+
+## Das Schema `intern` ist geparkt und in sich kaputt
+
+Gefunden am 28.09.2026, als `tests/mandant.sql` zum ersten Mal den
+Dateispeicher mitgeprüft hat.
+
+Der geparkte Greenfield-Stand hat neben seinen 110 Tabellen auch ein Schema
+`intern` mit rund 50 Hilfsfunktionen hinterlassen. Die Tabellen sind am 14.09.
+nach `altbestand` gewandert, die Funktionen nicht — sie greifen weiter auf
+`public.benutzer`, `public.objekte`, `public.web_expose` und ein gutes Dutzend
+weiterer Namen zu, die es unter `public` nicht mehr gibt. Jeder Aufruf endet
+mit `relation "public.…" does not exist`.
+
+**Folgenlos, solange es dort bleibt:** 204 der 208 Richtlinien auf
+`altbestand`-Tabellen rufen `intern.*` auf, aber `altbestand` ist nicht
+exponiert, und ein Fehler in einer Richtlinie sperrt, er öffnet nicht. Von den
+525 Richtlinien im Schema `public` nutzt keine einzige `intern.*`.
+
+**Nicht folgenlos war:** 16 Richtlinien auf `storage.objects`. Die Tabelle
+gehört dem Produkt, nicht dem geparkten Stand — dort hat jeder angemeldete
+Zugriff einen Fehler geworfen. Gelöscht in `fork_10`, begründet in
+`docs/ENTSCHEIDUNGEN.md`. Die Migration hat einen Wachposten: eine neue
+Richtlinie auf `storage.objects`, die `intern.*` aufruft, lässt sie scheitern.
+
+**Was noch offen ist:** `intern` verschwindet zusammen mit `altbestand`, wenn
+der geparkte Stand endgültig abgeräumt wird. Das ist eine Entscheidung des
+Betreibers, kein technischer Schritt — bis dahin bleibt beides liegen.

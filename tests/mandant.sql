@@ -110,7 +110,56 @@ select 'Beta liest nur eigene Objekte',
        'gesehen: ' || coalesce(string_agg(bezeichnung, ', '), '(nichts)')
   from public.immobilien;
 
--- 6) Ohne Anmeldung ist gar nichts zu sehen
+-- 6) Auch im Dateispeicher trennt das erste Pfadsegment
+reset role;
+do $$
+declare a uuid; b uuid;
+begin
+  select mandant into a from wer where rolle='alpha';
+  select mandant into b from wer where rolle='beta';
+  insert into storage.buckets (id, name) values ('pruefeimer','pruefeimer')
+    on conflict (id) do nothing;
+  delete from storage.objects where bucket_id = 'pruefeimer';
+  -- Absichtlich sperrangelweit offen: diese Richtlinie erlaubt jedem
+  -- Angemeldeten alles im Pruefeimer. Nur so prueft der Test wirklich die
+  -- restriktive Trennung aus fork_09 — eine restriktive Richtlinie wird mit
+  -- UND verknuepft, also muss sie auch eine solche Erlaubnis einschraenken.
+  -- Ohne sie waere jede Zeile schon mangels Erlaubnis unsichtbar, und der
+  -- Test wuerde gruen leuchten, ohne etwas bewiesen zu haben.
+  drop policy if exists "pruefeimer_offen" on storage.objects;
+  create policy "pruefeimer_offen" on storage.objects
+    for all to authenticated
+    using (bucket_id = 'pruefeimer') with check (bucket_id = 'pruefeimer');
+  insert into storage.objects (bucket_id, name) values
+    ('pruefeimer', a::text || '/akte.pdf'),
+    ('pruefeimer', b::text || '/akte.pdf'),
+    ('pruefeimer', 'ohne-mandant.pdf');
+end $$;
+select set_config('request.jwt.claims',
+       json_build_object('sub', (select nutzer from wer where rolle='alpha'))::text, false);
+set role authenticated;
+insert into befund (pruefung, bestanden, bemerkung)
+select 'Alpha sieht nur eigene Dateien', count(*) = 1,
+       'gesehen: ' || coalesce(string_agg(name, ', '), '(nichts)')
+  from storage.objects where bucket_id = 'pruefeimer';
+
+-- 7) Eine Datei in den Ordner des anderen zu legen, muss scheitern
+do $$
+declare fremd uuid;
+begin
+  select mandant from wer where rolle='beta' into fremd;
+  begin
+    insert into storage.objects (bucket_id, name)
+      values ('pruefeimer', fremd::text || '/eingeschmuggelt.pdf');
+    insert into befund (pruefung, bestanden, bemerkung)
+      values ('Alpha kann nicht in Betas Ordner schreiben', false, 'Einfuegen ging durch');
+  exception when insufficient_privilege or check_violation then
+    insert into befund (pruefung, bestanden, bemerkung)
+      values ('Alpha kann nicht in Betas Ordner schreiben', true, 'abgewiesen');
+  end;
+end $$;
+
+-- 8) Ohne Anmeldung ist gar nichts zu sehen
 reset role;
 select set_config('request.jwt.claims', '', false);
 set role authenticated;
@@ -119,6 +168,7 @@ select 'Ohne Anmeldung kein Objekt sichtbar', count(*) = 0,
        count(*) || ' Zeile(n) sichtbar' from public.immobilien;
 
 reset role;
+drop policy if exists "pruefeimer_offen" on storage.objects;
 
 select nr, case when bestanden then 'ok  ' else 'FEHL' end as ergebnis, pruefung, bemerkung
   from befund order by nr;

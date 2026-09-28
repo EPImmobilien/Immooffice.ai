@@ -298,6 +298,41 @@ ERSETZUNGEN = [
 # durch die Datei einzelne Buchstaben treffen. Genau das ist beim Schreiben
 # dieses Skripts passiert.
 NACHBESSERN = [
+    # --- FORK: die letzten Schreibstellen.
+    ('FORK',
+     '      const pfad = "immobilien/" + z.immobilie_id + "/" + Date.now() + "_" + name.replace(/[^A-Za-z0-9._-]+/g, "_");',
+     '      immoSetzeMandant((await admin.from("immobilien").select("mandant_id").eq("id", z.immobilie_id).maybeSingle()).data?.mandant_id);\n      const pfad = "immobilien/" + z.immobilie_id + "/" + Date.now() + "_" + name.replace(/[^A-Za-z0-9._-]+/g, "_");',
+     'Mandant aus der Ziel-Immobilie (Bild-Zusammensetzen): mail-anhaenge-diagnose.',
+     {'mail-anhaenge-diagnose'}),
+    ('FORK',
+     '          if (dErr || !d) throw new Error("Datei nicht gefunden");',
+     '          if (dErr || !d) throw new Error("Datei nicht gefunden");\n          immoSetzeMandant(d.mandant_id);',
+     'Mandant aus dem Dateisatz (Zuschnitt): mail-anhaenge-diagnose.',
+     {'mail-anhaenge-diagnose'}),
+    # energieausweis-anfrage ist ein oeffentliches Formular ohne Anmeldung. Es
+    # kann seinen Mandanten nicht aus einem Token ableiten — also muss die
+    # einbettende Seite ihn mitschicken. Tut sie das nicht, greift der einzige
+    # Fall, in dem Raten kein Raten ist: es gibt genau einen Mandanten. Bei
+    # mehreren wird abgelehnt statt zugeordnet. Eine Anfrage, die im falschen
+    # Postfach landet, ist schlimmer als eine, die gar nicht ankommt: der
+    # Absender sieht den Fehler, der fremde Makler sieht fremde Kontaktdaten.
+    ('FORK',
+     '    const { count } = await db.from("energieausweis_anfragen").select("id", { count: "exact", head: true })',
+     '    const mandantWunsch = txt(form ? form.get("mandant") : (d?.mandant ?? null), 60);\n'
+     '    let mandant: string | null = null;\n'
+     '    if (/^[0-9a-f-]{36}$/i.test(mandantWunsch)) {\n'
+     '      const { data: m } = await db.from("mandanten").select("id").eq("id", mandantWunsch).maybeSingle();\n'
+     '      mandant = m?.id ?? null;\n'
+     '    } else {\n'
+     '      const { data: alle } = await db.from("mandanten").select("id").limit(2);\n'
+     '      if ((alle || []).length === 1) mandant = alle![0].id;\n'
+     '    }\n'
+     '    if (!mandant) return antwort({ ok: false, fehler: "Das Formular ist keinem Anbieter zugeordnet. Bitte wenden Sie sich direkt an Ihren Ansprechpartner." }, 400);\n'
+     '    immoSetzeMandant(mandant);\n'
+     '    const { count } = await db.from("energieausweis_anfragen").select("id", { count: "exact", head: true })',
+     'Mandant aus dem Formularfeld, sonst nur bei genau einem Mandanten: energieausweis-anfrage.',
+     {'energieausweis-anfrage'}),
+
     # --- FORK: Mandant fuer die uebrigen Funktionen, die Dateien schreiben.
     ('FORK',
      'const { data: brief, error: bErr } = await admin.from("briefe").select("*").eq("id", brief_id).maybeSingle();',
@@ -507,11 +542,15 @@ def main():
         uebernommen += 1
 
     print('Neutralisierung der Edge Functions:')
-    for grund, muster, _, bemerkung in ERSETZUNGEN + NACHBESSERN:
+    # Regeln sind Vierer- oder Fuenfertupel; das fuenfte Element grenzt eine
+    # Regel auf bestimmte Funktionen ein. Fuer den Bericht zaehlt nur, was in
+    # den ersten vier steht.
+    alle_regeln = [r[:4] for r in ERSETZUNGEN + NACHBESSERN]
+    for grund, muster, _, bemerkung in alle_regeln:
         n = zaehler.get((grund, muster), 0)
         if n:
             print(f'  [{grund:7s}] {n:4d}x  {bemerkung}')
-    nie = [b for g, m, _, b in ERSETZUNGEN + NACHBESSERN if not zaehler.get((g, m))]
+    nie = [b for g, m, _, b in alle_regeln if not zaehler.get((g, m))]
     if nie:
         print(f'\n  {len(nie)} Regel(n) ohne Treffer — Vorlage hat sich geaendert '
               f'oder die Regel ist ueberholt:')

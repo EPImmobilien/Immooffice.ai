@@ -828,3 +828,42 @@ Instanz und nicht gegen das laufende Projekt.
 - Der Sichtbarkeitsbereich je Mitarbeiter (nur eigene / Standort /
   Gesellschaft / Mandant) aus Abschnitt 1b. Die harte Grenze steht; die feine
   Abstufung darin kommt mit der Rechte-Matrix.
+
+## 2026-09-28 · Sechzehn Storage-Richtlinien des geparkten Stands gelöscht
+
+**Frage:** Auf `storage.objects` lagen 16 Richtlinien aus dem geparkten
+Greenfield-Stand. Sie rufen `intern.aktueller_mandant()`,
+`intern.darf_schreiben()`, `intern.ist_verwaltung()`,
+`intern.bild_im_web_expose()` und `intern.dokument_im_web_expose()` auf. Diese
+Funktionen lesen aus `public.benutzer` beziehungsweise `public.web_expose` —
+beide sind am 14.09. nach `altbestand` verschoben worden. Seitdem endete
+**jeder angemeldete Zugriff auf den Dateispeicher** mit
+
+```
+ERROR:  relation "public.benutzer" does not exist
+CONTEXT:  SQL function "aktueller_mandant" during startup
+```
+
+und zwar im Livebetrieb, nicht nur im Test. Reparieren oder löschen?
+
+**Entscheidung:** gelöscht, in `fork_10`. Das Schema `intern` selbst bleibt
+unberührt.
+
+**Grund:** Die 16 Richtlinien betreffen vier Eimer — `importe`, `marke`,
+`objektbilder`, `objektdokumente` —, die kein einziger Aufruf der Vorlage
+anfasst; geprüft gegen `src/` und alle 139 Edge Functions. Von den 525
+Richtlinien im Schema `public` nutzt **keine einzige** `intern.*`; alle 204
+Aufrufer sitzen auf `altbestand`-Tabellen. Die Funktionen gehören also
+vollständig zum geparkten Stand, und eine Richtlinie des geparkten Stands hat
+auf einer Tabelle des Produkts nichts verloren. Reparieren hätte geheißen, das
+Rechtemodell des Greenfield-Stands neben dem der Vorlage weiterzupflegen — zwei
+Modelle für dieselbe Tabelle. Was schützt, ist ohnehin die restriktive
+Richtlinie aus `fork_09`; die 59 Richtlinien der Vorlage bleiben unverändert.
+
+Die acht Dateien in den vier Eimern bleiben liegen. Sie sind in `fork_08` ins
+Mandantenverzeichnis umgezogen und danach nur noch über die `service_role`
+erreichbar — Löschen wäre Datenverlust ohne Not.
+
+`intern` selbst wird nicht angefasst: 204 Richtlinien auf `altbestand`-Tabellen
+hängen daran, und dort ist der Fehler folgenlos, weil `altbestand` nicht
+exponiert ist und ein Fehler sperrt statt öffnet. Vermerkt in `docs/OFFEN.md`.

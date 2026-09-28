@@ -15,6 +15,12 @@
 -- Tabellen mit RLS ist von 166 auf 187 gestiegen: alle 20 neuen Tabellen haben
 -- RLS, und der Befund suchkriterien_lauf ist in der Vorlage behoben.
 --
+-- Die zwanzig herausgezaehlten Storage-Richtlinien sind seit fork_10 ohnehin
+-- geloescht — bis auf die vier des Buckets 'branding'. Die Liste bleibt
+-- trotzdem stehen: sie macht den Test unabhaengig davon, ob er gegen eine
+-- frisch migrierte Instanz oder gegen ein Projekt laeuft, in dem fork_10 noch
+-- nicht angewendet ist.
+--
 -- Storage gehoert nicht zum Schema public und wandert beim Verschieben des
 -- Altbestands nicht mit. Deshalb zaehlen die beiden Storage-Zeilen die fuenf
 -- Buckets und zwanzig Richtlinien des Altbestands heraus — sonst wuerde der
@@ -73,7 +79,15 @@ zuwachs(bereich, mehr, grund) as (values
      'drei Primaerschluessel, mandanten.slug eindeutig'),
   ('Pruefbedingungen', 3, 'mandanten.abo_status, bundesland, einstufung.gruppe'),
   ('Indizes ohne Constraint', 180, 'je ein Index auf mandant_id, dazu '
-                                   'gesellschaft_id, bundesland, ein Standard')
+                                   'gesellschaft_id, bundesland, ein Standard'),
+  -- fork_08: Ruestzeug fuer den Umzug der Storage-Pfade.
+  ('Tabellen', 1, 'fork_08: storage_umzug_token'),
+  ('Tabellen mit RLS', 1, 'dieselbe'),
+  ('Primaer- und Eindeutigkeitsschluessel', 1, 'storage_umzug_token.token'),
+  ('Spalten', 2, 'storage_umzug_token: token, erstellt_am'),
+  ('Funktionen', 1, 'fork_08: storage_ohne_mandant()'),
+  -- fork_09: die harte Grenze im Dateispeicher.
+  ('Storage-Richtlinien', 1, 'fork_09: mandant_trennung, restriktiv')
 ),
 soll(bereich, soll) as (
   select v.bereich,

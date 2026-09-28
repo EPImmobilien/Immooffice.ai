@@ -127,6 +127,7 @@ Deno.serve(async (req) => {
       const bin = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
       const mime = String(z.mime || "image/jpeg");
       const name = String(z.name || (z.schluessel + ".jpg"));
+      immoSetzeMandant((await admin.from("immobilien").select("mandant_id").eq("id", z.immobilie_id).maybeSingle()).data?.mandant_id);
       const pfad = "immobilien/" + z.immobilie_id + "/" + Date.now() + "_" + name.replace(/[^A-Za-z0-9._-]+/g, "_");
       const { error: upErr } = await admin.storage.from("immobilie-dateien").upload(pfad, bin, { contentType: mime, upsert: false });
       if (upErr) throw new Error("Upload: " + upErr.message);
@@ -148,6 +149,7 @@ Deno.serve(async (req) => {
         try {
           const { data: d, error: dErr } = await admin.from("immobilie_datei").select("*").eq("id", String(a.datei_id)).maybeSingle();
           if (dErr || !d) throw new Error("Datei nicht gefunden");
+          immoSetzeMandant(d.mandant_id);
           // quelle_breite: verkleinerte Fassung ueber den Storage-Transform laden (Speicher/CPU des Workers schonen)
           const qb = Math.min(2000, Math.max(0, Number(a.quelle_breite) || 0));
           let { data: blob, error } = qb

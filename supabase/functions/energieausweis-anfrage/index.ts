@@ -346,6 +346,17 @@ Deno.serve(async (req) => {
     const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unbekannt";
     const ipHash = await hash(ip + "|ea");
     const vorEinerStunde = new Date(Date.now() - 3600000).toISOString();
+    const mandantWunsch = txt(form ? form.get("mandant") : (d?.mandant ?? null), 60);
+    let mandant: string | null = null;
+    if (/^[0-9a-f-]{36}$/i.test(mandantWunsch)) {
+      const { data: m } = await db.from("mandanten").select("id").eq("id", mandantWunsch).maybeSingle();
+      mandant = m?.id ?? null;
+    } else {
+      const { data: alle } = await db.from("mandanten").select("id").limit(2);
+      if ((alle || []).length === 1) mandant = alle![0].id;
+    }
+    if (!mandant) return antwort({ ok: false, fehler: "Das Formular ist keinem Anbieter zugeordnet. Bitte wenden Sie sich direkt an Ihren Ansprechpartner." }, 400);
+    immoSetzeMandant(mandant);
     const { count } = await db.from("energieausweis_anfragen").select("id", { count: "exact", head: true })
       .eq("ip_hash", ipHash).gte("created_at", vorEinerStunde);
     if ((count || 0) >= 5) return antwort({ ok: false, fehler: "Zu viele Anfragen. Bitte melden Sie sich telefonisch bei uns." }, 429);
