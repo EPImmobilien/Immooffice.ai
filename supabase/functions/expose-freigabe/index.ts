@@ -32,8 +32,9 @@ const AGB_URL = "https://immooffice.example/agb";
 const DATENSCHUTZ_URL = "https://immooffice.example/datenschutz";
 const LINK_BASIS = (Deno.env.get("EXPOSE_FREIGABE_BASIS") || "https://immooffice.example/?expose=").replace(/\/\?expose=$/, "/freigabe.html?expose=");
 const OBJEKT_BASIS = LINK_BASIS.replace(/freigabe\.html\?expose=$/, "objekt.html?t=");
-async function landingStandard(db: any): Promise<boolean> {
-  try { const { data } = await db.from("portal_einstellungen").select("wert").eq("schluessel", "landing_standard").maybeSingle(); return data ? data.wert === true : true; } catch (_e) { return true; }
+async function landingStandard(db: any, mandant: string | null): Promise<boolean> {
+  if (!mandant) return true;
+  try { const { data } = await db.from("portal_einstellungen").select("wert").eq("mandant_id", mandant).eq("schluessel", "landing_standard").maybeSingle(); return data ? data.wert === true : true; } catch (_e) { return true; }
 }
 
 function widerrufsbelehrung(firma: any) {
@@ -45,8 +46,8 @@ const BEGINN_TEXT = "Ich verlange ausdrücklich, dass Sie mit der Erbringung Ihr
 async function lade(db: any, t: string) {
   const { data: f } = await db.from("expose_freigaben").select("*").eq("token", t).maybeSingle();
   if (!f) return null;
-  const { data: im } = await db.from("immobilien").select("id, immo_nr, objekttitel, bezeichnung, strasse, hausnummer, plz, ort, vertragsart, angebotspreis, kaltmiete, wohnflaeche, zimmer, hauptbild_url, adresse_freigeben, zustaendig_id").eq("id", f.immobilie_id).maybeSingle();
-  const { data: firma } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("slug", f.firma_slug || "standard").maybeSingle();
+  const { data: im } = await db.from("immobilien").select("id, immo_nr, objekttitel, bezeichnung, strasse, hausnummer, plz, ort, vertragsart, angebotspreis, kaltmiete, wohnflaeche, zimmer, hauptbild_url, adresse_freigeben, zustaendig_id, mandant_id").eq("id", f.immobilie_id).maybeSingle();
+  const { data: firma } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").eq("slug", f.firma_slug || "standard").maybeSingle();
   const { data: maklerRoh } = im?.zustaendig_id ? await db.from("profiles").select("id, name, email, telefon, titel").eq("id", im.zustaendig_id).maybeSingle() : { data: null };
   const firmaFertig = firma || { firma_name: "Musterhaus Immobilien GmbH", strasse: "", plz: "", ort: "", email: "info@immooffice.example", telefon: null };
   // v16: Kunden bekommen die Büronummer, nie die Mobilnummer des Maklers
@@ -125,15 +126,15 @@ Deno.serve(async (req) => {
     // v13: Direktweg aus dem Newsletter – Objekt statt Token
     if (body.aktion === "objekt_laden" || body.aktion === "objekt_bestaetigen") {
       const immobilieId = String(body.immobilie_id || "").trim();
-      const { data: im } = immobilieId ? await db.from("immobilien").select("id, immo_nr, objekttitel, bezeichnung, strasse, hausnummer, plz, ort, vertragsart, angebotspreis, kaltmiete, wohnflaeche, zimmer, hauptbild_url, adresse_freigeben, provision_aussen, provisionsfrei, zustaendig_id, status").eq("id", immobilieId).maybeSingle() : { data: null as any };
+      const { data: im } = immobilieId ? await db.from("immobilien").select("id, immo_nr, objekttitel, bezeichnung, strasse, hausnummer, plz, ort, vertragsart, angebotspreis, kaltmiete, wohnflaeche, zimmer, hauptbild_url, adresse_freigeben, provision_aussen, provisionsfrei, zustaendig_id, status, mandant_id").eq("id", immobilieId).maybeSingle() : { data: null as any };
       if (!im) return json({ ok: false, fehler: "Dieses Objekt ist nicht (mehr) verfügbar." }, 404);
       const prov = provisionErmitteln(im);
       const { expose, dokumente } = await exposeSuchen(db, im.id);
       const anm = await nlVorbelegung(db, body.nl);
       const { data: makler } = im.zustaendig_id ? await db.from("profiles").select("id, name, email, telefon, firma_id").eq("id", im.zustaendig_id).maybeSingle() : { data: null as any };
       let firmaSlug = "standard";
-      if (makler?.firma_id) { const { data: fs } = await db.from("firma_stammdaten").select("slug").eq("id", makler.firma_id).maybeSingle(); if (fs?.slug) firmaSlug = fs.slug; }
-      const { data: firmaRow } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("slug", firmaSlug).maybeSingle();
+      if (makler?.firma_id) { const { data: fs } = await db.from("firma_stammdaten").select("slug").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").eq("id", makler.firma_id).maybeSingle(); if (fs?.slug) firmaSlug = fs.slug; }
+      const { data: firmaRow } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").eq("slug", firmaSlug).maybeSingle();
       const firma = firmaRow || { firma_name: "Musterhaus Immobilien GmbH", strasse: "", plz: "", ort: "", email: "info@immooffice.example", telefon: null };
       if (!prov || !expose) return json({ ok: false, fehler: `Für dieses Objekt ist der sofortige Exposé-Download derzeit nicht möglich. Bitte fordern Sie das Exposé per E-Mail an: ${makler?.email || firma.email}` }, 409);
 
@@ -148,7 +149,7 @@ Deno.serve(async (req) => {
       if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return json({ ok: false, fehler: "Bitte eine gültige E-Mail-Adresse angeben." }, 400);
       const name = String(body.name || "").trim().slice(0, 120) || anm?.name || null;
       let kontaktId: string | null = null;
-      const { data: kk } = await db.from("kontakte").select("id").ilike("email", email).eq("aktiv", true).limit(1);
+      const { data: kk } = await db.from("kontakte").select("id").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").ilike("email", email).eq("aktiv", true).limit(1);
       kontaktId = kk && kk[0] ? kk[0].id : null;
       if (!kontaktId && anm?.kontakt_id && anm.email && anm.email.toLowerCase() === email) kontaktId = anm.kontakt_id;
       if (!kontaktId) {
@@ -188,7 +189,7 @@ Deno.serve(async (req) => {
     if (body.aktion === "bestaetigen") {
       if (new Date(f.gueltig_bis) < new Date() && !f.bestaetigt_am) return json({ ok: false, fehler: "Der Link ist abgelaufen." }, 410);
       // v14: Objektseite als Standard (portal_einstellungen.landing_standard) – vor der Bestätigungsmail festlegen
-      if (!f.landing && await landingStandard(db)) { f.landing = true; await db.from("expose_freigaben").update({ landing: true }).eq("id", f.id); }
+      if (!f.landing && await landingStandard(db, im?.mandant_id ?? null)) { f.landing = true; await db.from("expose_freigaben").update({ landing: true }).eq("id", f.id); }
       const h = body.haken || {};
       for (const k of ["agb", "datenschutz", "widerruf", "beginn", "provision"]) if (!h[k]) return json({ ok: false, fehler: "Bitte alle Pflichtfelder bestätigen." }, 400);
       const jetzt = new Date().toISOString();
@@ -210,13 +211,13 @@ Deno.serve(async (req) => {
             const mail = String(f.email || "").trim().toLowerCase();
             const { data: imArt } = await db.from("immobilien").select("objektart, vertragsart").eq("id", f.immobilie_id).maybeSingle();
             let kontaktId = f.kontakt_id || null;
-            if (!kontaktId && mail) { const { data: k } = await db.from("kontakte").select("id").ilike("email", mail).eq("aktiv", true).limit(1); kontaktId = k && k[0] ? k[0].id : null; }
+            if (!kontaktId && mail) { const { data: k } = await db.from("kontakte").select("id").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").ilike("email", mail).eq("aktiv", true).limit(1); kontaktId = k && k[0] ? k[0].id : null; }
             // v13: keine zweite aktive Anmeldung je Adresse; Zustimmung aus dem Download gilt als bestätigt (bestaetigt_am)
-            const { data: vorhanden } = await db.from("newsletter_anmeldungen").select("id").or(`freigabe_id.eq.${f.id},and(email.ilike.${mail},widerrufen_am.is.null)`).limit(1);
+            const { data: vorhanden } = await db.from("newsletter_anmeldungen").select("id").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").or(`freigabe_id.eq.${f.id},and(email.ilike.${mail},widerrufen_am.is.null)`).limit(1);
             if (!vorhanden || !vorhanden.length) await db.from("newsletter_anmeldungen").insert({ kontakt_id: kontaktId, email: mail, name: f.name || null, quelle: "expose_download", immobilie_id: f.immobilie_id, immo_nr: im?.immo_nr ? String(im.immo_nr) : null, objektart: imArt?.objektart || null, vertragsart: imArt?.vertragsart || im?.vertragsart || null, freigabe_id: f.id, angemeldet_am: jetzt, bestaetigt_am: jetzt, ip });
             const quelle = "Exposé-Download" + (im?.immo_nr ? " Objekt " + im.immo_nr : "");
             if (kontaktId) await db.from("kontakte").update({ newsletter_opt_in: true, newsletter_opt_in_am: jetzt, newsletter_quelle: quelle }).eq("id", kontaktId);
-            else if (mail) await db.from("kontakte").update({ newsletter_opt_in: true, newsletter_opt_in_am: jetzt, newsletter_quelle: quelle }).ilike("email", mail);
+            else if (mail) await db.from("kontakte").update({ newsletter_opt_in: true, newsletter_opt_in_am: jetzt, newsletter_quelle: quelle }).eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").ilike("email", mail);
           } catch (e) { console.error("Newsletter-Zustimmung:", e); }
         }
         const resendKey = Deno.env.get("RESEND_API_KEY");

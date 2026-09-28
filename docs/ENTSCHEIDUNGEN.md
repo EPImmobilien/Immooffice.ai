@@ -2056,3 +2056,40 @@ Projekt „am-park" wären nicht zu unterscheiden — `maybeSingle()` bricht dan
 ab, was immerhin laut ist statt falsch. Die saubere Lösung wäre eine Adresse,
 die den Mandanten mitführt; das ist eine Produktentscheidung, keine
 Reparatur. Steht in `tests/mandant-nachzug.py`.
+
+---
+
+## Das Exposé verriet fremde Impressen und änderte fremde Kontakte (28.09.2026)
+
+`expose-freigabe` ist der öffentlichste Endpunkt, den wir haben: jeder
+Interessent, der ein Exposé herunterlädt, landet dort. Er las an sieben
+Stellen ohne Mandantengrenze.
+
+- **Das Impressum.** `firma_stammdaten` wurde über `slug = "standard"`
+  geholt. Seit `fork_17` ist der Slug nur noch **je Mandant** eindeutig —
+  das Exposé von Makler A hätte Firmenname, Anschrift, Registergericht, HRB,
+  Geschäftsführer und USt-ID von Makler B tragen können. Ein falsches
+  Impressum unter einem Exposé ist nicht nur peinlich, es ist eine
+  Falschangabe gegenüber dem Interessenten.
+- **Die Landing-Einstellung** aus `portal_einstellungen` — seit `fork_23`
+  ebenfalls je Mandant — steuerte den Ablauf mandantenübergreifend.
+- **Drei Zugriffe auf `kontakte` suchten allein über die E-Mail-Adresse.**
+  Der schlimmste war ein **UPDATE**: Wer bei Makler A ein Exposé herunterlud
+  und dabei den Newsletter bestätigte, bekam das Häkchen
+  `newsletter_opt_in` auch am Kontaktsatz von Makler B gesetzt — samt
+  Quellenangabe zu einem Objekt, das Makler B nie hatte. Eine
+  Einwilligung, die der Betroffene diesem Makler nie gegeben hat, in dessen
+  Datenbestand geschrieben: das ist der Fall, den die Mandantentrennung
+  verhindern soll.
+- Dazu die Prüfung auf eine vorhandene `newsletter_anmeldungen`-Zeile und
+  beide `immobilien`-Selects, die den Mandanten gar nicht erst mitluden.
+
+Alle sieben hängen jetzt am Mandanten der Immobilie. Fehlt der — was nach
+`fork_22` nicht mehr vorkommen sollte —, wird gegen eine unmögliche
+Kennung gefiltert; lieber kein Impressum als ein fremdes.
+
+`tests/funktionen-oeffentlich.py` führt `expose-freigabe` damit unter
+*abgesichert*. `rundgang-oeffentlich` und `bewerbertest-abrufen` sind beim
+Durchlesen als **unbedenklich** herausgefallen: sie geben nur heraus, was
+am mitgebrachten Token hängt, und lesen nichts daneben. Bleiben
+**16 offene** Endpunkte.

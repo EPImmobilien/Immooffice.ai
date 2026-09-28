@@ -722,6 +722,101 @@ ERSETZUNGEN = [
      'Neubauportal: die Team-Mail bekommt den Mandanten des Zugangs.',
      {'projekt-upload'}),
 
+    # =====================================================================
+    # FORK — das Expose zeigte moeglicherweise ein fremdes Impressum
+    #
+    # expose-freigabe holt die Firmendaten fuer das Expose ueber
+    # firma_stammdaten.slug — "standard", wenn an der Freigabe nichts steht.
+    # Seit fork_17 ist der Slug nur noch JE MANDANT eindeutig. Zwei Mandanten
+    # haben beide einen Standort "standard", und maybeSingle() traf bis dahin
+    # genau einen — welchen, entschied die Reihenfolge der Datenbank.
+    #
+    # Was da falsch stehen konnte, ist nicht irgendein Feld: Firmenname,
+    # Anschrift, Registergericht, HRB, Geschaeftsfuehrer, USt-ID. Das
+    # Impressum des Exposes, das ein Interessent zu sehen bekommt, und der
+    # Absender, unter dem er angeschrieben wird.
+    #
+    # Der Mandant steht am OBJEKT — das ist die verlaessliche Quelle: wessen
+    # Expose es ist, entscheidet, wem das Objekt gehoert.
+    # =====================================================================
+    ('FORK',
+     r'\.select\("id, immo_nr, objekttitel, bezeichnung, strasse, hausnummer, plz, ort, vertragsart, angebotspreis, kaltmiete, wohnflaeche, zimmer, hauptbild_url, adresse_freigeben, zustaendig_id"\)',
+     '.select("id, immo_nr, objekttitel, bezeichnung, strasse, hausnummer, plz, ort, vertragsart, angebotspreis, kaltmiete, wohnflaeche, zimmer, hauptbild_url, adresse_freigeben, zustaendig_id, mandant_id")',
+     'Expose-Freigabe: das Objekt bringt seinen Mandanten mit.',
+     {'expose-freigabe'}),
+    # Die Objektseite laedt eine andere Spaltenliste — ohne diese zweite
+    # Regel waere im.mandant_id dort undefined, und die Ersatzkennung
+    # daneben haette still gar nichts gefunden.
+    ('FORK',
+     r'\.select\("id, immo_nr, objekttitel, bezeichnung, strasse, hausnummer, plz, ort, vertragsart, angebotspreis, kaltmiete, wohnflaeche, zimmer, hauptbild_url, adresse_freigeben, provision_aussen, provisionsfrei, zustaendig_id, status"\)',
+     '.select("id, immo_nr, objekttitel, bezeichnung, strasse, hausnummer, plz, ort, vertragsart, angebotspreis, kaltmiete, wohnflaeche, zimmer, hauptbild_url, adresse_freigeben, provision_aussen, provisionsfrei, zustaendig_id, status, mandant_id")',
+     'Expose-Freigabe: auch die Objektseite bringt den Mandanten mit.',
+     {'expose-freigabe'}),
+    ('FORK',
+     r'\.select\("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon"\)\.eq\("slug", f\.firma_slug \|\| "standard"\)',
+     '.select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").eq("slug", f.firma_slug || "standard")',
+     'Expose-Freigabe: das Impressum kommt vom Mandanten des Objekts.',
+     {'expose-freigabe'}),
+    ('FORK',
+     r'\.select\("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon"\)\.eq\("slug", firmaSlug\)',
+     '.select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").eq("slug", firmaSlug)',
+     'Expose-Freigabe: dasselbe auf der Objektseite.',
+     {'expose-freigabe'}),
+    # Auch der Slug des zustaendigen Maklers gehoert in seinen Mandanten.
+    ('FORK',
+     r'\{ const \{ data: fs \} = await db\.from\("firma_stammdaten"\)\.select\("slug"\)\.eq\("id", makler\.firma_id\)\.maybeSingle\(\);',
+     '{ const { data: fs } = await db.from("firma_stammdaten").select("slug").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").eq("id", makler.firma_id).maybeSingle();',
+     'Expose-Freigabe: auch der Standort des Maklers nur im eigenen Mandanten.',
+     {'expose-freigabe'}),
+
+    # Die Vorgabe "Objektseite an" ist seit fork_23 je Mandant eingestellt.
+    # Ohne Mandanten traf die Abfrage die Einstellung irgendeines anderen —
+    # oder, ab dem zweiten, gar keine mehr: maybeSingle() bricht bei zwei
+    # Zeilen ab.
+    ('FORK',
+     r'async function landingStandard\(db: any\): Promise<boolean> \{\n  try \{ const \{ data \} = await db\.from\("portal_einstellungen"\)\.select\("wert"\)\.eq\("schluessel", "landing_standard"\)\.maybeSingle\(\);',
+     'async function landingStandard(db: any, mandant: string | null): Promise<boolean> {\n'
+     '  if (!mandant) return true;\n'
+     '  try { const { data } = await db.from("portal_einstellungen").select("wert").eq("mandant_id", mandant).eq("schluessel", "landing_standard").maybeSingle();',
+     'Expose-Freigabe: die Vorgabe der Objektseite je Mandant.',
+     {'expose-freigabe'}),
+    ('FORK',
+     r'if \(!f\.landing && await landingStandard\(db\)\)',
+     'if (!f.landing && await landingStandard(db, im?.mandant_id ?? null))',
+     'Expose-Freigabe: die Vorgabe wird fuer den Mandanten des Objekts gelesen.',
+     {'expose-freigabe'}),
+
+    # Die Pruefung auf eine vorhandene Anmeldung suchte ueber die
+    # E-Mail-Adresse — quer durch alle Mandanten. Wer beim einen Makler
+    # angemeldet ist, waere beim anderen stillschweigend uebersprungen
+    # worden.
+    ('FORK',
+     r'\.from\("newsletter_anmeldungen"\)\.select\("id"\)\.or\(`freigabe_id\.eq\.\$\{f\.id\},and\(email\.ilike\.\$\{mail\},widerrufen_am\.is\.null\)`\)\.limit\(1\);',
+     '.from("newsletter_anmeldungen").select("id").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").or(`freigabe_id.eq.${f.id},and(email.ilike.${mail},widerrufen_am.is.null)`).limit(1);',
+     'Expose-Freigabe: eine vorhandene Anmeldung nur im eigenen Mandanten.',
+     {'expose-freigabe'}),
+
+    # --- FORK: der Kontakt wurde ueber die E-Mail-Adresse gesucht — und die
+    # gibt es bei mehreren Maklern. Drei Stellen, und die dritte ist die
+    # schlimmste: sie SCHREIBT. Ein Interessent, der bei Makler A ein Expose
+    # herunterlaedt, haette bei Makler B die Newsletter-Zustimmung gesetzt
+    # bekommen, ohne dass dort jemand etwas davon merkt.
+    ('FORK',
+     r'\.from\("kontakte"\)\.select\("id"\)\.ilike\("email", email\)\.eq\("aktiv", true\)\.limit\(1\)',
+     '.from("kontakte").select("id").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").ilike("email", email).eq("aktiv", true).limit(1)',
+     'Expose-Freigabe: den Kontakt nur im eigenen Mandanten suchen.',
+     {'expose-freigabe'}),
+    ('FORK',
+     r'\.from\("kontakte"\)\.select\("id"\)\.ilike\("email", mail\)\.eq\("aktiv", true\)\.limit\(1\)',
+     '.from("kontakte").select("id").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").ilike("email", mail).eq("aktiv", true).limit(1)',
+     'Expose-Freigabe: dasselbe beim Bestaetigen.',
+     {'expose-freigabe'}),
+    ('FORK',
+     r'\.from\("kontakte"\)\.update\(\{ newsletter_opt_in: true, newsletter_opt_in_am: jetzt, newsletter_quelle: quelle \}\)\.ilike\("email", mail\)',
+     '.from("kontakte").update({ newsletter_opt_in: true, newsletter_opt_in_am: jetzt, newsletter_quelle: quelle }).eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").ilike("email", mail)',
+     'Expose-Freigabe: die Newsletter-Zustimmung nur am eigenen Kontakt setzen.',
+     {'expose-freigabe'}),
+
     # --- FREMD: Verweise auf das Supabase-Projekt der Vorlage
     ('FREMD', r'yazwkzzjiquprtjpurur', 'usguiggfciavwzkdfjgt',
      'Projektkennung der Vorlage durch die eigene ersetzt.'),

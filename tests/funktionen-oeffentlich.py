@@ -43,6 +43,12 @@ ABGESICHERT = {
     'akq-lead-eingang': ('immoMandantAusAnfrage',
         'Eingang der Akquise. Postfach, Quelle, Pipeline, zustaendiger Makler '
         'und beide inserts sind auf den Mandanten aus der Anfrage begrenzt.'),
+    'expose-freigabe': ('im?.mandant_id',
+        'Alles haengt am Objekt der Freigabe: Impressum, die Vorgabe der '
+        'Objektseite, die Suche nach dem Kontakt, die Newsletter-Anmeldung '
+        'und die Zustimmung am Kontakt. Vorher liefen fuenf davon ueber den '
+        'Slug "standard" oder ueber die E-Mail-Adresse — beides gibt es bei '
+        'mehreren Maklern.'),
     'web-lead': ('immoMandantAusAnfrage',
         'Eingang fuer Bewertungsanfragen. Mandant aus der Anfrage, Chef und '
         'Empfaenger aus dem Mandanten; Kontaktsuche und beide inserts sind '
@@ -55,17 +61,26 @@ UNBEDENKLICH = {
     'newsletter-abmelden':
         'Arbeitet allein ueber den Abmelde-Token. Der Token IST der Nachweis; '
         'er benennt genau eine Anmeldung, und mehr passiert nicht.',
+    'rundgang-oeffentlich':
+        'Laedt den Rundgang ueber share_token; alles Weitere haengt an dieser '
+        'einen Zeile. Der Token IST der Nachweis, und er benennt genau einen '
+        'Rundgang.',
+    'bewerbertest-abrufen':
+        'Laedt die Einladung ueber ihren Token und liefert den Namen des '
+        'Kandidaten plus einen festen Fragenkatalog. Keine Abfrage, die ueber '
+        'diese eine Zeile hinausgeht.',
 }
 
 # --- Gelesen, Befund offen, noch nicht abgesichert -------------------------
 # Diese Liste darf kuerzer werden, nie laenger. Wer eine Funktion absichert,
 # traegt sie oben ein und streicht sie hier.
 NOCH_OFFEN = {
-    'bewerbertest-abgeben': 'Bewerbertest, Zuordnung ungeprueft.',
-    'bewerbertest-abrufen': 'Bewerbertest, Zuordnung ungeprueft.',
+    # Gelesen: laedt die Einladung ueber ihren Token, schreibt die Antworten
+    # mit deren Mandanten. Was noch fehlt, ist die Gegenprobe, dass die
+    # KI-Auswertung keine fremden Daten mitschickt.
+    'bewerbertest-abgeben': 'Token-gebunden; KI-Auswertung ungelesen.',
     'eigentuemer-benachrichtigungen-versenden': 'Versendet aus einer Warteschlange ohne mandant_id.',
     'eigentuemer-zugang-anfordern': 'Legt Zugaenge an.',
-    'expose-freigabe': 'Gibt Exposes frei; Token-gebunden, aber ungelesen.',
     'ki-bildbearbeitung': 'Schreibt Bilder, 44 kB, ungelesen.',
     'news-briefing-erstellen': 'Erzeugt Briefings.',
     'portal-ftp-diagnose': 'Diagnose.',
@@ -83,7 +98,6 @@ NOCH_OFFEN = {
     'projekt-wohnungen': 'Neubauportal.',
     'push-antworten': 'Push.',
     'push-senden': 'Push — verschickt an Geraete.',
-    'rundgang-oeffentlich': 'Oeffentlicher Rundgang.',
     'signatur-token-validieren': 'Token-gebunden, aber ungelesen.',
     'suchkriterien-newsletter': 'Verschickt Newsletter — nach fork_16 gepruefte '
                                 'Quelle, der Versandweg selbst aber ungelesen.',

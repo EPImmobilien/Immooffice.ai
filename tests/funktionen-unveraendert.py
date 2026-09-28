@@ -88,6 +88,11 @@ for _f in ('signatur-token-validieren', 'bewerbertest-abgeben',
 for _f in ('projekt-interaktion', 'projekt-login', 'projekt-upload'):
     ERWEITERT[_f] = 'Versendet ueber das Postfach des eigenen Mandanten (Phase 2)'
 
+# Alles in der Expose-Freigabe haengt am Mandanten des Objekts — Impressum,
+# Kontaktsuche, Newsletter. Vorher lief das ueber den Slug "standard" und
+# ueber die E-Mail-Adresse; beides gibt es bei mehreren Maklern.
+ERWEITERT['expose-freigabe'] = ('Alles am Mandanten des Objekts (Phase 2)')
+
 BLOCKZEILEN = {
     'mpe-pdf-erzeugen': {
         'const pins: Array<[number, number, string, string, string]> = [',
