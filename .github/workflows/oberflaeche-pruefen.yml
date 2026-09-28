@@ -42,7 +42,13 @@ jobs:
               schlecht=1
             fi
           done < adressen.txt
-          [ $schlecht -eq 0 ] || echo "::error::Mindestens eine CDN-Adresse antwortet nicht mit 200."
+          if [ $schlecht -ne 0 ]; then
+            echo '=== NICHT ERREICHBAR ==='
+            while read -r u; do
+              code="$(curl -sS -o /dev/null -w '%{http_code}' -L --max-time 30 "$u" || echo 000)"
+              [ "$code" = "200" ] || echo "::error::$code  $u"
+            done < adressen.txt
+          fi
           exit $schlecht
 
       - name: Laedt die Seite?
@@ -60,7 +66,10 @@ jobs:
         run: |
           set -euo pipefail
           npm install --no-save playwright@1.49.1
-          npx playwright install --with-deps chromium
+          # Nicht `npx playwright install`: npx holt die NEUESTE Fassung und
+          # laedt deren Browser, die zur installierten Bibliothek nicht
+          # passen ("Executable doesn't exist at .../chromium_headless_shell-1148").
+          ./node_modules/.bin/playwright install --with-deps chromium
           cat > pruefen.mjs <<'ENDE'
           import { chromium } from 'playwright';
           const url = process.argv[2];
