@@ -698,13 +698,26 @@ enthält — und es steht kein fremder Vertragstext mehr im Programm.
 (`immoVorlageFuellen`). Neunundvierzig Anker sind damit weg, darunter alle
 Namen, Anschriften, Geburtsdaten und Ausweisnummern.
 
-**Offen: `fillMietvertrag`.** Sechs Anker stehen noch, darunter die Anschrift
-und das Kreditinstitut aus einem Mustermietvertrag. Der Grund ist nicht
-Bequemlichkeit: `vertragsvorlagen.art` kennt nur Maklervertrag, Vollmacht,
-Objektnachweis und Reservierung. Der Mietvertrag hat damit **keinen Weg über
-eine eigene Vorlage** und kann nicht auf dieselbe Weise umgestellt werden.
+**Ebenfalls erledigt: `fillMietvertrag`.** `fork_26` hat `mietvertrag` als
+fünfte Vorlagenart aufgenommen, mit eigenem Feldkatalog und zwei
+Beteiligten-Blöcken (Vermieter und Mieter können beide Eheleute sein).
+Damit sind alle 56 Anker weg.
 
-Dafür braucht es eine eigene Migration: `mietvertrag` als fünfte Art, ein
-Feldkatalog dafür (Mieter, Miete, Kaution, Übergabe, Laufzeit) und dann
-dieselbe Umstellung. Solange das aussteht, bleiben die sechs Anker — und mit
-ihnen die Musterdaten.
+**Offen bleibt nur**, welche Vorgabewerte für den Mietvertrag sinnvoll wären
+— Kündigungsausschluss, Kaution in Monatsmieten. Die Prüfbedingung lässt für
+ihn bisher nur `{}` zu. Das ist eine fachliche Frage, die niemand gestellt
+hat; lieber keine Vorgabe als eine erfundene.
+
+## Die Blockliste steht an zwei Stellen
+
+`scripts/neutral.sh` und `tests/funktionen-unveraendert.py` führen je ein
+eigenes, base64-kodiertes Muster für die Kennzeichen der Referenz. Am
+28.09.2026 ist das aufgefallen, als die eine Liste grün war und die andere
+rot — dieselbe Fundstelle, zwei Urteile.
+
+Beide zu pflegen ist fehleranfällig; die Muster laufen auseinander, und
+gemerkt wird es erst, wenn ein Kennzeichen durchrutscht. Sie gehören an eine
+Stelle, aus der sich beide bedienen.
+
+Nicht dringend, aber es wird nicht besser: jede neue Fundstelle vergrößert
+den Abstand.

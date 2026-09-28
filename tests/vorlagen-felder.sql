@@ -256,17 +256,29 @@ begin
 end $$;
 
 -- --- 11) Der Katalog nennt Gruppe und Block -------------------------------
+-- Je GRUPPE hoechstens ein Block — nicht je Dokumentart. Der Mietvertrag hat
+-- zwei Beteiligten-Gruppen, Vermieter und Mieter, und damit zwei Bloecke.
+-- Zwei Bloecke in DERSELBEN Gruppe waeren zwei Stellen fuer dasselbe.
 insert into befund (pruefung, bestanden, bemerkung)
-select 'Jede Dokumentart hat genau ein Block-Feld je Beteiligten-Gruppe',
-       (select count(*) from jsonb_array_elements(public.vorlagen_feld_katalog('maklervertrag')) e
-         where (e->>'block')::boolean) = 1
-   and (select count(*) from jsonb_array_elements(public.vorlagen_feld_katalog('objektnachweis')) e
-         where (e->>'block')::boolean) = 1
-   and (select count(*) from jsonb_array_elements(public.vorlagen_feld_katalog('reservierung')) e
-         where (e->>'block')::boolean) = 1
-   and not exists (select 1 from jsonb_array_elements(public.vorlagen_feld_katalog('maklervertrag')) e
-                    where e->>'gruppe' is null),
-       'geprueft';
+select 'Je Gruppe hoechstens ein Block, und jedes Feld hat eine Gruppe',
+       not exists (
+         select 1 from unnest(array['maklervertrag','vollmacht','objektnachweis',
+                                    'reservierung','mietvertrag']) a(art)
+          cross join lateral jsonb_array_elements(public.vorlagen_feld_katalog(a.art)) e
+          where e->>'gruppe' is null)
+   and not exists (
+         select 1 from unnest(array['maklervertrag','vollmacht','objektnachweis',
+                                    'reservierung','mietvertrag']) a(art)
+          cross join lateral jsonb_array_elements(public.vorlagen_feld_katalog(a.art)) e
+          where coalesce((e->>'block')::boolean, false)
+          group by a.art, e->>'gruppe' having count(*) > 1),
+       'fuenf Arten geprueft';
+
+insert into befund (pruefung, bestanden, bemerkung)
+select 'Der Mietvertrag hat zwei Beteiligten-Bloecke',
+       (select count(*) from jsonb_array_elements(public.vorlagen_feld_katalog('mietvertrag')) e
+         where (e->>'block')::boolean) = 2,
+       'Vermieter und Mieter';
 
 select nr, case when bestanden is true then 'ok  ' else 'FEHL' end as ergebnis, pruefung, bemerkung
   from befund order by nr;

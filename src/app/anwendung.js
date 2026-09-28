@@ -1352,6 +1352,43 @@ function immoWerteFuerVorgang(art, v, firma) {
       notar_adresse: v.notar_adresse || ""
     };
   }
+  if (art === "mietvertrag") {
+    const anschrift = (strasse, plz, ort) => [strasse || "",
+      `${plz || ""} ${ort || ""}`.trim()].filter(Boolean).join("\n");
+    return {
+      ...gemeinsam,
+      vermieter_block: immoBeteiligtenBlock(v.vermieter_typ, v.vermieter_name,
+        v.vermieter_strasse, v.vermieter_plz, v.vermieter_ort, v.vermieter_erben),
+      vermieter_name: v.vermieter_name || "",
+      vermieter_strasse: v.vermieter_strasse || "",
+      vermieter_plz: v.vermieter_plz || "",
+      vermieter_ort: v.vermieter_ort || "",
+      mieter_block: immoBeteiligtenBlock(v.mieter_typ, v.mieter_name,
+        v.mieter_strasse, v.mieter_plz, v.mieter_ort, v.mieter_erben),
+      mieter_name: v.mieter_name || "",
+      mieter_strasse: v.mieter_strasse || "",
+      mieter_plz: v.mieter_plz || "",
+      mieter_ort: v.mieter_ort || "",
+      objekt_adresse: anschrift(v.objekt_strasse, v.objekt_plz, v.objekt_ort),
+      objekt_lage: v.objekt_lage || "",
+      objekt_raeume: v.objekt_raeume || "",
+      objekt_wohnflaeche: v.objekt_wohnflaeche || "",
+      objekt_zustand: v.objekt_zustand || "",
+      schluessel: v.schluessel || "",
+      mietbeginn: v.mietbeginn || "",
+      kuendigungsausschluss_monate: v.kuendigungsausschluss_monate || "",
+      miete_grundmiete: v.miete_grundmiete || "",
+      miete_stellplatz: v.miete_stellplatz || "",
+      miete_bk_kalt: v.miete_bk_kalt || "",
+      miete_bk_warm: v.miete_bk_warm || "",
+      miete_gesamt: v.miete_gesamt || "",
+      kaution_betrag: v.kaution_betrag || "",
+      bank_kontoinhaber: v.bank_kontoinhaber || "",
+      bank_iban: v.bank_iban || "",
+      bank_bic: v.bank_bic || "",
+      bank_institut: v.bank_institut || ""
+    };
+  }
   if (art === "reservierung") {
     const anschrift = [v.kaeufer_strasse || "",
       `${v.kaeufer_plz || ""} ${v.kaeufer_ort || ""}`.trim(),
@@ -1787,262 +1824,44 @@ async function fillMaklervertrag(e) {
   immoVorlageWarnungen(warnungen);
 }
 
-async function fillMietvertrag(e) {
-  const t = base64ToBlob(VORLAGE_MIETVERTRAG),
-    n = await t.arrayBuffer(),
-    a = await window.JSZip.loadAsync(n);
-  let r = await a.file("word/document.xml").async("string");
-
-  function l(e, t, n, a) {
-    const r = (a = a || {}).excludeIfContains || [],
-      l = !1 !== a.onlyFirst;
-    let i = !1;
-    return e.replace(/<w:p\s[^>]*>[\s\S]*?<\/w:p>/g, e => {
-      if (l && i) return e;
-      const o = [],
-        s = /<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g;
-      let c;
-      for (; null !== (c = s.exec(e));) o.push(c[1]);
-      const d = o.join("");
-      if (!d.includes(t)) return e;
-      if (r.some(e => d.includes(e))) return e;
-      const u = e.match(/^<w:p\s[^>]*>/);
-      if (!u) return e;
-      const m = u[0];
-      let g = e.slice(m.length, -6);
-      const A = g.match(/^<w:pPr>[\s\S]*?<\/w:pPr>/);
-      let f = A ? A[0] : "";
-      A && (g = g.slice(f.length)), a.stripUnderline && f && (f = f.replace(/<w:u\s[^/]*\/>/g, "").replace(/<w:u\/>/g, ""));
-      g.match(/^[\s\S]*?<w:r(?:\s[^>]*)?>[\s\S]*?<\/w:r>/);
-      const p = g.match(/<w:r(?:\s[^>]*)?>[\s\S]*?<\/w:r>/);
-      if (!p) return e;
-      const h = p[0],
-        b = h.match(/^<w:r(?:\s[^>]*)?>/),
-        y = b ? b[0] : "<w:r>",
-        E = h.match(/<w:rPr>[\s\S]*?<\/w:rPr>/);
-      let v = E ? E[0] : "";
-      a.stripUnderline && v && (v = v.replace(/<w:u\s[^/]*\/>/g, "").replace(/<w:u\/>/g, ""));
-      const k = [];
-      n.forEach((e, t) => {
-        t > 0 && k.push("<w:br/>"), k.push(`<w:t xml:space="preserve">${escapeXml(e)}</w:t>`)
-      });
-      const w = `${y}${v}${k.join("")}</w:r>`;
-      return i = !0, `${m}${f}${w}</w:p>`
-    })
-  }
-
-  function i(e, t, n) {
-    if ("erben" === e && n && n.length > 0) {
-      const e = ["Erbengemeinschaft"];
-      return n.forEach((t, n) => {
-        e.push(""), e.push(`Erbe ${n+1}: ${t.name||""}`), t.strasse && e.push(t.strasse);
-        const a = `${t.plz||""} ${t.ort||""}`.trim();
-        a && e.push(a)
-      }), e
-    }
-    return ["eheleute" === e ? "Eheleute" : "herr" === e ? "Herr" : "frau" === e ? "Frau" : "", t || ""].filter(e => "" !== e)
-  }
-  const o = "erben" === e.vermieter_typ && Array.isArray(e.vermieter_erben) && e.vermieter_erben.length > 0,
-    s = "erben" === e.mieter_typ && Array.isArray(e.mieter_erben) && e.mieter_erben.length > 0;
-  let c, d, u, m, g, A, f, p;
-  o ? (c = i(e.vermieter_typ, null, e.vermieter_erben), d = "", u = "", m = e.vermieter_erben[0]?.land || e.vermieter_land || "Deutschland") : (c = i(e.vermieter_typ, e.vermieter_name, null), d = e.vermieter_strasse || "", u = `${e.vermieter_plz||""} ${e.vermieter_ort||""}`.trim(), m = e.vermieter_land || "Deutschland"), s ? (g = i(e.mieter_typ, null, e.mieter_erben), A = "", f = "", p = e.mieter_erben[0]?.land || e.mieter_land || "Deutschland") : (g = i(e.mieter_typ, e.mieter_name, null), A = e.mieter_strasse || "", f = `${e.mieter_plz||""} ${e.mieter_ort||""}`.trim(), p = e.mieter_land || "Deutschland"), r = l(r, "Maren", c, {
-    excludeIfContains: ["Kontoinhaber"],
-    stripUnderline: !0
-  }), r = l(r, "Sanddornweg", [d], {
-    stripUnderline: !0
-  }), r = l(r, "18209 Bad Doberan", [u], {
-    excludeIfContains: ["Kröpeliner", "ausschließlichen"],
-    stripUnderline: !0
-  });
-
-  function h(e, t) {
-    return e.replace(/<w:p\s[^>]*>[\s\S]*?<\/w:p>/g, e => {
-      const n = [],
-        a = /<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g;
-      let r;
-      for (; null !== (r = a.exec(e));) n.push(r[1]);
-      const l = n.join("");
-      if (!l.includes(t)) return e;
-      const i = e.match(/^<w:p\s[^>]*>/);
-      if (!i) return e;
-      const o = i[0];
-      let s = e.slice(o.length, -6);
-      const c = s.match(/^<w:pPr>[\s\S]*?<\/w:pPr>/),
-        d = c ? c[0] : "";
-      c && (s = s.slice(d.length));
-      const u = s.match(/<w:r(?:\s[^>]*)?>[\s\S]*?<\/w:r>/);
-      if (!u) return e;
-      const m = u[0],
-        g = m.match(/^<w:r(?:\s[^>]*)?>/),
-        A = g ? g[0] : "<w:r>",
-        f = m.match(/<w:rPr>[\s\S]*?<\/w:rPr>/);
-      return `${o}${d}${`${A}${f?f[0]:""}<w:t xml:space="preserve">${l.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</w:t></w:r>`}</w:p>`
-    })
-  }
-  r = l(r, "Petra", [...g, A, f, p].filter(e => "" !== e), {
-    stripUnderline: !0
-  }), r = h(r, "Kröpeliner");
-  const b = `${e.objekt_strasse||""}, ${e.objekt_plz||""} ${e.objekt_ort||""}`.trim(),
-    y = e.objekt_lage || "";
-  r = r.split("Kröpeliner Straße 7, 18209 Bad Doberan").join(escapeXml(b)), r = r.split("WE16, Dachgeschoss, rechts").join(escapeXml(y)), r = r.split("aus 3 Zimmern, 1 Küche, 1 Bad, 1 Flur/Diele, 1 Abstellkammer, 1 Balkon.").join(`aus ${escapeXml(e.objekt_raeume||"")}.`), r = r.split("Die Wohnfläche beträgt ca. 78 qm.").join(`Die Wohnfläche beträgt ca. ${escapeXml(e.objekt_wohnflaeche||"")} qm.`), r = h(r, "Erstbezug"), r = r.split("im Erstbezug.").join(`im ${escapeXml(e.objekt_zustand||"Erstbezug")}.`), r = h(r, "Mietverhältnis beginnt"), e.neubau_klausel && (r = r.split('Das Mietverhältnis beginnt am 01.06.2026 ("Mietbeginn"). An diesem Tag erfolgt die Übergabe des Mietobjektes an den Mieter.').join(`Das Mietverhältnis beginnt voraussichtlich am ${escapeXml(e.mietbeginn||"")} („geplanter Mietbeginn“). Die Übergabe des Mietobjektes an den Mieter erfolgt am tatsächlichen Übergabetag gemäß dem vorstehenden Vorbehalt Mietbeginn (Neubauvorhaben).`)), r = r.split("am 01.06.2026").join(`am ${escapeXml(e.mietbeginn||"")}`), r = h(r, "Beide Parteien verzichten"), r = r.split("von 24 Monaten").join(`von ${escapeXml(e.kuendigungsausschluss_monate||"24")} Monaten`), r = h(r, "Schlüssel übergeben"), r = r.split("3 Wohnungs-/Haustürschlüssel, 2 Briefkastenschlüssel").join(escapeXml(e.schluessel || ""));
-  const E = formatMoneyDE(e.miete_grundmiete || "0"),
-    v = e.miete_stellplatz ? formatMoneyDE(e.miete_stellplatz) : null,
-    k = formatMoneyDE(e.miete_bk_kalt || "0"),
-    w = formatMoneyDE(e.miete_bk_warm || "0"),
-    R = e.miete_gesamt ? formatMoneyDE(e.miete_gesamt) : formatMoneyDE(((parseFloat((e.miete_grundmiete || "0").replace(/\./g, "").replace(",", ".")) || 0) + (parseFloat((e.miete_stellplatz || "0").replace(/\./g, "").replace(",", ".")) || 0) + (parseFloat((e.miete_bk_kalt || "0").replace(/\./g, "").replace(",", ".")) || 0) + (parseFloat((e.miete_bk_warm || "0").replace(/\./g, "").replace(",", ".")) || 0)).toFixed(2).replace(".", ",")),
-    x = ["Der Mieter zahlt dem Vermieter monatlich", `Grundmiete: ${E} €`];
-  v && x.push(`Stellplatz: ${v} €`), x.push(`Vorauszahlung für kalte Betriebskosten: ${k} €`), x.push(`Vorauszahlung für warme Betriebskosten (Heiz- und Warmwasserkosten): ${w} €`), x.push("_________________________________________________________________________"), x.push(`Monatliche Gesamtmiete: ${R} €`), r = l(r, "Grundmiete: 1.248", x);
-  const S = ["Die Gesamtmiete gemäß § 4 ist vom Mieter monatlich ab Beginn der Mietzeit gemäß § 2.1 im Voraus, spätestens bis zum dritten Werktag des Monats auf folgendes Konto zu überweisen:", "", `Kontoinhaber: ${e.bank_kontoinhaber||""}`, "", `IBAN: ${e.bank_iban||""}`, `BIC: ${e.bank_bic||""}`];
-  if (e.bank_institut && S.push(`Kreditinstitut: ${e.bank_institut}`), r = l(r, "Kontoinhaber", S), e.bank_institut && (r = h(r, "ING DiB"), r = r.split("ING DiBa").join(escapeXml(e.bank_institut))), e.kaution_betrag) {
-    const t = formatMoneyDE(e.kaution_betrag);
-    r = h(r, "3.744,00"), r = r.split("3.744,00 €").join(`${escapeXml(t)} €`)
-  }
-  if (e.neubau_klausel) {
-    const e = e => `<w:p><w:pPr><w:pStyle w:val="Paragraph"/></w:pPr>${e}</w:p>`,
-      t = (e, t) => `<w:r><w:rPr>${t?"<w:b/>":""}</w:rPr><w:t xml:space="preserve">${escapeXml(e)}</w:t></w:r>`,
-      n = `<w:p><w:pPr><w:pStyle w:val="Heading1NotNumbered"/></w:pPr>${t("Vorbehalt Mietbeginn (Neubauvorhaben)")}</w:p>` + e(t("Neubau-Vorbehalt: ", !0) + t("Da es sich bei dem Mietobjekt um ein Neubauvorhaben handelt, dessen Fertigstellungstermin von bau- und genehmigungsrechtlichen Umständen abhängt, die der Vermieter nicht vollständig beeinflussen kann, gelten folgende Sonderregelungen:")) + e(t("1. Der Vermieter ist berechtigt, den in § 2 genannten geplanten Mietbeginn zu verschieben, sofern er dem Mieter die Verschiebung mindestens 3 Monate vor dem ursprünglich vereinbarten Einzugsdatum schriftlich mitteilt. Die Mitteilung hat den neuen voraussichtlichen Termin zu enthalten.")) + e(t("2. Schadensersatzansprüche des Mieters wegen einer Verschiebung des Mietbeginns sind ausgeschlossen, wenn die Verzögerung auf Umstände zurückzuführen ist, die der Vermieter nicht zu vertreten hat (insbesondere: Bauverzögerungen durch Witterung, behördliche Genehmigungsverfahren, Lieferengpässe bei Baumaterialien oder Ausfall von Subunternehmern).")) + e(t("3. Die Mietzahlungspflicht und die Pflicht zur Kautionsleistung beginnen in jedem Fall erst mit dem tatsächlichen Übergabedatum, das im Übergabeprotokoll festgehalten wird. Die Kaution ist spätestens 14 Tage vor dem tatsächlichen Übergabetermin zu leisten.")) + e(t("4. Außerordentliches Kündigungsrecht des Mieters: Teilt der Vermieter eine Verschiebung des Mietbeginns mit einer Frist von weniger als 3 Monaten mit, ist der Mieter berechtigt, diesen Mietvertrag innerhalb von 14 Tagen nach Erhalt der Mitteilung außerordentlich mit sofortiger Wirkung zu kündigen. In diesem Fall sind keine Vertragsstrafen oder Kosten für den Mieter fällig.")),
-      a = r.indexOf('<w:pStyle w:val="berschrift1"');
-    if (-1 !== a) {
-      const e = r.lastIndexOf("<w:p ", a); - 1 !== e && (r = r.slice(0, e) + n + r.slice(e))
-    }
-  }
-  a.file("word/document.xml", r);
-  const z = await a.generateAsync({
-      type: "blob"
-    }),
-    C = URL.createObjectURL(z),
-    I = document.createElement("a");
-  I.href = C;
-  const B = o && e.vermieter_erben[0]?.name ? e.vermieter_erben[0].name : e.vermieter_name || "Vermieter";
-  I.download = `Mietvertrag_${fileSafe(B)}_${fileSafe(e.objekt_strasse||"Objekt")}.docx`, document.body.appendChild(I), I.click(), I.remove(), URL.revokeObjectURL(C)
-}
-async function fillVollmacht(e) {
-  const t = STANDORTE[e.standort || "musterstadt"],
-    n = (new Date).toLocaleDateString("de-DE");
-  let a = [];
-  if (("erben" === e.verkaeufer_typ || "mehrere" === e.verkaeufer_typ) && Array.isArray(e.erben) && e.erben.length > 0) "erben" === e.verkaeufer_typ && a.push("Erbengemeinschaft - bestehend aus:"), e.erben.forEach((e, t) => {
-    t > 0 && a.push(""), a.push(e.name || ""), e.strasse && a.push(e.strasse);
-    const n = `${e.plz||""} ${e.ort||""}`.trim();
-    n && a.push(n)
-  });
-  else if ("firma" === e.verkaeufer_typ) {
-    e.verkaeufer_name && a.push(e.verkaeufer_name), e.verkaeufer_vertreter && a.push(`vertreten durch ${e.verkaeufer_vertreter}`), e.verkaeufer_register && a.push(e.verkaeufer_register), e.verkaeufer_strasse && a.push(e.verkaeufer_strasse);
-    const t = `${e.verkaeufer_plz||""} ${e.verkaeufer_ort||""}`.trim();
-    t && a.push(t)
-  } else {
-    const t = "eheleute" === e.verkaeufer_typ ? "Eheleute" : "herr" === e.verkaeufer_typ ? "Herr" : "frau" === e.verkaeufer_typ ? "Frau" : "";
-    t && a.push(t), e.verkaeufer_name && a.push(e.verkaeufer_name), e.verkaeufer_strasse && a.push(e.verkaeufer_strasse);
-    const n = `${e.verkaeufer_plz||""} ${e.verkaeufer_ort||""}`.trim();
-    n && a.push(n)
-  }
-  let r = [];
-  e.objekt_bezeichnung && r.push(e.objekt_bezeichnung), e.objekt_strasse ? r.push(e.objekt_strasse) : e.objekt_adresse && r.push(e.objekt_adresse);
-  const l = `${e.objekt_plz||""} ${e.objekt_ort||""}`.trim();
-  l && r.push(l);
-  const i = e => String(null == e ? "" : e).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"),
-    o = (e, t = {}) => {
-      const n = t.size || "20",
-        a = t.bold ? "<w:b/>" : "",
-        r = t.underline ? '<w:u w:val="single"/>' : "";
-      return `<w:p><w:pPr>${t.align?`<w:jc w:val="${t.align}"/>`:""}${null!=t.spacing?`<w:spacing w:after="${t.spacing}"/>`:'<w:spacing w:after="120"/>'}</w:pPr><w:r><w:rPr>${a}${r}<w:rFonts w:ascii="Montserrat" w:hAnsi="Montserrat" w:cs="Montserrat"/><w:sz w:val="${n}"/></w:rPr><w:t xml:space="preserve">${i(e)}</w:t></w:r></w:p>`
-    },
-    s = e => `<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr><w:spacing w:after="60"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Montserrat" w:hAnsi="Montserrat" w:cs="Montserrat"/><w:sz w:val="20"/></w:rPr><w:t xml:space="preserve">${i(e)}</w:t></w:r></w:p>`,
-    c = () => '<w:p><w:pPr><w:spacing w:after="60"/></w:pPr></w:p>';
-  let d = '<w:tbl>\n<w:tblPr><w:tblW w:w="9000" w:type="dxa"/><w:tblLayout w:type="fixed"/><w:tblBorders><w:top w:val="nil"/><w:left w:val="nil"/><w:bottom w:val="nil"/><w:right w:val="nil"/><w:insideH w:val="nil"/><w:insideV w:val="nil"/></w:tblBorders></w:tblPr>\n<w:tblGrid><w:gridCol w:w="6300"/><w:gridCol w:w="2700"/></w:tblGrid>\n<w:tr>\n<w:tc>\n<w:tcPr><w:tcW w:w="6300" w:type="dxa"/><w:vAlign w:val="center"/></w:tcPr>\n<w:p><w:pPr><w:jc w:val="center"/><w:spacing w:before="600" w:after="0"/></w:pPr>\n<w:r><w:rPr><w:b/><w:rFonts w:ascii="Montserrat" w:hAnsi="Montserrat" w:cs="Montserrat"/><w:sz w:val="28"/></w:rPr><w:t>Vollmacht</w:t></w:r></w:p>\n</w:tc>\n<w:tc>\n<w:tcPr><w:tcW w:w="2700" w:type="dxa"/></w:tcPr>\n<w:p><w:pPr><w:jc w:val="right"/></w:pPr>\n<w:r><w:rPr><w:noProof/></w:rPr><w:drawing>\n<wp:inline distT="0" distB="0" distL="0" distR="0" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing">\n<wp:extent cx="1200000" cy="778000"/>\n<wp:effectExtent l="0" t="0" r="0" b="0"/>\n<wp:docPr id="1" name="Logo"/>\n<wp:cNvGraphicFramePr/>\n<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">\n<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">\n<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">\n<pic:nvPicPr><pic:cNvPr id="1" name="Logo"/><pic:cNvPicPr/></pic:nvPicPr>\n<pic:blipFill><a:blip r:embed="rIdLogo" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>\n<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="1200000" cy="778000"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr>\n</pic:pic>\n</a:graphicData>\n</a:graphic>\n</wp:inline>\n</w:drawing></w:r></w:p>\n</w:tc>\n</w:tr>\n</w:tbl>';
-  if (d += o("Auftraggeber"), d += '<w:p><w:pPr><w:spacing w:after="60"/></w:pPr></w:p>', a.forEach(e => {
-      d += o(e, {
-        spacing: "0"
-      })
-    }), d += '<w:p><w:pPr><w:spacing w:after="60"/></w:pPr></w:p>', d += o("erteilt"), d += '<w:p><w:pPr><w:spacing w:after="60"/></w:pPr></w:p>', d += o(t.name, {
-      spacing: "0"
-    }), d += o(t.firma, {
-      spacing: "0"
-    }), d += o("{geschaeftsfuehrer}", {
-      spacing: "0"
-    }), d += o(t.strasse, {
-      spacing: "0"
-    }), d += o(t.plz_ort, {
-      spacing: "0"
-    }), d += '<w:p><w:pPr><w:spacing w:after="60"/></w:pPr></w:p>', d += o("zu der Immobilie:"), d += '<w:p><w:pPr><w:spacing w:after="60"/></w:pPr></w:p>', r.forEach(e => {
-      d += o(e, {
-        spacing: "0"
-      })
-    }), d += '<w:p><w:pPr><w:spacing w:after="60"/></w:pPr></w:p>', d += o("die Vollmacht zur:"), d += s("Einsichtnahme in das Grundbuch und zur Anfertigung bzw. Einholung eines aktuellen Grundbuchauszuges"), d += s("Einsichtnahme in die Grundakte"), d += s("Einsichtnahme in die der Eintragung von vorhandenen Belastungen zugrunde liegenden Unterlagen bzw. Anforderung von Unterlagen, die im Grundbuch eingetragene Belastungen betreffen"), d += s("zur Einsichtnahme in das Kataster"), d += s("zur Einsichtnahme in das Baulastenverzeichnis"), d += s("zur Einsichtnahme in das Altlastenverzeichnis oder Altlastenkataster"), d += s("zur Einsichtnahme in die Bauakte und zur Anfertigung von Auszügen aus der Bauakte, sofern dies aus Sicht des Immobilienmaklers erforderlich ist"), d += s("zur Einsichtnahme in weitere behördliche Akten"), d += s("zur Einsichtnahme von Akten im Zusammenhang mit Eintragungen in Abteilung III des Grundbuchs bzw. Anforderung von Unterlagen, Verträgen und zugrunde liegenden Vereinbarungen, die Eintragungen in Abteilung III des Grundbuchs betreffen."), d += s("Sonstiges"), d += '<w:p><w:pPr><w:spacing w:after="60"/></w:pPr></w:p>', d += o("Die Vollmacht erstreckt sich auch auf die schriftliche Anforderung von Auszügen aus den genannten Akten und Registern.", {
-      spacing: "0"
-    }), d += o(" Der Auftraggeber erteilt dem Makler zudem die Vollmacht, bei einem Notar den Notarvertrag in dem Moment anzufordern, wenn die beiden Parteien des notariellen Kaufvertrages hinreichend bestimmt sind.", {
-      spacing: "0"
-    }), d += o("Mit der Übermittlung der personenbezogenen Daten an die jeweiligen Stellen erklärt sich der Auftraggeber einverstanden.", {
-      spacing: "0"
-    }), d += o("Die Vollmacht gilt für das Maklerbüro, so dass auch die Mitarbeitenden des Maklerbüros diese Vollmacht nutzen dürfen.", {
-      spacing: "0"
-    }), d += ((e, t = {}) => `<w:p><w:pPr>${t.align?`<w:jc w:val="${t.align}"/>`:""}${null!=t.spacing?`<w:spacing w:after="${t.spacing}"/>`:'<w:spacing w:after="120"/>'}</w:pPr>${e.map(e=>{const t=e.size||"20";return`<w:r><w:rPr>${e.bold?"<w:b/>":""}${e.underline?'<w:u w:val="single"/>':""}<w:rFonts w:ascii="Montserrat" w:hAnsi="Montserrat" w:cs="Montserrat"/><w:sz w:val="${t}"/></w:rPr><w:t xml:space="preserve">${i(e.text)}</w:t></w:r>`}).join("")}</w:p>`)([{
-      text: "Der Immobilienmakler darf "
-    }, {
-      text: "keine",
-      underline: !0
-    }, {
-      text: " Untervollmacht an weitere Maklerbüros erteilen."
-    }], {
-      spacing: "0"
-    }), d += o("Der Immobilienmakler darf externen Dienstleister Untervollmacht zur Beantragung der o.g. Unterlagen erteilen.", {
-      spacing: "0"
-    }), d += '<w:p><w:pPr><w:spacing w:after="60"/></w:pPr></w:p>', d += '<w:p><w:pPr><w:spacing w:after="60"/></w:pPr></w:p>', d += o(`Datum: ${n}`), d += '<w:p><w:pPr><w:spacing w:after="60"/></w:pPr></w:p>', d += o("______________________________________", {
-      spacing: "60"
-    }), "eheleute" === e.verkaeufer_typ) d += '<w:p><w:pPr><w:spacing w:after="60"/></w:pPr></w:p>', d += o("______________________________________", {
-    spacing: "60"
-  });
-  else if (("erben" === e.verkaeufer_typ || "mehrere" === e.verkaeufer_typ) && Array.isArray(e.erben) && e.erben.length > 1)
-    for (let t = 1; t < e.erben.length; t++) d += c(), d += o("______________________________________", {
-      spacing: "60"
+// Ein Block aus N Beteiligten — dieselbe Form wie buildVerkaeuferBlock, nur
+// ohne Bindung an die Feldnamen des Maklervertrags. Der Mietvertrag fuehrt
+// zwei solche Gruppen: Vermieter und Mieter koennen beide Eheleute oder eine
+// Erbengemeinschaft sein.
+function immoBeteiligtenBlock(typ, name, strasse, plz, ort, weitere) {
+  const liste = Array.isArray(weitere) ? weitere.filter((p) => p && (p.name || p.strasse)) : [];
+  if ((typ === "erben" || typ === "mehrere") && liste.length > 0) {
+    const zeilen = typ === "erben" ? ["Erbengemeinschaft"] : [];
+    liste.forEach((p, i) => {
+      if (zeilen.length > 0) zeilen.push("");
+      zeilen.push(typ === "erben" ? `Erbe ${i + 1}: ${p.name || ""}` : (p.name || ""));
+      zeilen.push(p.strasse || "");
+      zeilen.push(`${p.plz || ""} ${p.ort || ""}`.trim());
     });
-  const u = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">\n<w:body>\n${d}\n<w:sectPr>\n<w:pgSz w:w="11906" w:h="16838"/>\n<w:pgMar w:top="900" w:right="1134" w:bottom="900" w:left="1134" w:header="708" w:footer="708" w:gutter="0"/>\n</w:sectPr>\n</w:body>\n</w:document>`,
-    m = LOGO_BLAU.split(",")[1],
-    g = atob(m),
-    A = new Uint8Array(g.length);
-  for (let e = 0; e < g.length; e++) A[e] = g.charCodeAt(e);
-  const f = new window.JSZip;
-  f.file("[Content_Types].xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">\n<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>\n<Default Extension="xml" ContentType="application/xml"/>\n<Default Extension="png" ContentType="image/png"/>\n<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>\n<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>\n<Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>\n</Types>'), f.file("_rels/.rels", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>\n</Relationships>'), f.file("word/document.xml", u), f.file("word/_rels/document.xml.rels", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>\n<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering" Target="numbering.xml"/>\n<Relationship Id="rIdLogo" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/logo.png"/>\n</Relationships>'), f.file("word/styles.xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">\n<w:docDefaults>\n<w:rPrDefault><w:rPr><w:rFonts w:ascii="Montserrat" w:hAnsi="Montserrat" w:cs="Montserrat"/><w:sz w:val="20"/></w:rPr></w:rPrDefault>\n</w:docDefaults>\n</w:styles>'), f.file("word/numbering.xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">\n<w:abstractNum w:abstractNumId="0">\n<w:lvl w:ilvl="0">\n<w:start w:val="1"/>\n<w:numFmt w:val="bullet"/>\n<w:lvlText w:val="&#8226;"/>\n<w:lvlJc w:val="left"/>\n<w:pPr><w:ind w:left="720" w:hanging="360"/></w:pPr>\n<w:rPr><w:rFonts w:ascii="Symbol" w:hAnsi="Symbol"/></w:rPr>\n</w:lvl>\n</w:abstractNum>\n<w:num w:numId="1"><w:abstractNumId w:val="0"/></w:num>\n</w:numbering>'), f.file("word/media/logo.png", A);
-  const p = await f.generateAsync({
-    type: "blob",
-    mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-  });
-  let h = "";
-  if (("erben" === e.verkaeufer_typ || "mehrere" === e.verkaeufer_typ) && Array.isArray(e.erben) && e.erben.length > 0) {
-    const t = (e.erben[0].name || "").split(/\s+/);
-    h = t[t.length - 1] || ""
-  } else if ("firma" === e.verkaeufer_typ && e.verkaeufer_name) h = e.verkaeufer_name;
-  else if (e.verkaeufer_name) {
-    const t = e.verkaeufer_name.split(/\s+/);
-    h = t[t.length - 1] || ""
+    return zeilen.join("\n");
   }
-  h || (h = "Auftraggeber");
-  const b = `Vollmacht_${fileObjekt(e)}_${fileSafe(h)}.docx`,
-    y = URL.createObjectURL(p),
-    E = document.createElement("a");
-  E.href = y, E.download = b, E.click(), setTimeout(() => URL.revokeObjectURL(y), 1e3)
+  const vorsatz = typ === "eheleute" ? "Eheleute" : typ === "herr" ? "Herr"
+    : typ === "frau" ? "Frau" : "";
+  return [vorsatz, name || "", strasse || "", `${plz || ""} ${ort || ""}`.trim()]
+    .filter((z) => z !== "").join("\n");
 }
-async function fillObjektnachweis(e) {
-  // Wie beim Maklervertrag: der Inhalt kommt aus den markierten Stellen.
-  // Hier standen achtunddreissig woertliche Anker aus einem Mustervertrag,
-  // darunter Namen, Anschriften, Geburtsdaten und Ausweisnummern der
-  // Vertragsparteien. Alle weg.
+
+async function fillMietvertrag(e) {
+  // Wie bei Maklervertrag und Objektnachweis: der Inhalt kommt aus den
+  // markierten Stellen der eigenen Vorlage. Hier standen zuletzt die
+  // Vornamen der Mietparteien, ihre Strasse, die Anschrift des Objekts, das
+  // Kreditinstitut und die Hoehe der Miete aus einem Mustermietvertrag.
   const firma = STANDORTE[e.standort || "musterstadt"] || {};
-  const { bytes, endung, warnungen } = await immoVorlageFuellen("objektnachweis", e, firma);
-  const kaeufer = Array.isArray(e.kaeufer) ? e.kaeufer : [];
-  const namen = kaeufer.map((k) => k.nachname || "").filter(Boolean).join("+") || "Kaeufer";
-  immoDateiAnbieten(bytes, `Objektnachweis_${fileObjekt(e)}_${fileSafe(namen)}.${endung}`, endung);
+  const { bytes, endung, warnungen } = await immoVorlageFuellen("mietvertrag", e, firma);
+  const wer = (e.vermieter_typ === "erben" || e.vermieter_typ === "mehrere")
+      && Array.isArray(e.vermieter_erben) && e.vermieter_erben[0] && e.vermieter_erben[0].name
+    ? e.vermieter_erben[0].name
+    : (e.vermieter_name || "Vermieter");
+  const datei = `Mietvertrag_${fileSafe(wer)}_${fileSafe(e.objekt_strasse || "Objekt")}.${endung}`;
+  immoDateiAnbieten(bytes, datei, endung);
   immoVorlageWarnungen(warnungen);
 }
 
-
-function exportText(e, t) {
-  const n = new Blob([t], {
-      type: "text/plain;charset=utf-8"
-    }),
-    a = URL.createObjectURL(n),
-    r = document.createElement("a");
-  r.href = a, r.download = e, r.click(), setTimeout(() => URL.revokeObjectURL(a), 1e3)
-}
 
 function GlobalSuche({
   offen: e,
@@ -48496,7 +48315,7 @@ function ExposeKachel({
     headlineZeile2: r = "AM SEE",
     headlineZeile2Gold: l = !0,
     headlineSkala: i = 1,
-    subline: o = "19399 DOBBERTIN",
+    subline: o = "12345 MUSTERDORF",
     objektart: s = "haus",
     domain: c = "immooffice.example"
   } = e, d = kachelSpalten(e), u = 32, m = i, g = Math.round(64 * m), A = Math.round(10 * m), f = Math.round(24 * m);
@@ -52022,10 +51841,10 @@ function MarketingVorlagen({
       headlineZeile2: "AM SEE",
       headlineZeile2Gold: !0,
       headlineSkala: 1,
-      subline: "19399 DOBBERTIN",
+      subline: "12345 MUSTERDORF",
       domain: "immooffice.example",
-      lat: 54.0924,
-      lng: 12.0991,
+      lat: 51.1657,
+      lng: 10.4515,
       zoom: 15,
       kartenStil: "voyager",
       standortBadge: "STANDORT",
@@ -94426,7 +94245,7 @@ function MietvertraegeTab({
         }
       }, React.createElement("label", {
         style: labelStyle
-      }, "Name * ", "eheleute" === n && "(z.B. „Maren & Andreas Engel“)"), React.createElement("input", {
+      }, "Name * ", "eheleute" === n && "(z.B. „Anna & Bernd Muster“)"), React.createElement("input", {
         value: p[`${e}_name`],
         onChange: t => h({
           ...p,
@@ -94760,7 +94579,7 @@ function MietvertraegeTab({
       ...p,
       objekt_strasse: e.target.value
     }),
-    placeholder: "z.B. Kröpeliner Straße 7",
+    placeholder: "z.B. Musterstraße 7",
     style: inputStyle
   })), React.createElement("div", null, React.createElement("label", {
     style: labelStyle
@@ -95032,7 +94851,7 @@ function MietvertraegeTab({
       ...p,
       bank_kontoinhaber: e.target.value
     }),
-    placeholder: "z.B. Andreas Engel und Maren Engel",
+    placeholder: "z.B. Anna Muster und Bernd Muster",
     style: inputStyle
   })), React.createElement("div", {
     style: {
@@ -95066,7 +94885,7 @@ function MietvertraegeTab({
       ...p,
       bank_institut: e.target.value
     }),
-    placeholder: "z.B. ING DiBa",
+    placeholder: "z.B. Musterbank",
     style: inputStyle
   }))), React.createElement("h4", {
     style: {
@@ -127063,7 +126882,7 @@ function KwSuchkriterium({ kontakt, onClose, vorbelegung, index }) {
     React.createElement(ImmoFeld, { label: "Objektarten" }, React.createElement("div", { style: { display: "flex", gap: 6, flexWrap: "wrap", paddingTop: 4, marginBottom: 10 } },
       KW_OBJEKTARTEN.map((o) => chip(f.objektarten.includes(o), () => toggle("objektarten", o), o)))),
     React.createElement("div", { className: "mob-keep", style: kwGrid("2fr 1fr") },
-      React.createElement(ImmoFeld, { label: "Orte / Regionen" }, kwEingabe(f.orte, (v) => s("orte", v), { placeholder: "z. B. Musterstadt, Musterdorf, Bad Doberan" })),
+      React.createElement(ImmoFeld, { label: "Orte / Regionen" }, kwEingabe(f.orte, (v) => s("orte", v), { placeholder: "z. B. Musterstadt, Musterdorf, Musterhausen" })),
       React.createElement(ImmoFeld, { label: "PLZ-Bereich" }, kwEingabe(f.plz, (v) => s("plz", v), { placeholder: "z. B. 180, 181" }))),
     React.createElement("div", { className: "mob-keep", style: kwGrid("2fr 1fr") },
       React.createElement(ImmoFeld, { label: "Umkreis um Ort (optional)" }, kwEingabe(f.umkreis_label, (v) => s("umkreis_label", v), { placeholder: "z. B. Musterstadt oder 12345 Musterdorf" })),
@@ -134027,7 +133846,8 @@ const IMMO_VERTRAGSARTEN = [
   ["maklervertrag", "Maklervertrag", "Der Auftrag des Eigentümers. Platzhalter: {firma_name}, {geschaeftsfuehrer}, {strasse}, {plz_ort}."],
   ["vollmacht", "Vollmacht", "Die Vollmacht des Auftraggebers."],
   ["objektnachweis", "Objektnachweis", "Der Nachweis gegenüber dem Interessenten."],
-  ["reservierung", "Reservierung", "Die Reservierungsvereinbarung."]
+  ["reservierung", "Reservierung", "Die Reservierungsvereinbarung."],
+  ["mietvertrag", "Mietvertrag", "Der Mietvertrag über eine Wohnung."]
 ];
 
 function EinstVertragsvorlagen({ user }) {

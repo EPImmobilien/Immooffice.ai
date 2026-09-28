@@ -531,6 +531,31 @@ ERSETZUNGEN = [
      'Akquise-Protokoll traegt den Mandanten der Anfrage.',
      {'akq-lead-eingang'}),
 
+    # --- MARKE: die Stilbeispiele fuer die KI beschreiben ein echtes Objekt
+    # der Referenz — Ort, Landkreis, Naturpark, Grundstuecksgroesse,
+    # Baujahr. Sie stehen im Auftrag an das Sprachmodell und praegen jeden
+    # erzeugten Text. Der STIL ist das Gewollte, nicht das Objekt; deshalb
+    # dieselbe Machart mit erfundenen Angaben.
+    ('MARKE',
+     r'`Dieser liebevoll gepflegte und vollständig möblierte Bungalow befindet sich in idyllischer Naturlage in Dobbertin, nur wenige Gehminuten vom Dobbertiner See entfernt\. Das ca\. 354 m² große Eigentumsgrundstück liegt ruhig am Ende einer kleinen Sackgasse innerhalb einer gewachsenen Bungalowsiedlung und bietet ein hohes Maß an Privatsphäre\. Der Bungalow verfügt über ca\. 39 m² Wohnfläche, verteilt auf zwei Zimmer und wird durch eine sonnige, teilweise überdachte Terrasse in Südlage ergänzt\. Das ursprünglich ca\. 1974 errichtete Gebäude wurde ab 2015 umfassend energetisch saniert und in den Folgejahren fortlaufend modernisiert\.`',
+     '`Dieser liebevoll gepflegte und vollständig möblierte Bungalow befindet '
+     'sich in idyllischer Naturlage in Musterdorf, nur wenige Gehminuten vom '
+     'Mustersee entfernt. Das ca. 354 m² große Eigentumsgrundstück liegt ruhig '
+     'am Ende einer kleinen Sackgasse innerhalb einer gewachsenen '
+     'Bungalowsiedlung und bietet ein hohes Maß an Privatsphäre. Der Bungalow '
+     'verfügt über ca. 39 m² Wohnfläche, verteilt auf zwei Zimmer und wird '
+     'durch eine sonnige, teilweise überdachte Terrasse in Südlage ergänzt. '
+     'Das ursprünglich ca. 1974 errichtete Gebäude wurde ab 2015 umfassend '
+     'energetisch saniert und in den Folgejahren fortlaufend modernisiert.`',
+     'Stilbeispiel der KI: ein echtes Objekt der Referenz.'),
+    ('MARKE',
+     r'`Die Immobilie befindet sich in ruhiger und naturnaher Lage in Dobbertin im Landkreis Ludwigslust-Parchim\. Der Ort liegt mitten im Naturpark Nossentiner/Schwinzer Heide\. Die naechste Kreisstadt liegt rund 25 km entfernt, die naechste Grossstadt etwa 70 km\.`',
+     '`Die Immobilie befindet sich in ruhiger und naturnaher Lage in Musterdorf '
+     'im Landkreis Musterkreis. Der Ort liegt mitten in einem Naturpark. Die '
+     'naechste Kreisstadt liegt rund 25 km entfernt, die naechste Grossstadt '
+     'etwa 70 km.`',
+     'Stilbeispiel der KI: die Lagebeschreibung desselben Objekts.'),
+
     # --- FREMD: Verweise auf das Supabase-Projekt der Vorlage
     ('FREMD', r'yazwkzzjiquprtjpurur', 'usguiggfciavwzkdfjgt',
      'Projektkennung der Vorlage durch die eigene ersetzt.'),

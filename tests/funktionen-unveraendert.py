@@ -29,7 +29,7 @@ FORK = WURZEL / 'supabase' / 'functions'
 # 28.09.2026 genauso und aus demselben Grund. Wer die Liste lesen will:
 #   python3 -c "import base64;print(base64.b64decode('...').decode())"
 KENNZEICHEN = re.compile(
-    base64.b64decode('ZW5nZmVyfGVwd29ybGR8ZXBbLV8gXT9pbW1vYmlsaWVufGVwLXdvcmxkfEVQIFdvcmxkfEUmUHxFJmFtcDtQfEVOR0ZFUnxWKMO2fG9lfFxcdTAwZjYpZ2VudGVpY2h8Vm9lZ2VudGVpY2h8Um9zdG9ja3xTY2h3ZXJpbnxCZXJsaW58SGFtYnVyZ3xXYXJuZW0ow7x8dWUpbmRlfE1hcmtncmFmZW5oZWlkZXwxODA1NXwxODA1N3wxOTA1NXxQdXNjaGtpbnwwMzgxWyAvLi1dPzM2WyAvLi1dPzc3WyAvLi1dPzk5WyAvLi1dPzg4fHNwcmVuZ25ldHRlcnxTUFJFTkdORVRURVJ8am90Zm9ybXxzaXBnYXRlfHlvZGVja3xzaG9wLT90dnx5YXp3a3p6amlxdXBydGpwdXJ1cnxTVEFORE9SVEVcW3xTVEFORE9SVEVcLg==').decode(),
+    base64.b64decode('ZW5nZmVyfGVwd29ybGR8ZXBbLV8gXT9pbW1vYmlsaWVufGVwLXdvcmxkfEVQIFdvcmxkfEUmUHxFJmFtcDtQfEVOR0ZFUnxWKMO2fG9lfFxcdTAwZjYpZ2VudGVpY2h8Vm9lZ2VudGVpY2h8Um9zdG9ja3xTY2h3ZXJpbnxCZXJsaW58SGFtYnVyZ3xXYXJuZW0ow7x8dWUpbmRlfE1hcmtncmFmZW5oZWlkZXwxODA1NXwxODA1N3wxOTA1NXxQdXNjaGtpbnwwMzgxWyAvLi1dPzM2WyAvLi1dPzc3WyAvLi1dPzk5WyAvLi1dPzg4fHNwcmVuZ25ldHRlcnxTUFJFTkdORVRURVJ8am90Zm9ybXxzaXBnYXRlfHlvZGVja3xzaG9wLT90dnx5YXp3a3p6amlxdXBydGpwdXJ1cnxTVEFORE9SVEVcW3xTVEFORE9SVEVcLnxEb2JiZXJ0aW58THVkd2lnc2x1c3Q=').decode(),
     re.IGNORECASE)
 
 # Zeilen, die nur verschwinden, weil sie zu einem Block gehoeren, dessen

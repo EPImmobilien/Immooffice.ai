@@ -1946,3 +1946,39 @@ Migration mit eigenem Feldkatalog — steht in `docs/OFFEN.md`.
 aufzunehmen würde das Gate rot färben, solange `fillMietvertrag` sie noch
 trägt — ein Gate, das man abschalten muss, um arbeiten zu können, wird
 abgeschaltet. Sie kommen mit dem Umbau des Mietvertrags dazu.
+
+---
+
+## Auch der Mietvertrag, und damit sind alle Anker weg (28.09.2026)
+
+`fork_26` nimmt `mietvertrag` als fünfte Vorlagenart auf. **Zwei
+Beteiligten-Blöcke statt einem:** Vermieter *und* Mieter können Eheleute oder
+eine Erbengemeinschaft sein — die Tabelle führt für beide ein
+`vermieter_erben` beziehungsweise `mieter_erben`. Die Regel „entweder der
+Block oder die Einzelfelder" gilt je Gruppe und trug das ohne Änderung; ein
+Wachposten hält fest, dass keine Gruppe zwei Blöcke bekommt.
+
+**Keine Vorgabewerte für den Mietvertrag.** Welche hier sinnvoll wären —
+Kündigungsausschluss, Kaution in Monatsmieten — ist eine fachliche Frage, die
+niemand gestellt hat. Lieber keine Vorgabe als eine erfundene.
+
+### Was beim Aufräumen noch zum Vorschein kam
+
+Nachdem die Anker weg waren, konnte die Blockliste endlich um die Orte aus
+den Musterverträgen wachsen. Und prompt fand sie vier weitere Nester, die mit
+der Dokumenterzeugung nichts zu tun hatten:
+
+| Fundstelle | |
+|---|---|
+| Platzhalter der Mietvertrags-Maske | Straße, Stadt, Kreditinstitut und **zwei Namen** eines echten Paares — dem Nutzer direkt vor Augen |
+| Stilbeispiele der KI in `generate-text` | die vollständige Beschreibung eines echten Objekts samt Ort, Landkreis und Naturpark. Sie steht im Auftrag an das Sprachmodell und prägt **jeden** erzeugten Text |
+| Vorgabewerte der Marketingkachel | Ort und Koordinaten der Referenzregion |
+| Ortssuche im Objektportal | ein Ort der Referenz als Beispiel |
+
+Alle ersetzt — der **Stil** der KI-Beispiele war das Gewollte, nicht das
+Objekt, also dieselbe Machart mit erfundenen Angaben.
+
+**Die Blockliste steht jetzt an beiden Stellen**, in `scripts/neutral.sh` und
+in `tests/funktionen-unveraendert.py`. Dass es zwei sind, ist keine schöne
+Lösung — es ist mir erst aufgefallen, als die eine grün war und die andere
+rot. Vermerkt in `docs/OFFEN.md`.

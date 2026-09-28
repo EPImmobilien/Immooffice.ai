@@ -170,6 +170,8 @@ zuwachs(bereich, mehr, grund) as (values
   -- fork_25: mehrere Beteiligte in einem Block, mit Untergrenze der Schrift.
   ('Spalten', 1, 'fork_25: vorlagen_felder.mindest_schriftgroesse'),
   ('Pruefbedingungen', 1, 'fork_25: Untergrenze nicht ueber der Ausgangsgroesse')
+  -- fork_26 aendert nur eine vorhandene Pruefbedingung (art) und eine
+  -- vorhandene Funktion (vorlagen_feld_katalog) — keine neuen Kennzahlen.
 ),
 soll(bereich, soll) as (
   select v.bereich,

@@ -2735,6 +2735,123 @@ ERSETZUNGEN = [
      '// Bei gemeinsamem Nachnamen "Vorname & Vorname Nachname", sonst beide Namen voll.',
      'Beispielnamen der Referenz im Kommentar zum Personentext.'),
 
+    # --- Der Mietvertrag ist seit fork_26 eine Vorlagenart wie die anderen.
+    ('FORK',
+     r'(  if \(art === "reservierung"\) \{)',
+     '  if (art === "mietvertrag") {\n'
+     '    const anschrift = (strasse, plz, ort) => [strasse || "",\n'
+     '      `${plz || ""} ${ort || ""}`.trim()].filter(Boolean).join("\\\\n");\n'
+     '    return {\n'
+     '      ...gemeinsam,\n'
+     '      vermieter_block: immoBeteiligtenBlock(v.vermieter_typ, v.vermieter_name,\n'
+     '        v.vermieter_strasse, v.vermieter_plz, v.vermieter_ort, v.vermieter_erben),\n'
+     '      vermieter_name: v.vermieter_name || "",\n'
+     '      vermieter_strasse: v.vermieter_strasse || "",\n'
+     '      vermieter_plz: v.vermieter_plz || "",\n'
+     '      vermieter_ort: v.vermieter_ort || "",\n'
+     '      mieter_block: immoBeteiligtenBlock(v.mieter_typ, v.mieter_name,\n'
+     '        v.mieter_strasse, v.mieter_plz, v.mieter_ort, v.mieter_erben),\n'
+     '      mieter_name: v.mieter_name || "",\n'
+     '      mieter_strasse: v.mieter_strasse || "",\n'
+     '      mieter_plz: v.mieter_plz || "",\n'
+     '      mieter_ort: v.mieter_ort || "",\n'
+     '      objekt_adresse: anschrift(v.objekt_strasse, v.objekt_plz, v.objekt_ort),\n'
+     '      objekt_lage: v.objekt_lage || "",\n'
+     '      objekt_raeume: v.objekt_raeume || "",\n'
+     '      objekt_wohnflaeche: v.objekt_wohnflaeche || "",\n'
+     '      objekt_zustand: v.objekt_zustand || "",\n'
+     '      schluessel: v.schluessel || "",\n'
+     '      mietbeginn: v.mietbeginn || "",\n'
+     '      kuendigungsausschluss_monate: v.kuendigungsausschluss_monate || "",\n'
+     '      miete_grundmiete: v.miete_grundmiete || "",\n'
+     '      miete_stellplatz: v.miete_stellplatz || "",\n'
+     '      miete_bk_kalt: v.miete_bk_kalt || "",\n'
+     '      miete_bk_warm: v.miete_bk_warm || "",\n'
+     '      miete_gesamt: v.miete_gesamt || "",\n'
+     '      kaution_betrag: v.kaution_betrag || "",\n'
+     '      bank_kontoinhaber: v.bank_kontoinhaber || "",\n'
+     '      bank_iban: v.bank_iban || "",\n'
+     '      bank_bic: v.bank_bic || "",\n'
+     '      bank_institut: v.bank_institut || ""\n'
+     '    };\n'
+     '  }\n'     r'\1',
+     'Vorlagen fuellen: die Werte des Mietvertrags.'),
+
+    ('FORK',
+     r'(?s)async function fillMietvertrag\(e\) \{.*?\n\}\n(?=\nfunction )',
+     '// Ein Block aus N Beteiligten — dieselbe Form wie buildVerkaeuferBlock, nur\n'
+     '// ohne Bindung an die Feldnamen des Maklervertrags. Der Mietvertrag fuehrt\n'
+     '// zwei solche Gruppen: Vermieter und Mieter koennen beide Eheleute oder eine\n'
+     '// Erbengemeinschaft sein.\n'
+     'function immoBeteiligtenBlock(typ, name, strasse, plz, ort, weitere) {\n'
+     '  const liste = Array.isArray(weitere) ? weitere.filter((p) => p && (p.name || p.strasse)) : [];\n'
+     '  if ((typ === "erben" || typ === "mehrere") && liste.length > 0) {\n'
+     '    const zeilen = typ === "erben" ? ["Erbengemeinschaft"] : [];\n'
+     '    liste.forEach((p, i) => {\n'
+     '      if (zeilen.length > 0) zeilen.push("");\n'
+     '      zeilen.push(typ === "erben" ? `Erbe ${i + 1}: ${p.name || ""}` : (p.name || ""));\n'
+     '      zeilen.push(p.strasse || "");\n'
+     '      zeilen.push(`${p.plz || ""} ${p.ort || ""}`.trim());\n'
+     '    });\n'
+     '    return zeilen.join("\\\\n");\n'
+     '  }\n'
+     '  const vorsatz = typ === "eheleute" ? "Eheleute" : typ === "herr" ? "Herr"\n'
+     '    : typ === "frau" ? "Frau" : "";\n'
+     '  return [vorsatz, name || "", strasse || "", `${plz || ""} ${ort || ""}`.trim()]\n'
+     '    .filter((z) => z !== "").join("\\\\n");\n'
+     '}\n'
+     '\n'
+     'async function fillMietvertrag(e) {\n'
+     '  // Wie bei Maklervertrag und Objektnachweis: der Inhalt kommt aus den\n'
+     '  // markierten Stellen der eigenen Vorlage. Hier standen zuletzt die\n'
+     '  // Vornamen der Mietparteien, ihre Strasse, die Anschrift des Objekts, das\n'
+     '  // Kreditinstitut und die Hoehe der Miete aus einem Mustermietvertrag.\n'
+     '  const firma = STANDORTE[e.standort || "musterstadt"] || {};\n'
+     '  const { bytes, endung, warnungen } = await immoVorlageFuellen("mietvertrag", e, firma);\n'
+     '  const wer = (e.vermieter_typ === "erben" || e.vermieter_typ === "mehrere")\n'
+     '      && Array.isArray(e.vermieter_erben) && e.vermieter_erben[0] && e.vermieter_erben[0].name\n'
+     '    ? e.vermieter_erben[0].name\n'
+     '    : (e.vermieter_name || "Vermieter");\n'
+     '  const datei = `Mietvertrag_${fileSafe(wer)}_${fileSafe(e.objekt_strasse || "Objekt")}.${endung}`;\n'
+     '  immoDateiAnbieten(bytes, datei, endung);\n'
+     '  immoVorlageWarnungen(warnungen);\n'
+     '}\n'     '\n'
+     "",
+     'Mietvertrag: Inhalt aus den markierten Stellen statt aus Ankern.'),
+
+    ('FORK',
+     r'  \["reservierung", "Reservierung", "Die Reservierungsvereinbarung\."\]\n\];',
+     '  ["reservierung", "Reservierung", "Die Reservierungsvereinbarung."],\n'
+     '  ["mietvertrag", "Mietvertrag", "Der Mietvertrag über eine Wohnung."]\n'
+     '];',
+     'Vertragsvorlagen: der Mietvertrag als fuenfte Art.'),
+
+    # --- MARKE: Beispielwerte aus dem Mustermietvertrag in den Platzhaltern
+    # der Eingabemaske. Sie stehen dem Nutzer vor Augen: zwei Namen, eine
+    # Strasse und eine Stadt der Referenz, ein Kreditinstitut. Ein Beispiel
+    # muss ein Beispiel sein, keine Anschrift, die es wirklich gibt.
+    ('MARKE', r'z\.B\. Kröpeliner Straße 7', 'z.B. Musterstraße 7',
+     'Beispielanschrift der Referenz im Platzhalter.'),
+    ('MARKE', r'z\.B\. ING DiBa', 'z.B. Musterbank',
+     'Kreditinstitut aus den Musterdaten im Platzhalter.'),
+    ('MARKE', r'\(z\.B\. „Maren & Andreas Engel“\)', '(z.B. „Anna & Bernd Muster“)',
+     'Beispielnamen aus den Musterdaten im Platzhalter.'),
+    ('MARKE', r'z\.B\. Andreas Engel und Maren Engel', 'z.B. Anna Muster und Bernd Muster',
+     'wie oben, in der ausgeschriebenen Fassung.'),
+    ('MARKE', r'z\. B\. Musterstadt, Musterdorf, Bad Doberan',
+     'z. B. Musterstadt, Musterdorf, Musterhausen',
+     'Ort der Referenz im Platzhalter der Ortssuche.'),
+
+    # --- MARKE: Vorgabewerte der Marketingkachel. "19399 DOBBERTIN" ist der
+    # Ort eines echten Objekts der Referenz, und die Koordinaten daneben
+    # zeigen auf ihre Region. Beides steht als VORGABE im Quelltext und
+    # erscheint jedem, der die Kachel zum ersten Mal oeffnet.
+    ('MARKE', r'"19399 DOBBERTIN"', '"12345 MUSTERDORF"',
+     'Ort eines Objekts der Referenz als Vorgabewert der Marketingkachel.'),
+    ('MARKE', r'lat: 54\.0924,\n      lng: 12\.0991,',
+     'lat: 51.1657,\n      lng: 10.4515,',
+     'Koordinaten der Referenzregion als Vorgabe; jetzt die Mitte Deutschlands.'),
+
     ('MARKE', r'\bEP_', 'IMMO_', 'Vorsatz EP_ in Bezeichnern der Oberflaeche.'),
 
     # --- MARKE: das Kuerzel in der Erkennung interner Umbuchungen.

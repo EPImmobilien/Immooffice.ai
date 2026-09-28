@@ -50,7 +50,12 @@ STAMM="$(printf %s 'dijDtnxcXHUwMGY2fG9lKWdlbnRlaWNofEhSQjE2NTk4fERFMzcwMTAwMDc4
 # Standorte der Referenz. Getrennt gefuehrt, weil sie nur im Produktcode ein
 # Fehler sind: docs/ und die Neutralisierungsskripte muessen sie benennen
 # duerfen, und die stehen ohnehin in AUS.
-ORTE="$(printf %s 'XGJyb3N0b2NrfFxic2Nod2VyaW58d2FybmVtKMO8fFxcdTAwZmN8dWUpbmRlfFxiMTgwNTVcYnxcYjE4MDU3XGJ8XGIxOTA1NVxi' | base64 -d)"
+#
+# Am 28.09.2026 um die Orte aus den Musterverträgen erweitert — Anschriften
+# der Vertragsparteien und des Mietobjekts. Sie standen als Suchtexte in der
+# Dokumenterzeugung; die ist seither auf markierte Stellen umgestellt, und
+# damit duerfen sie hier stehen, ohne das Gate rot zu faerben.
+ORTE="$(printf %s 'XGJyb3N0b2NrfFxic2Nod2VyaW58d2FybmVtKMO8fFxcdTAwZmN8dWUpbmRlfFxiMTgwNTVcYnxcYjE4MDU3XGJ8XGIxOTA1NVxifHNhbmRkb3Jud2VnfGtyKMO2fG9lKXBlbGluZXJ8YmFkID9kb2JlcmFufFxiMTgyMDlcYnxcYjE5MzcwXGJ8XGIxOTM4NlxifFxicGFyY2hpbVxifFxicGFzc293XGJ8XGIxODM1NlxifFxiYmFydGhcYnxkb2JiZXJ0aW4=' | base64 -d)"
 # Fremdes Supabase-Projekt.
 FREMD='yazwkzzjiquprtjpurur'
 # Dienste, die Phase 1.4 des Auftrags ersatzlos streicht. Geprueft wird nur
