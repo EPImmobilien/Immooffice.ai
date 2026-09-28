@@ -520,3 +520,49 @@ gewesen. Mit ihr ist er eine gewöhnliche Codeänderung.
 Schema — Phase 9 verbietet das Entfernen von Spalten. Die Oberfläche liest und
 schreibt sie nicht mehr. Ebenso bleibt das Druckformat „Schaufenster-Aushang":
 ein Aushang aus Papier ist kein Digital Signage.
+
+## 28.09.2026 — das Neutralitäts-Gate war undicht, an drei Stellen
+
+**Frage:** Beim Ausrollen der Edge Functions fiel in `parse-objektnachweis`
+eine Beispieladresse mit der Postleitzahl des Referenzunternehmens auf. Das
+Gate war grün. Warum?
+
+**Befund:** Drei unabhängige Lücken, jede für sich ausreichend.
+
+1. **Der Kommentarfilter war nicht verankert.** `rg` liefert
+   `pfad:nummer:inhalt`; der Filter `':[[:space:]]*(--|#|//|\*)'` suchte
+   irgendwo in dieser Zeile. Damit galt jede Zeile als Kommentar, die
+   `: #` oder `://` enthielt — also jede Zeile mit einer URL und jede mit
+   einem Hashtag. Auf diese Weise sind drei Zeilen mit dem Marken-Hashtag
+   des Referenzunternehmens durchgerutscht.
+2. **`\uXXXX` wurde nicht gelesen.** Die Büroanschrift stand in
+   `energieausweis-anfrage` als `Am Vögenteich 26 R, 18055 Rostock`.
+   Das Muster `V(oe|ö)genteich` geht daran vorbei.
+3. **Rufnummer und Standorte standen in keinem Muster.** Die Durchwahl des
+   Referenzunternehmens stand 15-mal im Quelltext, die Sitze 141-mal — als
+   Rückfallwert, als Schlüssel einer Standorttabelle, als Beispiel in
+   Eingabefeldern und in einem Wörterbuch der Rechtschreibprüfung.
+
+**Entscheidung:** Alle drei behoben. Der Filter ist auf den Zeilenanfang
+verankert, die Muster führen die `\uXXXX`-Schreibweise mit, und Rufnummer,
+Postleitzahlen und Standorte sind aufgenommen — letztere als eigene Prüfung,
+die nur den Produktcode liest, weil `docs/` sie benennen muss.
+
+**Die Muster stehen BASE64-kodiert im Skript.** `docs/NEUTRALITAET.md` sah
+dafür eine unversionierte Datei vor. Die gibt es nicht, und auf einem frischen
+Klon hätte sie das Gate stumm durchgewunken — die schlechteste aller
+Varianten. Kodiert ist beides erfüllt: im Repository steht kein lesbares
+Kennzeichen, und das Gate greift überall. `tests/funktionen-unveraendert.py`
+macht es seitdem genauso; dort standen die Ortsnamen bis dahin im Klartext.
+
+**Was ersetzt wurde:** Rufnummer → `{telefon}`; Anschrift → entfernt, wie
+schon zuvor bei den unmaskierten Vorkommen; Postleitzahlen → `12345`;
+Standorte durchgehend → `Musterstadt`, `Beispielstadt`, `Musterdorf`. Die
+Standorte sind *ersetzt*, nicht entfernt: sie sind nicht nur Beispieltext,
+sondern auch Schlüssel einer Standorttabelle und Wert in Auswahlfeldern. Wer
+sie nur dort tilgt, wo sie sichtbar sind, zerlegt die Zuordnung.
+
+**Was das über die Arbeitsweise sagt:** Ein Gate, das nie etwas findet, ist
+kein Beweis für Sauberkeit. Dieses hier hat 146 Zeilen übersehen, während es
+„sauber" meldete. Gefunden wurden sie nicht vom Gate, sondern beim Lesen einer
+einzelnen Datei vor dem Ausrollen.

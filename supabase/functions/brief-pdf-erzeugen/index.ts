@@ -181,7 +181,7 @@ Deno.serve(async (req) => {
       gesperrt("I M M O B I L I E N", MITTE, H - 110, fB, 8, GOLD, 3.4, true);
       kopfEnde = H - 118;
     }
-    gesperrt("ROSTOCK   -   SCHWERIN   -   BERLIN", MITTE, kopfEnde - 16, fR, 6.5, GRAU, 1.6, true);
+    gesperrt("", MITTE, kopfEnde - 16, fR, 6.5, GRAU, 1.6, true);
     doppelLinie(kopfEnde - 32);
 
     // ---- Absenderzeile + Anschrift ----

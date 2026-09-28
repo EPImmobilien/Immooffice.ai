@@ -1,7 +1,7 @@
 // Supabase Edge Function: generate-text
 // Erzeugt Exposé-Texte mit Claude (Anthropic) im Stil von Musterhaus Immobilien.
 //
-// v5.12.0: Captions: korrekte Telefonnummer 0381 36 77 99 88 (vorher stand eine falsche
+// v5.12.0: Captions: korrekte Telefonnummer (vorher stand eine falsche
 //          Nummer fest im Prompt); Verbot, Kontaktdaten zu erfinden; fester KI-Hinweis
 //          wird an alle Social-Media-Captions automatisch angehaengt (vor dem Hashtag-Block).
 // v5.11.0: Objekt-/Lage-/Ausstattungstexte deutlich ausfuehrlicher & verkaufsfoerdernder
@@ -80,7 +80,7 @@ const corsHeaders = {
 // stammt aus Website/Impressum immooffice.example.
 // ---------------------------------------------------------------
 const KONTAKT_EMAIL = "info@immooffice.example";
-const KONTAKT_TELEFON = "0381 36 77 99 88";
+const KONTAKT_TELEFON = "";
 const KI_HINWEIS = "Hinweis: Dieser Beitrag wurde mit KI-Unterstützung erstellt.";
 
 // Haengt den KI-Hinweis an eine Caption an - vor einem evtl. vorhandenen
@@ -109,7 +109,7 @@ const STIL_BEISPIELE: Record<string, { objekt: string[]; lage: string[] }> = {
       `Dieser liebevoll gepflegte und vollständig möblierte Bungalow befindet sich in idyllischer Naturlage in Dobbertin, nur wenige Gehminuten vom Dobbertiner See entfernt. Das ca. 354 m² große Eigentumsgrundstück liegt ruhig am Ende einer kleinen Sackgasse innerhalb einer gewachsenen Bungalowsiedlung und bietet ein hohes Maß an Privatsphäre. Der Bungalow verfügt über ca. 39 m² Wohnfläche, verteilt auf zwei Zimmer und wird durch eine sonnige, teilweise überdachte Terrasse in Südlage ergänzt. Das ursprünglich ca. 1974 errichtete Gebäude wurde ab 2015 umfassend energetisch saniert und in den Folgejahren fortlaufend modernisiert.`,
     ],
     lage: [
-      `Die Immobilie befindet sich in ruhiger und naturnaher Lage in Dobbertin im Landkreis Ludwigslust-Parchim. Der Ort liegt mitten im Naturpark Nossentiner/Schwinzer Heide. Schwerin liegt rund 55 km entfernt, die Hansestadt Rostock etwa 70 km.`,
+      `Die Immobilie befindet sich in ruhiger und naturnaher Lage in Dobbertin im Landkreis Ludwigslust-Parchim. Der Ort liegt mitten im Naturpark Nossentiner/Schwinzer Heide. Die naechste Kreisstadt liegt rund 25 km entfernt, die naechste Grossstadt etwa 70 km.`,
     ],
   },
   wohnung: { objekt: [], lage: [] },
@@ -229,11 +229,11 @@ Antworte AUSSCHLIESSLICH mit einem JSON-Array aus genau 3 Strings, ohne Markdown
     const quelle = (daten.ort || "").toString().trim();
 
     const hashtagsBlock = mitHashtags
-      ? `\n8. Leerzeile, dann 6–10 passende Hashtags. Mix aus:\n   - Branche/Thema: #immobilien #immobilienmarkt #immobilienwissen + 1–2 zum konkreten Thema\n   - Regional/Marke: #engferundpartner #rostock #mecklenburgvorpommern #makler`
+      ? `\n8. Leerzeile, dann 6–10 passende Hashtags. Mix aus:\n   - Branche/Thema: #immobilien #immobilienmarkt #immobilienwissen + 1–2 zum konkreten Thema\n   - Regional/Marke: #immobilienmakler #makler`
       : `\n\nKEINE Hashtags am Ende – lass den Hashtag-Block komplett weg.`;
 
     return {
-      system: `Du bist Social-Media-Texter für Musterhaus Immobilien GmbH aus Rostock. Du schreibst eine AUSFÜHRLICHE, gut erklärende Instagram-Caption zu einer BRANCHEN-NACHRICHT (kein Objekt-Inserat).
+      system: `Du bist Social-Media-Texter für Musterhaus Immobilien GmbH. Du schreibst eine AUSFÜHRLICHE, gut erklärende Instagram-Caption zu einer BRANCHEN-NACHRICHT (kein Objekt-Inserat).
 
 KONTEXT: Auf der zugehörigen Bild-Kachel stehen nur 3 kurze Kernaussagen plus der Hinweis "Mehr dazu in der Caption". Die Caption ist also der Ort, an dem das Thema WIRKLICH erklärt und eingeordnet wird – sie muss die Stichpunkte mit Substanz füllen, nicht nur wiederholen.
 
@@ -286,7 +286,7 @@ Antworte AUSSCHLIESSLICH mit der fertigen Caption – kein Vorwort, kein Markdow
     const hatBilder = !!(body.bilder && body.bilder.length > 0);
 
     const hashtagsBlock = mitHashtags
-      ? `\n7. Leerzeile, dann 8–12 passende Hashtags. Mix aus:\n   - Verkauft: #verkauft #immobilieverkauft #happyowners #neueheimat\n   - Branche: #immobilien #makler #immobilienmakler\n   - Regional: #engferundpartner #rostock #mecklenburgvorpommern #ostsee`
+      ? `\n7. Leerzeile, dann 8–12 passende Hashtags. Mix aus:\n   - Verkauft: #verkauft #immobilieverkauft #happyowners #neueheimat\n   - Branche: #immobilien #makler #immobilienmakler\n   - Regional: #immobilienmakler #ostsee`
       : `\n\nKEINE Hashtags am Ende.`;
 
     const bilderHinweis = hatBilder
@@ -294,7 +294,7 @@ Antworte AUSSCHLIESSLICH mit der fertigen Caption – kein Vorwort, kein Markdow
       : `\n\nKein Foto beigefügt - das ist okay.`;
 
     return {
-      system: `Du bist Social-Media-Texter für Musterhaus Immobilien GmbH aus Rostock. Du schreibst eine Instagram-Caption für eine VERKAUFTE Immobilie.
+      system: `Du bist Social-Media-Texter für Musterhaus Immobilien GmbH. Du schreibst eine Instagram-Caption für eine VERKAUFTE Immobilie.
 
 WICHTIG - KEINE Verkaufsanzeige:
 - Immobilie ist VERKAUFT
@@ -343,7 +343,7 @@ Antworte AUSSCHLIESSLICH mit der fertigen Caption.`,
     const hatBilder = !!(body.bilder && body.bilder.length > 0);
 
     const hashtagsBlock = mitHashtags
-      ? `\n7. Leerzeile, dann 8–12 passende Hashtags. Mix aus:\n   - Branche: #immobilien #makler #immobilienmakler #traumimmobilie\n   - Regional: #engferundpartner #rostock #mecklenburgvorpommern #ostsee\n   - Objekt-spezifisch: 1–2 Hashtags`
+      ? `\n7. Leerzeile, dann 8–12 passende Hashtags. Mix aus:\n   - Branche: #immobilien #makler #immobilienmakler #traumimmobilie\n   - Regional: #immobilienmakler #ostsee\n   - Objekt-spezifisch: 1–2 Hashtags`
       : `\n\nKEINE Hashtags am Ende.`;
 
     const bilderHinweis = hatBilder
@@ -351,7 +351,7 @@ Antworte AUSSCHLIESSLICH mit der fertigen Caption.`,
       : `\n\nKein Foto. Highlights aus Eckdaten ableiten.`;
 
     return {
-      system: `Du bist Social-Media-Texter für Musterhaus Immobilien GmbH aus Rostock. Instagram-Captions im lockeren Stil mit Emojis.
+      system: `Du bist Social-Media-Texter für Musterhaus Immobilien GmbH. Instagram-Captions im lockeren Stil mit Emojis.
 
 REGELN:
 - Deutsch, neutral. Emojis am Zeilenanfang (🏡 ✨ 📍 📐 🛏️ 📩). 600–900 Zeichen ohne Hashtags.

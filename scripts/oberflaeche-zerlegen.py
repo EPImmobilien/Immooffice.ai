@@ -158,6 +158,73 @@ ERSETZUNGEN = [
     ('MARKE', r'Am V(ö|oe)genteich 26 ?[rR]', '', 'Bueroanschrift der Referenz.'),
     ('MARKE', r'V(ö|oe)genteich', '', 'Strassenname der Referenz, Restfaelle.'),
 
+    # ------------------------------------------------------------------
+    # Nachtrag 28.09.2026. Bis hierher war die Marke getroffen, die HERKUNFT
+    # aber nicht: Rufnummer, Postleitzahlen und die Standorte der Referenz
+    # standen weiter im Quelltext — als Rueckfallwerte, als Schluessel, als
+    # Beispiele in Eingabefeldern und in einem Woerterbuch. Aufgefallen ist
+    # es erst, als das Neutralitaets-Gate selbst repariert war
+    # (scripts/neutral.sh, gleiches Datum).
+    # ------------------------------------------------------------------
+
+    # --- MARKE: Rufnummer der Referenz. Platzhalter statt Leerstring, weil
+    # die Nummer in Fliesstexten steht, die sonst mitten im Satz abbrechen.
+    ('MARKE', r'tel:\+493813677998', 'tel:{telefon}',
+     'Rufnummer der Referenz als Telefon-Link im 360-Grad-Rundgang.'),
+    ('MARKE', r'0381 36 77 99 88', '{telefon}',
+     'Rufnummer der Referenz im Fuss, in der Abwesenheitsnotiz und als '
+     'Beispiel in einem Eingabefeld.'),
+
+    # --- MARKE: regionale Eigennamen im Woerterbuch der Rechtschreibpruefung.
+    # Muss VOR den Ortsregeln unten stehen, sonst benennt es sie nur um.
+    ('MARKE',
+     r'"Warnem(ü|ue)nde", "K(ü|ue)hlungsborn", "B(ü|ue)tzow", "Teterow", '
+     r'"G(ü|ue)strow", "Ludwigslust", "Parchim", "Sanitz", ',
+     '',
+     'Orte im Umkreis der Referenz. Sie stehen im Woerterbuch, damit die '
+     'Rechtschreibpruefung sie nicht anstreicht — und verraten damit die '
+     'Herkunft. Der Mandant pflegt seine eigenen Orte (Phase 2.4).'),
+    ('MARKE', r'"Skyborn", "AKANT", ', '',
+     'Zwei regionale Eigennamen im selben Woerterbuch.'),
+    ('MARKE', r'Qonto-Export \(Rostock/Schwerin\), Vivid-Export \(Berlin\)',
+     'Qonto-Export, Vivid-Export',
+     'Zuordnung der Bankexporte zu den Bueros der Referenz im Hilfetext.'),
+    ('MARKE', r'Notarin Dr\. Zierau', 'Notarin Dr. Muster',
+     'Name einer namentlich genannten Notarin im Beispieltext eines Feldes.'),
+    ('MARKE', r'Doberaner Str\. 16', 'Musterstrasse 16',
+     'Strasse am Sitz der Referenz als Beispiel in einem Eingabefeld.'),
+    ('MARKE', r'Hopfenmarkt 1', 'Marktplatz 1', 'wie oben'),
+    ('MARKE', r'"Am  26"', '"{strasse}"',
+     'Rest der Bueroanschrift, nachdem der Strassenname entfernt wurde. Sie '
+     'steht in der Liste der Textbausteine, die aus den Word-Vorlagen '
+     'herausgefiltert werden — ein Platzhalter haelt die Liste brauchbar.'),
+    ('MARKE',
+     r'lat: 54\.0887, lng: 12\.1394,(\s*)// Vorgabe: Rostock, bis eine Adresse',
+     r'lat: 51.1657, lng: 10.4515,\1// Vorgabe: Mitte Deutschlands, bis eine Adresse',
+     'Kartenmittelpunkt auf den Sitz der Referenz. Die geografische Mitte '
+     'Deutschlands ist der neutrale Ersatz.'),
+
+    # --- MARKE: Postleitzahlen der Referenz.
+    ('MARKE', r'\b1805[0-9]\b', '12345', 'Postleitzahlen am Sitz der Referenz.'),
+    ('MARKE', r'\b18119\b', '12345', 'Postleitzahl des Ortsteils.'),
+    ('MARKE', r'\b19055\b', '12345', 'Postleitzahl der Zweigstelle.'),
+
+    # --- MARKE: die Standorte der Referenz. Durchgehend ersetzt, nicht
+    # entfernt: die Namen stehen nicht nur in Beispieltexten, sondern auch
+    # als Schluessel einer Standorttabelle und als Wert in Auswahlfeldern.
+    # Wer sie nur dort tilgt, wo sie sichtbar sind, zerlegt die Zuordnung.
+    ('MARKE', r'Warnem(ü|ue)nde', 'Musterdorf', 'Ortsteil am Sitz der Referenz.'),
+    ('MARKE', r'WARNEM(Ü|UE)NDE', 'MUSTERDORF', 'wie oben, in Versalien.'),
+    ('MARKE', r'Rostock', 'Musterstadt', 'Sitz der Referenz.'),
+    ('MARKE', r'ROSTOCK', 'MUSTERSTADT', 'wie oben, in Versalien.'),
+    ('MARKE', r'rostock', 'musterstadt', 'wie oben, als Schluessel.'),
+    ('MARKE', r'Schwerin', 'Beispielstadt', 'Zweigstelle der Referenz.'),
+    ('MARKE', r'SCHWERIN', 'BEISPIELSTADT', 'wie oben, in Versalien.'),
+    ('MARKE', r'schwerin', 'beispielstadt', 'wie oben, als Schluessel.'),
+    ('MARKE', r'Musterhaus Immobilien GmbH Beispielstadt GmbH',
+     'Musterhaus Immobilien Beispielstadt GmbH',
+     'doppeltes GmbH, das erst durch die Ortsersetzung entsteht.'),
+
     # --- MARKE: eingebettete Dateien. Sie stehen als Base64 im Quelltext und
     # sind fuer das Neutralitaets-Gate unsichtbar — es liest Text, nicht Bilder.
     # Vier Logos der Referenz in zwei Bloecken, zweimal dieselbe Wortmarke in

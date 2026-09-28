@@ -15,19 +15,34 @@ Laeuft nur, wenn reference/functions vorhanden ist — ohne die Vorlage gibt es
 nichts zu vergleichen. Auf einem Rechner ohne Referenzmaterial meldet sie das
 und ist zufrieden; sie ist eine Pruefung der Uebersetzung, nicht des Ergebnisses.
 """
-import difflib, pathlib, re, sys
+import base64, difflib, pathlib, re, sys
 
 WURZEL = pathlib.Path(__file__).resolve().parent.parent
 VORLAGE = WURZEL / 'reference' / 'functions'
 FORK = WURZEL / 'supabase' / 'functions'
 
 # Was eine Zeile enthalten haben muss, damit ihre Aenderung erklaert ist.
+#
+# BASE64, nicht im Klartext: eine Datei, die Kennzeichen des
+# Referenzunternehmens sucht, darf sie nicht selbst lesbar enthalten
+# (CLAUDE.md, Abschnitt Abgrenzung). scripts/neutral.sh macht es seit dem
+# 28.09.2026 genauso und aus demselben Grund. Wer die Liste lesen will:
+#   python3 -c "import base64;print(base64.b64decode('...').decode())"
 KENNZEICHEN = re.compile(
-    r'engfer|epworld|ep-world|EP World|E&P|E&amp;P|ENGFER|'
-    r'V(ö|oe)genteich|Voegenteich|Rostock|Schwerin|Berlin|18055|19055|Puschkin|'
-    r'sprengnetter|SPRENGNETTER|jotform|sipgate|yodeck|shop-?tv|'
-    r'yazwkzzjiquprtjpurur|STANDORTE\[',
+    base64.b64decode('ZW5nZmVyfGVwd29ybGR8ZXAtd29ybGR8RVAgV29ybGR8RSZQfEUmYW1wO1B8RU5HRkVSfFYow7Z8b2V8XFx1MDBmNilnZW50ZWljaHxWb2VnZW50ZWljaHxSb3N0b2NrfFNjaHdlcmlufEJlcmxpbnxIYW1idXJnfFdhcm5lbSjDvHx1ZSluZGV8TWFya2dyYWZlbmhlaWRlfDE4MDU1fDE4MDU3fDE5MDU1fFB1c2Noa2lufDAzODFbIC8uLV0/MzZbIC8uLV0/NzdbIC8uLV0/OTlbIC8uLV0/ODh8c3ByZW5nbmV0dGVyfFNQUkVOR05FVFRFUnxqb3Rmb3JtfHNpcGdhdGV8eW9kZWNrfHNob3AtP3R2fHlhendrenpqaXF1cHJ0anB1cnVyfFNUQU5ET1JURVxbfFNUQU5ET1JURVwu').decode(),
     re.IGNORECASE)
+
+# Zeilen, die nur verschwinden, weil sie zu einem Block gehoeren, dessen
+# uebrige Zeilen ein Kennzeichen tragen. Bisher genau einer: die
+# Standortkarte in mpe-pdf-erzeugen. Ihre vier Kartenpunkte markieren die
+# Bueros der Referenz; die beiden Klammerzeilen tragen selbst kein
+# Kennzeichen, koennen aber nicht stehen bleiben, wenn die Punkte gehen.
+BLOCKZEILEN = {
+    'mpe-pdf-erzeugen': {
+        'const pins: Array<[number, number, string, string, string]> = [',
+        '];',
+    },
+}
 
 
 def main():
@@ -65,6 +80,8 @@ def main():
                     dazu.add(zeile[1:])
             for zeile in weg:
                 if zeile in dazu:
+                    continue
+                if zeile in BLOCKZEILEN.get(ordner.name, ()):
                     continue
                 if not KENNZEICHEN.search(zeile):
                     beanstandet.append(

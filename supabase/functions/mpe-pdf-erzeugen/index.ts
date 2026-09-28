@@ -751,8 +751,8 @@ fy -= 11;
 {
 const bx = 560, bw3 = W - 70 - bx, oben = H - 168, unten = 76, gap3 = 12;
 const bh3 = (oben - unten - 2 * gap3) / 3;
-const dateien = ["mpe/buero-rostock.jpg", "mpe/buero-schwerin.jpg", "mpe/buero-berlin.jpg"];
-const namen = ["Rostock", "Schwerin", "Berlin"];
+const dateien = ["mpe/buero-1.jpg", "mpe/buero-2.jpg", "mpe/buero-3.jpg"];
+const namen = ["", "", ""];
 let by3 = oben - bh3;
 for (let i = 0; i < 3; i++) {
 const img = await brandBild(dateien[i]);
@@ -809,12 +809,12 @@ for (const f of geo.features) {
 if (!AKTIV.has(f.properties.id)) continue;
 page.drawSvgPath(svgVon(f), { x: 0, y: H, borderColor: GOLD, borderWidth: 0.9, opacity: 0 });
 }
-const pins: Array<[number, number, string, string, string]> = [
-[12.140, 54.089, "Rostock", "r", ""],
-[11.415, 53.630, "Schwerin", "u", ""],
-[9.993, 53.551, "Hamburg", "l", "Vertriebspartner"],
-[13.413, 52.523, "Berlin", "r", ""],
-];
+const pins: Array<[number, number, string, string, string]> = [];
+// Die vier Kartenpunkte der Vorlage sind entfallen: sie markieren die
+// Bueros des Referenzunternehmens und seinen Vertriebspartner.
+// Ab Phase 2.4 kommen sie aus firma_standorte des Mandanten; bis dahin
+// zeichnet die Karte keine Punkte (docs/OFFEN.md).
+//
 for (const p of pins) {
 const pt = P(p[0], p[1]);
 page.drawEllipse({ x: pt[0], y: pt[1], xScale: 7.5, yScale: 7.5, borderColor: GOLD, borderWidth: 0.9, opacity: 0 });
@@ -1492,7 +1492,7 @@ if (lh > 230) { lh = 230; lw = lh / r; }
 page.drawImage(logoWeiss, { x: (W - lw) / 2, y: (H - lh) / 2 + 26, width: lw, height: lh });
 }
 page.drawRectangle({ x: W / 2 - 30, y: H / 2 - 92, width: 60, height: 1.4, color: GOLD });
-text(standorte.map((s: any) => (s.ort || "").toUpperCase()).filter(Boolean).join("  ·  ") || "ROSTOCK", W / 2, H / 2 - 122, fSB, 8.5, GOLDHELL, 2.2, "c");
+text(standorte.map((s: any) => (s.ort || "").toUpperCase()).filter(Boolean).join("  ·  ") || "", W / 2, H / 2 - 122, fSB, 8.5, GOLDHELL, 2.2, "c");
 text(String(firma.web || "www.immooffice.example").replace(/^https?:\/\//, ""), W / 2, H / 2 - 146, fL, 9, rgb(0.843, 0.859, 0.910), 0.2, "c");
 const pdfBytes = await pdf.save({ useObjectStreams: false });
 const slug = String(bew.titel || adresse || "Objekt").replace(/[^a-zA-Z0-9]/g, "_").slice(0, 40);

@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
     const t = token();
     const { data: row, error } = await db.from("expose_freigaben").insert({
       token: t, immobilie_id: immobilieId, kontakt_id: body.kontakt_id || null, email, name: body.name || null,
-      provisionsmodell: modell, provision_text: provisionText, firma_slug: firmaSlug || "rostock",
+      provisionsmodell: modell, provision_text: provisionText, firma_slug: firmaSlug || "standard",
       erstellt_von: u.user.id, expose_datei_id: expose.id, dokument_ids: dokumente, landing,
     }).select("id").single();
     if (error) throw error;

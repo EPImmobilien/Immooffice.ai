@@ -569,7 +569,7 @@ if (data) ap = data;
 const apName = [ap.titel, ap.name].map((x: any) => (x || "").trim()).filter(Boolean).join(" ");
 let firma: any = null;
 if (ap.firma_id) { const { data } = await admin.from("firma_stammdaten").select("*").eq("id", ap.firma_id).maybeSingle(); if (data && data.aktiv !== false) firma = data; }
-if (!firma) { const { data } = await admin.from("firma_stammdaten").select("*").eq("slug", "rostock").maybeSingle(); firma = data; }
+if (!firma) { const { data } = await admin.from("firma_stammdaten").select("*").eq("slug", "standard").maybeSingle(); firma = data; }
 if (!firma) { const { data } = await admin.from("firma_stammdaten").select("*").eq("aktiv", true).order("sortierung").limit(1).maybeSingle(); firma = data; }
 if (!firma) return jsonErr(500, "Firma-Stammdaten fehlen");
 const pdf = await PDFDocument.create();
@@ -1672,7 +1672,7 @@ if (lhS > 230) { lhS = 230; lwS = lhS / rS; }
 page.drawImage(schlussLogo, { x: (W - lwS) / 2, y: (H - lhS) / 2 + 26, width: lwS, height: lhS });
 }
 page.drawRectangle({ x: W / 2 - 16, y: H / 2 - 92, width: 32, height: 1.6, color: GOLD });
-text(standorte.map((s: any) => (s.ort || "").toUpperCase()).filter(Boolean).join("  ·  ") || "ROSTOCK", W / 2, H / 2 - 122, fSB, 8, GOLD, 2.6, "c");
+text(standorte.map((s: any) => (s.ort || "").toUpperCase()).filter(Boolean).join("  ·  ") || "", W / 2, H / 2 - 122, fSB, 8, GOLD, 2.6, "c");
 text(firmaWeb, W / 2, H / 2 - 146, fM, 9, rgb(0.85, 0.86, 0.9), 1, "c");
 await schritt("seiten-fertig", String(planListe.length));
 const pdfBytes = await pdf.save({ useObjectStreams: false });

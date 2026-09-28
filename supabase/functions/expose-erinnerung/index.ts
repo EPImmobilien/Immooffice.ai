@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
       if (abgerufen) { erg.push({ id: f.id, an: f.email, uebersprungen: "über anderen Link abgerufen" }); continue; }
       try {
         const { data: im } = await db.from("immobilien").select("immo_nr, objekttitel, bezeichnung, plz, ort, zustaendig_id").eq("id", f.immobilie_id).maybeSingle();
-        const { data: firma } = await db.from("firma_stammdaten").select("firma_name, email, strasse, plz, ort").eq("slug", f.firma_slug || "rostock").maybeSingle();
+        const { data: firma } = await db.from("firma_stammdaten").select("firma_name, email, strasse, plz, ort").eq("slug", f.firma_slug || "standard").maybeSingle();
         const maklerId = im?.zustaendig_id || f.erstellt_von;
         const { data: makler } = maklerId ? await db.from("profiles").select("name, email, telefon").eq("id", maklerId).maybeSingle() : { data: null };
         const titel = im?.objekttitel || im?.bezeichnung || "die angefragte Immobilie";

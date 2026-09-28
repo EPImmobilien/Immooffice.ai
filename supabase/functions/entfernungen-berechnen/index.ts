@@ -16,7 +16,7 @@
 //   1. Datei nach supabase/functions/entfernungen-berechnen/index.ts
 //   2. supabase functions deploy entfernungen-berechnen --no-verify-jwt
 //
-// Input:  { adresse: "Straße 12, 18055 Rostock" }
+// Input:  { adresse: "Musterstrasse 12, 12345 Musterstadt" }
 // Output: { ok: true, koordinaten: { lat, lon }, distanzen: { kindergarten, grundschule, ... }, hinweise: [...] }
 // ============================================================
 

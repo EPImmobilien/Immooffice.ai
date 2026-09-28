@@ -438,7 +438,7 @@ function buildReservierungAbsaetze(res: any, firma: any): Absatz[] {
   a.push({ text: "- unvorhersehbare Umst\u00e4nde eintreten, die den Verkauf der Immobilie unm\u00f6glich machen (z. B. h\u00f6here Gewalt, beh\u00f6rdliche Untersagung, Rechtsstreitigkeiten bez\u00fcglich der Immobilie).", indent: 6 });
   a.push({ text: "Im Falle eines R\u00fccktritts durch den Verk\u00e4ufer/Makler wird die geleistete Reservierungsgeb\u00fchr vollst\u00e4ndig zur\u00fcckerstattet. Weitere Anspr\u00fcche des K\u00e4ufers bestehen nicht.", spaceAfter: 14 });
 
-  a.push({ text: `${res.ort_unterzeichnung || "Rostock"}, ${formatGermanDate(res.datum_unterzeichnung) || new Date().toLocaleDateString("de-DE")}` });
+  a.push({ text: `${res.ort_unterzeichnung || ""}, ${formatGermanDate(res.datum_unterzeichnung) || new Date().toLocaleDateString("de-DE")}` });
 
   return a;
 }

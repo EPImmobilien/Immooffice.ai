@@ -23,7 +23,7 @@
 //       bestätigten Zugangs, wenn für das Objekt noch keine KI-FAQ vorliegt.
 //   v8 (20.09.): „Adresse freigeben“ am Objekt gilt nur VOR der Bestätigung. Nach dem bestätigten Maklervertrag
 //       liefert "laden" Straße/Hausnummer und die exakte Lage (Sonnenverlauf, Karte) – vorher weiterhin gerundet/ohne Straße.
-//   v7 (20.09.): Ansprechpartner zeigt die BÜRONUMMER (firma_stammdaten.telefon der Gesellschaft, Rückfall Rostock),
+//   v7 (20.09.): Ansprechpartner zeigt die BÜRONUMMER (firma_stammdaten.telefon der Gesellschaft, Rueckfall leer),
 //       nie die Mobilnummer aus dem Profil.
 //   v6 (20.09.): Suchkriterien exakt wie der Adressbuch-Dialog (kontakte.such_profil): vermarktungsart [] (kauf/miete),
 //       objektarten [] (Wohnung, Haus, Mehrfamilienhaus, Grundstück, Gewerbe, Sonstiges), status, orte, plz,
@@ -59,7 +59,7 @@ const OBJEKT_BASIS = (Deno.env.get("PORTAL_URL") || "https://immooffice.example"
 const BUCKET = "immobilie-dateien";
 const OEFFENTLICH = `${Deno.env.get("SUPABASE_URL")}/storage/v1/object/public/${BUCKET}/`;
 const FRAGEN_TAG = 20;
-const BUERO_TELEFON = "0381 36 77 99 88";   // Rückfall, wenn die Gesellschaft keine Büronummer hinterlegt hat
+const BUERO_TELEFON = "";   // Rueckfall, wenn die Gesellschaft keine Bueronummer hinterlegt hat
 const BEGINN_TEXT = "Ich verlange ausdrücklich, dass Sie mit der Erbringung Ihrer Maklerleistung (Zugang zur Objektseite, Zusendung des Exposés und weiterer Objektinformationen) bereits vor Ablauf der Widerrufsfrist beginnen. Mir ist bekannt, dass ich bei vollständiger Vertragserfüllung durch Sie mein Widerrufsrecht verliere und bei einem Widerruf während der Frist Wertersatz für die bis dahin erbrachte Leistung schulde.";
 
 function widerrufsbelehrung(firma: any) {
@@ -86,7 +86,7 @@ async function kontext(db: any, t: string) {
   if (!f) return null;
   const { data: im } = await db.from("immobilien").select(IM_FELDER).eq("id", f.immobilie_id).maybeSingle();
   if (!im) return null;
-  const { data: firmaRow } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("slug", f.firma_slug || "rostock").maybeSingle();
+  const { data: firmaRow } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("slug", f.firma_slug || "standard").maybeSingle();
   const firma = firmaRow || { firma_name: "Musterhaus Immobilien GmbH", strasse: "", plz: "", ort: "", email: "info@immooffice.example" };
   const { data: makler } = im.zustaendig_id ? await db.from("profiles").select("id, name, email, telefon, funktion, foto_url").eq("id", im.zustaendig_id).maybeSingle() : { data: null as any };
   return { f, im, firma, makler };
@@ -328,14 +328,14 @@ async function ladeAntwort(db: any, ctx: any, vorschau: boolean): Promise<{ stat
 async function kontextVorschau(db: any, immobilieId: string, nutzer: { id: string; name: string | null; email: string | null }) {
   const { data: im } = await db.from("immobilien").select(IM_FELDER).eq("id", immobilieId).maybeSingle();
   if (!im) return null;
-  const { data: firmaRow } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("slug", "rostock").maybeSingle();
+  const { data: firmaRow } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("slug", "standard").maybeSingle();
   const firma = firmaRow || { firma_name: "Musterhaus Immobilien GmbH", strasse: "", plz: "", ort: "", email: "info@immooffice.example" };
   const { data: makler } = im.zustaendig_id ? await db.from("profiles").select("id, name, email, telefon, funktion, foto_url").eq("id", im.zustaendig_id).maybeSingle() : { data: null as any };
   const jetzt = new Date().toISOString();
   const f = { id: null, token: null, immobilie_id: im.id, email: nutzer.email || "", name: "Vorschau", kontakt_id: null, created_at: jetzt, geoeffnet_am: jetzt, bestaetigt_am: jetzt,
     landing: true, gueltig_bis: null, provisionsmodell: im.provisionsfrei ? "provisionsfrei" : "kaeufer",
     provision_text: im.provisionsfrei ? "Für Sie als Käufer fällt keine Provision an." : `Käuferprovision: ${im.provision_aussen || "gemäß Exposé"}`,
-    newsletter: false, downloads: 0, expose_datei_id: null, firma_slug: "rostock", abgesagt_am: null, absage_grund: null, absage_text: null, widerrufen_am: null, erinnerung_am: null, vorschau: true };
+    newsletter: false, downloads: 0, expose_datei_id: null, firma_slug: "standard", abgesagt_am: null, absage_grund: null, absage_text: null, widerrufen_am: null, erinnerung_am: null, vorschau: true };
   return { f, im, firma, makler };
 }
 
@@ -363,7 +363,7 @@ Deno.serve(async (req) => {
         const { data: imr } = fr ? await db.from("immobilien").select("id, immo_nr, objekttitel, bezeichnung, zustaendig_id").eq("id", fr.immobilie_id).maybeSingle() : { data: null as any };
         if (!fr || !imr) { await db.from("landing_fragen").update({ makler_info_am: new Date().toISOString() }).in("id", fragen.map((q: any) => q.id)); continue; }
         const { data: mk } = imr.zustaendig_id ? await db.from("profiles").select("name, email").eq("id", imr.zustaendig_id).maybeSingle() : { data: null as any };
-        const { data: fi } = await db.from("firma_stammdaten").select("firma_name, email").eq("slug", fr.firma_slug || "rostock").maybeSingle();
+        const { data: fi } = await db.from("firma_stammdaten").select("firma_name, email").eq("slug", fr.firma_slug || "standard").maybeSingle();
         const firmaMail = fi?.email || "info@immooffice.example";
         const titel2 = imr.objekttitel || imr.bezeichnung || "Immobilie"; const nr2 = imr.immo_nr ? ` (Nr. ${imr.immo_nr})` : ""; const wer2 = fr.name || fr.email;
         const n = fragen.length;

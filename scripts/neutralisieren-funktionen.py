@@ -139,6 +139,101 @@ ERSETZUNGEN = [
     ('PHASE14', r'z\.B\. "sprengnetter"', 'z.B. "bewertungsdienst"',
      'Beispiel in einem Kommentar'),
 
+    # ------------------------------------------------------------------
+    # Nachtrag 28.09.2026. Die Regeln oben haben die Marke getroffen, aber
+    # drei Klassen von Kennzeichen uebersehen — gefunden erst, als das
+    # Neutralitaets-Gate selbst repariert war (siehe scripts/neutral.sh):
+    #   1. Umlaute in \uXXXX-Schreibweise. Die Bueroanschrift der Referenz
+    #      steht in energieausweis-anfrage als "Vögenteich"; das Muster
+    #      V(oe|ö)genteich geht daran vorbei.
+    #   2. Die Rufnummer der Referenz. Sie stand in keiner Regel.
+    #   3. Die Standorte der Referenz — als Rueckfallwert, als Schluessel
+    #      einer Standorttabelle, als Hashtag und als Beispiel in
+    #      KI-Anweisungen.
+    # ------------------------------------------------------------------
+
+    # --- MARKE: Rufnummer der Referenz. Ueberall ein Rueckfallwert hinter
+    # firma_stammdaten.telefon. Ersatzlos, aus demselben Grund wie bei der
+    # Anschrift: eine erfundene Nummer waere schlimmer als keine.
+    ('MARKE', r'"0381 36 77 99 88"', '""',
+     'Rufnummer der Referenz als Rueckfallwert.'),
+    ('MARKE', r'korrekte Telefonnummer 0381 36 77 99 88 \(', 'korrekte Telefonnummer (',
+     'Rufnummer der Referenz in einem Aenderungsvermerk.'),
+    ('MARKE', r'Telefon 0381 36 77 99 88 &nbsp;\\u00b7&nbsp; ', '',
+     'Rufnummer im Fuss der HTML-Mail des Energieausweis-Fragebogens.'),
+
+    # --- MARKE: Bueroanschrift der Referenz in \uXXXX-Schreibweise.
+    ('MARKE', r'&nbsp;\\u00b7&nbsp; Am V\\u00f6genteich 26 R, 18055 Rostock', '',
+     'Anschrift im Fuss der HTML-Mail.'),
+    ('MARKE', r' "Am V\\u00f6genteich 26 R, 18055 Rostock", "Tel\.: 0381 36 77 99 88",', '',
+     'Anschrift und Rufnummer im Signaturblock der Bestaetigungsmail.'),
+    ('MARKE', r', Am V\\u00f6genteich 26 R, 18055 Rostock, Tel\.: 0381 36 77 99 88,', ',',
+     'Anschrift und Rufnummer in der Widerrufsbelehrung. Der gesetzliche '
+     'Mustertext bleibt, die Angaben des Betreibers fallen heraus — sie '
+     'gehoeren nach firma_stammdaten (Phase 2.4).'),
+    ('MARKE', r', Am V\\u00f6genteich 26 R, 18055 Rostock', '',
+     'Anschrift in der Anschrift-Zeile des Muster-Widerrufsformulars.'),
+
+    # --- MARKE: Marken- und Regional-Hashtags der Referenz in den
+    # Anweisungen fuer die Social-Media-Texte.
+    ('MARKE', r'#engferundpartner #rostock #mecklenburgvorpommern', '#immobilienmakler',
+     'Marken-Hashtag der Referenz und ihre Regional-Hashtags.'),
+    ('MARKE', r' aus Rostock\.', '.',
+     'Sitz der Referenz in den Rollenbeschreibungen der Social-Media-Texte.'),
+
+    # --- MARKE: Sitz der Referenz in KI-Anweisungen. Je Stelle eine Regel,
+    # weil der Satzbau jedes Mal anders ist und ein allgemeines Muster fuer
+    # "Rostock" auch echte Objektdaten treffen wuerde.
+    ('MARKE', r'\nin Rostock\. Du hilfst', '\nDu hilfst', 'Sitz in claude-chat.'),
+    ('MARKE', r'GmbH in Rostock,', 'GmbH,', 'Sitz in mail-ki-vorschlag.'),
+    ('MARKE', r' GmbH, Rostock\)', ' GmbH)', 'Sitz in objekt-wissen-auslesen.'),
+    ('MARKE', r', Rostock/Schwerin/Berlin\)', ')', 'Standortliste in akq-mail-leads.'),
+
+    # --- MARKE: Standorte als Rueckfallwerte und Schluessel.
+    ('MARKE', r'ort_unterzeichnung \|\| "Rostock"', 'ort_unterzeichnung || ""',
+     'Unterzeichnungsort in Reservierung und Signaturvorgang.'),
+    ('MARKE', r'\|\| "ROSTOCK"', '|| ""',
+     'Standortzeile im Fuss der Expose- und MPE-PDFs.'),
+    ('MARKE', r'"rostock"', '"standard"',
+     'Slug des Hauptstandorts der Referenz — Rueckfall bei firma_stammdaten.'),
+    ('MARKE', r'gesperrt\("ROSTOCK   -   SCHWERIN   -   BERLIN"', 'gesperrt(""',
+     'Standortzeile im Briefkopf von brief-pdf-erzeugen.'),
+
+    # --- MARKE: Standorte in Beispielen fuer die KI-Auslese.
+    ('MARKE', r'\(z\. B\. 18055 ROSTOCK\)', '(z. B. 12345 MUSTERSTADT)',
+     'Beispiel-Postleitzahl in parse-expose.'),
+    ('MARKE', r'"Stra(ß|ss)e 12, 18055 Rostock"', '"Musterstrasse 12, 12345 Musterstadt"',
+     'Beispiel-Anschrift im Kopfkommentar von entfernungen-berechnen.'),
+    ('MARKE', r'"(plz|objekt_plz)": "1805[57]"', r'"\1": "12345"',
+     'Beispiel-Postleitzahl in parse-objektnachweis.'),
+    ('MARKE', r'"(ort|geburtsort|objekt_ort)": "Rostock"', r'"\1": "Musterstadt"',
+     'Beispiel-Ort in parse-objektnachweis.'),
+    ('MARKE', r'Schwerin liegt rund 55 km entfernt, die Hansestadt Rostock etwa 70 km\.',
+     'Die naechste Kreisstadt liegt rund 25 km entfernt, die naechste '
+     'Grossstadt etwa 70 km.',
+     'Beispiel-Lagetext in generate-text; er nennt die Sitze der Referenz.'),
+    ('MARKE', r'Wohnung in Warnem(ü|ue)nde', 'Wohnung in Musterstadt',
+     'Beispiel-Expose im Bewerbertest.'),
+    ('MARKE', r'im Rostocker Ortsteil Markgrafenheide', 'im Ortsteil Musterdorf',
+     'wie oben'),
+    ('MARKE', r'Titel "Warnemuende" vs\. Text "Markgrafenheide"',
+     'Titel "Musterstadt" vs. Text "Musterdorf"',
+     'Loesungsschluessel zum Beispiel-Expose; er muss zum Text oben passen.'),
+    ('MARKE', r'STANDORTE\.rostock', 'STANDORTE.standard',
+     'Schluessel der Standorttabelle ohne Anfuehrungszeichen — der Zugriff '
+     'auf den Hauptstandort in vertrag-pdf und signatur-vorgang-starten.'),
+
+    # --- MARKE: Standorte in Kommentaren. Das Gate laesst Kommentarzeilen
+    # durch — ein Kommentar ruft nichts auf. Hier stehen sie trotzdem, weil
+    # sie den Sitz der Referenz nennen.
+    ('MARKE', r'R(ü|ue)ckfall Rostock', 'Rueckfall leer',
+     'Kommentar in expose-freigabe und objekt-landing.'),
+    ('MARKE', r'const BUERO_TELEFON = "";   // R(ü|ue)ckfall, wenn die '
+              r'Gesellschaft keine B(ü|ue)ronummer hinterlegt hat',
+     'const BUERO_TELEFON = "";   // Rueckfall, wenn die Gesellschaft keine '
+     'Bueronummer hinterlegt hat',
+     'Umlaute im Kommentar daneben — nur Kosmetik, damit die Zeile lesbar bleibt.'),
+
     # --- FREMD: Verweise auf das Supabase-Projekt der Vorlage
     ('FREMD', r'yazwkzzjiquprtjpurur', 'usguiggfciavwzkdfjgt',
      'Projektkennung der Vorlage durch die eigene ersetzt.'),
@@ -168,6 +263,47 @@ NACHBESSERN = [
     ('MARKE', 'STANDORTE[vertrag.standort || "rostock"] || STANDORTE.rostock',
      'STANDORTE[vertrag.standort || "standard"] || STANDORTE.standard',
      'Schluessel der Standorttabelle in vertrag-pdf (Zugriff).'),
+
+    # --- Nachtrag 28.09.2026: die Standorte der Referenz in der KI-Anweisung
+    # von parse-maklervertrag. Woertlich, weil der Text erst nach den
+    # Namensregeln oben diese Gestalt hat: die Regel fuer den Firmennamen
+    # zieht die zuvor umgebrochene Zeile zusammen.
+    ('MARKE', '"standort": "standard" | "schwerin" | null,',
+     '"standort": "standard" | "zweigstelle" | null,',
+     'Standort-Aufzaehlung im JSON-Schema der Vertragsauslese.'),
+    ('MARKE',
+     '- STANDORT erkennst du am Briefkopf des Vertrags: erwaehnt das die '
+     '"Musterhaus Immobilien GmbH Rostock" -> rostock, "Schwerin" -> schwerin. '
+     'Wenn nicht eindeutig -> null.',
+     '- STANDORT erkennst du am Briefkopf des Vertrags: nennt er den Hauptsitz '
+     '-> standard, eine Zweigstelle -> zweigstelle. Wenn nicht eindeutig -> null.',
+     'Erklaerung dazu; sie nannte die beiden Bueros der Referenz.'),
+
+    # --- Nachtrag 28.09.2026: die Bueros der Referenz in mpe-pdf-erzeugen.
+    # Woertlich ersetzt, weil hier Klammern und Punkte im Muster stehen.
+    ('MARKE',
+     'const dateien = ["mpe/buero-rostock.jpg", "mpe/buero-schwerin.jpg", "mpe/buero-berlin.jpg"];\n'
+     'const namen = ["Rostock", "Schwerin", "Berlin"];',
+     'const dateien = ["mpe/buero-1.jpg", "mpe/buero-2.jpg", "mpe/buero-3.jpg"];\n'
+     'const namen = ["", "", ""];',
+     'Buerofotos und Bueronamen der Referenz in der MPE-Seitenleiste. Die '
+     'Schleife laeuft weiter ueber drei Plaetze — fehlt das Bild, vermerkt '
+     'die Funktion das wie bisher als Warnung.'),
+    ('MARKE',
+     'const pins: Array<[number, number, string, string, string]> = [\n'
+     '[12.140, 54.089, "Rostock", "r", ""],\n'
+     '[11.415, 53.630, "Schwerin", "u", ""],\n'
+     '[9.993, 53.551, "Hamburg", "l", "Vertriebspartner"],\n'
+     '[13.413, 52.523, "Berlin", "r", ""],\n'
+     '];',
+     'const pins: Array<[number, number, string, string, string]> = [];\n'
+     '// Die vier Kartenpunkte der Vorlage sind entfallen: sie markieren die\n'
+     '// Bueros des Referenzunternehmens und seinen Vertriebspartner.\n'
+     '// Ab Phase 2.4 kommen sie aus firma_standorte des Mandanten; bis dahin\n'
+     '// zeichnet die Karte keine Punkte (docs/OFFEN.md).\n'
+     '//',
+     'Standortkarte im MPE-PDF. Gleich viele Zeilen wie zuvor, damit die '
+     'Zeilenbremse im Skript greift, wenn eine andere Regel danebengeht.'),
 
     ('MARKE', f'const PORTAL_URL = "https://{HOST}";',
      f'const PORTAL_URL = Deno.env.get("PORTAL_URL") || "https://{HOST}";',

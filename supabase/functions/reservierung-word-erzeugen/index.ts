@@ -201,7 +201,7 @@ Deno.serve(async (req) => {
     children.push(body("Im Falle eines R\u00fccktritts durch den Verk\u00e4ufer/Makler wird die geleistete Reservierungsgeb\u00fchr vollst\u00e4ndig zur\u00fcckerstattet. Weitere Anspr\u00fcche des K\u00e4ufers bestehen nicht.", { spaceAfter: 240 }));
 
     // Ort/Datum + Unterschriften
-    children.push(body(`${res.ort_unterzeichnung || "Rostock"}, ${datumDe(res.datum_unterzeichnung)}`, { spaceAfter: 200 }));
+    children.push(body(`${res.ort_unterzeichnung || ""}, ${datumDe(res.datum_unterzeichnung)}`, { spaceAfter: 200 }));
     children.push(body("Unterschriften:", { bold: true, spaceAfter: 80 }));
     for (const p of sigLine(res.kaeufer_name)) children.push(p);
     children.push(leer(160));

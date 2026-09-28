@@ -454,7 +454,7 @@ Deno.serve(async (req) => {
       y = height - margin;
     }
     y -= 10;
-    page.drawText(fix(`${res.ort_unterzeichnung || "Rostock"}, ${datumDe(res.datum_unterzeichnung)}`), {
+    page.drawText(fix(`${res.ort_unterzeichnung || ""}, ${datumDe(res.datum_unterzeichnung)}`), {
       x: margin, y, size: 11, font: fontRegular, color: CI.text,
     });
     y -= 35;

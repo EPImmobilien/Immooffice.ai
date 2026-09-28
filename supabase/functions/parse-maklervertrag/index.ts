@@ -35,7 +35,7 @@ Antworte AUSSCHLIESSLICH mit gueltigem JSON in genau dieser Struktur:
 
 {
   "vertrag": {
-    "standort": "rostock" | "schwerin" | null,
+    "standort": "standard" | "zweigstelle" | null,
     "vertragsart": "verkauf" | "vermietung" | null,
     "verkaeufer_typ": "allein" | "eheleute" | "erben" | "gbr" | null,
     "verkaeufer_name": "string - Voll: 'Max Mustermann' oder 'Max und Maria Mustermann'" | null,
@@ -79,7 +79,7 @@ Antworte AUSSCHLIESSLICH mit gueltigem JSON in genau dieser Struktur:
 Wichtige Hinweise:
 - VERTRAGSART erkennst du am Inhalt: geht es um Verkauf einer Immobilie -> "verkauf",
   geht es um Vermietung -> "vermietung". Im Zweifel "verkauf".
-- STANDORT erkennst du am Briefkopf des Vertrags: erwaehnt das die "Musterhaus Immobilien GmbH Rostock" -> rostock, "Schwerin" -> schwerin. Wenn nicht eindeutig -> null.
+- STANDORT erkennst du am Briefkopf des Vertrags: nennt er den Hauptsitz -> standard, eine Zweigstelle -> zweigstelle. Wenn nicht eindeutig -> null.
 - VERKAEUFER_TYP:
   * Eine Person allein -> "allein"
   * Ein Ehepaar (Mann + Frau) -> "eheleute"

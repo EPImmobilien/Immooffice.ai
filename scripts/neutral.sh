@@ -26,8 +26,22 @@ AUS=(--glob '!reference/**' --glob '!docs/**' --glob '!CLAUDE.md'
 
 # Kennzeichen des Referenzunternehmens und seiner Anwendung.
 MARKEN='engfer|engferundpartner|e&p ?world|e&p ?immobilien|ep-?world|epworld|epimmobilien'
-# Personen- und Ortsangaben der Referenz, die in Standardwerten steckten.
-STAMM='voegenteich|vögenteich|HRB16598|DE370100078|DE74100101236085969429|QNTODEB2XXX|079/108/00900'
+# Personen-, Anschrift- und Ortsangaben der Referenz, die in Standardwerten
+# steckten. Sie stehen hier BASE64-kodiert, nicht im Klartext: eine Datei, die
+# ein Kennzeichen sucht, darf es nicht selbst lesbar enthalten (CLAUDE.md,
+# Abschnitt Abgrenzung). docs/NEUTRALITAET.md sieht dafuer eine unversionierte
+# Musterdatei vor — die aber auf einem frischen Klon fehlt und das Gate damit
+# still durchwinkt. Kodiert ist beides erfuellt: nichts lesbar, und das Gate
+# greift ueberall.
+#
+# Die Muster fuehren auch die \uXXXX-Schreibweise der Umlaute mit. Der
+# Quelltext der Vorlage legt Umlaute stellenweise so ab, und genau dahinter
+# hatte sich die Bueroanschrift der Referenz bis zum 28.09.2026 versteckt.
+STAMM="$(printf %s 'dijDtnxcXHUwMGY2fG9lKWdlbnRlaWNofEhSQjE2NTk4fERFMzcwMTAwMDc4fERFNzQxMDAxMDEyMzYwODU5Njk0Mjl8UU5UT0RFQjJYWFh8MDc5LzEwOC8wMDkwMHwwMzgxWyAvLi1dPzM2WyAvLi1dPzc3WyAvLi1dPzk5WyAvLi1dPzg4fFwrPzQ5WyAtXT8zODFbIC1dPzM2Nzc5OTg=' | base64 -d)"
+# Standorte der Referenz. Getrennt gefuehrt, weil sie nur im Produktcode ein
+# Fehler sind: docs/ und die Neutralisierungsskripte muessen sie benennen
+# duerfen, und die stehen ohnehin in AUS.
+ORTE="$(printf %s 'XGJyb3N0b2NrfFxic2Nod2VyaW58d2FybmVtKMO8fFxcdTAwZmN8dWUpbmRlfFxiMTgwNTVcYnxcYjE4MDU3XGJ8XGIxOTA1NVxi' | base64 -d)"
 # Fremdes Supabase-Projekt.
 FREMD='yazwkzzjiquprtjpurur'
 # Dienste, die Phase 1.4 des Auftrags ersatzlos streicht. Geprueft wird nur
@@ -45,9 +59,13 @@ pruefe() {
   shift 2
   local pfade=("$@"); [[ ${#pfade[@]} -eq 0 ]] && pfade=(.)
   # Kommentarzeilen zaehlen nicht: eine Zeile, die die Streichung erklaert,
-  # ist kein Aufruf.
+  # ist kein Aufruf. Der Filter muss am ANFANG des Zeileninhalts greifen —
+  # rg liefert "pfad:nummer:inhalt", und ein unverankertes ':[ ]*#' trifft
+  # jedes ": #" und jedes "://" mitten im Text. Bis zum 28.09.2026 fiel
+  # dadurch jede Zeile mit einer URL oder einem Hashtag aus der Pruefung,
+  # darunter drei Zeilen mit dem Marken-Hashtag der Referenz.
   treffer="$(rg -i --line-number "${AUS[@]}" -- "$muster" "${pfade[@]}" 2>/dev/null \
-             | rg -v ':[[:space:]]*(--|#|//|\*)' || true)"
+             | rg -v '^[^:]*:[0-9]+:[[:space:]]*(--|#|//|\*)' || true)"
   if [[ -n "$treffer" ]]; then
     printf '\n[FEHLER] %s\n%s\n' "$titel" "$treffer"
     fehler=1
@@ -72,8 +90,13 @@ for p in "${ENTFALLEN_PFADE[@]}"; do
 done
 if [[ ${#vorhandene[@]} -gt 0 ]]; then
   pruefe "Keine in Phase 1.4 gestrichenen Dienste" "$ENTFALLEN" "${vorhandene[@]}"
+  # Standorte der Referenz: nur im Produktcode ein Fehler. Sie steckten dort
+  # als Rueckfallwerte ("firma_slug || ..."), als Schluessel einer
+  # Standorttabelle und als Beispiele in KI-Anweisungen.
+  pruefe "Keine Standorte der Referenz" "$ORTE" "${vorhandene[@]}"
 else
   echo "[ok] Keine in Phase 1.4 gestrichenen Dienste (noch kein Anwendungscode)"
+  echo "[ok] Keine Standorte der Referenz (noch kein Anwendungscode)"
 fi
 
 # Schluessel und Geheimnisse.

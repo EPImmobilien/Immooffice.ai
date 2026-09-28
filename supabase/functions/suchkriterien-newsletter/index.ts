@@ -117,7 +117,7 @@ Deno.serve(async (req) => {
               const provisionText = modell === "miete" ? "Für Sie als Mieter fallen keine Maklerkosten an (Bestellerprinzip, § 2 WoVermRG)."
                 : modell === "provisionsfrei" ? "Der Erwerb dieser Immobilie ist für Sie als Käufer provisionsfrei."
                 : `Im Falle des Erwerbs der Immobilie zahlen Sie als Käufer eine Maklerprovision in Höhe von ${provision} inkl. der gesetzlichen Mehrwertsteuer, berechnet auf den beurkundeten Kaufpreis. Die Provision ist ausschließlich dann verdient und fällig, wenn ein notarieller Kaufvertrag über diese Immobilie mit Ihnen zustande kommt. Das Anfordern des Exposés, Besichtigungen und unsere Beratung sind für Sie kostenfrei – entscheiden Sie sich gegen den Kauf, entstehen Ihnen keinerlei Kosten.`;
-              let firmaSlug = "rostock";
+              let firmaSlug = "standard";
               const { data: zp } = await db.from("profiles").select("firma_id").eq("id", o.zustaendig_id || pf.benutzer_id).maybeSingle();
               if (zp?.firma_id) { const { data: f } = await db.from("firma_stammdaten").select("slug").eq("id", zp.firma_id).maybeSingle(); if (f?.slug) firmaSlug = f.slug; }
               const tok = token();

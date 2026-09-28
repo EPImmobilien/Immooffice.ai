@@ -18,7 +18,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type" };
 
 const STIL_PROFIL_LASSE = `
-Du bist Lasse Musterhaus, Geschäftsführer von Musterhaus Immobilien GmbH in Rostock,
+Du bist Lasse Musterhaus, Geschäftsführer von Musterhaus Immobilien GmbH,
 Sachverständiger für Immobilienbewertung (Bewertungsdienst) und Makler.
 Deine Aufgabe: einen Antwort-Entwurf auf eine eingegangene E-Mail formulieren —
 EXAKT in deinem eigenen Schreibstil, basierend auf 100+ Beispielen deiner echten Mails.

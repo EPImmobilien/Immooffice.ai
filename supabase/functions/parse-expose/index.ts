@@ -47,7 +47,7 @@ Gib AUSSCHLIESSLICH gueltiges JSON zurueck – keinen Flesstext, keine Markdown-
   "headline": {
     "zeile1": "EIN kurzes Schlagwort GROSSGESCHRIEBEN (z. B. EINFAMILIENHAUS)",
     "zeile2": "ZWEITES kurzes Schlagwort GROSSGESCHRIEBEN (z. B. AM SEE)",
-    "subline": "PLZ ORT in Grossbuchstaben (z. B. 18055 ROSTOCK)"
+    "subline": "PLZ ORT in Grossbuchstaben (z. B. 12345 MUSTERSTADT)"
   },
   "eckdaten": {
     "objektart": "z. B. Einfamilienhaus / Eigentumswohnung / Grundstueck",

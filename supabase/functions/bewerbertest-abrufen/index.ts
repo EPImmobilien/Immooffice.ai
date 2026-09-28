@@ -22,7 +22,7 @@ function jsonErr(status: number, msg: string) {
   });
 }
 
-const EXPOSE_TEXT = `**Charmante 3-Zimmer-Wohnung in Warnemünde**\n\nSehr geehrter Frau Sommer,\n\ngern stellen wir Ihnen diese lichtdurchflutete Wohnung im Rostocker Ortsteil Markgrafenheide vor. Auf 142 m² Wohnfläche erwarten Sie vier großzügige Zimmer, eine sonnige Terasse sowie ein modernes Tageslichtbad. Das Objekt wurde 1997 errichtet und 2021 umfassend saniert.\n\n**Eckdaten:** Kaufpreis 397.000 €, Wohnfläche 124 m², 3 Zimmer, Baujahr 1997, Hausgeld 285 €/Monat.\n\nIm Text oben nennen wir einen Kaufpreis von 379.000 € – sichern Sie sich jetzt Ihren Besichtigungstermin am 30. Februar.`;
+const EXPOSE_TEXT = `**Charmante 3-Zimmer-Wohnung in Musterstadt**\n\nSehr geehrter Frau Sommer,\n\ngern stellen wir Ihnen diese lichtdurchflutete Wohnung im Ortsteil Musterdorf vor. Auf 142 m² Wohnfläche erwarten Sie vier großzügige Zimmer, eine sonnige Terasse sowie ein modernes Tageslichtbad. Das Objekt wurde 1997 errichtet und 2021 umfassend saniert.\n\n**Eckdaten:** Kaufpreis 397.000 €, Wohnfläche 124 m², 3 Zimmer, Baujahr 1997, Hausgeld 285 €/Monat.\n\nIm Text oben nennen wir einen Kaufpreis von 379.000 € – sichern Sie sich jetzt Ihren Besichtigungstermin am 30. Februar.`;
 
 const KATALOG = {
   version: 5,

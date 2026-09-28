@@ -241,8 +241,8 @@ function rahmen(opt: { kopfzeile: string; anrede: string; einleitung: string; d:
     </td></tr>
 
     <tr><td style="background:${NAVY};padding:18px 24px;font:400 12px/1.7 Arial,Helvetica,sans-serif;color:#c9cde0">
-      Musterhaus Immobilien GmbH &nbsp;\u00b7&nbsp; Am V\u00f6genteich 26 R, 18055 Rostock<br>
-      Telefon 0381 36 77 99 88 &nbsp;\u00b7&nbsp; <a href="mailto:info@immooffice.example" style="color:${GOLD};text-decoration:none">info@immooffice.example</a> &nbsp;\u00b7&nbsp; <a href="https://immooffice.example" style="color:${GOLD};text-decoration:none">immooffice.example</a>
+      Musterhaus Immobilien GmbH <br>
+      <a href="mailto:info@immooffice.example" style="color:${GOLD};text-decoration:none">info@immooffice.example</a> &nbsp;\u00b7&nbsp; <a href="https://immooffice.example" style="color:${GOLD};text-decoration:none">immooffice.example</a>
     </td></tr>
   </table>
 </td></tr></table>
@@ -253,13 +253,13 @@ const WIDERRUF_TEXT = [
   "WIDERRUFSBELEHRUNG",
   "",
   "Widerrufsrecht",
-  "Sie haben das Recht, binnen 14 Tagen ohne Angabe von Gr\u00fcnden diesen Vertrag zu widerrufen. Die Widerrufsfrist betr\u00e4gt 14 Tage ab dem Tag des Vertragsabschlusses. Um Ihr Widerrufsrecht auszu\u00fcben, m\u00fcssen Sie uns (Musterhaus Immobilien GmbH, Am V\u00f6genteich 26 R, 18055 Rostock, Tel.: 0381 36 77 99 88, E-Mail: info@immooffice.example) mittels einer eindeutigen Erkl\u00e4rung (z. B. ein mit der Post versandter Brief oder eine E-Mail) \u00fcber Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie k\u00f6nnen das Muster-Widerrufsformular oder eine andere eindeutige Erkl\u00e4rung auch auf unserer Webseite www.immooffice.example elektronisch ausf\u00fcllen und \u00fcbermitteln. Machen Sie von dieser M\u00f6glichkeit Gebrauch, so werden wir Ihnen unverz\u00fcglich (z. B. per E-Mail) eine Best\u00e4tigung \u00fcber den Eingang eines solchen Widerrufs \u00fcbermitteln. Zur Wahrung der Widerrufsfrist reicht es aus, dass Sie die Mitteilung \u00fcber die Aus\u00fcbung des Widerrufsrechts vor Ablauf der Widerrufsfrist absenden.",
+  "Sie haben das Recht, binnen 14 Tagen ohne Angabe von Gr\u00fcnden diesen Vertrag zu widerrufen. Die Widerrufsfrist betr\u00e4gt 14 Tage ab dem Tag des Vertragsabschlusses. Um Ihr Widerrufsrecht auszu\u00fcben, m\u00fcssen Sie uns (Musterhaus Immobilien GmbH, E-Mail: info@immooffice.example) mittels einer eindeutigen Erkl\u00e4rung (z. B. ein mit der Post versandter Brief oder eine E-Mail) \u00fcber Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie k\u00f6nnen das Muster-Widerrufsformular oder eine andere eindeutige Erkl\u00e4rung auch auf unserer Webseite www.immooffice.example elektronisch ausf\u00fcllen und \u00fcbermitteln. Machen Sie von dieser M\u00f6glichkeit Gebrauch, so werden wir Ihnen unverz\u00fcglich (z. B. per E-Mail) eine Best\u00e4tigung \u00fcber den Eingang eines solchen Widerrufs \u00fcbermitteln. Zur Wahrung der Widerrufsfrist reicht es aus, dass Sie die Mitteilung \u00fcber die Aus\u00fcbung des Widerrufsrechts vor Ablauf der Widerrufsfrist absenden.",
   "",
   "Folgen des Widerrufs",
   "Wenn Sie diesen Vertrag widerrufen, haben wir Ihnen alle Zahlungen, die wir von Ihnen erhalten haben, unverz\u00fcglich und sp\u00e4testens binnen vierzehn Tagen ab dem Tag zur\u00fcckzuzahlen, an dem die Mitteilung \u00fcber Ihren Widerruf dieses Vertrags bei uns eingegangen ist. F\u00fcr diese R\u00fcckzahlung verwenden wir dasselbe Zahlungsmittel, das Sie bei der urspr\u00fcnglichen Transaktion eingesetzt haben, es sei denn, mit Ihnen wurde ausdr\u00fccklich etwas anderes vereinbart; in keinem Fall werden Ihnen wegen dieser R\u00fcckzahlung Entgelte berechnet. Haben Sie verlangt, dass die Dienstleistungen w\u00e4hrend der Widerrufsfrist beginnen sollen, so haben Sie uns einen angemessenen Betrag zu zahlen, der dem Anteil der bis zu dem Zeitpunkt, zu dem Sie uns von der Aus\u00fcbung des Widerrufsrechts hinsichtlich dieses Vertrags unterrichten, bereits erbrachten Dienstleistungen im Vergleich zum Gesamtumfang der im Vertrag vorgesehenen Dienstleistungen entspricht.",
   "",
   "Muster-Widerrufsformular",
-  "An Musterhaus Immobilien GmbH, Am V\u00f6genteich 26 R, 18055 Rostock, E-Mail: info@immooffice.example:",
+  "An Musterhaus Immobilien GmbH, E-Mail: info@immooffice.example:",
   "Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag \u00fcber die Erbringung der folgenden Dienstleistung: Erstellung eines Energieausweises auf Verbrauchsbasis.",
   "Bestellt am (*) / erhalten am (*): __________",
   "Name des/der Verbraucher(s): __________",
@@ -417,7 +417,7 @@ Deno.serve(async (req) => {
         `Guten Tag ${txt(d?.kontakt?.name, 120)},`, "",
         "vielen Dank f\u00fcr Ihre Anfrage. Wir haben Ihre Angaben erhalten und pr\u00fcfen sie. Bei R\u00fcckfragen melden wir uns telefonisch, in der Regel innerhalb von zwei Werktagen.", "",
         alsText(d, ""), "", WIDERRUF_TEXT, "",
-        "Mit freundlichen Gr\u00fc\u00dfen", "Musterhaus Immobilien GmbH", "Am V\u00f6genteich 26 R, 18055 Rostock", "Tel.: 0381 36 77 99 88",
+        "Mit freundlichen Gr\u00fc\u00dfen", "Musterhaus Immobilien GmbH",
       ].join("\n"),
       anhaenge,
     });

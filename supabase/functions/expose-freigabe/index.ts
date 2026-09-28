@@ -1,6 +1,6 @@
 // ============================================================================
 // expose-freigabe v16 (Deploy-Version 24; öffentlich, ohne JWT — Zugriff nur per Token aus dem Link)
-//   v16 (20.09.): Kunden sehen die BÜRONUMMER der Gesellschaft (firma_stammdaten.telefon, Rückfall Rostock) statt der
+//   v16 (20.09.): Kunden sehen die BÜRONUMMER der Gesellschaft (firma_stammdaten.telefon, Rueckfall leer) statt der
 //        Mobilnummer des Maklers – auf der Seite (laden) und in der Bestätigungsmail.
 //   v15 (20.09.): Nach Widerruf (expose_freigaben.widerrufen_am, über die Objektseite) ist der Token ungültig – laden/download/bestaetigen 404.
 //   v14 (Stufe 53, Objekt-Landingpage): Freigaben mit landing=true führen auf objekt.html?t= (Redirect, Bestätigungsmail);
@@ -46,11 +46,11 @@ async function lade(db: any, t: string) {
   const { data: f } = await db.from("expose_freigaben").select("*").eq("token", t).maybeSingle();
   if (!f) return null;
   const { data: im } = await db.from("immobilien").select("id, immo_nr, objekttitel, bezeichnung, strasse, hausnummer, plz, ort, vertragsart, angebotspreis, kaltmiete, wohnflaeche, zimmer, hauptbild_url, adresse_freigeben, zustaendig_id").eq("id", f.immobilie_id).maybeSingle();
-  const { data: firma } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("slug", f.firma_slug || "rostock").maybeSingle();
+  const { data: firma } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("slug", f.firma_slug || "standard").maybeSingle();
   const { data: maklerRoh } = im?.zustaendig_id ? await db.from("profiles").select("id, name, email, telefon, titel").eq("id", im.zustaendig_id).maybeSingle() : { data: null };
   const firmaFertig = firma || { firma_name: "Musterhaus Immobilien GmbH", strasse: "", plz: "", ort: "", email: "info@immooffice.example", telefon: null };
   // v16: Kunden bekommen die Büronummer, nie die Mobilnummer des Maklers
-  const bueroTel = firmaFertig.telefon || "0381 36 77 99 88";
+  const bueroTel = firmaFertig.telefon || "";
   const makler = maklerRoh ? { ...maklerRoh, telefon: bueroTel } : null;
   return { f, im, firma: { ...firmaFertig, telefon: bueroTel }, makler };
 }
@@ -131,7 +131,7 @@ Deno.serve(async (req) => {
       const { expose, dokumente } = await exposeSuchen(db, im.id);
       const anm = await nlVorbelegung(db, body.nl);
       const { data: makler } = im.zustaendig_id ? await db.from("profiles").select("id, name, email, telefon, firma_id").eq("id", im.zustaendig_id).maybeSingle() : { data: null as any };
-      let firmaSlug = "rostock";
+      let firmaSlug = "standard";
       if (makler?.firma_id) { const { data: fs } = await db.from("firma_stammdaten").select("slug").eq("id", makler.firma_id).maybeSingle(); if (fs?.slug) firmaSlug = fs.slug; }
       const { data: firmaRow } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("slug", firmaSlug).maybeSingle();
       const firma = firmaRow || { firma_name: "Musterhaus Immobilien GmbH", strasse: "", plz: "", ort: "", email: "info@immooffice.example", telefon: null };
@@ -139,7 +139,7 @@ Deno.serve(async (req) => {
 
       if (body.aktion === "objekt_laden") {
         const { provision_aussen: _pa, provisionsfrei: _pf, zustaendig_id: _z, status: _st, ...imPub } = im;
-        return json({ ok: true, objekt: true, im: imPub, firma, makler: makler ? { name: makler.name, email: makler.email, telefon: firma.telefon || "0381 36 77 99 88" } : null,
+        return json({ ok: true, objekt: true, im: imPub, firma, makler: makler ? { name: makler.name, email: makler.email, telefon: firma.telefon || "" } : null,
           provisionsmodell: prov.modell, provision_text: prov.text, vorbelegt: anm ? { name: anm.name || "", email: anm.email || "" } : null, unterlagen_anzahl: dokumente.length,
           texte: { widerrufsbelehrung: widerrufsbelehrung(firma), beginn_text: BEGINN_TEXT, agb_url: AGB_URL, datenschutz_url: DATENSCHUTZ_URL } });
       }
