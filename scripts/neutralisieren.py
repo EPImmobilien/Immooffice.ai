@@ -276,6 +276,16 @@ $function$;
     inhalt = inhalt.replace("'Bearer <ANON_KEY>'",
                             "'Bearer ' || coalesce((select decrypted_secret from vault.decrypted_secrets where name = 'anon_key'), '')")
     protokoll.append(('FREMD', 1, 'Cron: Projekt-URL und anon-Key aus dem Vault statt im Klartext im Job.'))
+    # Die beiden inaktiven Jobs werden im Export mit 'update cron.job set
+    # active = false' abgeschaltet. Auf Supabase darf die Migrationsrolle
+    # cron.job nicht schreiben (permission denied for table job); der
+    # unterstuetzte Weg ist cron.alter_job. Gleiches Ergebnis, erlaubtes Mittel.
+    n_inaktiv = len(re.findall(r"update cron\.job set active = false where jobname = '[^']+';", inhalt))
+    inhalt = re.sub(r"update cron\.job set active = false where jobname = '([^']+)';",
+                    lambda m: ("select cron.alter_job((select jobid from cron.job where jobname = '%s'),\n"
+                               "                      active := false);") % m.group(1),
+                    inhalt)
+    protokoll.append(('FREMD', n_inaktiv, 'Cron: inaktive Jobs ueber cron.alter_job statt update cron.job.'))
     schreibe('20260915001000_vorlage_cron.sql', 'Cron-Jobs der Vorlage',
              ['70-cron.sql'], inhalt,
              '-- 33 Jobs (jotform-sync entfaellt nach Phase 1.4). Projekt-URL und\n'

@@ -280,10 +280,12 @@ Wenn die Vorlage einen löscht, folgt der Fork.
 
 ## 27.09.2026 — Storage-Reste des Altbestands bleiben stehen
 
-**Frage:** Die lokale Instanz hat drei Buckets und dreizehn
-Storage-Richtlinien mehr als die Vorlage: `marke`, `objektbilder`,
-`objektdokumente`. Sie stammen aus der Next.js-Anwendung und wandern beim
-Verschieben nicht nach `altbestand`, weil `storage` ein eigenes Schema ist.
+**Frage:** Die lokale Instanz hat fünf Buckets und zwanzig
+Storage-Richtlinien mehr als die Vorlage: `branding`, `importe`, `marke`,
+`objektbilder`, `objektdokumente`. Sie stammen aus der Next.js-Anwendung und
+wandern beim Verschieben nicht nach `altbestand`, weil `storage` ein eigenes
+Schema ist. (Zuerst waren nur drei Buckets und dreizehn Richtlinien notiert;
+`branding` und `importe` kamen beim Vollständigkeitstest dazu.)
 
 **Entscheidung:** Stehen lassen, nicht löschen. `tests/vorlage-vollstaendig.sql`
 zählt sie ausdrücklich heraus, damit der Test auf einer Instanz mit Altbestand
@@ -332,3 +334,23 @@ Anwenden gegengeprueft: Supabase legt den angewendeten Text in
 `supabase_migrations.schema_migrations.statements` ab, und dessen Pruefsumme
 muss mit der Pruefsumme des Abschnitts auf der Platte uebereinstimmen. Zusaetzlich
 wird am Ende jedes Objekt gegen das Quellprojekt verglichen, wie beim Abgleich.
+
+## 28.09.2026 — Inaktive Cron-Jobs über `cron.alter_job` statt `update cron.job`
+
+**Frage:** Der Schema-Export schaltet die beiden inaktiven Jobs
+`news-briefing-taeglich` und `onoffice-waechter-60min` mit
+`update cron.job set active = false` ab. Auf dem eigenen Projekt scheitert das:
+`permission denied for table job`. Die Migrationsrolle darf `cron.job` lesen,
+aber nicht schreiben — lokal fällt das nicht auf, weil die Testinstanz die
+Tabelle ohne diese Einschränkung anlegt.
+
+**Entscheidung:** In `scripts/neutralisieren.py` wird das `update` beim
+Erzeugen der Migration durch
+`select cron.alter_job((select jobid from cron.job where jobname = '…'), active := false)`
+ersetzt. `20260915001000_vorlage_cron.sql` ist entsprechend neu erzeugt.
+
+**Grund:** Gleiches Ergebnis — 33 Jobs, davon zwei inaktiv, nachgemessen —,
+aber über die dafür vorgesehene Funktion von pg_cron statt über einen direkten
+Schreibzugriff auf die Systemtabelle. Die Änderung gehört ins Skript und nicht
+in die erzeugte Datei, sonst verwirft sie der nächste Lauf. Kein
+Verhaltensunterschied zur Vorlage: dort sind dieselben zwei Jobs inaktiv.

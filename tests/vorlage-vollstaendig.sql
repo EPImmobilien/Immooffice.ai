@@ -16,9 +16,14 @@
 -- RLS, und der Befund suchkriterien_lauf ist in der Vorlage behoben.
 --
 -- Storage gehoert nicht zum Schema public und wandert beim Verschieben des
--- Altbestands nicht mit. Deshalb zaehlen die beiden Storage-Zeilen die drei
--- Buckets und dreizehn Richtlinien des Altbestands heraus — sonst wuerde der
+-- Altbestands nicht mit. Deshalb zaehlen die beiden Storage-Zeilen die fuenf
+-- Buckets und zwanzig Richtlinien des Altbestands heraus — sonst wuerde der
 -- Test bei einer Instanz mit Altbestand anders ausgehen als bei einer ohne.
+-- Die Liste stand zuerst auf drei Buckets und dreizehn Richtlinien; beim
+-- Abgleich gegen das laufende Projekt kamen 'branding' (vier Richtlinien) und
+-- 'importe' (drei) dazu. Nicht zu verwechseln mit dem eigenen Bucket
+-- 'branding-assets' der Vorlage, dessen Richtlinien branding_lesen,
+-- branding_schreiben und branding_loeschen heissen.
 
 \set ON_ERROR_STOP on
 \pset pager off
@@ -65,11 +70,14 @@ with soll(bereich, soll) as (values
   ('Tabellen mit RLS', (select count(*) from pg_class c join pg_namespace n on n.oid=c.relnamespace
                          where n.nspname='public' and c.relkind='r' and c.relrowsecurity)),
   ('Buckets', (select count(*) from storage.buckets
-                where id not in ('marke', 'objektbilder', 'objektdokumente'))),
+                where id not in ('branding', 'importe', 'marke', 'objektbilder',
+                                 'objektdokumente'))),
   ('Storage-Richtlinien', (select count(*) from pg_policy pol join pg_class c on c.oid=pol.polrelid
                             join pg_namespace n on n.oid=c.relnamespace
                            where n.nspname='storage'
                              and pol.polname not in (
+      'branding_delete', 'branding_insert', 'branding_read', 'branding_update',
+      'importe_anlegen', 'importe_lesen', 'importe_loeschen',
       'marke_aendern', 'marke_anlegen', 'marke_loeschen',
       'objektbilder_aendern', 'objektbilder_anlegen', 'objektbilder_lesen',
       'objektbilder_loeschen', 'objektbilder_web_expose',

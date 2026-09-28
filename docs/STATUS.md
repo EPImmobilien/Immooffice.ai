@@ -235,16 +235,25 @@ Supabase-Projekt, oder ausdrückliche Freigabe zum Löschen.
 - [x] `npm run neutral` und `npm run check` eingerichtet, beide grün
 - [x] `tests/vorlage-vollstaendig.sql` — 15 Kennzahlen, alle gleich wie im
       Quellprojekt
+- [x] **Am 28.09.2026 auf `usguiggfciavwzkdfjgt` angewendet.** Alle 19
+      Fork-Migrationen, in 31 Abschnitten abgeschrieben und jeder einzeln
+      gegengeprüft: Supabase legt den angewendeten Text in
+      `supabase_migrations.schema_migrations.statements` ab, dessen Prüfsumme
+      mit der des Abschnitts auf der Platte verglichen wurde. 31 von 31 beim
+      ersten Versuch gleich. Danach alle 15 Kennzahlen im laufenden Projekt
+      gemessen: 187 Tabellen, 5 Sichten, 6 Sequenzen, 104 Funktionen, 64
+      Trigger, 344 Richtlinien, 232 Primär-/Eindeutigkeitsschlüssel, 98
+      Prüfbedingungen, 302 Fremdschlüssel, 266 Indizes, 187 Tabellen mit RLS,
+      22 Buckets, 59 Storage-Richtlinien, 42 Cron-Jobs, 2791 Spalten — alle
+      gleich wie im Quellprojekt.
 
 ## 5. Als Nächstes
 
-1. **Ihre Entscheidung** zu Abschnitt 3 (Altbestand) — nötig, bevor
-   irgendetwas in das Projekt eingespielt wird. Bis dahin entsteht alles als
-   Datei, nichts in der Datenbank. Der Rest von Phase 0 ist fertig.
-2. Zwei Vault-Einträge (`projekt_url`, `anon_key`) — `docs/OFFEN.md`, Punkt 1.
-   Ohne sie laufen die Cron-Jobs ins Leere.
-3. Edge Functions: wartet auf Abschnitt 2.2.
-4. Phase 1: `reference/epworld-src.html` in `src/` zerlegen, CDN-Versionen
+1. Zwei Vault-Einträge (`projekt_url`, `anon_key`) — `docs/OFFEN.md`, Punkt 1.
+   Ohne sie laufen die Cron-Jobs ins Leere. Sie stehen jetzt im Projekt und
+   feuern nach Plan, aber jeder Aufruf geht mit leerem Schlüssel hinaus.
+2. Edge Functions: wartet auf Abschnitt 2.2.
+3. Phase 1: `reference/epworld-src.html` in `src/` zerlegen, CDN-Versionen
    festnageln, neutralisieren, `dist/index.html` bauen. Läuft ohne Ihre
    Mitwirkung; danach **Gate 1**.
 

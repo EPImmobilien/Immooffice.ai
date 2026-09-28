@@ -225,11 +225,22 @@ entfällt (Phase 1.4), `shop-tv` entfällt samt vier Storage-Richtlinien
   war. Deshalb wird jeder Block einzeln geprüft und nicht nur die Datei als
   Ganzes.
 
-**Storage braucht keinen Nachtrag.** Die drei Buckets `marke`, `objektbilder`,
-`objektdokumente` und dreizehn Storage-Richtlinien, die die lokale Instanz mehr
-hat als die Vorlage, stammen aus dem **Altbestand** der Next.js-Anwendung. Sie
-wandern beim Verschieben nach `altbestand` nicht mit, weil `storage` ein eigenes
-Schema ist. Gelöscht wird nichts — vermerkt in `docs/OFFEN.md`.
+**Storage braucht keinen Nachtrag.** Die fünf Buckets `branding`, `importe`,
+`marke`, `objektbilder`, `objektdokumente` und zwanzig Storage-Richtlinien, die
+die lokale Instanz mehr hat als die Vorlage, stammen aus dem **Altbestand** der
+Next.js-Anwendung. Sie wandern beim Verschieben nach `altbestand` nicht mit,
+weil `storage` ein eigenes Schema ist. Gelöscht wird nichts — vermerkt in
+`docs/OFFEN.md`.
+
+Die Liste stand zuerst auf drei Buckets und dreizehn Richtlinien. Beim
+Vollständigkeitstest gegen das laufende Projekt fehlten genau zwei Buckets und
+sieben Richtlinien: `branding` mit vier und `importe` mit drei. Beide sind vom
+17.07. und 03.09. und damit älter als jede Fork-Migration. Nicht zu verwechseln
+mit dem eigenen Bucket `branding-assets` der Vorlage, dessen Richtlinien
+`branding_lesen`, `branding_schreiben` und `branding_loeschen` heißen — der
+Altbestand nutzt `branding_read`, `branding_insert`, `branding_update`,
+`branding_delete`. Die Zählung war unvollständig, nicht der Abgleich: im Schema
+`public` stimmen alle dreizehn übrigen Kennzahlen.
 
 **Ein Sicherheitsbefund ist behoben.** `suchkriterien_lauf` hatte in der Vorlage
 kein RLS; im Export vom 14.09. stand die Zeile deshalb auskommentiert. Die

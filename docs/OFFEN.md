@@ -88,9 +88,9 @@ Einspielen des E&P-Schemas. Drei Wege in `docs/STATUS.md` Abschnitt 3.
    einschalten und den Job mit Schlüssel versehen, oder ein eigenes Geheimnis
    wie bei `x-diagnose-secret`.
 
-9. **Storage-Reste des Altbestands.** Die Buckets `marke`, `objektbilder`,
-   `objektdokumente` und dreizehn Storage-Richtlinien stammen aus der
-   Next.js-Anwendung. Beim Verschieben des Altbestands wandern sie nicht mit,
+9. **Storage-Reste des Altbestands.** Die Buckets `branding`, `importe`,
+   `marke`, `objektbilder`, `objektdokumente` und zwanzig Storage-Richtlinien
+   stammen aus der Next.js-Anwendung. Beim Verschieben des Altbestands wandern sie nicht mit,
    weil `storage` ein eigenes Schema ist und
    `alter table … set schema altbestand` dort nicht greift. Sie enthalten
    möglicherweise Dateien; gelöscht wird nichts. Zu entscheiden nach Gate 1:

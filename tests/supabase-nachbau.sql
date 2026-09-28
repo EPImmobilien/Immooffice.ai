@@ -249,6 +249,32 @@ returns bigint language sql as $$
   select cron.schedule('job-' || md5(schedule || command), schedule, command);
 $$;
 
+-- Signatur wie bei pg_cron: alle Felder ausser jobid sind benannte Parameter
+-- mit Vorgabewert null, und null heisst "nicht aendern". Die Migrationen
+-- benutzen nur `active`; die uebrigen stehen da, damit ein Aufruf mit anderem
+-- Feld hier nicht still danebengeht, sondern wirkt.
+create or replace function cron.alter_job(
+  job_id bigint,
+  schedule text default null,
+  command text default null,
+  database text default null,
+  username text default null,
+  active boolean default null)
+returns void language plpgsql as $$
+begin
+  update cron.job j
+     set schedule = coalesce(alter_job.schedule, j.schedule),
+         command  = coalesce(alter_job.command,  j.command),
+         database = coalesce(alter_job.database, j.database),
+         username = coalesce(alter_job.username, j.username),
+         active   = coalesce(alter_job.active,   j.active)
+   where j.jobid = alter_job.job_id;
+  if not found then
+    raise exception 'could not find valid entry for job %', alter_job.job_id;
+  end if;
+end;
+$$;
+
 create or replace function cron.unschedule(job_name text)
 returns boolean language plpgsql as $$
 begin
