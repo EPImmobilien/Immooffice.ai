@@ -80,6 +80,13 @@ else
   fehler=1
 fi
 
+abschnitt "Edge Functions: verify_jwt fuer jede festgelegt"
+if python3 tests/funktionen-config.py; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Noch nicht abgedeckt"
 cat <<'ENDE'
 - Erster Start gegen das eigene Projekt — braucht ausgerollte Edge Functions

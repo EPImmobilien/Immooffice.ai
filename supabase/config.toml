@@ -1,0 +1,446 @@
+# Supabase-Projektkonfiguration.
+#
+# Einziger Zweck bisher: fuer JEDE Edge Function festhalten, ob die Plattform
+# vor dem Aufruf ein gueltiges JWT verlangt. Ohne diesen Eintrag setzt die
+# Supabase-CLI verify_jwt = true — und damit waeren die 39 oeffentlich
+# erreichbaren Funktionen tot: der Abmeldelink im Newsletter, die
+# Objekt-Landingpage, der Lead-Eingang, der Bewerbertest.
+#
+# Woher die Werte stammen:
+#   - 126 aus docs/EDGE_FUNCTIONS.md, dem Bestandsverzeichnis der Vorlage;
+#   - 13 ohne Eintrag dort wurden aus ihren Auth-Markern bestimmt (prueft die
+#     Funktion selbst ein Token, liest sie auth.getUser, ruft ein Cron-Job sie
+#     ohne Authorization-Kopf auf?);
+#   -  9 stillgelegte Funktionen stehen auf true, wie es ihr Kopfkommentar vom
+#     23.09.2026 ausdruecklich festhaelt.
+#
+# Wer einen Wert aendert, oeffnet oder schliesst eine Tuer ins Projekt. Das
+# gehoert in den Diff und nicht in die Oberflaeche von Supabase.
+
+project_id = "usguiggfciavwzkdfjgt"
+
+
+# --- Ohne JWT-Pruefung (30) ------------------------------------------
+# Jede dieser Funktionen ist aus dem offenen Netz erreichbar und muss
+# ihren Zugang selbst pruefen — ueber einen Token im Link, eine eigene
+# Kopfzeile oder ein Geheimnis aus dem Vault.
+
+[functions.akq-lead-eingang]
+verify_jwt = false
+
+[functions.bewerbertest-abgeben]
+verify_jwt = false
+
+[functions.bewerbertest-abrufen]
+verify_jwt = false
+
+[functions.bild-empfang]
+verify_jwt = false
+
+[functions.eigentuemer-benachrichtigungen-versenden]
+verify_jwt = false
+
+[functions.eigentuemer-zugang-anfordern]
+verify_jwt = false
+
+[functions.energieausweis-anfrage]
+verify_jwt = false
+
+[functions.expose-freigabe]
+verify_jwt = false
+
+[functions.ki-bildbearbeitung]
+verify_jwt = false
+
+[functions.mail-anhaenge-diagnose]
+verify_jwt = false
+
+[functions.news-briefing-erstellen]
+verify_jwt = false
+
+[functions.newsletter-abmelden]
+verify_jwt = false
+
+[functions.objekt-landing]
+verify_jwt = false
+
+[functions.oeffentliche-objekte]
+verify_jwt = false
+
+[functions.onoffice-expose-abgleich]
+verify_jwt = false
+
+[functions.onoffice-suchkriterien]
+verify_jwt = false
+
+[functions.portal-ftp-diagnose]
+verify_jwt = false
+
+[functions.projekt-daten]
+verify_jwt = false
+
+[functions.projekt-interaktion]
+verify_jwt = false
+
+[functions.projekt-login]
+verify_jwt = false
+
+[functions.projekt-upload]
+verify_jwt = false
+
+[functions.projekt-wohnungen]
+verify_jwt = false
+
+[functions.push-antworten]
+verify_jwt = false
+
+[functions.push-senden]
+verify_jwt = false
+
+[functions.rundgang-oeffentlich]
+verify_jwt = false
+
+[functions.signatur-token-validieren]
+verify_jwt = false
+
+[functions.signatur-unterschreiben]
+verify_jwt = false
+
+[functions.suchkriterien-newsletter]
+verify_jwt = false
+
+[functions.upload-benachrichtigung-versenden]
+verify_jwt = false
+
+[functions.web-lead]
+verify_jwt = false
+
+
+# --- Mit JWT-Pruefung (109) -------------------------------------------
+
+[functions.akq-automation-lauf]
+verify_jwt = true
+
+[functions.akq-ki-vorlage]
+verify_jwt = true
+
+[functions.akq-mail-leads]
+verify_jwt = true
+
+[functions.akq-wertindikation-pdf]
+verify_jwt = true
+
+[functions.besichtigung-nachfassen]
+verify_jwt = true
+
+[functions.bewerbertest-einladen]
+verify_jwt = true
+
+[functions.bewertung-aus-aufnahme]
+verify_jwt = true
+
+[functions.bild-beschriften]
+verify_jwt = true
+
+[functions.bild-web-variante]
+verify_jwt = true
+
+[functions.brief-pdf-erzeugen]
+verify_jwt = true
+
+[functions.buero-verschieben]
+verify_jwt = true
+
+[functions.claude-chat]
+verify_jwt = true
+
+[functions.credentials-anzeigen]
+verify_jwt = true
+
+[functions.credentials-speichern]
+verify_jwt = true
+
+[functions.datei-namen-ki]
+verify_jwt = true
+
+[functions.dokument-umbenennen-vorschlag]
+verify_jwt = true
+
+[functions.ea-mailtest]
+verify_jwt = true
+
+[functions.eigentuemer-dokument-onedrive-push]
+verify_jwt = true
+
+[functions.eigentuemer-dokument-uebernehmen]
+verify_jwt = true
+
+[functions.eigentuemer-einladen]
+verify_jwt = true
+
+[functions.eigentuemer-einladung-nachfassen]
+verify_jwt = true
+
+[functions.eigentuemer-link-erneut-senden]
+verify_jwt = true
+
+[functions.eigentuemer-loeschen]
+verify_jwt = true
+
+[functions.eigentuemer-nachricht-senden]
+verify_jwt = true
+
+[functions.eigentuemer-person-hinzufuegen]
+verify_jwt = true
+
+[functions.eigentuemer-report-pdf]
+verify_jwt = true
+
+[functions.energieausweis-auslesen]
+verify_jwt = true
+
+[functions.energieausweis-schaetzen]
+verify_jwt = true
+
+[functions.entfernungen-berechnen]
+verify_jwt = true
+
+[functions.expose-erinnerung]
+verify_jwt = true
+
+[functions.expose-freigabe-erstellen]
+verify_jwt = true
+
+[functions.expose-memtest]
+verify_jwt = true
+
+[functions.expose-pdf-erzeugen]
+verify_jwt = true
+
+[functions.expose-pruefen]
+verify_jwt = true
+
+[functions.expose-rueckmeldung-melden]
+verify_jwt = true
+
+[functions.fahrt-ermitteln]
+verify_jwt = true
+
+[functions.generate-text]
+verify_jwt = true
+
+[functions.mail-abwesenheit-verarbeiten]
+verify_jwt = true
+
+[functions.mail-anfrage-verarbeiten]
+verify_jwt = true
+
+[functions.mail-anhaenge-extrahieren]
+verify_jwt = true
+
+[functions.mail-aufgaben-erkennen]
+verify_jwt = true
+
+[functions.mail-gelesen-setzen]
+verify_jwt = true
+
+[functions.mail-ki-vorschlag]
+verify_jwt = true
+
+[functions.mail-postfach-backfill]
+verify_jwt = true
+
+[functions.mail-postfach-pull]
+verify_jwt = true
+
+[functions.mail-postfach-speichern]
+verify_jwt = true
+
+[functions.mail-rechnung-weiterleiten]
+verify_jwt = true
+
+[functions.mail-senden]
+verify_jwt = true
+
+[functions.mail-zu-mietanfrage]
+verify_jwt = true
+
+[functions.mail-zu-todo]
+verify_jwt = true
+
+[functions.makler-nachricht-senden]
+verify_jwt = true
+
+[functions.mietvertrag-pdf]
+verify_jwt = true
+
+[functions.MIGRATION_notizen]
+verify_jwt = true
+
+[functions.mitarbeiter-anlegen]
+verify_jwt = true
+
+[functions.mitarbeiter-loeschen]
+verify_jwt = true
+
+[functions.mpe-pdf-erzeugen]
+verify_jwt = true
+
+[functions.newsletter-senden]
+verify_jwt = true
+
+[functions.notiz-analysieren]
+verify_jwt = true
+
+[functions.notiz-transkribieren]
+verify_jwt = true
+
+[functions.objekt-wissen-auslesen]
+verify_jwt = true
+
+[functions.onoffice-adress-diagnose]
+verify_jwt = true
+
+[functions.onoffice-adressen]
+verify_jwt = true
+
+[functions.onoffice-agreement-diagnose]
+verify_jwt = true
+
+[functions.onoffice-bild-diagnose]
+verify_jwt = true
+
+[functions.onoffice-bilder]
+verify_jwt = true
+
+[functions.onoffice-felder-werte-diagnose]
+verify_jwt = true
+
+[functions.onoffice-import]
+verify_jwt = true
+
+[functions.onoffice-nachtrag-test]
+verify_jwt = true
+
+[functions.onoffice-objekt-anlegen]
+verify_jwt = true
+
+[functions.onoffice-objekt-speichern]
+verify_jwt = true
+
+[functions.onoffice-portal-diagnose]
+verify_jwt = true
+
+[functions.onoffice-status-uebertragen]
+verify_jwt = true
+
+[functions.onoffice-sync]
+verify_jwt = true
+
+[functions.onoffice-termin-schreiben]
+verify_jwt = true
+
+[functions.onoffice-termine-sync]
+verify_jwt = true
+
+[functions.onoffice-test]
+verify_jwt = true
+
+[functions.onoffice-upload-diagnose]
+verify_jwt = true
+
+[functions.onoffice-vorlagen-import]
+verify_jwt = true
+
+[functions.onoffice-waechter]
+verify_jwt = true
+
+[functions.parse-einwertung]
+verify_jwt = true
+
+[functions.parse-energieabrechnung]
+verify_jwt = true
+
+[functions.parse-energieausweis]
+verify_jwt = true
+
+[functions.parse-expose]
+verify_jwt = true
+
+[functions.parse-grundbuch]
+verify_jwt = true
+
+[functions.parse-immo-dokument]
+verify_jwt = true
+
+[functions.parse-maklervertrag]
+verify_jwt = true
+
+[functions.parse-objektnachweis]
+verify_jwt = true
+
+[functions.parse-schmiede-notizen]
+verify_jwt = true
+
+[functions.parse-zaehler]
+verify_jwt = true
+
+[functions.portal-export]
+verify_jwt = true
+
+[functions.portal-export-homepage]
+verify_jwt = true
+
+[functions.projekt-datei-benachrichtigung]
+verify_jwt = true
+
+[functions.projekt-nachricht-antwort]
+verify_jwt = true
+
+[functions.radar-erfassen]
+verify_jwt = true
+
+[functions.rechnung-pdf-erzeugen]
+verify_jwt = true
+
+[functions.reservierung-pdf-erzeugen]
+verify_jwt = true
+
+[functions.reservierung-word-erzeugen]
+verify_jwt = true
+
+[functions.signatur-vorgang-starten]
+verify_jwt = true
+
+[functions.signatur-vorgang-widerrufen]
+verify_jwt = true
+
+[functions.smooth-function]
+verify_jwt = true
+
+[functions.sprachmemo-auswerten]
+verify_jwt = true
+
+[functions.termin-erinnerung]
+verify_jwt = true
+
+[functions.termin-fahrzeit]
+verify_jwt = true
+
+[functions.termin-serie]
+verify_jwt = true
+
+[functions.text-korrigieren]
+verify_jwt = true
+
+[functions.upload_benachrichtigung_planen]
+verify_jwt = true
+
+[functions.urlaub-hinweise]
+verify_jwt = true
+
+[functions.vertrag-pdf]
+verify_jwt = true
+
+[functions.web-asset-kopieren]
+verify_jwt = true
