@@ -108,7 +108,9 @@ zuwachs(bereich, mehr, grund) as (values
   ('Storage-Richtlinien', 2, 'fork_12: Datei lesen und pflegen'),
   -- fork_13: Mandanten-CI an firma_stammdaten.
   ('Spalten', 3, 'fork_13: ci_primaer, ci_akzent, ci_font'),
-  ('Pruefbedingungen', 1, 'firma_stammdaten_ci_farben_check')
+  ('Pruefbedingungen', 1, 'firma_stammdaten_ci_farben_check'),
+  -- fork_14: die Mandantengrenze in den Funktionen.
+  ('Funktionen', 2, 'fork_14: mandant_sichern(), mandant_grenze_gilt()')
 ),
 soll(bereich, soll) as (
   select v.bereich,

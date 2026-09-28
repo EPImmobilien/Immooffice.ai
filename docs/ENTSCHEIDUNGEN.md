@@ -1012,3 +1012,58 @@ Ladezeit eingebacken (`inputStyle`, `labelStyle`, `primaryBtn`,
 damit jeder Aufrufer dieselbe Referenz behält. Gesetzt wird immer **von der
 Plattform-CI aus**, nie vom zuletzt Gesetzten — sonst bliebe beim Wechsel die
 Farbe des vorigen Mandanten stehen.
+
+## 2026-09-28 · Die Mandantengrenze galt in siebzehn Funktionen nicht
+
+**Befund:** Die restriktiven Richtlinien aus `fork_07` schützen Tabellen. Sie
+schützen **nicht**, was in einer `SECURITY DEFINER`-Funktion passiert — die
+läuft mit den Rechten ihres Eigentümers, und RLS greift dort nicht. Im Schema
+`public` stehen siebzehn solche Funktionen, die eine `uuid` vom Aufrufer
+entgegennehmen. Keine einzige prüfte, ob der Datensatz dem Aufrufer gehört,
+und alle sind für `authenticated` ausführbar.
+
+Möglich war damit, sobald es zwei Mandanten gibt:
+
+| Funktion | was ein fremder Mandant damit konnte |
+|---|---|
+| `rechnung_startnummer_setzen` | fremden Rechnungsnummernkreis zurücksetzen |
+| `naechste_rechnungsnummer` | fremden Nummernkreis weiterzählen — eine Lücke in eine Nummernfolge reißen, die nach GoBD lückenlos sein muss |
+| `rechnung_stellen`, `_stornieren`, `_bezahlt_markieren` | fremde Rechnungen stellen, stornieren, als bezahlt markieren |
+| `delete_mitarbeiter` | fremden Mitarbeiter löschen |
+| `eigentuemer_ansprechpartner_info` | Name, E-Mail, Telefon fremder Makler lesen |
+| `objekt_kosten_berechnen`, `suchkriterien_abgleich` | Zahlen zu fremden Objekten |
+| und sieben weitere | |
+
+**Warum `tests/mandant.sql` das nicht gefunden hat:** Der Test prüft Tabellen,
+und dort ist die Grenze dicht. Eine Funktion ist ein Tunnel daneben. Dafür gibt
+es jetzt `tests/funktionen-mandant.sql` — zwei Mandanten, und Alpha ruft jede
+Funktion mit einer Kennung von Beta auf.
+
+**Entscheidung:** Die Körper der Vorlage werden **nicht** neu geschrieben. Eine
+Zeile wird vorne eingezogen, maschinell, und danach nachgeprüft. So bleibt der
+Rest Zeile für Zeile die Vorlage, und dieselbe Migration wirkt auch dann noch,
+wenn die Vorlage ihre Funktion einmal ändert.
+
+**Zwei bleiben ausgenommen:** `newsletter_abmelden` (der Token *ist* der
+Nachweis) und `expose_abgerufen` (die öffentliche Exposéseite meldet den
+Abruf). Ein Wachposten in der Migration lässt jede neue ungeprüfte Funktion
+auffallen.
+
+## 2026-09-28 · `current_user` ist in `SECURITY DEFINER` der Eigentümer
+
+**Fehler im ersten Entwurf von `fork_14`:** Die Ausnahme für die `service_role`
+stand als `current_user in ('service_role', 'postgres', 'supabase_admin')`. In
+einer `SECURITY DEFINER`-Funktion ist `current_user` aber der **Eigentümer**,
+nicht der Aufrufer — auf Supabase `postgres`. Die Ausnahme traf also immer zu,
+und der Wächter hat jeden durchgelassen.
+
+**Aufgefallen ist es nur, weil der Test zuerst geschrieben wurde** und alle
+neun Prüfungen rot blieben, obwohl die Migration sauber durchlief. Ein Wächter,
+der nichts abweist, sieht von außen genauso aus wie ein Wächter, den es nicht
+gibt.
+
+**Entscheidung:** `public.mandant_grenze_gilt()` liest den JWT-Anspruch, den
+PostgREST als `request.jwt.claims` setzt. Kein JWT heißt Cron, Wartung oder
+direkte Verbindung — dort gibt es keinen Mandanten, an dem zu messen wäre.
+`service_role` bleibt ausgenommen: sie umgeht RLS ohnehin überall, das ist der
+Weg der Edge Functions.

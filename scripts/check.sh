@@ -43,6 +43,13 @@ else
   fehler=1
 fi
 
+abschnitt "Mandantengrenze: halten auch die Funktionen?"
+if scripts/lokale-db.sh psql -q -f tests/funktionen-mandant.sql; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Rechte: Sichtbarkeitsbereich und Modulrechte"
 if scripts/lokale-db.sh psql -q -f tests/rechte.sql; then
   :
