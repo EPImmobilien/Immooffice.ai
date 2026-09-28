@@ -193,6 +193,81 @@ begin
   reset role;
 end $$;
 
+-- --- 9) Mehrere Beteiligte: der Block statt der Einzelfelder ------------
+-- Wie viele Erben ein Vertrag hat, weiss beim Markieren niemand. Deshalb
+-- markiert der Makler nicht "den Namen", sondern "den Block" — die
+-- Anwendung setzt ihn aus allen Beteiligten zusammen.
+do $$
+declare neu uuid; meldung text;
+begin
+  insert into public.vorlagen_felder (vorlage_id, feld, zeiger_art, suchtext, vorkommen)
+  values ((select wert from wer where was='v_word'), 'verkaeufer_block', 'textstelle',
+          'Eheleute Mustermann', 1) returning id into neu;
+  insert into befund (pruefung, bestanden, bemerkung)
+  values ('Ein Block fuer alle Beteiligten laesst sich markieren', neu is not null, 'angelegt');
+
+  -- Jetzt zusaetzlich ein Einzelfeld derselben Gruppe: das gaebe den
+  -- Verkaeufer zweimal im Dokument.
+  begin
+    insert into public.vorlagen_felder (vorlage_id, feld, zeiger_art, suchtext)
+    values ((select wert from wer where was='v_word'), 'verkaeufer_name', 'textstelle', 'Mustermann');
+    insert into befund (pruefung, bestanden, bemerkung)
+      values ('Block und Einzelfeld derselben Gruppe schliessen sich aus', false, 'ging durch');
+  exception when others then
+    get stacked diagnostics meldung = message_text;
+    insert into befund (pruefung, bestanden, bemerkung)
+      values ('Block und Einzelfeld derselben Gruppe schliessen sich aus',
+              meldung like '%Entweder der Block%', left(meldung, 60));
+  end;
+
+  -- Ein Feld einer ANDEREN Gruppe stoert nicht.
+  begin
+    insert into public.vorlagen_felder (vorlage_id, feld, zeiger_art, suchtext)
+    values ((select wert from wer where was='v_word'), 'objekt_adresse', 'textstelle', 'Musterweg 1');
+    insert into befund (pruefung, bestanden, bemerkung)
+      values ('Eine andere Gruppe stoert den Block nicht', true, 'angelegt');
+  exception when others then
+    get stacked diagnostics meldung = message_text;
+    insert into befund (pruefung, bestanden, bemerkung)
+      values ('Eine andere Gruppe stoert den Block nicht', false, left(meldung, 60));
+  end;
+end $$;
+
+-- --- 10) Die Untergrenze der Schrift --------------------------------------
+-- Verkleinert wird bis hierher; darunter wandert der Rest auf eine Anlage.
+-- Eine Untergrenze ueber der Ausgangsgroesse waere Unsinn.
+do $$
+declare meldung text;
+begin
+  begin
+    insert into public.vorlagen_felder (vorlage_id, feld, zeiger_art, seite, x, y, breite, hoehe,
+                                        schriftgroesse, mindest_schriftgroesse)
+    values ((select wert from wer where was='v_pdf'), 'projektname', 'rechteck', 0, 10, 10, 50, 12, 9, 11);
+    insert into befund (pruefung, bestanden, bemerkung)
+      values ('Untergrenze ueber der Ausgangsgroesse wird abgewiesen', false, 'ging durch');
+  exception when check_violation then
+    insert into befund (pruefung, bestanden, bemerkung)
+      values ('Untergrenze ueber der Ausgangsgroesse wird abgewiesen', true, 'abgewiesen');
+  when others then
+    get stacked diagnostics meldung = message_text;
+    insert into befund (pruefung, bestanden, bemerkung)
+      values ('Untergrenze ueber der Ausgangsgroesse wird abgewiesen', false, left(meldung, 60));
+  end;
+end $$;
+
+-- --- 11) Der Katalog nennt Gruppe und Block -------------------------------
+insert into befund (pruefung, bestanden, bemerkung)
+select 'Jede Dokumentart hat genau ein Block-Feld je Beteiligten-Gruppe',
+       (select count(*) from jsonb_array_elements(public.vorlagen_feld_katalog('maklervertrag')) e
+         where (e->>'block')::boolean) = 1
+   and (select count(*) from jsonb_array_elements(public.vorlagen_feld_katalog('objektnachweis')) e
+         where (e->>'block')::boolean) = 1
+   and (select count(*) from jsonb_array_elements(public.vorlagen_feld_katalog('reservierung')) e
+         where (e->>'block')::boolean) = 1
+   and not exists (select 1 from jsonb_array_elements(public.vorlagen_feld_katalog('maklervertrag')) e
+                    where e->>'gruppe' is null),
+       'geprueft';
+
 select nr, case when bestanden is true then 'ok  ' else 'FEHL' end as ergebnis, pruefung, bemerkung
   from befund order by nr;
 

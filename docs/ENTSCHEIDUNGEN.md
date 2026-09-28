@@ -1771,3 +1771,48 @@ nachgewiesen an einem absichtlich unklaren Befund.
 `request.jwt.claims`, aber nie `set local role authenticated`, und
 `aktuelle_mandant_id()` liest ohnehin über `auth.uid()` aus `profiles`. Sie
 war grün, weil sonst nichts in der Tabelle stand.
+
+---
+
+## Mehrere Beteiligte: ein Block, nicht viele Felder (28.09.2026)
+
+**Frage:** „Was machen wir, wenn es eine Gemeinschaft ist, wo wir mehrere
+Kontaktadressen eintragen müssen?"
+
+Ein markiertes Rechteck ist **ein** Platz. Wie viele Erben ein Vertrag hat,
+weiß beim Markieren niemand. Die Vorlage hat darauf längst eine Antwort, und
+sie ist die richtige: `buildVerkaeuferBlock()` setzt aus N Beteiligten
+**einen mehrzeiligen Textblock** zusammen —
+
+```
+Erbengemeinschaft
+
+Erbe 1: <Name>
+<Straße>
+<PLZ Ort>
+
+Erbe 2: <Name>
+…
+```
+
+— und der steht an einer Stelle im Dokument. Genauso bei Eheleuten
+(„Eheleute" plus gemeinsamer Name) und bei einer Firma („vertreten durch",
+Registernummer).
+
+**Also markiert der Makler nicht „den Namen", sondern „den Block".** Jedes
+Feld im Katalog nennt jetzt seine Gruppe, und jede Beteiligten-Gruppe hat
+genau ein Block-Feld.
+
+**Entweder-oder, serverseitig erzwungen:** wer den Block markiert, markiert
+nicht zusätzlich die Einzelfelder derselben Gruppe. Beides zusammen stünde
+doppelt im Dokument, und welches gewänne, wäre Zufall. Felder anderer Gruppen
+stören nicht.
+
+**Der Überlauf im PDF, jetzt zu Ende gedacht.** „Schrift verkleinern, bis es
+passt" führt bei fünf Erben in einem Kasten für einen Namen zur
+Unlesbarkeit. Deshalb `mindest_schriftgroesse` (Vorgabe 7 pt): bis dahin wird
+verkleinert, darunter wandert der Rest auf eine **Anlage**, und im Kasten
+steht ein Verweis. Abgeschnitten wird nie — ein fehlender Beteiligter in
+einem Vertrag ist ein Rechtsmangel, keine Schönheitsfrage.
+
+Im Word stellt sich die Frage nicht: dort fließt der Text um.

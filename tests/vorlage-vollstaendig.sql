@@ -166,7 +166,10 @@ zuwachs(bereich, mehr, grund) as (values
   ('Primaer- und Eindeutigkeitsschluessel', 1, 'fork_24: ein Feld je Vorlage einmal'),
   ('Pruefbedingungen', 5, 'fork_24: Zeiger, Ausrichtung, Vollstaendigkeit, Schriftgroesse, Dateiformat'),
   ('Fremdschluessel', 2, 'fork_24: vorlage_id und mandant_id'),
-  ('Indizes ohne Constraint', 2, 'fork_24: je Vorlage und je Mandant')
+  ('Indizes ohne Constraint', 2, 'fork_24: je Vorlage und je Mandant'),
+  -- fork_25: mehrere Beteiligte in einem Block, mit Untergrenze der Schrift.
+  ('Spalten', 1, 'fork_25: vorlagen_felder.mindest_schriftgroesse'),
+  ('Pruefbedingungen', 1, 'fork_25: Untergrenze nicht ueber der Ausgangsgroesse')
 ),
 soll(bereich, soll) as (
   select v.bereich,
