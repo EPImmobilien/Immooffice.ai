@@ -11242,7 +11242,7 @@ function BildEditorPage({
         let i = l,
           o = l;
         "ur" === O && (i = e.width - a - l), "ul" === O && (i = l), "or" === O && (i = e.width - a - l, o = l), "ol" === O && (i = l, o = l), "dr" === O && (i = e.width - a - l, o = e.height - r - l), "dl" === O && (i = l, o = e.height - r - l), t.drawImage(n, i, o, a, r)
-      }, n.src = "logo2" === q ? EP_LOGO2_DATAURL : EP_LOGO_DATAURL
+      }, n.src = "logo2" === q ? IMMO_LOGO2_DATAURL : IMMO_LOGO_DATAURL
     }
   }, "Logo einfügen"))), React.createElement("div", {
     style: {
@@ -48467,8 +48467,8 @@ function ComingSoonStory({
     }
   }))
 }
-const EP_LOGO_DATAURL = "",
-  EP_LOGO2_DATAURL = "";
+const IMMO_LOGO_DATAURL = "",
+  IMMO_LOGO2_DATAURL = "";
 
 function macheQrDataUrl(e) {
   try {
@@ -48885,7 +48885,7 @@ function SchaufensterKachel({
       textShadow: "0 2px 24px rgba(0,0,0,0.35)"
     }
   }, n)), React.createElement("img", {
-    src: EP_LOGO_DATAURL,
+    src: IMMO_LOGO_DATAURL,
     alt: "Musterhaus Immobilien GmbH",
     crossOrigin: "anonymous",
     style: {
@@ -49414,7 +49414,7 @@ function PortalHauptbildKachel({
       justifyContent: "center"
     }
   }, React.createElement("img", {
-    src: EP_LOGO_DATAURL,
+    src: IMMO_LOGO_DATAURL,
     alt: "Musterhaus Immobilien GmbH",
     crossOrigin: "anonymous",
     style: {
@@ -75904,7 +75904,7 @@ function ConfigError() {
     }
   }, "Bei Netlify: ", React.createElement("strong", null, "Site Settings → Environment Variables"), " die Variablen", " ", React.createElement("code", null, "VITE_SUPABASE_URL"), " und ", React.createElement("code", null, "VITE_SUPABASE_ANON_KEY"), " setzen, dann neu deployen.")))
 }
-const EP_SIGNATUR = "Für Rückfragen stehen wir Ihnen gerne zur Verfügung!\n\nMit freundlichen Grüßen\n\n{absender_name}\n{absender_rolle}\n\n{firma_name}\n{firma_zusatz}\n\n{firma_register}\n{firma_strasse}\n{firma_plz_ort}\nGeschäftsführer: {firma_geschaeftsfuehrer}\nTel.: {firma_telefon}\nMail: {firma_email}\nWeb: {firma_web}\nInstagram: {firma_instagram}\n---\nDie Inhalte dieser E-Mail einschließlich eventueller Anhänge sind vertraulich. Sollten Sie nicht der beabsichtigte Empfänger dieser E-Mail sein, bitten wir Sie, den Inhalt umgehend zu löschen und uns darüber zu informieren. Bevor diese E-Mail versendet wurde, wurde sie auf Viren überprüft. Dennoch empfehlen wir, aufgrund der möglichen Gefahr während der Übertragung eine erneute Virenprüfung vorzunehmen. Wir übernehmen keine Haftung für eine mögliche Virenkontamination.\n\nThis email and its attachments are confidential. Please delete any misdirected emails immediately and notify us. We have checked the email for virus contamination before sending it; however, we recommend performing a virus scan due to potential risks during transmission. We disclaim any liability for virus contamination.",
+const IMMO_SIGNATUR = "Für Rückfragen stehen wir Ihnen gerne zur Verfügung!\n\nMit freundlichen Grüßen\n\n{absender_name}\n{absender_rolle}\n\n{firma_name}\n{firma_zusatz}\n\n{firma_register}\n{firma_strasse}\n{firma_plz_ort}\nGeschäftsführer: {firma_geschaeftsfuehrer}\nTel.: {firma_telefon}\nMail: {firma_email}\nWeb: {firma_web}\nInstagram: {firma_instagram}\n---\nDie Inhalte dieser E-Mail einschließlich eventueller Anhänge sind vertraulich. Sollten Sie nicht der beabsichtigte Empfänger dieser E-Mail sein, bitten wir Sie, den Inhalt umgehend zu löschen und uns darüber zu informieren. Bevor diese E-Mail versendet wurde, wurde sie auf Viren überprüft. Dennoch empfehlen wir, aufgrund der möglichen Gefahr während der Übertragung eine erneute Virenprüfung vorzunehmen. Wir übernehmen keine Haftung für eine mögliche Virenkontamination.\n\nThis email and its attachments are confidential. Please delete any misdirected emails immediately and notify us. We have checked the email for virus contamination before sending it; however, we recommend performing a virus scan due to potential risks during transmission. We disclaim any liability for virus contamination.",
   MIETANFRAGE_VORLAGEN = [{
     key: "empfangsbestaetigung",
     label: "Empfangsbestätigung",
@@ -77545,7 +77545,7 @@ var nspell = (() => {
     i.correct = s(), i.suggest = d(), i.spell = u(), i.add = A(), i.remove = f(), i.wordCharacters = p(), i.dictionary = b(), i.personal = y()
   })()
 })();
-const EP_SPELL = {
+const IMMO_SPELL = {
   status: "leer",
   sp: null,
   laden: null,
@@ -77564,39 +77564,39 @@ const EP_SPELL = {
 };
 
 function epSpellLaden() {
-  return EP_SPELL.laden || (EP_SPELL.status = "laedt", EP_SPELL.laden = (async () => {
+  return IMMO_SPELL.laden || (IMMO_SPELL.status = "laedt", IMMO_SPELL.laden = (async () => {
     try {
       if ("function" != typeof nspell) throw new Error("nspell fehlt");
-      const [e, t] = await Promise.all([fetch(EP_SPELL.URL_AFF).then(e => {
+      const [e, t] = await Promise.all([fetch(IMMO_SPELL.URL_AFF).then(e => {
         if (!e.ok) throw new Error("aff " + e.status);
         return e.text()
-      }), fetch(EP_SPELL.URL_DIC).then(e => {
+      }), fetch(IMMO_SPELL.URL_DIC).then(e => {
         if (!e.ok) throw new Error("dic " + e.status);
         return e.text()
       })]);
-      EP_SPELL.sp = nspell({
+      IMMO_SPELL.sp = nspell({
         aff: e,
         dic: t
-      }), EP_SPELL.status = "bereit"
+      }), IMMO_SPELL.status = "bereit"
     } catch (e) {
-      console.warn("Rechtschreibprüfung: Wörterbuch nicht geladen", e), EP_SPELL.status = "fehler"
+      console.warn("Rechtschreibprüfung: Wörterbuch nicht geladen", e), IMMO_SPELL.status = "fehler"
     }
-    return EP_SPELL.status
-  })()), EP_SPELL.laden
+    return IMMO_SPELL.status
+  })()), IMMO_SPELL.laden
 }
 
 function epSpellMerken(e) {
-  EP_SPELL.eigene.add(e), EP_SPELL.cache.delete(e);
+  IMMO_SPELL.eigene.add(e), IMMO_SPELL.cache.delete(e);
   try {
-    localStorage.setItem("ep_rechtschreibung_eigene", JSON.stringify([...EP_SPELL.eigene].filter(e => !EP_SPELL_FACH.has(e))))
+    localStorage.setItem("ep_rechtschreibung_eigene", JSON.stringify([...IMMO_SPELL.eigene].filter(e => !IMMO_SPELL_FACH.has(e))))
   } catch (e) {}
-} ["Exposé", "Exposés", "onOffice", "ImmoScout24", "ImmoScout", "Immowelt", "Kleinanzeigen", "Musterhaus", "ImmoOffice", "SCHUFA", "Schufa", "Courtage", "Bauträger", "Hebe-Schiebe-Tür", "Objektnachweis", "Reservierungsvereinbarung", "Marktpreiseinschätzung", "Selbstauskunft", "Mieterselbstauskunft", "Übergabeprotokoll", "Notarlaufzettel", "Dr", "Prof", "Nr", "Str", "Tel", "Fa", "Hr", "Fr", "ca", "bzw", "evtl", "ggf", "inkl", "exkl", "zzgl", "usw", "etc", "vgl", "bspw", "gem", "lt", "Mio", "Tsd", "MwSt", "Mwst", "USt", "Whg", "Zi", "OG", "EG", "DG", "UG", "KG", "Abs", "Art", "Az", "Pos", "St", "Std", "Min", "Sa", "So", "Mo", "Di", "Mi", "Do", "Jan", "Feb", "Mrz", "Apr", "Jun", "Jul", "Aug", "Sep", "Sept", "Okt", "Nov", "Dez", "Tsd", "qm", "m²", "PLZ", "WEG", "ETW", "EFH", "MFH", "DHH", "RH", "REH", "RMH", "Bj", "Wfl", "Nfl", "Gfl", "GmbH", "AG", "e", "V", "z", "B", "u", "a", "o", "ä", "s", "S", "d", "h", "i", "p"].forEach(e => EP_SPELL.eigene.add(e));
-const EP_SPELL_FACH = new Set(EP_SPELL.eigene),
+} ["Exposé", "Exposés", "onOffice", "ImmoScout24", "ImmoScout", "Immowelt", "Kleinanzeigen", "Musterhaus", "ImmoOffice", "SCHUFA", "Schufa", "Courtage", "Bauträger", "Hebe-Schiebe-Tür", "Objektnachweis", "Reservierungsvereinbarung", "Marktpreiseinschätzung", "Selbstauskunft", "Mieterselbstauskunft", "Übergabeprotokoll", "Notarlaufzettel", "Dr", "Prof", "Nr", "Str", "Tel", "Fa", "Hr", "Fr", "ca", "bzw", "evtl", "ggf", "inkl", "exkl", "zzgl", "usw", "etc", "vgl", "bspw", "gem", "lt", "Mio", "Tsd", "MwSt", "Mwst", "USt", "Whg", "Zi", "OG", "EG", "DG", "UG", "KG", "Abs", "Art", "Az", "Pos", "St", "Std", "Min", "Sa", "So", "Mo", "Di", "Mi", "Do", "Jan", "Feb", "Mrz", "Apr", "Jun", "Jul", "Aug", "Sep", "Sept", "Okt", "Nov", "Dez", "Tsd", "qm", "m²", "PLZ", "WEG", "ETW", "EFH", "MFH", "DHH", "RH", "REH", "RMH", "Bj", "Wfl", "Nfl", "Gfl", "GmbH", "AG", "e", "V", "z", "B", "u", "a", "o", "ä", "s", "S", "d", "h", "i", "p"].forEach(e => IMMO_SPELL.eigene.add(e));
+const IMMO_SPELL_FACH = new Set(IMMO_SPELL.eigene),
   epSpellGross = e => e ? e[0].toUpperCase() + e.slice(1) : e;
 
 function epSpellBasis(e) {
-  const t = EP_SPELL.sp;
-  return !t || !e || (!!(EP_SPELL.eigene.has(e) || EP_SPELL.eigene.has(e.toLowerCase()) || EP_SPELL.eigene.has(epSpellGross(e.toLowerCase()))) || (!(!EP_SPELL.namen.has(e) && !EP_SPELL.namen.has(e.toLowerCase())) || (t.correct(e) || t.correct(epSpellGross(e)) || t.correct(e.toLowerCase()))))
+  const t = IMMO_SPELL.sp;
+  return !t || !e || (!!(IMMO_SPELL.eigene.has(e) || IMMO_SPELL.eigene.has(e.toLowerCase()) || IMMO_SPELL.eigene.has(epSpellGross(e.toLowerCase()))) || (!(!IMMO_SPELL.namen.has(e) && !IMMO_SPELL.namen.has(e.toLowerCase())) || (t.correct(e) || t.correct(epSpellGross(e)) || t.correct(e.toLowerCase()))))
 }
 
 function epSpellOk(e, t) {
@@ -77620,16 +77620,16 @@ function epSpellOk(e, t) {
 }
 
 function epSpellWortOk(e) {
-  if ("bereit" !== EP_SPELL.status) return !0;
-  if (EP_SPELL.ignoriert.has(e)) return !0;
-  const t = EP_SPELL.cache.get(e);
+  if ("bereit" !== IMMO_SPELL.status) return !0;
+  if (IMMO_SPELL.ignoriert.has(e)) return !0;
+  const t = IMMO_SPELL.cache.get(e);
   if (void 0 !== t) return t;
   const n = epSpellOk(e, 0);
-  return EP_SPELL.cache.set(e, n), n
+  return IMMO_SPELL.cache.set(e, n), n
 }
 
 function epSpellVorschlaege(e) {
-  const t = EP_SPELL.sp;
+  const t = IMMO_SPELL.sp;
   if (!t) return [];
   try {
     let n = t.suggest(e).slice(0, 5);
@@ -77645,10 +77645,10 @@ function epSpellVorschlaege(e) {
     return []
   }
 }
-const EP_SPELL_ANREDE = /^(herr|herrn|frau|familie|hallo|liebe|lieber|dr|prof|geehrte|geehrter|geehrtes|sehr|ehepaar|fam|firma|fa)\.?$/i;
+const IMMO_SPELL_ANREDE = /^(herr|herrn|frau|familie|hallo|liebe|lieber|dr|prof|geehrte|geehrter|geehrtes|sehr|ehepaar|fam|firma|fa)\.?$/i;
 
 function epSpellFehler(e, t) {
-  if ("bereit" !== EP_SPELL.status || !e) return [];
+  if ("bereit" !== IMMO_SPELL.status || !e) return [];
   const n = Math.min(null == t ? e.length : t, e.length),
     a = e.slice(0, n),
     r = [];
@@ -77660,7 +77660,7 @@ function epSpellFehler(e, t) {
       n = e.index,
       o = n + t.length,
       s = i;
-    i = t, t.length < 2 || (r.some(([e, t]) => n >= e && o <= t) || /\d/.test(a.slice(Math.max(0, n - 1), o + 1)) || /^[A-ZÄÖÜ]{2,}$/.test(t) || EP_SPELL_ANREDE.test(s) && /^[A-ZÄÖÜ]/.test(t) || epSpellWortOk(t) || l.push({
+    i = t, t.length < 2 || (r.some(([e, t]) => n >= e && o <= t) || /\d/.test(a.slice(Math.max(0, n - 1), o + 1)) || /^[A-ZÄÖÜ]{2,}$/.test(t) || IMMO_SPELL_ANREDE.test(s) && /^[A-ZÄÖÜ]/.test(t) || epSpellWortOk(t) || l.push({
       start: n,
       end: o,
       wort: t
@@ -78082,7 +78082,7 @@ function epHtmlZuText(e) {
     e.appendChild(document.createTextNode("\n"))
   }), t.textContent.replace(/\u00a0/g, " ").replace(/\n{3,}/g, "\n\n").replace(/\n+$/, "")
 }
-const EP_EDITOR_FARBEN = [{
+const IMMO_EDITOR_FARBEN = [{
   n: "Navy",
   c: "#263159"
 }, {
@@ -78120,14 +78120,14 @@ function MailRichEditor({
     [d, u] = useState(!1),
     [m, g] = useState({}),
     A = !a && "undefined" != typeof CSS && CSS.highlights && "undefined" != typeof Highlight,
-    [f, p] = useState("bereit" === EP_SPELL.status),
+    [f, p] = useState("bereit" === IMMO_SPELL.status),
     [h, b] = useState(null),
     y = React.useRef([]);
   useEffect(() => {
     if (!A) return;
     let e = !0;
     if (epSpellLaden().then(() => {
-        e && p("bereit" === EP_SPELL.status)
+        e && p("bereit" === IMMO_SPELL.status)
       }), !document.getElementById("ep-spell-css")) {
       const e = document.createElement("style");
       e.id = "ep-spell-css", e.textContent = "::highlight(ep-tippfehler){text-decoration:underline wavy #c83c3c;text-decoration-skip-ink:none}", document.head.appendChild(e)
@@ -78335,7 +78335,7 @@ function MailRichEditor({
       fontFamily: FONT,
       marginRight: 2
     }
-  }, "Farbe:"), EP_EDITOR_FARBEN.map(e => React.createElement("button", {
+  }, "Farbe:"), IMMO_EDITOR_FARBEN.map(e => React.createElement("button", {
     key: e.c,
     type: "button",
     title: e.n,
@@ -78456,7 +78456,7 @@ function MailRichEditor({
   }, "keine Vorschläge"), React.createElement("button", {
     type: "button",
     onClick: () => {
-      h && (EP_SPELL.ignoriert.add(h.wort), EP_SPELL.cache.delete(h.wort), b(null), setTimeout(E, 0))
+      h && (IMMO_SPELL.ignoriert.add(h.wort), IMMO_SPELL.cache.delete(h.wort), b(null), setTimeout(E, 0))
     },
     title: "Wort in dieser Sitzung nicht mehr markieren",
     style: {
@@ -78481,19 +78481,19 @@ function SpellTextarea({
   namen: i,
   onKeyDown: o
 }) {
-  const [s, c] = useState("bereit" === EP_SPELL.status), [d, u] = useState([]), [m, g] = useState(null), A = React.useRef(null), f = React.useRef(null), p = n || f, h = !r;
+  const [s, c] = useState("bereit" === IMMO_SPELL.status), [d, u] = useState([]), [m, g] = useState(null), A = React.useRef(null), f = React.useRef(null), p = n || f, h = !r;
   useEffect(() => {
     if (!h) return;
     let e = !0;
     return epSpellLaden().then(() => {
-      e && c("bereit" === EP_SPELL.status)
+      e && c("bereit" === IMMO_SPELL.status)
     }), () => {
       e = !1
     }
   }, [h]), useEffect(() => {
     if (i && i.size) {
-      for (const e of i) EP_SPELL.namen.add(e);
-      EP_SPELL.cache.clear()
+      for (const e of i) IMMO_SPELL.namen.add(e);
+      IMMO_SPELL.cache.clear()
     }
   }, [i]), useEffect(() => {
     if (!h || !s) return void u([]);
@@ -78608,7 +78608,7 @@ function SpellTextarea({
     type: "button",
     onMouseDown: e => e.preventDefault(),
     onClick: () => {
-      m && (EP_SPELL.ignoriert.add(m.wort), EP_SPELL.cache.delete(m.wort), g(null), u(epSpellFehler(e || "", l)))
+      m && (IMMO_SPELL.ignoriert.add(m.wort), IMMO_SPELL.cache.delete(m.wort), g(null), u(epSpellFehler(e || "", l)))
     },
     title: "In dieser Sitzung nicht mehr anstreichen",
     style: w
@@ -78642,7 +78642,7 @@ function SpellTextarea({
     spellCheck: !0,
     lang: "de",
     style: y
-  })), h && "laedt" === EP_SPELL.status && React.createElement("div", {
+  })), h && "laedt" === IMMO_SPELL.status && React.createElement("div", {
     style: {
       fontSize: 10,
       color: CI.muted,
@@ -122772,7 +122772,7 @@ function App() {
   }))
 }
 const rootEl = document.getElementById("root");
-!window.EP_EXPOSE_MODE && rootEl && ReactDOM.createRoot(rootEl).render(React.createElement(App, null)), setTimeout(() => {
+!window.IMMO_EXPOSE_MODE && rootEl && ReactDOM.createRoot(rootEl).render(React.createElement(App, null)), setTimeout(() => {
   const e = document.getElementById("loadingScreen");
   e && (e.classList.add("hidden"), setTimeout(() => e.style.display = "none", 500))
 }, 400);
@@ -127314,11 +127314,11 @@ function dashTermineOffen(liste) {
  *   - alles, was der Kopf-Handler (errorOverlay) VOR dem Laden dieses Moduls
  *     in window._epFehlerWarteschlange gelegt hat
  *
- * Schutz vor Fluten: je Sitzung höchstens EP_FEHLER_MAX Meldungen und jede
+ * Schutz vor Fluten: je Sitzung höchstens IMMO_FEHLER_MAX Meldungen und jede
  * Meldung (Schlüssel = Text + erste Stack-Zeile) nur einmal.
  */
 
-const EP_FEHLER_MAX = 25;
+const IMMO_FEHLER_MAX = 25;
 const epFehlerGesehen = new Set();
 let epFehlerGesendet = 0;
 let epFehlerVersionCache = null;
@@ -127413,7 +127413,7 @@ function epFehlerMerken(f) {
   if (/ResizeObserver loop/.test(meldung)) return false;
   const schl = epFehlerSchluessel(meldung, f.stack);
   if (epFehlerGesehen.has(schl)) return false;
-  if (epFehlerGesendet >= EP_FEHLER_MAX) return false;
+  if (epFehlerGesendet >= IMMO_FEHLER_MAX) return false;
   epFehlerGesehen.add(schl);
   epFehlerGesendet++;
   epFehlerAusstehend.push({ ...f, meldung, zeit: f.zeit || Date.now() });
@@ -127584,17 +127584,17 @@ function AdminFehler({ user }) {
  *   - window.epOffline: { sync, ausgangSenden, lade, stand, istOffline, ... }
  */
 
-const EP_OFF_DB = "immooffice-offline";
-const EP_OFF_DB_VERSION = 1;
-const EP_OFF_AUFFRISCHEN_MIN = 30;
-const EP_OFF_TERMINE_TAGE = 14;
+const IMMO_OFF_DB = "immooffice-offline";
+const IMMO_OFF_DB_VERSION = 1;
+const IMMO_OFF_AUFFRISCHEN_MIN = 30;
+const IMMO_OFF_TERMINE_TAGE = 14;
 
 let epOffDbVersprechen = null;
 function epOffDb() {
   if (epOffDbVersprechen) return epOffDbVersprechen;
   epOffDbVersprechen = new Promise((ok, fehler) => {
     if (!window.indexedDB) { fehler(new Error("IndexedDB steht nicht zur Verfügung.")); return; }
-    const anfrage = indexedDB.open(EP_OFF_DB, EP_OFF_DB_VERSION);
+    const anfrage = indexedDB.open(IMMO_OFF_DB, IMMO_OFF_DB_VERSION);
     anfrage.onupgradeneeded = () => {
       const db = anfrage.result;
       if (!db.objectStoreNames.contains("daten")) db.createObjectStore("daten", { keyPath: "name" });
@@ -127644,7 +127644,7 @@ function epOffDatum(verschiebungTage) {
   return d.toISOString().slice(0, 10);
 }
 
-const EP_OFF_QUELLEN = {
+const IMMO_OFF_QUELLEN = {
   immobilien: (sb) => sb.from("immobilien")
     .select("id, immo_nr, bezeichnung, objekttitel, strasse, hausnummer, plz, ort, etage, wohnungsnr, objektart, objekttyp, vertragsart, status, angebotspreis, kaltmiete, nebenkosten, wohnflaeche, nutzflaeche, grundstueck, zimmer, baujahr, zustaendig_id, notizen, updated_at")
     .neq("status", "archiviert").order("updated_at", { ascending: false }).limit(1500),
@@ -127653,7 +127653,7 @@ const EP_OFF_QUELLEN = {
     .order("updated_at", { ascending: false }).limit(4000),
   termine: (sb) => sb.from("termine")
     .select("id, titel, datum, uhrzeit, ende, datum_ende, ganztags, ort, art, notiz, status, ersteller_id, ersteller_name, teilnehmer, immobilie_id, kontakt_id")
-    .gte("datum", epOffDatum(-1)).lte("datum", epOffDatum(EP_OFF_TERMINE_TAGE))
+    .gte("datum", epOffDatum(-1)).lte("datum", epOffDatum(IMMO_OFF_TERMINE_TAGE))
     .neq("status", "storniert").order("datum", { ascending: true }).order("uhrzeit", { ascending: true }).limit(600),
   uebergabeprotokolle: (sb) => sb.from("uebergabeprotokoll")
     .select("id, protokoll_typ, kontext, uebergabe_datum, uebergabe_uhrzeit, objekt_adresse, vermieter_name, mieter_name, status, ersteller_id, updated_at")
@@ -127679,9 +127679,9 @@ function epOffSync(grund) {
       await epOffPut("daten", { name: "nutzer", stand: new Date().toISOString(),
         wert: { id: window._currentUserId, name: window._currentUserName || "", rolle: window._currentUserRole || "" } });
     } catch (e) { ergebnis.fehler.push("Speicher: " + (e.message || e)); }
-    for (const name of Object.keys(EP_OFF_QUELLEN)) {
+    for (const name of Object.keys(IMMO_OFF_QUELLEN)) {
       try {
-        const { data, error } = await EP_OFF_QUELLEN[name](window._sb);
+        const { data, error } = await IMMO_OFF_QUELLEN[name](window._sb);
         if (error) throw error;
         await epOffPut("daten", { name, stand: new Date().toISOString(), liste: data || [] });
       } catch (e) {
@@ -127712,9 +127712,9 @@ async function epOffLade(name) {
 
 /* ---------- Ausgang ---------- */
 
-const EP_OFF_AUFNAHME_ZAHLEN = ["grundstuecksgroesse_m2", "wohnflaeche_m2", "nutzflaeche_m2", "anzahl_zimmer", "nettokaltmiete_monat_eur", "energiekennwert_kwh_m2_a", "einschaetzung_marktwert_eur"];
-const EP_OFF_AUFNAHME_GANZZAHLEN = ["eigentuemer_seit_jahr", "baujahr", "anzahl_schlafzimmer", "anzahl_badezimmer", "badezimmer_mit_fenster", "heizungsbaujahr"];
-const EP_OFF_AUFNAHME_LISTEN = ["bodenbelaege", "besonderheiten"];
+const IMMO_OFF_AUFNAHME_ZAHLEN = ["grundstuecksgroesse_m2", "wohnflaeche_m2", "nutzflaeche_m2", "anzahl_zimmer", "nettokaltmiete_monat_eur", "energiekennwert_kwh_m2_a", "einschaetzung_marktwert_eur"];
+const IMMO_OFF_AUFNAHME_GANZZAHLEN = ["eigentuemer_seit_jahr", "baujahr", "anzahl_schlafzimmer", "anzahl_badezimmer", "badezimmer_mit_fenster", "heizungsbaujahr"];
+const IMMO_OFF_AUFNAHME_LISTEN = ["bodenbelaege", "besonderheiten"];
 
 function epOffZahl(w, ganz) {
   if (w === "" || w == null) return null;
@@ -127729,9 +127729,9 @@ function epOffAufnahmeSatz(daten, uid, name) {
   Object.keys(daten || {}).forEach((k) => {
     const w = daten[k];
     if (k === "id" || k === "fotos") return;
-    if (EP_OFF_AUFNAHME_ZAHLEN.includes(k)) satz[k] = epOffZahl(w, false);
-    else if (EP_OFF_AUFNAHME_GANZZAHLEN.includes(k)) satz[k] = epOffZahl(w, true);
-    else if (EP_OFF_AUFNAHME_LISTEN.includes(k)) satz[k] = Array.isArray(w) && w.length ? w : null;
+    if (IMMO_OFF_AUFNAHME_ZAHLEN.includes(k)) satz[k] = epOffZahl(w, false);
+    else if (IMMO_OFF_AUFNAHME_GANZZAHLEN.includes(k)) satz[k] = epOffZahl(w, true);
+    else if (IMMO_OFF_AUFNAHME_LISTEN.includes(k)) satz[k] = Array.isArray(w) && w.length ? w : null;
     else if (typeof w === "boolean") satz[k] = w;
     else if (w === "" || w === undefined) satz[k] = null;
     else satz[k] = w;
@@ -127846,7 +127846,7 @@ async function epOffAuffrischenWennAlt(grund) {
   if (epOffIstOffline() || !window._sb || !window._currentUserId) return;
   const stand = await epOffStand();
   const alter = stand ? (Date.now() - new Date(stand).getTime()) / 60000 : Infinity;
-  if (alter >= EP_OFF_AUFFRISCHEN_MIN) await epOffSync(grund);
+  if (alter >= IMMO_OFF_AUFFRISCHEN_MIN) await epOffSync(grund);
   else await epOffAusgangSenden().catch(() => {});
 }
 
@@ -127886,7 +127886,7 @@ try { epOffStarten(); } catch (e) { console.warn("[Offline] Start:", e && e.mess
 
 const epOffH = React.createElement;
 
-const EP_OFF_STIL = {
+const IMMO_OFF_STIL = {
   feld: { width: "100%", boxSizing: "border-box", padding: "10px 11px", border: `1px solid ${CI.border}`, borderRadius: 6, fontFamily: FONT, fontSize: 15, color: CI.blau, background: "#fff" },
   label: { display: "block", fontSize: 12, fontWeight: 600, color: CI.muted, marginBottom: 4, textTransform: "uppercase", letterSpacing: ".04em" },
   knopf: (aktiv, farbe) => ({ padding: "9px 14px", borderRadius: 6, border: `1px solid ${aktiv ? (farbe || CI.blau) : CI.border}`, background: aktiv ? (farbe || CI.blau) : "#fff", color: aktiv ? "#fff" : CI.blau, cursor: "pointer", fontSize: 14, fontFamily: FONT, fontWeight: 600 }),
@@ -127895,16 +127895,16 @@ const EP_OFF_STIL = {
 
 function OffFeld({ label, children, breit }) {
   return epOffH("div", { style: { marginBottom: 12, gridColumn: breit ? "1 / -1" : undefined } },
-    label && epOffH("label", { style: EP_OFF_STIL.label }, label), children);
+    label && epOffH("label", { style: IMMO_OFF_STIL.label }, label), children);
 }
 
 function OffText({ wert, onChange, platzhalter, zeilen, typ, inputMode }) {
-  if (zeilen) return epOffH("textarea", { value: wert || "", placeholder: platzhalter || "", rows: zeilen, onChange: (e) => onChange(e.target.value), style: { ...EP_OFF_STIL.feld, resize: "vertical" } });
-  return epOffH("input", { type: typ || "text", inputMode: inputMode, value: wert == null ? "" : wert, placeholder: platzhalter || "", onChange: (e) => onChange(e.target.value), style: EP_OFF_STIL.feld });
+  if (zeilen) return epOffH("textarea", { value: wert || "", placeholder: platzhalter || "", rows: zeilen, onChange: (e) => onChange(e.target.value), style: { ...IMMO_OFF_STIL.feld, resize: "vertical" } });
+  return epOffH("input", { type: typ || "text", inputMode: inputMode, value: wert == null ? "" : wert, placeholder: platzhalter || "", onChange: (e) => onChange(e.target.value), style: IMMO_OFF_STIL.feld });
 }
 
 function OffAuswahl({ wert, onChange, optionen, leer }) {
-  return epOffH("select", { value: wert || "", onChange: (e) => onChange(e.target.value), style: EP_OFF_STIL.feld },
+  return epOffH("select", { value: wert || "", onChange: (e) => onChange(e.target.value), style: IMMO_OFF_STIL.feld },
     epOffH("option", { value: "" }, leer || "— bitte wählen —"),
     optionen.map((o) => { const v = typeof o === "string" ? o : o.v, l = typeof o === "string" ? o : o.l; return epOffH("option", { key: v, value: v }, l); }));
 }
@@ -127917,11 +127917,11 @@ function OffSchalter({ wert, onChange, label }) {
 function OffChips({ werte, onChange, optionen }) {
   const liste = Array.isArray(werte) ? werte : [];
   return epOffH("div", { style: { display: "flex", flexWrap: "wrap", gap: 8 } },
-    optionen.map((o) => epOffH("button", { key: o, type: "button", onClick: () => onChange(liste.includes(o) ? liste.filter((x) => x !== o) : [...liste, o]), style: { ...EP_OFF_STIL.knopf(liste.includes(o), CI.gold), padding: "7px 11px", fontSize: 13 } }, o)));
+    optionen.map((o) => epOffH("button", { key: o, type: "button", onClick: () => onChange(liste.includes(o) ? liste.filter((x) => x !== o) : [...liste, o]), style: { ...IMMO_OFF_STIL.knopf(liste.includes(o), CI.gold), padding: "7px 11px", fontSize: 13 } }, o)));
 }
 
 function OffAbschnitt({ titel, offen, onToggle, children, hinweis }) {
-  return epOffH("div", { style: EP_OFF_STIL.karte, "data-off-abschnitt": titel },
+  return epOffH("div", { style: IMMO_OFF_STIL.karte, "data-off-abschnitt": titel },
     epOffH("div", { onClick: onToggle, style: { display: "flex", alignItems: "center", cursor: "pointer", gap: 8 } },
       epOffH("div", { style: { fontWeight: 700, color: CI.blau, fontSize: 16, flex: 1 } }, titel),
       hinweis && epOffH("span", { style: { fontSize: 12, color: CI.muted } }, hinweis),
@@ -127976,8 +127976,8 @@ function OffFotoLeiste({ fotos, onHinzu, onWeg, klein }) {
         epOffH("img", { src: f.vorschau || f.dataUrl, alt: f.name || "", style: { width: klein ? 64 : 88, height: klein ? 64 : 88, objectFit: "cover", borderRadius: 6, border: `1px solid ${CI.border}` } }),
         epOffH("button", { type: "button", onClick: () => onWeg(i), title: "Foto entfernen", style: { position: "absolute", top: -6, right: -6, width: 22, height: 22, borderRadius: 11, border: "none", background: CI.danger, color: "#fff", cursor: "pointer", fontSize: 12, lineHeight: "22px", padding: 0 } }, "✕")))),
     epOffH("div", { style: { display: "flex", gap: 8 } },
-      epOffH("button", { type: "button", disabled: laeuft, onClick: () => refKamera.current && refKamera.current.click(), style: { ...EP_OFF_STIL.knopf(false), padding: "7px 11px", fontSize: 13 } }, laeuft ? "…" : "📷 Foto aufnehmen"),
-      epOffH("button", { type: "button", disabled: laeuft, onClick: () => ref.current && ref.current.click(), style: { ...EP_OFF_STIL.knopf(false), padding: "7px 11px", fontSize: 13 } }, "🖼 Aus Mediathek")),
+      epOffH("button", { type: "button", disabled: laeuft, onClick: () => refKamera.current && refKamera.current.click(), style: { ...IMMO_OFF_STIL.knopf(false), padding: "7px 11px", fontSize: 13 } }, laeuft ? "…" : "📷 Foto aufnehmen"),
+      epOffH("button", { type: "button", disabled: laeuft, onClick: () => ref.current && ref.current.click(), style: { ...IMMO_OFF_STIL.knopf(false), padding: "7px 11px", fontSize: 13 } }, "🖼 Aus Mediathek")),
     epOffH("input", { ref: refKamera, type: "file", accept: "image/*", capture: "environment", style: { display: "none" }, onChange: (e) => { aufnehmen(e.target.files); e.target.value = ""; } }),
     epOffH("input", { ref: ref, type: "file", accept: "image/*", multiple: true, style: { display: "none" }, onChange: (e) => { aufnehmen(e.target.files); e.target.value = ""; } }));
 }
@@ -127999,7 +127999,7 @@ function OffUnterschrift({ wert, onChange, label }) {
   const ende = () => { if (!zeichnet.current) return; zeichnet.current = false; onChange(ref.current.toDataURL("image/png")); };
   const loeschen = () => { const c = ref.current; c.getContext("2d").clearRect(0, 0, c.width, c.height); setLeer(true); onChange(""); };
   return epOffH("div", { style: { marginBottom: 12 } },
-    epOffH("label", { style: EP_OFF_STIL.label }, label),
+    epOffH("label", { style: IMMO_OFF_STIL.label }, label),
     epOffH("canvas", { ref, width: 600, height: 200, "data-off-unterschrift": label,
       onMouseDown: start, onMouseMove: zieh, onMouseUp: ende, onMouseLeave: ende,
       onTouchStart: start, onTouchMove: zieh, onTouchEnd: ende,
@@ -128025,7 +128025,7 @@ function useOffEntwurf(id, art, daten, fotos) {
 
 function OffKopf({ titel, unter, onAbbruch, rechts }) {
   return epOffH("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 14 } },
-    epOffH("button", { type: "button", onClick: onAbbruch, style: { ...EP_OFF_STIL.knopf(false), padding: "7px 11px" } }, "‹ Zurück"),
+    epOffH("button", { type: "button", onClick: onAbbruch, style: { ...IMMO_OFF_STIL.knopf(false), padding: "7px 11px" } }, "‹ Zurück"),
     epOffH("div", { style: { flex: 1, minWidth: 0 } },
       epOffH("div", { style: { fontWeight: 700, color: CI.blau, fontSize: 17 } }, titel),
       unter && epOffH("div", { style: { fontSize: 12, color: CI.muted } }, unter)),
@@ -128036,9 +128036,9 @@ function OffKopf({ titel, unter, onAbbruch, rechts }) {
  *  Übergabeprotokoll (offline)
  * ===================================================================== */
 
-const EP_OFF_UEB_SCHLUESSEL = ["Wohnungstür", "Haustür", "Briefkasten", "Keller", "Dachboden", "Tiefgarage", "Müllraum", "Schließanlage"];
-const EP_OFF_UEB_ZAEHLER = [{ art: "Strom", einheit: "kWh" }, { art: "Gas", einheit: "m³" }, { art: "Wasser (kalt)", einheit: "m³" }, { art: "Wasser (warm)", einheit: "m³" }, { art: "Heizung", einheit: "MWh" }, { art: "Wärmemengenzähler", einheit: "kWh" }, { art: "Sonstiges", einheit: "" }];
-const EP_OFF_UEB_RAEUME = ["Wohnzimmer", "Schlafzimmer", "Küche", "Bad", "WC", "Flur / Diele", "Keller", "Balkon / Terrasse"];
+const IMMO_OFF_UEB_SCHLUESSEL = ["Wohnungstür", "Haustür", "Briefkasten", "Keller", "Dachboden", "Tiefgarage", "Müllraum", "Schließanlage"];
+const IMMO_OFF_UEB_ZAEHLER = [{ art: "Strom", einheit: "kWh" }, { art: "Gas", einheit: "m³" }, { art: "Wasser (kalt)", einheit: "m³" }, { art: "Wasser (warm)", einheit: "m³" }, { art: "Heizung", einheit: "MWh" }, { art: "Wärmemengenzähler", einheit: "kWh" }, { art: "Sonstiges", einheit: "" }];
+const IMMO_OFF_UEB_RAEUME = ["Wohnzimmer", "Schlafzimmer", "Küche", "Bad", "WC", "Flur / Diele", "Keller", "Balkon / Terrasse"];
 
 function epOffUebergabeLeer(vorbelegung) {
   const v = vorbelegung || {};
@@ -128086,9 +128086,9 @@ function OfflineUebergabeprotokoll({ user, entwurf, vorbelegung, onFertig, onAbb
     OffKopf({ titel: "Übergabeprotokoll", unter: "offline erfasst — wird gesendet, sobald Netz da ist", onAbbruch }),
     epOffH(OffAbschnitt, { titel: "Allgemein", offen: !!offen.allgemein, onToggle: () => um("allgemein") },
       epOffH("div", { style: { display: "flex", gap: 8, marginBottom: 12 } },
-        [["vermietung", "Vermietung"], ["verkauf", "Verkauf"]].map(([v, l]) => epOffH("button", { key: v, type: "button", onClick: () => t("kontext", v), style: { ...EP_OFF_STIL.knopf(m.kontext === v), flex: 1 } }, l))),
+        [["vermietung", "Vermietung"], ["verkauf", "Verkauf"]].map(([v, l]) => epOffH("button", { key: v, type: "button", onClick: () => t("kontext", v), style: { ...IMMO_OFF_STIL.knopf(m.kontext === v), flex: 1 } }, l))),
       epOffH("div", { style: { display: "flex", gap: 8, marginBottom: 12 } },
-        [["einzug", verkauf ? "Schlüsselübergabe" : "Einzug"], ["auszug", verkauf ? "Rückabwicklung" : "Auszug"]].map(([v, l]) => epOffH("button", { key: v, type: "button", onClick: () => t("protokoll_typ", v), style: { ...EP_OFF_STIL.knopf(m.protokoll_typ === v, v === "einzug" ? "#2da14b" : "#c1272d"), flex: 1 } }, l))),
+        [["einzug", verkauf ? "Schlüsselübergabe" : "Einzug"], ["auszug", verkauf ? "Rückabwicklung" : "Auszug"]].map(([v, l]) => epOffH("button", { key: v, type: "button", onClick: () => t("protokoll_typ", v), style: { ...IMMO_OFF_STIL.knopf(m.protokoll_typ === v, v === "einzug" ? "#2da14b" : "#c1272d"), flex: 1 } }, l))),
       epOffH("div", { style: zwei },
         epOffH(OffFeld, { label: "Datum" }, epOffH(OffText, { typ: "date", wert: m.uebergabe_datum, onChange: (w) => t("uebergabe_datum", w) })),
         epOffH(OffFeld, { label: "Uhrzeit" }, epOffH(OffText, { typ: "time", wert: m.uebergabe_uhrzeit, onChange: (w) => t("uebergabe_uhrzeit", w) }))),
@@ -128110,7 +128110,7 @@ function OfflineUebergabeprotokoll({ user, entwurf, vorbelegung, onFertig, onAbb
         epOffH(OffText, { wert: z.bemerkung, onChange: (w) => zeile("schluessel", i, "bemerkung", w), platzhalter: "Bemerkung" }),
         epOffH("button", { type: "button", onClick: () => weg("schluessel", i), style: { background: "none", border: "none", color: CI.danger, fontSize: 18, cursor: "pointer" } }, "✕"))),
       epOffH("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
-        EP_OFF_UEB_SCHLUESSEL.map((a) => epOffH("button", { key: a, type: "button", onClick: () => t("schluessel", [...m.schluessel, { id: Date.now() + Math.random(), art: a, anzahl: 1, bemerkung: "", foto_data_urls: [] }]), style: { ...EP_OFF_STIL.knopf(false), padding: "6px 10px", fontSize: 13 } }, "+ " + a)))),
+        IMMO_OFF_UEB_SCHLUESSEL.map((a) => epOffH("button", { key: a, type: "button", onClick: () => t("schluessel", [...m.schluessel, { id: Date.now() + Math.random(), art: a, anzahl: 1, bemerkung: "", foto_data_urls: [] }]), style: { ...IMMO_OFF_STIL.knopf(false), padding: "6px 10px", fontSize: 13 } }, "+ " + a)))),
     epOffH(OffAbschnitt, { titel: "Zählerstände", offen: !!offen.zaehler, onToggle: () => um("zaehler"), hinweis: m.zaehler.length ? m.zaehler.length + " Zähler" : "" },
       m.zaehler.map((z, i) => epOffH("div", { key: z.id, style: { border: `1px solid ${CI.border}`, borderRadius: 8, padding: 10, marginBottom: 10 } },
         epOffH("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 8 } },
@@ -128124,21 +128124,21 @@ function OfflineUebergabeprotokoll({ user, entwurf, vorbelegung, onFertig, onAbb
           onHinzu: (f) => zeile("zaehler", i, "foto_data_urls", [...(z.foto_data_urls || []), f.dataUrl]),
           onWeg: (j) => zeile("zaehler", i, "foto_data_urls", (z.foto_data_urls || []).filter((_, k) => k !== j)) }))),
       epOffH("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
-        EP_OFF_UEB_ZAEHLER.map((z) => epOffH("button", { key: z.art, type: "button", onClick: () => t("zaehler", [...m.zaehler, { id: Date.now() + Math.random(), art: z.art, einheit: z.einheit, nummer: "", stand: "", bemerkung: "", foto_data_urls: [] }]), style: { ...EP_OFF_STIL.knopf(false), padding: "6px 10px", fontSize: 13 } }, "+ " + z.art)))),
+        IMMO_OFF_UEB_ZAEHLER.map((z) => epOffH("button", { key: z.art, type: "button", onClick: () => t("zaehler", [...m.zaehler, { id: Date.now() + Math.random(), art: z.art, einheit: z.einheit, nummer: "", stand: "", bemerkung: "", foto_data_urls: [] }]), style: { ...IMMO_OFF_STIL.knopf(false), padding: "6px 10px", fontSize: 13 } }, "+ " + z.art)))),
     epOffH(OffAbschnitt, { titel: "Räume und Zustand", offen: !!offen.raeume, onToggle: () => um("raeume"), hinweis: m.raeume.length ? m.raeume.length + " Räume" : "" },
       m.raeume.map((r, i) => epOffH("div", { key: r.id, style: { border: `1px solid ${CI.border}`, borderRadius: 8, padding: 10, marginBottom: 10 } },
         epOffH("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 8 } },
-          epOffH("input", { value: r.name, onChange: (e) => zeile("raeume", i, "name", e.target.value), style: { ...EP_OFF_STIL.feld, fontWeight: 700, flex: 1 } }),
+          epOffH("input", { value: r.name, onChange: (e) => zeile("raeume", i, "name", e.target.value), style: { ...IMMO_OFF_STIL.feld, fontWeight: 700, flex: 1 } }),
           epOffH("button", { type: "button", onClick: () => weg("raeume", i), style: { background: "none", border: "none", color: CI.danger, fontSize: 18, cursor: "pointer" } }, "✕")),
         epOffH(OffText, { zeilen: 3, wert: r.notizen, onChange: (w) => zeile("raeume", i, "notizen", w), platzhalter: "Zustand, Mängel, Besonderheiten …" }),
         epOffH(OffFotoLeiste, { fotos: (r.foto_data_urls || []).map((d) => ({ dataUrl: d })),
           onHinzu: (f) => zeile("raeume", i, "foto_data_urls", [...(r.foto_data_urls || []), f.dataUrl]),
           onWeg: (j) => zeile("raeume", i, "foto_data_urls", (r.foto_data_urls || []).filter((_, k) => k !== j)) }))),
       epOffH("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
-        [...EP_OFF_UEB_RAEUME, "Weiterer Raum"].map((n) => epOffH("button", { key: n, type: "button", onClick: () => t("raeume", [...m.raeume, { id: Date.now() + Math.random(), name: n === "Weiterer Raum" ? "" : n, notizen: "", foto_data_urls: [], foto_pfade: [] }]), style: { ...EP_OFF_STIL.knopf(false), padding: "6px 10px", fontSize: 13 } }, "+ " + n)))),
+        [...IMMO_OFF_UEB_RAEUME, "Weiterer Raum"].map((n) => epOffH("button", { key: n, type: "button", onClick: () => t("raeume", [...m.raeume, { id: Date.now() + Math.random(), name: n === "Weiterer Raum" ? "" : n, notizen: "", foto_data_urls: [], foto_pfade: [] }]), style: { ...IMMO_OFF_STIL.knopf(false), padding: "6px 10px", fontSize: 13 } }, "+ " + n)))),
     epOffH(OffAbschnitt, { titel: "Rauchmelder und Übergaben", offen: !!offen.sonst, onToggle: () => um("sonst") },
       epOffH("div", { style: { display: "flex", gap: 8, marginBottom: 12 } },
-        [["vermieter", "Vom " + parteiA], ["mieter", "Vom " + parteiB], ["keine", "Nicht vorhanden"]].map(([v, l]) => epOffH("button", { key: v, type: "button", onClick: () => t("rauchmelder_typ", v), style: { ...EP_OFF_STIL.knopf(m.rauchmelder_typ === v, CI.gold), flex: 1, padding: "8px 6px", fontSize: 13 } }, l))),
+        [["vermieter", "Vom " + parteiA], ["mieter", "Vom " + parteiB], ["keine", "Nicht vorhanden"]].map(([v, l]) => epOffH("button", { key: v, type: "button", onClick: () => t("rauchmelder_typ", v), style: { ...IMMO_OFF_STIL.knopf(m.rauchmelder_typ === v, CI.gold), flex: 1, padding: "8px 6px", fontSize: 13 } }, l))),
       m.rauchmelder_typ !== "keine" && epOffH("div", { style: zwei },
         epOffH(OffFeld, { label: "Anzahl" }, epOffH(OffText, { typ: "number", inputMode: "numeric", wert: m.rauchmelder_anzahl, onChange: (w) => t("rauchmelder_anzahl", w) })),
         epOffH(OffSchalter, { wert: m.rauchmelder_funktioniert, onChange: (w) => t("rauchmelder_funktioniert", w), label: "funktionieren" })),
@@ -128151,16 +128151,16 @@ function OfflineUebergabeprotokoll({ user, entwurf, vorbelegung, onFertig, onAbb
       epOffH(OffUnterschrift, { label: parteiA, wert: m.unterschrift_vermieter, onChange: (w) => t("unterschrift_vermieter", w) }),
       epOffH(OffUnterschrift, { label: parteiB, wert: m.unterschrift_mieter, onChange: (w) => t("unterschrift_mieter", w) })),
     epOffH("div", { style: { display: "flex", gap: 10, marginTop: 6, marginBottom: 30 } },
-      epOffH("button", { type: "button", onClick: onAbbruch, style: { ...EP_OFF_STIL.knopf(false), flex: 1 } }, "Als Entwurf behalten"),
-      epOffH("button", { type: "button", disabled: laeuft, onClick: fertig, "data-off-fertig": "1", style: { ...EP_OFF_STIL.knopf(true, CI.gold), flex: 2 } }, laeuft ? "…" : "Fertig – in den Ausgang")));
+      epOffH("button", { type: "button", onClick: onAbbruch, style: { ...IMMO_OFF_STIL.knopf(false), flex: 1 } }, "Als Entwurf behalten"),
+      epOffH("button", { type: "button", disabled: laeuft, onClick: fertig, "data-off-fertig": "1", style: { ...IMMO_OFF_STIL.knopf(true, CI.gold), flex: 2 } }, laeuft ? "…" : "Fertig – in den Ausgang")));
 }
 
 /* =====================================================================
  *  Objektaufnahme (offline)
  * ===================================================================== */
 
-const EP_OFF_OA_OBJEKTARTEN = ["Einfamilienhaus", "Doppelhaushälfte", "Reihenhaus", "Reihenendhaus", "Eigentumswohnung", "Mehrfamilienhaus", "Bungalow", "Villa", "Grundstück", "Gewerbe"];
-const EP_OFF_OA_ABSCHNITTE = [
+const IMMO_OFF_OA_OBJEKTARTEN = ["Einfamilienhaus", "Doppelhaushälfte", "Reihenhaus", "Reihenendhaus", "Eigentumswohnung", "Mehrfamilienhaus", "Bungalow", "Villa", "Grundstück", "Gewerbe"];
+const IMMO_OFF_OA_ABSCHNITTE = [
   { id: "allgemein", titel: "Allgemein" }, { id: "lage", titel: "Lage" }, { id: "grundstueck", titel: "Grundstück" },
   { id: "gebaeude", titel: "Gebäude" }, { id: "wohnflaeche", titel: "Flächen und Räume" }, { id: "ausstattung", titel: "Ausstattung" },
   { id: "zustand", titel: "Zustand und Nutzung" }, { id: "unterlagen", titel: "Unterlagen" }, { id: "hinweise", titel: "Hinweise" },
@@ -128212,53 +128212,53 @@ function OfflineObjektaufnahme({ user, entwurf, vorbelegung, onFertig, onAbbruch
 
   return epOffH("div", { "data-off-formular": "objektaufnahme" },
     OffKopf({ titel: "Objektaufnahme", unter: "offline erfasst — Fotos werden mit der Aufnahme hochgeladen", onAbbruch }),
-    abschnitt(EP_OFF_OA_ABSCHNITTE[0], epOffH(React.Fragment, null,
+    abschnitt(IMMO_OFF_OA_ABSCHNITTE[0], epOffH(React.Fragment, null,
       epOffH(OffFeld, { label: "Objektadresse *" }, epOffH(OffText, { wert: s.objektadresse, onChange: (w) => P("objektadresse", w), platzhalter: "Straße Nr., PLZ Ort" })),
-      wahl("objektart", "Objektart", EP_OFF_OA_OBJEKTARTEN),
+      wahl("objektart", "Objektart", IMMO_OFF_OA_OBJEKTARTEN),
       text("ansprechpartner_eigentuemer", "Ansprechpartner / Eigentümer"),
       text("telefon_email", "Telefon / E-Mail"),
       epOffH("div", { style: zwei }, zahl("eigentuemer_seit_jahr", "Eigentümer seit (Jahr)"),
         wahl("verkauf_zeitrahmen", "Verkauf", [{ v: "sofort", l: "sofort" }, { v: "in_vorbereitung", l: "in Vorbereitung" }, { v: "spaeter", l: "zu späterem Zeitpunkt" }])))),
-    abschnitt(EP_OFF_OA_ABSCHNITTE[1], epOffH(React.Fragment, null,
+    abschnitt(IMMO_OFF_OA_ABSCHNITTE[1], epOffH(React.Fragment, null,
       text("ortsteil_wohnlage", "Ortsteil / Wohnlage"), lang("infrastruktur", "Infrastruktur"), lang("einkauf_schulen_oepnv", "Einkauf, Schulen, ÖPNV"), lang("besondere_lagevorteile", "Besondere Lagevorteile"))),
-    abschnitt(EP_OFF_OA_ABSCHNITTE[2], epOffH(React.Fragment, null,
+    abschnitt(IMMO_OFF_OA_ABSCHNITTE[2], epOffH(React.Fragment, null,
       epOffH("div", { style: zwei }, zahl("grundstuecksgroesse_m2", "Grundstück (m²)"),
         wahl("erschliessung", "Erschließung", [{ v: "voll", l: "voll erschlossen" }, { v: "teilweise", l: "teilweise erschlossen" }, { v: "nicht", l: "nicht erschlossen" }])),
       epOffH("div", { style: zwei }, wahl("zufahrt", "Zufahrt", [{ v: "oeffentlich", l: "öffentlich" }, { v: "privatweg", l: "Privatweg" }]),
         epOffH(OffFeld, { label: "Bebauungsplan" }, epOffH(OffSchalter, { wert: !!s.bebauungsplan_vorhanden, onChange: (w) => P("bebauungsplan_vorhanden", w), label: "vorhanden" }))),
       epOffH("div", { style: zwei }, text("grundbuchblatt_nr", "Grundbuchblatt"), text("flur_flurstueck", "Flur / Flurstück")))),
-    abschnitt(EP_OFF_OA_ABSCHNITTE[3], epOffH(React.Fragment, null,
+    abschnitt(IMMO_OFF_OA_ABSCHNITTE[3], epOffH(React.Fragment, null,
       epOffH("div", { style: zwei }, zahl("baujahr", "Baujahr"), wahl("bauweise", "Bauweise", ["massiv", "Holz", "Fertigbau", "sonstige"])),
       lang("modernisierungen_sanierungen", "Modernisierungen / Sanierungen"),
       epOffH("div", { style: zwei }, wahl("dach", "Dach", ["Satteldach", "Flachdach", "Walmdach", "anderes"]), wahl("keller", "Keller", [{ v: "ja_voll", l: "ja, voll" }, { v: "ja_teilw", l: "ja, teilw." }, { v: "nein", l: "nein" }])),
       epOffH("div", { style: zwei }, text("geschosse", "Geschosse"), text("fenster", "Fenster")))),
-    abschnitt(EP_OFF_OA_ABSCHNITTE[4], epOffH(React.Fragment, null,
+    abschnitt(IMMO_OFF_OA_ABSCHNITTE[4], epOffH(React.Fragment, null,
       epOffH("div", { style: zwei }, zahl("wohnflaeche_m2", "Wohnfläche (m²)"), zahl("nutzflaeche_m2", "Nutzfläche (m²)")),
       epOffH("div", { style: zwei }, zahl("anzahl_zimmer", "Zimmer"), zahl("anzahl_schlafzimmer", "Schlafzimmer")),
       epOffH("div", { style: zwei }, zahl("anzahl_badezimmer", "Badezimmer"), zahl("badezimmer_mit_fenster", "… davon mit Fenster")),
       ja("gaeste_wc", "Gäste-WC"), ja("balkon_terrasse", "Balkon / Terrasse"),
       text("garage_stellplatz_carport", "Garage / Stellplatz / Carport"))),
-    abschnitt(EP_OFF_OA_ABSCHNITTE[5], epOffH(React.Fragment, null,
+    abschnitt(IMMO_OFF_OA_ABSCHNITTE[5], epOffH(React.Fragment, null,
       epOffH(OffFeld, { label: "Bodenbeläge" }, epOffH(OffChips, { werte: s.bodenbelaege, onChange: (w) => P("bodenbelaege", w), optionen: ["Fliesen", "Parkett", "Laminat", "Teppich", "Vinyl"] })),
       epOffH("div", { style: zwei }, wahl("heizung_energietraeger", "Heizung / Energieträger", ["Gas", "Öl", "Wärmepumpe", "Fernwärme", "Elektro", "Sonstige"]), zahl("heizungsbaujahr", "Heizung Baujahr")),
       epOffH("div", { style: zwei }, epOffH(OffFeld, { label: "Energieausweis" }, epOffH(OffSchalter, { wert: !!s.energieausweis_vorhanden, onChange: (w) => P("energieausweis_vorhanden", w), label: "vorhanden" })), zahl("energiekennwert_kwh_m2_a", "Kennwert (kWh/m²a)")),
       epOffH(OffFeld, { label: "Besonderheiten" }, epOffH(OffChips, { werte: s.besonderheiten, onChange: (w) => P("besonderheiten", w), optionen: ["Kamin", "Fußbodenheizung", "PV-Anlage", "Einbauküche", "Alarmanlage", "Sauna", "Pool"] })),
       lang("einbauten_massmoebel", "Einbauten / Maßmöbel"))),
-    abschnitt(EP_OFF_OA_ABSCHNITTE[6], epOffH(React.Fragment, null,
+    abschnitt(IMMO_OFF_OA_ABSCHNITTE[6], epOffH(React.Fragment, null,
       wahl("allgemeiner_zustand", "Allgemeiner Zustand", ["sehr gut", "gut", "renovierungsbedürftig", "sanierungsbedürftig"]),
       lang("bekannte_maengel", "Bekannte Mängel / Schäden"), text("letzte_renovierung", "Letzte Renovierung"),
       wahl("nutzungssituation", "Nutzung", [{ v: "leer", l: "leer" }, { v: "eigengenutzt", l: "eigengenutzt" }, { v: "vermietet", l: "vermietet" }]),
       s.nutzungssituation === "vermietet" && epOffH("div", { style: zwei }, zahl("nettokaltmiete_monat_eur", "Nettokaltmiete (€/Monat)"), text("mietvertrag_seit", "Mietvertrag seit")))),
-    abschnitt(EP_OFF_OA_ABSCHNITTE[7], epOffH(React.Fragment, null,
+    abschnitt(IMMO_OFF_OA_ABSCHNITTE[7], epOffH(React.Fragment, null,
       [["doc_grundriss", "Grundriss"], ["doc_flurkarte_lageplan", "Flurkarte / Lageplan"], ["doc_energieausweis", "Energieausweis"], ["doc_grundbuchauszug", "Grundbuchauszug"], ["doc_bauplaene_baubeschreibung", "Baupläne / Baubeschreibung"], ["doc_wohnflaechenberechnung", "Wohnflächenberechnung"], ["doc_teilungserklaerung", "Teilungserklärung"], ["doc_protokolle_eigentuemerversammlung", "Protokolle Eigentümerversammlung"], ["doc_abrechnungen_wirtschaftsplan", "Abrechnungen / Wirtschaftsplan"]]
         .map(([k, l]) => epOffH(OffSchalter, { key: k, wert: !!s[k], onChange: (w) => P(k, w), label: l })))),
-    abschnitt(EP_OFF_OA_ABSCHNITTE[8], lang("besonderheiten_hinweise", "Besonderheiten / Hinweise")),
-    abschnitt(EP_OFF_OA_ABSCHNITTE[9], epOffH(React.Fragment, null,
+    abschnitt(IMMO_OFF_OA_ABSCHNITTE[8], lang("besonderheiten_hinweise", "Besonderheiten / Hinweise")),
+    abschnitt(IMMO_OFF_OA_ABSCHNITTE[9], epOffH(React.Fragment, null,
       zahl("einschaetzung_marktwert_eur", "Einschätzung Marktwert (€)"), lang("vermarktungshinweise", "Vermarktungshinweise"), lang("empfohlene_massnahmen", "Empfohlene Maßnahmen"),
       text("termin_objektfotos", "Termin Objektfotos"), text("ansprechpartner_besichtigungen", "Ansprechpartner Besichtigungen"))),
     epOffH("div", { style: { display: "flex", gap: 10, marginTop: 6, marginBottom: 30 } },
-      epOffH("button", { type: "button", onClick: onAbbruch, style: { ...EP_OFF_STIL.knopf(false), flex: 1 } }, "Als Entwurf behalten"),
-      epOffH("button", { type: "button", disabled: laeuft, onClick: fertig, "data-off-fertig": "1", style: { ...EP_OFF_STIL.knopf(true, CI.gold), flex: 2 } }, laeuft ? "…" : `Fertig – in den Ausgang${fotos.length ? " (" + fotos.length + " Fotos)" : ""}`)));
+      epOffH("button", { type: "button", onClick: onAbbruch, style: { ...IMMO_OFF_STIL.knopf(false), flex: 1 } }, "Als Entwurf behalten"),
+      epOffH("button", { type: "button", disabled: laeuft, onClick: fertig, "data-off-fertig": "1", style: { ...IMMO_OFF_STIL.knopf(true, CI.gold), flex: 2 } }, laeuft ? "…" : `Fertig – in den Ausgang${fotos.length ? " (" + fotos.length + " Fotos)" : ""}`)));
 }
 
 /*
@@ -128323,7 +128323,7 @@ function OffLeer({ text }) {
 
 function OffSuche({ wert, onChange, platzhalter }) {
   return epOffH("input", { type: "search", value: wert, onChange: (e) => onChange(e.target.value), placeholder: platzhalter, "data-off-suche": "1",
-    style: { ...EP_OFF_STIL.feld, marginBottom: 10 } });
+    style: { ...IMMO_OFF_STIL.feld, marginBottom: 10 } });
 }
 
 function OffDetailZeile(label, wert) {
@@ -128412,7 +128412,7 @@ function OfflineMappe({ user, eigenstaendig, eingebettet, onClose, startReiter }
     const o = objektVon(ansicht.id);
     inhalt = !o ? epOffH(OffLeer, { text: "Objekt nicht in der Mappe." }) : epOffH("div", null,
       OffKopf({ titel: epOffObjektName(o), unter: epOffObjektAdresse(o), onAbbruch: () => setAnsicht({ typ: "liste" }) }),
-      epOffH("div", { style: EP_OFF_STIL.karte },
+      epOffH("div", { style: IMMO_OFF_STIL.karte },
         OffDetailZeile("Status", o.status), OffDetailZeile("Vertragsart", o.vertragsart), OffDetailZeile("Objektart", [o.objektart, o.objekttyp].filter(Boolean).join(" · ")),
         OffDetailZeile("Etage / Wohnung", [o.etage, o.wohnungsnr].filter(Boolean).join(" / ")),
         OffDetailZeile(o.vertragsart === "miete" || o.kaltmiete ? "Kaltmiete" : "Angebotspreis", epOffGeld(o.vertragsart === "miete" || (!o.angebotspreis && o.kaltmiete) ? o.kaltmiete : o.angebotspreis)),
@@ -128420,10 +128420,10 @@ function OfflineMappe({ user, eigenstaendig, eingebettet, onClose, startReiter }
         OffDetailZeile("Grundstück", o.grundstueck ? o.grundstueck + " m²" : ""), OffDetailZeile("Zimmer", o.zimmer), OffDetailZeile("Baujahr", o.baujahr),
         OffDetailZeile("Notizen", o.notizen)),
       epOffH("div", { style: { display: "flex", gap: 10, flexWrap: "wrap" } },
-        epOffH("button", { type: "button", "data-off-neu": "uebergabeprotokoll", onClick: () => setAnsicht({ typ: "formular", art: "uebergabeprotokoll", vorbelegung: { objekt_adresse: epOffObjektAdresse(o), objekt_etage: o.etage || "", kontext: o.vertragsart === "miete" ? "vermietung" : "verkauf" } }), style: { ...EP_OFF_STIL.knopf(false), flex: 1 } }, "📋 Übergabeprotokoll"),
-        epOffH("button", { type: "button", "data-off-neu": "objektaufnahme", onClick: () => setAnsicht({ typ: "formular", art: "objektaufnahme", vorbelegung: { objektadresse: epOffObjektAdresse(o), objektart: o.objektart || "", immobilie_id: o.id } }), style: { ...EP_OFF_STIL.knopf(false), flex: 1 } }, "🏠 Objektaufnahme")),
+        epOffH("button", { type: "button", "data-off-neu": "uebergabeprotokoll", onClick: () => setAnsicht({ typ: "formular", art: "uebergabeprotokoll", vorbelegung: { objekt_adresse: epOffObjektAdresse(o), objekt_etage: o.etage || "", kontext: o.vertragsart === "miete" ? "vermietung" : "verkauf" } }), style: { ...IMMO_OFF_STIL.knopf(false), flex: 1 } }, "📋 Übergabeprotokoll"),
+        epOffH("button", { type: "button", "data-off-neu": "objektaufnahme", onClick: () => setAnsicht({ typ: "formular", art: "objektaufnahme", vorbelegung: { objektadresse: epOffObjektAdresse(o), objektart: o.objektart || "", immobilie_id: o.id } }), style: { ...IMMO_OFF_STIL.knopf(false), flex: 1 } }, "🏠 Objektaufnahme")),
       epOffH("div", { style: { marginTop: 16 } },
-        epOffH("div", { style: { ...EP_OFF_STIL.label, marginBottom: 6 } }, "Termine zu diesem Objekt"),
+        epOffH("div", { style: { ...IMMO_OFF_STIL.label, marginBottom: 6 } }, "Termine zu diesem Objekt"),
         (daten.termine || []).filter((t) => t.immobilie_id === o.id).map((t) => epOffH(OffZeile, { key: t.id, links: t.titel || t.art || "Termin", rechts: epOffDatumText(t.datum) + (t.uhrzeit ? " " + String(t.uhrzeit).slice(0, 5) : ""), unter: t.ort, onClick: () => setAnsicht({ typ: "termin", id: t.id }) })),
         !(daten.termine || []).some((t) => t.immobilie_id === o.id) && epOffH("div", { style: { fontSize: 13, color: CI.muted } }, "keine in den nächsten 14 Tagen")));
   } else if (ansicht.typ === "kontakt") {
@@ -128431,7 +128431,7 @@ function OfflineMappe({ user, eigenstaendig, eingebettet, onClose, startReiter }
     const tel = (n) => n ? epOffH("a", { href: "tel:" + String(n).replace(/[^\d+]/g, ""), style: { color: CI.blau, fontWeight: 600 } }, "📞 " + n) : null;
     inhalt = !k ? epOffH(OffLeer, { text: "Kontakt nicht in der Mappe." }) : epOffH("div", null,
       OffKopf({ titel: epOffKontaktName(k), unter: [k.firma, (k.rollen || []).join(", ")].filter(Boolean).join(" · "), onAbbruch: () => setAnsicht({ typ: "liste" }) }),
-      epOffH("div", { style: EP_OFF_STIL.karte },
+      epOffH("div", { style: IMMO_OFF_STIL.karte },
         OffDetailZeile("Telefon", tel(k.telefon)), OffDetailZeile("Mobil", tel(k.mobil)),
         OffDetailZeile("E-Mail", k.email ? epOffH("a", { href: "mailto:" + k.email, style: { color: CI.blau } }, k.email) : null),
         OffDetailZeile("Anschrift", [k.strasse, [k.plz, k.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ")),
@@ -128442,7 +128442,7 @@ function OfflineMappe({ user, eigenstaendig, eingebettet, onClose, startReiter }
     const o = t && objektVon(t.immobilie_id), k = t && kontaktVon(t.kontakt_id);
     inhalt = !t ? epOffH(OffLeer, { text: "Termin nicht in der Mappe." }) : epOffH("div", null,
       OffKopf({ titel: t.titel || t.art || "Termin", unter: epOffDatumText(t.datum) + (t.ganztags ? " · ganztags" : t.uhrzeit ? " · " + String(t.uhrzeit).slice(0, 5) + (t.ende ? "–" + String(t.ende).slice(0, 5) : "") + " Uhr" : ""), onAbbruch: () => setAnsicht({ typ: "liste" }) }),
-      epOffH("div", { style: EP_OFF_STIL.karte },
+      epOffH("div", { style: IMMO_OFF_STIL.karte },
         OffDetailZeile("Art", t.art), OffDetailZeile("Ort", t.ort), OffDetailZeile("Status", t.status),
         OffDetailZeile("Objekt", o ? epOffH("a", { href: "#", onClick: (e) => { e.preventDefault(); setAnsicht({ typ: "objekt", id: o.id }); }, style: { color: CI.blau } }, epOffObjektName(o)) : null),
         OffDetailZeile("Kontakt", k ? epOffH("a", { href: "#", onClick: (e) => { e.preventDefault(); setAnsicht({ typ: "kontakt", id: k.id }); }, style: { color: CI.blau } }, epOffKontaktName(k)) : null),
@@ -128455,11 +128455,11 @@ function OfflineMappe({ user, eigenstaendig, eingebettet, onClose, startReiter }
     liste.forEach((t) => { let g = tage.find((x) => x.datum === t.datum); if (!g) { g = { datum: t.datum, termine: [] }; tage.push(g); } g.termine.push(t); });
     inhalt = epOffH("div", null,
       uid && epOffH("div", { style: { display: "flex", gap: 8, marginBottom: 10 } },
-        epOffH("button", { type: "button", onClick: () => setNurMeine(true), style: { ...EP_OFF_STIL.knopf(nurMeine), padding: "7px 12px", fontSize: 13 } }, "Meine"),
-        epOffH("button", { type: "button", onClick: () => setNurMeine(false), style: { ...EP_OFF_STIL.knopf(!nurMeine), padding: "7px 12px", fontSize: 13 } }, "Alle")),
+        epOffH("button", { type: "button", onClick: () => setNurMeine(true), style: { ...IMMO_OFF_STIL.knopf(nurMeine), padding: "7px 12px", fontSize: 13 } }, "Meine"),
+        epOffH("button", { type: "button", onClick: () => setNurMeine(false), style: { ...IMMO_OFF_STIL.knopf(!nurMeine), padding: "7px 12px", fontSize: 13 } }, "Alle")),
       !tage.length ? epOffH(OffLeer, { text: keineDaten ? "Noch keine Daten in der Mappe. Bitte einmal online anmelden — die Mappe füllt sich dann selbst." : "Keine Termine in den nächsten 14 Tagen." })
         : tage.map((g) => epOffH("div", { key: g.datum, style: { marginBottom: 14 } },
-            epOffH("div", { style: { ...EP_OFF_STIL.label, marginBottom: 4 } }, epOffDatumText(g.datum) + (g.datum === heute ? " · heute" : "")),
+            epOffH("div", { style: { ...IMMO_OFF_STIL.label, marginBottom: 4 } }, epOffDatumText(g.datum) + (g.datum === heute ? " · heute" : "")),
             epOffH("div", { style: { borderRadius: 8, overflow: "hidden", border: `1px solid ${CI.border}` } },
               g.termine.map((t) => { const o = objektVon(t.immobilie_id); return epOffH(OffZeile, { key: t.id, kennung: "termin", links: t.titel || t.art || "Termin", rechts: t.ganztags ? "ganztags" : (t.uhrzeit ? String(t.uhrzeit).slice(0, 5) : ""), unter: [t.ort, o ? epOffObjektName(o) : null, (t.teilnehmer || []).join(", ")].filter(Boolean).join(" · "), farbe: t.ersteller_id === uid ? CI.gold : CI.border, onClick: () => setAnsicht({ typ: "termin", id: t.id }) }); })))));
   } else if (reiter === "objekte") {
@@ -128480,10 +128480,10 @@ function OfflineMappe({ user, eigenstaendig, eingebettet, onClose, startReiter }
   } else if (reiter === "protokolle") {
     inhalt = epOffH("div", null,
       epOffH("div", { style: { display: "flex", gap: 10, marginBottom: 14 } },
-        epOffH("button", { type: "button", "data-off-neu": "uebergabeprotokoll", onClick: () => setAnsicht({ typ: "formular", art: "uebergabeprotokoll" }), style: { ...EP_OFF_STIL.knopf(true), flex: 1 } }, "＋ Übergabeprotokoll"),
-        epOffH("button", { type: "button", "data-off-neu": "objektaufnahme", onClick: () => setAnsicht({ typ: "formular", art: "objektaufnahme" }), style: { ...EP_OFF_STIL.knopf(true), flex: 1 } }, "＋ Objektaufnahme")),
+        epOffH("button", { type: "button", "data-off-neu": "uebergabeprotokoll", onClick: () => setAnsicht({ typ: "formular", art: "uebergabeprotokoll" }), style: { ...IMMO_OFF_STIL.knopf(true), flex: 1 } }, "＋ Übergabeprotokoll"),
+        epOffH("button", { type: "button", "data-off-neu": "objektaufnahme", onClick: () => setAnsicht({ typ: "formular", art: "objektaufnahme" }), style: { ...IMMO_OFF_STIL.knopf(true), flex: 1 } }, "＋ Objektaufnahme")),
       entwuerfe.length > 0 && epOffH("div", { style: { marginBottom: 14 } },
-        epOffH("div", { style: { ...EP_OFF_STIL.label, marginBottom: 4 } }, "Entwürfe auf diesem Gerät"),
+        epOffH("div", { style: { ...IMMO_OFF_STIL.label, marginBottom: 4 } }, "Entwürfe auf diesem Gerät"),
         epOffH("div", { style: { borderRadius: 8, overflow: "hidden", border: `1px solid ${CI.border}` } },
           entwuerfe.map((e) => epOffH(OffZeile, { key: e.id, kennung: "entwurf", farbe: CI.gold,
             links: (e.art === "uebergabeprotokoll" ? "Übergabeprotokoll: " : "Objektaufnahme: ") + ((e.daten && (e.daten.objekt_adresse || e.daten.objektadresse)) || "(ohne Adresse)"),
@@ -128491,16 +128491,16 @@ function OfflineMappe({ user, eigenstaendig, eingebettet, onClose, startReiter }
             rechts: epOffH("button", { type: "button", onClick: (ev) => { ev.stopPropagation(); if (confirm("Entwurf löschen?")) window.epOffline.del("entwuerfe", e.id).then(laden); }, style: { background: "none", border: "none", color: CI.danger, cursor: "pointer", fontSize: 13, fontFamily: FONT } }, "löschen"),
             onClick: () => setAnsicht({ typ: "formular", art: e.art, entwurf: e }) })))),
       ausgang.length > 0 && epOffH("div", { style: { marginBottom: 14 } },
-        epOffH("div", { style: { ...EP_OFF_STIL.label, marginBottom: 4 } }, "Im Ausgang"),
+        epOffH("div", { style: { ...IMMO_OFF_STIL.label, marginBottom: 4 } }, "Im Ausgang"),
         epOffH("div", { style: { borderRadius: 8, overflow: "hidden", border: `1px solid ${CI.border}` } },
           ausgang.slice(0, 10).map((e) => { const st = OffAusgangStatus(e); return epOffH(OffZeile, { key: e.id, farbe: st.farbe, links: (e.art === "uebergabeprotokoll" ? "Übergabeprotokoll: " : "Objektaufnahme: ") + ((e.daten && (e.daten.objekt_adresse || e.daten.objektadresse)) || ""), unter: epOffZeitText(e.erstellt), rechts: st.text }); }))),
       epOffH("div", { style: { marginBottom: 14 } },
-        epOffH("div", { style: { ...EP_OFF_STIL.label, marginBottom: 4 } }, "Übergabeprotokolle im Portal (" + (daten.protokolle || []).length + ")"),
+        epOffH("div", { style: { ...IMMO_OFF_STIL.label, marginBottom: 4 } }, "Übergabeprotokolle im Portal (" + (daten.protokolle || []).length + ")"),
         !(daten.protokolle || []).length ? epOffH("div", { style: { fontSize: 13, color: CI.muted } }, "keine vorgehalten")
           : epOffH("div", { style: { borderRadius: 8, overflow: "hidden", border: `1px solid ${CI.border}` } },
               (daten.protokolle || []).slice(0, 30).map((p) => epOffH(OffZeile, { key: p.id, links: (p.objekt_adresse || "(ohne Adresse)"), unter: [(p.protokoll_typ === "auszug" ? "Auszug" : "Einzug"), p.kontext, p.uebergabe_datum ? epOffDatumText(p.uebergabe_datum) : null, p.mieter_name].filter(Boolean).join(" · "), rechts: p.status })))),
       epOffH("div", null,
-        epOffH("div", { style: { ...EP_OFF_STIL.label, marginBottom: 4 } }, "Objektaufnahmen im Portal (" + (daten.aufnahmen || []).length + ")"),
+        epOffH("div", { style: { ...IMMO_OFF_STIL.label, marginBottom: 4 } }, "Objektaufnahmen im Portal (" + (daten.aufnahmen || []).length + ")"),
         !(daten.aufnahmen || []).length ? epOffH("div", { style: { fontSize: 13, color: CI.muted } }, "keine vorgehalten")
           : epOffH("div", { style: { borderRadius: 8, overflow: "hidden", border: `1px solid ${CI.border}` } },
               (daten.aufnahmen || []).slice(0, 30).map((a) => epOffH(OffZeile, { key: a.id, links: a.objektadresse || "(ohne Adresse)", unter: [a.objektart, a.ansprechpartner_eigentuemer, a.erstellt_von_name].filter(Boolean).join(" · "), rechts: a.status })))),
@@ -128509,9 +128509,9 @@ function OfflineMappe({ user, eigenstaendig, eingebettet, onClose, startReiter }
     inhalt = epOffH("div", null,
       epOffH("div", { style: { display: "flex", gap: 10, alignItems: "center", marginBottom: 12 } },
         epOffH("div", { style: { flex: 1, fontSize: 13, color: CI.muted } }, online ? "Wartende Einträge werden gesendet." : "Ohne Netz bleiben die Einträge hier, bis wieder Verbindung besteht."),
-        online && ausgang.some((e) => e.status !== "gesendet") && epOffH("button", { type: "button", "data-off-senden": "1", onClick: async () => { setLaeuft(true); await window.epOffline.ausgangSenden(); setLaeuft(false); laden(); }, disabled: laeuft, style: { ...EP_OFF_STIL.knopf(true, CI.gold), padding: "8px 12px", fontSize: 13 } }, laeuft ? "…" : "Jetzt senden")),
+        online && ausgang.some((e) => e.status !== "gesendet") && epOffH("button", { type: "button", "data-off-senden": "1", onClick: async () => { setLaeuft(true); await window.epOffline.ausgangSenden(); setLaeuft(false); laden(); }, disabled: laeuft, style: { ...IMMO_OFF_STIL.knopf(true, CI.gold), padding: "8px 12px", fontSize: 13 } }, laeuft ? "…" : "Jetzt senden")),
       !ausgang.length ? epOffH(OffLeer, { text: "Der Ausgang ist leer." })
-        : ausgang.map((e) => { const st = OffAusgangStatus(e); return epOffH("div", { key: e.id, "data-off-ausgang": e.status, style: { ...EP_OFF_STIL.karte, borderLeft: `4px solid ${st.farbe}` } },
+        : ausgang.map((e) => { const st = OffAusgangStatus(e); return epOffH("div", { key: e.id, "data-off-ausgang": e.status, style: { ...IMMO_OFF_STIL.karte, borderLeft: `4px solid ${st.farbe}` } },
             epOffH("div", { style: { display: "flex", gap: 8, alignItems: "center" } },
               epOffH("div", { style: { flex: 1, fontWeight: 600, color: CI.blau } }, (e.art === "uebergabeprotokoll" ? "Übergabeprotokoll" : "Objektaufnahme") + ": " + ((e.daten && (e.daten.objekt_adresse || e.daten.objektadresse)) || "")),
               epOffH("span", { style: { fontSize: 12, fontWeight: 700, color: st.farbe } }, st.text)),
@@ -128577,7 +128577,7 @@ function OfflineHinweis() {
  * alle 15 Minuten und wenn die App wieder in den Vordergrund kommt.
  */
 
-const EP_WIDGET_TAKT_MIN = 15;
+const IMMO_WIDGET_TAKT_MIN = 15;
 let epWidgetZuletzt = 0;
 let epWidgetLaeuft = false;
 
@@ -128654,7 +128654,7 @@ window.epWidgetAktualisieren = epWidgetAktualisieren;
     if (window._currentUserId && window._sb) {
       clearInterval(warte);
       epWidgetAktualisieren(true);
-      setInterval(() => epWidgetAktualisieren(true), EP_WIDGET_TAKT_MIN * 60000);
+      setInterval(() => epWidgetAktualisieren(true), IMMO_WIDGET_TAKT_MIN * 60000);
     } else if (versuche > 600) clearInterval(warte);
   }, 3000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) epWidgetAktualisieren(false); });
@@ -128698,7 +128698,7 @@ function epFreigabeEmailAngleichen(text, an) {
  * baut daraus den text/calendar-Teil (SMTP) bzw. den .ics-Anhang (Resend).
  */
 
-const EP_EINL_DOMAIN = "immooffice.immooffice.example";
+const IMMO_EINL_DOMAIN = "immooffice.immooffice.example";
 
 function epEinlIcsText(s) {
   return String(s == null ? "" : s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
@@ -128736,7 +128736,7 @@ function epEinladungIcs(termin, o) {
     "BEGIN:VTIMEZONE", "TZID:Europe/Berlin", "BEGIN:STANDARD", "DTSTART:19701025T030000", "RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU", "TZOFFSETFROM:+0200", "TZOFFSETTO:+0100", "TZNAME:CET", "END:STANDARD",
     "BEGIN:DAYLIGHT", "DTSTART:19700329T020000", "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU", "TZOFFSETFROM:+0100", "TZOFFSETTO:+0200", "TZNAME:CEST", "END:DAYLIGHT", "END:VTIMEZONE",
     "BEGIN:VEVENT",
-    `UID:${termin.id}@${EP_EINL_DOMAIN}`,
+    `UID:${termin.id}@${IMMO_EINL_DOMAIN}`,
     `DTSTAMP:${stamp}`,
     `SEQUENCE:${Number(o.sequence) || 0}`,
     start, ende,
@@ -128899,8 +128899,8 @@ function TerminEinladung({ termin, user, team }) {
  * „Anruferkennung“ mit dem Knopf zu den iOS-Einstellungen.
  */
 
-const EP_ANRUFER_TAKT_MS = 24 * 60 * 60 * 1000;
-const EP_ANRUFER_ROLLEN = { eigentuemer: "Eigentümer", interessent: "Interessent", kaeufer: "Käufer", mieter: "Mieter", verkaeufer: "Verkäufer", vermieter: "Vermieter", notar: "Notar", handwerker: "Handwerker", partner: "Partner", tippgeber: "Tippgeber" };
+const IMMO_ANRUFER_TAKT_MS = 24 * 60 * 60 * 1000;
+const IMMO_ANRUFER_ROLLEN = { eigentuemer: "Eigentümer", interessent: "Interessent", kaeufer: "Käufer", mieter: "Mieter", verkaeufer: "Verkäufer", vermieter: "Vermieter", notar: "Notar", handwerker: "Handwerker", partner: "Partner", tippgeber: "Tippgeber" };
 
 function epAnruferKann() {
   return !!(window.EPApp && window.EPApp.faehigkeiten && window.EPApp.faehigkeiten.anruferkennung && typeof window.EPApp.anruferkennung === "function");
@@ -128908,7 +128908,7 @@ function epAnruferKann() {
 
 function epAnruferName(k) {
   const name = [k.vorname, k.nachname].filter(Boolean).join(" ").trim();
-  const rolle = (k.rollen || []).map((r) => EP_ANRUFER_ROLLEN[r] || r).filter(Boolean)[0];
+  const rolle = (k.rollen || []).map((r) => IMMO_ANRUFER_ROLLEN[r] || r).filter(Boolean)[0];
   let s = name || k.firma || "";
   if (name && k.firma && k.firma !== name) s += " · " + k.firma;
   if (rolle) s += " (" + rolle + ")";
@@ -128952,7 +128952,7 @@ async function epAnruferAktualisieren(erzwingen) {
     const summe = epAnruferPruefsumme(liste);
     let merk = {};
     try { merk = JSON.parse(localStorage.getItem("epAnruferkennung") || "{}"); } catch (e) {}
-    if (!erzwingen && merk.summe === summe && merk.status === "aktiv" && Date.now() - (merk.zeit || 0) < EP_ANRUFER_TAKT_MS) {
+    if (!erzwingen && merk.summe === summe && merk.status === "aktiv" && Date.now() - (merk.zeit || 0) < IMMO_ANRUFER_TAKT_MS) {
       return { status: merk.status, anzahl: liste.length, unveraendert: true };
     }
     const ergebnis = await window.EPApp.anruferkennung({ stand: new Date().toISOString(), eintraege: liste });
@@ -131842,10 +131842,10 @@ async function epAnhaengeSichern(mail, hinweis) {
 //    epVerkaufZiel merkt die Unterseite, VerkaufPage öffnet sie beim Start.
 // 2) Exposé-Versand direkt beim Kontakt (nutzt skExposeLinkSenden wie der Suchkriterien-Abgleich).
 // 3) Feld „Zuständig“ im Kontaktformular (kontakte.zustaendig_id) – fehlte bisher ganz.
-const EP_VERKAUF_UNTERSEITEN = ["vertraege", "reservierungen", "objektnachweise", "bewertung"];
+const IMMO_VERKAUF_UNTERSEITEN = ["vertraege", "reservierungen", "objektnachweise", "bewertung"];
 function epVerkaufStartLesen() {
   const z = window.__epVerkaufZiel;
-  if (z && EP_VERKAUF_UNTERSEITEN.includes(z)) { window.__epVerkaufZiel = null; return z; }
+  if (z && IMMO_VERKAUF_UNTERSEITEN.includes(z)) { window.__epVerkaufZiel = null; return z; }
   return null;
 }
 // Mitarbeiter für Auswahlfelder (einmal laden, dann gemerkt)
@@ -132329,7 +132329,7 @@ function KontaktPersonenBlock({ form, onFeld }) {
 
 // ---- Stufe 70: Einstellungen im Portal (22.09.2026) ----
 // Firmendaten, Signatur und Vorgabewerte standen an drei Stellen: in der Tabelle firma_stammdaten,
-// fest im Programm (STANDORTE, EP_SIGNATUR) und als Zahlen mitten im Quelltext. Ab hier gilt die
+// fest im Programm (STANDORTE, IMMO_SIGNATUR) und als Zahlen mitten im Quelltext. Ab hier gilt die
 // Datenbank; das fest Eingebaute bleibt nur als Notnagel, damit Verträge auch dann noch entstehen,
 // wenn die Tabelle einmal nicht erreichbar ist.
 window.__epEinst = window.__epEinst || null;
@@ -132396,7 +132396,7 @@ function epFirma(slug) {
   return liste.find((f) => f && f.slug === s)
     || liste.find((f) => f && f.typ === "standort" && f.aktiv !== false) || null;
 }
-const EP_SIGNATUR_PLATZHALTER = [
+const IMMO_SIGNATUR_PLATZHALTER = [
   ["{absender_name}", "Name der Person"], ["{absender_rolle}", "Funktion aus dem Profil"],
   ["{absender_telefon}", "Telefon aus dem Profil"], ["{absender_mail}", "E-Mail der Person"],
   ["{firma_name}", "Firmenname"], ["{firma_marke}", "Markenname des Standorts"],
@@ -132516,7 +132516,7 @@ function EinstSignatur({ user }) {
       style: { ...inputStyle, minHeight: 320, resize: "vertical", fontFamily: "ui-monospace, monospace", fontSize: 12 } }),
     React.createElement("div", { style: { fontSize: 11.5, color: CI.muted, marginTop: 10, lineHeight: 1.8 } },
       React.createElement("strong", { style: { color: CI.blau } }, "Platzhalter: "),
-      EP_SIGNATUR_PLATZHALTER.map(([p, was], i) => React.createElement("span", { key: p },
+      IMMO_SIGNATUR_PLATZHALTER.map(([p, was], i) => React.createElement("span", { key: p },
         i ? " · " : "", React.createElement("code", null, p), " ", was))),
     React.createElement("div", { style: { display: "flex", gap: 8, alignItems: "center", marginTop: 14, flexWrap: "wrap" } },
       React.createElement("button", { type: "button", onClick: speichern, disabled: busy,
@@ -132828,13 +132828,13 @@ async function epExposeMailTextFuerFenster({ antwort, editor, text, kontakt, bet
 }
 window.epExposeMailVorlage = epExposeMailVorlage; window.epExposeLinkSchonDrin = epExposeLinkSchonDrin; window.epExposeMailTextFuerFenster = epExposeMailTextFuerFenster;
 // Stufe 77 – Exposé-Anschreiben aus den onOffice-Vorlagen (25.09.2026)
-const EP_EXPOSE_VORLAGEN = {
+const IMMO_EXPOSE_VORLAGEN = {
   geteilt: { key: "expose_vorlage_kauf_geteilt", titel: "Beantwortung Portalanfrage Kauf geteilte Provision", onoffice_id: "5417", muster: /geteilte\s+provision/i },
   aussen: { key: "expose_vorlage_kauf_aussen", titel: "Beantwortung Portalanfrage Kauf Außen Provision", onoffice_id: "5419", muster: /au(ß|ss)en\s*provision/i },
   provisionsfrei: { key: "expose_vorlage_kauf_provisionsfrei", titel: "Beantwortung Portalanfrage Kauf provisionsfrei", onoffice_id: "5421", muster: /kauf.*provisionsfrei/i },
   miete: { key: "expose_vorlage_miete", titel: "Beantwortung Mietanfrage", onoffice_id: "7289", muster: /mietanfrage/i },
 };
-const EP_EXPOSE_OBJEKT_FELDER = "id, immo_nr, objekttitel, bezeichnung, strasse, hausnummer, plz, ort, zimmer, wohnflaeche, angebotspreis, kaltmiete, provision_aussen, provision_innen, provisionsfrei, vertragsart, adresse_freigeben";
+const IMMO_EXPOSE_OBJEKT_FELDER = "id, immo_nr, objekttitel, bezeichnung, strasse, hausnummer, plz, ort, zimmer, wohnflaeche, angebotspreis, kaltmiete, provision_aussen, provision_innen, provisionsfrei, vertragsart, adresse_freigeben";
 function epExposeProvisionNorm(p) {
   let l = String(p || "").trim().replace(/\s*%\s*$/, "");
   if (l && /^\d+([.,]\d+)?$/.test(l)) l = l.replace(".", ",") + " %"; else if (l && !/%/.test(l)) l += " %";
@@ -132863,14 +132863,14 @@ async function epExposeObjektLaden(objektOderId) {
   if (objektOderId && typeof objektOderId === "object" && "vertragsart" in objektOderId && "provision_aussen" in objektOderId && "adresse_freigeben" in objektOderId) return objektOderId;
   const id = typeof objektOderId === "string" ? objektOderId : objektOderId && objektOderId.id;
   if (!id) return objektOderId || null;
-  const { data } = await window._sb.from("immobilien").select(EP_EXPOSE_OBJEKT_FELDER).eq("id", id).maybeSingle();
+  const { data } = await window._sb.from("immobilien").select(IMMO_EXPOSE_OBJEKT_FELDER).eq("id", id).maybeSingle();
   return data ? { ...(typeof objektOderId === "object" ? objektOderId : {}), ...data } : (typeof objektOderId === "object" ? objektOderId : null);
 }
 /** Passende Vorlage: Einstellung (Titel) → onOffice-Nr. → Titelmuster. Liefert { vorlage|null, modell, objekt }. */
 async function epExposeVorlageWaehlen(objektOderId) {
   const objekt = await epExposeObjektLaden(objektOderId);
   const modell = epExposeModell(objekt);
-  const std = EP_EXPOSE_VORLAGEN[modell];
+  const std = IMMO_EXPOSE_VORLAGEN[modell];
   const liste = await epExposeVorlagenListe();
   const wunsch = String(epEinst(std.key, std.titel) || "").trim().toLowerCase();
   const titel = (v) => String(v.titel || "").trim().toLowerCase();
@@ -132909,7 +132909,7 @@ async function epExposeAnschreiben({ objekt, kontakt, nutzer, url, postfach }) {
   const betreff = mailVorlageFuellen(w.vorlage.betreff || "", ctx).trim() || `Exposé: ${skObjektTitel(w.objekt)}`;
   return { betreff, text, vorlage: w.vorlage, modell: w.modell };
 }
-window.epExposeModell = epExposeModell; window.epExposeVorlageWaehlen = epExposeVorlageWaehlen; window.epExposeVorlageKontext = epExposeVorlageKontext; window.epExposeAnschreiben = epExposeAnschreiben; window.EP_EXPOSE_VORLAGEN = EP_EXPOSE_VORLAGEN;
+window.epExposeModell = epExposeModell; window.epExposeVorlageWaehlen = epExposeVorlageWaehlen; window.epExposeVorlageKontext = epExposeVorlageKontext; window.epExposeAnschreiben = epExposeAnschreiben; window.IMMO_EXPOSE_VORLAGEN = IMMO_EXPOSE_VORLAGEN;
 // Stufe 78 – HTML-Mails passen auf den Bildschirm (25.09.2026)
 /** Verkleinert den Mailkörper im iframe per CSS zoom, wenn der Inhalt breiter ist als der Rahmen. Liefert den Faktor (1 = unverändert). */
 function epMailBreiteAnpassen(doc, iframe) {
@@ -133246,7 +133246,7 @@ async function epReservierungKaeuferVerknuepfen(a, reservierungId) {
 }
 
 // ===== Stufe 88: Checkliste beim Einladen (Auftrag 10.3) =====
-const EP_CHK_OBJEKTART = { haus: "Einfamilienhaus", wohnung: "Eigentumswohnung (WEG)", mfh: "Mehrfamilienhaus", grundstueck: "Grundstück" };
+const IMMO_CHK_OBJEKTART = { haus: "Einfamilienhaus", wohnung: "Eigentumswohnung (WEG)", mfh: "Mehrfamilienhaus", grundstueck: "Grundstück" };
 function EpEinladungCheckliste({ vertragId, vertrag, auswahl, onAuswahl }) {
   const [vorhanden, setVorhanden] = useState(null);   // Items, die der Vertrag schon hat
   const [vorlagen, setVorlagen] = useState([]);
@@ -133307,7 +133307,7 @@ function EpEinladungCheckliste({ vertragId, vertrag, auswahl, onAuswahl }) {
     React.createElement("div", { style: { fontSize: 11, color: CI.muted, marginBottom: 8, lineHeight: 1.4 } }, "Der Eigentümer sieht diese Punkte im Portal, kann sie abhaken und die Unterlagen direkt hochladen. Vorlage nach Objektart wählen, Punkte an- oder abwählen, eigene ergänzen."),
     React.createElement("select", { "data-ep-checkliste-vorlage": "1", style: { ...inputStyle, marginBottom: 8 }, value: vorlageId, onChange: e => setVorlageId(e.target.value) },
       React.createElement("option", { value: "" }, "— keine Checkliste anlegen —"),
-      vorlagen.map(v => React.createElement("option", { key: v.id, value: v.id }, v.name, v.objektart && EP_CHK_OBJEKTART[v.objektart] ? ` · ${EP_CHK_OBJEKTART[v.objektart]}` : ""))),
+      vorlagen.map(v => React.createElement("option", { key: v.id, value: v.id }, v.name, v.objektart && IMMO_CHK_OBJEKTART[v.objektart] ? ` · ${IMMO_CHK_OBJEKTART[v.objektart]}` : ""))),
     vorlageId && React.createElement(React.Fragment, null,
       React.createElement("div", { style: { maxHeight: 220, overflowY: "auto", border: `1px solid ${CI.border}`, padding: "6px 10px", background: "#fff" } },
         liste.length === 0 ? React.createElement("div", { style: { fontSize: 11, color: CI.muted } }, "Lädt Punkte …") :
@@ -133373,7 +133373,7 @@ function epPdfBildEinpassen(doc, dataUrl, x, y, w, h) {
   doc.addImage(dataUrl, "JPEG", bx, by, bw, bh);
   return { x: bx, y: by, w: bw, h: bh };
 }
-const EP_UP_MAIL_VORLAGE_STANDARD = { betreff: "Übergabeprotokoll – {objekt}",
+const IMMO_UP_MAIL_VORLAGE_STANDARD = { betreff: "Übergabeprotokoll – {objekt}",
   text: "{anrede},\n\nanbei erhalten Sie das Übergabeprotokoll für {objekt} vom {datum} als PDF.\n\nBitte prüfen Sie die Angaben (Schlüssel, Zählerstände, Zustand der Räume) und bewahren Sie das Protokoll zu Ihren Unterlagen auf. Bei Rückfragen erreichen Sie uns jederzeit telefonisch oder per E-Mail.\n\nVielen Dank für die gute Zusammenarbeit.\n\nMit freundlichen Grüßen" };
 function epUpDatumDe(d) { if (!d) return ""; const m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? `${m[3]}.${m[2]}.${m[1]}` : String(d); }
 function epUpObjektText(data) { return String(data.objekt_adresse || "").replace(/\s*\n\s*/g, ", ").replace(/\s+/g, " ").trim() || "das Objekt"; }
@@ -133412,8 +133412,8 @@ async function epUebergabeProtokollMailen(data, kontext) {
   let vorlage = null;
   try { const { data: v } = await window._sb.from("mail_vorlagen").select("betreff, text").eq("titel", "Übergabeprotokoll").eq("geteilt", true).limit(1); vorlage = v && v[0] || null; } catch (e) {}
   const fuelle = (t) => String(t || "").replace(/\{anrede\}/g, anrede).replace(/\{objekt\}/g, objekt).replace(/\{datum\}/g, datum);
-  const betreff = fuelle(vorlage && vorlage.betreff || EP_UP_MAIL_VORLAGE_STANDARD.betreff);
-  const text = fuelle(vorlage && vorlage.text || EP_UP_MAIL_VORLAGE_STANDARD.text);
+  const betreff = fuelle(vorlage && vorlage.betreff || IMMO_UP_MAIL_VORLAGE_STANDARD.betreff);
+  const text = fuelle(vorlage && vorlage.text || IMMO_UP_MAIL_VORLAGE_STANDARD.text);
   const pdf = await uebergabeProtokollAlsPDF(data);
   const blob = pdf.output("blob");
   const dateiname = `Uebergabeprotokoll_${(data.uebergabe_datum || "").replace(/[^0-9-]/g, "") || "ohne-datum"}_${objekt.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 40) || "objekt"}.pdf`;
@@ -133464,7 +133464,7 @@ function epNotarKontaktIds(daten) {
   for (const p of [...(daten && daten.verkaeufer || []), ...(daten && daten.kaeufer || [])]) if (p && p.kontakt_id && !ids.includes(p.kontakt_id)) ids.push(p.kontakt_id);
   return ids;
 }
-const EP_NOTAR_OBJEKT_FELDER = "id, immo_nr, bezeichnung, objekttitel, strasse, hausnummer, plz, ort, objektart, angebotspreis, wohnflaeche, zimmer, baujahr, kaltmiete, nebenkosten, kaution, hausgeld, wohnungsnr, etage, vermietet, energieausweis_typ, grundstueck";
+const IMMO_NOTAR_OBJEKT_FELDER = "id, immo_nr, bezeichnung, objekttitel, strasse, hausnummer, plz, ort, objektart, angebotspreis, wohnflaeche, zimmer, baujahr, kaltmiete, nebenkosten, kaution, hausgeld, wohnungsnr, etage, vermietet, energieausweis_typ, grundstueck";
 // Felder des Laufzettels aus einem Bestandsobjekt (nur gefuellte Werte ueberschreiben)
 function epNotarImmobilieAusObjekt(o) {
   const f = {};
@@ -133495,7 +133495,7 @@ function EpNotarObjektWahl({ immobilieId, setImmobilieId, setSektion }) {
       setLaedt(true); setMeldung("");
       try {
         let o = kurz || {};
-        const { data } = await window._sb.from("immobilien").select(EP_NOTAR_OBJEKT_FELDER).eq("id", id).maybeSingle();
+        const { data } = await window._sb.from("immobilien").select(IMMO_NOTAR_OBJEKT_FELDER).eq("id", id).maybeSingle();
         if (data) o = { ...kurz, ...data };
         setImmobilieId(id);
         setSektion("immobilie", epNotarImmobilieAusObjekt(o));
@@ -133553,7 +133553,7 @@ function epNotarKategorieZuDatei(d) {
   if (/mieterliste|mietvertr|mietaufstellung/.test(t)) return "mieterliste";
   return "sonstiges";
 }
-const EP_NOTAR_VORAUSWAHL = ["grundbuch", "teilungserklaerung", "energieausweis", "lageplan", "baulasten", "altlasten"];
+const IMMO_NOTAR_VORAUSWAHL = ["grundbuch", "teilungserklaerung", "energieausweis", "lageplan", "baulasten", "altlasten"];
 function EpNotarObjektUnterlagen({ immobilieId, aktivId, speichern, anhaenge, setData }) {
   const [liste, setListe] = useState(null);
   const [wahl, setWahl] = useState({});
@@ -133572,7 +133572,7 @@ function EpNotarObjektUnterlagen({ immobilieId, aktivId, speichern, anhaenge, se
         if (!lebt) return;
         setListe(d);
         const w = {}, k = {};
-        d.forEach(x => { const c = epNotarKategorieZuDatei(x); k[x.id] = c; const schon = (anhaenge || []).some(a => a.immobilie_datei_id === x.id); w[x.id] = !schon && EP_NOTAR_VORAUSWAHL.includes(c); });
+        d.forEach(x => { const c = epNotarKategorieZuDatei(x); k[x.id] = c; const schon = (anhaenge || []).some(a => a.immobilie_datei_id === x.id); w[x.id] = !schon && IMMO_NOTAR_VORAUSWAHL.includes(c); });
         setWahl(w); setKat(k);
       } catch (e) { console.warn("Objektunterlagen laden:", e && e.message || e); if (lebt) setListe([]); }
     })();
@@ -133633,7 +133633,7 @@ function EpNotarObjektUnterlagen({ immobilieId, aktivId, speichern, anhaenge, se
 
 // ===== Stufe 94: Vermarktungskanal Eigene Internetseite (Auftrag 13) =====
 // Schaufenster-TV/Yodeck ist nach Phase 1.4 des Auftrags entfallen.
-const EP_KANAL_LABEL = { website: "Eigene Internetseite" };
+const IMMO_KANAL_LABEL = { website: "Eigene Internetseite" };
 function epKanalDatum(z) { return z && z.uebertragen_am ? new Date(z.uebertragen_am).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : ""; }
 // Beim Speichern: geaenderte Schalter als Portal-Status spiegeln.
 async function epKanaeleSpiegeln(immobilieId, neu, alt) {
@@ -133670,11 +133670,11 @@ function EpKanalZeile({ kanal, label, kurz, an, zeile, gesperrt, objekt, onUmsch
 // Regel ab hier: Steht am Textende eine Grussformel, wird sie abgeschnitten und durch die Signatur
 // ersetzt; steckt die Signatur schon im Text, bleibt alles; ohne Signatur bleibt die Grussformel.
 // Dieselbe Regel gilt serverseitig in mail-senden und den Cron-Functions (mail-signatur.ts).
-const EP_GRUSS_ZEILE = /^\s*(?:mit\s+(?:freundlichen|besten|herzlichen|lieben|sonnigen)\s+gr(?:ü|ue)(?:ß|ss)en|(?:freundliche|viele|beste|herzliche|liebe|sch(?:ö|oe)ne|sonnige)\s+gr(?:ü|ue)(?:ß|ss)e|hochachtungsvoll|mfg|vg|lg)\s*[,.!]?\s*$/i;
+const IMMO_GRUSS_ZEILE = /^\s*(?:mit\s+(?:freundlichen|besten|herzlichen|lieben|sonnigen)\s+gr(?:ü|ue)(?:ß|ss)en|(?:freundliche|viele|beste|herzliche|liebe|sch(?:ö|oe)ne|sonnige)\s+gr(?:ü|ue)(?:ß|ss)e|hochachtungsvoll|mfg|vg|lg)\s*[,.!]?\s*$/i;
 function epGrussAbschneiden(text) {
   const zeilen = String(text || "").replace(/\r\n?/g, "\n").split("\n");
   for (let i = zeilen.length - 1, n = 0; i >= 0 && n < 10; i--, n++) {
-    if (EP_GRUSS_ZEILE.test(zeilen[i])) return zeilen.slice(0, i).join("\n").replace(/\s+$/, "");
+    if (IMMO_GRUSS_ZEILE.test(zeilen[i])) return zeilen.slice(0, i).join("\n").replace(/\s+$/, "");
   }
   return String(text || "").replace(/\s+$/, "");
 }
@@ -133704,7 +133704,7 @@ window.kalArtIntern = kalArtIntern;
 //   #error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired
 // auf das Portal. Die Anmeldeseite zeigte bisher nur das leere Login-Formular. Jetzt: Fehler beim Laden sichern
 // (bevor supabase-js die Adresse bereinigt), erklären und über eigentuemer-zugang-anfordern sofort einen neuen Link schicken.
-const EP_ZUGANG_FEHLER = (function () {
+const IMMO_ZUGANG_FEHLER = (function () {
   try {
     const roh = (window.location.hash || "").replace(/^#/, "") + "&" + (window.location.search || "").replace(/^\?/, "");
     const p = new URLSearchParams(roh);
@@ -133713,7 +133713,7 @@ const EP_ZUGANG_FEHLER = (function () {
     return { code, error: err, text };
   } catch (e) { return null; }
 })();
-function epZugangFehlerLesen() { return EP_ZUGANG_FEHLER; }
+function epZugangFehlerLesen() { return IMMO_ZUGANG_FEHLER; }
 function epZugangGewuenscht() { return /^#zugang(\b|$)/i.test(window.location.hash || ""); }
 function epZugangFehlerText(f) {
   if (!f) return "";

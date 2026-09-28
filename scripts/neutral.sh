@@ -74,10 +74,29 @@ pruefe() {
   fi
 }
 
+# Wie pruefe, aber ohne -i. Fuer Muster, bei denen die Schreibweise
+# entscheidet: der Vorsatz EP_ ist die Abkuerzung der Referenz und muss weg,
+# das kleingeschriebene ep_ ist der Bus-Name und bleibt (docs/NEUTRALITAET.md
+# Abschnitt 3 nimmt ihn begruendet aus).
+pruefe_genau() {
+  local titel="$1" muster="$2" treffer
+  shift 2
+  local pfade=("$@"); [[ ${#pfade[@]} -eq 0 ]] && pfade=(.)
+  treffer="$(rg --line-number "${AUS[@]}" -- "$muster" "${pfade[@]}" 2>/dev/null \
+             | rg -v '^[^:]*:[0-9]+:[[:space:]]*(--|#|//|\*)' || true)"
+  if [[ -n "$treffer" ]]; then
+    printf '\n[FEHLER] %s\n%s\n' "$titel" "$treffer"
+    fehler=1
+  else
+    printf '[ok] %s\n' "$titel"
+  fi
+}
+
 echo "=== Neutralitaets-Gate ==="
 pruefe "Keine Kennzeichen des Referenzunternehmens" "$MARKEN"
 pruefe "Keine Stammdaten des Referenzunternehmens"  "$STAMM"
 pruefe "Kein Verweis auf das fremde Supabase-Projekt" "$FREMD"
+pruefe_genau "Kein Vorsatz EP_ in Bezeichnern" '\bEP_[A-Z]'
 # Nur pruefen, was auch versioniert wird. src/ entsteht beim Bauen aus
 # reference/ und ist derzeit ignoriert (siehe .gitignore); ein unversioniertes
 # Arbeitsergebnis darf das Gate weder retten noch reissen. Sobald die Datei

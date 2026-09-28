@@ -287,7 +287,26 @@ ERSETZUNGEN = [
      'supabase-js auf 2.117.2 gepinnt — das ist, was @2 heute aufloest.'),
     ('MARKE', r'tesseract\.js@5/', 'tesseract.js@5.1.1/',
      'tesseract.js auf 5.1.1 gepinnt.'),
+
+    # --- MARKE: der Vorsatz EP_ in 41 Bezeichnern, rund 180 Stellen.
+    # docs/NEUTRALITAET.md Abschnitt 3 verlangt die Umbenennung ausdruecklich
+    # und nennt EP_TOKEN und EP_EXPOSE_MODE als Beispiele; passiert war sie
+    # nie, und das Gate fragte nicht danach (EP_ enthaelt kein "world").
+    #
+    # Umbenannt wird der ganze Vorsatz, nicht die genannten zwei: eine
+    # Auswahl liesse die Abkuerzung an 39 anderen Stellen stehen, und EP_ ist
+    # die Abkuerzung der Referenz — CLAUDE.md nennt Variablennamen
+    # ausdruecklich. IMMO_ ist die Entsprechung, die die Oberflaeche mit
+    # IMMO_SUPABASE_URL ohnehin schon fuehrt.
+    #
+    # NICHT betroffen ist das kleingeschriebene ep (ep-Bus, epSpellGross):
+    # Abschnitt 3 nimmt es begruendet aus. Diese Regel greift nur bei
+    # Grossbuchstaben mit Unterstrich.
+    #
+    # Muss NACH der Logo-Regel stehen, die EP_LOGO_DATAURL beim Namen nennt.
+    ('MARKE', r'\bEP_', 'IMMO_', 'Vorsatz EP_ in Bezeichnern der Oberflaeche.'),
 ]
+
 
 
 # Die Zugangsdaten stehen in der Vorlage im Auslieferungsstand. Im Fork setzt
