@@ -664,3 +664,36 @@ eine Bezeichnung, sind heute 28 Stellen zu finden. Es gehört an eine Stelle,
 **Noch nicht geprüft, ob die Namen überhaupt gültig sind.** Der erste Versuch
 scheiterte vorher am Schlüssel (siehe `docs/SECRETS.md`); die Anfrage kam nie
 so weit, dass das Modell geprüft worden wäre.
+
+## Die Dokumenterzeugung sucht nach dem Mustervertrag der Referenz
+
+**Gefunden am 28.09.2026**, beim Einbau der Vorlagen-Werte. Die drei
+Word-Erzeuger füllen die Vorlage nicht über Platzhalter, sondern indem sie
+**wörtliche Sätze aus einem konkreten Beispielvertrag der Referenz suchen und
+ersetzen** — 56 solcher Anker, davon 38 allein in `fillObjektnachweis`.
+
+**Zwei Folgen, und beide wiegen.**
+
+**1. Personenbezogene Daten im Quelltext.** Unter den Ankern stehen Namen,
+Anschriften, Geburtsdaten und **Ausweisnummern** von Vertragsparteien aus den
+Musterverträgen der Referenz. `CLAUDE.md` verbietet Beispieldaten der
+Referenz an jeder Stelle; die Blockliste hat sie nicht gefunden, weil sie
+Firma, Anschrift und Städte der Referenz kennt, aber nicht diese Orte und
+Personen. Das ist unabhängig von allem anderen zu entfernen.
+
+**2. Eine eigene Vorlage kann so gar nicht funktionieren.** Der Word-Text
+eines anderen Maklers enthält diese Sätze nicht. Die Ersetzung findet nichts,
+und das erzeugte Dokument bleibt, wie es war — ohne Fehlermeldung. Das
+Hochladen eigener Vorlagen, das `fork_12` ermöglicht, läuft damit heute ins
+Leere.
+
+**Der richtige Weg** ist der, den die Oberfläche im Reiter
+*Vertragsvorlagen* ohnehin schon verspricht: **benannte Platzhalter**
+(`{firma_name}`, `{laufzeit_monate}`, `{provision}`, …), die im Word-Text
+stehen und ersetzt werden. Damit funktioniert jede Vorlage, die diese Marken
+enthält — und es steht kein fremder Vertragstext mehr im Programm.
+
+**Zu tun:** `fillMaklervertrag`, `fillObjektnachweis` und `fillMietvertrag`
+auf Platzhalter umstellen und die 56 Anker samt der personenbezogenen Daten
+entfernen. Der alte Weg ist im Fork ohnehin tot: die beiden eingebauten
+Word-Dateien sind seit `fork_12` geleert.
