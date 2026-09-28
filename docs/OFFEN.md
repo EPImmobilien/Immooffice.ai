@@ -47,6 +47,62 @@ Einzelheiten in `docs/EDGE_FUNCTIONS.md`.
    Anschrift und Ort im erzeugten Maklervertrag leer. Ein Vertrag ohne
    Firmenkopf darf nicht an einen Kunden gehen.
 
+## Der Quelltext der Oberflaeche — **Ihre Mitwirkung noetig**
+
+Hinzugekommen am 28.09.2026 beim Zerlegen von `reference/epworld-src.html`.
+
+Die Datei sagt es in ihrer zweiten Zeile selbst: **„E&P World – vorkompiliert
+26.09.2026"**. Gemessen über die ganze Datei:
+
+| Anteil | Umfang |
+|---|---|
+| lesbarer Quelltext | 1,02 MB (20 %) |
+| **vorkompiliert** | **2,97 MB (58 %)** |
+| eingebettete Blobs (Base64) | 1,17 MB (23 %) |
+
+Der vorkompilierte Teil steckt in **drei Zeilen**: Zeile 31 (0,72 MB), Zeile
+180 (0,03 MB) und Zeile 4316 (2,22 MB). Die letzte ist `ImmobilienPage` — das
+Kernmodul des Produkts. Bezeichner sind auf einzelne Buchstaben verkürzt, die
+Formatierung ist weg.
+
+**Warum das ein Blocker ist, nicht nur unschön:** Phase 1.4 des Auftrags
+streicht Shop-TV ersatzlos. Die Streichung ist im lesbaren Teil möglich —
+`epShopTvPasst`, `epShopTvAbgleich` und die Kanalzeile lassen sich sauber
+entfernen. Aber **19 weitere Stellen liegen im vorkompilierten Kern**, in
+Zeichenketten und Feldnamen mitten in 2,22 MB auf einer Zeile. Dort lässt sich
+nichts herausschneiden, ohne zu raten. Dasselbe gilt für jede spätere
+Änderung: Mandantenfähigkeit, `firma_id` im Frontend, Neutralisierung von
+Texten, die im Kompilat stehen.
+
+**Was gebraucht wird:** der Stand *vor* dem Vorkompilieren. Die Vorlage
+kompiliert seit dem 19.07.2026 offline — der Kommentar in der Datei nennt das
+ausdrücklich („JSX wird seit 19.07.2026 offline vorkompiliert, iOS-Speicher"),
+also existiert auf der Seite der Vorlage ein Quellstand und ein Bauschritt.
+Gebraucht wird beides: die Quelldateien und das Skript, das daraus
+`epworld-src.html` macht.
+
+**Bis dahin:** `src/` entsteht zwar vollständig und ist neutralisiert bis auf
+Shop-TV, wird aber **nicht versioniert** (siehe `.gitignore`). Ein Stand, der
+das Gate nur mit einer Ausnahme passiert, wäre ein Gate mit einem Loch.
+`scripts/oberflaeche-zerlegen.py` erzeugt ihn in Sekunden neu.
+
+## Zwei CDN-Bibliotheken ohne feste Version
+
+`@supabase/supabase-js@2` und `tesseract.js@5` sind nur auf die Hauptversion
+festgelegt. React und React-DOM sind beim Zerlegen auf `18.3.1` festgenagelt
+worden; für die beiden anderen fehlt die Gegenprobe, weil der Egress-Proxy
+dieser Umgebung die CDNs nicht erreicht — eine geratene Patch-Version, die es
+nicht gibt, ließe die Anwendung gar nicht erst starten.
+
+Das ist kein theoretisches Risiko. Die Vorlage hat sich daran am **17.06.2026
+einen Totalausfall geholt**: eine neue Babel-Version wechselte still die
+Standard-Laufzeit, der Browser meldete „Cannot use import statement outside a
+module", und die gesamte Anwendung startete nicht mehr — bei unveränderter
+HTML. Der Kommentar dazu steht in `src/huelle/07-babel-hinweis.html`.
+
+Zu tun: einmal mit Netz die tatsächlich aufgelösten Versionen ablesen und
+eintragen.
+
 ## Entscheidung des Betreibers
 
 Der Altbestand im Zielprojekt (rund 110 Tabellen, Testdaten) blockiert das

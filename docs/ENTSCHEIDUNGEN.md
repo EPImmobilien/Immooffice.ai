@@ -409,3 +409,47 @@ ist es erst beim Hineinschauen in eine erzeugte Datei.
 unverändert in `reference/`, das Skript erzeugt neu. Teuer wäre er geworden,
 wenn er unbemerkt in einen Commit gelaufen wäre. Eine Prüfung, die genau diese
 Klasse von Fehlern erkennt, ist billiger als Sorgfalt beim Schreiben.
+
+
+## 28.09.2026 — Der Altbestand im Repository zieht um, er wird nicht gelöscht
+
+**Frage:** Die Oberfläche des Forks gehört nach `src/`. Dort liegt die
+Next.js-Anwendung des Altbestands.
+
+**Entscheidung:** `git mv src altbestand/next-app`. Nichts gelöscht.
+
+**Grund:** Dieselbe Überlegung wie bei der Datenbank am 27.09.: verschieben ist
+umkehrbar, löschen nicht. Der Altbestand ist laut `CLAUDE.md` kein
+Produktbestandteil, aber er ist der einzige Ort, an dem Teile seiner
+Geschichte noch stehen — im Repository fehlen 33 seiner 45 Migrationen.
+
+## 28.09.2026 — src/ ist vorerst nicht versioniert
+
+**Frage:** `src/` entsteht aus `reference/epworld-src.html` und ist
+neutralisiert — bis auf Shop-TV, das zu 19 Stellen im vorkompilierten Kern
+liegt und dort nicht sauber zu entfernen ist. Trotzdem einchecken, mit einer
+Ausnahme im Neutralitäts-Gate?
+
+**Entscheidung:** Nein. `src/` bleibt in `.gitignore`, bis der Quelltext der
+vorkompilierten Abschnitte vorliegt.
+
+**Grund:** Eine Ausnahme im Gate ist teurer als sie aussieht. Sie steht dann
+dort, sie wird mit der Zeit selbstverständlich, und niemand prüft mehr, ob sie
+noch nötig ist. `src/` ist außerdem vollständig aus der Vorlage reproduzierbar
+— es geht nichts verloren, es liegt nur nicht im Repository. Vermerkt in
+`docs/OFFEN.md`.
+
+## 28.09.2026 — Zugangsdaten kommen aus der Auslieferung, nicht aus dem Quelltext
+
+**Frage:** Die Vorlage trägt Projekt-Adresse und anon-Schlüssel im Klartext im
+Auslieferungsstand — im Hauptskript und im Fehlermelder des Frühstarts.
+
+**Entscheidung:** Beides kommt aus `window.IMMO_SUPABASE_URL` und
+`window.IMMO_SUPABASE_KEY`, die ein Konfigurationsblock im Kopf setzt. Die
+Platzhalter sind **leer**, nicht mit dem eigenen Projekt vorbelegt.
+
+**Grund:** Der anon-Schlüssel ist zwar öffentlich, aber es war der *fremde* —
+und nach der Ersetzung der Projekt-Adresse hätte im Fork eine Adresse des
+eigenen Projekts neben einem Schlüssel des fremden gestanden. Das ist nicht
+nur falsch, es fällt beim Ausprobieren auch nicht sofort auf. Ein leerer Wert
+fällt beim ersten Start auf, ein falscher nicht.

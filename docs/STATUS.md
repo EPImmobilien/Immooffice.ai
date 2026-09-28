@@ -264,9 +264,11 @@ Supabase-Projekt, oder ausdrückliche Freigabe zum Löschen.
 
 ## 5. Als Nächstes
 
-1. Phase 1: `reference/epworld-src.html` in `src/` zerlegen, CDN-Versionen
-   festnageln, neutralisieren, `dist/index.html` bauen. Läuft ohne Ihre
-   Mitwirkung; danach **Gate 1**.
+1. **Phase 1 hängt am Quelltext der Oberfläche.** Zerlegt, neutralisiert und
+   wieder zusammengebaut ist sie — aber 58 % des Anwendungscodes liegen
+   vorkompiliert vor, und dort lässt sich die Streichung aus Phase 1.4 nicht
+   ausführen. Es wird der Stand vor dem Vorkompilieren gebraucht.
+   `docs/OFFEN.md`, Abschnitt „Der Quelltext der Oberfläche".
 2. Phase 2.4: die Edge Functions mandantenfähig machen — `firma_stammdaten`
    statt fester Vorgabewerte. Die drei offenen Punkte stehen in
    `docs/OFFEN.md`.

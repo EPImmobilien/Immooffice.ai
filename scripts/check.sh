@@ -29,6 +29,21 @@ else
   fehler=1
 fi
 
+abschnitt "Oberflaeche: Zerlegung verliert nichts"
+if [[ -f reference/epworld-src.html ]]; then
+  roh="$(mktemp -d)"
+  if python3 scripts/oberflaeche-zerlegen.py --roh "$roh" >/dev/null \
+     && python3 scripts/bauen.py --aus "$roh" --pruefen >/dev/null; then
+    echo "[ok] src/ laesst sich byte-genau zur Vorlage zurueckbauen."
+  else
+    echo "[FEHLER] Der Rueckbau weicht von der Vorlage ab."
+    fehler=1
+  fi
+  rm -rf "$roh"
+else
+  echo "reference/epworld-src.html fehlt — nicht pruefbar (reference/ ist nicht versioniert)."
+fi
+
 abschnitt "Edge Functions: nur Kennzeichen geaendert"
 if python3 tests/funktionen-unveraendert.py; then
   :

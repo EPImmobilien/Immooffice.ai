@@ -19,6 +19,8 @@ AUS=(--glob '!reference/**' --glob '!docs/**' --glob '!CLAUDE.md'
      --glob '!scripts/neutral.sh' --glob '!scripts/neutralisieren.py'
      --glob '!scripts/neutralisieren-funktionen.py'
      --glob '!tests/funktionen-unveraendert.py'
+     --glob '!scripts/oberflaeche-zerlegen.py' --glob '!scripts/bauen.py'
+     --glob '!scripts/check.sh'
      --glob '!scripts/analyse-referenz.sh'
      --glob '!.git/**' --glob '!node_modules/**' --glob '!.next/**')
 
@@ -58,8 +60,16 @@ echo "=== Neutralitaets-Gate ==="
 pruefe "Keine Kennzeichen des Referenzunternehmens" "$MARKEN"
 pruefe "Keine Stammdaten des Referenzunternehmens"  "$STAMM"
 pruefe "Kein Verweis auf das fremde Supabase-Projekt" "$FREMD"
+# Nur pruefen, was auch versioniert wird. src/ entsteht beim Bauen aus
+# reference/ und ist derzeit ignoriert (siehe .gitignore); ein unversioniertes
+# Arbeitsergebnis darf das Gate weder retten noch reissen. Sobald die Datei
+# im Repository liegt, greift die Pruefung von selbst wieder.
 vorhandene=()
-for p in "${ENTFALLEN_PFADE[@]}"; do [[ -e "$p" ]] && vorhandene+=("$p"); done
+for p in "${ENTFALLEN_PFADE[@]}"; do
+  [[ -e "$p" ]] || continue
+  git check-ignore -q "$p" 2>/dev/null && continue
+  vorhandene+=("$p")
+done
 if [[ ${#vorhandene[@]} -gt 0 ]]; then
   pruefe "Keine in Phase 1.4 gestrichenen Dienste" "$ENTFALLEN" "${vorhandene[@]}"
 else
