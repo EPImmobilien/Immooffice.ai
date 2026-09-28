@@ -587,10 +587,13 @@ nicht.** Dafür braucht es einen Lauf mit echten parallelen Verbindungen, etwa
 über `pgbench` oder mehrere Edge-Function-Aufrufe gleichzeitig. Vor Gate 3
 (Stripe-Live) nachzuholen, weil dann Rechnungen im Echtbetrieb entstehen.
 
-**Ebenfalls offen aus Abschnitt 3c:** Zahlungsziele und Skonto,
-Rechnungsfreigabe mit Verantwortlichem, Mahnstufen, Buchungskonten (SKR03/04),
+**Ebenfalls offen aus Abschnitt 3c:** Mahnstufen, Buchungskonten (SKR03/04),
 Steuersätze und Reverse Charge, SEPA-Gläubiger-ID, DATEV-Export, ZUGFeRD und
-XRechnung. Gebaut ist bisher nur der Nummernkreis.
+XRechnung.
+
+Gebaut sind: der Nummernkreis, Zahlungsziele mit Skonto und die
+Rechnungsfreigabe — jeweils samt Maske unter *Einstellungen → Belegnummern*
+beziehungsweise *Einstellungen → Zahlung & Freigabe*.
 
 ## onOffice: was noch im Quelltext steht
 

@@ -219,6 +219,40 @@ begin
   end;
 end $$;
 
+-- --- 9) Die Vorschau zeigt, was spaeter auf dem Beleg steht --------------
+-- Die Frage ist nicht, ob zahlungsbedingung_text_aus einen huebschen Satz
+-- liefert, sondern ob es DERSELBE Satz ist wie der der gespeicherten Zeile.
+-- Genau da laufen zwei Fassungen einer Regel auseinander.
+do $$
+declare z uuid;
+begin
+  select id into z from public.zahlungsbedingungen
+   where name = '7 Tage 2 % Skonto'
+     and mandant_id = (select wert from wer where was='mandant');
+
+  insert into befund (pruefung, bestanden, bemerkung)
+  values ('Vorschau und Beleg zeigen denselben Satz',
+          public.zahlungsbedingung_text_aus(30, 2, 7, null) = public.zahlungsbedingung_text(z),
+          public.zahlungsbedingung_text_aus(30, 2, 7, null)),
+         ('Ohne Skonto ebenso',
+          public.zahlungsbedingung_text_aus(14, null, null, null) =
+          'Zahlbar innerhalb von 14 Tagen ohne Abzug.',
+          public.zahlungsbedingung_text_aus(14, null, null, null)),
+         ('Eigener Text schlaegt die Zahlen',
+          public.zahlungsbedingung_text_aus(14, 3, 7, '  Zahlung bei Uebergabe.  ') =
+          'Zahlung bei Uebergabe.',
+          public.zahlungsbedingung_text_aus(14, 3, 7, '  Zahlung bei Uebergabe.  '));
+end $$;
+
+-- --- 10) Die Regel steht nur an einer Stelle ------------------------------
+insert into befund (pruefung, bestanden, bemerkung)
+select 'zahlungsbedingung_text rechnet nicht selbst, sondern delegiert',
+       prosrc ~ 'zahlungsbedingung_text_aus' and prosrc !~ 'Zahlbar innerhalb',
+       case when prosrc ~ 'Zahlbar innerhalb' then 'der Satz steht wieder doppelt'
+            else 'delegiert' end
+  from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+ where n.nspname = 'public' and p.proname = 'zahlungsbedingung_text';
+
 select nr, case when bestanden then 'ok  ' else 'FEHL' end as ergebnis, pruefung, bemerkung
   from befund order by nr;
 

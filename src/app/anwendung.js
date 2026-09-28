@@ -132870,7 +132870,7 @@ function EinstellungenPage({ user }) {
   const knopf = (aktiv) => ({ background: "transparent", border: "none", padding: "10px 16px", fontSize: 14,
     fontWeight: aktiv ? 600 : 400, color: aktiv ? CI.blau : CI.muted,
     borderBottom: aktiv ? `2px solid ${CI.blau}` : "2px solid transparent", cursor: "pointer", fontFamily: FONT });
-  const reiterListe = [["firma", "Firma & Impressum"], ["gesellschaften", "Gesellschaften"], ["standorte", "Standorte"], ["belegnummern", "Belegnummern"], ["signatur", "Signatur & Texte"], ["vorgaben", "Vorgaben"], ["vertragsvorlagen", "Vertragsvorlagen"]];
+  const reiterListe = [["firma", "Firma & Impressum"], ["gesellschaften", "Gesellschaften"], ["standorte", "Standorte"], ["belegnummern", "Belegnummern"], ["zahlung", "Zahlung & Freigabe"], ["signatur", "Signatur & Texte"], ["vorgaben", "Vorgaben"], ["vertragsvorlagen", "Vertragsvorlagen"]];
   return React.createElement(React.Fragment, null,
     React.createElement("div", { style: { display: "flex", borderBottom: `1px solid ${CI.border}`, marginBottom: 24, flexWrap: "wrap" } },
       reiterListe.map(([id, label]) => React.createElement("button", { key: id, "data-einst-reiter": id,
@@ -132879,6 +132879,7 @@ function EinstellungenPage({ user }) {
       : reiter === "firma" ? React.createElement(AdminGmbHStammdaten, { user })
       : reiter === "gesellschaften" ? React.createElement(EinstGesellschaften, { user })
       : reiter === "belegnummern" ? React.createElement(EinstBelegnummern, { user })
+      : reiter === "zahlung" ? React.createElement(EinstZahlung, { user })
       : reiter === "standorte" ? React.createElement(EinstStandorte, null)
       : reiter === "signatur" ? React.createElement(EinstSignatur, { user })
       : reiter === "vertragsvorlagen" ? React.createElement(EinstVertragsvorlagen, { user })
@@ -132891,6 +132892,278 @@ function EinstellungenPage({ user }) {
 // Warum nicht in der Oberflaeche gerechnet: dann gaebe es die Regel
 // zweimal, und die beiden Fassungen laufen auseinander. Die Vorschau ist
 // hier nur Anzeige, die Wahrheit steht in der Datenbank.
+// Zahlungsbedingungen und Rechnungsfreigabe je Gesellschaft (Abschnitt 3c).
+//
+// Der Satz, der spaeter auf dem Beleg steht, wird NICHT hier gebaut. Die
+// Vorschau ruft zahlungsbedingung_text_aus — dieselbe Funktion, die auch die
+// Rechnung benutzt. Zwei Fassungen einer Regel laufen auseinander; bei
+// hat_recht() ist genau das schon einmal passiert.
+const IMMO_ZAHLUNG_LEER = { name: "", netto_tage: 14, skonto_prozent: null,
+  skonto_tage: null, text_auf_beleg: null, aktiv: true, ist_standard: false };
+function EinstZahlung({ user }) {
+  const [bedingungen, setBedingungen] = useState([]);
+  const [gesellschaften, setGesellschaften] = useState([]);
+  const [einstellungen, setEinstellungen] = useState([]);
+  const [leute, setLeute] = useState([]);
+  const [laedt, setLaedt] = useState(true);
+  const [meldung, setMeldung] = useState("");
+  const [fehler, setFehler] = useState("");
+  const [entwurf, setEntwurf] = useState({});
+  const [neue, setNeue] = useState({});
+  const [vorschau, setVorschau] = useState({});
+  const [speichert, setSpeichert] = useState(null);
+  const darfBedingungen = hatRecht(user, "rechnungen") || hatRecht(user, "admin");
+  const darfFreigabe = hatRecht(user, "admin");
+  const laden = async () => {
+    setLaedt(true);
+    try {
+      const [z, g, e, p] = await Promise.all([
+        window._sb.from("zahlungsbedingungen").select("*").order("sortierung").order("name"),
+        window._sb.from("gesellschaften").select("id, name").order("sortierung").order("name"),
+        window._sb.from("rechnung_einstellungen").select("*"),
+        window._sb.from("profiles").select("id, name, email, role").order("name")
+      ]);
+      for (const r of [z, g, e, p]) { if (r.error) throw r.error; }
+      setBedingungen(z.data || []);
+      setGesellschaften(g.data || []);
+      setEinstellungen(e.data || []);
+      setLeute(p.data || []);
+    } catch (f) {
+      setFehler("Zahlung und Freigabe konnten nicht geladen werden: " + (f.message || f));
+    }
+    setLaedt(false);
+  };
+  useEffect(() => { laden(); }, []);
+  // Leere Eingabe heisst "nicht gesetzt", nicht "null Prozent".
+  const zahl = (w) => {
+    if (w === null || w === undefined || String(w).trim() === "") return null;
+    const n = parseFloat(String(w).replace(",", "."));
+    return isFinite(n) ? n : null;
+  };
+  const wert = (id, feld, ersatz) => {
+    const e = entwurf[id];
+    return (e && e[feld] !== undefined) ? e[feld] : ersatz;
+  };
+  const setzen = (id, feld, w) =>
+    setEntwurf((alt) => ({ ...alt, [id]: { ...(alt[id] || {}), [feld]: w } }));
+  const vorschauHolen = async (schluessel, netto, proz, tage, text) => {
+    try {
+      const { data } = await window._sb.rpc("zahlungsbedingung_text_aus", {
+        p_netto_tage: zahl(netto) === null ? 0 : Math.round(zahl(netto)),
+        p_skonto_prozent: zahl(proz),
+        p_skonto_tage: zahl(tage) === null ? null : Math.round(zahl(tage)),
+        p_eigener_text: (text && String(text).trim()) ? String(text) : null
+      });
+      setVorschau((v) => ({ ...v, [schluessel]: data || "" }));
+    } catch (f) {
+      setVorschau((v) => ({ ...v, [schluessel]: "(Vorschau nicht möglich)" }));
+    }
+  };
+  const felderVon = (b, id) => {
+    const proz = zahl(wert(id, "skonto_prozent", b.skonto_prozent));
+    const tage = zahl(wert(id, "skonto_tage", b.skonto_tage));
+    const beides = proz !== null && tage !== null;
+    const text = String(wert(id, "text_auf_beleg", b.text_auf_beleg) || "").trim();
+    return {
+      name: String(wert(id, "name", b.name) || "").trim(),
+      netto_tage: Math.round(zahl(wert(id, "netto_tage", b.netto_tage)) || 0),
+      skonto_prozent: beides ? proz : null,
+      skonto_tage: beides ? Math.round(tage) : null,
+      text_auf_beleg: text || null,
+      aktiv: wert(id, "aktiv", b.aktiv) !== false
+    };
+  };
+  const sichern = async (b, gid, istNeu) => {
+    const id = istNeu ? "neu-" + (gid || "konto") : b.id;
+    setFehler(""); setMeldung(""); setSpeichert(id);
+    try {
+      const felder = felderVon(b, id);
+      if (!felder.name) throw new Error("Die Bedingung braucht einen Namen.");
+      if (felder.skonto_tage !== null && felder.skonto_tage > felder.netto_tage) {
+        throw new Error("Das Skontoziel liegt nach der Fälligkeit.");
+      }
+      const antwort = istNeu
+        ? await window._sb.from("zahlungsbedingungen").insert({ gesellschaft_id: gid || null, ...felder })
+        : await window._sb.from("zahlungsbedingungen").update(felder).eq("id", b.id);
+      if (antwort.error) throw antwort.error;
+      await logAction(istNeu ? "create" : "update", "zahlungsbedingung", istNeu ? "" : b.id, felder.name, felder);
+      setEntwurf((alt) => { const n = { ...alt }; delete n[id]; return n; });
+      if (istNeu) setNeue((alt) => { const n = { ...alt }; delete n[gid || "konto"]; return n; });
+      setMeldung("Gespeichert.");
+      await laden();
+    } catch (f) {
+      setFehler("Speichern fehlgeschlagen: " + (f.message || f));
+    }
+    setSpeichert(null);
+  };
+  // Es darf je Gesellschaft nur eine Standardbedingung geben; die Datenbank
+  // haelt das mit einem eindeutigen Index fest. Deshalb erst die alte
+  // abwaehlen, dann die neue setzen.
+  const standardSetzen = async (b) => {
+    setFehler(""); setMeldung(""); setSpeichert(b.id);
+    try {
+      let abwaehlen = window._sb.from("zahlungsbedingungen").update({ ist_standard: false }).eq("ist_standard", true);
+      abwaehlen = b.gesellschaft_id
+        ? abwaehlen.eq("gesellschaft_id", b.gesellschaft_id)
+        : abwaehlen.is("gesellschaft_id", null);
+      const a = await abwaehlen;
+      if (a.error) throw a.error;
+      const { error } = await window._sb.from("zahlungsbedingungen")
+        .update({ ist_standard: true }).eq("id", b.id);
+      if (error) throw error;
+      await logAction("update", "zahlungsbedingung", b.id, b.name, { ist_standard: true });
+      setMeldung("Standard gesetzt.");
+      await laden();
+    } catch (f) {
+      setFehler("Standard konnte nicht gesetzt werden: " + (f.message || f));
+    }
+    setSpeichert(null);
+  };
+  const entfernen = async (b) => {
+    if (!window.confirm("Die Zahlungsbedingung „" + b.name + "“ entfernen? Bereits gestellte Rechnungen behalten ihren Text.")) return;
+    setFehler(""); setMeldung(""); setSpeichert(b.id);
+    try {
+      const { error } = await window._sb.from("zahlungsbedingungen").delete().eq("id", b.id);
+      if (error) throw error;
+      await logAction("delete", "zahlungsbedingung", b.id, b.name, {});
+      setMeldung("Entfernt.");
+      await laden();
+    } catch (f) {
+      setFehler("Entfernen fehlgeschlagen: " + (f.message || f));
+    }
+    setSpeichert(null);
+  };
+  const freigabeVon = (gid) => einstellungen.filter(
+    (e) => (e.gesellschaft_id || null) === (gid || null))[0] || null;
+  const freigabeSichern = async (gid, felder) => {
+    setFehler(""); setMeldung(""); setSpeichert("freigabe-" + (gid || "konto"));
+    try {
+      const vorhanden = freigabeVon(gid);
+      const antwort = vorhanden
+        ? await window._sb.from("rechnung_einstellungen")
+            .update({ ...felder, geaendert_am: new Date().toISOString() }).eq("id", vorhanden.id)
+        : await window._sb.from("rechnung_einstellungen").insert({ gesellschaft_id: gid || null, ...felder });
+      if (antwort.error) throw antwort.error;
+      await logAction("update", "rechnung_einstellungen", gid || "", "Freigabe", felder);
+      setMeldung("Gespeichert.");
+      await laden();
+    } catch (f) {
+      setFehler("Speichern fehlgeschlagen: " + (f.message || f));
+    }
+    setSpeichert(null);
+  };
+  if (laedt) return React.createElement("div", { style: { padding: 24, color: CI.muted } }, "Lade Zahlung und Freigabe …");
+  const zeilen = gesellschaften.length
+    ? gesellschaften.map((g) => ({ id: g.id, name: g.name }))
+    : [{ id: null, name: "Ganzes Konto" }];
+  const feld = (id, name, w, breite, art) => React.createElement("input", {
+    style: { ...inputStyle, flex: "1 1 " + breite + "px", minWidth: 0 },
+    type: art || "text", value: w === null || w === undefined ? "" : w,
+    placeholder: name, disabled: !darfBedingungen,
+    onChange: (ev) => setzen(id, name, ev.target.value)
+  });
+  const bedingungKarte = (b, gid, istNeu) => {
+    const id = istNeu ? "neu-" + (gid || "konto") : b.id;
+    const netto = wert(id, "netto_tage", b.netto_tage);
+    const proz = wert(id, "skonto_prozent", b.skonto_prozent);
+    const tage = wert(id, "skonto_tage", b.skonto_tage);
+    const text = wert(id, "text_auf_beleg", b.text_auf_beleg);
+    if (vorschau[id] === undefined) vorschauHolen(id, netto, proz, tage, text);
+    return React.createElement("div", { key: id, "data-zahlungsbedingung": id,
+      style: { border: `1px solid ${CI.border}`, borderRadius: 6, padding: 12, marginBottom: 10,
+               background: b.ist_standard ? `${CI.gold}0e` : "transparent" } },
+      React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 } },
+        feld(id, "name", wert(id, "name", b.name), 200),
+        React.createElement("div", { style: { display: "flex", gap: 6, alignItems: "center", flex: "1 1 130px" } },
+          feld(id, "netto_tage", netto, 60, "number"),
+          React.createElement("span", { style: { fontSize: 12, color: CI.muted, whiteSpace: "nowrap" } }, "Tage netto")),
+        React.createElement("div", { style: { display: "flex", gap: 6, alignItems: "center", flex: "1 1 170px" } },
+          feld(id, "skonto_prozent", proz, 60, "number"),
+          React.createElement("span", { style: { fontSize: 12, color: CI.muted, whiteSpace: "nowrap" } }, "% Skonto bei"),
+          feld(id, "skonto_tage", tage, 60, "number"),
+          React.createElement("span", { style: { fontSize: 12, color: CI.muted, whiteSpace: "nowrap" } }, "Tagen"))),
+      React.createElement("input", { style: { ...inputStyle, width: "100%", marginBottom: 8 },
+        value: text === null || text === undefined ? "" : text, disabled: !darfBedingungen,
+        placeholder: "Eigener Text auf dem Beleg (leer = aus den Zahlen gebildet)",
+        onChange: (ev) => setzen(id, "text_auf_beleg", ev.target.value) }),
+      React.createElement("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 8 } },
+        "Auf dem Beleg: ",
+        React.createElement("span", { style: { color: CI.blau, fontWeight: 600 } },
+          vorschau[id] === undefined ? "…" : vorschau[id])),
+      React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" } },
+        darfBedingungen ? React.createElement("button", {
+          onClick: () => { vorschauHolen(id, netto, proz, tage, text); sichern(b, gid, istNeu); },
+          disabled: speichert === id,
+          style: { ...secondaryBtn, padding: "7px 14px", fontSize: 12.5 } },
+          speichert === id ? "Speichert …" : (istNeu ? "Anlegen" : "Speichern")) : null,
+        darfBedingungen ? React.createElement("button", {
+          onClick: () => vorschauHolen(id, netto, proz, tage, text),
+          style: { ...secondaryBtn, padding: "7px 14px", fontSize: 12.5 } }, "Vorschau") : null,
+        (!istNeu && darfBedingungen && !b.ist_standard) ? React.createElement("button", {
+          onClick: () => standardSetzen(b), disabled: speichert === id,
+          style: { ...secondaryBtn, padding: "7px 14px", fontSize: 12.5 } }, "als Standard") : null,
+        (!istNeu && b.ist_standard) ? React.createElement("span", {
+          style: { fontSize: 12, color: CI.gold, fontWeight: 700 } }, "Standard") : null,
+        (!istNeu && darfBedingungen) ? React.createElement("button", {
+          onClick: () => entfernen(b), disabled: speichert === id,
+          style: { ...secondaryBtn, padding: "7px 14px", fontSize: 12.5, marginLeft: "auto",
+                   color: CI.danger, borderColor: CI.danger } }, "Entfernen") : null));
+  };
+  return React.createElement("div", null,
+    React.createElement("div", { style: { fontSize: 13, color: CI.muted, marginBottom: 16, lineHeight: 1.6 } },
+      "Zahlungsziele und Skonto je Gesellschaft, und die Frage, wer eine Rechnung freigibt, ",
+      "bevor sie das Haus verlässt. Der Satz, der auf dem Beleg erscheint, kommt aus derselben ",
+      "Funktion, die ihn später druckt — die Vorschau kann also nicht davon abweichen."),
+    React.createElement(ErrorBox, null, fehler),
+    React.createElement(SuccessBox, null, meldung),
+    !darfBedingungen ? React.createElement("div", { style: { fontSize: 12.5, color: CI.muted, marginBottom: 16 } },
+      "Zum Ändern der Zahlungsbedingungen fehlt dir das Recht „Rechnungen“.") : null,
+    React.createElement("div", { style: { display: "grid", gap: 16 } },
+      zeilen.map((g) => {
+        const eigene = bedingungen.filter((b) => (b.gesellschaft_id || null) === (g.id || null));
+        const frei = freigabeVon(g.id) || {};
+        const freiSchluessel = "freigabe-" + (g.id || "konto");
+        const neuOffen = neue[g.id || "konto"];
+        return React.createElement("div", { key: g.id || "konto", "data-zahlung": g.id || "konto",
+          style: { ...cardStyle, padding: 16 } },
+          React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: CI.blau, marginBottom: 12 } }, g.name),
+          eigene.length ? eigene.map((b) => bedingungKarte(b, g.id, false))
+            : React.createElement("div", { style: { fontSize: 12.5, color: CI.muted, marginBottom: 10 } },
+                "Noch keine Bedingung eingerichtet. Ohne eine bleibt es beim bisherigen Verhalten."),
+          neuOffen ? bedingungKarte({ ...IMMO_ZAHLUNG_LEER, gesellschaft_id: g.id || null }, g.id, true) : null,
+          (darfBedingungen && !neuOffen) ? React.createElement("button", {
+            onClick: () => setNeue((alt) => ({ ...alt, [g.id || "konto"]: true })),
+            style: { ...secondaryBtn, padding: "7px 14px", fontSize: 12.5 } }, "Bedingung hinzufügen") : null,
+          React.createElement("div", { style: { marginTop: 18, paddingTop: 14, borderTop: `1px solid ${CI.border}` } },
+            React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: CI.blau, marginBottom: 8 } },
+              "Freigabe vor dem Versand"),
+            React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" } },
+              React.createElement("select", { style: { ...inputStyle, flex: "2 1 220px" },
+                value: frei.freigabe_durch || "", disabled: !darfFreigabe,
+                onChange: (ev) => freigabeSichern(g.id, { freigabe_durch: ev.target.value || null,
+                  freigabe_ab_betrag: frei.freigabe_ab_betrag === undefined ? null : frei.freigabe_ab_betrag }) },
+                React.createElement("option", { value: "" }, "niemand — Rechnungen gehen direkt raus"),
+                leute.map((p) => React.createElement("option", { key: p.id, value: p.id },
+                  (p.name || p.email) + (p.role ? " (" + p.role + ")" : "")))),
+              React.createElement("span", { style: { fontSize: 12, color: CI.muted, whiteSpace: "nowrap" } }, "ab"),
+              React.createElement("input", { style: { ...inputStyle, flex: "0 1 110px" }, type: "number",
+                value: frei.freigabe_ab_betrag === null || frei.freigabe_ab_betrag === undefined ? "" : frei.freigabe_ab_betrag,
+                placeholder: "jeder Betrag", disabled: !darfFreigabe || !frei.freigabe_durch,
+                onBlur: (ev) => freigabeSichern(g.id, { freigabe_durch: frei.freigabe_durch || null,
+                  freigabe_ab_betrag: ev.target.value === "" ? null : parseFloat(ev.target.value) }),
+                onChange: () => {} }),
+              React.createElement("span", { style: { fontSize: 12, color: CI.muted, whiteSpace: "nowrap" } }, "€ brutto"),
+              speichert === freiSchluessel ? React.createElement("span", {
+                style: { fontSize: 12, color: CI.muted } }, "speichert …") : null),
+            React.createElement("div", { style: { fontSize: 12, color: CI.muted, marginTop: 8, lineHeight: 1.6 } },
+              frei.freigabe_durch
+                ? "Rechnungen über der Grenze müssen erst freigegeben werden. Die Datenbank weist sie sonst ab — auch dann, wenn jemand den Weg über die Oberfläche umgeht."
+                : "Solange niemand benannt ist, ändert sich nichts am bisherigen Ablauf."),
+            !darfFreigabe ? React.createElement("div", { style: { fontSize: 12.5, color: CI.muted, marginTop: 6 } },
+              "Wer freigibt, legt die Verwaltung fest.") : null));
+      })));
+}
+
 const IMMO_BELEGARTEN = [
   ["rechnung", "Rechnung", "RE-{JJJJ}-{MM}-{#####}"],
   ["gutschrift", "Gutschrift / Korrektur", "GS-{JJJJ}-{MM}-{#####}"]

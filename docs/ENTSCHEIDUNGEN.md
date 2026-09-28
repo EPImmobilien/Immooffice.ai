@@ -1551,3 +1551,28 @@ die drei fehlenden Schriften unter `fonts/` — von der Funktion selbst geholt,
 Zeitstempel 16:33:38, ohne dass jemand etwas hochgeladen hat. Die sechs
 Schriften, die der Mandant schon hatte, wurden weiterhin unter
 `{mandant}/fonts/` gefunden: Stufe 1 vor Stufe 2, wie gebaut.
+
+---
+
+## Zahlung und Freigabe bekommen eine Maske (28.09.2026)
+
+`fork_19` hat Tabellen, Prüfung und Protokoll gebaut, aber keine Oberfläche.
+Eine Regel, die nur in der Datenbank steht und die niemand einstellen kann,
+ist keine Funktion, sondern eine Sperre. Der neue Reiter *Einstellungen →
+Zahlung & Freigabe* pflegt beides je Gesellschaft.
+
+**Zwei verschiedene Rechte, mit Absicht.** Zahlungsbedingungen darf pflegen,
+wer das Recht „Rechnungen" hat. **Wer freigibt, legt nur die Verwaltung
+fest** — sonst könnte sich der Buchhalter selbst zum Freigeber machen, und
+die Freigabe wäre keine. Beides steht so schon in den Richtlinien von
+`fork_19`; die Maske bildet es nur ab. Ausgeblendete Knöpfe sind kein
+Schutz — die Datenbank weist den Versuch ohnehin ab.
+
+**Die Vorschau rechnet nicht selbst.** `fork_21` zieht den Satz aus
+`zahlungsbedingung_text(uuid)` heraus in
+`zahlungsbedingung_text_aus(tage, prozent, skontotage, text)`; die alte
+Funktion liest nur noch die Zeile und delegiert. Damit kann die Oberfläche
+den Satz vor dem Speichern zeigen, ohne ihn ein zweites Mal zu bauen. Ein
+Wachposten in der Migration und eine Prüfung in `tests/rechnung-freigabe.sql`
+schlagen an, wenn der Satz je wieder an zwei Stellen steht — bei `hat_recht()`
+ist genau das schon einmal passiert.

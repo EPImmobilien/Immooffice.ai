@@ -143,7 +143,10 @@ zuwachs(bereich, mehr, grund) as (values
                     'rechnung_freigeben(), rechnung_faelligkeit()'),
   -- fork_20: onOffice abgeschaltet. Vierzehn Cron-Jobs weniger — das ist eine
   -- Abnahme, kein Zuwachs, deshalb eine negative Zahl.
-  ('Cron-Jobs', -14, 'fork_20: die onOffice-Jobs sind abbestellt')
+  ('Cron-Jobs', -14, 'fork_20: die onOffice-Jobs sind abbestellt'),
+  -- fork_21: der Zahlungstext, damit die Oberflaeche ihn vor dem Speichern
+  -- zeigen kann, ohne ihn ein zweites Mal zu bauen.
+  ('Funktionen', 1, 'fork_21: zahlungsbedingung_text_aus()')
 ),
 soll(bereich, soll) as (
   select v.bereich,
