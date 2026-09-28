@@ -52,6 +52,57 @@ Verschlüsselung — bei der Übernahme wird das auf den Vault umgestellt und in
 `docs/ENTSCHEIDUNGEN.md` protokolliert.
 
 <!-- INVENTAR-ANFANG -->
+## Woher die Werte kommen — gefragt am 28.09.2026
+
+Die Liste unten sagt, **was** gebraucht wird. Hier steht, **woher**. Die
+wenigsten davon sind „Passwörter, die irgendwo liegen" — die meisten muss der
+Betreiber erst anlegen.
+
+**Grundsatz: kein Wert des Referenzunternehmens.** Auch wenn ein Schlüssel der
+Vorlage bekannt wäre — er gehört einer anderen Firma, und `CLAUDE.md` schließt
+das aus. Jeder Zugang hier ist ein **neuer**, auf immoOffice.ai ausgestellter.
+
+### Die vier, ohne die nichts geht
+
+| Wert | Woher | Aufwand |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | console.anthropic.com → *API Keys* → *Create Key*. Beginnt mit `sk-ant-`. Kostet nach Verbrauch; für den Anfang reicht ein kleines Guthaben. | 5 Minuten |
+| `PORTAL_URL` | **Kein Passwort.** Die eigene Adresse der Anwendung, ohne Schrägstrich am Ende. Heute: `https://immoofficeai.netlify.app`, später `https://immooffice.ai`. Solange sie fehlt, zeigt jeder Einladungs- und Freigabelink auf `https://immooffice.example` — eine reservierte Platzhalter-Domain, die nirgendwo hinführt. | 1 Minute |
+| `RESEND_API_KEY` | resend.com → Konto anlegen → *API Keys* → *Create API Key*. Beginnt mit `re_`. **Vorher** unter *Domains* die eigene Absenderdomäne eintragen und die drei DNS-Einträge setzen, die Resend anzeigt (SPF, DKIM, DMARC). Ohne verifizierte Domäne nimmt Resend nur Post an die eigene Kontoadresse an. | 20 Minuten plus DNS-Wartezeit |
+| `EXPOSE_FREIGABE_BASIS` | Wieder kein Passwort: die Adresse der Freigabeseite, in aller Regel `{PORTAL_URL}/freigabe.html`. | 1 Minute |
+
+### Die beiden Verschlüsselungs-Schlüssel
+
+`MAIL_SECRET_KEY` und `CREDENTIALS_OBF_SECRET` sind **selbst zu erzeugen** —
+sie kommen von niemandem. Mit ihnen werden die SMTP-Passwörter der Postfächer
+und die hinterlegten Fremdzugänge verschlüsselt:
+
+```
+openssl rand -base64 32
+```
+
+**Einmal setzen und nie wieder ändern.** Wer sie tauscht, kann die damit
+verschlüsselten Zugangsdaten nicht mehr lesen; sie müssen dann neu eingegeben
+werden.
+
+### Was warten kann
+
+- `SMTP_*` — nur nötig, wenn der Systemversand **ohne** Resend laufen soll.
+  Mit Resend bleiben sie leer.
+- `REPLICATE_API_TOKEN` — replicate.com, für Spracherkennung und
+  KI-Bildbearbeitung. Ohne ihn fehlen diese beiden Funktionen, der Rest läuft.
+- `APNS_*` — nur für Push an eine iOS-Hülle. Kommt aus dem Apple Developer
+  Account und ist ohne App gegenstandslos.
+- `PUSH_HOOK_SECRET` — selbst erzeugt wie oben, schützt den Push-Endpunkt.
+- `BUCHHALTUNG_EMAIL` — eine Adresse, keine Anmeldung.
+
+### Eintragen
+
+**https://supabase.com/dashboard/project/usguiggfciavwzkdfjgt/functions/secrets**
+
+Ohne Anführungszeichen, ohne Leerzeichen am Ende. Die Funktionen lesen den
+neuen Wert beim nächsten Aufruf — ein erneutes Ausrollen ist nicht nötig.
+
 ## Inventar aus dem Quelltext — Stand 28.09.2026
 
 Erzeugt von `scripts/geheimnisse-inventar.py` aus jedem
@@ -64,10 +115,8 @@ nicht stumm aus, aber sie arbeitet auch nicht.
 | Geheimnis | Funktionen | Wofür |
 |---|---:|---|
 | `ANTHROPIC_API_KEY` | 41 | KI-Texte, Auslese von Unterlagen, Bewertung |
-| `RESEND_API_KEY` | 29 | Mailversand ueber Resend |
+| `RESEND_API_KEY` | 28 | Mailversand ueber Resend |
 | `MAIL_SECRET_KEY` | 21 | Schluessel, mit dem die SMTP-Passwoerter der Postfaecher verschluesselt sind |
-| `ONOFFICE_SECRET` | 13 | CRM-Anbindung onOffice, zweiter Teil des Zugangs |
-| `ONOFFICE_TOKEN` | 13 | CRM-Anbindung onOffice — je Mandant (Phase 6) |
 | `PORTAL_URL` | 12 | Adresse, unter der die Anwendung erreichbar ist; steckt in jedem Einladungslink |
 | `SMTP_FROM_EMAIL` | 9 | Absenderadresse des Systemversands |
 | `SMTP_FROM_NAME` | 5 | Absendername des Systemversands |
