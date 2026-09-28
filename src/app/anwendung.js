@@ -470,7 +470,7 @@ const inputStyle = {
 // Leere Werte heissen "nichts einstellen", nicht "weiss": dann bleibt die
 // Plattform-CI stehen. So steht es in docs/NEUTRALITAET.md Abschnitt 4.
 const IMMO_CI_PLATTFORM = { ...CI };
-function immoCiAnwenden(stamm) {
+async function immoCiAnwenden(stamm) {
   const hex = (w) => (typeof w === "string" && /^#[0-9A-Fa-f]{6}$/.test(w)) ? w : null;
   const primaer = hex(stamm && stamm.ci_primaer);
   const akzent = hex(stamm && stamm.ci_akzent);
@@ -494,10 +494,14 @@ function immoCiAnwenden(stamm) {
   Object.assign(cardStyle, { background: CI.card, border: `1px solid ${CI.border}`, boxShadow: CI.shadow });
   window.IMMO_LOGO_URL = null;
   window.IMMO_MARKE = (stamm && (stamm.marken_name || stamm.firma_name)) || null;
+  // branding-assets ist NICHT oeffentlich — dort liegen neben den Logos
+  // auch Schriften und Unterschriftsbilder. Also eine signierte Adresse,
+  // acht Stunden gueltig; bei jeder Anmeldung entsteht eine neue.
   if (stamm && stamm.logo_pfad) {
     try {
-      const { data } = window._sb.storage.from("branding-assets").getPublicUrl(stamm.logo_pfad);
-      window.IMMO_LOGO_URL = (data && data.publicUrl) || null;
+      const { data } = await window._sb.storage.from("branding-assets")
+        .createSignedUrl(stamm.logo_pfad, 60 * 60 * 8);
+      window.IMMO_LOGO_URL = (data && data.signedUrl) || null;
     } catch (f) { window.IMMO_LOGO_URL = null; }
   }
   if (typeof document !== "undefined" && document.documentElement) {
@@ -516,6 +520,27 @@ function immoAbdunkeln(farbe, anteil) {
     return Math.max(0, Math.min(255, Math.round(neu))).toString(16).padStart(2, "0");
   };
   return "#" + z(1) + z(3) + z(5);
+}
+
+// Vorschau eines Logos im Einstellungsformular. Eigene Komponente, weil
+// die Adresse signiert werden muss und das nicht im Rendern geht.
+function ImmoLogoVorschau({ pfad }) {
+  const [adresse, setAdresse] = useState(null);
+  useEffect(() => {
+    let laeuft = true;
+    window._sb.storage.from("branding-assets").createSignedUrl(pfad, 60 * 60)
+      .then(({ data }) => { if (laeuft) setAdresse((data && data.signedUrl) || null); })
+      .catch(() => { if (laeuft) setAdresse(null); });
+    return () => { laeuft = false; };
+  }, [pfad]);
+  if (!adresse) return React.createElement("span", {
+    style: { fontSize: 12, color: CI.muted }
+  }, "Logo hinterlegt");
+  return React.createElement("img", {
+    src: adresse,
+    alt: "Logo",
+    style: { height: 34, width: "auto", border: `1px solid ${CI.border}`, background: "#fff", padding: 2 }
+  });
 }
 
 // Das Logo: erst das des Mandanten, sonst eine Wortmarke aus dem
@@ -701,12 +726,12 @@ async function getProfile(e) {
     window.IMMO_STANDORT_ID = (s && s.id) || null;
     window.IMMO_GESELLSCHAFT_ID = (s && s.gesellschaft_id) || null;
     window.IMMO_BUNDESLAND = (s && s.bundesland) || null;
-    immoCiAnwenden(s);
+    await immoCiAnwenden(s);
   } catch (f) {
     window.IMMO_STANDORT_ID = null;
     window.IMMO_GESELLSCHAFT_ID = null;
     window.IMMO_BUNDESLAND = null;
-    immoCiAnwenden(null);
+    await immoCiAnwenden(null);
   }
   return t
 }
@@ -41422,11 +41447,8 @@ function AdminGmbHStammdaten({
     style: u
   }, "Logo"), React.createElement("div", {
     style: { display: "flex", gap: 8, alignItems: "center" }
-  }, e.logo_pfad ? React.createElement("img", {
-    src: (window._sb.storage.from("branding-assets").getPublicUrl(e.logo_pfad).data || {}).publicUrl || "",
-    alt: "Logo",
-    style: { height: 34, width: "auto", border: `1px solid ${CI.border}`, background: "#fff", padding: 2 }
-  }) : React.createElement("span", {
+  }, e.logo_pfad ? React.createElement(ImmoLogoVorschau, { pfad: e.logo_pfad })
+    : React.createElement("span", {
     style: { fontSize: 12, color: CI.muted }
   }, "Ohne Logo steht der Markenname"), React.createElement("label", {
     style: { ...secondaryBtn, padding: "7px 12px", fontSize: 12, cursor: "pointer", whiteSpace: "nowrap" }
