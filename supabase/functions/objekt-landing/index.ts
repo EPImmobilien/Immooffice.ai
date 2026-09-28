@@ -67,7 +67,7 @@ function widerrufsbelehrung(firma: any) {
   return `Widerrufsrecht\nSie haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag des Vertragsabschlusses.\nUm Ihr Widerrufsrecht auszuüben, müssen Sie uns (${adr}) mittels einer eindeutigen Erklärung (z. B. ein mit der Post versandter Brief oder E-Mail) über Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie können dafür das beigefügte Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist.\nZur Wahrung der Widerrufsfrist reicht es aus, dass Sie die Mitteilung über die Ausübung des Widerrufsrechts vor Ablauf der Widerrufsfrist absenden.\n\nFolgen des Widerrufs\nWenn Sie diesen Vertrag widerrufen, haben wir Ihnen alle Zahlungen, die wir von Ihnen erhalten haben, unverzüglich und spätestens binnen vierzehn Tagen ab dem Tag zurückzuzahlen, an dem die Mitteilung über Ihren Widerruf dieses Vertrags bei uns eingegangen ist. Für diese Rückzahlung verwenden wir dasselbe Zahlungsmittel, das Sie bei der ursprünglichen Transaktion eingesetzt haben, es sei denn, mit Ihnen wurde ausdrücklich etwas anderes vereinbart; in keinem Fall werden Ihnen wegen dieser Rückzahlung Entgelte berechnet.\nHaben Sie verlangt, dass die Dienstleistung während der Widerrufsfrist beginnen soll, so haben Sie uns einen angemessenen Betrag zu zahlen, der dem Anteil der bis zu dem Zeitpunkt, zu dem Sie uns von der Ausübung des Widerrufsrechts hinsichtlich dieses Vertrags unterrichten, bereits erbrachten Dienstleistungen im Vergleich zum Gesamtumfang der im Vertrag vorgesehenen Dienstleistungen entspricht.\n\nMuster-Widerrufsformular\n(Wenn Sie den Vertrag widerrufen wollen, dann füllen Sie bitte dieses Formular aus und senden Sie es zurück.)\nAn ${adr}\nHiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag über die Erbringung der folgenden Dienstleistung: Maklervertrag / Nachweis- und Vermittlungstätigkeit\nBestellt am (*)/erhalten am (*): ______\nName des/der Verbraucher(s): ______\nAnschrift des/der Verbraucher(s): ______\nUnterschrift des/der Verbraucher(s) (nur bei Mitteilung auf Papier), Datum\n(*) Unzutreffendes streichen.`;
 }
 
-const IM_FELDER = "id, immo_nr, objekttitel, bezeichnung, strasse, hausnummer, plz, ort, objektart, objekttyp, vertragsart, status, angebotspreis, kaltmiete, nebenkosten, heizkosten, hausgeld, kaution, kaution_monate, wohnflaeche, nutzflaeche, grundstueck, zimmer, schlafzimmer, badezimmer, etage, etagen_gesamt, baujahr, verfuegbar_ab, vermietet, energieausweis_typ, energie_kennwert, energie_klasse, energie_traeger, energie_gueltig_bis, heizungsart, stellplatz_art, stellplatz_anzahl, beschreibung_objekt, beschreibung_lage, beschreibung_ausstattung, beschreibung_sonstiges, hauptbild_url, adresse_freigeben, lage_koordinaten, lage_distanzen, zustaendig_id, provision_aussen, provisionsfrei";
+const IM_FELDER = "id, mandant_id, immo_nr, objekttitel, bezeichnung, strasse, hausnummer, plz, ort, objektart, objekttyp, vertragsart, status, angebotspreis, kaltmiete, nebenkosten, heizkosten, hausgeld, kaution, kaution_monate, wohnflaeche, nutzflaeche, grundstueck, zimmer, schlafzimmer, badezimmer, etage, etagen_gesamt, baujahr, verfuegbar_ab, vermietet, energieausweis_typ, energie_kennwert, energie_klasse, energie_traeger, energie_gueltig_bis, heizungsart, stellplatz_art, stellplatz_anzahl, beschreibung_objekt, beschreibung_lage, beschreibung_ausstattung, beschreibung_sonstiges, hauptbild_url, adresse_freigeben, lage_koordinaten, lage_distanzen, zustaendig_id, provision_aussen, provisionsfrei";
 
 async function resend(key: string, payload: any) {
   const r = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" }, body: JSON.stringify(payload) });
@@ -81,12 +81,27 @@ async function glocke(db: any, empfaenger: string | null, typ: string, titel: st
 const txt = (v: unknown) => { const s = v == null ? "" : String(v).trim(); return s || null; };
 const eur = (n: unknown) => n == null || n === "" ? "" : new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(Number(n));
 
+// Der Standort, dessen Angaben ins Impressum gehoeren: der des Objekts.
+// Erst der mit passendem Slug, sonst der erste nach Sortierung.
+async function immoStandortDesObjekts(db: any, mandant: string | null, slug: string | null) {
+  const felder = "firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon";
+  if (!mandant) return null;
+  if (slug) {
+    const { data } = await db.from("firma_stammdaten").select(felder)
+      .eq("mandant_id", mandant).eq("slug", slug).maybeSingle();
+    if (data) return data;
+  }
+  const { data } = await db.from("firma_stammdaten").select(felder)
+    .eq("mandant_id", mandant).order("sortierung").limit(1).maybeSingle();
+  return data;
+}
+
 async function kontext(db: any, t: string) {
   const { data: f } = await db.from("expose_freigaben").select("*").eq("token", t).maybeSingle();
   if (!f) return null;
   const { data: im } = await db.from("immobilien").select(IM_FELDER).eq("id", f.immobilie_id).maybeSingle();
   if (!im) return null;
-  const { data: firmaRow } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("slug", f.firma_slug || "standard").maybeSingle();
+  const firmaRow = await immoStandortDesObjekts(db, im.mandant_id, f.firma_slug || null);
   const firma = firmaRow || { firma_name: "Musterhaus Immobilien GmbH", strasse: "", plz: "", ort: "", email: "info@immooffice.example" };
   const { data: makler } = im.zustaendig_id ? await db.from("profiles").select("id, name, email, telefon, funktion, foto_url").eq("id", im.zustaendig_id).maybeSingle() : { data: null as any };
   return { f, im, firma, makler };
@@ -120,11 +135,11 @@ async function kontaktSichern(db: any, f: any, im: any): Promise<string | null> 
   if (f.kontakt_id) return f.kontakt_id;
   const mail = String(f.email || "").trim().toLowerCase();
   if (!mail) return null;
-  const { data: kk } = await db.from("kontakte").select("id").ilike("email", mail).eq("aktiv", true).limit(1);
+  const { data: kk } = await db.from("kontakte").select("id").eq("mandant_id", im.mandant_id).ilike("email", mail).eq("aktiv", true).limit(1);
   let id = kk && kk[0] ? kk[0].id : null;
   if (!id) {
     const teile = String(f.name || "").split(/\s+/).filter(Boolean); const nachname = teile.length ? teile.pop() : null; const vorname = teile.join(" ") || null;
-    const { data: kn } = await db.from("kontakte").insert({ vorname, nachname, email: mail, rollen: ["interessent"], quelle: "landingpage", aktiv: true, zustaendig_id: im.zustaendig_id || null }).select("id").single();
+    const { data: kn } = await db.from("kontakte").insert({ vorname, nachname, email: mail, rollen: ["interessent"], quelle: "landingpage", aktiv: true, mandant_id: im.mandant_id, zustaendig_id: im.zustaendig_id || null }).select("id").single();
     id = kn?.id || null;
   }
   if (id) await db.from("expose_freigaben").update({ kontakt_id: id }).eq("id", f.id);
@@ -328,7 +343,7 @@ async function ladeAntwort(db: any, ctx: any, vorschau: boolean): Promise<{ stat
 async function kontextVorschau(db: any, immobilieId: string, nutzer: { id: string; name: string | null; email: string | null }) {
   const { data: im } = await db.from("immobilien").select(IM_FELDER).eq("id", immobilieId).maybeSingle();
   if (!im) return null;
-  const { data: firmaRow } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("slug", "standard").maybeSingle();
+  const firmaRow = await immoStandortDesObjekts(db, im.mandant_id, null);
   const firma = firmaRow || { firma_name: "Musterhaus Immobilien GmbH", strasse: "", plz: "", ort: "", email: "info@immooffice.example" };
   const { data: makler } = im.zustaendig_id ? await db.from("profiles").select("id, name, email, telefon, funktion, foto_url").eq("id", im.zustaendig_id).maybeSingle() : { data: null as any };
   const jetzt = new Date().toISOString();
@@ -360,10 +375,10 @@ Deno.serve(async (req) => {
       let buendel = 0, gemeldet = 0;
       for (const [freigabeId, fragen] of gruppen) {
         const { data: fr } = await db.from("expose_freigaben").select("id, name, email, erstellt_von, immobilie_id, firma_slug").eq("id", freigabeId).maybeSingle();
-        const { data: imr } = fr ? await db.from("immobilien").select("id, immo_nr, objekttitel, bezeichnung, zustaendig_id").eq("id", fr.immobilie_id).maybeSingle() : { data: null as any };
+        const { data: imr } = fr ? await db.from("immobilien").select("id, mandant_id, immo_nr, objekttitel, bezeichnung, zustaendig_id").eq("id", fr.immobilie_id).maybeSingle() : { data: null as any };
         if (!fr || !imr) { await db.from("landing_fragen").update({ makler_info_am: new Date().toISOString() }).in("id", fragen.map((q: any) => q.id)); continue; }
         const { data: mk } = imr.zustaendig_id ? await db.from("profiles").select("name, email").eq("id", imr.zustaendig_id).maybeSingle() : { data: null as any };
-        const { data: fi } = await db.from("firma_stammdaten").select("firma_name, email").eq("slug", fr.firma_slug || "standard").maybeSingle();
+        const fi = await immoStandortDesObjekts(db, imr.mandant_id, fr.firma_slug || null);
         const firmaMail = fi?.email || "info@immooffice.example";
         const titel2 = imr.objekttitel || imr.bezeichnung || "Immobilie"; const nr2 = imr.immo_nr ? ` (Nr. ${imr.immo_nr})` : ""; const wer2 = fr.name || fr.email;
         const n = fragen.length;

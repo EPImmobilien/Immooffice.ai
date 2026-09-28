@@ -106,8 +106,26 @@ async function entschluessele(v: string): Promise<string> {
   return new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ct));
 }
 
-async function benachrichtige(db: any, an: string, betreff: string, text: string) {
-  const { data: pfs } = await db.from("mail_postfaecher").select("*").eq("aktiv", true)
+// Welcher Mandant ist gemeint? Ausdrueckliche Angabe, sonst der einzige,
+// sonst gar nichts. Dieselbe Reihenfolge wie in oeffentliche-objekte.
+async function immoMandantAusAnfrage(req: Request, db: any, koerper: any): Promise<string | null> {
+  let wunsch = "";
+  try { wunsch = (new URL(req.url).searchParams.get("mandant") || "").trim(); } catch (_) { /* egal */ }
+  if (!wunsch) wunsch = String(koerper?.mandant ?? "").trim();
+  if (!wunsch) wunsch = (req.headers.get("x-immo-mandant") || "").trim();
+  if (wunsch) {
+    const spalte = /^[0-9a-f-]{36}$/i.test(wunsch) ? "id" : "slug";
+    const { data } = await db.from("mandanten").select("id").eq(spalte, wunsch).maybeSingle();
+    return data?.id ?? null;
+  }
+  const { data: alle } = await db.from("mandanten").select("id").limit(2);
+  return (alle || []).length === 1 ? alle[0].id : null;
+}
+
+async function benachrichtige(db: any, mandant: string, an: string, betreff: string, text: string) {
+  // Das Postfach des Mandanten, nicht das erste ueberhaupt.
+  const { data: pfs } = await db.from("mail_postfaecher").select("*")
+    .eq("mandant_id", mandant).eq("aktiv", true)
     .order("ist_standard", { ascending: false }).limit(1);
   const pf = pfs && pfs[0];
   if (!pf) return { ok: false, fehler: "kein Postfach" };
@@ -179,14 +197,21 @@ Deno.serve(async (req) => {
       return antwort({ ok: false, fehler: "Zu viele Anfragen. Bitte melden Sie sich direkt telefonisch bei uns." }, 429);
     }
 
+    // --- Mandant ---
+    const mandant = await immoMandantAusAnfrage(req, db, body);
+    if (!mandant) {
+      await merke("kein_mandant");
+      return antwort({ ok: false, fehler: "Das Formular ist keinem Anbieter zugeordnet. Bitte wenden Sie sich direkt an Ihren Ansprechpartner." }, 400);
+    }
+
     // --- Quelle ---
     const quelleSlug = txt(body.quelle, 40).toLowerCase() || "website";
-    const { data: quelle } = await db.from("akq_quellen").select("id, name").eq("slug", quelleSlug).maybeSingle();
-    const { data: quelleFallback } = quelle ? { data: null } : await db.from("akq_quellen").select("id, name").eq("slug", "website").maybeSingle();
+    const { data: quelle } = await db.from("akq_quellen").select("id, name").eq("mandant_id", mandant).eq("slug", quelleSlug).maybeSingle();
+    const { data: quelleFallback } = quelle ? { data: null } : await db.from("akq_quellen").select("id, name").eq("mandant_id", mandant).eq("slug", "website").maybeSingle();
     const quelleId = (quelle || quelleFallback)?.id || null;
 
     // --- Kontakt finden oder anlegen ---
-    const { data: vorhanden } = await db.from("kontakte").select("*").ilike("email", email).limit(1);
+    const { data: vorhanden } = await db.from("kontakte").select("*").eq("mandant_id", mandant).ilike("email", email).limit(1);
     let kontakt = vorhanden && vorhanden[0];
     const kontaktFelder = {
       anrede: txt(body.anrede, 20) || null,
@@ -210,7 +235,7 @@ Deno.serve(async (req) => {
     }
 
     // --- Pipeline/Stufe ---
-    const { data: pipeline } = await db.from("akq_pipelines").select("id").eq("art", "setting").eq("aktiv", true)
+    const { data: pipeline } = await db.from("akq_pipelines").select("id").eq("mandant_id", mandant).eq("art", "setting").eq("aktiv", true)
       .order("sortierung").limit(1).maybeSingle();
     const { data: stufe } = pipeline
       ? await db.from("akq_stufen").select("id").eq("pipeline_id", pipeline.id).order("sortierung").limit(1).maybeSingle()
@@ -218,6 +243,7 @@ Deno.serve(async (req) => {
 
     // --- Zustaendigkeit: wer hat gerade die wenigsten offenen Leads? ---
     const { data: makler } = await db.from("profiles").select("id, name, email")
+      .eq("mandant_id", mandant)
       .in("role", ["chef", "mitarbeiter"]).eq("rechte->>akquise", "true");
     let zustaendig = (makler || [])[0] || null;
     if (makler && makler.length > 1) {
@@ -246,6 +272,7 @@ Deno.serve(async (req) => {
     const wert = schaetzung.wert;
 
     const { data: lead, error: leadErr } = await db.from("akq_leads").insert({
+      mandant_id: mandant,
       kontakt_id: kontakt.id,
       pipeline_id: pipeline?.id || null,
       stufe_id: stufe?.id || null,
@@ -274,6 +301,7 @@ Deno.serve(async (req) => {
     if (leadErr) throw leadErr;
 
     await db.from("akq_lead_historie").insert({
+      mandant_id: mandant,
       lead_id: lead.id, feld: "angelegt", alt: null,
       neu: `Über das Bewertungsformular (${(quelle || quelleFallback)?.name || quelleSlug})`,
       user_name: "Bewertungsformular",
@@ -295,7 +323,7 @@ Deno.serve(async (req) => {
     // --- Zustaendigen informieren ---
     if (zustaendig?.email) {
       const adresse = [[txt(body.strasse, 120), txt(body.hausnummer, 20)].filter(Boolean).join(" "), [txt(body.plz, 10), txt(body.ort, 80)].filter(Boolean).join(" ")].filter(Boolean).join(", ");
-      await benachrichtige(db, zustaendig.email,
+      await benachrichtige(db, mandant, zustaendig.email,
         `Neuer Akquise-Lead: ${[kontaktFelder.vorname, kontaktFelder.nachname].filter(Boolean).join(" ")}`,
         [
           `Über das Bewertungsformular ist ein neuer Eigentümer-Lead eingegangen.`,

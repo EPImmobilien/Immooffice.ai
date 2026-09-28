@@ -496,6 +496,210 @@ ERSETZUNGEN = [
      'web-lead: die Aktivitaet geht an den Chef des Mandanten.',
      {'web-lead'}),
 
+    # =====================================================================
+    # FORK — objekt-landing: das Impressum kam vom falschen Mandanten
+    #
+    # Die oeffentliche Objektseite holt Firmenname, Anschrift, Registergericht,
+    # Geschaeftsfuehrer und USt-IdNr. ueber einen SLUG:
+    #     .eq("slug", f.firma_slug || "standard")
+    # firma_stammdaten.slug war bis fork_17 global eindeutig, also traf das
+    # immer genau einen Standort — irgendeinen. Die Landingpage fuer das Objekt
+    # von Makler A haette die Rechtsangaben von Makler B gezeigt. Das ist nicht
+    # nur falsch, es ist die Impressumspflicht verfehlt.
+    #
+    # Ab fork_17 ist der Slug je Mandant eindeutig, ein Slug allein also gar
+    # nicht mehr aussagekraeftig. Der Standort kommt jetzt aus dem Mandanten
+    # DES OBJEKTS: erst der Standort mit passendem Slug, sonst der erste nach
+    # Sortierung. Das Objekt ist die einzige verlaessliche Quelle — die Seite
+    # zeigt schliesslich genau dieses Objekt.
+    # =====================================================================
+    ('FORK',
+     r'const IM_FELDER = "id, immo_nr,',
+     'const IM_FELDER = "id, mandant_id, immo_nr,',
+     'objekt-landing: das Objekt bringt seinen Mandanten mit.',
+     {'objekt-landing'}),
+
+    ('FORK',
+     r'async function kontext\(db: any, t: string\) \{',
+     '// Der Standort, dessen Angaben ins Impressum gehoeren: der des Objekts.\n'
+     '// Erst der mit passendem Slug, sonst der erste nach Sortierung.\n'
+     'async function immoStandortDesObjekts(db: any, mandant: string | null, slug: string | null) {\n'
+     '  const felder = "firma_name, strasse, plz, ort, email, web, hrb, registergericht, '
+     'geschaeftsfuehrer, ust_id, telefon";\n'
+     '  if (!mandant) return null;\n'
+     '  if (slug) {\n'
+     '    const { data } = await db.from("firma_stammdaten").select(felder)\n'
+     '      .eq("mandant_id", mandant).eq("slug", slug).maybeSingle();\n'
+     '    if (data) return data;\n'
+     '  }\n'
+     '  const { data } = await db.from("firma_stammdaten").select(felder)\n'
+     '    .eq("mandant_id", mandant).order("sortierung").limit(1).maybeSingle();\n'
+     '  return data;\n'
+     '}\n'
+     '\n'
+     'async function kontext(db: any, t: string) {',
+     'objekt-landing: Standort aus dem Mandanten des Objekts.',
+     {'objekt-landing'}),
+
+    ('FORK',
+     r'  const \{ data: firmaRow \} = await db\.from\("firma_stammdaten"\)\.select\("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon"\)\.eq\("slug", f\.firma_slug \|\| "standard"\)\.maybeSingle\(\);',
+     '  const firmaRow = await immoStandortDesObjekts(db, im.mandant_id, f.firma_slug || null);',
+     'objekt-landing: Impressum der Exposeseite vom Mandanten des Objekts.',
+     {'objekt-landing'}),
+
+    ('FORK',
+     r'  const \{ data: firmaRow \} = await db\.from\("firma_stammdaten"\)\.select\("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon"\)\.eq\("slug", "standard"\)\.maybeSingle\(\);',
+     '  const firmaRow = await immoStandortDesObjekts(db, im.mandant_id, null);',
+     'objekt-landing: Impressum der Vorschau vom Mandanten des Objekts.',
+     {'objekt-landing'}),
+
+    # Die Sammelmail an den Makler: auch dort der Standort des Objekts.
+    ('FORK',
+     r'        const \{ data: imr \} = fr \? await db\.from\("immobilien"\)\.select\("id, immo_nr, objekttitel, bezeichnung, zustaendig_id"\)',
+     '        const { data: imr } = fr ? await db.from("immobilien").select("id, mandant_id, immo_nr, objekttitel, bezeichnung, zustaendig_id")',
+     'objekt-landing: auch die Sammelmail kennt den Mandanten des Objekts.',
+     {'objekt-landing'}),
+
+    ('FORK',
+     r'        const \{ data: fi \} = await db\.from\("firma_stammdaten"\)\.select\("firma_name, email"\)\.eq\("slug", fr\.firma_slug \|\| "standard"\)\.maybeSingle\(\);',
+     '        const fi = await immoStandortDesObjekts(db, imr.mandant_id, fr.firma_slug || null);',
+     'objekt-landing: Absenderadresse der Sammelmail vom Mandanten des Objekts.',
+     {'objekt-landing'}),
+
+    # Der Interessentenkontakt, den die Seite anlegt, gehoert dem Mandanten des
+    # Objekts — nicht irgendeinem.
+    ('FORK',
+     r'  const \{ data: kk \} = await db\.from\("kontakte"\)\.select\("id"\)\.ilike\("email", mail\)\.eq\("aktiv", true\)\.limit\(1\);',
+     '  const { data: kk } = await db.from("kontakte").select("id").eq("mandant_id", im.mandant_id)'
+     '.ilike("email", mail).eq("aktiv", true).limit(1);',
+     'objekt-landing: Kontaktsuche nur im Mandanten des Objekts.',
+     {'objekt-landing'}),
+
+    ('FORK',
+     r'    const \{ data: kn \} = await db\.from\("kontakte"\)\.insert\(\{ vorname, nachname, email: mail, rollen: \["interessent"\], quelle: "landingpage", aktiv: true, zustaendig_id: im\.zustaendig_id \|\| null \}\)',
+     '    const { data: kn } = await db.from("kontakte").insert({ vorname, nachname, email: mail, '
+     'rollen: ["interessent"], quelle: "landingpage", aktiv: true, '
+     'mandant_id: im.mandant_id, zustaendig_id: im.zustaendig_id || null })',
+     'objekt-landing: neuer Interessent traegt den Mandanten des Objekts.',
+     {'objekt-landing'}),
+
+    # =====================================================================
+    # FORK — akq-lead-eingang: fuenf mandantenlose Auswahlen
+    #
+    # Der oeffentliche Eingang fuer Bewertungsanfragen der Akquise. Ohne
+    # Anmeldung erreichbar, mit service_role — RLS gilt nicht. Er waehlte
+    # durchweg "den ersten, den er findet":
+    #
+    #   mail_postfaecher  das erste aktive Postfach ueberhaupt. Die
+    #                     Benachrichtigung ueber einen Lead von Makler A waere
+    #                     aus dem Postfach von Makler B gegangen.
+    #   profiles          der Makler mit den wenigsten offenen Leads — ueber
+    #                     ALLE Mandanten. Ein Lead von A haette bei B gelegen,
+    #                     mit Name, E-Mail und Anschrift des Interessenten.
+    #   akq_pipelines     die erste aktive Pipeline, gleich welchen Mandanten.
+    #   akq_quellen       die Quelle "website" irgendeines Mandanten.
+    #   kontakte          Suche ueber die E-Mail-Adresse, mandantenuebergreifend,
+    #                     danach wurde der gefundene Kontakt GEAENDERT.
+    #
+    # Dazu trugen akq_leads und akq_lead_historie keinen Mandanten.
+    #
+    # Derselbe Weg wie bei oeffentliche-objekte und web-lead: der Mandant kommt
+    # aus der Anfrage, sonst ist er der einzige, sonst wird abgelehnt.
+    # =====================================================================
+    ('FORK',
+     r'async function benachrichtige\(db: any, an: string, betreff: string, text: string\) \{\n  const \{ data: pfs \} = await db\.from\("mail_postfaecher"\)\.select\("\*"\)\.eq\("aktiv", true\)\n    \.order\("ist_standard", \{ ascending: false \}\)\.limit\(1\);',
+     '// Welcher Mandant ist gemeint? Ausdrueckliche Angabe, sonst der einzige,\n'
+     '// sonst gar nichts. Dieselbe Reihenfolge wie in oeffentliche-objekte.\n'
+     'async function immoMandantAusAnfrage(req: Request, db: any, koerper: any): Promise<string | null> {\n'
+     '  let wunsch = "";\n'
+     '  try { wunsch = (new URL(req.url).searchParams.get("mandant") || "").trim(); } catch (_) { /* egal */ }\n'
+     '  if (!wunsch) wunsch = String(koerper?.mandant ?? "").trim();\n'
+     '  if (!wunsch) wunsch = (req.headers.get("x-immo-mandant") || "").trim();\n'
+     '  if (wunsch) {\n'
+     '    const spalte = /^[0-9a-f-]{36}$/i.test(wunsch) ? "id" : "slug";\n'
+     '    const { data } = await db.from("mandanten").select("id").eq(spalte, wunsch).maybeSingle();\n'
+     '    return data?.id ?? null;\n'
+     '  }\n'
+     '  const { data: alle } = await db.from("mandanten").select("id").limit(2);\n'
+     '  return (alle || []).length === 1 ? alle[0].id : null;\n'
+     '}\n'
+     '\n'
+     'async function benachrichtige(db: any, mandant: string, an: string, betreff: string, text: string) {\n'
+     '  // Das Postfach des Mandanten, nicht das erste ueberhaupt.\n'
+     '  const { data: pfs } = await db.from("mail_postfaecher").select("*")\n'
+     '    .eq("mandant_id", mandant).eq("aktiv", true)\n'
+     '    .order("ist_standard", { ascending: false }).limit(1);',
+     'akq-lead-eingang: Postfach des Mandanten statt des ersten aktiven.',
+     {'akq-lead-eingang'}),
+
+    # Mandant bestimmen, bevor irgendetwas ausgewaehlt oder geschrieben wird.
+    ('FORK',
+     r'    // --- Quelle ---\n    const quelleSlug = txt\(body\.quelle, 40\)\.toLowerCase\(\) \|\| "website";\n    const \{ data: quelle \} = await db\.from\("akq_quellen"\)\.select\("id, name"\)\.eq\("slug", quelleSlug\)\.maybeSingle\(\);\n    const \{ data: quelleFallback \} = quelle \? \{ data: null \} : await db\.from\("akq_quellen"\)\.select\("id, name"\)\.eq\("slug", "website"\)\.maybeSingle\(\);',
+     '    // --- Mandant ---\n'
+     '    const mandant = await immoMandantAusAnfrage(req, db, body);\n'
+     '    if (!mandant) {\n'
+     '      await merke("kein_mandant");\n'
+     '      return antwort({ ok: false, fehler: "Das Formular ist keinem Anbieter zugeordnet. '
+     'Bitte wenden Sie sich direkt an Ihren Ansprechpartner." }, 400);\n'
+     '    }\n'
+     '\n'
+     '    // --- Quelle ---\n'
+     '    const quelleSlug = txt(body.quelle, 40).toLowerCase() || "website";\n'
+     '    const { data: quelle } = await db.from("akq_quellen").select("id, name")'
+     '.eq("mandant_id", mandant).eq("slug", quelleSlug).maybeSingle();\n'
+     '    const { data: quelleFallback } = quelle ? { data: null } : await db.from("akq_quellen")'
+     '.select("id, name").eq("mandant_id", mandant).eq("slug", "website").maybeSingle();',
+     'akq-lead-eingang: Mandant steht fest, bevor etwas ausgewaehlt wird.',
+     {'akq-lead-eingang'}),
+
+    ('FORK',
+     r'    const \{ data: vorhanden \} = await db\.from\("kontakte"\)\.select\("\*"\)\.ilike\("email", email\)\.limit\(1\);',
+     '    const { data: vorhanden } = await db.from("kontakte").select("*")'
+     '.eq("mandant_id", mandant).ilike("email", email).limit(1);',
+     'akq-lead-eingang: Kontaktsuche nur im eigenen Mandanten.',
+     {'akq-lead-eingang'}),
+
+    ('FORK',
+     r'    const \{ data: pipeline \} = await db\.from\("akq_pipelines"\)\.select\("id"\)\.eq\("art", "setting"\)\.eq\("aktiv", true\)\n      \.order\("sortierung"\)\.limit\(1\)\.maybeSingle\(\);',
+     '    const { data: pipeline } = await db.from("akq_pipelines").select("id")'
+     '.eq("mandant_id", mandant).eq("art", "setting").eq("aktiv", true)\n'
+     '      .order("sortierung").limit(1).maybeSingle();',
+     'akq-lead-eingang: Pipeline des eigenen Mandanten.',
+     {'akq-lead-eingang'}),
+
+    ('FORK',
+     r'    const \{ data: makler \} = await db\.from\("profiles"\)\.select\("id, name, email"\)\n      \.in\("role", \["chef", "mitarbeiter"\]\)\.eq\("rechte->>akquise", "true"\);',
+     '    const { data: makler } = await db.from("profiles").select("id, name, email")\n'
+     '      .eq("mandant_id", mandant)\n'
+     '      .in("role", ["chef", "mitarbeiter"]).eq("rechte->>akquise", "true");',
+     'akq-lead-eingang: zustaendig wird nur, wer zum Mandanten gehoert.',
+     {'akq-lead-eingang'}),
+
+    ('FORK',
+     r'    const \{ data: lead, error: leadErr \} = await db\.from\("akq_leads"\)\.insert\(\{\n      kontakt_id: kontakt\.id,',
+     '    const { data: lead, error: leadErr } = await db.from("akq_leads").insert({\n'
+     '      mandant_id: mandant,\n'
+     '      kontakt_id: kontakt.id,',
+     'akq-lead-eingang: der Lead traegt seinen Mandanten.',
+     {'akq-lead-eingang'}),
+
+    ('FORK',
+     r'    await db\.from\("akq_lead_historie"\)\.insert\(\{\n      lead_id: lead\.id, feld: "angelegt", alt: null,',
+     '    await db.from("akq_lead_historie").insert({\n'
+     '      mandant_id: mandant,\n'
+     '      lead_id: lead.id, feld: "angelegt", alt: null,',
+     'akq-lead-eingang: die Historie traegt ihren Mandanten.',
+     {'akq-lead-eingang'}),
+
+    # Die Aufrufstelle muss die geaenderte Signatur mitnehmen — sonst stuende
+    # die E-Mail-Adresse an der Stelle des Mandanten und die Benachrichtigung
+    # ginge gar nicht mehr raus. Beim ersten Durchlauf genau so passiert.
+    ('FORK',
+     r'      await benachrichtige\(db, zustaendig\.email,',
+     '      await benachrichtige(db, mandant, zustaendig.email,',
+     'akq-lead-eingang: die Aufrufstelle kennt die neue Signatur.',
+     {'akq-lead-eingang'}),
+
 ]
 
 # Drei Funktionen verdrahten die Portal-Adresse fest, statt sie wie alle

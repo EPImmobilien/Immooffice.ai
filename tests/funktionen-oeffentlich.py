@@ -36,6 +36,13 @@ ABGESICHERT = {
         'Schreibt Dateien; Mandant aus Immobilie beziehungsweise Dateisatz.'),
     'signatur-unterschreiben': ('immoSetzeMandant',
         'Mandant aus dem Signaturvorgang, den der Token benennt.'),
+    'objekt-landing': ('immoStandortDesObjekts',
+        'Oeffentliche Objektseite. Impressum, Absenderadresse und neue '
+        'Interessentenkontakte kommen aus dem Mandanten DES OBJEKTS, nicht '
+        'ueber einen festen Slug.'),
+    'akq-lead-eingang': ('immoMandantAusAnfrage',
+        'Eingang der Akquise. Postfach, Quelle, Pipeline, zustaendiger Makler '
+        'und beide inserts sind auf den Mandanten aus der Anfrage begrenzt.'),
     'web-lead': ('immoMandantAusAnfrage',
         'Eingang fuer Bewertungsanfragen. Mandant aus der Anfrage, Chef und '
         'Empfaenger aus dem Mandanten; Kontaktsuche und beide inserts sind '
@@ -54,7 +61,6 @@ UNBEDENKLICH = {
 # Diese Liste darf kuerzer werden, nie laenger. Wer eine Funktion absichert,
 # traegt sie oben ein und streicht sie hier.
 NOCH_OFFEN = {
-    'akq-lead-eingang': 'Nimmt Leads entgegen — welchem Mandanten gehoeren sie?',
     'bewerbertest-abgeben': 'Bewerbertest, Zuordnung ungeprueft.',
     'bewerbertest-abrufen': 'Bewerbertest, Zuordnung ungeprueft.',
     'eigentuemer-benachrichtigungen-versenden': 'Versendet aus einer Warteschlange ohne mandant_id.',
@@ -62,7 +68,6 @@ NOCH_OFFEN = {
     'expose-freigabe': 'Gibt Exposes frei; Token-gebunden, aber ungelesen.',
     'ki-bildbearbeitung': 'Schreibt Bilder, 44 kB, ungelesen.',
     'news-briefing-erstellen': 'Erzeugt Briefings.',
-    'objekt-landing': 'Oeffentliche Objektseite, 54 kB, ungelesen.',
     'onoffice-expose-abgleich': 'Fremdanbindung.',
     'onoffice-suchkriterien': 'Fremdanbindung.',
     'portal-ftp-diagnose': 'Diagnose.',

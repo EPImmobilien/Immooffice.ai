@@ -57,7 +57,7 @@ for _f in ('expose-pdf-erzeugen', 'mpe-pdf-erzeugen', 'energieausweis-anfrage',
 # Oeffentliche Endpunkte, die ihren Mandanten selbst bestimmen muessen. Sie
 # benutzen den service_role, fuer den RLS nicht gilt — die Grenze ziehen sie
 # also im Quelltext. Buch darueber fuehrt tests/funktionen-oeffentlich.py.
-for _f in ('oeffentliche-objekte', 'web-lead'):
+for _f in ('oeffentliche-objekte', 'web-lead', 'objekt-landing', 'akq-lead-eingang'):
     ERWEITERT[_f] = ('Oeffentlicher Endpunkt: bestimmt seinen Mandanten '
                      'selbst (Phase 2)')
 

@@ -1272,3 +1272,47 @@ mehrdeutig (Hilfstabelle *und* Variable), alle zehn scheiterten aus dem
 Jetzt steht jede Einfügung ausgeschrieben, mit allen Pflichtfeldern, und nur
 `unique_violation` zählt als Kollision; alles andere gilt als **nicht
 gelaufener Testfall** und damit als Fehler.
+
+## 2026-09-28 · `objekt-landing`: das Impressum kam vom falschen Mandanten
+
+Die öffentliche Objektseite holte Firmenname, Anschrift, Registergericht,
+Geschäftsführer und USt-IdNr. über einen **Slug**:
+
+```js
+.eq("slug", f.firma_slug || "standard")
+```
+
+`firma_stammdaten.slug` war bis `fork_17` global eindeutig — das traf also
+immer genau einen Standort, irgendeinen. **Die Landingpage für das Objekt von
+Makler A hätte die Rechtsangaben von Makler B gezeigt.** Das ist nicht nur
+falsch, das verfehlt die Impressumspflicht.
+
+Seit `fork_17` ist der Slug je Mandant eindeutig — ein Slug allein sagt also
+gar nichts mehr. Der Standort kommt jetzt aus dem Mandanten **des Objekts**:
+erst der mit passendem Slug, sonst der erste nach Sortierung. Das Objekt ist
+die verlässliche Quelle; die Seite zeigt schließlich genau dieses Objekt.
+
+Ebenfalls behoben: die Suche nach dem Interessentenkontakt lief über alle
+Mandanten, und ein neu angelegter Kontakt trug keinen.
+
+## 2026-09-28 · `akq-lead-eingang`: fünf Auswahlen ohne Mandantenbezug
+
+Der öffentliche Eingang für Bewertungsanfragen wählte durchweg „den ersten,
+den er findet":
+
+| Auswahl | Folge |
+|---|---|
+| `mail_postfaecher` | die Benachrichtigung über einen Lead von Makler A wäre **aus dem Postfach von Makler B** gegangen |
+| `profiles` | „der Makler mit den wenigsten offenen Leads" — über **alle** Mandanten. Ein Lead von A hätte bei B gelegen, mit Name, E-Mail und Anschrift des Interessenten |
+| `akq_pipelines` | die erste aktive Pipeline, gleich welchen Mandanten |
+| `akq_quellen` | die Quelle „website" irgendeines Mandanten |
+| `kontakte` | Suche über die E-Mail-Adresse, mandantenübergreifend — und der gefundene Kontakt wurde danach **geändert** |
+
+Dazu trugen `akq_leads` und `akq_lead_historie` keinen Mandanten.
+
+**Ein Fehler beim Bauen, im selben Durchgang gefunden:** Ich habe die Signatur
+von `benachrichtige()` um den Mandanten erweitert, die Aufrufstelle aber
+zunächst nicht. Dort stand dann die E-Mail-Adresse an der Stelle des
+Mandanten — die Benachrichtigung wäre gar nicht mehr rausgegangen. Aufgefallen
+beim Lesen des erzeugten Ergebnisses, nicht beim Schreiben der Regel. Deshalb
+gehört der Blick auf das Erzeugte zum Vorgang, nicht ans Ende.
