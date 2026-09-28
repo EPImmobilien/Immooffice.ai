@@ -25,13 +25,17 @@ Aufruf:
     python3 scripts/oberflaeche-zerlegen.py           zerlegen und neutralisieren
     python3 scripts/oberflaeche-zerlegen.py --roh DIR nur zerlegen, nach DIR
 """
-import pathlib, re, shutil, sys
+import pathlib, re, shutil, subprocess, sys
 
 WURZEL = pathlib.Path(__file__).resolve().parent.parent
 VORLAGE = WURZEL / 'reference' / 'epworld-src.html'
 ZIEL = WURZEL / 'src'
 
 HOST = 'immooffice.example'
+
+# Ein einzelner Backslash. Als Name lesbarer als drei Anfuehrungszeichen tief
+# verschachtelte Maskierung.
+BS = chr(92)
 
 # Die Stuecke: Datei -> (erste Zeile, letzte Zeile) in der Vorlage, 1-basiert,
 # jeweils OHNE das umschliessende <script>/<style>-Tag. scripts/bauen.py setzt
@@ -73,6 +77,16 @@ TAGS = {
 ERSETZUNGEN = [
     # --- MARKE: ein Personenname im Bezeichner. Muss vor der Wortmarken-Regel
     # stehen, sonst bleibt "Lasse" allein stehen.
+    ('MARKE', r'vertreten durch Lasse Engfer', 'vertreten durch {geschaeftsfuehrer}',
+     'Name in den Textbausteinen, die aus den Word-Vorlagen herausgefiltert '
+     'werden.'),
+    ('MARKE', r'(Genehmigung durch|wird) Lasse Engfer', r'\1 die Geschaeftsfuehrung',
+     'Name im Hinweistext der Urlaubsverwaltung. Die Rolle statt der Person — '
+     'inhaltlich dasselbe, ohne Kennzeichen.'),
+    ('MARKE', r'"Lasse Engfer"', '"{geschaeftsfuehrer}"',
+     'Name des Geschaeftsfuehrers als Vorgabewert und als Suchbegriff in den '
+     'Word-Vorlagen. Ein Platzhalter statt eines leeren Werts: die Suche darf '
+     'weiterhin ins Leere laufen, nicht auf Position 0 treffen.'),
     ('MARKE', r'moveLasseEngferLeft', 'moveNamenszeileLinks',
      'Funktionsname mit dem Namen des Geschaeftsfuehrers der Referenz.'),
 
@@ -94,19 +108,70 @@ ERSETZUNGEN = [
     ('MARKE', r'Engfer\s*&amp;\s*Partner', 'Musterhaus Immobilien',
      'Firmenname ohne Zusatz, HTML-maskiert.'),
     ('MARKE', r'Engfer\s*&\s*Partner', 'Musterhaus Immobilien', 'Firmenname ohne Zusatz.'),
-    ('MARKE', r'\bENGFER\b', 'MUSTERHAUS', 'Wortmarke in Versalien.'),
-    ('MARKE', r'\bE&P\s*World\b', 'ImmoOffice', 'Produktname der Referenz.'),
-    ('MARKE', r'\bE&amp;P\s*World\b', 'ImmoOffice', 'Produktname HTML-maskiert.'),
-    ('MARKE', r'\bE&P\s*Portal\b', 'ImmoOffice', 'Name der Anwendung in den PWA-Angaben.'),
-    ('MARKE', r'\bE&P\s*Immobilien\b', 'Musterhaus Immobilien GmbH', 'Firmenname kurz.'),
-    ('MARKE', r'\bE&amp;P\b', 'ImmoOffice', 'Kuerzel HTML-maskiert, Restfaelle.'),
-    ('MARKE', r'\bepworld\b', 'immooffice', 'Produktname klein geschrieben.'),
-    ('MARKE', r'\bEngfer\b', 'Musterhaus', 'Nachname der Referenz, Restfaelle.'),
-    ('MARKE', r'\bengfer\b', 'musterhaus', 'wie oben, klein geschrieben.'),
+    # Achtung: KEINE fuehrende Wortgrenze \b bei den folgenden Regeln. Die
+    # Treffer stehen oft direkt hinter einem maskierten \n in einer
+    # JS-Zeichenkette; dessen 'n' ist ein Wortzeichen, und \b greift dann
+    # nicht. Die Muster sind auch ohne Wortgrenze eindeutig genug.
+    ('MARKE', r'ENGFER\b', 'MUSTERHAUS', 'Wortmarke in Versalien.'),
+    ('MARKE', r'E&P[- ]?World\b', 'ImmoOffice',
+     'Produktname der Referenz, auch mit Bindestrich geschrieben.'),
+    ('MARKE', r'E&amp;P\s*World\b', 'ImmoOffice', 'Produktname HTML-maskiert.'),
+    ('MARKE', r'E&P\s*Portal\b', 'ImmoOffice', 'Name der Anwendung in den PWA-Angaben.'),
+    ('MARKE', r'E&P\s*Immobilien\b', 'Musterhaus Immobilien GmbH', 'Firmenname kurz.'),
+    ('MARKE', r'E&amp;P\b', 'ImmoOffice', 'Kuerzel HTML-maskiert, Restfaelle.'),
+    ('MARKE', r'epworld\b', 'immooffice', 'Produktname klein geschrieben.'),
+    ('MARKE', r'Engfer\b', 'Musterhaus', 'Nachname der Referenz, Restfaelle.'),
+    ('MARKE', r'engfer\b', 'musterhaus', 'wie oben, klein geschrieben.'),
+    ('MARKE', r'https://www\.instagram\.com/engfer_und_partner_immo/', '{instagram}',
+     'Instagram-Adresse der Referenz in der Mail-Signatur. Der Platzhalter '
+     'folgt der Schreibweise, die die Signatur ohnehin benutzt ({absender_name}).'),
+    ('MARKE', r'engfer_', 'immooffice_',
+     'Dateinamen-Vorsatz der Referenz bei Marketing-Ausgaben.'),
+    ('MARKE', r'@engferundpartner\\\.\(de\|com\)', f'@{HOST.replace(".", chr(92)+chr(92)+".")}',
+     'Maildomain der Referenz innerhalb eines regulaeren Ausdrucks — dort ist '
+     'der Punkt maskiert, deshalb greift die Regel weiter oben nicht.'),
+    ('MARKE', r'"e&p immobilien", "e und p immobilien", ', '',
+     'Eigennamen der Referenz in der Kontenzuordnung der Liquiditaetsplanung.'),
+    ('MARKE', r', "ep immobilien"', '', 'wie oben'),
+    ('MARKE', r'EPWorldApp', 'ImmoOfficeApp',
+     'Kennung der iOS-Huelle im User-Agent.'),
+    # Zuletzt, damit die Regeln oben ihre genaueren Faelle zuerst bekommen.
+    ('MARKE', r'E&P\b', 'ImmoOffice', 'Kuerzel der Referenz, Restfaelle.'),
+
+    ('MARKE', r'"DE74100101236085969429"', '"DE02120300000000202051"',
+     'IBAN der Referenz als Beispiel im Bankfeld — ersetzt durch die offizielle '
+     'Test-IBAN der Deutschen Bundesbank, die keinem Konto gehoert.'),
+
+    ('MARKE', r'Musterhaus Immobilien GmbH GmbH', 'Musterhaus Immobilien GmbH',
+     'doppeltes GmbH, wo im Original schon eines stand.'),
 
     # --- MARKE: Anschrift der Referenz
     ('MARKE', r'Am V(ö|oe)genteich 26 ?[rR]', '', 'Bueroanschrift der Referenz.'),
     ('MARKE', r'V(ö|oe)genteich', '', 'Strassenname der Referenz, Restfaelle.'),
+
+    # --- MARKE: eingebettete Dateien. Sie stehen als Base64 im Quelltext und
+    # sind fuer das Neutralitaets-Gate unsichtbar — es liest Text, nicht Bilder.
+    # Vier Logos der Referenz in zwei Bloecken, zweimal dieselbe Wortmarke in
+    # anderer Groesse. Die Konstanten bleiben stehen und werden leer: der Code
+    # prueft sie ohnehin auf Inhalt, und laut docs/NEUTRALITAET.md tritt bei
+    # fehlendem Logo eine Wortmarke aus dem Firmennamen an seine Stelle.
+    ('MARKE',
+     r'(\b(?:LOGO_BLAU|LOGO_DUNKEL|LOGO_ECHT|LOGO_HELL|EP_LOGO_DATAURL|'
+     r'EP_LOGO2_DATAURL)\s*=\s*)"data:image/[a-z+]+;base64,[A-Za-z0-9+/=]+"',
+     r'\1""',
+     'Logos der Referenz als Base64 — geleert.'),
+
+    # --- MARKE: die beiden Word-Vorlagen der Referenz, ebenfalls Base64.
+    # Sie tragen Briefkopf und Vertragstext der Referenz. docs/NEUTRALITAET.md
+    # Abschnitt 5 ist eindeutig: Rechtstexte der Referenz werden ERSETZT, nicht
+    # uebernommen. Ersetzen kann dieses Skript sie nicht — eine gueltige
+    # Word-Datei laesst sich nicht als Ersetzungsregel schreiben. Also geleert;
+    # die Vertragserzeugung steht damit still, bis neutrale Muster vorliegen.
+    # Vermerkt in docs/OFFEN.md.
+    ('MARKE',
+     r'(\b(?:VORLAGE_MAKLERVERTRAG|VORLAGE_OBJEKTNACHWEIS)\s*=\s*)"[A-Za-z0-9+/=]{500,}"',
+     r'\1""',
+     'Word-Vorlagen der Referenz als Base64 — geleert.'),
 
     # --- FREMD: Zugangsdaten. Die Vorlage traegt Projekt-Adresse und
     # anon-Schluessel im Klartext im Auslieferungsstand. Der Schluessel ist
@@ -114,7 +179,7 @@ ERSETZUNGEN = [
     # Repository noch in einen Fork, der auf ein anderes Projekt zeigt. Beides
     # kommt jetzt aus zwei globalen Werten, die huelle/01-kopf.html setzt.
     ('FREMD',
-     r'createClient\("https://[a-z]+\.supabase\.co","eyJ[A-Za-z0-9._-]+",',
+     r'createClient\(\s*"https://[a-z]+\.supabase\.co"\s*,\s*"eyJ[A-Za-z0-9._-]+"\s*,',
      'createClient(window.IMMO_SUPABASE_URL, window.IMMO_SUPABASE_KEY,',
      'Anlegen des Supabase-Zugangs ohne verdrahtete Zugangsdaten.'),
     ('FREMD',
@@ -155,6 +220,82 @@ KONFIGURATION = """<script>
 """
 
 
+def ist_vorkompiliert(zeile):
+    """Erkennt eine Zeile, die aus einem Kompilat stammt.
+
+    Zwei Merkmale zusammen, nicht einzeln: sehr lang UND voller Bezeichner aus
+    einem einzigen Buchstaben. Lang allein trifft auch eingebettete Blobs,
+    kurze Namen allein auch handgeschriebene Schleifen.
+    """
+    return len(zeile) > 2000 and len(re.findall(r'[({,]\s*[a-z]\s*[:,)=]', zeile)) > 5
+
+
+def ausformatieren(inhalt, datei):
+    """Bricht vorkompilierte Zeilen um, ohne ein Zeichen Logik zu aendern.
+
+    Die Vorlage liefert 2,97 MB Anwendungscode in drei Zeilen, die groesste mit
+    2,4 MB. Darin ist nichts zu finden, nichts zu aendern und nichts zu pruefen.
+    js-beautify setzt nur Zeilenumbrueche und Einrueckungen.
+
+    Dass wirklich nur Leerraum angefasst wurde, wird nachgerechnet: entfernt man
+    aus beiden Fassungen jeden Leerraum, muessen sie zeichengleich sein. Waere
+    irgendwo ein Zeichen Programmtext verlorengegangen, hinzugekommen oder
+    vertauscht worden, fiele das hier auf.
+    """
+    zeilen = inhalt.split('\n')
+    treffer = [i for i, z in enumerate(zeilen) if ist_vorkompiliert(z)]
+    if not treffer:
+        return inhalt, 0
+
+    werkzeug = WURZEL / 'node_modules' / '.bin' / 'js-beautify'
+    if not werkzeug.exists():
+        sys.exit(f'{werkzeug} fehlt. Einmal `npm install` ausfuehren — '
+                 'js-beautify steht in den devDependencies.')
+
+    for i in treffer:
+        roh = zeilen[i]
+        fertig = subprocess.run(
+            [str(werkzeug), '--indent-size', '2', '-f', '-'],
+            input=roh, capture_output=True, text=True, check=True).stdout.rstrip('\n')
+        ohne = lambda s: re.sub(r'\s+', '', s)
+        if ohne(roh) != ohne(fertig):
+            sys.exit(f'ABBRUCH: Beim Umbrechen von {datei}, Zeile {i+1}, hat sich '
+                     'mehr als Leerraum geaendert. Ergebnis verworfen.')
+        zeilen[i] = fertig
+    return '\n'.join(zeilen), len(treffer)
+
+
+def signatur_neutralisieren(inhalt):
+    """Ersetzt den Geschaeftsbriefkopf in der Mail-Signatur durch Platzhalter.
+
+    Die Signatur traegt Handelsregister, Anschrift, Geschaeftsfuehrer und
+    Telefonnummer der Referenz. Einzelne Ersetzungen lassen ein Flickwerk
+    zurueck, deshalb wird der Block als Ganzes getauscht — in derselben
+    Schreibweise, die die Signatur ohnehin benutzt ({absender_name}). Gefuellt
+    wird er aus firma_stammdaten; das ist Phase 2.4.
+
+    Bewusst keine Regel mit regulaerem Ausdruck: die Zeichenkette enthaelt
+    maskierte Zeilenumbrueche (Backslash + n), und die richtig zu maskieren ist
+    eine Fehlerquelle ohne Gewinn. Ein Textfund ist hier eindeutig.
+    """
+    anfang = inhalt.find('const EP_SIGNATUR = "')
+    if anfang < 0:
+        return inhalt, 0
+    nach_rolle = inhalt.find('{absender_rolle}' + BS + 'n' + BS + 'n', anfang)
+    trenner = inhalt.find(BS + 'n---' + BS + 'n', anfang)
+    if nach_rolle < 0 or trenner < 0 or trenner < nach_rolle:
+        sys.exit('ABBRUCH: EP_SIGNATUR hat einen anderen Aufbau als erwartet.')
+    kopf_ab = nach_rolle + len('{absender_rolle}' + BS + 'n' + BS + 'n')
+    ersatz = BS.join([
+        '{firma_name}', 'n{firma_zusatz}', 'n', 'n{firma_register}',
+        'n{firma_strasse}', 'n{firma_plz_ort}',
+        'nGesch\u00e4ftsf\u00fchrer: {firma_geschaeftsfuehrer}',
+        'nTel.: {firma_telefon}', 'nMail: {firma_email}',
+        'nWeb: {firma_web}', 'nInstagram: {firma_instagram}',
+    ])
+    return inhalt[:kopf_ab] + ersatz + inhalt[trenner:], 1
+
+
 def pruefe_haeufigkeit(n, bemerkung, datei):
     """Notbremse gegen Regeln, die versehentlich zu breit greifen."""
     if n > 400:
@@ -184,10 +325,20 @@ def main():
     if ziel.exists():
         shutil.rmtree(ziel)
 
-    zaehler = {}
+    zaehler, formatiert = {}, {}
     for datei, (a, b) in STUECKE.items():
         inhalt = '\n'.join(z[a - 1:b]) + '\n'
         if not roh:
+            inhalt, n_formatiert = ausformatieren(inhalt, datei)
+            if n_formatiert:
+                formatiert[datei] = n_formatiert
+            # Erst nach dem Umbrechen: vorher steht die Signatur als
+            # EP_SIGNATUR=" mitten in einer 2,4-MB-Zeile und ist so nicht
+            # zuverlaessig zu greifen.
+            inhalt, n_signatur = signatur_neutralisieren(inhalt)
+            if n_signatur:
+                print('  [MARKE]    1x  Geschaeftsbriefkopf in der Mail-Signatur '
+                      'durch Platzhalter ersetzt.')
             for grund, muster, ersatz, bemerkung in ERSETZUNGEN:
                 inhalt, n = re.subn(muster, ersatz, inhalt)
                 pruefe_haeufigkeit(n, bemerkung, datei)
@@ -213,6 +364,9 @@ def main():
         print(f'\n  {len(nie)} Regel(n) ohne Treffer:')
         for b in nie:
             print(f'    - {b}')
+    for datei, n in formatiert.items():
+        print(f'\n[FORMAT] {datei}: {n} vorkompilierte Zeile(n) umgebrochen '
+              f'(nur Leerraum, nachgerechnet).')
     print(f'\n{len(STUECKE)} Stuecke geschrieben nach {ziel}')
     return 0
 

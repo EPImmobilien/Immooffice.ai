@@ -17,6 +17,8 @@
     "test:e2e": "playwright test",
     "pruefen": "npm run check",
     "neutral": "scripts/neutral.sh",
+    "oberflaeche": "python3 scripts/oberflaeche-zerlegen.py",
+    "bauen": "python3 scripts/bauen.py",
     "db": "scripts/lokale-db.sh",
     "db:test": "scripts/lokale-db.sh neu && scripts/lokale-db.sh migrieren && scripts/lokale-db.sh psql -q -f tests/vorlage-vollstaendig.sql",
     "check": "scripts/check.sh"
@@ -41,6 +43,7 @@
     "@types/react-dom": "19.2.4",
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.1",
+    "js-beautify": "1.15.1",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.3",
     "vitest": "4.1.10"

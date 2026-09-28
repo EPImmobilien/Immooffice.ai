@@ -47,7 +47,57 @@ Einzelheiten in `docs/EDGE_FUNCTIONS.md`.
    Anschrift und Ort im erzeugten Maklervertrag leer. Ein Vertrag ohne
    Firmenkopf darf nicht an einen Kunden gehen.
 
-## Der Quelltext der Oberflaeche — **Ihre Mitwirkung noetig**
+## ~~Der Quelltext der Oberflaeche~~ — geklärt am 28.09.2026, anders als gedacht
+
+**Es gibt keinen.** `EPImmobilien/epworld-app` ist die iOS-Hülle; die README
+sagt: „Das Portal bleibt die einzige Quelle: Netlify-Deploy wie bisher."
+Daneben liegen rund zwanzig Einbau-Skripte (`warnzone-einbau.py`,
+`kosten-einbau.py`, `werkzeuge-einbau.mjs` …), die **die eine `index.html`
+flicken** — und dabei fertig kompilierten Code schreiben, kein JSX. Auch die
+Zeile `/* E&P World – vorkompiliert TT.MM.JJJJ (…) */` ist kein Hinweis auf
+einen Bauschritt: sie ist ein Änderungsvermerk, den diese Skripte bei jedem
+Einbau neu setzen.
+
+Die `index.html` **ist** die Quelle. Die Frage nach einem Stand davor ging ins
+Leere.
+
+**Gelöst durch Ausformatieren.** Die drei vorkompilierten Zeilen sind
+umgebrochen: aus 2,97 MB in drei Zeilen wurden rund 136.000 lesbare. Dass dabei
+nur Leerraum angefasst wurde, rechnet das Skript nach — entfernt man aus beiden
+Fassungen jeden Leerraum, müssen sie zeichengleich sein. `ShopTvPage` steht
+jetzt als gewöhnliche Funktion in Zeile 56719 und lässt sich normal entfernen.
+
+**Preis:** Die Oberfläche ist nicht mehr zeilenweise mit der Vorlage
+vergleichbar. Für den laufenden Abgleich gilt dieselbe Regel wie für die
+Neutralisierung: erst die Vorlage genauso formatieren, dann vergleichen.
+
+## Noch offen an der Oberfläche
+
+1. **Shop-TV ist noch drin** — 118 Zeilen über acht Aufrufstellen: die Seite
+   `ShopTvPage`, `ShopTvKachelModern`, ein Marketing-Format, Kacheln, die
+   Kanalzeile der Objektseite, die Yodeck-Anbindung. Phase 1.4 verlangt die
+   ersatzlose Streichung. Das ist eine echte Modulentfernung, keine
+   Textersetzung — und der Grund, warum `src/` noch nicht versioniert ist.
+
+2. **Die beiden Word-Vorlagen sind leer.** `VORLAGE_MAKLERVERTRAG` und
+   `VORLAGE_OBJEKTNACHWEIS` lagen als Base64 im Quelltext und trugen Briefkopf
+   und Vertragstext der Referenz. `docs/NEUTRALITAET.md` Abschnitt 5 ist
+   eindeutig: Rechtstexte der Referenz werden **ersetzt**, nicht übernommen.
+   Ersetzen kann ein Skript sie nicht — eine gültige Word-Datei lässt sich
+   nicht als Regel schreiben. Bis neutrale Muster vorliegen, erzeugt der Fork
+   **keine Maklerverträge und keine Objektnachweise**.
+
+3. **Die Logos sind leer.** Sechs Konstanten trugen die Wortmarke der Referenz
+   als Base64 — für das Gate unsichtbar, weil es Text liest und keine Bilder.
+   Geleert; laut `docs/NEUTRALITAET.md` tritt bei fehlendem Logo eine Wortmarke
+   aus dem Firmennamen an seine Stelle.
+
+4. **Die Mail-Signatur ist ein Platzhaltergerüst.** Sie trug den vollständigen
+   Geschäftsbriefkopf der Referenz. Jetzt stehen dort `{firma_name}`,
+   `{firma_register}` und so weiter — zu füllen aus `firma_stammdaten` in
+   Phase 2.4.
+
+## ~~Der Quelltext der Oberflaeche — Ihre Mitwirkung noetig~~
 
 Hinzugekommen am 28.09.2026 beim Zerlegen von `reference/epworld-src.html`.
 

@@ -453,3 +453,38 @@ und nach der Ersetzung der Projekt-Adresse hätte im Fork eine Adresse des
 eigenen Projekts neben einem Schlüssel des fremden gestanden. Das ist nicht
 nur falsch, es fällt beim Ausprobieren auch nicht sofort auf. Ein leerer Wert
 fällt beim ersten Start auf, ein falscher nicht.
+
+
+## 28.09.2026 — Die vorkompilierten Abschnitte werden ausformatiert
+
+**Frage:** 2,97 MB des Anwendungscodes liegen in drei Zeilen, die größte mit
+2,4 MB. Darin ist nichts zu finden, nichts zu ändern und nichts zu prüfen.
+Hinnehmen oder umbrechen?
+
+**Entscheidung:** Umbrechen, mit `js-beautify` als Schritt der Zerlegung.
+
+**Grund:** Es ist eine reine Leerraum-Änderung — kein Zeichen Programmlogik
+wird angefasst. Das Skript rechnet es nach: entfernt man aus beiden Fassungen
+jeden Leerraum, müssen sie zeichengleich sein; sonst bricht es ab. Der Gewinn
+ist groß — aus drei unlesbaren Zeilen werden 136.000 lesbare, und damit wird
+aus „nicht machbar" eine gewöhnliche Codeänderung.
+
+**Preis, bewusst in Kauf genommen:** Die Oberfläche ist danach nicht mehr
+zeilenweise mit der Vorlage vergleichbar. Für den laufenden Abgleich gilt
+dieselbe Regel wie für die Neutralisierung (siehe Eintrag vom 27.09.): erst
+die Vorlage genauso behandeln, dann vergleichen. Ein Schritt mehr, kein Risiko.
+
+## 28.09.2026 — Eingebettete Dateien der Referenz werden geleert, nicht ersetzt
+
+**Frage:** Im Quelltext stecken sechs Logos und zwei Word-Vorlagen der Referenz
+als Base64 — zusammen rund 1 MB. Für das Neutralitäts-Gate unsichtbar, weil es
+Text liest und keine Bilder. Womit ersetzen?
+
+**Entscheidung:** Die Konstanten bleiben stehen und werden leer.
+
+**Grund:** Ein erfundenes Logo wäre eine Behauptung, eine nachgebaute
+Vertragsvorlage wäre schlimmer — sie sähe gebrauchsfertig aus und trüge
+Rechtstext, den niemand geprüft hat. `docs/NEUTRALITAET.md` Abschnitt 5
+verlangt ausdrücklich, Rechtstexte zu ersetzen statt zu übernehmen; bis es
+neutrale Muster gibt, ist „erzeugt nichts" der ehrliche Zustand. Beides steht
+in `docs/OFFEN.md`, damit es nicht in Vergessenheit gerät.
