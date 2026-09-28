@@ -1152,3 +1152,52 @@ beauftragt — zog dessen Kontakt mit herein, samt Besichtigungsterminen.
 
 `aktueller_eigentuemer_id` bleibt unverändert: sie sucht über `auth.uid()`, und
 ein Benutzerkonto gehört zu genau einem Mandanten.
+
+## 2026-09-28 · Öffentliche Endpunkte: `oeffentliche-objekte` zeigte alle Mandanten
+
+**Befund:** 30 der 139 Edge Functions sind ohne JWT erreichbar **und**
+benutzen den `service_role`. Für den gilt RLS nicht — sie müssen die
+Mandantengrenze also selbst ziehen. `oeffentliche-objekte` tat es nicht:
+
+```js
+supabase.from("immobilien")
+  .eq("website_veroeffentlichen", true)
+  .in("status", ["vermarktung", "reserviert"])
+```
+
+Keine Mandantenbedingung, `Access-Control-Allow-Origin: *`, keine Anmeldung.
+**Jede Makler-Webseite hätte die Objekte aller anderen Makler gezeigt** — mit
+Preis, Fläche, Ort und, bei freigegebener Adresse, Straße und Hausnummer.
+
+**Entscheidung — ein Muster, nicht fünf:** Ein öffentlicher Endpunkt bestimmt
+seinen Mandanten in dieser Reihenfolge:
+
+1. `?mandant=<Kennung oder Kürzel>` beziehungsweise der Kopfeintrag
+   `x-immo-mandant`,
+2. sonst: gibt es genau einen Mandanten, ist er gemeint,
+3. sonst: ablehnen statt raten.
+
+Schritt 2 hält den heutigen Betrieb am Laufen, ohne dass eine eingebettete
+Seite etwas ändern muss. Ab dem zweiten Mandanten muss sie sagen, wen sie
+meint — und bis dahin liefert der Endpunkt lieber nichts als das Falsche.
+Dasselbe Vorgehen wie bei `energieausweis-anfrage`.
+
+## 2026-09-28 · Ein Buch statt eines Urteils für die restlichen 24
+
+**Frage:** 24 weitere öffentliche Endpunkte sind ungelesen. Das Gate rot zu
+schalten, bis alle durchgesehen sind, hieße: kein Commit mehr, bis ein
+Nachmittag Lesearbeit erledigt ist.
+
+**Entscheidung:** `tests/funktionen-oeffentlich.py` führt Buch statt zu
+urteilen. Es kann nicht entscheiden, ob eine Funktion die Grenze richtig
+zieht — das muss ein Mensch lesen. Es hält fest, welche gelesen sind, und wird
+**rot bei einer Verschlechterung**: eine neue Funktion ohne JWT, die in keiner
+Liste steht, oder eine als abgesichert geführte, die ihr Kennzeichen verloren
+hat.
+
+Die Liste `NOCH_OFFEN` darf nur kürzer werden, nie länger. Jeder Lauf von
+`npm run check` schreibt hin, wie viele es noch sind.
+
+**Warum nicht einfach rot:** Ein Gate, das man abschalten muss, um arbeiten zu
+können, wird abgeschaltet. Ein Gate, das eine Zahl nennt, die kleiner werden
+muss, bleibt stehen.

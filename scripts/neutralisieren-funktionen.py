@@ -286,6 +286,77 @@ ERSETZUNGEN = [
     # --- FREMD: Verweise auf das Supabase-Projekt der Vorlage
     ('FREMD', r'yazwkzzjiquprtjpurur', 'usguiggfciavwzkdfjgt',
      'Projektkennung der Vorlage durch die eigene ersetzt.'),
+    # =====================================================================
+    # FORK — oeffentliche Endpunkte muessen ihren Mandanten kennen
+    #
+    # 30 der 139 Funktionen sind ohne Anmeldung erreichbar UND benutzen den
+    # service_role — fuer den RLS nicht gilt. Sie muessen die Mandantengrenze
+    # also selbst ziehen. oeffentliche-objekte tat es nicht: sie lieferte ALLE
+    # veroeffentlichten Objekte ALLER Mandanten an jeden, mit
+    # Access-Control-Allow-Origin: *. Jede Makler-Webseite haette die Objekte
+    # aller anderen gezeigt.
+    #
+    # Das Muster dafuer steht einmal hier und wird durchgetragen, dieselbe
+    # Reihenfolge wie in energieausweis-anfrage:
+    #   1. ?mandant=<Kennung oder Kuerzel> aus der Anfrage
+    #   2. sonst: gibt es genau einen Mandanten, ist er gemeint
+    #   3. sonst: ablehnen statt raten
+    #
+    # Zu 2: Solange eine Anwendung einen Mandanten hat, ist die Zuordnung
+    # eindeutig und die Seiten brauchen nichts zu aendern. Ab dem zweiten muss
+    # die einbettende Seite sagen, wen sie meint — und bis dahin liefert der
+    # Endpunkt lieber nichts als das Falsche.
+    # =====================================================================
+    ('FORK',
+     r'Deno\.serve\(async \(req\) => \{\n  if \(req\.method === "OPTIONS"\) return new Response\("ok", \{ headers: corsHeaders \}\);\n  try \{\n    const supabase = createClient\(Deno\.env\.get\("SUPABASE_URL"\)!, Deno\.env\.get\("SUPABASE_SERVICE_ROLE_KEY"\)!, \{ auth: \{ persistSession: false \} \}\);',
+     '// Welcher Mandant ist gemeint? Fuer jeden oeffentlichen Endpunkt\n'
+     '// dieselbe Reihenfolge: ausdrueckliche Angabe, sonst der einzige, sonst\n'
+     '// gar nichts. Rueckgabe null heisst "nicht entscheidbar" — der Aufrufer\n'
+     '// lehnt dann ab, statt zu raten.\n'
+     'async function immoMandantAusAnfrage(req: Request, db: any): Promise<string | null> {\n'
+     '  let wunsch = "";\n'
+     '  try {\n'
+     '    const url = new URL(req.url);\n'
+     '    wunsch = (url.searchParams.get("mandant") || "").trim();\n'
+     '  } catch (_) { /* keine brauchbare Adresse */ }\n'
+     '  if (!wunsch) wunsch = (req.headers.get("x-immo-mandant") || "").trim();\n'
+     '  if (wunsch) {\n'
+     '    const spalte = /^[0-9a-f-]{36}$/i.test(wunsch) ? "id" : "slug";\n'
+     '    const { data } = await db.from("mandanten").select("id").eq(spalte, wunsch).maybeSingle();\n'
+     '    return data?.id ?? null;\n'
+     '  }\n'
+     '  const { data: alle } = await db.from("mandanten").select("id").limit(2);\n'
+     '  return (alle || []).length === 1 ? alle[0].id : null;\n'
+     '}\n'
+     '\n'
+     'Deno.serve(async (req) => {\n'
+     '  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });\n'
+     '  try {\n'
+     '    const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });\n'
+     '    const mandant = await immoMandantAusAnfrage(req, supabase);\n'
+     '    if (!mandant) {\n'
+     '      return new Response(JSON.stringify({ ok: false, anzahl: 0, objekte: [],\n'
+     '        fehler: "Die Anfrage ist keinem Anbieter zugeordnet. Bitte ?mandant=<Kuerzel> mitgeben." }), {\n'
+     '        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });\n'
+     '    }',
+     'oeffentliche-objekte: der Endpunkt muss wissen, fuer wen er antwortet.',
+     {'oeffentliche-objekte'}),
+
+    ('FORK',
+     r'        \.eq\("aktiv", true\)\.eq\("auf_webseite", true\);',
+     '        .eq("mandant_id", mandant)\n'
+     '        .eq("aktiv", true).eq("auf_webseite", true);',
+     'oeffentliche-objekte: der onOffice-Spiegel nur vom eigenen Mandanten.',
+     {'oeffentliche-objekte'}),
+
+    ('FORK',
+     r'        \.eq\("website_veroeffentlichen", true\)\n        \.in\("status", \["vermarktung", "reserviert"\]\);',
+     '        .eq("mandant_id", mandant)\n'
+     '        .eq("website_veroeffentlichen", true)\n'
+     '        .in("status", ["vermarktung", "reserviert"]);',
+     'oeffentliche-objekte: die eigenen Objekte nur vom eigenen Mandanten.',
+     {'oeffentliche-objekte'}),
+
 ]
 
 # Drei Funktionen verdrahten die Portal-Adresse fest, statt sie wie alle
@@ -452,6 +523,7 @@ NACHBESSERN = [
 
     ('MARKE', f'const PORTAL_URL = "https://{HOST}";',
      f'const PORTAL_URL = Deno.env.get("PORTAL_URL") || "https://{HOST}";',
+
      'Feste Portal-Adresse aus PORTAL_URL lesen, wie in den uebrigen Funktionen.'),
     ('MARKE', f'const OBJEKT_BASIS = "https://{HOST}/objekt.html?t=";',
      f'const OBJEKT_BASIS = (Deno.env.get("PORTAL_URL") || "https://{HOST}")'

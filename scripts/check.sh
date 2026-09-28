@@ -140,6 +140,13 @@ else
   fehler=1
 fi
 
+abschnitt "Edge Functions: oeffentliche Endpunkte im Buch"
+if python3 tests/funktionen-oeffentlich.py; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Edge Functions: verify_jwt fuer jede festgelegt"
 if python3 tests/funktionen-config.py; then
   :

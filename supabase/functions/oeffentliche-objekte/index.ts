@@ -21,10 +21,36 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
 
+// Welcher Mandant ist gemeint? Fuer jeden oeffentlichen Endpunkt
+// dieselbe Reihenfolge: ausdrueckliche Angabe, sonst der einzige, sonst
+// gar nichts. Rueckgabe null heisst "nicht entscheidbar" — der Aufrufer
+// lehnt dann ab, statt zu raten.
+async function immoMandantAusAnfrage(req: Request, db: any): Promise<string | null> {
+  let wunsch = "";
+  try {
+    const url = new URL(req.url);
+    wunsch = (url.searchParams.get("mandant") || "").trim();
+  } catch (_) { /* keine brauchbare Adresse */ }
+  if (!wunsch) wunsch = (req.headers.get("x-immo-mandant") || "").trim();
+  if (wunsch) {
+    const spalte = /^[0-9a-f-]{36}$/i.test(wunsch) ? "id" : "slug";
+    const { data } = await db.from("mandanten").select("id").eq(spalte, wunsch).maybeSingle();
+    return data?.id ?? null;
+  }
+  const { data: alle } = await db.from("mandanten").select("id").limit(2);
+  return (alle || []).length === 1 ? alle[0].id : null;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
+    const mandant = await immoMandantAusAnfrage(req, supabase);
+    if (!mandant) {
+      return new Response(JSON.stringify({ ok: false, anzahl: 0, objekte: [],
+        fehler: "Die Anfrage ist keinem Anbieter zugeordnet. Bitte ?mandant=<Kuerzel> mitgeben." }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
 
     // optionaler Filter via Query (?vermarktung=kauf|miete, ?id=<onoffice_id oder ep_<uuid>>)
     const url = new URL(req.url);
@@ -37,6 +63,7 @@ Deno.serve(async (req) => {
     if (!nurEigene) {
       let q = supabase.from("onoffice_objekte")
         .select("onoffice_id, objektnr_extern, titel, objektart, vermarktungsart, plz, ort, kaufpreis, kaltmiete, wohnflaeche, grundstueck, zimmer, baujahr, hauptbild_url, updated_at")
+        .eq("mandant_id", mandant)
         .eq("aktiv", true).eq("auf_webseite", true);
       if (vermarktung === "kauf" || vermarktung === "miete") q = q.eq("vermarktungsart", vermarktung);
       if (einzelId) q = q.eq("onoffice_id", einzelId);
@@ -50,6 +77,7 @@ Deno.serve(async (req) => {
     {
       let q = supabase.from("immobilien")
         .select("id, immo_nr, bezeichnung, objekttitel, objektart, objekttyp, vertragsart, strasse, hausnummer, plz, ort, angebotspreis, kaltmiete, nebenkosten, wohnflaeche, nutzflaeche, grundstueck, zimmer, baujahr, hauptbild_url, status, website_top_angebot, referenz, adresse_freigeben, provisionsfrei, provision_aussen, verfuegbar_ab, beschreibung_objekt, energie_klasse, energie_kennwert, energieausweis_typ, rundgang_url, updated_at")
+        .eq("mandant_id", mandant)
         .eq("website_veroeffentlichen", true)
         .in("status", ["vermarktung", "reserviert"]);
       if (einzelId && nurEigene) q = q.eq("id", einzelId.slice(3));
