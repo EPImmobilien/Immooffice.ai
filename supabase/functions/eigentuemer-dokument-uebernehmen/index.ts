@@ -64,7 +64,7 @@ Deno.serve(async (req) => {
     const { data: u, error: ue } = await admin.auth.getUser(auth.replace(/^Bearer\s+/i, ""));
     if (ue || !u?.user) return antwort({ ok: false, error: "Nicht authentifiziert." }, 401);
     const uid = u.user.id;
-    const { data: profil } = await admin.from("profiles").select("role").eq("id", uid).maybeSingle();
+    const { data: profil } = await admin.from("profiles").select("role, mandant_id").eq("id", uid).maybeSingle(); immoSetzeMandant(profil?.mandant_id);
     const istTeam = ["chef", "mitarbeiter"].includes(profil?.role || "");
 
     const body = await req.json().catch(() => ({}));

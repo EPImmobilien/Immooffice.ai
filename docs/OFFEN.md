@@ -379,7 +379,7 @@ danach einen anderen zurück, als er gespeichert hat.
 |---|---|
 | 1. Oberfläche stellt den Mandanten voran | **fertig** — eine Hülle um `storage.from()`, neun Prüfungen in `tests/storage-huelle.js` |
 | 2a. Hülle in den Edge Functions | **fertig** — 11 Funktionen, 22 Schreibstellen |
-| 2b. Jede Funktion ihren Mandanten ermitteln lassen | offen — siehe Liste unten |
+| 2b. Jede Funktion ihren Mandanten ermitteln lassen | **5 von 11** — siehe Liste unten |
 | 3. Die 90 vorhandenen Dateien umziehen | offen |
 | 4. Restriktive Richtlinie auf `storage.objects` | offen — **erst nach 2 und 3**, sonst sperrt sie aus, was noch am alten Ort liegt |
 
@@ -400,11 +400,11 @@ Pfad baut, verlöre Dateien.
 
 | Funktion | Aufruf | Quelle des Mandanten |
 |---|---|---|
-| `expose-pdf-erzeugen` | Nutzer (JWT) | `auth.getUser` → `profiles.mandant_id` |
-| `mpe-pdf-erzeugen` | Nutzer (JWT) | dito |
-| `eigentuemer-dokument-uebernehmen` | Nutzer (JWT) | dito |
-| `eigentuemer-report-pdf` | Nutzer (JWT) | dito |
-| `signatur-vorgang-starten` | Nutzer (JWT) | dito |
+| ~~`expose-pdf-erzeugen`~~ | Nutzer (JWT) | **fertig** — die vorhandene Profilabfrage um `mandant_id` erweitert |
+| ~~`mpe-pdf-erzeugen`~~ | Nutzer (JWT) | **fertig**, dito |
+| ~~`eigentuemer-dokument-uebernehmen`~~ | Nutzer (JWT) | **fertig**, dito |
+| ~~`eigentuemer-report-pdf`~~ | Nutzer (JWT) | **fertig**, dito |
+| ~~`signatur-vorgang-starten`~~ | Nutzer (JWT) | **fertig** — eigene Abfrage, weil sie ihren Client erst nach `getUser` erzeugt |
 | `brief-pdf-erzeugen` | Nutzer (JWT), kein `getUser` | aus dem Brief-Datensatz |
 | `web-asset-kopieren` | Nutzer (JWT), kein `getUser` | aus dem Zielpfad-Auftrag |
 | `energieausweis-anfrage` | **öffentlich** | aus dem Standort, an den die Anfrage geht |

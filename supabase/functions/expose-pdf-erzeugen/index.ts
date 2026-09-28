@@ -463,7 +463,7 @@ const { data: ud, error: userErr } = await userClient.auth.getUser();
 if (userErr || !ud || !ud.user) return jsonErr(401, "Nicht authentifiziert");
 userData = ud;
 }
-const { data: profil } = await admin.from("profiles").select("id,name,titel,firma_id,funktion,telefon,email,foto_url").eq("id", userData.user.id).maybeSingle();
+const { data: profil } = await admin.from("profiles").select("id,name,titel,firma_id,funktion,telefon,email,foto_url,mandant_id").eq("id", userData.user.id).maybeSingle(); immoSetzeMandant(profil?.mandant_id);
 if (!profil) return jsonErr(403, "Kein Teamzugang");
 const { data: immo, error: iErr } = await admin.from("immobilien").select("*").eq("id", immobilie_id).maybeSingle();
 if (iErr) throw iErr;

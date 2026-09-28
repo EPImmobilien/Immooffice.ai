@@ -148,7 +148,7 @@ if (!authHeader) return jsonErr(401, "Kein Auth-Token");
 const userClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: authHeader } } });
 const { data: userData, error: userErr } = await userClient.auth.getUser();
 if (userErr || !userData || !userData.user) return jsonErr(401, "Nicht authentifiziert");
-const { data: profil } = await admin.from("profiles").select("id,name,funktion,telefon,email,foto_url,role,firma_id").eq("id", userData.user.id).maybeSingle();
+const { data: profil } = await admin.from("profiles").select("id,name,funktion,telefon,email,foto_url,role,firma_id,mandant_id").eq("id", userData.user.id).maybeSingle(); immoSetzeMandant(profil?.mandant_id);
 if (!profil || !["chef", "mitarbeiter"].includes(profil.role)) return jsonErr(403, "Kein Teamzugang");
 const { data: bew, error: bErr } = await admin.from("bewertungen").select("*").eq("id", bewertung_id).maybeSingle();
 if (bErr) throw bErr;

@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
     const jwt = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
     const { data: u } = await db.auth.getUser(jwt);
     if (!u?.user) return antwort({ ok: false, fehler: "Nicht angemeldet." }, 401);
-    const { data: prof } = await db.from("profiles").select("role, name, email, telefon, titel, firma_id").eq("id", u.user.id).maybeSingle();
+    const { data: prof } = await db.from("profiles").select("role, name, email, telefon, titel, firma_id, mandant_id").eq("id", u.user.id).maybeSingle(); immoSetzeMandant(prof?.mandant_id);
     if (!prof || !["chef", "mitarbeiter"].includes(prof.role)) return antwort({ ok: false, fehler: "Keine Berechtigung." }, 403);
     const body = await req.json().catch(() => ({}));
     const immobilieId = String(body.immobilie_id || ""); if (!immobilieId) throw new Error("immobilie_id fehlt.");

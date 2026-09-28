@@ -643,6 +643,7 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
+    immoSetzeMandant((await admin.from("profiles").select("mandant_id").eq("id", aktuellerUserId).maybeSingle()).data?.mandant_id);
     const vertragId = (body.vertrag_id || "").toString().trim();
     const dokumentTyp = (body.dokument_typ || "").toString().trim();
     const begleittext = (body.begleittext || "").toString();

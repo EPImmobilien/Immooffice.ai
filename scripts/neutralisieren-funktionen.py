@@ -298,6 +298,45 @@ ERSETZUNGEN = [
 # durch die Datei einzelne Buchstaben treffen. Genau das ist beim Schreiben
 # dieses Skripts passiert.
 NACHBESSERN = [
+    # --- FORK: den Mandanten setzen, damit die Storage-Huelle greift.
+    # Diese vier laden ohnehin direkt danach das Profil des Aufrufers.
+    # Die Abfrage wird um mandant_id erweitert, statt eine zweite zu
+    # stellen. Der Aufruf haengt an derselben Zeile — so bleibt die
+    # Einrichtung des Quelltexts unberuehrt und die Zeilenzahl gleich.
+    ('FORK',
+     'const { data: profil } = await admin.from("profiles").select("id,name,titel,firma_id,funktion,telefon,email,foto_url").eq("id", userData.user.id).maybeSingle();',
+     'const { data: profil } = await admin.from("profiles").select("id,name,titel,firma_id,funktion,telefon,email,foto_url,mandant_id").eq("id", userData.user.id).maybeSingle(); immoSetzeMandant(profil?.mandant_id);',
+     'Mandant aus dem Profil des Aufrufers: expose-pdf-erzeugen.',
+     {'expose-pdf-erzeugen'}),
+    ('FORK',
+     'const { data: profil } = await admin.from("profiles").select("id,name,funktion,telefon,email,foto_url,role,firma_id").eq("id", userData.user.id).maybeSingle();',
+     'const { data: profil } = await admin.from("profiles").select("id,name,funktion,telefon,email,foto_url,role,firma_id,mandant_id").eq("id", userData.user.id).maybeSingle(); immoSetzeMandant(profil?.mandant_id);',
+     'Mandant aus dem Profil des Aufrufers: mpe-pdf-erzeugen.',
+     {'mpe-pdf-erzeugen'}),
+    ('FORK',
+     'const { data: profil } = await admin.from("profiles").select("role").eq("id", uid).maybeSingle();',
+     'const { data: profil } = await admin.from("profiles").select("role, mandant_id").eq("id", uid).maybeSingle(); immoSetzeMandant(profil?.mandant_id);',
+     'Mandant aus dem Profil des Aufrufers: eigentuemer-dokument-uebernehmen.',
+     {'eigentuemer-dokument-uebernehmen'}),
+    # signatur-vorgang-starten erzeugt ihren Client ERST NACH getUser. Die
+    # Huelle und damit immoSetzeMandant stehen also hinter aktuellerUserId;
+    # gesetzt wird der Mandant deshalb an der naechsten Stelle danach, an der
+    # der Handler ohnehin weiterliest.
+    ('FORK',
+     'const body = await req.json();\n    const vertragId = (body.vertrag_id || "").toString().trim();',
+     'const body = await req.json();\n'
+     '    immoSetzeMandant((await admin.from("profiles").select("mandant_id")'
+     '.eq("id", aktuellerUserId).maybeSingle()).data?.mandant_id);\n'
+     '    const vertragId = (body.vertrag_id || "").toString().trim();',
+     'Mandant aus dem Profil des Aufrufers: signatur-vorgang-starten.',
+     {'signatur-vorgang-starten'}),
+
+    ('FORK',
+     'const { data: prof } = await db.from("profiles").select("role, name, email, telefon, titel, firma_id").eq("id", u.user.id).maybeSingle();',
+     'const { data: prof } = await db.from("profiles").select("role, name, email, telefon, titel, firma_id, mandant_id").eq("id", u.user.id).maybeSingle(); immoSetzeMandant(prof?.mandant_id);',
+     'Mandant aus dem Profil des Aufrufers: eigentuemer-report-pdf.',
+     {'eigentuemer-report-pdf'}),
+
     # Die kurze Namensregel greift auch dort, wo im Original schon ein GmbH
     # stand. Einmal geradeziehen ist billiger als eine Regel je Schreibweise.
     ('MARKE', 'Musterhaus Immobilien GmbH GmbH', 'Musterhaus Immobilien GmbH',
@@ -417,7 +456,10 @@ def main():
                     zaehler[(grund, muster)] = zaehler.get((grund, muster), 0) + n
                     if grund == 'FORK':
                         erweitert = True
-            for grund, muster, ersatz, bemerkung in NACHBESSERN:
+            for regel in NACHBESSERN:
+                grund, muster, ersatz, bemerkung = regel[:4]
+                if len(regel) > 4 and ordner.name not in regel[4]:
+                    continue
                 n = inhalt.count(muster)
                 pruefe_haeufigkeit(n, bemerkung, datei)
                 if n:
