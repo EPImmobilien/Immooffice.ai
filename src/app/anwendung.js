@@ -34,6 +34,59 @@ window._sb = window.supabase.createClient(window.IMMO_SUPABASE_URL, window.IMMO_
     detectSessionInUrl: !0
   }
 })), window._isConfigured = !0;
+
+// --- Storage: jeder Pfad traegt den Mandanten als erstes Segment ----------
+//
+// Warum hier und nicht an den 51 Stellen, die Pfade bauen: die Anwendung
+// arbeitet weiter mit mandantenrelativen Pfaden, und genau die stehen auch in
+// der Datenbank (immobilie_datei.storage_path und Geschwister). Waere der
+// Mandant Teil des gespeicherten Pfades, muesste jede dieser Spalten
+// mitwandern. So bleibt er, wo er hingehoert: in der Zugriffsschicht.
+//
+// Die restriktive Richtlinie auf storage.objects prueft genau dieses erste
+// Segment. Wer die Huelle umgeht, kommt also nicht weiter — sie ist
+// Bequemlichkeit, nicht die Sicherung.
+//
+// Ohne angemeldeten Nutzer (IMMO_MANDANT_ID null) bleibt der Pfad unberuehrt.
+// Solche Aufrufe scheitern ohnehin an der Richtlinie; ein erfundenes Praefix
+// machte daraus nur einen schwerer zu lesenden Fehler.
+(function () {
+  const echt = window._sb.storage.from.bind(window._sb.storage);
+  const vorne = (pfad) => {
+    const m = window.IMMO_MANDANT_ID;
+    if (!m || typeof pfad !== "string" || !pfad) return pfad;
+    return pfad === m || pfad.startsWith(m + "/") ? pfad : m + "/" + pfad;
+  };
+  const einsOderViele = (p) => Array.isArray(p) ? p.map(vorne) : vorne(p);
+  const MIT_PFAD = ["upload", "uploadToSignedUrl", "download", "remove",
+                    "createSignedUrl", "createSignedUrls", "getPublicUrl",
+                    "info", "exists"];
+  window._sb.storage.from = function (bucket) {
+    const api = echt(bucket);
+    const huelle = Object.create(api);
+    MIT_PFAD.forEach((name) => {
+      if (typeof api[name] !== "function") return;
+      huelle[name] = function (pfad, ...rest) {
+        return api[name](einsOderViele(pfad), ...rest);
+      };
+    });
+    // list ohne Prefix wuerde die Wurzel des Buckets auflisten — also alle
+    // Mandanten. Ohne Angabe wird deshalb der eigene Ordner aufgelistet.
+    if (typeof api.list === "function") {
+      huelle.list = function (prefix, ...rest) {
+        const m = window.IMMO_MANDANT_ID;
+        return api.list(prefix ? vorne(prefix) : (m || prefix), ...rest);
+      };
+    }
+    ["move", "copy"].forEach((name) => {
+      if (typeof api[name] !== "function") return;
+      huelle[name] = function (von, nach, ...rest) {
+        return api[name](vorne(von), vorne(nach), ...rest);
+      };
+    });
+    return huelle;
+  };
+})();
 const htmlZuText = e => {
     if (!e) return "";
     try {

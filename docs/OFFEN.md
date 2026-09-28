@@ -372,3 +372,20 @@ danach einen anderen zurück, als er gespeichert hat.
 
 **Voraussetzung ist erfüllt:** `window.IMMO_MANDANT_ID` steht seit dem
 28.09.2026. Ohne die wäre der Umbau nicht möglich gewesen.
+
+### Stand 28.09.2026 — Schritt 1 von 4 ist gebaut
+
+| Schritt | Stand |
+|---|---|
+| 1. Oberfläche stellt den Mandanten voran | **fertig** — eine Hülle um `storage.from()`, neun Prüfungen in `tests/storage-huelle.js` |
+| 2. Edge Functions ebenso | offen — 12 Dateien, sie arbeiten mit `service_role` und kennen den Mandanten nicht von selbst |
+| 3. Die 90 vorhandenen Dateien umziehen | offen |
+| 4. Restriktive Richtlinie auf `storage.objects` | offen — **erst nach 2 und 3**, sonst sperrt sie aus, was noch am alten Ort liegt |
+
+Die Reihenfolge ist nicht beliebig. Schritt 4 zuerst, und die Anwendung
+kommt an keine Datei mehr; Schritt 3 zuerst, und die Oberfläche sucht am
+neuen Ort, während die Edge Functions am alten schreiben.
+
+**Die Hülle ist Bequemlichkeit, nicht die Sicherung.** Sie erspart es, 51
+Aufrufstellen anzufassen — aber wer sie umgeht, kommt an Pfade ohne Präfix.
+Gesichert wird erst in Schritt 4, in der Datenbank.

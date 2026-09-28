@@ -81,6 +81,13 @@ else
   echo "src/ fehlt — nichts zu pruefen."
 fi
 
+abschnitt "Oberflaeche: Storage-Huelle"
+if node tests/storage-huelle.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Oberflaeche: Rauchtest"
 if python3 tests/oberflaeche-rauchtest.py; then
   :
