@@ -146,7 +146,11 @@ zuwachs(bereich, mehr, grund) as (values
   ('Cron-Jobs', -14, 'fork_20: die onOffice-Jobs sind abbestellt'),
   -- fork_21: der Zahlungstext, damit die Oberflaeche ihn vor dem Speichern
   -- zeigen kann, ohne ihn ein zweites Mal zu bauen.
-  ('Funktionen', 1, 'fork_21: zahlungsbedingung_text_aus()')
+  ('Funktionen', 1, 'fork_21: zahlungsbedingung_text_aus()'),
+  -- fork_22: ein Wachposten, der mandant_id aus dem Elternsatz fuellt, an
+  -- sechzehn Tabellen. Sechzehn Trigger, eine Funktion.
+  ('Funktionen', 1, 'fork_22: mandant_aus_eltern()'),
+  ('Trigger', 16, 'fork_22: mandant_aus_eltern an sechzehn Tabellen')
 ),
 soll(bereich, soll) as (
   select v.bereich,

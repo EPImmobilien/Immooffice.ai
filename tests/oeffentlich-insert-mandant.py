@@ -41,34 +41,57 @@ OHNE_MANDANT = {
     'schema_migrations', 'fehler_protokoll',
 }
 
+# Tabellen, deren Mandant seit fork_22 aus dem Elternsatz kommt: ein
+# BEFORE-INSERT-Wachposten fuellt mandant_id, wenn sie leer ist. Fuer sie ist
+# eine Einfuegung ohne mandant_id kein Fehler mehr — die Angabe steht schon
+# im Elternsatz, und der Trigger kann sie nicht vergessen, ein Aufrufer
+# schon.
+#
+# Dass er wirklich haengt und wirklich fuellt, prueft tests/
+# mandant-aus-eltern.sql gegen eine echte Datenbank. Diese Liste hier ist nur
+# die Abschrift, damit die Dateiprueefung ohne Datenbank auskommt — laufen
+# beide auseinander, faellt es dort auf, wo es zaehlt.
+DURCH_TRIGGER = {
+    'projekt_zugaenge', 'projekt_aktivitaeten', 'projekt_anfragen',
+    'projekt_maengel', 'projekt_nachrichten', 'projekt_merkliste',
+    'projekt_kunden_dateien',
+    'expose_freigaben', 'landing_fragen', 'landing_besichtigungswuensche',
+    'landing_faq',
+    'newsletter_anmeldungen', 'ki_bildbearbeitung_log', 'push_log',
+    'vermerke', 'mail_versendet',
+}
+
 # Wie weit hinter dem .insert( noch nach mandant_id gesucht wird. Grosszuegig
 # genug fuer die langen Objektliterale der Vorlage, eng genug, dass nicht das
 # mandant_id des naechsten Aufrufs mitgezaehlt wird.
 FENSTER = 400
 
-MUSTER = re.compile(r'\.from\(\s*"([a-z0-9_]+)"\s*\)\s*(?:\.[a-z]+\([^)]*\)\s*)*?\.insert\(', re.S)
+# insert UND upsert. Der zweite war in der ersten Fassung nicht dabei — und
+# genau so eine Stelle stand in projekt-interaktion: die Merkliste legt ihre
+# Zeile per upsert an, also ebenso ohne Mandanten.
+MUSTER = re.compile(r'\.from\(\s*"([a-z0-9_]+)"\s*\)\s*(?:\.[a-z]+\([^)]*\)\s*)*?\.(?:insert|upsert)\(', re.S)
 
 # --- Gelesen, Befund offen. Die Liste darf nur kuerzer werden. -------------
 # Schluessel ist Funktion -> Menge der Tabellen, in die sie ohne Mandanten
 # schreibt. Wer eine Fundstelle schliesst, streicht sie hier.
 NOCH_OFFEN = {
+    # Die Aktivitaet haengt an einem Eigentuemer oder einem Vertrag — welcher
+    # von beiden, entscheidet der Aufrufer. fork_22 traegt sie deshalb nicht:
+    # ein Wachposten, der zwischen zwei gleichrangigen Eltern waehlen muesste,
+    # raet. Hier gehoert der Mandant in den Quelltext.
     'eigentuemer-zugang-anfordern': {'aktivitaeten'},
-    'expose-freigabe': {'kontakte', 'expose_freigaben', 'newsletter_anmeldungen'},
-    'ki-bildbearbeitung': {'ki_bildbearbeitung_log'},
-    # Zweite Fundstelle: .insert(neu) uebergibt ein vorbereitetes Objekt.
-    # Die erste, die die Spalten einzeln aufzaehlt, traegt den Mandanten.
+    'objekt-landing': {'aktivitaeten'},
+    # Zweite Fundstelle: .insert(neu) uebergibt ein vorbereitetes Objekt. Die
+    # erste, die die Spalten einzeln aufzaehlt, traegt den Mandanten.
     'mail-anhaenge-diagnose': {'immobilie_datei'},
-    'objekt-landing': {'aktivitaeten', 'landing_besichtigungswuensche', 'landing_fragen'},
+    # Ein Kontakt hat keinen Elternsatz — er IST einer. Der Mandant muss aus
+    # dem Vorgang kommen, in dem er entsteht.
+    'expose-freigabe': {'kontakte'},
+    # Ein Briefing gehoert einem Mandanten, haengt aber an keiner Zeile.
+    'news-briefing-erstellen': {'news_briefings'},
+    # onOffice-Diagnose. Faellt mit dem Ausbau der Anbindung ohnehin weg;
+    # solange sie liegt, steht sie hier.
     'portal-ftp-diagnose': {'onoffice_diagnose'},
-    'projekt-daten': {'projekt_aktivitaeten'},
-    'projekt-interaktion': {'projekt_zugaenge', 'projekt_aktivitaeten', 'projekt_anfragen',
-                            'projekt_maengel', 'projekt_nachrichten'},
-    'projekt-login': {'projekt_aktivitaeten'},
-    'projekt-upload': {'projekt_kunden_dateien', 'projekt_aktivitaeten'},
-    'push-antworten': {'mail_versendet'},
-    'push-senden': {'push_log'},
-    'suchkriterien-newsletter': {'expose_freigaben', 'newsletter_anmeldungen',
-                                 'mail_versendet', 'vermerke'},
 }
 
 
@@ -86,7 +109,7 @@ def fundstellen():
             continue
         for m in MUSTER.finditer(quelle):
             tabelle = m.group(1)
-            if tabelle in OHNE_MANDANT:
+            if tabelle in OHNE_MANDANT or tabelle in DURCH_TRIGGER:
                 continue
             if 'mandant_id' in quelle[m.end():m.end() + FENSTER]:
                 gut += 1

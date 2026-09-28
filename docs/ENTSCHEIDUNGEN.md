@@ -1623,3 +1623,45 @@ macht das Gate rot. Nachgewiesen an einem entfernten Eintrag.
 wäre mir genau das beinahe durchgegangen — die erste Fassung setzte einen
 optionalen Parameter, den kein Aufrufer je füllte. Die Trefferzählung des
 Generators hat es gemeldet.
+
+---
+
+## Der Mandant kommt vom Elternsatz (28.09.2026)
+
+Nach den sieben Stellen, die im Quelltext geschlossen wurden, blieben 28
+Aufrufe in 14 Funktionen, die Zeilen ohne `mandant_id` anlegen. Jede einzeln
+im Quelltext nachzuziehen wäre der falsche Weg gewesen — nicht weil es viel
+Arbeit ist, sondern weil **jede neue Zeile Quelltext es wieder vergessen
+kann**.
+
+**Was dort fehlt, ist keine Angabe, die der Aufrufer treffen muss.** Sie
+steht schon im Elternsatz: eine Projektaktivität gehört dem Mandanten ihres
+Projekts, eine Frage auf der Objektseite dem Mandanten des Objekts. Das ist
+keine Vermutung, sondern die Definition.
+
+`fork_22` hängt deshalb einen BEFORE-INSERT-Wachposten an **sechzehn
+Tabellen**, der `mandant_id` aus dem Elternsatz füllt — und nur dann, wenn
+sie leer ist. Wer sie setzt, behält sie.
+
+**Warum das kein Schlupfloch ist:** Postgres wertet die WITH-CHECK-Bedingung
+einer Richtlinie **nach** den BEFORE-Triggern aus. Trägt ein angemeldeter
+Nutzer ein Kind eines fremden Elternsatzes ein, setzt der Wachposten
+pflichtgemäß den fremden Mandanten — und genau daran weist die restriktive
+Richtlinie aus `fork_07` die Zeile ab. Der Wachposten kann die Grenze also
+nicht aufweichen, nur vervollständigen. `tests/mandant-aus-eltern.sql` führt
+beides vor; die Gegenprobe ist Prüfung 7.
+
+**Was er nicht tut: raten.** Ist das Elternfeld leer oder der Elternsatz ohne
+Mandanten, bleibt die Zeile ohne. Lieber sichtbar unvollständig als falsch
+zugeordnet. Aus demselben Grund trägt `aktivitaeten` keinen Wachposten: die
+Zeile hängt wahlweise an einem Eigentümer oder an einem Vertrag, und ein
+Wachposten, der zwischen zwei gleichrangigen Eltern wählen müsste, rät.
+
+**Damit sind von 47 Fundstellen noch sechs offen** — `aktivitaeten` in zwei
+Funktionen, ein zweiter Aufruf in `mail-anhaenge-diagnose`, `kontakte` in
+`expose-freigabe`, `news_briefings` und die onOffice-Diagnose, die mit der
+Anbindung ohnehin wegfällt. Jede braucht eine eigene Quelle im Quelltext.
+
+**Nebenbei:** die erste Fassung der Prüfung sah nur `insert`, nicht `upsert`.
+Drei Fundstellen mehr kamen dabei heraus, darunter die Merkliste des
+Neubauportals.

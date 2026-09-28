@@ -78,6 +78,13 @@ else
   fehler=1
 fi
 
+abschnitt "Mandant aus dem Elternsatz"
+if scripts/lokale-db.sh psql -q -f tests/mandant-aus-eltern.sql; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Rechte: Sichtbarkeitsbereich und Modulrechte"
 if scripts/lokale-db.sh psql -q -f tests/rechte.sql; then
   :
