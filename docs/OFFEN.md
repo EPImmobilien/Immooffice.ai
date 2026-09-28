@@ -136,7 +136,20 @@ Shop-TV, wird aber **nicht versioniert** (siehe `.gitignore`). Ein Stand, der
 das Gate nur mit einer Ausnahme passiert, wäre ein Gate mit einem Loch.
 `scripts/oberflaeche-zerlegen.py` erzeugt ihn in Sekunden neu.
 
-## Zwei CDN-Bibliotheken ohne feste Version
+## ~~Zwei CDN-Bibliotheken ohne feste Version~~ — erledigt am 28.09.2026
+
+Alle **vierzehn** Fremdbibliotheken tragen jetzt eine feste Version.
+`@supabase/supabase-js@2` → `2.117.2`, `tesseract.js@5` → `5.1.1`, React und
+React-DOM → `18.3.1`. Die Nummern stammen aus der npm-Registry — sie ist die
+Quelle, aus der die CDNs ihre Pakete ziehen, also löst `@2` genau dorthin auf.
+Der Rauchtest prüft ab jetzt bei jedem Lauf, dass keine Adresse ohne
+Versionsnummer zurückkommt.
+
+**Was offen bleibt:** Die CDN-Adressen selbst sind ungeprüft — der
+Egress-Proxy sperrt jsdelivr und unpkg. Ein Tippfehler in einem Pfad fiele
+erst beim ersten Start auf.
+
+## ~~Zwei CDN-Bibliotheken ohne feste Version~~
 
 `@supabase/supabase-js@2` und `tesseract.js@5` sind nur auf die Hauptversion
 festgelegt. React und React-DOM sind beim Zerlegen auf `18.3.1` festgenagelt

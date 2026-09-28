@@ -15,7 +15,7 @@ Aufruf:
     python3 scripts/bauen.py            baut dist/index.html
     python3 scripts/bauen.py --pruefen  baut und vergleicht mit der Vorlage
 """
-import hashlib, pathlib, sys
+import hashlib, os, pathlib, sys
 
 WURZEL = pathlib.Path(__file__).resolve().parent.parent
 SRC = WURZEL / 'src'
@@ -67,11 +67,43 @@ def bauen(quelle=None):
     return '\n'.join(teile) + '\n'
 
 
+# Die Zugangsdaten stehen NICHT im Quelltext. src/ traegt zwei leere
+# Platzhalter; gefuellt werden sie hier, beim Bauen, aus der Umgebung. So
+# taucht kein Schluessel im Repository auf, und derselbe Quellstand baut fuer
+# verschiedene Projekte.
+ZUGANG = ('IMMO_SUPABASE_URL', 'IMMO_SUPABASE_KEY')
+
+
+def zugang_einsetzen(inhalt):
+    gesetzt, fehlend = [], []
+    for name in ZUGANG:
+        wert = os.environ.get(name, '').strip()
+        platzhalter = f'window.{name} = "";'
+        if platzhalter not in inhalt:
+            sys.exit(f'ABBRUCH: Platzhalter fuer {name} fehlt in src/huelle/01-kopf.html.')
+        if wert:
+            if '"' in wert or '\\' in wert:
+                sys.exit(f'ABBRUCH: {name} enthaelt Anfuehrungszeichen oder Backslash.')
+            inhalt = inhalt.replace(platzhalter, f'window.{name} = "{wert}";')
+            gesetzt.append(name)
+        else:
+            fehlend.append(name)
+    return inhalt, gesetzt, fehlend
+
+
 def main():
     quelle = None
     if '--aus' in sys.argv:
         quelle = pathlib.Path(sys.argv[sys.argv.index('--aus') + 1])
     inhalt = bauen(quelle)
+    if '--roh' not in sys.argv and '--aus' not in sys.argv:
+        inhalt, gesetzt, fehlend = zugang_einsetzen(inhalt)
+        if gesetzt:
+            print('Zugang aus der Umgebung gesetzt: ' + ', '.join(gesetzt))
+        if fehlend:
+            print('HINWEIS: ' + ', '.join(fehlend) + ' nicht gesetzt — die '
+                  'gebaute Datei kann sich nicht anmelden. Zum Ausrollen die '
+                  'Umgebungsvariablen setzen (siehe .env.example).')
     ZIEL.parent.mkdir(parents=True, exist_ok=True)
     ZIEL.write_text(inhalt, encoding='utf-8')
     print(f'{ZIEL.relative_to(WURZEL)}: {len(inhalt):,} Zeichen, '

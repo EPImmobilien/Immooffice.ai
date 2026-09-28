@@ -262,6 +262,12 @@ Supabase-Projekt, oder ausdrückliche Freigabe zum Löschen.
       `tests/funktionen-unveraendert.py` geprüft: jede geänderte Zeile muss
       vorher ein Kennzeichen enthalten haben. Beides Teil von `npm run check`.
 
+- [x] **Phase 1 weitgehend abgeschlossen (28.09.2026).** Oberfläche zerlegt,
+      ausformatiert, neutralisiert, Shop-TV entfernt, alle vierzehn
+      CDN-Bibliotheken gepinnt. `npm run check` deckt jetzt vier der fünf vom
+      Auftrag geforderten Teile ab: Build, Syntaxprüfung, Rauchtest,
+      Neutralitäts-Gate. Der Mandantentest kommt mit Phase 2.
+
 ## 5. Als Nächstes
 
 1. **Phase 1 hängt am Quelltext der Oberfläche.** Zerlegt, neutralisiert und

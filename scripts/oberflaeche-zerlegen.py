@@ -209,10 +209,17 @@ ERSETZUNGEN = [
     # neue Babel-Version wechselte still die Standard-Laufzeit, und die App
     # startete nicht mehr. Der Kommentar dazu steht in huelle/07. React und
     # react-dom werden hier festgenagelt; fuer supabase-js und tesseract.js
-    # fehlt die Gegenprobe, weil diese Umgebung die CDNs nicht erreicht —
-    # vermerkt in docs/OFFEN.md.
+    # Die Versionsnummern stammen aus der npm-Registry — sie ist die Quelle,
+    # aus der die CDNs ihre Pakete ziehen, also loest @2 genau dorthin auf.
+    # Was diese Umgebung NICHT kann: die CDN-Adresse selbst abrufen; der
+    # Egress-Proxy sperrt jsdelivr und unpkg. Ein Tippfehler in der Adresse
+    # faellt deshalb erst beim ersten Start auf. Vermerkt in docs/OFFEN.md.
     ('MARKE', r'react@18/umd', 'react@18.3.1/umd', 'React auf 18.3.1 gepinnt.'),
     ('MARKE', r'react-dom@18/umd', 'react-dom@18.3.1/umd', 'React-DOM auf 18.3.1 gepinnt.'),
+    ('MARKE', r'supabase-js@2"', 'supabase-js@2.117.2"',
+     'supabase-js auf 2.117.2 gepinnt — das ist, was @2 heute aufloest.'),
+    ('MARKE', r'tesseract\.js@5/', 'tesseract.js@5.1.1/',
+     'tesseract.js auf 5.1.1 gepinnt.'),
 ]
 
 

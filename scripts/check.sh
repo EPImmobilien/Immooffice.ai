@@ -66,6 +66,13 @@ else
   echo "src/ fehlt — nichts zu pruefen."
 fi
 
+abschnitt "Oberflaeche: Rauchtest"
+if python3 tests/oberflaeche-rauchtest.py; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Edge Functions: nur Kennzeichen geaendert"
 if python3 tests/funktionen-unveraendert.py; then
   :
@@ -75,8 +82,8 @@ fi
 
 abschnitt "Noch nicht abgedeckt"
 cat <<'ENDE'
-- Rauchtest (ein App-Skript, ein createRoot, CDN-Pins, Bundle-Groesse) — kommt
-                                       mit dem ersten Start gegen das eigene Projekt
+- Erster Start gegen das eigene Projekt — braucht ausgerollte Edge Functions
+                                       und einen Ort, an dem die Datei liegt
 - Syntaxpruefung der Edge Functions  — kein Deno und kein TypeScript in dieser
                                        Umgebung; geprueft wird nur, dass die
                                        Neutralisierung nichts anderes anfasst
