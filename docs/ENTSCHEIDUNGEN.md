@@ -959,3 +959,56 @@ Mandanten, eine anwaltliche Prüfung ist erforderlich.
 im Quelltext zusammen, die Reservierung entsteht in einer Edge Function. Beide
 funktionieren heute; sie umzubauen ist eine Verhaltensänderung und gehört in
 einen eigenen Schritt. Vermerkt in `docs/OFFEN.md`.
+
+## 2026-09-28 · Plattform-CI: die Farbwerte waren noch die der Referenz
+
+**Befund:** `CLAUDE.md` legt die Plattform-CI fest — Marineblau `#1B2A47`
+(dunkel `#12203B`), Gold `#B5934F` (hell `#C9AE72`), Hintergrund `#FAFAFA`,
+Karten `#FFFFFF`, Linien `#E6E8EB`, gedämpfter Text `#7A828C`. Im Quelltext
+standen `#263159`, `#D4A567`, `#1a2342`, `#e0bd80`, `#FAFAF7`, `#E8E4DA`,
+`#8B8377`: die Farben der Referenz. `docs/NEUTRALITAET.md` nennt unter
+„Neutralisiert wird die Marke" die **Farbwerte** ausdrücklich.
+
+**Entscheidung:** getauscht, als `MARKE`-Regel im Zerlegeskript. Dazu die
+beiden Schattenfarben, die dasselbe Blau in `rgba()` wiederholten.
+
+**Kein Redesign.** Layout, Komponenten, Icons, Abstände, Schrift — alles
+unverändert. Getauscht sind acht Zahlen. Das ist genau die Grenze, die
+`CLAUDE.md` zieht: „Neutralisiert wird die Marke …, nicht die Oberfläche."
+
+## 2026-09-28 · Logo: Wortmarke statt kaputtem Bild
+
+**Befund:** `LOGO_BLAU` und `LOGO_DUNKEL` sind im Fork geleert — es waren die
+Logos der Referenz. Die Komponente `Logo` gab sie aber unverändert als
+`<img src="">` aus: an jeder Stelle ein kaputtes Bild.
+`docs/NEUTRALITAET.md` Abschnitt 4 sagt, was stattdessen passieren soll:
+„Fehlt ein Logo, tritt eine Wortmarke aus dem Firmennamen an seine Stelle."
+
+**Entscheidung:** gebaut. `Logo` nimmt jetzt in dieser Reihenfolge: das Logo
+des Mandanten aus `firma_stammdaten.logo_pfad`, sonst das eingebaute, sonst
+eine Wortmarke aus `marken_name` beziehungsweise `firma_name`. Der `alt`-Text
+trug bis hierher fest „Musterhaus Immobilien GmbH" und kommt jetzt aus
+demselben Wert.
+
+## 2026-09-28 · Mandanten-CI hängt am Standort, nicht am Mandanten
+
+**Frage:** Wohin mit `ci_primaer`, `ci_akzent`, `ci_font` — an `mandanten`
+oder an `firma_stammdaten`?
+
+**Entscheidung:** an `firma_stammdaten`, also je Standort.
+
+**Grund:** Die Vorlage hängt Logo, Anschrift und Briefkopf schon dort hin, und
+die PDF-Funktionen lesen `logo_pfad` von dort (`reservierung-pdf-erzeugen`,
+`akq-wertindikation-pdf`). Ein Mandant mit zwei Gesellschaften hat zwei
+Briefköpfe. Eine zweite Ablage am Mandanten hätte zwei Wahrheiten ergeben —
+und die Frage, welche gilt, wäre in jeder PDF-Funktion einzeln zu beantworten
+gewesen. Der Angemeldete bekommt die CI seines Standorts.
+
+**Wie sie ankommt:** `CI` wird an über 6000 Stellen gelesen, aber fast immer
+beim Rendern — eine Änderung an den Eigenschaften des Objekts kommt dort von
+selbst an. Nur fünf Stile stehen auf Modulebene und hatten ihre Farben zur
+Ladezeit eingebacken (`inputStyle`, `labelStyle`, `primaryBtn`,
+`secondaryBtn`, `cardStyle`); die werden überschrieben, nicht neu gebaut,
+damit jeder Aufrufer dieselbe Referenz behält. Gesetzt wird immer **von der
+Plattform-CI aus**, nie vom zuletzt Gesetzten — sonst bliebe beim Wechsel die
+Farbe des vorigen Mandanten stehen.

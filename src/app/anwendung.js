@@ -389,19 +389,19 @@ function useBodyScrollLock() {
 }
 const PORTAL_VERSION = "5.34.0",
   CI = {
-    blau: "#263159",
-    gold: "#D4A567",
-    blauDark: "#1a2342",
-    goldLight: "#e0bd80",
-    bg: "#FAFAF7",
+    blau: "#1B2A47",
+    gold: "#B5934F",
+    blauDark: "#12203B",
+    goldLight: "#C9AE72",
+    bg: "#FAFAFA",
     card: "#FFFFFF",
-    border: "#E8E4DA",
-    ink: "#263159",
-    muted: "#8B8377",
+    border: "#E6E8EB",
+    ink: "#1B2A47",
+    muted: "#7A828C",
     danger: "#c0392b",
     success: "#1e7e34",
-    shadow: "0 2px 12px rgba(38,49,89,0.06)",
-    shadowHover: "0 12px 32px rgba(38,49,89,0.12)"
+    shadow: "0 2px 12px rgba(27,42,71,0.06)",
+    shadowHover: "0 12px 32px rgba(27,42,71,0.12)"
   },
   FONT = "'Montserrat', system-ui, sans-serif",
   FONT_SERIF = "'Cormorant Garamond', 'Times New Roman', serif",
@@ -464,13 +464,81 @@ const inputStyle = {
     boxShadow: CI.shadow
   };
 
+// Die CI des Mandanten anwenden. Wird aus getProfile gerufen, also nach
+// der Anmeldung und bevor React mit dem Profil neu rendert.
+//
+// Leere Werte heissen "nichts einstellen", nicht "weiss": dann bleibt die
+// Plattform-CI stehen. So steht es in docs/NEUTRALITAET.md Abschnitt 4.
+const IMMO_CI_PLATTFORM = { ...CI };
+function immoCiAnwenden(stamm) {
+  const hex = (w) => (typeof w === "string" && /^#[0-9A-Fa-f]{6}$/.test(w)) ? w : null;
+  const primaer = hex(stamm && stamm.ci_primaer);
+  const akzent = hex(stamm && stamm.ci_akzent);
+  // Immer von der Plattform-CI aus, nie vom zuletzt Gesetzten: sonst
+  // bliebe beim Abmelden die Farbe des vorigen Mandanten stehen.
+  Object.assign(CI, IMMO_CI_PLATTFORM);
+  if (primaer) { CI.blau = primaer; CI.ink = primaer; CI.blauDark = immoAbdunkeln(primaer, .25); }
+  if (akzent) { CI.gold = akzent; CI.goldLight = immoAbdunkeln(akzent, -.3); }
+  if (primaer) {
+    const r = parseInt(primaer.slice(1, 3), 16), g = parseInt(primaer.slice(3, 5), 16), b = parseInt(primaer.slice(5, 7), 16);
+    CI.shadow = `0 2px 12px rgba(${r},${g},${b},0.06)`;
+    CI.shadowHover = `0 12px 32px rgba(${r},${g},${b},0.12)`;
+  }
+  // Die fuenf Stile auf Modulebene haben ihre Farben zur Ladezeit
+  // eingebacken. Ueberschreiben statt neu bauen — jeder Aufrufer haelt
+  // dieselbe Referenz.
+  Object.assign(inputStyle, { border: `1px solid ${CI.border}`, background: CI.card, color: CI.ink });
+  Object.assign(labelStyle, { color: CI.muted });
+  Object.assign(primaryBtn, { background: CI.blau, color: "#fff" });
+  Object.assign(secondaryBtn, { background: "transparent", color: CI.blau, border: `1px solid ${CI.border}` });
+  Object.assign(cardStyle, { background: CI.card, border: `1px solid ${CI.border}`, boxShadow: CI.shadow });
+  window.IMMO_LOGO_URL = null;
+  window.IMMO_MARKE = (stamm && (stamm.marken_name || stamm.firma_name)) || null;
+  if (stamm && stamm.logo_pfad) {
+    try {
+      const { data } = window._sb.storage.from("branding-assets").getPublicUrl(stamm.logo_pfad);
+      window.IMMO_LOGO_URL = (data && data.publicUrl) || null;
+    } catch (f) { window.IMMO_LOGO_URL = null; }
+  }
+  if (typeof document !== "undefined" && document.documentElement) {
+    const s = document.documentElement.style;
+    s.setProperty("--immo-primaer", CI.blau);
+    s.setProperty("--immo-akzent", CI.gold);
+    if (stamm && stamm.ci_font) s.setProperty("--immo-font", stamm.ci_font);
+  }
+}
+// Hellt auf (negativer Anteil) oder dunkelt ab. Ohne Bibliothek, weil es
+// fuer zwei abgeleitete Farbtoene keine braucht.
+function immoAbdunkeln(farbe, anteil) {
+  const z = (i) => {
+    const w = parseInt(farbe.slice(i, i + 2), 16);
+    const neu = anteil >= 0 ? w * (1 - anteil) : w + (255 - w) * -anteil;
+    return Math.max(0, Math.min(255, Math.round(neu))).toString(16).padStart(2, "0");
+  };
+  return "#" + z(1) + z(3) + z(5);
+}
+
+// Das Logo: erst das des Mandanten, sonst eine Wortmarke aus dem
+// Firmennamen. Genau so verlangt es docs/NEUTRALITAET.md Abschnitt 4 —
+// und bis hierher stand hier ein <img src="">, also ein kaputtes Bild,
+// weil die eingebauten Logos der Referenz geleert worden sind.
 function Logo({
   height: e = 60,
   variant: t = "blau"
 }) {
+  const quelle = window.IMMO_LOGO_URL || ("dunkel" === t ? LOGO_DUNKEL : LOGO_BLAU);
+  const marke = window.IMMO_MARKE || "ImmoOffice";
+  if (!quelle) return React.createElement("div", {
+    style: {
+      height: e, display: "flex", alignItems: "center",
+      fontFamily: FONT_SERIF, fontSize: Math.max(14, Math.round(e * .42)),
+      fontWeight: 600, letterSpacing: ".04em", whiteSpace: "nowrap",
+      color: "dunkel" === t ? "#fff" : CI.blau
+    }
+  }, marke);
   return React.createElement("img", {
-    src: "dunkel" === t ? LOGO_DUNKEL : LOGO_BLAU,
-    alt: "Musterhaus Immobilien GmbH",
+    src: quelle,
+    alt: marke,
     style: {
       height: e,
       width: "auto",
@@ -626,17 +694,19 @@ async function getProfile(e) {
     const {
       data: s
     } = await window._sb.from("firma_stammdaten")
-      .select("id, bundesland, gesellschaft_id")
+      .select("id, bundesland, gesellschaft_id, ci_primaer, ci_akzent, ci_font, logo_pfad, marken_name, firma_name")
       .order("sortierung")
       .limit(1)
       .maybeSingle();
     window.IMMO_STANDORT_ID = (s && s.id) || null;
     window.IMMO_GESELLSCHAFT_ID = (s && s.gesellschaft_id) || null;
     window.IMMO_BUNDESLAND = (s && s.bundesland) || null;
+    immoCiAnwenden(s);
   } catch (f) {
     window.IMMO_STANDORT_ID = null;
     window.IMMO_GESELLSCHAFT_ID = null;
     window.IMMO_BUNDESLAND = null;
+    immoCiAnwenden(null);
   }
   return t
 }
@@ -10751,7 +10821,7 @@ function BildEditorPage({
       position: "absolute",
       inset: 0,
       zIndex: 20,
-      background: "rgba(38,49,89,0.06)",
+      background: "rgba(27,42,71,0.06)",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
@@ -41315,6 +41385,75 @@ function AdminGmbHStammdaten({
     placeholder: "z. B. Musterhaus Immobilien GmbH Beispielstadt"
   })), React.createElement("div", null, React.createElement("label", {
     style: u
+  }, "Primärfarbe"), React.createElement("div", {
+    style: { display: "flex", gap: 8, alignItems: "center" }
+  }, React.createElement("input", {
+    type: "color",
+    value: e.ci_primaer || CI.blau,
+    onChange: t => c(e.id, "ci_primaer", t.target.value.toUpperCase()),
+    style: { width: 44, height: 38, padding: 0, border: `1px solid ${CI.border}`, background: "#fff", cursor: "pointer" }
+  }), React.createElement("input", {
+    style: { ...d, flex: 1 },
+    value: e.ci_primaer || "",
+    onChange: t => c(e.id, "ci_primaer", t.target.value.trim().toUpperCase()),
+    placeholder: "leer = Plattformfarbe"
+  }))), React.createElement("div", null, React.createElement("label", {
+    style: u
+  }, "Akzentfarbe"), React.createElement("div", {
+    style: { display: "flex", gap: 8, alignItems: "center" }
+  }, React.createElement("input", {
+    type: "color",
+    value: e.ci_akzent || CI.gold,
+    onChange: t => c(e.id, "ci_akzent", t.target.value.toUpperCase()),
+    style: { width: 44, height: 38, padding: 0, border: `1px solid ${CI.border}`, background: "#fff", cursor: "pointer" }
+  }), React.createElement("input", {
+    style: { ...d, flex: 1 },
+    value: e.ci_akzent || "",
+    onChange: t => c(e.id, "ci_akzent", t.target.value.trim().toUpperCase()),
+    placeholder: "leer = Plattformfarbe"
+  }))), React.createElement("div", null, React.createElement("label", {
+    style: u
+  }, "Schriftfamilie"), React.createElement("input", {
+    style: d,
+    value: e.ci_font || "",
+    onChange: t => c(e.id, "ci_font", t.target.value),
+    placeholder: "leer = Montserrat"
+  })), React.createElement("div", null, React.createElement("label", {
+    style: u
+  }, "Logo"), React.createElement("div", {
+    style: { display: "flex", gap: 8, alignItems: "center" }
+  }, e.logo_pfad ? React.createElement("img", {
+    src: (window._sb.storage.from("branding-assets").getPublicUrl(e.logo_pfad).data || {}).publicUrl || "",
+    alt: "Logo",
+    style: { height: 34, width: "auto", border: `1px solid ${CI.border}`, background: "#fff", padding: 2 }
+  }) : React.createElement("span", {
+    style: { fontSize: 12, color: CI.muted }
+  }, "Ohne Logo steht der Markenname"), React.createElement("label", {
+    style: { ...secondaryBtn, padding: "7px 12px", fontSize: 12, cursor: "pointer", whiteSpace: "nowrap" }
+  }, e.logo_pfad ? "Ersetzen" : "Hochladen", React.createElement("input", {
+    type: "file",
+    accept: "image/png,image/jpeg,image/svg+xml,image/webp",
+    style: { display: "none" },
+    onChange: async (ev) => {
+      const datei = ev.target.files && ev.target.files[0];
+      ev.target.value = "";
+      if (!datei) return;
+      try {
+        const endung = (datei.name.split(".").pop() || "png").toLowerCase();
+        // Mandantenrelativ — die Speicher-Huelle stellt die
+        // Mandantenkennung voran, die Richtlinie aus fork_09 prueft sie.
+        const pfad = "logos/" + e.id + "-" + Date.now() + "." + endung;
+        const { error: uErr } = await window._sb.storage.from("branding-assets")
+          .upload(pfad, datei, { upsert: false, contentType: datei.type || undefined });
+        if (uErr) throw uErr;
+        c(e.id, "logo_pfad", pfad);
+        await logAction("upload", "logo", e.id, e.firma_name || "", { pfad });
+      } catch (f) {
+        alert("Logo konnte nicht hochgeladen werden: " + (f.message || f));
+      }
+    }
+  })))), React.createElement("div", null, React.createElement("label", {
+    style: u
   }, "Web"), React.createElement("input", {
     style: d,
     value: e.web || "",
@@ -41376,6 +41515,10 @@ function AdminGmbHStammdaten({
         ust_id: e.ust_id,
         geschaeftsfuehrer: e.geschaeftsfuehrer,
         marken_name: e.marken_name,
+        ci_primaer: e.ci_primaer || null,
+        ci_akzent: e.ci_akzent || null,
+        ci_font: e.ci_font || null,
+        logo_pfad: e.logo_pfad || null,
         web: e.web,
         fax: e.fax,
         aufsichtsbehoerde: e.aufsichtsbehoerde,

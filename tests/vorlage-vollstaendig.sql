@@ -105,7 +105,10 @@ zuwachs(bereich, mehr, grund) as (values
   ('Indizes ohne Constraint', 2, 'vertragsvorlagen: mandant_id und die Suche'),
   ('Richtlinien', 3, 'fork_12: lesen, pflegen, mandant_trennung'),
   ('Buckets', 1, 'fork_12: vertragsvorlagen'),
-  ('Storage-Richtlinien', 2, 'fork_12: Datei lesen und pflegen')
+  ('Storage-Richtlinien', 2, 'fork_12: Datei lesen und pflegen'),
+  -- fork_13: Mandanten-CI an firma_stammdaten.
+  ('Spalten', 3, 'fork_13: ci_primaer, ci_akzent, ci_font'),
+  ('Pruefbedingungen', 1, 'firma_stammdaten_ci_farben_check')
 ),
 soll(bereich, soll) as (
   select v.bereich,
