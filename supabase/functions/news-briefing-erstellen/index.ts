@@ -136,7 +136,7 @@ Deno.serve(async (req) => {
     // Schon ein Briefing heute? (Idempotenz)
     if (!force) {
       const { data: existing } = await admin
-        .from("news_briefings").select("id").eq("briefing_datum", heute).maybeSingle();
+        .from("news_briefings").select("id").eq("briefing_datum", heute).limit(1).maybeSingle();
       if (existing?.id) {
         return jsonResponse({
           ok: true,
@@ -270,7 +270,8 @@ Erstelle das Tagesbriefing.`;
     // ---- 4. Speichern (upsert auf briefing_datum) ----
     const { data: briefing, error: insErr } = await admin
       .from("news_briefings")
-      .upsert({
+      .upsert(((await admin.from("mandanten").select("id")).data || []).map((m: any) => ({
+        mandant_id: m.id,
         briefing_datum: heute,
         zusammenfassung: briefingText,
         themen,
@@ -282,7 +283,7 @@ Erstelle das Tagesbriefing.`;
         })),
         anzahl_artikel: alleArtikel.length,
         modell,
-      }, { onConflict: "briefing_datum" })
+      })), { onConflict: "mandant_id,briefing_datum" })
       .select()
       .single();
 

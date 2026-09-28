@@ -556,6 +556,66 @@ ERSETZUNGEN = [
      'etwa 70 km.`',
      'Stilbeispiel der KI: die Lagebeschreibung desselben Objekts.'),
 
+    # =====================================================================
+    # FORK — die letzten drei Einfuegungen ohne Mandanten
+    #
+    # Nach fork_22 und fork_27 blieben drei uebrig, bei denen kein
+    # Elternsatz half. Jede hat ihre eigene Quelle, und die steht hier.
+    # =====================================================================
+
+    # Der Interessent, der sich ein Expose herunterlaedt, gehoert dem
+    # Mandanten des OBJEKTS — nicht dem des Ersten, der zufaellig passt. Ein
+    # Kontakt hat keinen Elternsatz, er ist selbst einer.
+    ('FORK',
+     r'\.from\("kontakte"\)\.insert\(\{ vorname, nachname, email, rollen: \["interessent"\], quelle: "newsletter", aktiv: true,',
+     '.from("kontakte").insert({ mandant_id: im.mandant_id, vorname, nachname, email, rollen: ["interessent"], quelle: "newsletter", aktiv: true,',
+     'Expose-Freigabe: der neue Interessent traegt den Mandanten des Objekts.',
+     {'expose-freigabe'}),
+
+    # Das Briefing ist fuer alle Mandanten dasselbe — Branchennachrichten
+    # sind es ja auch. Erzeugt wird es EINMAL, ein KI-Aufruf; gespeichert je
+    # Mandant, weil die Tabelle seit fork_05 eine Mandantenzuordnung traegt
+    # und die Zeile ohne sie fuer jeden unsichtbar waere.
+    #
+    # Der Konfliktschluessel muss mitziehen: fork_17 hat die Eindeutigkeit
+    # von briefing_datum auf (mandant_id, briefing_datum) umgestellt. Ein
+    # upsert auf den alten Schluessel faende gar keine Regel mehr und
+    # brueche ab.
+    ('FORK',
+     r'      \.upsert\(\{\n        briefing_datum: heute,\n        zusammenfassung: briefingText,\n        themen,\n        quellen: alleArtikel\.map\(a => \(\{\n          quelle: a\.quelle,\n          titel: a\.titel,\n          link: a\.link,\n          pub_datum: a\.pub_datum,\n        \}\)\),\n        anzahl_artikel: alleArtikel\.length,\n        modell,\n      \}, \{ onConflict: "briefing_datum" \}\)',
+     '      .upsert(((await admin.from("mandanten").select("id")).data || []).map((m: any) => ({\n'
+     '        mandant_id: m.id,\n'
+     '        briefing_datum: heute,\n'
+     '        zusammenfassung: briefingText,\n'
+     '        themen,\n'
+     '        quellen: alleArtikel.map(a => ({\n'
+     '          quelle: a.quelle,\n'
+     '          titel: a.titel,\n'
+     '          link: a.link,\n'
+     '          pub_datum: a.pub_datum,\n'
+     '        })),\n'
+     '        anzahl_artikel: alleArtikel.length,\n'
+     '        modell,\n'
+     '      })), { onConflict: "mandant_id,briefing_datum" })',
+     'News-Briefing: je Mandant eine Zeile, aus einem Lauf.',
+     {'news-briefing-erstellen'}),
+
+    # Die Idempotenzpruefung traf vorher genau eine Zeile. Ab dem zweiten
+    # Mandanten trifft sie mehrere, und maybeSingle() bricht ab.
+    ('FORK',
+     r'\.from\("news_briefings"\)\.select\("id"\)\.eq\("briefing_datum", heute\)\.maybeSingle\(\);',
+     '.from("news_briefings").select("id").eq("briefing_datum", heute).limit(1).maybeSingle();',
+     'News-Briefing: die Idempotenzpruefung vertraegt mehrere Mandanten.',
+     {'news-briefing-erstellen'}),
+
+    # Der Diagnose-Eintrag gehoert dem Mandanten, dessen Portalzugang
+    # geprueft wurde.
+    ('FORK',
+     r'  await db\.from\("onoffice_diagnose"\)\.insert\(\{\n    test: ',
+     '  await db.from("onoffice_diagnose").insert({\n    mandant_id: z?.mandant_id ?? null,\n    test: ',
+     'Portal-Diagnose: der Eintrag traegt den Mandanten des Zugangs.',
+     {'portal-ftp-diagnose'}),
+
     # --- FREMD: Verweise auf das Supabase-Projekt der Vorlage
     ('FREMD', r'yazwkzzjiquprtjpurur', 'usguiggfciavwzkdfjgt',
      'Projektkennung der Vorlage durch die eigene ersetzt.'),

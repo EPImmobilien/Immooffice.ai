@@ -153,7 +153,7 @@ Deno.serve(async (req) => {
       if (!kontaktId && anm?.kontakt_id && anm.email && anm.email.toLowerCase() === email) kontaktId = anm.kontakt_id;
       if (!kontaktId) {
         const teile = String(name || "").split(/\s+/).filter(Boolean); const nachname = teile.length ? teile.pop() : null; const vorname = teile.join(" ") || null;
-        const { data: kn, error: kErr } = await db.from("kontakte").insert({ vorname, nachname, email, rollen: ["interessent"], quelle: "newsletter", aktiv: true, zustaendig_id: im.zustaendig_id || null }).select("id").single();
+        const { data: kn, error: kErr } = await db.from("kontakte").insert({ mandant_id: im.mandant_id, vorname, nachname, email, rollen: ["interessent"], quelle: "newsletter", aktiv: true, zustaendig_id: im.zustaendig_id || null }).select("id").single();
         if (kErr) console.error("Kontakt anlegen:", kErr); kontaktId = kn?.id || null;
       }
       const tNeu = tokenNeu();

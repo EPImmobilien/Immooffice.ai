@@ -93,6 +93,7 @@ Deno.serve(async (req) => {
   }
 
   await db.from("onoffice_diagnose").insert({
+    mandant_id: z?.mandant_id ?? null,
     test: `ftp ${portal} ${ordner} ${datei}`.trim(),
     errorcode: out.ok ? "0" : "FEHLER",
     meldung: String(out.fehler || "ok").slice(0, 300),

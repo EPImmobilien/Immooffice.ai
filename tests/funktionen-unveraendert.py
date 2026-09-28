@@ -78,7 +78,8 @@ for _f in ('rechnung-pdf-erzeugen', 'reservierung-pdf-erzeugen',
 # Ohne mandant_id greift der Standardwert aktuelle_mandant_id(), und der ist
 # ohne Anmelde-Token NULL — die Zeile waere fuer jeden unsichtbar.
 # Buch darueber fuehrt tests/oeffentlich-insert-mandant.py.
-for _f in ('signatur-token-validieren', 'bewerbertest-abgeben'):
+for _f in ('signatur-token-validieren', 'bewerbertest-abgeben',
+           'expose-freigabe', 'news-briefing-erstellen', 'portal-ftp-diagnose'):
     ERWEITERT[_f] = ('Schreibt mit Mandanten statt ohne (Phase 2)')
 
 BLOCKZEILEN = {

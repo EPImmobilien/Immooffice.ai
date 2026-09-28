@@ -172,6 +172,10 @@ zuwachs(bereich, mehr, grund) as (values
   ('Pruefbedingungen', 1, 'fork_25: Untergrenze nicht ueber der Ausgangsgroesse')
   -- fork_26 aendert nur eine vorhandene Pruefbedingung (art) und eine
   -- vorhandene Funktion (vorlagen_feld_katalog) — keine neuen Kennzahlen.
+  ,
+  -- fork_27: der Wachposten aus fork_22 jetzt auch an aktivitaeten und
+  -- immobilie_datei.
+  ('Trigger', 2, 'fork_27: mandant_aus_eltern an zwei weiteren Tabellen')
 ),
 soll(bereich, soll) as (
   select v.bereich,

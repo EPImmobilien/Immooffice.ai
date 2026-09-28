@@ -59,6 +59,9 @@ DURCH_TRIGGER = {
     'landing_faq',
     'newsletter_anmeldungen', 'ki_bildbearbeitung_log', 'push_log',
     'vermerke', 'mail_versendet',
+    # fork_27 nachgezogen: die Aktivitaet ueber Eigentuemer, Vertrag oder
+    # Empfaenger (in dieser Reihenfolge), die Datei ueber ihre Immobilie.
+    'aktivitaeten', 'immobilie_datei',
 }
 
 # Wie weit hinter dem .insert( noch nach mandant_id gesucht wird. Grosszuegig
@@ -74,25 +77,11 @@ MUSTER = re.compile(r'\.from\(\s*"([a-z0-9_]+)"\s*\)\s*(?:\.[a-z]+\([^)]*\)\s*)*
 # --- Gelesen, Befund offen. Die Liste darf nur kuerzer werden. -------------
 # Schluessel ist Funktion -> Menge der Tabellen, in die sie ohne Mandanten
 # schreibt. Wer eine Fundstelle schliesst, streicht sie hier.
-NOCH_OFFEN = {
-    # Die Aktivitaet haengt an einem Eigentuemer oder einem Vertrag — welcher
-    # von beiden, entscheidet der Aufrufer. fork_22 traegt sie deshalb nicht:
-    # ein Wachposten, der zwischen zwei gleichrangigen Eltern waehlen muesste,
-    # raet. Hier gehoert der Mandant in den Quelltext.
-    'eigentuemer-zugang-anfordern': {'aktivitaeten'},
-    'objekt-landing': {'aktivitaeten'},
-    # Zweite Fundstelle: .insert(neu) uebergibt ein vorbereitetes Objekt. Die
-    # erste, die die Spalten einzeln aufzaehlt, traegt den Mandanten.
-    'mail-anhaenge-diagnose': {'immobilie_datei'},
-    # Ein Kontakt hat keinen Elternsatz — er IST einer. Der Mandant muss aus
-    # dem Vorgang kommen, in dem er entsteht.
-    'expose-freigabe': {'kontakte'},
-    # Ein Briefing gehoert einem Mandanten, haengt aber an keiner Zeile.
-    'news-briefing-erstellen': {'news_briefings'},
-    # onOffice-Diagnose. Faellt mit dem Ausbau der Anbindung ohnehin weg;
-    # solange sie liegt, steht sie hier.
-    'portal-ftp-diagnose': {'onoffice_diagnose'},
-}
+# Leer — und das soll so bleiben. Am 28.09.2026 standen hier siebenundvierzig
+# Fundstellen; sechzehn hat der Wachposten aus fork_22 uebernommen, zwei mehr
+# fork_27, der Rest steht im Quelltext. Jede neue Fundstelle macht das Gate
+# jetzt rot, nicht nur die Liste laenger.
+NOCH_OFFEN = {}
 
 
 def fundstellen():
@@ -152,6 +141,9 @@ def main():
         print(f'\n  NOCH OHNE MANDANTEN sind {gesamt_offen} Einfuegungen. Das Gate ist')
         print('  deshalb nicht rot — die Liste ist bekannt und begrenzt —, aber vor')
         print('  Gate 2 muss sie leer sein.')
+    else:
+        print('\n  Keine einzige Einfuegung ohne Mandanten. Fuer Gate 2 ist dieser')
+        print('  Punkt damit erfuellt.')
     print('\n[ok] Keine neue Einfuegung ohne Mandanten.')
     return 0
 

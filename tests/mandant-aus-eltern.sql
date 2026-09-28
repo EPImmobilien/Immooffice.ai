@@ -153,8 +153,35 @@ end $$;
 
 -- --- 6) Haengen die Wachposten ueberall, wo sie sollen? --------------------
 insert into befund (pruefung, bestanden, bemerkung)
-select 'Siebzehn Tabellen tragen den Wachposten', count(*) = 17, count(*)::text
+select 'Neunzehn Tabellen tragen den Wachposten', count(*) = 19, count(*)::text
   from pg_trigger where tgname = 'mandant_aus_eltern' and not tgisinternal;
+
+-- --- 7) Die Aktivitaet nimmt das erste gefuellte Elternpaar ---------------
+-- Drei Paare in einer Reihenfolge: Eigentuemer, Vertrag, Empfaenger. Das ist
+-- keine Wahl zwischen Gleichrangigen, sondern eine Reihenfolge — und deshalb
+-- immer dieselbe Antwort.
+do $$
+declare eig uuid; neu uuid; g1 uuid; g2 uuid;
+begin
+  insert into public.eigentuemer (mandant_id, nachname, email)
+  values ((select wert from wer where was='m_a'), 'Probe', 'eig@eltern.example')
+  returning id into eig;
+
+  insert into public.aktivitaeten (zielgruppe, typ, titel, eigentuemer_id)
+  values ('makler', 'pruefung', 'ueber den Eigentuemer', eig) returning id into neu;
+  select mandant_id into g1 from public.aktivitaeten where id = neu;
+
+  insert into public.aktivitaeten (zielgruppe, typ, titel, empfaenger_user_id)
+  values ('makler', 'pruefung', 'ueber den Empfaenger',
+          (select wert from wer where was='u_a')) returning id into neu;
+  select mandant_id into g2 from public.aktivitaeten where id = neu;
+
+  insert into befund (pruefung, bestanden, bemerkung)
+  values ('Aktivitaet erbt ueber den Eigentuemer',
+          g1 = (select wert from wer where was='m_a'), coalesce(g1::text, '(leer)')),
+         ('Aktivitaet erbt ueber den Empfaenger, wenn kein Eigentuemer dranhaengt',
+          g2 = (select wert from wer where was='m_a'), coalesce(g2::text, '(leer)'));
+end $$;
 
 select nr, case when bestanden is true then 'ok  ' else 'FEHL' end as ergebnis, pruefung, bemerkung
   from befund order by nr;

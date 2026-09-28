@@ -1982,3 +1982,47 @@ Objekt, also dieselbe Machart mit erfundenen Angaben.
 in `tests/funktionen-unveraendert.py`. Dass es zwei sind, ist keine schöne
 Lösung — es ist mir erst aufgefallen, als die eine grün war und die andere
 rot. Vermerkt in `docs/OFFEN.md`.
+
+---
+
+## Keine Einfügung ohne Mandanten mehr (28.09.2026)
+
+Von den 47 Fundstellen, die am selben Tag aufgefallen waren, sind **alle
+geschlossen**. `tests/oeffentlich-insert-mandant.py` führt jetzt eine leere
+Liste — jede neue Fundstelle macht das Gate rot, nicht nur die Liste länger.
+
+| | |
+|---|---|
+| 16 Tabellen | Wachposten aus `fork_22` |
+| 2 Tabellen | `fork_27`, siehe unten |
+| Rest | im Quelltext, an der Quelle des Vorgangs |
+
+**Eine eigene Begründung musste ich zurücknehmen.** Zu `fork_22` hatte ich
+geschrieben, `aktivitaeten` bekomme keinen Wachposten, weil die Zeile
+„wahlweise an einem Eigentümer oder an einem Vertrag" hänge und ein
+Wachposten zwischen zwei gleichrangigen Eltern raten müsste. Das war zu
+vorsichtig: die Funktion nimmt ihre Argumente **paarweise und in einer
+Reihenfolge** — Eigentümer, dann Vertrag, dann Empfänger. Das ist eine Regel,
+kein Raten. Bei `immobilie_datei` war es schlicht Unaufmerksamkeit; eine
+Fundstelle übergab ein vorbereitetes Objekt (`insert(neu)`) und kam in der
+Durchsicht nicht vor.
+
+**Drei brauchten wirklich eine eigene Quelle:**
+
+- **`expose-freigabe`** — ein Kontakt hat keinen Elternsatz, er *ist* einer.
+  Der Interessent gehört dem Mandanten des **Objekts**, dessen Exposé er
+  herunterlädt.
+- **`news-briefing-erstellen`** — das Briefing ist für alle dasselbe,
+  Branchennachrichten sind es ja auch. Erzeugt wird es **einmal** (ein
+  KI-Aufruf), gespeichert je Mandant. Dabei fiel ein zweiter Fehler auf: der
+  `upsert` zielte noch auf `briefing_datum` allein, während `fork_17` die
+  Eindeutigkeit längst auf `(mandant_id, briefing_datum)` umgestellt hatte —
+  er hätte gar keine Regel mehr gefunden und wäre abgebrochen. Und die
+  Idempotenzprüfung mit `maybeSingle()` hätte ab dem zweiten Mandanten
+  mehrere Zeilen getroffen.
+- **`portal-ftp-diagnose`** — der Eintrag gehört dem Mandanten des
+  Portalzugangs, der geprüft wurde.
+
+**Für Gate 2 ist dieser Punkt damit erfüllt.** Offen bleiben die
+19 öffentlichen Endpunkte, die beim **Lesen** noch nicht begrenzen —
+`tests/funktionen-oeffentlich.py` führt darüber Buch.
