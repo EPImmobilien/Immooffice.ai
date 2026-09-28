@@ -659,3 +659,59 @@ seit jeher richtig. Jetzt alle drei.
 
 **Was offen bleibt:** Die Richtlinien trennen bisher nach Rolle, nicht nach
 Mandant. Das ist der nächste Schritt.
+
+## 28.09.2026 — `konto_id` ist die Mandantengrenze, nicht `firma_id`
+
+**Frage:** Der Auftrag verlangt drei Ebenen — Konto, Gesellschaften, Standorte
+— und schlägt vor, dafür die vorhandene `firma_id` als Konto zu verwenden,
+„damit nicht 167 Tabellen umbenannt werden müssen". Geht das?
+
+**Nein, und der Grund spart zugleich die befürchtete Umbenennung.**
+
+`firma_id` gibt es bisher in genau **zwei** Tabellen: `profiles` und
+`rechnung_nummern_sequence`. Beide zeigen per Fremdschlüssel auf
+`firma_stammdaten`. Dort bedeutet sie heute schon „Standort beziehungsweise
+Rechtsträger": `firma_stammdaten.typ` hat den Standardwert `'standort'`, und
+die Vorlage führte darin ihre drei Büros mit je eigenen Firmendaten,
+Registerangaben und Nummernkreisen.
+
+Genau das will der Auftrag selbst: „Jede Gesellschaft hat einen eigenen
+Rechnungs-Nummernkreis." Würde `firma_id` zum Konto umgedeutet, hinge
+`rechnung_nummern_sequence` am Konto statt an der Gesellschaft — das Gegenteil
+der Anforderung, und zwar stillschweigend, weil die Spalte gleich heißt.
+
+Die befürchtete Umbenennung fällt ohnehin nicht an: **185 der 187 Tabellen
+haben überhaupt keine Mandantenspalte.** Sie brauchen so oder so eine neue.
+Wie sie heißt, kostet nichts.
+
+**Entscheidung:**
+
+| Ebene | Träger | Spalte |
+|---|---|---|
+| Konto (Mandant) | neue Tabelle `konten` | `konto_id` — **hier trennt die RLS** |
+| Gesellschaft | neue Tabelle `gesellschaften` | `gesellschaft_id` |
+| Standort | `firma_stammdaten` (ist es schon) | `firma_id` — unverändert |
+
+Die Helferfunktion heißt `aktuelle_konto_id()`, nicht `current_firma_id()`:
+das Schema ist durchgehend deutsch benannt (`aktuelle_rolle`, `ist_chef`,
+`ist_team`), und gemischte Sprachen bei sicherheitskritischen Namen laden zu
+Verwechslungen ein. Gleiche Bauart wie die Geschwister — `stable`,
+`security definer`, fester `search_path`.
+
+**Zwei weitere Annahmen des Auftrags, die nicht zutreffen:**
+
+1. „`firma_stammdaten` mit `ci_primaer`, `ci_akzent` und `ci_font`" — diese
+   Spalten gibt es dort nicht. `firma_stammdaten` hat von Branding nur
+   `logo_pfad`. Die Farb- und Schriftspalten liegen in
+   `altbestand.mandant_branding` und heißen `farbe_primaer`, `farbe_akzent`,
+   `schriftart`, `schrift_serifen`, `schrift_serifenlos`, `logo_pfad`,
+   `logo_invers_pfad`. Beim Aufbau des Brandings (Abschnitt 2) wird darauf
+   aufgesetzt, nicht auf erfundene `ci_*`-Namen.
+2. Die Ausgangszahlen (167 Tabellen, 215 Richtlinien, 64 ohne Richtlinie)
+   stammen aus einem Stand vor Abschluss der Schema-Übernahme. Tatsächlich:
+   187, 344, 8.
+
+**Was offen bleibt:** `fork_02` legt nur die Struktur an. Keine Daten
+verschoben, keine Spalte `NOT NULL`. Das erste Konto, der Backfill und die
+Pflichtfelder folgen in `fork_03`; erst danach lassen sich die 185 übrigen
+Tabellen sinnvoll mit `konto_id` versehen.

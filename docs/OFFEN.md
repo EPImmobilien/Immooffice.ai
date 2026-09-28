@@ -273,3 +273,35 @@ bekommt die Rolle `chef`. Ein Trigger auf `auth.users` ist der naheliegende
 Weg, weil er auch bei Registrierung über einen fremden Anbieter greift.
 
 Bis dahin muss ein Profil von Hand angelegt werden.
+
+## Adressbuch als CSV ausgeben — angefordert 28.09.2026
+
+Die Vorlage kann CSV für Akquise-Pipeline, Kosten/Kennzahlen und
+Newsletter-Anmeldungen. Für **Kontakte** gibt es keinen Export. Der Wunsch ist
+also eine echte Erweiterung, keine Übernahme.
+
+**Wird nicht vorgezogen, und zwar aus zwei Gründen:**
+
+1. Ein Export ist die breiteste Tür, die eine Anwendung hat. Solange die
+   Mandantentrennung nicht steht (`firma_id`, RLS), zieht er potenziell
+   Datensätze über Mandantengrenzen hinweg. Genau die Lücke, die niemand
+   sieht, weil im Bildschirm alles richtig aussieht.
+2. Der Auftrag definiert in Abschnitt 1b ein eigenes Recht „Export" und einen
+   Sichtbarkeitsbereich je Mitarbeiter (nur eigene / Standort / Gesellschaft /
+   Konto). Ein Export, der vor diesen Regeln entsteht, ignoriert sie.
+
+**Gebaut wird er deshalb zusammen mit der Rechte-Matrix (1b)**, mit diesen
+Eigenschaften:
+
+- Semikolon als Trennzeichen, UTF-8 mit BOM — wie die drei vorhandenen
+  Exporte der Vorlage, damit Excel die Umlaute richtig liest.
+- Spalten folgen der Kontaktliste, nicht der Tabelle: Anrede, Vorname,
+  Nachname, Firma, Rolle, E-Mail, Telefon, Mobil, Anschrift, Tags, Zuständig,
+  Quelle, angelegt am.
+- Es wird exportiert, was der Nutzer **auch sehen darf** — dieselbe Abfrage
+  wie die Liste, nicht ein eigener, weiter gefasster Zugriff.
+- Jeder Export landet im Audit-Log, mit Anzahl der Datensätze. Ein Export
+  personenbezogener Daten ist ein Vorgang, über den man Auskunft geben können
+  muss.
+- Widerrufene Newsletter-Kontakte werden gekennzeichnet, nicht stillschweigend
+  mitgeliefert.

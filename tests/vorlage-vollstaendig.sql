@@ -54,7 +54,22 @@ with vorlage(bereich, soll) as (values
 ),
 -- Angemeldeter Zuwachs des Forks gegenueber der Vorlage.
 zuwachs(bereich, mehr, grund) as (values
-  ('Richtlinien', 2, 'fork_01: amt_vorlage — Team liest, Chef pflegt')
+  ('Richtlinien', 2, 'fork_01: amt_vorlage — Team liest, Chef pflegt'),
+  -- fork_02: konten und gesellschaften, dazu die Verweise nach oben.
+  ('Tabellen', 2, 'fork_02: konten, gesellschaften'),
+  ('Tabellen mit RLS', 2, 'fork_02: dieselben beiden'),
+  ('Richtlinien', 4, 'fork_02: je zwei fuer konten und gesellschaften'),
+  ('Funktionen', 1, 'fork_02: aktuelle_konto_id()'),
+  ('Spalten', 24, 'fork_02: konten 11, gesellschaften 10, '
+                  'firma_stammdaten +konto_id +gesellschaft_id, profiles +konto_id'),
+  ('Fremdschluessel', 4, 'fork_02: gesellschaften->konten, firma_stammdaten->konten, '
+                         'firma_stammdaten->gesellschaften, profiles->konten'),
+  ('Primaer- und Eindeutigkeitsschluessel', 3,
+     'fork_02: zwei Primaerschluessel, konten.slug eindeutig'),
+  ('Pruefbedingungen', 1, 'fork_02: konten.abo_status'),
+  ('Indizes ohne Constraint', 5,
+     'fork_02: gesellschaften_ein_standard, gesellschaften_konto_idx, '
+     'firma_stammdaten_konto_idx, firma_stammdaten_gesellschaft_idx, profiles_konto_idx')
 ),
 soll(bereich, soll) as (
   select v.bereich,
