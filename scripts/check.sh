@@ -43,6 +43,13 @@ else
   fehler=1
 fi
 
+abschnitt "Rechte: Sichtbarkeitsbereich und Modulrechte"
+if scripts/lokale-db.sh psql -q -f tests/rechte.sql; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Oberflaeche: Zerlegung verliert nichts"
 if [[ -f reference/epworld-src.html ]]; then
   roh="$(mktemp -d)"

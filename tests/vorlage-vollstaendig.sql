@@ -87,7 +87,14 @@ zuwachs(bereich, mehr, grund) as (values
   ('Spalten', 2, 'storage_umzug_token: token, erstellt_am'),
   ('Funktionen', 1, 'fork_08: storage_ohne_mandant()'),
   -- fork_09: die harte Grenze im Dateispeicher.
-  ('Storage-Richtlinien', 1, 'fork_09: mandant_trennung, restriktiv')
+  ('Storage-Richtlinien', 1, 'fork_09: mandant_trennung, restriktiv'),
+  -- fork_11: Abschnitt 1b, Sichtbarkeitsbereich und das Recht "Export".
+  ('Spalten', 1, 'fork_11: profiles.sichtbarkeit'),
+  ('Pruefbedingungen', 1, 'fork_11: profiles_sichtbarkeit_check'),
+  ('Funktionen', 3, 'fork_11: sichtbare_mitarbeiter(), hat_recht(), '
+                    'darf_exportieren()'),
+  ('Richtlinien', 6, 'fork_11: sichtbarkeitsbereich auf den sechs Tabellen '
+                     'mit zustaendig_id')
 ),
 soll(bereich, soll) as (
   select v.bereich,

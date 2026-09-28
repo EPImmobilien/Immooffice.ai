@@ -895,3 +895,41 @@ braucht, baut die Funktion aus dieser Beschreibung neu.
 auf dem Projekt liegt und nicht im Repository steht, *meldet* er; entfernt wird
 es von Hand. Ein Abgleich, der löscht, was er nicht kennt, ist auf einem
 Produktivprojekt die falsche Richtung.
+
+## 2026-09-28 · Sichtbarkeitsbereich und Export-Recht (Abschnitt 1b)
+
+**Frage:** Abschnitt 1b verlangt je Mitarbeiter einen Sichtbarkeitsbereich
+(nur eigene / Standort / Gesellschaft / Konto) und ein eigenes Recht „Export".
+Neu bauen oder an das Rechtemodell der Vorlage anknüpfen?
+
+**Entscheidung:** angeknüpft. Die Vorlage hat `profiles.stufe` (Rollenvorlage),
+`profiles.rechte` (Einzelhäkchen je Modul, als jsonb) und `profiles.firma_id`
+(Hauptstandort). Das ist bereits das Prinzip aus `CLAUDE.md`, „Rechte als
+Vorlage plus Einzelhäkchen". Dazu kommen in `fork_11` nur zwei Dinge:
+`profiles.sichtbarkeit` und das Modul `export`.
+
+**Was neu ist und nicht in der Vorlage stand: die Durchsetzung.** `hatRecht()`
+steht dort allein in der Oberfläche. `CLAUDE.md` verlangt „serverseitig und in
+der Datenbank erzwungen (RLS) — niemals nur durch ausgeblendete
+Bedienelemente". Deshalb gibt es jetzt `public.hat_recht(modul)` als
+SQL-Fassung derselben Regel, Zeile für Zeile.
+
+**Zwei Fassungen einer Regel sind eine Gefahrenquelle.** `tests/rechte.sql`
+prüft die SQL-Fassung gegen jeden Zweig der JavaScript-Fassung — auch den
+Sonderfall „`rechte` ist leer": dann gilt alles außer `finanzen`, `admin`,
+`rechnungen` und `posteingang`. `posteingang` hängt in der Vorlage an einer
+festen E-Mail-Adresse; im Fork ist sie neutralisiert und gehört niemandem, die
+SQL-Fassung sperrt das Modul deshalb schlicht.
+
+**Standardwert `konto` — keine Verhaltensänderung.** Wer nichts einstellt,
+sieht wie bisher den ganzen Mandanten. Ein Chef sieht ihn immer, unabhängig von
+der Einstellung: sonst schlösse ein versehentliches „nur eigene" den Inhaber
+aus seinem eigenen Unternehmen aus.
+
+**Datensätze ohne Zuständigen bleiben für alle sichtbar.** Sonst verschwänden
+sie aus jeder Liste, und niemand könnte sie noch jemandem zuweisen.
+
+**Nur sechs Tabellen:** `kontakte`, `immobilien`, `aufgaben`, `todos`,
+`akq_leads`, `akq_aktivitaeten` — genau die mit `zustaendig_id`. Ohne
+Zuständigen gibt es keinen Anker für „eigene", und ein erfundener wäre eine
+Verhaltensänderung.
