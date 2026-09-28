@@ -18,6 +18,14 @@ on:
         description: 'Adresse der ausgelieferten Oberflaeche'
         required: true
         default: 'https://immoofficeai.netlify.app'
+      konto:
+        description: 'E-Mail fuer den Anmeldeversuch (leer = nur laden)'
+        required: false
+        default: ''
+      passwort:
+        description: 'Passwort dazu. Nur Wegwerf-Zugaenge hier eintragen — der Wert steht im Protokoll der Oberflaeche.'
+        required: false
+        default: ''
 
 jobs:
   pruefen:
@@ -33,8 +41,13 @@ jobs:
           # Genau die Adressen, die die gebaute Datei laedt — aus ihr geholt,
           # nicht abgeschrieben.
           python3 scripts/bauen.py > /dev/null
+          # Nur, was die Seite tatsaechlich LAEDT. <link rel="preconnect">
+          # nennt einen Host ohne Pfad — der antwortet naturgemaess mit 404
+          # und ist trotzdem in Ordnung. Beim ersten Lauf hat genau das zwei
+          # Fehlalarme erzeugt.
           { grep -o '<script[^>]*src="https://[^"]*"' dist/index.html | sed 's/.*src="//;s/"//'
-            grep -o '<link[^>]*href="https://[^"]*"' dist/index.html | sed 's/.*href="//;s/"//'
+            grep -o '<link[^>]*rel="stylesheet"[^>]*href="https://[^"]*"' dist/index.html | sed 's/.*href="//;s/"//'
+            grep -o '<link[^>]*href="https://[^"]*"[^>]*rel="stylesheet"' dist/index.html | sed 's/.*href="//;s/".*//'
           } | sort -u > adressen.txt
           : > befund/cdn.txt
           while read -r u; do
@@ -50,7 +63,9 @@ jobs:
           mkdir -p befund
           U='${{ github.event.inputs.adresse }}'
           : > befund/dateien.txt
-          for p in "" /sw.js /freigabe.html /objekt.html /sonnenverlauf.html /_redirects; do
+          # _redirects steht bewusst nicht in der Liste: Netlify wertet die
+          # Datei aus und liefert sie nicht aus. Ein 404 darauf ist richtig.
+          for p in "" /sw.js /freigabe.html /objekt.html /sonnenverlauf.html; do
             code="$(curl -sS -o /dev/null -w '%{http_code}' -L --max-time 30 "$U$p" || echo 000)"
             printf '%s  %s\n' "$code" "${p:-/}" >> befund/dateien.txt
           done
@@ -85,6 +100,23 @@ jobs:
           });
           await seite.goto(url, { waitUntil: 'load', timeout: 60000 });
           await seite.waitForTimeout(12000);
+
+          // Anmeldung durchspielen, wenn ein Zugang mitgegeben wurde. Das ist
+          // der eigentliche Nachweis: startet die Anwendung GEGEN DAS EIGENE
+          // Projekt, oder nur als Huelle?
+          const konto = process.argv[3] || '', passwort = process.argv[4] || '';
+          if (konto && passwort) {
+            try {
+              await seite.fill('input[type="email"]', konto);
+              await seite.fill('input[type="password"]', passwort);
+              await seite.click('button:has-text("ANMELDEN"), button:has-text("Anmelden")');
+              await seite.waitForTimeout(15000);
+              console.log('Anmeldung ausgeloest.');
+            } catch (e) {
+              console.log('Anmeldung nicht moeglich: ' + e.message.split('\n')[0]);
+            }
+          }
+
           const w = await seite.evaluate(() => {
             const r = document.getElementById('root');
             return { kinder: r ? r.children.length : -1,
@@ -102,6 +134,7 @@ jobs:
           await browser.close();
           ENDE
           node pruefen.mjs '${{ github.event.inputs.adresse }}' \
+            '${{ github.event.inputs.konto }}' '${{ github.event.inputs.passwort }}' \
             > "$GITHUB_WORKSPACE/befund/browser.txt" 2>&1 || true
           tail -5 "$GITHUB_WORKSPACE/befund/browser.txt"
 
