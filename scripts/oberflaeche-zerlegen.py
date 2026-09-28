@@ -1315,8 +1315,24 @@ def main():
                      f'Zeile {b+1} ist {z[b].strip()[:40]!r}.\n'
                      'Die Vorlage hat einen anderen Aufbau als STUECKE beschreibt.')
 
+    # src/ wird geleert, damit ein entferntes Stueck nicht liegen bleibt —
+    # ABER src/seiten/ gehoert nicht diesem Skript. Die Nebenseiten (sw.js,
+    # freigabe.html, objekt.html, sonnenverlauf.html, _redirects) erzeugt
+    # scripts/nebenseiten.py aus eigenen Quellen. Am 28.09.2026 hat dieses
+    # Skript sie mitgeloescht, und der Commit danach hat die Loeschung
+    # mitgenommen: die Auslieferung haette nur noch aus index.html bestanden.
+    fremd = ziel / 'seiten'
+    gerettet = None
+    if fremd.exists():
+        gerettet = ziel.parent / '.seiten-umzug'
+        if gerettet.exists():
+            shutil.rmtree(gerettet)
+        shutil.move(str(fremd), str(gerettet))
     if ziel.exists():
         shutil.rmtree(ziel)
+    if gerettet is not None:
+        ziel.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(gerettet), str(fremd))
 
     zaehler, formatiert = {}, {}
     for datei, (a, b) in STUECKE.items():

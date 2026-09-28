@@ -72,6 +72,23 @@ else
   fehler=1
 fi
 
+abschnitt "Oberflaeche: die Nebenseiten sind da"
+# Am 28.09.2026 hat scripts/oberflaeche-zerlegen.py beim Leeren von src/ auch
+# src/seiten/ mitgenommen, und der Commit danach hat die Loeschung
+# uebernommen. Aufgefallen ist es nur, weil die Dateiliste des Commits gelesen
+# wurde. Ein Hinweis im Protokoll reicht dafuer nicht — hier faellt es auf.
+fehlend=""
+for f in src/seiten/sw.js src/seiten/freigabe.html src/seiten/objekt.html \
+         src/seiten/sonnenverlauf.html src/seiten/_redirects; do
+  [[ -e "$f" ]] || fehlend="$fehlend $f"
+done
+if [[ -n "$fehlend" ]]; then
+  echo "[FEHLER] Es fehlt:$fehlend — `npm run nebenseiten` ausfuehren."
+  fehler=1
+else
+  echo "[ok] Alle fuenf Nebenseiten liegen in src/seiten/."
+fi
+
 abschnitt "Oberflaeche: Syntax"
 if [[ -d src ]]; then
   syntaxfehler=0
