@@ -10,6 +10,7 @@ nicht lösbar ist. Nach Auftrag Abschnitt 9.
 | Egress-Proxy sperrt `api.supabase.com` und beide `*.supabase.co` | Kein CLI-Export, kein `db push`. Schema nur über die Verwaltungsschnittstelle lesbar. |
 | Egress-Proxy sperrt `unpkg.com` und `cdn.jsdelivr.net` | Die tatsächlich aufgelösten CDN-Versionen sind nicht feststellbar; exakte Pins stehen aus. Ein lokaler Build kann die Bibliotheken nicht laden, der Smoke-Test also nur die Struktur prüfen, nicht das Laufverhalten. |
 | Kein Supabase-CLI, Installation ohne Netz nicht möglich | `supabase functions download`, `supabase secrets list`, `supabase db dump` entfallen. |
+| ~~Ausrollen der Edge Functions nur über das MCP-Werkzeug, Datei für Datei~~ | **Gelöst am 28.09.2026:** `.github/workflows/funktionen-ausrollen.yml`. Ein Actions-Runner hat freien Netzzugang und überträgt die Dateien so, wie sie im Repository liegen — byte-genau, ohne Abschrift. Braucht das Repository-Geheimnis `SUPABASE_ACCESS_TOKEN`. |
 
 ## Zugangsdaten
 
