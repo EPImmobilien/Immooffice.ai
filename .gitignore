@@ -51,3 +51,4 @@ npm-debug.log*
 # neutralisiert, ohne Shop-TV, syntaktisch geprueft. Nicht von Hand aendern —
 # der naechste Lauf des Skripts verwirft die Aenderung. Aenderungen gehoeren
 # in das Skript, mit Grund.
+__pycache__/
