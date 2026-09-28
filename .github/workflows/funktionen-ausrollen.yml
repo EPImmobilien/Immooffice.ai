@@ -83,9 +83,16 @@ jobs:
           # dieselbe — von Hand angestossen, und was im Repository liegt,
           # wird nicht entfernt.
           #
-          # Der Name kommt ueber die Umgebung, nicht ueber ${{ }} in die
-          # Zeile: sonst schriebe GitHub die Eingabe woertlich in das Skript,
-          # und wer den Lauf starten darf, koennte Befehle einschleusen.
+          # Der Name kommt ueber die Umgebung, nicht ueber eine Ersetzung
+          # in der Zeile: sonst schriebe GitHub die Eingabe woertlich in das
+          # Skript, und wer den Lauf starten darf, koennte Befehle
+          # einschleusen.
+          #
+          # Und der Grund, warum hier keine leere Ersetzung als Beispiel
+          # steht: GitHub liest Ersetzungen auch in Kommentaren. Eine leere
+          # ist keine gueltige, und die ganze Datei gilt als ungueltig — der
+          # Lauf bricht nach null Sekunden ohne einen einzigen Job ab.
+          # Passiert am 28.09.2026, Lauf 17.
           namen="$(printf '%s' "$LOESCHEN" | tr ',' ' ')"
           for name in $namen; do
             case "$name" in
