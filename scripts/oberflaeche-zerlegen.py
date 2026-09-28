@@ -497,6 +497,186 @@ ERSETZUNGEN = [
      '\nfunction canDelete(e) {',
      'Adressbuch: die CSV-Ausgabe samt Protokolleintrag.'),
 
+    # =====================================================================
+    # FORK — eigene Vertragsvorlagen je Mandant, angefordert am 28.09.2026
+    #
+    # VORLAGE_MAKLERVERTRAG und VORLAGE_OBJEKTNACHWEIS sind im Fork geleert
+    # (Abschnitt 5 von docs/NEUTRALITAET.md: Rechtstexte der Referenz werden
+    # ersetzt, nicht uebernommen). Seitdem entsteht gar kein Vertrag mehr.
+    # Statt eines neuen fest eingebauten Textes kommt die Vorlage ab hier vom
+    # Mandanten — aus dem Eimer vertragsvorlagen, ueber die Tabelle
+    # public.vertragsvorlagen (fork_12).
+    # =====================================================================
+    ('FORK',
+     r'\nasync function fillMaklervertrag\(e\) \{\n  const t = base64ToBlob\(VORLAGE_MAKLERVERTRAG\),',
+     '\n'
+     '// Die Word-Vorlage des Mandanten. Gesucht wird von innen nach aussen:\n'
+     '// erst die der eigenen Gesellschaft, sonst die des Mandanten, jeweils die\n'
+     '// hoechste aktive Version.\n'
+     '//\n'
+     '// KEIN eingebauter Ersatztext. Ein Vertragsmuster, das niemand geprueft\n'
+     '// hat, wird benutzt, als waere es geprueft — CLAUDE.md verbietet genau\n'
+     '// das ("Vertragsmuster nie ungeprueft als rechtssicher bezeichnen").\n'
+     '// Fehlt die Vorlage, sagt die Anwendung das und nennt den Weg dorthin,\n'
+     '// statt etwas Erfundenes auszugeben.\n'
+     'async function immoVertragsvorlage(art, eingebaut) {\n'
+     '  const bezeichnung = {\n'
+     '    maklervertrag: "Maklervertrag", vollmacht: "Vollmacht",\n'
+     '    objektnachweis: "Objektnachweis", reservierung: "Reservierung"\n'
+     '  }[art] || art;\n'
+     '  try {\n'
+     '    const { data } = await window._sb.from("vertragsvorlagen")\n'
+     '      .select("storage_pfad, gesellschaft_id, version")\n'
+     '      .eq("art", art).eq("aktiv", true)\n'
+     '      .order("version", { ascending: false });\n'
+     '    const treffer = (data || []);\n'
+     '    const eigene = window.IMMO_GESELLSCHAFT_ID\n'
+     '      ? treffer.find((v) => v.gesellschaft_id === window.IMMO_GESELLSCHAFT_ID)\n'
+     '      : null;\n'
+     '    const gewaehlt = eigene || treffer.find((v) => !v.gesellschaft_id) || null;\n'
+     '    if (gewaehlt) {\n'
+     '      const { data: datei, error } = await window._sb.storage\n'
+     '        .from("vertragsvorlagen").download(gewaehlt.storage_pfad);\n'
+     '      if (error) throw error;\n'
+     '      if (datei) return datei;\n'
+     '    }\n'
+     '  } catch (f) {\n'
+     '    console.warn("Vertragsvorlage konnte nicht geladen werden:", f && f.message || f);\n'
+     '  }\n'
+     '  if (eingebaut) return base64ToBlob(eingebaut);\n'
+     '  throw new Error("Für „" + bezeichnung + "“ ist keine Vorlage hinterlegt. "\n'
+     '    + "Eine Word-Datei lädt hoch, wer den Admin-Bereich darf: "\n'
+     '    + "Einstellungen → Vertragsvorlagen.");\n'
+     '}\n'
+     '\nasync function fillMaklervertrag(e) {\n'
+     '  const t = await immoVertragsvorlage("maklervertrag", VORLAGE_MAKLERVERTRAG),',
+     'Vertragsvorlagen: Lader und Maklervertrag daran angeschlossen.'),
+
+    ('FORK',
+     r'async function fillObjektnachweis\(e\) \{\n  const t = base64ToBlob\(VORLAGE_OBJEKTNACHWEIS\),',
+     'async function fillObjektnachweis(e) {\n'
+     '  const t = await immoVertragsvorlage("objektnachweis", VORLAGE_OBJEKTNACHWEIS),',
+     'Vertragsvorlagen: Objektnachweis daran angeschlossen.'),
+
+    # Der Reiter in den Einstellungen. Fuenfter neben Firma, Standorte,
+    # Signatur und Vorgaben — dort gehoert er hin, denn es sind Firmendaten.
+    ('FORK',
+     r'  const reiterListe = \[\["firma", "Firma & Impressum"\], \["standorte", "Standorte"\], \["signatur", "Signatur & Texte"\], \["vorgaben", "Vorgaben"\]\];',
+     '  const reiterListe = [["firma", "Firma & Impressum"], ["standorte", "Standorte"], ["signatur", "Signatur & Texte"], ["vorgaben", "Vorgaben"], ["vertragsvorlagen", "Vertragsvorlagen"]];',
+     'Einstellungen: fuenfter Reiter fuer die Vertragsvorlagen.'),
+
+    ('FORK',
+     r'      : reiter === "signatur" \? React\.createElement\(EinstSignatur, \{ user \}\)\n      : React\.createElement\(EinstVorgaben, null\)\);',
+     '      : reiter === "signatur" ? React.createElement(EinstSignatur, { user })\n'
+     '      : reiter === "vertragsvorlagen" ? React.createElement(EinstVertragsvorlagen, { user })\n'
+     '      : React.createElement(EinstVorgaben, null));',
+     'Einstellungen: der Reiter zeigt EinstVertragsvorlagen.'),
+
+    # Die Seite selbst, neben EinstStandorte.
+    ('FORK',
+     r'\n// Die Standorte sind kein eigener Datentopf mehr, sondern die Sicht auf firma_stammdaten\.',
+     '\n'
+     '// Vertragsvorlagen je Mandant. Hochladen darf nur, wer das Modul "admin"\n'
+     '// hat; das erzwingen die Richtlinien aus fork_12 in der Datenbank und im\n'
+     '// Dateispeicher. Was hier steht, blendet nur aus, was ohnehin scheitern\n'
+     '// wuerde.\n'
+     'const IMMO_VERTRAGSARTEN = [\n'
+     '  ["maklervertrag", "Maklervertrag", "Der Auftrag des Eigentümers. Platzhalter: {firma_name}, {geschaeftsfuehrer}, {strasse}, {plz_ort}."],\n'
+     '  ["vollmacht", "Vollmacht", "Die Vollmacht des Auftraggebers."],\n'
+     '  ["objektnachweis", "Objektnachweis", "Der Nachweis gegenüber dem Interessenten."],\n'
+     '  ["reservierung", "Reservierung", "Die Reservierungsvereinbarung."]\n'
+     '];\n'
+     '\n'
+     'function EinstVertragsvorlagen({ user }) {\n'
+     '  const [zeilen, setZeilen] = useState([]);\n'
+     '  const [laedt, setLaedt] = useState(true);\n'
+     '  const [meldung, setMeldung] = useState("");\n'
+     '  const [fehler, setFehler] = useState("");\n'
+     '  const [beschaeftigt, setBeschaeftigt] = useState("");\n'
+     '  const darfPflegen = hatRecht(user, "admin");\n'
+     '  const laden = async () => {\n'
+     '    setLaedt(true);\n'
+     '    try {\n'
+     '      const { data, error } = await window._sb.from("vertragsvorlagen")\n'
+     '        .select("*").order("art").order("version", { ascending: false });\n'
+     '      if (error) throw error;\n'
+     '      setZeilen(data || []);\n'
+     '    } catch (f) {\n'
+     '      setFehler("Vorlagen konnten nicht geladen werden: " + (f.message || f));\n'
+     '    }\n'
+     '    setLaedt(false);\n'
+     '  };\n'
+     '  useEffect(() => { laden(); }, []);\n'
+     '  const aktuelle = (art) => (zeilen.filter((z) => z.art === art && z.aktiv)[0] || null);\n'
+     '  const hochladen = async (art, datei) => {\n'
+     '    if (!datei) return;\n'
+     '    setFehler(""); setMeldung(""); setBeschaeftigt(art);\n'
+     '    try {\n'
+     '      const vorher = zeilen.filter((z) => z.art === art);\n'
+     '      const version = vorher.reduce((m, z) => Math.max(m, z.version || 0), 0) + 1;\n'
+     '      // Mandantenrelativ: die Speicher-Huelle stellt die Mandantenkennung\n'
+     '      // voran, die Richtlinie aus fork_09 prueft sie.\n'
+     '      const pfad = "vorlagen/" + art + "/v" + version + "-" + Date.now() + ".docx";\n'
+     '      const { error: uErr } = await window._sb.storage.from("vertragsvorlagen")\n'
+     '        .upload(pfad, datei, { upsert: false,\n'
+     '          contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });\n'
+     '      if (uErr) throw uErr;\n'
+     '      // Die neue Fassung gilt, die alten bleiben liegen.\n'
+     '      await window._sb.from("vertragsvorlagen").update({ aktiv: false }).eq("art", art);\n'
+     '      const { error: iErr } = await window._sb.from("vertragsvorlagen").insert({\n'
+     '        art, storage_pfad: pfad, dateiname: datei.name || "", version, aktiv: true,\n'
+     '        gesellschaft_id: window.IMMO_GESELLSCHAFT_ID || null,\n'
+     '        hochgeladen_von: window._currentUserId || null\n'
+     '      });\n'
+     '      if (iErr) throw iErr;\n'
+     '      await logAction("upload", "vertragsvorlage", art, datei.name || art, { version });\n'
+     '      setMeldung("Vorlage für „" + art + "“ gespeichert (Fassung " + version + ").");\n'
+     '      await laden();\n'
+     '    } catch (f) {\n'
+     '      setFehler("Hochladen fehlgeschlagen: " + (f.message || f));\n'
+     '    }\n'
+     '    setBeschaeftigt("");\n'
+     '  };\n'
+     '  if (laedt) return React.createElement("div", { style: { padding: 24, color: CI.muted } }, "Lade Vorlagen …");\n'
+     '  return React.createElement("div", null,\n'
+     '    React.createElement("div", { style: { fontSize: 13, color: CI.muted, marginBottom: 16, lineHeight: 1.6 } },\n'
+     '      "Hier hinterlegst du deine eigenen Word-Vorlagen. Sie werden verwendet, sobald sie da sind; ",\n'
+     '      "eine neue Fassung ersetzt die alte nicht, sie überholt sie — ältere bleiben nachvollziehbar liegen."),\n'
+     '    React.createElement("div", { style: { padding: "12px 14px", background: `${CI.gold}18`,\n'
+     '      borderLeft: `3px solid ${CI.gold}`, fontSize: 12.5, color: CI.blau, lineHeight: 1.5, marginBottom: 20 } },\n'
+     '      React.createElement("strong", null, "Rechtlicher Hinweis: "),\n'
+     '      "Diese Anwendung prüft die hochgeladenen Texte nicht und macht keine Aussage darüber, "\n'
+     '      + "ob sie rechtssicher sind. Die inhaltliche und rechtliche Verantwortung für jede Vorlage "\n'
+     '      + "liegt bei dir; eine anwaltliche Prüfung ist erforderlich."),\n'
+     '    React.createElement(ErrorBox, null, fehler),\n'
+     '    React.createElement(SuccessBox, null, meldung),\n'
+     '    !darfPflegen ? React.createElement("div", { style: { fontSize: 12.5, color: CI.muted, marginBottom: 16 } },\n'
+     '      "Zum Ändern fehlt dir das Recht „Admin-Bereich“ — du siehst hier nur, was hinterlegt ist.") : null,\n'
+     '    React.createElement("div", { style: { display: "grid",\n'
+     '      gridTemplateColumns: "repeat(auto-fit, minmax(min(300px,100%), 1fr))", gap: 12 } },\n'
+     '      IMMO_VERTRAGSARTEN.map(([art, label, hinweis]) => {\n'
+     '        const jetzt = aktuelle(art);\n'
+     '        return React.createElement("div", { key: art, "data-vertragsart": art,\n'
+     '          style: { border: `1px solid ${CI.border}`, padding: 16, background: "#fff" } },\n'
+     '          React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: CI.blau } }, label),\n'
+     '          React.createElement("div", { style: { fontSize: 12, color: CI.muted, marginTop: 6, lineHeight: 1.5 } }, hinweis),\n'
+     '          React.createElement("div", { style: { fontSize: 12.5, marginTop: 12,\n'
+     '            color: jetzt ? CI.blau : CI.muted } },\n'
+     '            jetzt ? ("Fassung " + jetzt.version + (jetzt.dateiname ? " — " + jetzt.dateiname : ""))\n'
+     '                  : "Noch keine Vorlage hinterlegt."),\n'
+     '          darfPflegen ? React.createElement("label", { style: { ...secondaryBtn, display: "inline-flex",\n'
+     '            marginTop: 12, cursor: beschaeftigt === art ? "wait" : "pointer",\n'
+     '            opacity: beschaeftigt === art ? .6 : 1 } },\n'
+     '            beschaeftigt === art ? "Lädt …" : (jetzt ? "Neue Fassung hochladen" : "Vorlage hochladen"),\n'
+     '            React.createElement("input", { type: "file", accept: ".docx", style: { display: "none" },\n'
+     '              disabled: beschaeftigt === art,\n'
+     '              onChange: (ev) => { const d = ev.target.files && ev.target.files[0];\n'
+     '                ev.target.value = ""; hochladen(art, d); } })) : null);\n'
+     '      })));\n'
+     '}\n'
+     '\n// Die Standorte sind kein eigener Datentopf mehr, sondern die Sicht auf firma_stammdaten.',
+     'Einstellungen: die Seite EinstVertragsvorlagen.'),
+
     ('MARKE', r'\bEP_', 'IMMO_', 'Vorsatz EP_ in Bezeichnern der Oberflaeche.'),
 ]
 

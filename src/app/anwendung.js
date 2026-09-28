@@ -1257,8 +1257,47 @@ function docxLayoutAufraeumen(e) {
   let d = r.join("");
   return d = d.replace(/\u0001TBL(\d+)\u0001/g, (e, n) => t[Number(n)]), d
 }
+// Die Word-Vorlage des Mandanten. Gesucht wird von innen nach aussen:
+// erst die der eigenen Gesellschaft, sonst die des Mandanten, jeweils die
+// hoechste aktive Version.
+//
+// KEIN eingebauter Ersatztext. Ein Vertragsmuster, das niemand geprueft
+// hat, wird benutzt, als waere es geprueft — CLAUDE.md verbietet genau
+// das ("Vertragsmuster nie ungeprueft als rechtssicher bezeichnen").
+// Fehlt die Vorlage, sagt die Anwendung das und nennt den Weg dorthin,
+// statt etwas Erfundenes auszugeben.
+async function immoVertragsvorlage(art, eingebaut) {
+  const bezeichnung = {
+    maklervertrag: "Maklervertrag", vollmacht: "Vollmacht",
+    objektnachweis: "Objektnachweis", reservierung: "Reservierung"
+  }[art] || art;
+  try {
+    const { data } = await window._sb.from("vertragsvorlagen")
+      .select("storage_pfad, gesellschaft_id, version")
+      .eq("art", art).eq("aktiv", true)
+      .order("version", { ascending: false });
+    const treffer = (data || []);
+    const eigene = window.IMMO_GESELLSCHAFT_ID
+      ? treffer.find((v) => v.gesellschaft_id === window.IMMO_GESELLSCHAFT_ID)
+      : null;
+    const gewaehlt = eigene || treffer.find((v) => !v.gesellschaft_id) || null;
+    if (gewaehlt) {
+      const { data: datei, error } = await window._sb.storage
+        .from("vertragsvorlagen").download(gewaehlt.storage_pfad);
+      if (error) throw error;
+      if (datei) return datei;
+    }
+  } catch (f) {
+    console.warn("Vertragsvorlage konnte nicht geladen werden:", f && f.message || f);
+  }
+  if (eingebaut) return base64ToBlob(eingebaut);
+  throw new Error("Für „" + bezeichnung + "“ ist keine Vorlage hinterlegt. "
+    + "Eine Word-Datei lädt hoch, wer den Admin-Bereich darf: "
+    + "Einstellungen → Vertragsvorlagen.");
+}
+
 async function fillMaklervertrag(e) {
-  const t = base64ToBlob(VORLAGE_MAKLERVERTRAG),
+  const t = await immoVertragsvorlage("maklervertrag", VORLAGE_MAKLERVERTRAG),
     n = await t.arrayBuffer(),
     a = await window.JSZip.loadAsync(n);
   let r = await a.file("word/document.xml").async("string");
@@ -1562,7 +1601,7 @@ async function fillVollmacht(e) {
   E.href = y, E.download = b, E.click(), setTimeout(() => URL.revokeObjectURL(y), 1e3)
 }
 async function fillObjektnachweis(e) {
-  const t = base64ToBlob(VORLAGE_OBJEKTNACHWEIS),
+  const t = await immoVertragsvorlage("objektnachweis", VORLAGE_OBJEKTNACHWEIS),
     n = await t.arrayBuffer(),
     a = await window.JSZip.loadAsync(n);
   let r = await a.file("word/document.xml").async("string");
@@ -132669,7 +132708,7 @@ function EinstellungenPage({ user }) {
   const knopf = (aktiv) => ({ background: "transparent", border: "none", padding: "10px 16px", fontSize: 14,
     fontWeight: aktiv ? 600 : 400, color: aktiv ? CI.blau : CI.muted,
     borderBottom: aktiv ? `2px solid ${CI.blau}` : "2px solid transparent", cursor: "pointer", fontFamily: FONT });
-  const reiterListe = [["firma", "Firma & Impressum"], ["standorte", "Standorte"], ["signatur", "Signatur & Texte"], ["vorgaben", "Vorgaben"]];
+  const reiterListe = [["firma", "Firma & Impressum"], ["standorte", "Standorte"], ["signatur", "Signatur & Texte"], ["vorgaben", "Vorgaben"], ["vertragsvorlagen", "Vertragsvorlagen"]];
   return React.createElement(React.Fragment, null,
     React.createElement("div", { style: { display: "flex", borderBottom: `1px solid ${CI.border}`, marginBottom: 24, flexWrap: "wrap" } },
       reiterListe.map(([id, label]) => React.createElement("button", { key: id, "data-einst-reiter": id,
@@ -132678,7 +132717,107 @@ function EinstellungenPage({ user }) {
       : reiter === "firma" ? React.createElement(AdminGmbHStammdaten, { user })
       : reiter === "standorte" ? React.createElement(EinstStandorte, null)
       : reiter === "signatur" ? React.createElement(EinstSignatur, { user })
+      : reiter === "vertragsvorlagen" ? React.createElement(EinstVertragsvorlagen, { user })
       : React.createElement(EinstVorgaben, null));
+}
+
+// Vertragsvorlagen je Mandant. Hochladen darf nur, wer das Modul "admin"
+// hat; das erzwingen die Richtlinien aus fork_12 in der Datenbank und im
+// Dateispeicher. Was hier steht, blendet nur aus, was ohnehin scheitern
+// wuerde.
+const IMMO_VERTRAGSARTEN = [
+  ["maklervertrag", "Maklervertrag", "Der Auftrag des Eigentümers. Platzhalter: {firma_name}, {geschaeftsfuehrer}, {strasse}, {plz_ort}."],
+  ["vollmacht", "Vollmacht", "Die Vollmacht des Auftraggebers."],
+  ["objektnachweis", "Objektnachweis", "Der Nachweis gegenüber dem Interessenten."],
+  ["reservierung", "Reservierung", "Die Reservierungsvereinbarung."]
+];
+
+function EinstVertragsvorlagen({ user }) {
+  const [zeilen, setZeilen] = useState([]);
+  const [laedt, setLaedt] = useState(true);
+  const [meldung, setMeldung] = useState("");
+  const [fehler, setFehler] = useState("");
+  const [beschaeftigt, setBeschaeftigt] = useState("");
+  const darfPflegen = hatRecht(user, "admin");
+  const laden = async () => {
+    setLaedt(true);
+    try {
+      const { data, error } = await window._sb.from("vertragsvorlagen")
+        .select("*").order("art").order("version", { ascending: false });
+      if (error) throw error;
+      setZeilen(data || []);
+    } catch (f) {
+      setFehler("Vorlagen konnten nicht geladen werden: " + (f.message || f));
+    }
+    setLaedt(false);
+  };
+  useEffect(() => { laden(); }, []);
+  const aktuelle = (art) => (zeilen.filter((z) => z.art === art && z.aktiv)[0] || null);
+  const hochladen = async (art, datei) => {
+    if (!datei) return;
+    setFehler(""); setMeldung(""); setBeschaeftigt(art);
+    try {
+      const vorher = zeilen.filter((z) => z.art === art);
+      const version = vorher.reduce((m, z) => Math.max(m, z.version || 0), 0) + 1;
+      // Mandantenrelativ: die Speicher-Huelle stellt die Mandantenkennung
+      // voran, die Richtlinie aus fork_09 prueft sie.
+      const pfad = "vorlagen/" + art + "/v" + version + "-" + Date.now() + ".docx";
+      const { error: uErr } = await window._sb.storage.from("vertragsvorlagen")
+        .upload(pfad, datei, { upsert: false,
+          contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+      if (uErr) throw uErr;
+      // Die neue Fassung gilt, die alten bleiben liegen.
+      await window._sb.from("vertragsvorlagen").update({ aktiv: false }).eq("art", art);
+      const { error: iErr } = await window._sb.from("vertragsvorlagen").insert({
+        art, storage_pfad: pfad, dateiname: datei.name || "", version, aktiv: true,
+        gesellschaft_id: window.IMMO_GESELLSCHAFT_ID || null,
+        hochgeladen_von: window._currentUserId || null
+      });
+      if (iErr) throw iErr;
+      await logAction("upload", "vertragsvorlage", art, datei.name || art, { version });
+      setMeldung("Vorlage für „" + art + "“ gespeichert (Fassung " + version + ").");
+      await laden();
+    } catch (f) {
+      setFehler("Hochladen fehlgeschlagen: " + (f.message || f));
+    }
+    setBeschaeftigt("");
+  };
+  if (laedt) return React.createElement("div", { style: { padding: 24, color: CI.muted } }, "Lade Vorlagen …");
+  return React.createElement("div", null,
+    React.createElement("div", { style: { fontSize: 13, color: CI.muted, marginBottom: 16, lineHeight: 1.6 } },
+      "Hier hinterlegst du deine eigenen Word-Vorlagen. Sie werden verwendet, sobald sie da sind; ",
+      "eine neue Fassung ersetzt die alte nicht, sie überholt sie — ältere bleiben nachvollziehbar liegen."),
+    React.createElement("div", { style: { padding: "12px 14px", background: `${CI.gold}18`,
+      borderLeft: `3px solid ${CI.gold}`, fontSize: 12.5, color: CI.blau, lineHeight: 1.5, marginBottom: 20 } },
+      React.createElement("strong", null, "Rechtlicher Hinweis: "),
+      "Diese Anwendung prüft die hochgeladenen Texte nicht und macht keine Aussage darüber, "
+      + "ob sie rechtssicher sind. Die inhaltliche und rechtliche Verantwortung für jede Vorlage "
+      + "liegt bei dir; eine anwaltliche Prüfung ist erforderlich."),
+    React.createElement(ErrorBox, null, fehler),
+    React.createElement(SuccessBox, null, meldung),
+    !darfPflegen ? React.createElement("div", { style: { fontSize: 12.5, color: CI.muted, marginBottom: 16 } },
+      "Zum Ändern fehlt dir das Recht „Admin-Bereich“ — du siehst hier nur, was hinterlegt ist.") : null,
+    React.createElement("div", { style: { display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(min(300px,100%), 1fr))", gap: 12 } },
+      IMMO_VERTRAGSARTEN.map(([art, label, hinweis]) => {
+        const jetzt = aktuelle(art);
+        return React.createElement("div", { key: art, "data-vertragsart": art,
+          style: { border: `1px solid ${CI.border}`, padding: 16, background: "#fff" } },
+          React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: CI.blau } }, label),
+          React.createElement("div", { style: { fontSize: 12, color: CI.muted, marginTop: 6, lineHeight: 1.5 } }, hinweis),
+          React.createElement("div", { style: { fontSize: 12.5, marginTop: 12,
+            color: jetzt ? CI.blau : CI.muted } },
+            jetzt ? ("Fassung " + jetzt.version + (jetzt.dateiname ? " — " + jetzt.dateiname : ""))
+                  : "Noch keine Vorlage hinterlegt."),
+          darfPflegen ? React.createElement("label", { style: { ...secondaryBtn, display: "inline-flex",
+            marginTop: 12, cursor: beschaeftigt === art ? "wait" : "pointer",
+            opacity: beschaeftigt === art ? .6 : 1 } },
+            beschaeftigt === art ? "Lädt …" : (jetzt ? "Neue Fassung hochladen" : "Vorlage hochladen"),
+            React.createElement("input", { type: "file", accept: ".docx", style: { display: "none" },
+              disabled: beschaeftigt === art,
+              onChange: (ev) => { const d = ev.target.files && ev.target.files[0];
+                ev.target.value = ""; hochladen(art, d); } })) : null);
+      })));
 }
 
 // Die Standorte sind kein eigener Datentopf mehr, sondern die Sicht auf firma_stammdaten. Diese

@@ -933,3 +933,29 @@ sie aus jeder Liste, und niemand könnte sie noch jemandem zuweisen.
 `akq_leads`, `akq_aktivitaeten` — genau die mit `zustaendig_id`. Ohne
 Zuständigen gibt es keinen Anker für „eigene", und ein erfundener wäre eine
 Verhaltensänderung.
+
+## 2026-09-28 · Kein eingebautes Vertragsmuster als Rückfallebene
+
+**Frage:** `docs/OFFEN.md` hatte für die Vertragsvorlagen notiert: „fehlt sie,
+eine neutrale Musterfassung mit dem Pflichthinweis auf anwaltliche Prüfung".
+Beim Bauen stellte sich die Frage, ob das eine gute Idee ist.
+
+**Entscheidung:** Nein. Es gibt keinen eingebauten Ersatztext. Fehlt die
+Vorlage, bricht die Erzeugung mit einer Meldung ab, die den Weg nennt:
+*Einstellungen → Vertragsvorlagen*.
+
+**Grund:** `CLAUDE.md` ist an dieser Stelle eindeutig — „Vertragsmuster **nie**
+ungeprüft als rechtssicher bezeichnen". Ein mitgeliefertes Muster wird aber
+genau so benutzt: es erscheint im Produkt, es sieht fertig aus, und der
+Hinweis daneben wird beim zweiten Mal überlesen. Ein Maklervertrag ist kein
+Platzhaltertext; er begründet einen Provisionsanspruch. Lieber eine Anwendung,
+die sagt „hier fehlt etwas", als eine, die etwas Erfundenes ausgibt.
+
+Der Reiter trägt den Hinweis dafür dauerhaft und unübersehbar: die Anwendung
+prüft die hochgeladenen Texte nicht, die rechtliche Verantwortung liegt beim
+Mandanten, eine anwaltliche Prüfung ist erforderlich.
+
+**Zwei der vier lesen noch keine Vorlage** — `fillVollmacht` baut ihr Dokument
+im Quelltext zusammen, die Reservierung entsteht in einer Edge Function. Beide
+funktionieren heute; sie umzubauen ist eine Verhaltensänderung und gehört in
+einen eigenen Schritt. Vermerkt in `docs/OFFEN.md`.

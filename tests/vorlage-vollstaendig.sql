@@ -94,7 +94,18 @@ zuwachs(bereich, mehr, grund) as (values
   ('Funktionen', 3, 'fork_11: sichtbare_mitarbeiter(), hat_recht(), '
                     'darf_exportieren()'),
   ('Richtlinien', 6, 'fork_11: sichtbarkeitsbereich auf den sechs Tabellen '
-                     'mit zustaendig_id')
+                     'mit zustaendig_id'),
+  -- fork_12: eigene Vertragsvorlagen je Mandant.
+  ('Tabellen', 1, 'fork_12: vertragsvorlagen'),
+  ('Tabellen mit RLS', 1, 'dieselbe'),
+  ('Spalten', 12, 'vertragsvorlagen: zwoelf Spalten'),
+  ('Primaer- und Eindeutigkeitsschluessel', 1, 'vertragsvorlagen.id'),
+  ('Pruefbedingungen', 1, 'vertragsvorlagen_art_check'),
+  ('Fremdschluessel', 3, 'mandant_id, gesellschaft_id, hochgeladen_von'),
+  ('Indizes ohne Constraint', 2, 'vertragsvorlagen: mandant_id und die Suche'),
+  ('Richtlinien', 3, 'fork_12: lesen, pflegen, mandant_trennung'),
+  ('Buckets', 1, 'fork_12: vertragsvorlagen'),
+  ('Storage-Richtlinien', 2, 'fork_12: Datei lesen und pflegen')
 ),
 soll(bereich, soll) as (
   select v.bereich,

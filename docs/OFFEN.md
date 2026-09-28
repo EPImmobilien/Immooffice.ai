@@ -322,7 +322,7 @@ jedem Aufrufer.
 der des Mitarbeiters. Sobald Abschnitt 1b jedem Mitarbeiter einen Hauptstandort
 gibt, kommt das Land von dort.
 
-## Eigene Vertragsvorlagen je Makler — angefordert 28.09.2026
+## ~~Eigene Vertragsvorlagen je Makler~~ — grosstenteils erledigt 28.09.2026
 
 Jeder Mandant soll eigene Vorlagen für **Maklerverträge, Vollmachten,
 Objektnachweise und Reservierungen** hinterlegen können.
@@ -485,3 +485,24 @@ Betreibers, kein technischer Schritt — bis dahin bleibt beides liegen.
   Verschlechterung gegenüber der Vorlage, aber es ist auch noch nicht das,
   was `CLAUDE.md` verlangt. Der Weg dahin ist gebahnt: die Funktion steht, es
   fehlen die Richtlinien, die sie fragen.
+
+## Vertragsvorlagen: zwei der vier lesen noch keine
+
+`fork_12` und der Reiter **Einstellungen → Vertragsvorlagen** stehen. Alle vier
+Arten lassen sich hochladen, versionieren und werden mandantengetrennt
+abgelegt. Gelesen wird die hinterlegte Vorlage aber erst von zweien:
+
+| Art | liest die Vorlage | warum |
+|---|---|---|
+| Maklervertrag | **ja** | las vorher `VORLAGE_MAKLERVERTRAG`, jetzt den Mandanten |
+| Objektnachweis | **ja** | dasselbe mit `VORLAGE_OBJEKTNACHWEIS` |
+| Vollmacht | noch nicht | `fillVollmacht` baut das Dokument im Quelltext zusammen, es gibt gar keine Datei zum Ersetzen |
+| Reservierung | noch nicht | entsteht in der Edge Function `reservierung-word-erzeugen`, nicht in der Oberfläche |
+
+Beide Umbauten sind Verhaltensänderungen an Stellen, die heute funktionieren —
+anders als bei den ersten beiden, die ohne Vorlage gar nichts mehr erzeugt
+haben. Sie gehören deshalb in einen eigenen Schritt und nicht nebenbei.
+
+**Kein eingebauter Ersatztext, bewusst.** Fehlt die Vorlage, sagt die Anwendung
+das und nennt den Weg dorthin. Ein Vertragsmuster, das niemand geprüft hat,
+wird benutzt, als wäre es geprüft — `CLAUDE.md` verbietet genau das.
