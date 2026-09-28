@@ -556,6 +556,35 @@ async function getProfile(e) {
     error: n
   } = await window._sb.from("profiles").select("*").eq("id", e).single();
   if (n) throw n;
+
+  // Mandantenkontext einmal global ablegen.
+  //
+  // Die Vorlage war einmandantig und brauchte das nicht. Der Fork braucht es
+  // an vielen Stellen — Feiertage, Storage-Pfade, Branding, Auswahl von
+  // Gesellschaft und Standort —, und jede davon soll es nicht selbst laden.
+  // getProfile ist die einzige Stelle, an der das Profil des Angemeldeten
+  // geholt wird; hier steht es genau einmal.
+  //
+  // Faellt eine der Abfragen aus, bleibt der Wert null. Die Aufrufer sind
+  // darauf eingerichtet: die Feiertagsrechnung nimmt dann die neun
+  // bundesweiten, und das ist besser als falsche.
+  window.IMMO_MANDANT_ID = (t && t.mandant_id) || null;
+  try {
+    const {
+      data: s
+    } = await window._sb.from("firma_stammdaten")
+      .select("id, bundesland, gesellschaft_id")
+      .order("sortierung")
+      .limit(1)
+      .maybeSingle();
+    window.IMMO_STANDORT_ID = (s && s.id) || null;
+    window.IMMO_GESELLSCHAFT_ID = (s && s.gesellschaft_id) || null;
+    window.IMMO_BUNDESLAND = (s && s.bundesland) || null;
+  } catch (f) {
+    window.IMMO_STANDORT_ID = null;
+    window.IMMO_GESELLSCHAFT_ID = null;
+    window.IMMO_BUNDESLAND = null;
+  }
   return t
 }
 

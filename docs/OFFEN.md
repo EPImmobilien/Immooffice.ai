@@ -306,20 +306,21 @@ Eigenschaften:
 - Widerrufene Newsletter-Kontakte werden gekennzeichnet, nicht stillschweigend
   mitgeliefert.
 
-## Feiertage: das Bundesland erreicht die Oberfläche noch nicht
+## ~~Feiertage: das Bundesland erreicht die Oberfläche noch nicht~~ — erledigt 28.09.2026
 
 `feiertage(jahr, land)` rechnet für alle sechzehn Länder, und
 `firma_stammdaten.bundesland` trägt den Wert. Die Edge Function
 `urlaub-hinweise` liest ihn einmal je Lauf.
 
-**Die Oberfläche noch nicht:** sie liest `window.IMMO_BUNDESLAND`, und das
-setzt bisher niemand. Bis dahin rechnet sie mit den neun bundesweiten
-Feiertagen — richtig, aber unvollständig, und der Hinweistext sagt es.
+**Die Oberfläche jetzt auch:** `getProfile()` legt nach der Anmeldung
+`window.IMMO_MANDANT_ID`, `IMMO_STANDORT_ID`, `IMMO_GESELLSCHAFT_ID` und
+`IMMO_BUNDESLAND` ab. Das ist die einzige Stelle, an der das Profil des
+Angemeldeten geladen wird; damit steht der Kontext genau einmal und nicht in
+jedem Aufrufer.
 
-Gehört mit Abschnitt 1b erledigt: dort bekommt jeder Mitarbeiter einen
-Hauptstandort, und dann ist das Land eine Eigenschaft des Mitarbeiters, nicht
-des ersten gefundenen Standorts. Beides jetzt zu bauen hieße, es zweimal zu
-bauen.
+**Was daran noch offen ist:** Der Standort ist der erste nach Sortierung, nicht
+der des Mitarbeiters. Sobald Abschnitt 1b jedem Mitarbeiter einen Hauptstandort
+gibt, kommt das Land von dort.
 
 ## Eigene Vertragsvorlagen je Makler — angefordert 28.09.2026
 
@@ -347,3 +348,27 @@ Reservierung haben in der Vorlage überhaupt keine hinterlegbare Vorlage.
 **Reihenfolge:** nach der Mandantentrennung. Eine Vorlagenverwaltung ohne
 `mandant_id` auf der Tabelle und ohne Trennung im Storage wäre genau die Art
 Tür, die man später nicht mehr zubekommt.
+
+## Storage: die Buckets sind noch nicht getrennt
+
+Die Tabellen sind getrennt (`tests/mandant.sql`, sieben Prüfungen). Die 27
+Buckets nicht. Ein Pfad wie `objektbilder/{immobilie_id}/…` trägt keinen
+Mandanten, und fünf Buckets sind **öffentlich** (`branding`,
+`immobilie-dateien`, `ki-bilder`, `marke`, `web-assets`) — dort liest jeder
+mit, der den Pfad kennt.
+
+**Der Weg ist klar, er ist nur nicht klein.** Supabase trennt Mandanten im
+Storage über das erste Pfadsegment, geprüft mit
+`(storage.foldername(name))[1] = aktuelle_mandant_id()::text` in einer
+restriktiven Richtlinie auf `storage.objects` — dieselbe Bauart wie bei den
+Tabellen, eine Richtlinie für alle Buckets.
+
+Was daran hängt: **51 Schreibstellen in 12 Dateien** bauen Pfade. Sie müssen
+den Mandanten voranstellen, und die 90 vorhandenen Dateien müssen umziehen,
+samt der Pfade, die in `immobilie_datei.storage_path` und Geschwistern stehen.
+
+Nicht im Trigger lösbar: schriebe die Datenbank den Pfad um, läse der Aufrufer
+danach einen anderen zurück, als er gespeichert hat.
+
+**Voraussetzung ist erfüllt:** `window.IMMO_MANDANT_ID` steht seit dem
+28.09.2026. Ohne die wäre der Umbau nicht möglich gewesen.
