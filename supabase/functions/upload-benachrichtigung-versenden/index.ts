@@ -92,18 +92,31 @@ Deno.serve(async (req) => {
       });
     };
 
-    const { data: chefs } = await supabase
-      .from("profiles")
-      .select("name, email")
-      .eq("role", "chef");
+    // Die Chefs gehoeren zum Mandanten des Eintrags, nicht zur Plattform.
+    // Vorher wurden sie EINMAL geladen, ueber alle Mandanten, und jede
+    // Meldung ging an jeden von ihnen: der eine Makler las den Namen des
+    // Eigentuemers und die Titel der Dokumente des anderen mit.
+    const chefsJeMandant = new Map<string, Array<{ name: string; email: string }>>();
+    const holeChefs = async (mandant: string | null): Promise<Array<{ name: string; email: string }>> => {
+      if (!mandant) return [];
+      if (!chefsJeMandant.has(mandant)) {
+        const { data } = await supabase.from("profiles").select("name, email")
+          .eq("mandant_id", mandant).eq("role", "chef");
+        chefsJeMandant.set(mandant, (data || []) as Array<{ name: string; email: string }>);
+      }
+      return chefsJeMandant.get(mandant) || [];
+    };
 
     let verschickt = 0, fehlgeschlagen = 0;
 
     for (const eintrag of queue) {
       try {
+        const mandant = eintrag.mandant_id || null;
+        if (!mandant) throw new Error("Eintrag ohne Mandanten \u2013 kein Versand.");
         const { data: eig } = await supabase
           .from("eigentuemer")
           .select("anrede, vorname, nachname, firma")
+          .eq("mandant_id", mandant)
           .eq("id", eintrag.eigentuemer_id)
           .maybeSingle();
         const eigName = eig
@@ -115,11 +128,12 @@ Deno.serve(async (req) => {
           const { data: ap } = await supabase
             .from("profiles")
             .select("name, email")
+            .eq("mandant_id", mandant)
             .eq("id", eintrag.ansprechpartner_id)
             .maybeSingle();
           if (ap?.email) empfaengerMap.set(ap.email.toLowerCase(), ap.name || "");
         }
-        for (const c of chefs || []) {
+        for (const c of await holeChefs(mandant)) {
           if (c.email) empfaengerMap.set(c.email.toLowerCase(), c.name || "");
         }
         if (empfaengerMap.size === 0) throw new Error("Keine Empfaenger gefunden (kein Ansprechpartner, kein Chef-Profil).");
@@ -127,6 +141,7 @@ Deno.serve(async (req) => {
         const { data: dokumente } = await supabase
           .from("eigentuemer_dokumente")
           .select("name, kategorie, created_at")
+          .eq("mandant_id", mandant)
           .eq("eigentuemer_id", eintrag.eigentuemer_id)
           .eq("hochgeladen_von_typ", "eigentuemer")
           .gte("created_at", eintrag.created_at)

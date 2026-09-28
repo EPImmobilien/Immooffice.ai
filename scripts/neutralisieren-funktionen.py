@@ -1756,6 +1756,36 @@ NACHBESSERN = [
      'const { data } = await admin.from(quelltabelle).select("*").eq("id", vorgang.vertrag_id).eq("mandant_id", vorgang.mandant_id).maybeSingle();',
      'Signaturlink: das Dokument muss demselben Mandanten gehoeren wie der Vorgang.',
      {'signatur-token-validieren'}),
+
+    # =====================================================================
+    # FORK — die Upload-Meldung ging an die Chefs ALLER Mandanten
+    #
+    # upload-benachrichtigung-versenden laedt die Empfaenger einmal vor der
+    # Schleife: .eq("role", "chef"), sonst nichts. Bei einem Mandanten ist
+    # das die Bueroleitung. Bei zehn sind es zehn Bueroleitungen, und jede
+    # bekommt jede Meldung — mit dem Namen des Eigentuemers, der Zahl der
+    # Dokumente und deren Titeln ("Grundbuch", "Mieterliste"). Das ist kein
+    # Zugriffsfehler an einer Schnittstelle, das ist eine Mail, die im
+    # falschen Postfach liegt und dort bleibt.
+    #
+    # Die Chefs werden jetzt je Mandant geladen und gemerkt, damit die
+    # Schleife nicht fuer jeden Eintrag neu fragt.
+    # =====================================================================
+    ('FORK', '    const { data: chefs } = await supabase\n      .from("profiles")\n      .select("name, email")\n      .eq("role", "chef");', '    // Die Chefs gehoeren zum Mandanten des Eintrags, nicht zur Plattform.\n    // Vorher wurden sie EINMAL geladen, ueber alle Mandanten, und jede\n    // Meldung ging an jeden von ihnen: der eine Makler las den Namen des\n    // Eigentuemers und die Titel der Dokumente des anderen mit.\n    const chefsJeMandant = new Map<string, Array<{ name: string; email: string }>>();\n    const holeChefs = async (mandant: string | null): Promise<Array<{ name: string; email: string }>> => {\n      if (!mandant) return [];\n      if (!chefsJeMandant.has(mandant)) {\n        const { data } = await supabase.from("profiles").select("name, email")\n          .eq("mandant_id", mandant).eq("role", "chef");\n        chefsJeMandant.set(mandant, (data || []) as Array<{ name: string; email: string }>);\n      }\n      return chefsJeMandant.get(mandant) || [];\n    };',
+     'Upload-Meldung: die Chefs je Mandant statt einmal fuer alle.',
+     {'upload-benachrichtigung-versenden'}),
+    ('FORK', '    for (const eintrag of queue) {\n      try {\n        const { data: eig } = await supabase\n          .from("eigentuemer")\n          .select("anrede, vorname, nachname, firma")\n          .eq("id", eintrag.eigentuemer_id)\n          .maybeSingle();', '    for (const eintrag of queue) {\n      try {\n        const mandant = eintrag.mandant_id || null;\n        if (!mandant) throw new Error("Eintrag ohne Mandanten \\u2013 kein Versand.");\n        const { data: eig } = await supabase\n          .from("eigentuemer")\n          .select("anrede, vorname, nachname, firma")\n          .eq("mandant_id", mandant)\n          .eq("id", eintrag.eigentuemer_id)\n          .maybeSingle();',
+     'Upload-Meldung: ohne Mandanten kein Versand; der Eigentuemer aus ihm.',
+     {'upload-benachrichtigung-versenden'}),
+    ('FORK', '          const { data: ap } = await supabase\n            .from("profiles")\n            .select("name, email")\n            .eq("id", eintrag.ansprechpartner_id)\n            .maybeSingle();', '          const { data: ap } = await supabase\n            .from("profiles")\n            .select("name, email")\n            .eq("mandant_id", mandant)\n            .eq("id", eintrag.ansprechpartner_id)\n            .maybeSingle();',
+     'Upload-Meldung: der Ansprechpartner aus dem eigenen Mandanten.',
+     {'upload-benachrichtigung-versenden'}),
+    ('FORK', '        for (const c of chefs || []) {', '        for (const c of await holeChefs(mandant)) {',
+     'Upload-Meldung: die Chefs des eigenen Mandanten.',
+     {'upload-benachrichtigung-versenden'}),
+    ('FORK', '        const { data: dokumente } = await supabase\n          .from("eigentuemer_dokumente")\n          .select("name, kategorie, created_at")\n          .eq("eigentuemer_id", eintrag.eigentuemer_id)', '        const { data: dokumente } = await supabase\n          .from("eigentuemer_dokumente")\n          .select("name, kategorie, created_at")\n          .eq("mandant_id", mandant)\n          .eq("eigentuemer_id", eintrag.eigentuemer_id)',
+     'Upload-Meldung: die Dokumente aus dem eigenen Mandanten.',
+     {'upload-benachrichtigung-versenden'}),
 ]
 
 

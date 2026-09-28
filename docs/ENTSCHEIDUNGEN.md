@@ -2141,3 +2141,45 @@ erweiterte Funktion ohnehin eine Regel aus der ersten Liste abbekam, fiel es
 nicht auf. Jetzt setzen beide Schleifen es.
 
 Damit: **abgesichert 11, unbedenklich 3, noch offen 14.**
+
+---
+
+## Die Upload-Meldung ging an die Chefs aller Mandanten (28.09.2026)
+
+Die beiden Warteschlangen-Jobs des Eigentümerportals sehen gleich aus und
+sind es nicht.
+
+**`eigentuemer-benachrichtigungen-versenden`** ist in Ordnung. Er arbeitet
+eine Warteschlange über alle Mandanten ab — das darf er —, und jeder Eintrag
+hängt allein an seiner `eigentuemer_id`: Empfänger sind dessen eigene
+Personen, Dokumente dessen eigene Dokumente. Keine Abfrage ohne diesen Bezug.
+Er ist gelesen und unverändert geblieben.
+
+**`upload-benachrichtigung-versenden`** lud die Empfänger **einmal vor der
+Schleife**:
+
+```
+    const { data: chefs } = await supabase
+      .from("profiles").select("name, email").eq("role", "chef");
+```
+
+Bei einem Mandanten ist das die Büroleitung. Bei zehn sind es zehn
+Büroleitungen, und jede bekommt jede Meldung — mit dem Namen des
+Eigentümers, der Zahl der Dokumente und deren Titeln („Grundbuch",
+„Mieterliste", „Teilungserklärung"). Aus den Titeln allein lässt sich
+ablesen, was beim anderen Makler gerade in Vorbereitung ist.
+
+Das ist kein abgewiesener Zugriff an einer Schnittstelle, den jemand später
+im Protokoll findet. Das ist eine Mail, die im falschen Postfach liegt und
+dort bleibt.
+
+Die Chefs werden jetzt je Mandant geladen und gemerkt, damit die Schleife
+nicht für jeden Eintrag neu fragt. Ansprechpartner, Eigentümer und Dokumente
+hängen ebenfalls am Mandanten des Eintrags; ohne Mandanten wird der Eintrag
+als Fehlversuch gezählt statt versendet.
+
+Was bleibt: die Absenderadresse kommt aus der Umgebung und ist für alle
+Mandanten dieselbe. Das ist bekannt und steht als Punkt 1 in
+`docs/OFFEN.md`.
+
+**Abgesichert 12, unbedenklich 4, noch offen 12.**

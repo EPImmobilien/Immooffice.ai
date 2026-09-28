@@ -60,6 +60,12 @@ ABGESICHERT = {
         'Dokument muss ihm gehoeren — die blosse Kennung ist kein Nachweis —, '
         'und das PDF wird ueber die Storage-Huelle gelesen, also unter '
         'demselben Pfad, unter dem es geschrieben wurde.'),
+    'upload-benachrichtigung-versenden': ('holeChefs',
+        'Warteschlange ueber alle Mandanten — das darf sie, solange jeder '
+        'Eintrag nur seine eigenen Empfaenger erreicht. Die Chefs wurden '
+        'vorher EINMAL geladen, ueber die ganze Plattform, und bekamen jede '
+        'Meldung: Name des Eigentuemers, Zahl und Titel der Dokumente. Jetzt '
+        'je Mandant, und ohne Mandanten kein Versand.'),
     'web-lead': ('immoMandantAusAnfrage',
         'Eingang fuer Bewertungsanfragen. Mandant aus der Anfrage, Chef und '
         'Empfaenger aus dem Mandanten; Kontaktsuche und beide inserts sind '
@@ -80,6 +86,12 @@ UNBEDENKLICH = {
         'Laedt die Einladung ueber ihren Token und liefert den Namen des '
         'Kandidaten plus einen festen Fragenkatalog. Keine Abfrage, die ueber '
         'diese eine Zeile hinausgeht.',
+    'eigentuemer-benachrichtigungen-versenden':
+        'Warteschlange ueber alle Mandanten, aber jeder Eintrag haengt allein '
+        'an seiner eigentuemer_id: Empfaenger sind dessen eigene Personen, '
+        'Dokumente dessen eigene Dokumente. Keine Abfrage ohne diesen Bezug. '
+        'Die Absenderadresse kommt aus der Umgebung und ist damit fuer alle '
+        'dieselbe — das ist bekannt und steht in docs/OFFEN.md.',
 }
 
 # --- Gelesen, Befund offen, noch nicht abgesichert -------------------------
@@ -90,7 +102,6 @@ NOCH_OFFEN = {
     # mit deren Mandanten. Was noch fehlt, ist die Gegenprobe, dass die
     # KI-Auswertung keine fremden Daten mitschickt.
     'bewerbertest-abgeben': 'Token-gebunden; KI-Auswertung ungelesen.',
-    'eigentuemer-benachrichtigungen-versenden': 'Versendet aus einer Warteschlange ohne mandant_id.',
     'ki-bildbearbeitung': 'Schreibt Bilder, 44 kB, ungelesen.',
     'news-briefing-erstellen': 'Erzeugt Briefings.',
     'portal-ftp-diagnose': 'Diagnose.',
@@ -110,7 +121,6 @@ NOCH_OFFEN = {
     'push-senden': 'Push — verschickt an Geraete.',
     'suchkriterien-newsletter': 'Verschickt Newsletter — nach fork_16 gepruefte '
                                 'Quelle, der Versandweg selbst aber ungelesen.',
-    'upload-benachrichtigung-versenden': 'Versendet Benachrichtigungen.',
 }
 
 

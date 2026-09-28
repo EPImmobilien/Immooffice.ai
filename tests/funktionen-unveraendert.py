@@ -105,6 +105,11 @@ ERWEITERT['eigentuemer-zugang-anfordern'] = (
 ERWEITERT['signatur-token-validieren'] = (
     'Storage-Huelle und Dokument nur aus demselben Mandanten (Phase 2)')
 
+# Die Upload-Meldung ging an die Chefs aller Mandanten — einmal geladen,
+# ohne Grenze, und jede Meldung an jeden.
+ERWEITERT['upload-benachrichtigung-versenden'] = (
+    'Empfaenger je Mandant statt einmal fuer alle (Phase 2)')
+
 BLOCKZEILEN = {
     'mpe-pdf-erzeugen': {
         'const pins: Array<[number, number, string, string, string]> = [',
