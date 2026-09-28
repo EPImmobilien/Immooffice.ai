@@ -28,14 +28,39 @@
 \set ON_ERROR_STOP on
 \pset pager off
 
+-- AB PHASE 2 waechst der Fork ueber die Vorlage hinaus. Der Test bleibt
+-- trotzdem scharf: er vergleicht nicht mehr gegen eine feste Zahl, sondern
+-- gegen "Vorlage plus angemeldeter Zuwachs". Wer etwas hinzufuegt, traegt es
+-- unten in `zuwachs` ein, mit Grund. Wer etwas verliert, faellt weiterhin auf.
+--
+-- Ohne diese Trennung haette der Test zwei schlechte Enden: entweder man hebt
+-- die Zahl bei jeder Aenderung an, dann prueft er nichts mehr, oder man
+-- schaltet ihn ab, dann erst recht nicht.
+
 -- Einfacher und lesbarer als eine Prozedur: eine Tabelle mit Soll und Ist.
-with soll(bereich, soll) as (values
+-- Sie wird EINMAL gebildet; Ausgabe und Abbruchbedingung lesen beide daraus.
+-- Vorher standen die Zahlen zweimal in dieser Datei — in der Tabelle und
+-- noch einmal hartcodiert im do-Block darunter. Am 28.09.2026 liefen die
+-- beiden Fassungen auseinander: die Tabelle meldete fuenfzehnmal ok, der
+-- do-Block brach trotzdem ab.
+create temporary table pruefung as
+with vorlage(bereich, soll) as (values
   ('Tabellen', 187), ('Sichten', 5), ('Sequenzen', 6),
   ('Funktionen', 104), ('Trigger', 64), ('Richtlinien', 344),
   ('Primaer- und Eindeutigkeitsschluessel', 232), ('Pruefbedingungen', 98),
   ('Fremdschluessel', 302), ('Indizes ohne Constraint', 266),
   ('Tabellen mit RLS', 187), ('Buckets', 22), ('Storage-Richtlinien', 59),
   ('Cron-Jobs', 42), ('Spalten', 2791)
+),
+-- Angemeldeter Zuwachs des Forks gegenueber der Vorlage.
+zuwachs(bereich, mehr, grund) as (values
+  ('Richtlinien', 2, 'fork_01: amt_vorlage — Team liest, Chef pflegt')
+),
+soll(bereich, soll) as (
+  select v.bereich,
+         v.soll + coalesce((select sum(z.mehr) from zuwachs z
+                             where z.bereich = v.bereich), 0)
+    from vorlage v
 ), ist(bereich, ist) as (values
   ('Tabellen', (select count(*) from pg_class c join pg_namespace n on n.oid=c.relnamespace
                  where n.nspname='public' and c.relkind='r')),
@@ -88,32 +113,22 @@ with soll(bereich, soll) as (values
 )
 select case when s.soll = i.ist then 'ok  ' else 'FEHL' end as ergebnis,
        s.bereich, i.ist, s.soll
-from soll s join ist i using (bereich)
-order by case when s.soll = i.ist then 1 else 0 end, s.bereich;
+from soll s join ist i using (bereich);
+
+select ergebnis, bereich, ist, soll from pruefung
+order by case when ergebnis = 'ok  ' then 1 else 0 end, bereich;
 
 do $$
-declare abweichungen int;
+declare
+  abweichungen int;
+  liste text;
 begin
-  select count(*) into abweichungen from (
-    select 1 where (select count(*) from pg_class c join pg_namespace n on n.oid=c.relnamespace
-                     where n.nspname='public' and c.relkind='r') <> 187
-    union all
-    select 1 where (select count(*) from pg_policy pol join pg_class c on c.oid=pol.polrelid
-                     join pg_namespace n on n.oid=c.relnamespace where n.nspname='public') <> 344
-    union all
-    select 1 where (select count(*) from pg_proc p join pg_namespace n on n.oid=p.pronamespace
-                     where n.nspname='public' and p.prokind in ('f','p')) <> 104
-    union all
-    select 1 where (select count(*) from information_schema.columns where table_schema='public') <> 2791
-    union all
-    select 1 where (select count(*) from pg_constraint con join pg_class r on r.oid=con.conrelid
-                     join pg_namespace n on n.oid=r.relnamespace
-                     where n.nspname='public' and con.contype='f') <> 302
-    union all
-    select 1 where (select count(*) from cron.job) <> 42
-  ) x;
+  select count(*), string_agg(bereich || ': ist ' || ist || ', soll ' || soll, '; ')
+    into abweichungen, liste
+    from pruefung where ist <> soll;
   if abweichungen > 0 then
-    raise exception 'Vorlage nicht vollstaendig: % Kennzahl(en) weichen ab', abweichungen;
+    raise exception 'Vorlage nicht vollstaendig: % Kennzahl(en) weichen ab — %',
+      abweichungen, liste;
   end if;
 end;
 $$;

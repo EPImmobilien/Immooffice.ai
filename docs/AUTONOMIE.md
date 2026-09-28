@@ -46,6 +46,10 @@ Zahlen aus einem Auftrag werden nachgemessen, bevor darauf aufgebaut wird.
 - Deutsch, Präfix `phase-N:`.
 - Nur bei grünem `npm run check` — Build, Syntax, Rauchtest,
   Neutralitäts-Gate, Mandantentest.
+- **Den Exit-Status des Checks tatsächlich auswerten.** `npm run check | tail -2`
+  liefert den Status von `tail`, nicht den des Checks. Am 28.09.2026 ist auf
+  diese Weise ein Commit auf rotem Check durchgegangen. Entweder in eine Datei
+  schreiben und `$?` prüfen oder `set -o pipefail` setzen.
 - Die Commit-Nachricht erklärt **warum**, nicht was der Diff ohnehin zeigt.
 
 ## Migrationen
