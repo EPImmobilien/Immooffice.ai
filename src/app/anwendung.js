@@ -133503,6 +133503,310 @@ const IMMO_VORLAGE_FELDER = {
   vollmacht: []
 };
 
+// Markieren, wo in der eigenen Vorlage welcher Wert steht.
+//
+// Zwei Wege, weil die Dateiformate verschieden sind (fork_24):
+//
+//   PDF   Die Seite wird gezeichnet, der Makler zieht ein Rechteck auf.
+//         Gespeichert werden Seite und Koordinaten in Punkten, Ursprung
+//         unten links — dieselbe Rechnung wie beim Stempeln der
+//         Unterschrift, damit beide Seiten dasselbe meinen.
+//
+//   Word  Eine .docx hat keine Koordinaten, sie ist XML. Der Makler
+//         markiert die Stelle im Text, gespeichert wird der Suchtext und
+//         das wievielte Vorkommen gemeint ist.
+//
+// WARUM DER WORD-TEXT NICHT VON mammoth KOMMT: mammoth glaettet den Text
+// fuers Lesen. Gesucht wird spaeter aber in word/document.xml. Was der
+// Makler markiert, muss genau das sein, was dort steht — sonst findet die
+// Erzeugung nichts und sagt nichts. Deshalb lesen wir die Absaetze selbst.
+function immoDocxAbsaetze(xml) {
+  const doc = new DOMParser().parseFromString(xml, "application/xml");
+  const absaetze = [];
+  const p = doc.getElementsByTagName("w:p");
+  for (let i = 0; i < p.length; i++) {
+    const t = p[i].getElementsByTagName("w:t");
+    let zeile = "";
+    for (let j = 0; j < t.length; j++) zeile += (t[j].textContent || "");
+    absaetze.push(zeile);
+  }
+  return absaetze;
+}
+
+function VorlagenMarkierung({ vorlage, user, onSchliessen }) {
+  const [katalog, setKatalog] = useState([]);
+  const [felder, setFelder] = useState([]);
+  const [seiten, setSeiten] = useState([]);
+  const [absaetze, setAbsaetze] = useState([]);
+  const [laedt, setLaedt] = useState(true);
+  const [fehler, setFehler] = useState("");
+  const [meldung, setMeldung] = useState("");
+  const [zieht, setZieht] = useState(null);
+  const [offen, setOffen] = useState(null);
+  const [speichert, setSpeichert] = useState(false);
+  const darf = hatRecht(user, "admin");
+  const istPdf = vorlage.dateiformat === "pdf";
+
+  const felderLaden = async () => {
+    const { data, error } = await window._sb.from("vorlagen_felder")
+      .select("*").eq("vorlage_id", vorlage.id).order("feld");
+    if (error) throw error;
+    setFelder(data || []);
+  };
+
+  useEffect(() => { (async () => {
+    setLaedt(true); setFehler("");
+    try {
+      const { data: kat } = await window._sb.rpc("vorlagen_feld_katalog", { p_art: vorlage.art });
+      setKatalog(kat || []);
+      await felderLaden();
+
+      const { data: datei, error: dErr } = await window._sb.storage
+        .from("vertragsvorlagen").download(vorlage.storage_pfad);
+      if (dErr) throw dErr;
+      const puffer = await datei.arrayBuffer();
+
+      if (istPdf) {
+        if (typeof pdfjsLib === "undefined") throw new Error("Die PDF-Anzeige (pdf.js) ist nicht geladen.");
+        const dok = await pdfjsLib.getDocument({ data: puffer.slice(0) }).promise;
+        const raus = [];
+        // 1.5-fache Vergroesserung: gross genug, um ein Kaestchen genau zu
+        // treffen, klein genug, dass zehn Seiten den Rechner nicht anhalten.
+        const skala = 1.5;
+        for (let n = 1; n <= dok.numPages; n++) {
+          const seite = await dok.getPage(n);
+          const sicht = seite.getViewport({ scale: skala });
+          const leinwand = document.createElement("canvas");
+          leinwand.width = Math.floor(sicht.width);
+          leinwand.height = Math.floor(sicht.height);
+          await seite.render({ canvasContext: leinwand.getContext("2d"), viewport: sicht }).promise;
+          raus.push({ nr: n - 1, breite: leinwand.width, hoehe: leinwand.height,
+                      skala, bild: leinwand.toDataURL("image/png") });
+        }
+        setSeiten(raus);
+      } else {
+        const zip = await window.JSZip.loadAsync(puffer);
+        const xml = await zip.file("word/document.xml").async("string");
+        setAbsaetze(immoDocxAbsaetze(xml));
+      }
+    } catch (f) {
+      setFehler("Die Vorlage konnte nicht geöffnet werden: " + (f.message || f));
+    }
+    setLaedt(false);
+  })(); }, [vorlage.id]);
+
+  const feldName = (f) => {
+    const e = katalog.filter((k) => k.feld === f)[0];
+    return e ? e.name : f;
+  };
+  // Schon markierte Felder verschwinden aus der Auswahl: ein Feld gibt es
+  // je Vorlage nur einmal, und die Datenbank weist das zweite ohnehin ab.
+  const nochFrei = () => katalog.filter((k) => !felder.some((f) => f.feld === k.feld));
+
+  const sichern = async (satz) => {
+    setFehler(""); setMeldung(""); setSpeichert(true);
+    try {
+      const { error } = await window._sb.from("vorlagen_felder")
+        .insert({ vorlage_id: vorlage.id, ...satz });
+      if (error) throw error;
+      await logAction("create", "vorlagen_feld", vorlage.id, satz.feld, satz);
+      setMeldung("Markierung gespeichert.");
+      setOffen(null);
+      await felderLaden();
+    } catch (f) {
+      setFehler("Speichern fehlgeschlagen: " + (f.message || f));
+    }
+    setSpeichert(false);
+  };
+
+  const entfernen = async (zeile) => {
+    setFehler(""); setMeldung("");
+    try {
+      const { error } = await window._sb.from("vorlagen_felder").delete().eq("id", zeile.id);
+      if (error) throw error;
+      await logAction("delete", "vorlagen_feld", zeile.id, zeile.feld, {});
+      await felderLaden();
+    } catch (f) {
+      setFehler("Entfernen fehlgeschlagen: " + (f.message || f));
+    }
+  };
+
+  // --- PDF: ziehen ---------------------------------------------------------
+  const punkt = (ev, el) => {
+    const r = el.getBoundingClientRect();
+    return { x: ev.clientX - r.left, y: ev.clientY - r.top };
+  };
+  const zugStart = (ev, seite) => {
+    if (!darf) return;
+    const p = punkt(ev, ev.currentTarget);
+    setZieht({ seite: seite.nr, x0: p.x, y0: p.y, x1: p.x, y1: p.y });
+  };
+  const zugZieht = (ev) => {
+    if (!zieht) return;
+    const p = punkt(ev, ev.currentTarget);
+    setZieht({ ...zieht, x1: p.x, y1: p.y });
+  };
+  const zugEnde = (seite) => {
+    if (!zieht || zieht.seite !== seite.nr) return;
+    const x = Math.min(zieht.x0, zieht.x1), y = Math.min(zieht.y0, zieht.y1);
+    const b = Math.abs(zieht.x1 - zieht.x0), h = Math.abs(zieht.y1 - zieht.y0);
+    setZieht(null);
+    // Ein Klick ist kein Rechteck. Unter fünf Punkten war es ein Versehen.
+    if (b < 5 || h < 5) return;
+    // In PDF-Punkte umrechnen. pdf-lib zaehlt von unten links.
+    setOffen({
+      art: "rechteck", seite: seite.nr,
+      x: +(x / seite.skala).toFixed(2),
+      y: +((seite.hoehe - (y + h)) / seite.skala).toFixed(2),
+      breite: +(b / seite.skala).toFixed(2),
+      hoehe: +(h / seite.skala).toFixed(2)
+    });
+  };
+
+  // --- Word: markieren -----------------------------------------------------
+  const textMarkiert = () => {
+    if (!darf) return;
+    const s = window.getSelection ? String(window.getSelection()) : "";
+    const gewaehlt = s.replace(/\s+/g, " ").trim();
+    if (gewaehlt.length < 2) return;
+    const ganz = absaetze.join("\n");
+    const treffer = ganz.split(gewaehlt).length - 1;
+    if (treffer === 0) {
+      setFehler("Diese Stelle steht so nicht im Dokument — bitte innerhalb einer Zeile markieren.");
+      return;
+    }
+    setFehler("");
+    setOffen({ art: "textstelle", suchtext: gewaehlt, treffer, vorkommen: 1 });
+  };
+
+  if (laedt) return React.createElement("div", { style: { padding: 24, color: CI.muted } },
+    "Vorlage wird geöffnet …");
+
+  const zuordnung = offen ? React.createElement("div", {
+    style: { position: "fixed", inset: 0, background: "rgba(27,42,71,.35)", zIndex: 60,
+             display: "flex", alignItems: "center", justifyContent: "center", padding: 16 } },
+    React.createElement("div", { style: { ...cardStyle, padding: 20, maxWidth: 460, width: "100%" } },
+      React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: CI.blau, marginBottom: 4 } },
+        "Wozu gehört diese Stelle?"),
+      React.createElement("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 14, lineHeight: 1.5 } },
+        offen.art === "rechteck"
+          ? ("Seite " + (offen.seite + 1) + " · " + Math.round(offen.breite) + " × " + Math.round(offen.hoehe) + " Punkte")
+          : ("„" + offen.suchtext.slice(0, 70) + (offen.suchtext.length > 70 ? "…" : "") + "“")),
+      offen.art === "textstelle" && offen.treffer > 1
+        ? React.createElement("div", { style: { marginBottom: 12 } },
+            React.createElement("label", { style: labelStyle },
+              "Diese Stelle steht " + offen.treffer + "-mal im Dokument. Welche ist gemeint?"),
+            React.createElement("select", { style: inputStyle, value: offen.vorkommen,
+              onChange: (ev) => setOffen({ ...offen, vorkommen: Number(ev.target.value) }) },
+              Array.from({ length: offen.treffer }, (_, i) => React.createElement("option",
+                { key: i + 1, value: i + 1 }, "das " + (i + 1) + ". Vorkommen"))))
+        : null,
+      React.createElement("label", { style: labelStyle }, "Feld"),
+      React.createElement("select", { style: inputStyle, value: offen.feld || "",
+        "data-markierung-feld": "1",
+        onChange: (ev) => setOffen({ ...offen, feld: ev.target.value }) },
+        React.createElement("option", { value: "" }, "— bitte wählen —"),
+        nochFrei().map((k) => React.createElement("option", { key: k.feld, value: k.feld },
+          k.name + (k.block ? "  (mehrzeilig)" : "")))),
+      React.createElement("div", { style: { fontSize: 11, color: CI.muted, marginTop: 8, lineHeight: 1.5 } },
+        "Bei mehreren Beteiligten — Eheleuten, einer Erbengemeinschaft — nimm den ganzen Block. ",
+        "Wie viele Personen darin stehen, entscheidet sich erst beim Vertrag."),
+      React.createElement("div", { style: { display: "flex", gap: 8, marginTop: 16 } },
+        React.createElement("button", {
+          onClick: () => {
+            if (!offen.feld) { setFehler("Bitte ein Feld wählen."); return; }
+            const satz = offen.art === "rechteck"
+              ? { feld: offen.feld, zeiger_art: "rechteck", seite: offen.seite,
+                  x: offen.x, y: offen.y, breite: offen.breite, hoehe: offen.hoehe }
+              : { feld: offen.feld, zeiger_art: "textstelle",
+                  suchtext: offen.suchtext, vorkommen: offen.vorkommen };
+            sichern(satz);
+          },
+          disabled: speichert, style: { ...primaryBtn, opacity: speichert ? .6 : 1 } },
+          speichert ? "Speichert …" : "Übernehmen"),
+        React.createElement("button", { onClick: () => setOffen(null), style: secondaryBtn }, "Abbrechen"))))
+    : null;
+
+  return React.createElement("div", null,
+    React.createElement("div", { style: { display: "flex", gap: 12, alignItems: "center", marginBottom: 14, flexWrap: "wrap" } },
+      React.createElement("button", { onClick: onSchliessen, style: secondaryBtn }, "← Zurück"),
+      React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: CI.blau } },
+        "Felder markieren — " + (vorlage.dateiname || vorlage.art)),
+      React.createElement("span", { style: { fontSize: 11, color: CI.gold, letterSpacing: "0.12em",
+        textTransform: "uppercase", fontWeight: 600 } }, istPdf ? "PDF" : "Word")),
+    React.createElement("div", { style: { fontSize: 13, color: CI.muted, marginBottom: 16, lineHeight: 1.6 } },
+      istPdf
+        ? "Zieh mit der Maus ein Rechteck über die Stelle, an der ein Wert stehen soll, und ordne ihr ein Feld zu."
+        : "Markiere mit der Maus die Stelle im Text, an der ein Wert stehen soll, und ordne ihr ein Feld zu."),
+    React.createElement(ErrorBox, null, fehler),
+    React.createElement(SuccessBox, null, meldung),
+    !darf ? React.createElement("div", { style: { fontSize: 12.5, color: CI.muted, marginBottom: 14 } },
+      "Zum Markieren fehlt dir das Recht „Admin-Bereich“ — du siehst hier nur, was markiert ist.") : null,
+
+    React.createElement("div", { style: { display: "grid", gridTemplateColumns: "minmax(0,1fr) 280px", gap: 16, alignItems: "start" } },
+      // --- links: das Dokument ---
+      React.createElement("div", null,
+        istPdf
+          ? seiten.map((s) => React.createElement("div", { key: s.nr,
+              style: { position: "relative", marginBottom: 16, border: `1px solid ${CI.border}`,
+                       width: s.breite, maxWidth: "100%" },
+              onMouseDown: (ev) => zugStart(ev, s),
+              onMouseMove: zugZieht,
+              onMouseUp: () => zugEnde(s),
+              onMouseLeave: () => setZieht(null) },
+              React.createElement("img", { src: s.bild, alt: "Seite " + (s.nr + 1),
+                draggable: false, style: { display: "block", width: "100%", userSelect: "none" } }),
+              felder.filter((f) => f.zeiger_art === "rechteck" && f.seite === s.nr).map((f) =>
+                React.createElement("div", { key: f.id, title: feldName(f.feld),
+                  style: { position: "absolute", border: `2px solid ${CI.gold}`,
+                           background: `${CI.gold}22`, pointerEvents: "none",
+                           left: Number(f.x) * s.skala, width: Number(f.breite) * s.skala,
+                           top: s.hoehe - (Number(f.y) + Number(f.hoehe)) * s.skala,
+                           height: Number(f.hoehe) * s.skala } },
+                  React.createElement("div", { style: { position: "absolute", top: -16, left: 0,
+                    fontSize: 10, color: "#fff", background: CI.gold, padding: "1px 4px",
+                    whiteSpace: "nowrap" } }, feldName(f.feld)))),
+              (zieht && zieht.seite === s.nr) ? React.createElement("div", {
+                style: { position: "absolute", border: `2px dashed ${CI.blau}`,
+                         background: `${CI.blau}14`, pointerEvents: "none",
+                         left: Math.min(zieht.x0, zieht.x1), top: Math.min(zieht.y0, zieht.y1),
+                         width: Math.abs(zieht.x1 - zieht.x0), height: Math.abs(zieht.y1 - zieht.y0) } }) : null))
+          : React.createElement("div", { onMouseUp: textMarkiert,
+              style: { border: `1px solid ${CI.border}`, background: "#fff", padding: 20,
+                       maxHeight: "70vh", overflow: "auto", fontSize: 13, lineHeight: 1.7,
+                       color: CI.ink, whiteSpace: "pre-wrap" } },
+              absaetze.length ? absaetze.join("\n") : "(Dieses Dokument enthält keinen Text.)")),
+
+      // --- rechts: was schon markiert ist ---
+      React.createElement("div", null,
+        React.createElement("div", { style: { fontSize: 11, color: CI.gold, letterSpacing: "0.12em",
+          textTransform: "uppercase", fontWeight: 600, marginBottom: 8 } },
+          "Markiert (" + felder.length + " von " + katalog.length + ")"),
+        felder.length === 0
+          ? React.createElement("div", { style: { fontSize: 12.5, color: CI.muted, lineHeight: 1.5 } },
+              "Noch nichts markiert. Ohne Markierung bleibt das Dokument, wie es ist.")
+          : felder.map((f) => React.createElement("div", { key: f.id, "data-markierung": f.feld,
+              style: { border: `1px solid ${CI.border}`, padding: "8px 10px", marginBottom: 6,
+                       display: "flex", gap: 8, alignItems: "flex-start" } },
+              React.createElement("div", { style: { flex: 1, minWidth: 0 } },
+                React.createElement("div", { style: { fontSize: 12.5, fontWeight: 600, color: CI.blau } },
+                  feldName(f.feld)),
+                React.createElement("div", { style: { fontSize: 11, color: CI.muted, marginTop: 2,
+                  overflow: "hidden", textOverflow: "ellipsis" } },
+                  f.zeiger_art === "rechteck"
+                    ? ("Seite " + (f.seite + 1) + " · " + Math.round(f.breite) + " × " + Math.round(f.hoehe))
+                    : ("„" + String(f.suchtext).slice(0, 40) + "“"
+                       + (f.vorkommen > 1 ? " (" + f.vorkommen + ".)" : "")))),
+              darf ? React.createElement("button", { onClick: () => entfernen(f),
+                style: { background: "none", border: "none", color: CI.danger, cursor: "pointer",
+                         fontSize: 16, lineHeight: 1, padding: 0 }, title: "Markierung entfernen" }, "×") : null)),
+        React.createElement("div", { style: { fontSize: 11, color: CI.muted, marginTop: 12, lineHeight: 1.5 } },
+          istPdf
+            ? "Passt ein Wert nicht ins Rechteck, wird die Schrift verkleinert — bis 7 pt. Reicht auch das nicht, kommt der Rest auf eine Anlage."
+            : "Im Word fließt der Text um; ein Block darf beliebig lang werden."))),
+    zuordnung);
+}
+
 const IMMO_VERTRAGSARTEN = [
   ["maklervertrag", "Maklervertrag", "Der Auftrag des Eigentümers. Platzhalter: {firma_name}, {geschaeftsfuehrer}, {strasse}, {plz_ort}."],
   ["vollmacht", "Vollmacht", "Die Vollmacht des Auftraggebers."],
@@ -133518,6 +133822,7 @@ function EinstVertragsvorlagen({ user }) {
   const [beschaeftigt, setBeschaeftigt] = useState("");
   const darfPflegen = hatRecht(user, "admin");
   const [vorgabenEntwurf, setVorgabenEntwurf] = useState({});
+  const [markiert, setMarkiert] = useState(null);
   // Nur die Felder DIESER Art werden geschrieben. Ein Wert, der zu
   // einer anderen Art gehoert, weist die Datenbank ohnehin ab — aber
   // es waere ein Fehler, der erst dort auffaellt.
@@ -133572,16 +133877,20 @@ function EinstVertragsvorlagen({ user }) {
       const version = vorher.reduce((m, z) => Math.max(m, z.version || 0), 0) + 1;
       // Mandantenrelativ: die Speicher-Huelle stellt die Mandantenkennung
       // voran, die Richtlinie aus fork_09 prueft sie.
-      const pfad = "vorlagen/" + art + "/v" + version + "-" + Date.now() + ".docx";
+      const istPdf = /\.pdf$/i.test(datei.name || "");
+      const endung = istPdf ? ".pdf" : ".docx";
+      const pfad = "vorlagen/" + art + "/v" + version + "-" + Date.now() + endung;
       const { error: uErr } = await window._sb.storage.from("vertragsvorlagen")
         .upload(pfad, datei, { upsert: false,
-          contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+          contentType: istPdf ? "application/pdf"
+            : "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
       if (uErr) throw uErr;
       // Die neue Fassung gilt, die alten bleiben liegen.
       await window._sb.from("vertragsvorlagen").update({ aktiv: false }).eq("art", art);
       const vorher_aktiv = vorher.filter((z) => z.aktiv)[0] || vorher[0] || null;
       const { error: iErr } = await window._sb.from("vertragsvorlagen").insert({
         art, storage_pfad: pfad, dateiname: datei.name || "", version, aktiv: true,
+        dateiformat: istPdf ? "pdf" : "docx",
         vorgaben: (vorher_aktiv && vorher_aktiv.vorgaben) || {},
         gesellschaft_id: window.IMMO_GESELLSCHAFT_ID || null,
         hochgeladen_von: window._currentUserId || null
@@ -133596,6 +133905,10 @@ function EinstVertragsvorlagen({ user }) {
     setBeschaeftigt("");
   };
   if (laedt) return React.createElement("div", { style: { padding: 24, color: CI.muted } }, "Lade Vorlagen …");
+  // Solange eine Vorlage markiert wird, tritt die Liste zurueck. Zwei
+  // Dinge nebeneinander waeren auf einem schmalen Bildschirm keines.
+  if (markiert) return React.createElement(VorlagenMarkierung, {
+    vorlage: markiert, user, onSchliessen: () => { setMarkiert(null); laden(); } });
   return React.createElement("div", null,
     React.createElement("div", { style: { fontSize: 13, color: CI.muted, marginBottom: 16, lineHeight: 1.6 } },
       "Hier hinterlegst du deine eigenen Word-Vorlagen. Sie werden verwendet, sobald sie da sind; ",
@@ -133622,6 +133935,10 @@ function EinstVertragsvorlagen({ user }) {
             color: jetzt ? CI.blau : CI.muted } },
             jetzt ? ("Fassung " + jetzt.version + (jetzt.dateiname ? " — " + jetzt.dateiname : ""))
                   : "Noch keine Vorlage hinterlegt."),
+          jetzt ? React.createElement("button", {
+            onClick: () => setMarkiert(jetzt), "data-markieren": art,
+            style: { ...secondaryBtn, padding: "7px 14px", fontSize: 12.5, marginTop: 10 } },
+            darfPflegen ? "Felder markieren" : "Markierungen ansehen") : null,
           (jetzt && (IMMO_VORLAGE_FELDER[art] || []).length) ? React.createElement("div",
             { style: { marginTop: 12, paddingTop: 12, borderTop: `1px solid ${CI.border}` } },
             React.createElement("div", { style: { fontSize: 11, color: CI.gold, letterSpacing: "0.12em",
@@ -133653,7 +133970,7 @@ function EinstVertragsvorlagen({ user }) {
             marginTop: 12, cursor: beschaeftigt === art ? "wait" : "pointer",
             opacity: beschaeftigt === art ? .6 : 1 } },
             beschaeftigt === art ? "Lädt …" : (jetzt ? "Neue Fassung hochladen" : "Vorlage hochladen"),
-            React.createElement("input", { type: "file", accept: ".docx", style: { display: "none" },
+            React.createElement("input", { type: "file", accept: ".docx,.pdf", style: { display: "none" },
               disabled: beschaeftigt === art,
               onChange: (ev) => { const d = ev.target.files && ev.target.files[0];
                 ev.target.value = ""; hochladen(art, d); } })) : null);

@@ -1816,3 +1816,33 @@ steht ein Verweis. Abgeschnitten wird nie — ein fehlender Beteiligter in
 einem Vertrag ist ein Rechtsmangel, keine Schönheitsfrage.
 
 Im Word stellt sich die Frage nicht: dort fließt der Text um.
+
+---
+
+## Die Markierungs-Oberfläche (28.09.2026)
+
+Ein Bauteil für beide Wege, weil sie sich nur im Zeiger unterscheiden.
+
+**PDF:** die Seiten werden mit `pdf.js` auf eine Leinwand gezeichnet (1,5-fach
+— groß genug, um ein Kästchen genau zu treffen, klein genug, dass zehn Seiten
+den Rechner nicht anhalten). Der Makler zieht ein Rechteck; gespeichert wird
+in **PDF-Punkten mit Ursprung unten links**, weil `pdf-lib` beim Stempeln so
+rechnet. Bereits markierte Felder liegen als goldene Rahmen über der Seite.
+
+**Word:** die Absätze werden aus `word/document.xml` gelesen und angezeigt.
+**Nicht über `mammoth`** — das glättet den Text fürs Lesen, gesucht wird aber
+später im XML. Was der Makler markiert, muss genau das sein, was dort steht;
+sonst findet die Erzeugung nichts und sagt nichts. Kommt die markierte Stelle
+mehrfach vor, fragt die Oberfläche, welche gemeint ist.
+
+Ein Klick unter fünf Punkten Kantenlänge gilt als Versehen, nicht als
+Rechteck. Schon markierte Felder verschwinden aus der Auswahlliste.
+
+**Eine Vorlage darf jetzt auch ein PDF sein** — `dateiformat` wird beim
+Hochladen aus der Dateiendung bestimmt und entscheidet, welcher Weg gilt.
+
+**Beim Bauen gestolpert, weil es wiederkommt:** der Ersatztext einer Regel in
+`scripts/oberflaeche-zerlegen.py` geht durch `re.subn`, und dort ist ein
+Rückstrich eine Anweisung, kein Zeichen. Das `\s` in einem regulären Ausdruck
+des eingefügten JavaScript ließ den Generator mit „bad escape" abbrechen. Im
+Ersatz müssen Rückstriche verdoppelt stehen.
