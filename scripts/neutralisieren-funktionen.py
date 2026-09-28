@@ -448,6 +448,89 @@ ERSETZUNGEN = [
       'rechnung-pdf-erzeugen', 'vertrag-pdf', 'mietvertrag-pdf',
       'reservierung-pdf-erzeugen', 'reservierung-word-erzeugen'}),
 
+    # =====================================================================
+    # FORK — oeffentliche Endpunkte schrieben Zeilen ohne Mandanten
+    #
+    # GEFUNDEN am 28.09.2026 beim Lesen der oeffentlichen Endpunkte: 47
+    # Einfuegungen in 18 Funktionen, alle in Tabellen der Gruppe MANDANT,
+    # keine einzige mit mandant_id.
+    #
+    # WARUM DAS EIN FEHLER IST, DER SICH VERSTECKT: mandant_id traegt den
+    # Standardwert aktuelle_mandant_id(). Der liest den Mandanten aus dem
+    # Anmelde-Token. Ein Aufruf ohne Token hat keinen — der Standard ist dann
+    # NULL, und die Zeile entsteht ohne Mandanten. Die restriktive Richtlinie
+    # aus fork_07 vergleicht mandant_id mit dem Mandanten des Lesers, und
+    # NULL ist mit nichts gleich. Die Zeile ist fuer JEDEN unsichtbar.
+    #
+    # Es gibt keine Fehlermeldung. Der Interessent stellt seine Frage auf der
+    # Objektseite, die Zeile entsteht, und kein Makler sieht sie je.
+    #
+    # Buch darueber fuehrt tests/oeffentlich-insert-mandant.py. Hier die
+    # erste Haelfte: die Stellen, an denen der Mandant schon in Reichweite
+    # liegt — am Vorgang, an der Einladung, in der Storage-Huelle.
+    # =====================================================================
+
+    # Signatur: jedes Ereignis gehoert dem Mandanten seines Vorgangs. Acht
+    # Fundstellen in der einen Funktion, zwei in der anderen — alle beginnen
+    # mit vorgang_id, deshalb reicht ein Muster.
+    ('FORK',
+     r'\.from\("signatur_events"\)\.insert\(\{(\s*)vorgang_id: vorgang\.id,',
+     r'.from("signatur_events").insert({\1mandant_id: vorgang.mandant_id, vorgang_id: vorgang.id,',
+     'Signatur-Ereignisse tragen den Mandanten ihres Vorgangs.',
+     {'signatur-unterschreiben', 'signatur-token-validieren'}),
+
+    ('FORK',
+     r'\.from\("eigentuemer_dokumente"\)\.insert\(\{\n(\s*)eigentuemer_id: eigentuemerId,',
+     r'.from("eigentuemer_dokumente").insert({\n\1mandant_id: vorgang.mandant_id,\n\1eigentuemer_id: eigentuemerId,',
+     'Die abgelegte Vertragskopie traegt den Mandanten des Vorgangs.',
+     {'signatur-unterschreiben'}),
+
+    # Bewerbertest: die Antworten gehoeren dem Mandanten, der eingeladen hat.
+    # Ohne das haette der Bewerber den Test ausgefuellt und niemand haette
+    # das Ergebnis je gesehen.
+    ('FORK',
+     r'\.from\("bewerber_antworten"\)\.insert\(\{\n(\s*)einladung_id: einladung\.id,',
+     r'.from("bewerber_antworten").insert({\n\1mandant_id: einladung.mandant_id,\n\1einladung_id: einladung.id,',
+     'Die Testantworten tragen den Mandanten der Einladung.',
+     {'bewerbertest-abgeben'}),
+
+    # Bilder: der Mandant steht schon in der Storage-Huelle, gesetzt aus der
+    # Ziel-Immobilie. Die Datei-Zeile bekommt ihn jetzt auch.
+    ('FORK',
+     r'\.from\("immobilie_datei"\)\.insert\(\{\n(\s*)immobilie_id: (meta|z)\.immobilie_id,',
+     r'.from("immobilie_datei").insert({\n\1mandant_id: immoMandant,\n\1immobilie_id: \2.immobilie_id,',
+     'Die Datei-Zeile traegt den Mandanten der Immobilie.',
+     {'bild-empfang', 'mail-anhaenge-diagnose'}),
+
+    # Energieausweis: immoSetzeMandant(mandant) steht ein paar Zeilen davor.
+    ('FORK',
+     r'\.from\("energieausweis_anfragen"\)\.insert\(\{\n(\s*)id: vorgang,',
+     r'.from("energieausweis_anfragen").insert({\n\1mandant_id: immoMandant,\n\1id: vorgang,',
+     'Die Anfrage traegt den Mandanten, den die Funktion ermittelt hat.',
+     {'energieausweis-anfrage'}),
+
+    # Akquise: das Eingangsprotokoll gehoert dem Mandanten der Anfrage.
+    # Die Hilfsfunktion darueber bestimmt ihn bereits; hier wird er nur
+    # weitergereicht. Bleibt er unbekannt, bleibt die Zeile ohne — ein
+    # Protokolleintrag ohne Mandanten ist besser als kein Protokoll.
+    # Der Protokolleintrag entsteht an Stellen, an denen der Mandant noch
+    # nicht feststeht (Rate-Limit, fehlerhafte Anfrage). Deshalb eine
+    # Veraenderliche neben ipHash und email statt eines weiteren Parameters:
+    # sobald der Mandant bekannt ist, traegt jeder folgende Eintrag ihn.
+    # Vorher bleibt er leer — ein Protokolleintrag ohne Mandanten ist besser
+    # als kein Protokoll, und abgewiesen wurde die Anfrage ja gerade, WEIL
+    # kein Mandant zu ihr gehoerte.
+    ('FORK',
+     r'(  let ipHash = "";\n  let email = "";)',
+     r'\1\n  let mandantLog: string | null = null;',
+     'Akquise-Protokoll: Platz fuer den Mandanten.',
+     {'akq-lead-eingang'}),
+    ('FORK',
+     r'\.from\("akq_eingang_log"\)\.insert\(\{ ip_hash: ipHash, email, ergebnis \}\)',
+     '.from("akq_eingang_log").insert({ mandant_id: mandantLog, ip_hash: ipHash, email, ergebnis })',
+     'Akquise-Protokoll traegt den Mandanten der Anfrage.',
+     {'akq-lead-eingang'}),
+
     # --- FREMD: Verweise auf das Supabase-Projekt der Vorlage
     ('FREMD', r'yazwkzzjiquprtjpurur', 'usguiggfciavwzkdfjgt',
      'Projektkennung der Vorlage durch die eigene ersetzt.'),
@@ -1124,6 +1207,18 @@ ERSETZUNGEN = [
      'Reservierung: den Mandanten aus dem Vorgang setzen.',
      {'reservierung-pdf-erzeugen', 'reservierung-word-erzeugen'}),
 
+
+
+    # Diese Regel steht ganz am Ende der Liste, und das ist kein Zufall: die
+    # Zeile, an der sie ansetzt, entsteht selbst erst durch eine Regel weiter
+    # oben. Weiter vorne eingehaengt lief sie ins Leere — die Zaehlung der
+    # Treffer hat es gemeldet, sonst waere mandantLog stumm null geblieben
+    # und das Protokoll haette weiter ohne Mandanten geschrieben.
+    ('FORK',
+     r'(    const mandant = await immoMandantAusAnfrage\(req, db, body\);)',
+     r'\1\n    mandantLog = mandant;',
+     'Akquise-Protokoll: den Mandanten merken, sobald er feststeht.',
+     {'akq-lead-eingang'}),
 
 ]
 

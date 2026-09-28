@@ -164,8 +164,9 @@ Deno.serve(async (req) => {
 
   let ipHash = "";
   let email = "";
+  let mandantLog: string | null = null;
   const merke = async (ergebnis: string) => {
-    try { await db.from("akq_eingang_log").insert({ ip_hash: ipHash, email, ergebnis }); } catch (_) { /* egal */ }
+    try { await db.from("akq_eingang_log").insert({ mandant_id: mandantLog, ip_hash: ipHash, email, ergebnis }); } catch (_) { /* egal */ }
   };
 
   try {
@@ -199,6 +200,7 @@ Deno.serve(async (req) => {
 
     // --- Mandant ---
     const mandant = await immoMandantAusAnfrage(req, db, body);
+    mandantLog = mandant;
     if (!mandant) {
       await merke("kein_mandant");
       return antwort({ ok: false, fehler: "Das Formular ist keinem Anbieter zugeordnet. Bitte wenden Sie sich direkt an Ihren Ansprechpartner." }, 400);

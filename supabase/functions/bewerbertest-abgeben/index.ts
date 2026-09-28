@@ -138,6 +138,7 @@ Deno.serve(async (req) => {
     }
 
     const { error: insErr } = await admin.from("bewerber_antworten").insert({
+      mandant_id: einladung.mandant_id,
       einladung_id: einladung.id,
       antworten,
       punkte_auto: { teil2a: p2a, teil2b: p2b, teil3: p3, details },

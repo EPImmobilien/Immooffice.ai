@@ -168,6 +168,13 @@ else
   fehler=1
 fi
 
+abschnitt "Edge Functions: schreiben sie mit Mandanten?"
+if python3 tests/oeffentlich-insert-mandant.py; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Edge Functions: Syntax"
 if node tests/funktionen-syntax.js; then
   :

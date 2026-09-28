@@ -107,6 +107,7 @@ Deno.serve(async (req) => {
     const { error: upErr } = await admin.storage.from("immobilie-dateien").upload(pfad, bytes, { contentType: mime, upsert: false });
     if (upErr) throw new Error("Upload: " + upErr.message);
     const { data: neu, error: insErr } = await admin.from("immobilie_datei").insert({
+      mandant_id: immoMandant,
       immobilie_id: meta.immobilie_id, name, titel: meta.titel ?? null, doktyp: meta.doktyp || "Bild", kategorie: meta.kategorie || "foto",
       mime_type: mime, size_bytes: bytes.length, speicher_typ: "supabase", storage_path: pfad, quelle: meta.quelle || "wiederhergestellt",
       oeffentlich: meta.oeffentlich !== false, sortierung: Number(meta.sortierung) || 0, ersteller_id: meta.ersteller_id ?? null,

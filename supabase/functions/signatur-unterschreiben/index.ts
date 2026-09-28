@@ -254,7 +254,7 @@ Deno.serve(async (req) => {
       client_meta: clientMeta ? { ...clientMeta, ip: ipAdresse } : (ipAdresse ? { ip: ipAdresse } : null),
     }).eq("id", empfaenger.id);
     await admin.from("signatur_events").insert({
-      vorgang_id: vorgang.id, empfaenger_id: empfaenger.id, event_typ: "unterschrieben",
+      mandant_id: vorgang.mandant_id, vorgang_id: vorgang.id, empfaenger_id: empfaenger.id, event_typ: "unterschrieben",
       details: {
         bestaetigung_inhalt: bestaetigungInhalt,
         bestaetigung_widerruf: bestaetigungWiderruf,
@@ -322,12 +322,12 @@ Deno.serve(async (req) => {
           try {
             await sendeMailUeberPostfach(admin, erstellerPostfach.id, e.email, e.anzeigename, betreff, text);
             await admin.from("signatur_events").insert({
-              vorgang_id: vorgang.id, empfaenger_id: e.id, event_typ: "mail_gesendet",
+              mandant_id: vorgang.mandant_id, vorgang_id: vorgang.id, empfaenger_id: e.id, event_typ: "mail_gesendet",
               details: { email: e.email, anlass: istVerkaeuferRunde ? "gegenzeichnung_verkaeufer" : "gegenzeichnung" },
             });
           } catch (mailErr) {
             await admin.from("signatur_events").insert({
-              vorgang_id: vorgang.id, empfaenger_id: e.id, event_typ: "mail_fehlgeschlagen",
+              mandant_id: vorgang.mandant_id, vorgang_id: vorgang.id, empfaenger_id: e.id, event_typ: "mail_fehlgeschlagen",
               details: { email: e.email, error: String(mailErr instanceof Error ? mailErr.message : mailErr) },
             });
           }
@@ -420,7 +420,7 @@ Deno.serve(async (req) => {
     await admin.from("signatur_vorgaenge").update({
       status: "abgeschlossen", signed_pdf_pfad: signedPfad, abgeschlossen_am: abgeschlossenAm,
     }).eq("id", vorgang.id);
-    await admin.from("signatur_events").insert({ vorgang_id: vorgang.id, event_typ: "abgeschlossen", details: { in_felder_gestempelt: inFelderGestempelt } });
+    await admin.from("signatur_events").insert({ mandant_id: vorgang.mandant_id, vorgang_id: vorgang.id, event_typ: "abgeschlossen", details: { in_felder_gestempelt: inFelderGestempelt } });
 
     if (vorgang.dokument_typ === "maklervertrag" && vorgang.vertrag_id) {
       await admin.from("vertraege").update({ original_pdf_pfad: signedPfad }).eq("id", vorgang.vertrag_id);
@@ -443,6 +443,7 @@ Deno.serve(async (req) => {
               continue;
             }
             await admin.from("eigentuemer_dokumente").insert({
+              mandant_id: vorgang.mandant_id,
               eigentuemer_id: eigentuemerId,
               maklervertrag_id: vorgang.vertrag_id,
               name: dateiname,
@@ -487,9 +488,9 @@ Deno.serve(async (req) => {
             + `Mit freundlichen Gr\u00fc\u00dfen\nMusterhaus Immobilien GmbH`,
             [{ filename: `${titel.replace(/\s+/g, "_")}_unterschrieben.pdf`, content: finalBytes, contentType: "application/pdf" }]
           );
-          await admin.from("signatur_events").insert({ vorgang_id: vorgang.id, empfaenger_id: e.id, event_typ: "mail_gesendet", details: { email: e.email, anlass: "abschluss", rolle: e.rolle } });
+          await admin.from("signatur_events").insert({ mandant_id: vorgang.mandant_id, vorgang_id: vorgang.id, empfaenger_id: e.id, event_typ: "mail_gesendet", details: { email: e.email, anlass: "abschluss", rolle: e.rolle } });
         } catch (mailErr) {
-          await admin.from("signatur_events").insert({ vorgang_id: vorgang.id, empfaenger_id: e.id, event_typ: "mail_fehlgeschlagen", details: { email: e.email, error: String(mailErr instanceof Error ? mailErr.message : mailErr) } });
+          await admin.from("signatur_events").insert({ mandant_id: vorgang.mandant_id, vorgang_id: vorgang.id, empfaenger_id: e.id, event_typ: "mail_fehlgeschlagen", details: { email: e.email, error: String(mailErr instanceof Error ? mailErr.message : mailErr) } });
         }
       }
 
@@ -526,10 +527,10 @@ Deno.serve(async (req) => {
             + `Das vollst\u00e4ndig unterzeichnete Dokument liegt im Anhang. ${rolleHinweis}\n`,
             [{ filename: `${titel.replace(/\s+/g, "_")}_unterschrieben.pdf`, content: finalBytes, contentType: "application/pdf" }]
           );
-          await admin.from("signatur_events").insert({ vorgang_id: vorgang.id, event_typ: "mail_gesendet", details: { email: kopiePostfach.email_adresse, anlass: "makler_kopie", an_betreuer: anBetreuer } });
+          await admin.from("signatur_events").insert({ mandant_id: vorgang.mandant_id, vorgang_id: vorgang.id, event_typ: "mail_gesendet", details: { email: kopiePostfach.email_adresse, anlass: "makler_kopie", an_betreuer: anBetreuer } });
         }
       } catch (maklerMailErr) {
-        await admin.from("signatur_events").insert({ vorgang_id: vorgang.id, event_typ: "mail_fehlgeschlagen", details: { anlass: "makler_kopie", error: String(maklerMailErr instanceof Error ? maklerMailErr.message : maklerMailErr) } });
+        await admin.from("signatur_events").insert({ mandant_id: vorgang.mandant_id, vorgang_id: vorgang.id, event_typ: "mail_fehlgeschlagen", details: { anlass: "makler_kopie", error: String(maklerMailErr instanceof Error ? maklerMailErr.message : maklerMailErr) } });
       }
     }
 

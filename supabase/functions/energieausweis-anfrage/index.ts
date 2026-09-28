@@ -445,6 +445,7 @@ Deno.serve(async (req) => {
     }
 
     await db.from("energieausweis_anfragen").insert({
+      mandant_id: immoMandant,
       id: vorgang,
       name: txt(d?.kontakt?.name, 120),
       email,

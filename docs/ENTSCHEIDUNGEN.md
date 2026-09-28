@@ -1576,3 +1576,50 @@ den Satz vor dem Speichern zeigen, ohne ihn ein zweites Mal zu bauen. Ein
 Wachposten in der Migration und eine Prüfung in `tests/rechnung-freigabe.sql`
 schlagen an, wenn der Satz je wieder an zwei Stellen steht — bei `hat_recht()`
 ist genau das schon einmal passiert.
+
+---
+
+## Die öffentlichen Endpunkte schrieben Zeilen ohne Mandanten (28.09.2026)
+
+Beim Durchlesen der offenen öffentlichen Endpunkte gefunden: **47
+Einfügungen in 18 Funktionen, alle in Tabellen der Gruppe MANDANT, keine
+einzige mit `mandant_id`.**
+
+**Warum das ein Fehler ist, der sich versteckt.** `mandant_id` trägt den
+Standardwert `aktuelle_mandant_id()`. Der liest den Mandanten aus dem
+Anmelde-Token. Ein Aufruf ohne Token hat keinen — der Standard ist dann
+NULL, und die Zeile entsteht ohne Mandanten. Die restriktive Richtlinie aus
+`fork_07` vergleicht `mandant_id` mit dem Mandanten des Lesers, und **NULL
+ist mit nichts gleich**. Die Zeile ist damit für jeden unsichtbar.
+
+Es gibt keine Fehlermeldung. Der Interessent stellt seine Frage auf der
+Objektseite, die Zeile entsteht, und kein Makler sieht sie je. Der Bewerber
+füllt den Test aus, und das Ergebnis verschwindet.
+
+Aufgefallen ist es nur, weil die Tabellen auf dieser Instanz noch fast leer
+sind — die Fundstellen waren zu lesen, nicht zu spüren.
+
+**Geschlossen sind sieben Fundstellen**, nämlich die, an denen der Mandant
+schon in Reichweite lag:
+
+| | |
+|---|---|
+| `signatur_events` (10×) und die abgelegte Vertragskopie | Mandant des Vorgangs |
+| `bewerber_antworten` | Mandant der Einladung |
+| `immobilie_datei` (`bild-empfang`) | Mandant der Immobilie, aus der Storage-Hülle |
+| `energieausweis_anfragen` | der Mandant, den die Funktion selbst ermittelt |
+| `akq_eingang_log` | Mandant der Anfrage, sobald er feststeht |
+
+**25 bleiben offen** — vor allem das Neubauportal (`projekt-*`, fünf
+Funktionen) und der Newsletter. Sie brauchen jeweils eine eigene Quelle für
+den Mandanten, und die will gelesen, nicht geraten sein.
+
+**Buch darüber führt `tests/oeffentlich-insert-mandant.py`,** Teil von
+`npm run check`. Die Liste darf nur kürzer werden; eine neue Fundstelle
+macht das Gate rot. Nachgewiesen an einem entfernten Eintrag.
+
+**Was die Prüfung NICHT leistet:** sie sieht, *dass* eine Funktion
+`mandant_id` mitgibt, nicht *ob der Wert stimmt*. Beim Akquise-Protokoll
+wäre mir genau das beinahe durchgegangen — die erste Fassung setzte einen
+optionalen Parameter, den kein Aufrufer je füllte. Die Trefferzählung des
+Generators hat es gemeldet.

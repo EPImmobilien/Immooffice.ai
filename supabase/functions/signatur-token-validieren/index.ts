@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
     if (abgelaufen && vorgang.status !== "abgeschlossen" && empfaenger.status !== "unterschrieben") {
       if (vorgang.status !== "abgelaufen") {
         await admin.from("signatur_vorgaenge").update({ status: "abgelaufen" }).eq("id", vorgang.id);
-        await admin.from("signatur_events").insert({ vorgang_id: vorgang.id, event_typ: "abgelaufen", details: {} });
+        await admin.from("signatur_events").insert({ mandant_id: vorgang.mandant_id, vorgang_id: vorgang.id, event_typ: "abgelaufen", details: {} });
       }
       throw new Error("Dieser Link ist leider abgelaufen. Bitte wenden Sie sich an Ihren Makler für einen neuen Link.");
     }
@@ -96,7 +96,7 @@ Deno.serve(async (req) => {
         status: empfaenger.status === "wartend" || empfaenger.status === "eingeladen" ? "geoeffnet" : empfaenger.status,
       }).eq("id", empfaenger.id);
       await admin.from("signatur_events").insert({
-        vorgang_id: vorgang.id, empfaenger_id: empfaenger.id, event_typ: "link_geoeffnet", details: {},
+        mandant_id: vorgang.mandant_id, vorgang_id: vorgang.id, empfaenger_id: empfaenger.id, event_typ: "link_geoeffnet", details: {},
       });
     }
 

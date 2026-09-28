@@ -74,6 +74,13 @@ for _f in ('rechnung-pdf-erzeugen', 'reservierung-pdf-erzeugen',
     ERWEITERT[_f] = ('CI, Briefkopf und Schriften aus dem Mandanten, '
                      'Storage-Huelle (Phase 2)')
 
+# Oeffentliche Endpunkte, die ihre Zeilen jetzt mit Mandanten schreiben.
+# Ohne mandant_id greift der Standardwert aktuelle_mandant_id(), und der ist
+# ohne Anmelde-Token NULL — die Zeile waere fuer jeden unsichtbar.
+# Buch darueber fuehrt tests/oeffentlich-insert-mandant.py.
+for _f in ('signatur-token-validieren', 'bewerbertest-abgeben'):
+    ERWEITERT[_f] = ('Schreibt mit Mandanten statt ohne (Phase 2)')
+
 BLOCKZEILEN = {
     'mpe-pdf-erzeugen': {
         'const pins: Array<[number, number, string, string, string]> = [',
