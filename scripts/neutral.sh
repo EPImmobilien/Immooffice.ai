@@ -9,13 +9,16 @@
 # Bedingung fuer jeden Commit (Teil von `npm run check`).
 #
 # Nicht geprueft werden Pfade, die Altkennzeichen benennen MUESSEN, weil sie
-# die Abgrenzung selbst beschreiben: docs/, CLAUDE.md, dieses Skript und das
-# Neutralisierungsskript. reference/ ist nicht versioniert und ebenfalls aus.
+# die Abgrenzung selbst beschreiben: docs/, CLAUDE.md, dieses Skript, die
+# beiden Neutralisierungsskripte und der Test, der ihr Ergebnis prueft.
+# reference/ ist nicht versioniert und ebenfalls aus.
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
 AUS=(--glob '!reference/**' --glob '!docs/**' --glob '!CLAUDE.md'
      --glob '!scripts/neutral.sh' --glob '!scripts/neutralisieren.py'
+     --glob '!scripts/neutralisieren-funktionen.py'
+     --glob '!tests/funktionen-unveraendert.py'
      --glob '!scripts/analyse-referenz.sh'
      --glob '!.git/**' --glob '!node_modules/**' --glob '!.next/**')
 

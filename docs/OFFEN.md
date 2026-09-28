@@ -17,11 +17,35 @@ nicht lösbar ist. Nach Auftrag Abschnitt 9.
 Funktionen entstehen nach Abschnitt 2 mit Status `SPÄTER` hinter einem
 Feature-Flag. Einzeln aufgeführt in `docs/SECRETS.md`.
 
-## Quelltext der Edge Functions
+## ~~Quelltext der Edge Functions~~ — erledigt am 28.09.2026
 
-130 Funktionen, mehrere Megabyte. Nicht über die Verwaltungsschnittstelle
-holbar — jeder Abruf läuft durch den Arbeitsspeicher des Modells. Der Befehl
-zum Export steht in `docs/STATUS.md` 2.2.
+~~130 Funktionen, mehrere Megabyte. Nicht über die Verwaltungsschnittstelle
+holbar.~~ Der Betreiber hat sie mit dem Supabase-CLI geholt: 143 Funktionen,
+2,8 MB. 139 davon sind neutralisiert übernommen, vier entfallen nach Phase 1.4.
+Einzelheiten in `docs/EDGE_FUNCTIONS.md`.
+
+**Was dabei offen bleibt — drei Punkte, alle Phase 2.4:**
+
+1. **Die Funktionen sind einmandantig.** Sie lesen Firmenname, Absender und
+   Anschrift aus Umgebungsvariablen und festen Vorgabewerten, nicht aus
+   `firma_stammdaten` des Mandanten, dem der Datensatz gehört. Mit mehreren
+   Mandanten verschickt jede Mail denselben Absender.
+
+2. **Die Platzhalter-Adresse `immooffice.example` muss ersetzt werden.** Sie
+   steht überall dort, wo die Vorlage ihre eigene Domain verdrahtet hatte:
+   als Rückfall hinter `PORTAL_URL` und `EXPOSE_FREIGABE_BASIS`, in
+   Absenderadressen und in den Empfängerlisten von `web-lead`. Die Endung
+   `.example` ist nach RFC 2606 reserviert und existiert nicht — solange sie
+   dort steht, gehen diese Mails ins Leere und diese Links führen nirgendwohin.
+   Das ist Absicht: ein Platzhalter, der auffällt, ist besser als eine
+   erfundene Domain, die zufällig jemandem gehört.
+
+3. **`vertrag-pdf` erzeugt Verträge ohne Firmenkopf.** Die Funktion trug die
+   drei Standorte der Referenz als Tabelle im Quelltext. An ihre Stelle ist
+   ein leerer Eintrag `standard` getreten. Bis die Werte aus
+   `firma_stammdaten` (`typ = 'standort'`) kommen, bleiben Firmenname,
+   Anschrift und Ort im erzeugten Maklervertrag leer. Ein Vertrag ohne
+   Firmenkopf darf nicht an einen Kunden gehen.
 
 ## Entscheidung des Betreibers
 

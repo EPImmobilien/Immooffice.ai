@@ -94,6 +94,14 @@ gekennzeichnet), und spielt `supabase/migrations/*.sql` der Reihe nach ein.
 Damit ist jede Migration vor dem Anwenden prüfbar, ohne das echte Projekt
 anzufassen. Das galt bis hierher nicht.
 
+### 2.2 Edge Functions: Quelltext nicht übertragbar — **erledigt am 28.09.2026**
+
+Der Betreiber hat die Funktionen mit dem Supabase-CLI geholt: **143 statt der
+130 aus dem Inventar vom 14.09.** — keine fehlte, dreizehn sind dazugekommen.
+139 sind neutralisiert übernommen, vier entfallen nach Phase 1.4.
+Siehe `docs/EDGE_FUNCTIONS.md`. Der nachstehende Weg ist damit gegangen; er
+bleibt hier stehen, weil er bei jedem weiteren Abgleich wieder gebraucht wird.
+
 ### 2.2 Edge Functions: Quelltext nicht übertragbar — `SPÄTER`
 
 130 Funktionen mit geschätzt mehreren Megabyte Quelltext lassen sich über diesen
@@ -247,15 +255,23 @@ Supabase-Projekt, oder ausdrückliche Freigabe zum Löschen.
       22 Buckets, 59 Storage-Richtlinien, 42 Cron-Jobs, 2791 Spalten — alle
       gleich wie im Quellprojekt.
 
+- [x] **Edge Functions übernommen am 28.09.2026.** 143 geliefert, 139
+      neutralisiert übernommen, 4 nach Phase 1.4 gestrichen. Die
+      Neutralisierung ist ein Skript
+      (`scripts/neutralisieren-funktionen.py`), ihr Ergebnis wird von
+      `tests/funktionen-unveraendert.py` geprüft: jede geänderte Zeile muss
+      vorher ein Kennzeichen enthalten haben. Beides Teil von `npm run check`.
+
 ## 5. Als Nächstes
 
-1. Zwei Vault-Einträge (`projekt_url`, `anon_key`) — `docs/OFFEN.md`, Punkt 1.
-   Ohne sie laufen die Cron-Jobs ins Leere. Sie stehen jetzt im Projekt und
-   feuern nach Plan, aber jeder Aufruf geht mit leerem Schlüssel hinaus.
-2. Edge Functions: wartet auf Abschnitt 2.2.
-3. Phase 1: `reference/epworld-src.html` in `src/` zerlegen, CDN-Versionen
+1. Phase 1: `reference/epworld-src.html` in `src/` zerlegen, CDN-Versionen
    festnageln, neutralisieren, `dist/index.html` bauen. Läuft ohne Ihre
    Mitwirkung; danach **Gate 1**.
+2. Phase 2.4: die Edge Functions mandantenfähig machen — `firma_stammdaten`
+   statt fester Vorgabewerte. Die drei offenen Punkte stehen in
+   `docs/OFFEN.md`.
+3. Die Funktionen ausrollen. Bis dahin feuern die Cron-Jobs gegen Funktionen,
+   die im eigenen Projekt noch nicht liegen.
 
 ## 6. Sicherheitsbefund im Referenzprojekt — **behoben**
 

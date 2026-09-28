@@ -29,11 +29,21 @@ else
   fehler=1
 fi
 
+abschnitt "Edge Functions: nur Kennzeichen geaendert"
+if python3 tests/funktionen-unveraendert.py; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Noch nicht abgedeckt"
 cat <<'ENDE'
 - Build von dist/index.html          — kommt mit Phase 1 (es gibt noch keine Oberflaeche)
 - Syntaxpruefung der Oberflaeche     — dito
 - Rauchtest (ein App-Skript, ein createRoot, CDN-Pins, Bundle-Groesse) — dito
+- Syntaxpruefung der Edge Functions  — kein Deno und kein TypeScript in dieser
+                                       Umgebung; geprueft wird nur, dass die
+                                       Neutralisierung nichts anderes anfasst
 - tests/mandant.sql                  — kommt mit Phase 2 (firma_id existiert noch nicht)
 ENDE
 

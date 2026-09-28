@@ -354,3 +354,58 @@ aber über die dafür vorgesehene Funktion von pg_cron statt über einen direkte
 Schreibzugriff auf die Systemtabelle. Die Änderung gehört ins Skript und nicht
 in die erzeugte Datei, sonst verwirft sie der nächste Lauf. Kein
 Verhaltensunterschied zur Vorlage: dort sind dieselben zwei Jobs inaktiv.
+
+
+## 28.09.2026 — Platzhalter statt erfundener Domain in den Edge Functions
+
+**Frage:** Die Funktionen der Vorlage verdrahten an rund vierzig Stellen die
+Domain des Referenzunternehmens — als Absenderadresse, als Rückfall hinter
+`PORTAL_URL`, in Empfängerlisten. Wodurch ersetzen?
+
+**Entscheidung:** Durch `immooffice.example`. Die Endung `.example` ist nach
+RFC 2606 reserviert und kann niemandem gehören.
+
+**Grund:** Eine plausibel klingende Domain wäre gefährlich. Sie kann heute
+frei sein und morgen jemandem gehören — und dann gehen Exposé-Links und
+Kundenmails an einen Fremden. Ein Platzhalter, der sichtbar keiner ist, kostet
+einen Konfigurationsschritt und schließt diesen Fehler aus. Vermerkt in
+`docs/OFFEN.md`, Punkt 2.
+
+## 28.09.2026 — Die Standorttabelle in vertrag-pdf wird leer, nicht erfunden
+
+**Frage:** `vertrag-pdf` trägt die drei Standorte der Referenz als Tabelle im
+Quelltext, mit den Ortsnamen als Schlüssel. Ersetzen durch Musterdaten oder
+leeren?
+
+**Entscheidung:** Ein einziger leerer Eintrag `standard`. Kein Musterfirmenname,
+keine erfundene Anschrift.
+
+**Grund:** Ein Maklervertrag mit einer Musteranschrift im Kopf sieht
+gebrauchsfertig aus und ist es nicht — das ist die gefährlichere Variante.
+Leer fällt beim ersten Blick auf das PDF auf. Die richtige Quelle ist
+`firma_stammdaten` mit `typ = 'standort'`; die Tabelle dafür steht schon im
+Schema. Das Verdrahten ist Phase 2.4 und steht in `docs/OFFEN.md`, Punkt 3.
+
+## 28.09.2026 — Eine Prüfung gegen zu breite Ersetzungsregeln
+
+**Frage:** Die Neutralisierung der Funktionen sind rund dreißig
+Ersetzungsregeln über 2,7 MB Quelltext. Wie merkt man, dass eine Regel mehr
+trifft als gedacht?
+
+**Anlass:** Beim ersten Versuch stand `STANDORTE["rostock"]` als Muster da.
+Muster sind reguläre Ausdrücke, und `[...]` ist dort eine Zeichenklasse — die
+Regel hat quer durch alle 149 Dateien einzelne Buchstaben ersetzt. Aufgefallen
+ist es erst beim Hineinschauen in eine erzeugte Datei.
+
+**Entscheidung:** Drei Sicherungen.
+1. `NACHBESSERN` wird wörtlich ausgewertet, nicht als Ausdruck — dort stehen
+   Code-Schnipsel mit Klammern und Punkten.
+2. Das Skript bricht ab, wenn eine Regel in einer Datei öfter als 60-mal
+   greift oder wenn eine Datei Zeilen gewinnt.
+3. `tests/funktionen-unveraendert.py` prüft jede geänderte Zeile darauf, ob
+   sie vorher ein Kennzeichen enthielt. Teil von `npm run check`.
+
+**Grund:** Der Fehler war nicht klug, aber er war billig — die Vorlage liegt
+unverändert in `reference/`, das Skript erzeugt neu. Teuer wäre er geworden,
+wenn er unbemerkt in einen Commit gelaufen wäre. Eine Prüfung, die genau diese
+Klasse von Fehlern erkennt, ist billiger als Sorgfalt beim Schreiben.

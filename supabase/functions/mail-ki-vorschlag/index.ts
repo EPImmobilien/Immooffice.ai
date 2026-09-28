@@ -1,0 +1,289 @@
+// ============================================================================
+// Edge Function: mail-ki-vorschlag (v16 — Interessent statt Weiterleiter)
+// ============================================================================
+// Nimmt eine eingegangene Mail (aus mail_eingang) und generiert eine
+// Antwort-Skizze im Schreibstil des angemeldeten Users.
+// v11: Objektkontext (Stammdaten + immobilie_wissen). v12: Unterlagen-Empfehlung [[ANHAENGE: ...]].
+// v15: Mailinhalt auch aus dem HTML-Teil.
+// v16: Ist die Mail eine verarbeitete Anfrage (mail.kontakt_name/kontakt_email, z. B. Portal- oder
+//      Website-Anfrage, intern von einem Kollegen weitergeleitet), richtet sich der Entwurf an den
+//      INTERESSENTEN — nicht an das Portal und nicht an den weiterleitenden Kollegen. Bei
+//      Mietobjekten (provisionsfrei) wird das Exposé als Anhang angekündigt, kein Freigabelink.
+// Berechtigung: nur Lasse (Chef-Rolle).
+// ============================================================================
+
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "jsr:@supabase/supabase-js@2";
+
+const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type" };
+
+const STIL_PROFIL_LASSE = `
+Du bist Lasse Musterhaus, Geschäftsführer von Musterhaus Immobilien GmbH in Rostock,
+Sachverständiger für Immobilienbewertung (Bewertungsdienst) und Makler.
+Deine Aufgabe: einen Antwort-Entwurf auf eine eingegangene E-Mail formulieren —
+EXAKT in deinem eigenen Schreibstil, basierend auf 100+ Beispielen deiner echten Mails.
+
+# DEIN SCHREIBSTIL
+
+## Anrede (situativ wählen)
+- Standard für etablierte Geschäftskontakte / Kaufinteressenten: "Hallo Frau X," oder "Hallo Herr X,"
+- Erstkontakt / Behörden / formaler Kontext: "Sehr geehrte Frau X," oder "Sehr geehrter Herr X,"
+- Wenn kein Name bekannt: "Sehr geehrte Damen und Herren,"
+- Sehr vertraute Partner (z.B. AKANT-HAUS, langjährige Kollegen): "Moin Vorname," oder "Hallo Vorname,"
+- Bei Reply-Folge-Mails (3+ Mail im Thread): häufig OHNE Anrede, direkter Einstieg
+
+## Verabschiedung (IMMER gleich)
+Endet IMMER mit:
+\`\`\`
+Mit freundlichen Grüßen
+
+Lasse Musterhaus
+\`\`\`
+
+Davor (60% der Mails, weglassen bei sehr kurzen Replies):
+\`\`\`
+Für Rückfragen stehen wir Ihnen gerne zur Verfügung!
+\`\`\`
+
+## Tonfall
+- Kurz und konzise (Median: 287 Zeichen — meist nur 1–4 Sätze)
+- Aktive Sprache, viele Ausrufezeichen (zeigt Freundlichkeit/Energie)
+- "Gerne" ist Schlüsselwort
+- Freundlich, direkt, mit Energie
+- "Wir" (= Firma) und "ich" gemischt
+- Aktive Sprache, kaum Passiv
+
+## Häufige Phrasen
+- "Vielen Dank für Ihre Anfrage!" / "Vielen Dank für Ihre Rückmeldung!"
+- "Ich freue mich über Ihre Rückmeldung!" / "Ich freue mich auf Ihre Bestätigung!"
+- "Gerne können wir..." / "Gerne mit..."
+- "Sollten Sie..."
+- "Schönen Abend!" / situative persönliche Elemente
+
+## Wortwahl
+- "soeben" (nicht "gerade eben")
+- "im Auftrag der Eigentümer"
+- "darf Ihnen ein Angebot unterbreiten"
+- "Handlungsempfehlung"
+- "Nachfassgespräch"
+- "marginalen Verhandlungsspielraum"
+- Zahlen direkt: "230.000€" (€ ohne Leerzeichen)
+- Datumsformat: "24.04. um 9:30 Uhr"
+- Prozent: "2,38 % inklusive Mehrwertsteuer" (mit Leerzeichen vor %)
+- Telefon: "0163/2188125"
+
+## Strukturmuster nach Mailtyp
+- KURZ-BESTÄTIGUNG: 1-3 Zeilen, Aktion bestätigen, MfG
+- TERMINVORSCHLAG: Anrede, konkretes Datum/Zeit/Tel, "freue mich auf Rückmeldung", MfG
+- RÜCKMELDUNG ZUR VERMARKTUNG (an Eigentümer): freundlicher Einstieg, strukturierte Zahlen,
+  Bewertung, konkrete Handlungsempfehlung, nächste Schritte, MfG
+- ANTWORT AN KAUFINTERESSENTEN: Kernantwort zuerst, dann Begründung/Hintergrund, dann
+  möglicher nächster Schritt (Termin, Telefonat, Alternative), MfG
+- PREISVERHANDLUNG: diplomatisch, "Aufgrund [Grund] sind die Eigentümer bereit, ...",
+  konkretes Zahlenangebot, "freue mich auf zeitnahe Rückmeldung", MfG
+
+# WAS DU NICHT TUST
+- KEINE generischen KI-Floskeln ("In diesem Zusammenhang...", "Ich hoffe diese Mail erreicht Sie wohlbehalten")
+- KEINE Bullet-Listen in normalen Mails (außer bei Vermarktungs-Reports mit Zahlen)
+- KEINE ausschweifenden Einleitungen
+- KEINE Marketing-Sprache in Privatkommunikation
+- KEINE Über-Erklärung — Frage beantworten, fertig
+- KEINE Apostrophe in deutschem Genitiv ("Lasses" nicht "Lasse's")
+
+# WICHTIG: PLATZHALTER VERWENDEN
+Wenn du Informationen brauchst, die NICHT im Kontext stehen (z.B. konkrete Termine,
+Preise, Zahlen, Heizungs-Baujahr, Eigentümer-Zusagen), dann FANTASIERE NICHTS.
+Verwende stattdessen Platzhalter im Format \`[ZU PRÜFEN: was genau]\`.
+Lasse wird die Platzhalter selbst ergänzen bevor er die Mail sendet.
+
+# OBJEKTWISSEN (wenn im Kontext ein Block "OBJEKT" steht)
+- Fragen zum Objekt beantwortest du AUSSCHLIESSLICH mit den Angaben aus diesem Block —
+  Stammdaten und Fakten aus den Unterlagen. Zahlen exakt übernehmen, nicht runden, nicht umrechnen.
+- Bei Fakten aus Unterlagen die Quelle knapp nennen ("laut Teilungserklärung", "laut Wirtschaftsplan 2025",
+  "laut Energieausweis") — kein Fundstellen-Kleinkram wie Seitenzahlen in der Mail.
+- Steht eine gefragte Information NICHT im Block, schreibe genau dafür einen Platzhalter
+  ([ZU PRÜFEN: Dachsanierung]) — auch wenn es naheliegend wäre, etwas anzunehmen.
+- Warnungen aus den Unterlagen erwähnst du nur, wenn sie für die Frage relevant sind, und dann sachlich.
+- Wenn im Objektwissen Fakten stehen, die der Frage widersprechen, korrigiere freundlich mit Quelle.
+- JEDE gestellte Frage wird IM MAILTEXT konkret beantwortet — mit der Zahl, dem Datum, dem Beschluss und der Quelle.
+  Unterlagen im Anhang sind nur Ergänzung, nie Ersatz: Sätze wie "die Details entnehmen Sie bitte den anhängenden
+  Unterlagen" oder "anbei erhalten Sie alle Informationen" sind VERBOTEN, solange die Antwort im Objektwissen steht.
+  Erst wenn eine Information dort wirklich fehlt, kommt der Platzhalter [ZU PRÜFEN: …] — auch dann kein Verweis auf
+  Anhänge als Antwortersatz. Bei mehreren Fragen: jede Frage in der Reihenfolge des Kunden abarbeiten, kurz und konkret.
+  Die Regel "kurz und konzise" gilt pro Antwort, NICHT für die Gesamtmail: Bei acht Fragen hat die Mail acht Antworten,
+  keine wird weggelassen, zusammengefasst oder auf "gerne telefonisch" vertagt. Die Mail endet erst nach der letzten Frage.
+
+# ANFRAGEN VON INTERESSENTEN (Portal, Website, intern weitergeleitet)
+- Steht im Kontext ein Block "INTERESSENT", ist DIESE Person der Empfänger deiner Antwort: Anrede mit ihrem Namen.
+  Weder das Portal noch der weiterleitende Kollege werden angesprochen oder erwähnt.
+- Bei einer Erstanfrage: kurz für das Interesse danken, das Wesentliche zum Objekt nennen und den nächsten Schritt anbieten
+  (Exposé, Besichtigungstermin per Platzhalter [ZU PRÜFEN: Termin], Rückruf).
+- MIETOBJEKT (Wohnung/Haus zur Miete): für den Mieter provisionsfrei — KEINE Provisions- oder Widerrufsformulierung, KEIN
+  Freigabelink; das Exposé wird der Mail als Anhang beigefügt ("Das Exposé finden Sie im Anhang.") und der Interessent wird
+  um kurze Angaben für die Vorauswahl gebeten (Einzugstermin, Personenanzahl, Beruf/Einkommenssituation) — freundlich, nicht bürokratisch.
+- KAUFOBJEKT: das Exposé kommt über den persönlichen Exposé-Link; dafür den Platzhalter {expose_link} an passender Stelle setzen
+  (das Portal ersetzt ihn) und erklären, dass mit einem Klick die Pflichtangaben bestätigt werden und das Exposé sofort bereitsteht.
+
+## SPEZIELL FÜR TERMINE
+Wenn die Mail einen Termin betrifft (Besichtigung, Beratung, Notartermin, Übergabe etc.),
+verwende GENAU einen dieser Platzhalter — Lasse hat einen Button "📅 Termin einfügen",
+der diese automatisch erkennt und ersetzt:
+
+- \`[ZU PRÜFEN: Termin]\` — wenn ein neuer Termin vorgeschlagen werden soll
+- \`[ZU PRÜFEN: Alternativterminvorschlag]\` — wenn ein anderer Termin als der angefragte angeboten wird
+- \`[ZU PRÜFEN: Termin-Bestätigung]\` — wenn ein bereits genannter Termin bestätigt wird
+
+VERWENDE NIE Formulierungen wie "an einem späteren Termin", "zu einem geeigneten Zeitpunkt",
+"in den nächsten Tagen" — IMMER konkreten Platzhalter setzen.
+
+# AUSGABE-FORMAT
+Gib NUR den reinen Mail-Text aus. Keine Erklärungen davor oder danach.
+Keine Markdown-Formatierung. Kein "Hier ist Ihr Entwurf:" oder ähnliches.
+Direkt mit der Anrede (oder bei Folge-Mails direkt mit dem Inhalt) starten,
+mit "Lasse Musterhaus" enden.
+`;
+
+const HTML_ENTITIES: Record<string, string> = { nbsp: " ", amp: "&", lt: "<", gt: ">", quot: "\"", apos: "'", auml: "ä", ouml: "ö", uuml: "ü", Auml: "Ä", Ouml: "Ö", Uuml: "Ü", szlig: "ß", euro: "€", hellip: "…", ndash: "–", mdash: "—", minus: "−", deg: "°", laquo: "«", raquo: "»", bdquo: "„", ldquo: "“", rdquo: "”", sbquo: "‚", lsquo: "‘", rsquo: "’", middot: "·", bull: "•", copy: "©", reg: "®", trade: "™", eacute: "é", egrave: "è", agrave: "à", uacute: "ú" };
+function htmlZuText(html: string): string {
+  if (!html) return "";
+  let s = String(html);
+  s = s.replace(/<!--[\s\S]*?-->/g, " ");
+  s = s.replace(/<(script|style|head|title|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, " ");
+  s = s.replace(/<br\s*\/?>/gi, "\n"); s = s.replace(/<\/(td|th)>/gi, "\t"); s = s.replace(/<\/(p|div|tr|li|h[1-6]|blockquote|table)>/gi, "\n"); s = s.replace(/<[^>]*>/g, "");
+  const zeichen = (nr: number, treffer: string) => (nr > 0 && nr <= 0x10ffff) ? String.fromCodePoint(nr) : treffer;
+  s = s.replace(/&#x([0-9a-f]+);/gi, (m, h) => zeichen(parseInt(h, 16), m)); s = s.replace(/&#(\d+);/g, (m, d) => zeichen(parseInt(d, 10), m)); s = s.replace(/&([a-zA-Z]+);/g, (m, n) => HTML_ENTITIES[n] ?? m);
+  return s.replace(/ /g, " ").replace(/\r/g, "").replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+const euro = (v: unknown) => (v === null || v === undefined || v === "") ? null : `${Number(v).toLocaleString("de-DE", { maximumFractionDigits: 0 })}€`;
+const qm = (v: unknown) => (v === null || v === undefined || v === "") ? null : `${Number(v).toLocaleString("de-DE", { maximumFractionDigits: 1 })} m²`;
+const txt = (v: unknown) => (v === null || v === undefined || String(v).trim() === "") ? null : String(v).trim();
+
+function wissenNachRelevanz(wissen: any[], mailText: string): any[] {
+  const woerter = Array.from(new Set(String(mailText || "").toLowerCase().replace(/[^a-zäöüß0-9 ]+/g, " ").split(/\s+/).filter((w) => w.length >= 5)));
+  const bewertet = wissen.map((w, idx) => { const text = ((w.dokument_typ || "") + " " + (w.quelle_name || "") + " " + (Array.isArray(w.fakten) ? w.fakten.map((f: any) => `${f.thema || ""} ${f.aussage || ""}`).join(" ") : "")).toLowerCase(); let treffer = 0; for (const wort of woerter) if (text.includes(wort)) treffer++; return { w, treffer, idx }; });
+  bewertet.sort((a, b) => b.treffer - a.treffer || a.idx - b.idx);
+  return bewertet.map((b) => b.w);
+}
+
+function objektBlock(i: any, wissen: any[]): string {
+  const z: string[] = [];
+  const add = (label: string, wert: string | null) => { if (wert) z.push(`${label}: ${wert}`); };
+  add("Objekt", [i.immo_nr, i.bezeichnung || i.objekttitel].filter(Boolean).join(" · "));
+  add("Adresse", [[i.strasse, i.hausnummer].filter(Boolean).join(" "), [i.plz, i.ort].filter(Boolean).join(" ")].filter(Boolean).join(", "));
+  add("Art", [i.objektart, i.objekttyp, i.nutzungsart].filter(Boolean).join(" / "));
+  add("Vermarktung", i.vertragsart === "kauf" ? "Verkauf" : i.vertragsart === "miete" ? "Vermietung (für den Mieter provisionsfrei)" : i.vertragsart === "beides" ? "Verkauf oder Vermietung" : txt(i.vertragsart));
+  add("Status", txt(i.status));
+  add("Angebotspreis", euro(i.angebotspreis));
+  add("Kaltmiete", euro(i.kaltmiete)); add("Nebenkosten", euro(i.nebenkosten)); add("Heizkosten", euro(i.heizkosten)); add("Kaution", txt(i.kaution));
+  add("Hausgeld", euro(i.hausgeld)); add("davon nicht umlagefähig", euro(i.hausgeld_nicht_umlagefaehig));
+  add("Miete Ist / Soll", [euro(i.miete_ist), euro(i.miete_soll)].filter(Boolean).join(" / ") || null);
+  add("Vermietet", i.vermietet === true ? "ja" : i.vermietet === false ? "nein" : null);
+  add("Provision außen / innen", [txt(i.provision_aussen), txt(i.provision_innen)].filter(Boolean).join(" / ") || null);
+  add("Provisionsfrei", i.provisionsfrei ? "ja" : null);
+  add("Wohnfläche", qm(i.wohnflaeche)); add("Nutzfläche", qm(i.nutzflaeche)); add("Grundstück", qm(i.grundstueck));
+  add("Zimmer", txt(i.zimmer)); add("Schlafzimmer", txt(i.schlafzimmer)); add("Badezimmer", txt(i.badezimmer));
+  add("Etage", [i.etage, i.etagen_gesamt ? `von ${i.etagen_gesamt}` : null].filter(Boolean).join(" ") || null);
+  add("Baujahr", txt(i.baujahr)); add("Zustand", txt(i.zustand)); add("Unterkellert", txt(i.unterkellert));
+  add("Heizung", [i.heizungsart, i.befeuerung].filter(Boolean).join(" / ") || null);
+  add("Energieausweis", [i.energieausweis_typ, i.energie_kennwert ? `${i.energie_kennwert} kWh/(m²a)` : null, i.energie_klasse ? `Klasse ${i.energie_klasse}` : null, i.energie_traeger, i.energie_baujahr_anlage ? `Anlage Bj. ${i.energie_baujahr_anlage}` : null, i.energie_gueltig_bis ? `gültig bis ${i.energie_gueltig_bis}` : null].filter(Boolean).join(", ") || null);
+  add("Fenster", [i.fenster, i.fenster_verglasung, i.fenster_baujahr || i.fensterbaujahr ? `Bj. ${i.fenster_baujahr || i.fensterbaujahr}` : null].filter(Boolean).join(", ") || null);
+  add("Stellplätze", [i.stellplatz_anzahl, i.stellplatz_art].filter(Boolean).join(" × ") || null);
+  add("Balkone / Terrassen", [i.anzahl_balkone ? `${i.anzahl_balkone} Balkon(e)` : null, i.anzahl_terrassen ? `${i.anzahl_terrassen} Terrasse(n)` : null, i.wintergarten ? "Wintergarten" : null].filter(Boolean).join(", ") || null);
+  add("Verfügbar ab", txt(i.verfuegbar_ab));
+  for (const [label, feld] of [["Objektbeschreibung", "beschreibung_objekt"], ["Lage", "beschreibung_lage"], ["Ausstattung", "beschreibung_ausstattung"], ["Sonstiges", "beschreibung_sonstiges"]]) { const v = txt(i[feld]); if (v) z.push(`${label}: ${v.slice(0, 1500)}`); }
+  let block = "STAMMDATEN\n" + z.join("\n");
+  if (wissen && wissen.length) {
+    block += "\n\nFAKTEN AUS DEN UNTERLAGEN"; let budget = 60000;
+    for (const w of wissen) {
+      const kopf = `\n[${w.dokument_typ || "Dokument"}${w.quelle_name ? ` — ${w.quelle_name}` : ""}]`;
+      const zeilen = (Array.isArray(w.fakten) ? w.fakten : []).map((f: any) => `- ${f.thema ? f.thema + ": " : ""}${f.aussage}${f.fundstelle ? ` (${f.fundstelle})` : ""}`);
+      const warn = (Array.isArray(w.warnungen) ? w.warnungen : []).map((x: any) => `- Hinweis: ${x}`);
+      const teil = [kopf, ...zeilen, ...warn].join("\n");
+      if (teil.length > budget) { block += teil.slice(0, budget) + "\n…(gekürzt)"; break; }
+      block += teil; budget -= teil.length;
+    }
+  }
+  return block;
+}
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  try {
+    const body = await req.json();
+    const { mail_eingang_id } = body;
+    if (!mail_eingang_id) return jsonErr(400, "Fehlende Parameter: mail_eingang_id");
+    const authHeader = req.headers.get("authorization"); if (!authHeader) return jsonErr(401, "Kein Auth-Token");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!; const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!; const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) return jsonErr(500, "ANTHROPIC_API_KEY nicht gesetzt");
+    const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+    const userClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: authHeader } } });
+    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !userData?.user) return jsonErr(401, "Nicht authentifiziert");
+    const userId = userData.user.id;
+    const { data: profile } = await admin.from("profiles").select("role, email").eq("id", userId).maybeSingle();
+    if (profile?.role !== "chef") return jsonErr(403, "KI-Vorschläge sind aktuell nur für die Chef-Rolle verfügbar (Test-Phase).");
+    const { data: mail, error: mailErr } = await admin.from("mail_eingang").select("*").eq("id", mail_eingang_id).maybeSingle();
+    if (mailErr || !mail) return jsonErr(404, "Mail nicht gefunden");
+    const mailText = (mail.text && String(mail.text).trim()) ? String(mail.text) : htmlZuText(mail.html || "");
+
+    let objekt: any = null; let wissen: any[] = []; let objektHerkunft = ""; const unterlagen: any[] = [];
+    const immoId = body.immobilie_id || mail.immobilie_id || ((mail.immobilie_id_ki_konfidenz || 0) >= 60 ? mail.immobilie_id_ki_vorschlag : null);
+    if (immoId) {
+      const { data: immo } = await admin.from("immobilien").select("*").eq("id", immoId).maybeSingle();
+      if (immo) {
+        objekt = immo; objektHerkunft = body.immobilie_id ? "gewählt" : mail.immobilie_id ? "zugeordnet" : "KI-Vorschlag";
+        const { data: w } = await admin.from("immobilie_wissen").select("dokument_typ, quelle_name, quelle_typ, quelle_ref, fakten, warnungen, ausgewertet_am").eq("immobilie_id", immoId).order("ausgewertet_am", { ascending: false }).limit(40);
+        wissen = w || [];
+        const { data: dateien } = await admin.from("immobilie_datei").select("id, name, kategorie, oeffentlich, mime_type").eq("immobilie_id", immoId).in("kategorie", ["dokument", "grundriss", "lageplan"]).order("created_at", { ascending: false }).limit(60);
+        for (const d of dateien || []) { if (!/\.(pdf|png|jpe?g|webp)$/i.test(d.name || "")) continue; const wz = wissen.find((x) => x.quelle_ref === d.id); unterlagen.push({ id: d.id, name: d.name, quelle: "portal", freigegeben: !!d.oeffentlich, typ: (wz && wz.dokument_typ) || (d.kategorie === "grundriss" ? "Grundriss" : d.kategorie === "lageplan" ? "Lageplan" : "Dokument") }); }
+        for (const wz of wissen) if (wz.quelle_typ === "onedrive" && wz.quelle_ref && !unterlagen.some((u) => u.id === wz.quelle_ref)) unterlagen.push({ id: wz.quelle_ref, name: wz.quelle_name, quelle: "onedrive", freigegeben: false, typ: wz.dokument_typ || "Dokument" });
+      }
+    }
+
+    // v16: Interessent aus der Anfrage-Verarbeitung
+    const ad = mail.anfrage_daten && typeof mail.anfrage_daten === "object" ? mail.anfrage_daten : null;
+    const kont = ad && ad.kontakt ? ad.kontakt : null;
+    const interessentName = mail.kontakt_name || (kont ? [kont.anrede, kont.vorname, kont.nachname].filter(Boolean).join(" ") : "");
+    const interessentMail = mail.kontakt_email || (kont && kont.email) || "";
+    const istAnfrage = !!(interessentName || interessentMail);
+    const absender = mail.absender_name ? `${mail.absender_name} <${mail.absender_email}>` : (mail.absender_email || "unbekannt");
+    const interessentTeil = istAnfrage ? `\n\nINTERESSENT (Empfänger deiner Antwort)\nName: ${interessentName || "unbekannt"}\nE-Mail: ${interessentMail || "unbekannt"}${kont && kont.telefon ? `\nTelefon: ${kont.telefon}` : ""}${ad && ad.portal ? `\nQuelle: ${ad.portal}` : ""}${ad && Array.isArray(ad.wuensche) && ad.wuensche.length ? `\nWünsche: ${ad.wuensche.join(", ")}` : ""}${ad && ad.nachricht ? `\nNachricht des Interessenten: ${String(ad.nachricht).slice(0, 1500)}` : ""}\nHinweis: Die Mail wurde von ${absender} übermittelt (Portal bzw. Kollege) — antworte dem Interessenten, nicht dem Übermittler.${objekt && /miet/i.test(String(objekt.vertragsart || "")) ? "\nDas Objekt ist ein MIETOBJEKT: provisionsfrei, Exposé als Anhang, kein Freigabelink." : objekt ? "\nDas Objekt ist ein KAUFOBJEKT: Exposé über den persönlichen Link {expose_link}." : ""}` : "";
+    const unterlagenTeil = unterlagen.length ? `\n\nVERFÜGBARE UNTERLAGEN ZUM OBJEKT (id · Name · Typ · Freigabe)\n${unterlagen.map((u) => `- ${u.id} · ${u.name} · ${u.typ} · ${u.freigegeben ? "für Kunden freigegeben" : "intern (nur nach Rücksprache)"}`).join("\n")}\nBeantworte zuerst alle Fragen vollständig im Text aus dem Objektwissen. Unterlagen, die dazu passen (Exposé, Grundriss, Energieausweis, Wirtschaftsplan, Teilungserklärung, Protokolle), kannst du ZUSÄTZLICH mitschicken: dann ein kurzer Satz am Ende ("Die Unterlagen dazu füge ich Ihnen bei.") und als ALLERLETZTE Zeile: [[ANHAENGE: id, id]] — nur ids aus dieser Liste, bevorzugt freigegebene; interne nur, wenn sie eine konkrete Frage betreffen. Der Anhang ersetzt NIE die Antwort im Text. Passt nichts: keine Marker-Zeile.` : "";
+    const objektTeil = objekt ? `\n\nOBJEKT (${objektHerkunft}; Fakten aus ${wissen.length} ausgewerteten Unterlagen)\n---\n${objektBlock(objekt, wissenNachRelevanz(wissen, `${mail.betreff || ""} ${mailText}`))}\n---${unterlagenTeil}\n` : "";
+
+    const userPrompt = `
+Eine E-Mail ist eingegangen. Formuliere bitte einen Antwort-Entwurf in meinem Schreibstil.
+
+ABSENDER: ${absender}
+BETREFF: ${mail.betreff || "(kein Betreff)"}
+DATUM: ${mail.gesendet_am ? new Date(mail.gesendet_am).toLocaleString("de-DE") : "?"}${interessentTeil}
+
+NACHRICHT:
+---
+${mailText || "(Kein Text-Inhalt)"}
+---${objektTeil}
+
+Antworte nur mit dem reinen Mail-Text (kein "Hier ist ihr Entwurf:", keine Erklärungen).
+Wenn dir Informationen fehlen, nutze Platzhalter wie [ZU PRÜFEN: ...].
+`.trim();
+
+    const anthropicResponse = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 6000, system: STIL_PROFIL_LASSE, messages: [{ role: "user", content: userPrompt }] }) });
+    if (!anthropicResponse.ok) { const errText = await anthropicResponse.text(); console.error("Anthropic API Fehler:", anthropicResponse.status, errText); return jsonErr(500, `KI-Anfrage fehlgeschlagen (${anthropicResponse.status}): ${errText.slice(0, 300)}`); }
+    const anthropicData = await anthropicResponse.json();
+    let antwortText = anthropicData?.content?.[0]?.text || "";
+    if (!antwortText) return jsonErr(500, "KI hat leere Antwort geliefert");
+    if (anthropicData?.stop_reason === "max_tokens") {
+      try {
+        const r2 = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 4000, system: STIL_PROFIL_LASSE, messages: [{ role: "user", content: userPrompt }, { role: "assistant", content: antwortText }, { role: "user", content: "Deine Antwort wurde am Ausgabelimit abgeschnitten. Setze exakt an der Abbruchstelle fort — ohne Wiederholung, ohne Anrede, ohne Einleitung — bis alle Fragen beantwortet sind und die Mail regulär mit \"Mit freundlichen Grüßen\" und \"Lasse Musterhaus\" endet." }] }) });
+        if (r2.ok) { const d2 = await r2.json(); const t2 = d2?.content?.[0]?.text || ""; if (t2) antwortText = antwortText.replace(/\s+$/, "") + (antwortText.endsWith("\n") || /^\s/.test(t2) ? "" : " ") + t2.replace(/^\s+/, ""); }
+      } catch (e) { console.warn("Fortsetzung:", e); }
+    }
+    let anhaengeEmpfehlung: any[] = [];
+    const am = antwortText.match(/\[\[ANHAENGE:\s*([^\]]*)\]\]/i);
+    if (am) { const ids = am[1].split(/[\s,;]+/).map((x) => x.trim()).filter(Boolean); anhaengeEmpfehlung = unterlagen.filter((u) => ids.includes(u.id)); antwortText = antwortText.replace(am[0], "").replace(/\n{3,}$/, "\n").trim(); }
+    try { await admin.from("mail_ki_log").insert({ benutzer_id: userId, mail_eingang_id, eingabe_zeichen: userPrompt.length, ausgabe_zeichen: antwortText.length, model: "claude-sonnet-4-6", input_tokens: anthropicData?.usage?.input_tokens || null, output_tokens: anthropicData?.usage?.output_tokens || null }); } catch (e) { console.warn("mail_ki_log:", e); }
+    return new Response(JSON.stringify({ ok: true, entwurf: antwortText, usage: anthropicData?.usage || null, interessent: istAnfrage ? { name: interessentName, email: interessentMail } : null, objekt: objekt ? { id: objekt.id, immo_nr: objekt.immo_nr, bezeichnung: objekt.bezeichnung || objekt.objekttitel, herkunft: objektHerkunft, vertragsart: objekt.vertragsart, wissen_anzahl: wissen.length, fakten_anzahl: wissen.reduce((s, w) => s + (Array.isArray(w.fakten) ? w.fakten.length : 0), 0) } : null, unterlagen, anhaenge_empfehlung: anhaengeEmpfehlung }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  } catch (e) { console.error("Unerwarteter Fehler:", e); return jsonErr(500, e instanceof Error ? e.message : String(e)); }
+});
+function jsonErr(status: number, msg: string) { return new Response(JSON.stringify({ ok: false, error: msg }), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } }); }

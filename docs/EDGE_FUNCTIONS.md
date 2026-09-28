@@ -1,10 +1,19 @@
 # Edge Functions der Referenz
 
-Vollstaendige Liste aus dem Projekt `yazwkzzjiquprtjpurur`, gelesen ueber die
-Verwaltungsschnittstelle. **Quelltext liegt noch nicht vor** — siehe
-`docs/STATUS.md` Abschnitt 2.2.
+Vollstaendige Liste aus dem Projekt der Vorlage, gelesen ueber die
+Verwaltungsschnittstelle.
 
-**130 Funktionen.** `verify_jwt=false` heisst: ohne Anmeldung
+**Stand 28.09.2026: der Quelltext liegt vor.** Der Betreiber hat alle
+Funktionen ueber `supabase functions download` geholt; sie liegen
+unversioniert unter `reference/functions/` und neutralisiert unter
+`supabase/functions/`. Wie, steht in Abschnitt „Uebernahme" am Ende dieser
+Datei.
+
+Die Tabelle unten ist der Stand vom 14.09. mit **130 Funktionen**. Die Vorlage
+hat seither **13 dazubekommen**; sie stehen am Ende, nicht einsortiert, damit
+sichtbar bleibt, was Nachtrag ist. Zusammen **143**.
+
+`verify_jwt=false` heisst: ohne Anmeldung
 aufrufbar. Jede dieser Funktionen muss in Phase 2.4 einzeln geprueft werden,
 denn sie kann `firma_id` nicht aus einem JWT ableiten und braucht einen
 anderen Nachweis (Token, Signatur, Freigabe).
@@ -163,3 +172,53 @@ Quelltexts zu entscheiden und hier nachzutragen — nicht vorab zu streichen.
 
 Dazu entfaellt die sipgate-Telefonie (keine eigene Function, im Frontend)
 und der Sprengnetter-Schluessel.
+
+
+## Nachtrag 28.09.2026 — 13 weitere Funktionen
+
+Beim Herunterladen zaehlte das CLI 143 statt der 130 aus dem Inventar vom
+14.09. Keine der 130 fehlte; es sind dreizehn dazugekommen. Sie passen genau
+zu dem, was der Schema-Abgleich vom 26.09. nachgezogen hat — Landingpage,
+Newsletter, Eigentuemer-Zugang, onOffice-Expose-Abgleich. Zwei unabhaengige
+Messungen, dasselbe Ergebnis.
+
+`verify_jwt` ist hier noch nicht erhoben; das geschieht beim Ausrollen.
+
+| Funktion | Wozu sie gehoert |
+|---|---|
+| `bild-beschriften` | Bild-Pipeline |
+| `bild-empfang` | Bild-Pipeline |
+| `eigentuemer-dokument-uebernehmen` | Eigentuemerportal |
+| `eigentuemer-einladung-nachfassen` | Eigentuemerportal, Cron-Job `eigentuemer-einladung-nachfassen-taeglich` |
+| `eigentuemer-zugang-anfordern` | Eigentuemerportal |
+| `mail-gelesen-setzen` | Posteingang |
+| `mitarbeiter-anlegen` | Benutzerverwaltung |
+| `newsletter-abmelden` | Newsletter, Tabelle `newsletter_anmeldungen` |
+| `newsletter-senden` | Newsletter, Tabelle `newsletter_kampagnen` |
+| `objekt-landing` | Objekt-Landingpage, Cron-Job `landing-fragen-5min` |
+| `onoffice-agreement-diagnose` | onOffice |
+| `onoffice-expose-abgleich` | onOffice, Cron-Job `onoffice-expose-abgleich-2h` |
+| `onoffice-status-uebertragen` | onOffice, Tabelle `onoffice_status_log` |
+
+## Uebernahme 28.09.2026
+
+**139 von 143 uebernommen.** Vier entfallen nach Phase 1.4 des Auftrags
+ersatzlos: `jotform-poll` und `jotform-webhook` (Formular-Sync des
+Referenzunternehmens), `yodeck-api` und `yodeck-test` (Digital Signage /
+Shop-TV).
+
+Die Neutralisierung steht als Skript in `scripts/neutralisieren-funktionen.py`
+— jede Ersetzung mit Grund und Bemerkung, nachlesbar und wiederholbar. Rund
+300 Stellen in 73 der 149 Dateien: Firmenname, Maildomain, Portal-Adresse,
+Bueroanschrift, Logo-Dateiname, Bundle-Kennung der iOS-App, Projektkennung.
+
+`tests/funktionen-unveraendert.py` prueft nach jedem Lauf, dass **jede**
+geaenderte Zeile vorher ein Kennzeichen enthielt. Die Pruefung ist Teil von
+`npm run check`. Sie ist entstanden, nachdem eine zu breit geratene Regel
+beim ersten Versuch quer durch alle Dateien einzelne Buchstaben ersetzt hatte.
+
+**Was die Uebernahme nicht leistet:** die Funktionen bleiben einmandantig.
+Absender, Firmenname und Portal-Adresse kommen weiterhin aus
+Umgebungsvariablen und festen Vorgabewerten, nicht aus `firma_stammdaten` des
+jeweiligen Mandanten. Das ist Phase 2.4. Was das konkret bedeutet, steht in
+`docs/OFFEN.md`.
