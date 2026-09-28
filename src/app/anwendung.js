@@ -132873,17 +132873,175 @@ function EinstellungenPage({ user }) {
   const knopf = (aktiv) => ({ background: "transparent", border: "none", padding: "10px 16px", fontSize: 14,
     fontWeight: aktiv ? 600 : 400, color: aktiv ? CI.blau : CI.muted,
     borderBottom: aktiv ? `2px solid ${CI.blau}` : "2px solid transparent", cursor: "pointer", fontFamily: FONT });
-  const reiterListe = [["firma", "Firma & Impressum"], ["standorte", "Standorte"], ["signatur", "Signatur & Texte"], ["vorgaben", "Vorgaben"], ["vertragsvorlagen", "Vertragsvorlagen"]];
+  const reiterListe = [["firma", "Firma & Impressum"], ["gesellschaften", "Gesellschaften"], ["standorte", "Standorte"], ["signatur", "Signatur & Texte"], ["vorgaben", "Vorgaben"], ["vertragsvorlagen", "Vertragsvorlagen"]];
   return React.createElement(React.Fragment, null,
     React.createElement("div", { style: { display: "flex", borderBottom: `1px solid ${CI.border}`, marginBottom: 24, flexWrap: "wrap" } },
       reiterListe.map(([id, label]) => React.createElement("button", { key: id, "data-einst-reiter": id,
         onClick: () => setReiter(id), style: knopf(reiter === id) }, label))),
     !geladen ? React.createElement("div", { style: { padding: 24, color: CI.muted } }, "Lade Einstellungen …")
       : reiter === "firma" ? React.createElement(AdminGmbHStammdaten, { user })
+      : reiter === "gesellschaften" ? React.createElement(EinstGesellschaften, { user })
       : reiter === "standorte" ? React.createElement(EinstStandorte, null)
       : reiter === "signatur" ? React.createElement(EinstSignatur, { user })
       : reiter === "vertragsvorlagen" ? React.createElement(EinstVertragsvorlagen, { user })
       : React.createElement(EinstVorgaben, null));
+}
+
+// Die Gesellschaften eines Mandanten. Zwischen Konto und Standort: ein
+// Mandant kann mehrere Gesellschaften fuehren, jede mit eigenen
+// Standorten, eigenem Briefkopf und eigenem Rechnungsnummernkreis.
+//
+// Geloescht wird nicht, sondern stillgelegt: an einer Gesellschaft haengen
+// Standorte, und an denen haengen Rechnungen, deren Nummernkreis nicht
+// verschwinden darf.
+const IMMO_RECHTSFORMEN = ["GmbH", "GmbH & Co. KG", "UG (haftungsbeschränkt)",
+  "AG", "KG", "OHG", "GbR", "PartG", "PartG mbB", "e.K.", "Einzelunternehmen",
+  "eG", "Stiftung", "Sonstige"];
+
+function EinstGesellschaften({ user }) {
+  const [zeilen, setZeilen] = useState([]);
+  const [standorte, setStandorte] = useState([]);
+  const [laedt, setLaedt] = useState(true);
+  const [meldung, setMeldung] = useState("");
+  const [fehler, setFehler] = useState("");
+  const [speichert, setSpeichert] = useState(null);
+  const [neuName, setNeuName] = useState("");
+  const [neuForm, setNeuForm] = useState("GmbH");
+  const darfAendern = user && "chef" === user.role;
+  const laden = async () => {
+    setLaedt(true);
+    try {
+      const [g, s] = await Promise.all([
+        window._sb.from("gesellschaften").select("*").order("sortierung").order("name"),
+        window._sb.from("firma_stammdaten").select("id, firma_name, ort, gesellschaft_id, aktiv").order("sortierung")
+      ]);
+      if (g.error) throw g.error;
+      if (s.error) throw s.error;
+      setZeilen(g.data || []);
+      setStandorte(s.data || []);
+    } catch (f) {
+      setFehler("Gesellschaften konnten nicht geladen werden: " + (f.message || f));
+    }
+    setLaedt(false);
+  };
+  useEffect(() => { laden(); }, []);
+  const anlegen = async () => {
+    const name = neuName.trim();
+    if (!name) { setFehler("Bitte einen Namen eintragen."); return; }
+    setFehler(""); setMeldung(""); setSpeichert("neu");
+    try {
+      // mandant_id kommt aus dem Standardwert aktuelle_mandant_id().
+      const { error } = await window._sb.from("gesellschaften").insert({
+        name, rechtsform: neuForm,
+        ist_standard: (zeilen || []).length === 0,
+        sortierung: (zeilen || []).length + 1
+      });
+      if (error) throw error;
+      await logAction("create", "gesellschaft", "", name, { rechtsform: neuForm });
+      setNeuName(""); setMeldung("„" + name + "“ angelegt.");
+      await laden();
+    } catch (f) {
+      setFehler("Anlegen fehlgeschlagen: " + (f.message || f));
+    }
+    setSpeichert(null);
+  };
+  const aendern = async (zeile, felder) => {
+    setFehler(""); setMeldung(""); setSpeichert(zeile.id);
+    try {
+      const { error } = await window._sb.from("gesellschaften")
+        .update({ ...felder, geaendert_am: new Date().toISOString() }).eq("id", zeile.id);
+      if (error) throw error;
+      await logAction("update", "gesellschaft", zeile.id, zeile.name, felder);
+      setMeldung("„" + zeile.name + "“ gespeichert.");
+      await laden();
+    } catch (f) {
+      setFehler("Speichern fehlgeschlagen: " + (f.message || f));
+    }
+    setSpeichert(null);
+  };
+  const zuordnen = async (standort, gesellschaftId) => {
+    setFehler(""); setMeldung(""); setSpeichert(standort.id);
+    try {
+      const { error } = await window._sb.from("firma_stammdaten")
+        .update({ gesellschaft_id: gesellschaftId || null }).eq("id", standort.id);
+      if (error) throw error;
+      await logAction("update", "standort", standort.id, standort.firma_name || "",
+        { gesellschaft_id: gesellschaftId || null });
+      setMeldung("Standort „" + (standort.firma_name || "") + "“ zugeordnet.");
+      await laden();
+    } catch (f) {
+      setFehler("Zuordnen fehlgeschlagen: " + (f.message || f));
+    }
+    setSpeichert(null);
+  };
+  if (laedt) return React.createElement("div", { style: { padding: 24, color: CI.muted } }, "Lade Gesellschaften …");
+  const ohne = standorte.filter((s) => !s.gesellschaft_id);
+  return React.createElement("div", null,
+    React.createElement("div", { style: { fontSize: 13, color: CI.muted, marginBottom: 16, lineHeight: 1.6 } },
+      "Zwischen Konto und Standort. Ein Konto kann mehrere Gesellschaften führen, jede mit eigenen ",
+      "Standorten, eigenem Briefkopf und eigenem Rechnungsnummernkreis. Wer nur eine Firma hat, ",
+      "legt eine an und ordnet ihr alle Standorte zu."),
+    React.createElement(ErrorBox, null, fehler),
+    React.createElement(SuccessBox, null, meldung),
+    !darfAendern ? React.createElement("div", { style: { fontSize: 12.5, color: CI.muted, marginBottom: 16 } },
+      "Ändern darf nur die Geschäftsführung — du siehst hier nur, was eingerichtet ist.") : null,
+    darfAendern ? React.createElement("div", { style: { ...cardStyle, marginBottom: 20, padding: 16 } },
+      React.createElement("div", { style: { fontSize: 12, fontWeight: 600, color: CI.blau, marginBottom: 10 } }, "Neue Gesellschaft"),
+      React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } },
+        React.createElement("input", { style: { ...inputStyle, flex: "2 1 220px" },
+          value: neuName, placeholder: "Name, z. B. Musterhaus Immobilien GmbH",
+          onChange: (ev) => setNeuName(ev.target.value) }),
+        React.createElement("select", { style: { ...inputStyle, flex: "1 1 160px" },
+          value: neuForm, onChange: (ev) => setNeuForm(ev.target.value) },
+          IMMO_RECHTSFORMEN.map((r) => React.createElement("option", { key: r, value: r }, r))),
+        React.createElement("button", { onClick: anlegen, disabled: speichert === "neu",
+          style: { ...primaryBtn, opacity: speichert === "neu" ? .6 : 1 } },
+          speichert === "neu" ? "Legt an …" : "Anlegen"))) : null,
+    !zeilen.length ? React.createElement("div", { style: { fontSize: 13, color: CI.muted } },
+      "Noch keine Gesellschaft angelegt.")
+      : React.createElement("div", { style: { display: "grid", gap: 12 } },
+        zeilen.map((z) => {
+          const meine = standorte.filter((s) => s.gesellschaft_id === z.id);
+          return React.createElement("div", { key: z.id, "data-gesellschaft": z.id,
+            style: { ...cardStyle, padding: 16, opacity: z.aktiv === false ? .55 : 1 } },
+            React.createElement("div", { style: { display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" } },
+              React.createElement("input", { style: { ...inputStyle, flex: "2 1 220px" },
+                defaultValue: z.name || "", disabled: !darfAendern,
+                onBlur: (ev) => { const w = ev.target.value.trim();
+                  if (w && w !== z.name) aendern(z, { name: w }); } }),
+              React.createElement("select", { style: { ...inputStyle, flex: "1 1 160px" },
+                value: z.rechtsform || "Sonstige", disabled: !darfAendern,
+                onChange: (ev) => aendern(z, { rechtsform: ev.target.value }) },
+                IMMO_RECHTSFORMEN.map((r) => React.createElement("option", { key: r, value: r }, r))),
+              z.ist_standard ? React.createElement("span", {
+                style: { fontSize: 11, color: CI.gold, fontWeight: 600, letterSpacing: ".05em" } }, "STANDARD") : null,
+              darfAendern ? React.createElement("button", {
+                onClick: () => aendern(z, { aktiv: !(z.aktiv !== false) }),
+                disabled: speichert === z.id,
+                title: "Stilllegen statt löschen — an einer Gesellschaft hängen Standorte und deren Rechnungsnummern",
+                style: { ...secondaryBtn, padding: "7px 12px", fontSize: 12 } },
+                z.aktiv === false ? "Wieder aktiv" : "Stilllegen") : null),
+            React.createElement("div", { style: { fontSize: 12, color: CI.muted, marginTop: 10, lineHeight: 1.6 } },
+              meine.length ? ("Standorte: " + meine.map((s) => s.firma_name || "—").join(", "))
+                           : "Noch kein Standort zugeordnet."));
+        })),
+    !ohne.length ? null : React.createElement("div", { style: { marginTop: 24 } },
+      React.createElement("div", { style: { fontSize: 12, fontWeight: 600, color: CI.blau, marginBottom: 8 } },
+        "Standorte ohne Gesellschaft (" + ohne.length + ")"),
+      React.createElement("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 10, lineHeight: 1.5 } },
+        "Solange ein Standort keiner Gesellschaft gehört, greift der Sichtbarkeitsbereich ",
+        React.createElement("strong", null, "Eigene Gesellschaft"), " für ihn nicht."),
+      React.createElement("div", { style: { display: "grid", gap: 8 } },
+        ohne.map((s) => React.createElement("div", { key: s.id,
+          style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" } },
+          React.createElement("span", { style: { flex: "1 1 200px", fontSize: 13, color: CI.blau } },
+            (s.firma_name || "—") + (s.ort ? " — " + s.ort : "")),
+          React.createElement("select", { style: { ...inputStyle, flex: "1 1 200px" },
+            value: "", disabled: !darfAendern || speichert === s.id,
+            onChange: (ev) => zuordnen(s, ev.target.value) },
+            React.createElement("option", { value: "" }, "Gesellschaft wählen …"),
+            zeilen.filter((z) => z.aktiv !== false).map((z) =>
+              React.createElement("option", { key: z.id, value: z.id }, z.name))))))));
 }
 
 // Vertragsvorlagen je Mandant. Hochladen darf nur, wer das Modul "admin"

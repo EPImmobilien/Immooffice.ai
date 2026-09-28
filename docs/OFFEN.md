@@ -506,3 +506,36 @@ haben. Sie gehören deshalb in einen eigenen Schritt und nicht nebenbei.
 **Kein eingebauter Ersatztext, bewusst.** Fehlt die Vorlage, sagt die Anwendung
 das und nennt den Weg dorthin. Ein Vertragsmuster, das niemand geprüft hat,
 wird benutzt, als wäre es geprüft — `CLAUDE.md` verbietet genau das.
+
+## Abschnitt 3: was steht und was noch fehlt
+
+**Steht:**
+
+- Die Mandantengrenze gilt jetzt auch in den Funktionen (`fork_14`) — das war
+  der wichtigste Fund beim Einstieg ins Rechnungswesen, siehe
+  `docs/ENTSCHEIDUNGEN.md`.
+- Konto → Gesellschaften → Standorte ist bedienbar: **Einstellungen →
+  Gesellschaften**. Anlegen, umbenennen, Rechtsform, stilllegen, und die
+  Zuordnung der Standorte. Gelöscht wird nicht, sondern stillgelegt: an einer
+  Gesellschaft hängen Standorte, und an denen hängen Rechnungen, deren
+  Nummernkreis nicht verschwinden darf.
+- Das Rechnungswesen selbst ist vollständig aus der Vorlage übernommen —
+  `rechnungen`, `rechnung_positionen`, `rechnung_kunden`,
+  `rechnung_nummern_sequence` (je Standort und Jahr), `rechnungen_audit`,
+  dazu die Liquiditätsplanung. Es wird nichts nachgebaut.
+
+**Fehlt noch:**
+
+- **Der Rechnungsnummernkreis hängt am Standort, nicht an der Gesellschaft.**
+  Der Primärschlüssel von `rechnung_nummern_sequence` ist `(firma_id, jahr)`.
+  Für ein Unternehmen mit zwei Standorten unter einer Gesellschaft heißt das
+  zwei getrennte Nummernkreise. Ob das gewollt ist, ist eine kaufmännische
+  Entscheidung des Betreibers, keine technische — beides ist zulässig, solange
+  jeder Kreis für sich lückenlos ist. **Nicht geändert**, weil es das Verhalten
+  der Vorlage ist und eine Umstellung bestehende Nummern berührt.
+- Die Umsatzsteuer-Vorgaben (`standard_mwst_satz`, `kleinunternehmer`) stehen
+  je Standort in `firma_stammdaten` und werden dort auch gepflegt. Eine
+  Prüfung, ob sie zur Rechtsform der Gesellschaft passt, gibt es nicht.
+- `eigentuemer_benachrichtigung_queue` hat als einzige Warteschlange kein
+  `mandant_id`. Sie ist in `mandanten_einstufung` als DIENST geführt; zu
+  prüfen bleibt, ob das stimmt oder ob sie fachlich zum Mandanten gehört.
