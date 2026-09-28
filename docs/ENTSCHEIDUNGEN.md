@@ -1386,3 +1386,40 @@ Der Satz auf dem Beleg kommt aus `zahlungsbedingung_text()`: ein eigener Text
 schlägt die Zahlen, sonst wird er daraus gebildet („Zahlbar innerhalb von 7
 Tagen mit 2 % Skonto, innerhalb von 30 Tagen ohne Abzug."). Rein rechnend,
 damit Vorschau und Beleg denselben Satz zeigen.
+
+## 2026-09-28 · Die PDFs fanden weder Schriften noch Logo — mein Fehler
+
+**Gemeldet:** „man kann keine Exposés generieren, keine PDFs, keine
+Rechnungen … bisher ist es wirklich nur eine reine Oberfläche."
+
+**Das Protokoll der Rechnungsfunktion sagt genau, warum:**
+
+```
+Fonts geladen: Montserrat-Regular: FEHLT  Montserrat-Bold: FEHLT  Marcellus: FEHLT
+Logo-Download Fehler: Object not found
+```
+
+**Zwei Ursachen, die sich überlagert haben.**
+
+**1. Mein Fehler.** `fork_08` hat alle Dateien im Speicher ins
+Mandantenverzeichnis verschoben. Elf Funktionen, die Dateien **schreiben**,
+haben damals die Speicher-Hülle bekommen. Die Funktionen, die Schriften und
+Logo **lesen**, nicht — sie suchten weiter unter `fonts/Montserrat-Regular.ttf`
+statt `{mandant}/fonts/…`. Die Trennung war richtig, die Durchsicht der
+Lesestellen habe ich schlicht vergessen.
+
+**2. Die gesuchten Dateien gibt es überhaupt nicht.** Im Eimer liegen
+Montserrat Light, Medium, SemiBold, Italic und SemiBoldItalic sowie GreatVibes
+— aber weder Regular noch Bold noch Marcellus. Die Vorlage hatte sie, der Fork
+hat sie nie bekommen. Auch mit korrektem Pfad wäre das PDF auf Helvetica
+zurückgefallen.
+
+**Entscheidung:** beides. Der Mandantenpfad, **und** eine Ersatzkette auf das,
+was tatsächlich da ist — Medium statt Regular, SemiBold statt Bold. Das sieht
+im Satz näher am Gewollten aus als Helvetica, und es funktioniert ohne dass
+jemand erst Dateien hochlädt.
+
+**Der Zwischenspeicher der Schriften ist jetzt nach Mandant getrennt.** Er war
+modulweit: sobald dieselbe Instanz zwei Anfragen bedient, wäre die Schrift des
+einen Mandanten im Dokument des nächsten gelandet. Dieselbe Klasse Fehler, die
+ich heute bei den PDF-Farben vermieden habe — hier lag sie schon im Bestand.

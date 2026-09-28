@@ -36,17 +36,47 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-// Font-Pfade im Storage-Bucket branding-assets
-const FONT_MONTSERRAT_REGULAR = "fonts/Montserrat-Regular.ttf";
-const FONT_MONTSERRAT_BOLD    = "fonts/Montserrat-Bold.ttf";
-const FONT_MARCELLUS          = "fonts/Marcellus-Regular.ttf";
+// Schriften im Eimer branding-assets. Je Schnitt eine Reihe von
+// Kandidaten: der erste, den es gibt, wird genommen.
+const IMMO_SCHRIFT_REGULAR  = ["fonts/Montserrat-Regular.ttf",
+                               "fonts/Montserrat-Medium.ttf",
+                               "fonts/Montserrat-Light.ttf"];
+const IMMO_SCHRIFT_BOLD     = ["fonts/Montserrat-Bold.ttf",
+                               "fonts/Montserrat-SemiBold.ttf",
+                               "fonts/Montserrat-Medium.ttf"];
+const IMMO_SCHRIFT_HEADLINE = ["fonts/Marcellus-Regular.ttf"];
 
-// In-Memory-Cache fuer Fonts und Logo (ueberlebt mehrere Aufrufe in der Edge Function Instance)
-let cachedFonts: {
+// Eine Datei aus branding-assets, mit dem Mandanten davor. Seit fork_08
+// liegt dort alles unter {mandant}/…; der zweite Versuch ohne Praefix
+// ist fuer Bestaende, die den Umzug nie mitgemacht haben.
+async function immoBrandingDatei(admin: any, mandant: string | null, pfad: string) {
+  const wege = mandant ? [mandant + "/" + pfad, pfad] : [pfad];
+  for (const w of wege) {
+    try {
+      const { data } = await admin.storage.from("branding-assets").download(w);
+      if (data) return await data.arrayBuffer();
+    } catch (_) { /* naechster Weg */ }
+  }
+  return null;
+}
+
+// Der erste Kandidat, den es gibt.
+async function immoSchrift(admin: any, mandant: string | null, kandidaten: string[]) {
+  for (const k of kandidaten) {
+    const b = await immoBrandingDatei(admin, mandant, k);
+    if (b) return { puffer: b, quelle: k };
+  }
+  return null;
+}
+
+// Zwischenspeicher je Mandant. Vorher war er modulweit — die Schrift des
+// einen Mandanten waere im Dokument des naechsten gelandet, sobald
+// dieselbe Instanz zwei Anfragen bedient.
+const immoSchriftCache = new Map<string, {
   montserratRegular?: ArrayBuffer;
   montserratBold?: ArrayBuffer;
   marcellus?: ArrayBuffer;
-} = {};
+}>();
 
 // #rrggbb in rgb() von pdf-lib. Unbrauchbares faellt auf den Ersatz
 // zurueck — ein Dokument in unlesbaren Farben waere schlimmer als eines
@@ -163,28 +193,25 @@ Deno.serve(async (req) => {
     const istTest = rechnung.ist_test === true;
 
     // ---- Fonts aus Storage laden (Cache pro Instance) ----
+    const immoMandantKey = String(firma.mandant_id || "ohne");
+    let cachedFonts = immoSchriftCache.get(immoMandantKey);
+    if (!cachedFonts) { cachedFonts = {}; immoSchriftCache.set(immoMandantKey, cachedFonts); }
     if (fontkit && !cachedFonts.montserratRegular) {
       try {
-        const results = await Promise.allSettled([
-          admin.storage.from("branding-assets").download(FONT_MONTSERRAT_REGULAR),
-          admin.storage.from("branding-assets").download(FONT_MONTSERRAT_BOLD),
-          admin.storage.from("branding-assets").download(FONT_MARCELLUS),
+        const [r, b, h] = await Promise.all([
+          immoSchrift(admin, firma.mandant_id, IMMO_SCHRIFT_REGULAR),
+          immoSchrift(admin, firma.mandant_id, IMMO_SCHRIFT_BOLD),
+          immoSchrift(admin, firma.mandant_id, IMMO_SCHRIFT_HEADLINE),
         ]);
-        if (results[0].status === "fulfilled" && results[0].value.data) {
-          cachedFonts.montserratRegular = await results[0].value.data.arrayBuffer();
-        }
-        if (results[1].status === "fulfilled" && results[1].value.data) {
-          cachedFonts.montserratBold = await results[1].value.data.arrayBuffer();
-        }
-        if (results[2].status === "fulfilled" && results[2].value.data) {
-          cachedFonts.marcellus = await results[2].value.data.arrayBuffer();
-        }
-        console.log("Fonts geladen:",
-          "Montserrat-Regular:", cachedFonts.montserratRegular?.byteLength || "FEHLT",
-          "Montserrat-Bold:", cachedFonts.montserratBold?.byteLength || "FEHLT",
-          "Marcellus:", cachedFonts.marcellus?.byteLength || "FEHLT");
+        if (r) cachedFonts.montserratRegular = r.puffer;
+        if (b) cachedFonts.montserratBold = b.puffer;
+        if (h) cachedFonts.marcellus = h.puffer;
+        console.log("Schriften geladen:",
+          "Fliesstext:", r ? r.quelle : "FEHLT",
+          "fett:", b ? b.quelle : "FEHLT",
+          "Ueberschrift:", h ? h.quelle : "FEHLT (nimmt fett)");
       } catch (e) {
-        console.warn("Font-Download fehlgeschlagen:", e instanceof Error ? e.message : String(e));
+        console.warn("Schrift-Download fehlgeschlagen:", e instanceof Error ? e.message : String(e));
       }
     }
 
@@ -237,13 +264,12 @@ Deno.serve(async (req) => {
     let embeddedLogo: any = null;
     if (firma.logo_pfad) {
       try {
-        const { data: logoBlob, error: logoErr } = await admin.storage
-          .from("branding-assets")
-          .download(firma.logo_pfad);
-        if (logoErr) {
-          console.warn("Logo-Download Fehler:", logoErr.message);
-        } else if (logoBlob) {
-          const logoBytes = await logoBlob.arrayBuffer();
+        // logo_pfad ist mandantenrelativ gespeichert; seit fork_08 liegt
+        // die Datei unter {mandant}/…
+        const logoBytes = await immoBrandingDatei(admin, firma.mandant_id, firma.logo_pfad);
+        if (!logoBytes) {
+          console.warn("Logo nicht gefunden:", firma.logo_pfad);
+        } else {
           const pfadLower = firma.logo_pfad.toLowerCase();
           if (pfadLower.endsWith(".jpg") || pfadLower.endsWith(".jpeg")) {
             embeddedLogo = await pdf.embedJpg(logoBytes);

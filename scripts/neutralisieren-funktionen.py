@@ -893,6 +893,126 @@ ERSETZUNGEN = [
      {'signatur-vorgang-starten'}),
 
 
+    # =====================================================================
+    # FORK — die Dokumente fanden weder Schriften noch Logo
+    #
+    # GEMELDET am 28.09.2026: "man kann keine Exposés generieren, keine PDFs,
+    # keine Rechnungen". Das Protokoll der Rechnungsfunktion sagt genau, warum:
+    #
+    #   Fonts geladen: Montserrat-Regular: FEHLT  Montserrat-Bold: FEHLT
+    #                  Marcellus: FEHLT
+    #   Logo-Download Fehler: Object not found
+    #
+    # ZWEI URSACHEN, die sich ueberlagert haben:
+    #
+    # 1) MEIN FEHLER. fork_08 hat alle Dateien im Speicher ins
+    #    Mandantenverzeichnis verschoben. Elf Funktionen, die Dateien
+    #    SCHREIBEN, haben damals die Speicher-Huelle bekommen. Die Funktionen,
+    #    die Schriften und Logo LESEN, nicht — sie suchen weiter unter
+    #    "fonts/Montserrat-Regular.ttf" statt "{mandant}/fonts/…".
+    #
+    # 2) Die gesuchten Dateien gibt es ueberhaupt nicht. Im Eimer liegen
+    #    Montserrat Light, Medium, SemiBold, Italic und SemiBoldItalic sowie
+    #    GreatVibes — aber weder Regular noch Bold noch Marcellus. Die Vorlage
+    #    hatte sie, der Fork hat sie nie bekommen.
+    #
+    # Deshalb hier BEIDES: der Mandantenpfad, und eine Ersatzkette auf das,
+    # was tatsaechlich da ist. Medium statt Regular und SemiBold statt Bold
+    # sehen im Satz naeher am Gewollten aus als Helvetica.
+    #
+    # Der Zwischenspeicher wird nach Mandant getrennt. Vorher war er
+    # modulweit: die Schrift des einen Mandanten waere im Dokument des
+    # naechsten gelandet, sobald dieselbe Instanz zwei Anfragen bedient.
+    # =====================================================================
+    ('FORK',
+     r'// Font-Pfade im Storage-Bucket branding-assets\nconst FONT_MONTSERRAT_REGULAR = "fonts/Montserrat-Regular\.ttf";\nconst FONT_MONTSERRAT_BOLD    = "fonts/Montserrat-Bold\.ttf";\nconst FONT_MARCELLUS          = "fonts/Marcellus-Regular\.ttf";',
+     '// Schriften im Eimer branding-assets. Je Schnitt eine Reihe von\n'
+     '// Kandidaten: der erste, den es gibt, wird genommen.\n'
+     'const IMMO_SCHRIFT_REGULAR  = ["fonts/Montserrat-Regular.ttf",\n'
+     '                               "fonts/Montserrat-Medium.ttf",\n'
+     '                               "fonts/Montserrat-Light.ttf"];\n'
+     'const IMMO_SCHRIFT_BOLD     = ["fonts/Montserrat-Bold.ttf",\n'
+     '                               "fonts/Montserrat-SemiBold.ttf",\n'
+     '                               "fonts/Montserrat-Medium.ttf"];\n'
+     'const IMMO_SCHRIFT_HEADLINE = ["fonts/Marcellus-Regular.ttf"];\n'
+     '\n'
+     '// Eine Datei aus branding-assets, mit dem Mandanten davor. Seit fork_08\n'
+     '// liegt dort alles unter {mandant}/…; der zweite Versuch ohne Praefix\n'
+     '// ist fuer Bestaende, die den Umzug nie mitgemacht haben.\n'
+     'async function immoBrandingDatei(admin: any, mandant: string | null, pfad: string) {\n'
+     '  const wege = mandant ? [mandant + "/" + pfad, pfad] : [pfad];\n'
+     '  for (const w of wege) {\n'
+     '    try {\n'
+     '      const { data } = await admin.storage.from("branding-assets").download(w);\n'
+     '      if (data) return await data.arrayBuffer();\n'
+     '    } catch (_) { /* naechster Weg */ }\n'
+     '  }\n'
+     '  return null;\n'
+     '}\n'
+     '\n'
+     '// Der erste Kandidat, den es gibt.\n'
+     'async function immoSchrift(admin: any, mandant: string | null, kandidaten: string[]) {\n'
+     '  for (const k of kandidaten) {\n'
+     '    const b = await immoBrandingDatei(admin, mandant, k);\n'
+     '    if (b) return { puffer: b, quelle: k };\n'
+     '  }\n'
+     '  return null;\n'
+     '}',
+     'PDF: Schriften mit Mandantenpfad und Ersatzkette (Rechnung).',
+     {'rechnung-pdf-erzeugen'}),
+
+    # Der Zwischenspeicher haelt jetzt je Mandant einen Satz.
+    ('FORK',
+     r'// In-Memory-Cache fuer Fonts und Logo \(ueberlebt mehrere Aufrufe in der Edge Function Instance\)\nlet cachedFonts: \{\n  montserratRegular\?: ArrayBuffer;\n  montserratBold\?: ArrayBuffer;\n  marcellus\?: ArrayBuffer;\n\} = \{\};',
+     '// Zwischenspeicher je Mandant. Vorher war er modulweit — die Schrift des\n'
+     '// einen Mandanten waere im Dokument des naechsten gelandet, sobald\n'
+     '// dieselbe Instanz zwei Anfragen bedient.\n'
+     'const immoSchriftCache = new Map<string, {\n'
+     '  montserratRegular?: ArrayBuffer;\n'
+     '  montserratBold?: ArrayBuffer;\n'
+     '  marcellus?: ArrayBuffer;\n'
+     '}>();',
+     'PDF: Zwischenspeicher der Schriften je Mandant.',
+     {'rechnung-pdf-erzeugen'}),
+
+    ('FORK',
+     r'    if \(fontkit && !cachedFonts\.montserratRegular\) \{\n      try \{\n        const results = await Promise\.allSettled\(\[\n          admin\.storage\.from\("branding-assets"\)\.download\(FONT_MONTSERRAT_REGULAR\),\n          admin\.storage\.from\("branding-assets"\)\.download\(FONT_MONTSERRAT_BOLD\),\n          admin\.storage\.from\("branding-assets"\)\.download\(FONT_MARCELLUS\),\n        \]\);\n        if \(results\[0\]\.status === "fulfilled" && results\[0\]\.value\.data\) \{\n          cachedFonts\.montserratRegular = await results\[0\]\.value\.data\.arrayBuffer\(\);\n        \}\n        if \(results\[1\]\.status === "fulfilled" && results\[1\]\.value\.data\) \{\n          cachedFonts\.montserratBold = await results\[1\]\.value\.data\.arrayBuffer\(\);\n        \}\n        if \(results\[2\]\.status === "fulfilled" && results\[2\]\.value\.data\) \{\n          cachedFonts\.marcellus = await results\[2\]\.value\.data\.arrayBuffer\(\);\n        \}\n        console\.log\("Fonts geladen:",\n          "Montserrat-Regular:", cachedFonts\.montserratRegular\?\.byteLength \|\| "FEHLT",\n          "Montserrat-Bold:", cachedFonts\.montserratBold\?\.byteLength \|\| "FEHLT",\n          "Marcellus:", cachedFonts\.marcellus\?\.byteLength \|\| "FEHLT"\);\n      \} catch \(e\) \{\n        console\.warn\("Font-Download fehlgeschlagen:", e instanceof Error \? e\.message : String\(e\)\);\n      \}\n    \}',
+     '    const immoMandantKey = String(firma.mandant_id || "ohne");\n'
+     '    let cachedFonts = immoSchriftCache.get(immoMandantKey);\n'
+     '    if (!cachedFonts) { cachedFonts = {}; immoSchriftCache.set(immoMandantKey, cachedFonts); }\n'
+     '    if (fontkit && !cachedFonts.montserratRegular) {\n'
+     '      try {\n'
+     '        const [r, b, h] = await Promise.all([\n'
+     '          immoSchrift(admin, firma.mandant_id, IMMO_SCHRIFT_REGULAR),\n'
+     '          immoSchrift(admin, firma.mandant_id, IMMO_SCHRIFT_BOLD),\n'
+     '          immoSchrift(admin, firma.mandant_id, IMMO_SCHRIFT_HEADLINE),\n'
+     '        ]);\n'
+     '        if (r) cachedFonts.montserratRegular = r.puffer;\n'
+     '        if (b) cachedFonts.montserratBold = b.puffer;\n'
+     '        if (h) cachedFonts.marcellus = h.puffer;\n'
+     '        console.log("Schriften geladen:",\n'
+     '          "Fliesstext:", r ? r.quelle : "FEHLT",\n'
+     '          "fett:", b ? b.quelle : "FEHLT",\n'
+     '          "Ueberschrift:", h ? h.quelle : "FEHLT (nimmt fett)");\n'
+     '      } catch (e) {\n'
+     '        console.warn("Schrift-Download fehlgeschlagen:", e instanceof Error ? e.message : String(e));\n'
+     '      }\n'
+     '    }',
+     'PDF: Schriften je Mandant laden, mit Ersatzkette (Rechnung).',
+     {'rechnung-pdf-erzeugen'}),
+
+    # Das Logo liest schon firma.logo_pfad — es fehlte nur der Mandant davor.
+    ('FORK',
+     r'        const \{ data: logoBlob, error: logoErr \} = await admin\.storage\n          \.from\("branding-assets"\)\n          \.download\(firma\.logo_pfad\);\n        if \(logoErr\) \{\n          console\.warn\("Logo-Download Fehler:", logoErr\.message\);\n        \} else if \(logoBlob\) \{\n          const logoBytes = await logoBlob\.arrayBuffer\(\);',
+     '        // logo_pfad ist mandantenrelativ gespeichert; seit fork_08 liegt\n'
+     '        // die Datei unter {mandant}/…\n'
+     '        const logoBytes = await immoBrandingDatei(admin, firma.mandant_id, firma.logo_pfad);\n'
+     '        if (!logoBytes) {\n'
+     '          console.warn("Logo nicht gefunden:", firma.logo_pfad);\n'
+     '        } else {',
+     'PDF: das Logo mit dem Mandantenpfad holen (Rechnung).',
+     {'rechnung-pdf-erzeugen'}),
+
 ]
 
 # Drei Funktionen verdrahten die Portal-Adresse fest, statt sie wie alle
