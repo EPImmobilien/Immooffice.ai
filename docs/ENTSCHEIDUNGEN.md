@@ -1117,3 +1117,38 @@ Jetzt liest der Test den Quelltext der Funktion. Nachgewiesen ist beides: mit
 **Warum die Prüfung „innerhalb eines Mandanten findet er weiterhin" dazugehört:**
 Ein Abgleich, der gar nichts mehr findet, wäre kein Datenschutz, sondern ein
 Ausfall — und von außen nicht zu unterscheiden.
+
+## 2026-09-28 · Newsletter-Empfänger waren ohne Anmeldung abrufbar
+
+**Befund:** `public.newsletter_empfaenger` liest `newsletter_anmeldungen` ohne
+Mandantenbedingung. Ihre Rechteprüfung endete auf
+
+```sql
+or current_user in ('service_role','postgres')
+```
+
+— dieselbe Falle wie in `fork_14`: In einer `SECURITY DEFINER`-Funktion ist
+`current_user` der **Eigentümer**, auf Supabase `postgres`. Die Bedingung war
+also immer wahr und die Rollenprüfung davor ohne jede Wirkung. Die Funktion ist
+für `anon` ausführbar.
+
+Zusammengenommen: **ohne Anmeldung** die E-Mail-Adressen, Namen und
+Abmelde-Token sämtlicher Newsletter-Empfänger aller Mandanten.
+
+**Nachgewiesen, nicht vermutet:** `tests/hintergrund-mandant.sql` ruft die
+Funktion mit `{"role":"anon"}` auf. Gegen eine Instanz ohne `fork_16` kommen
+beide Mandanten zurück; mit `fork_16` keiner.
+
+**Entscheidung:** Mandantenbedingung ergänzt und die Rollenprüfung repariert
+(über `mandant_grenze_gilt()` statt `current_user`). Dazu ein dritter
+Wachposten: **keine** `SECURITY DEFINER`-Funktion im Schema `public` darf
+Rechte über `current_user` prüfen. Die Migration schlägt fehl, wenn eine
+dazukommt.
+
+Ebenfalls in `fork_16`: `eigentuemer_besichtigungen` sammelte die Kontakte des
+angemeldeten Eigentümers unter anderem über den Abgleich der E-Mail-Adresse.
+Dieselbe Adresse bei einem anderen Makler — was vorkommt, wer zwei Makler
+beauftragt — zog dessen Kontakt mit herein, samt Besichtigungsterminen.
+
+`aktueller_eigentuemer_id` bleibt unverändert: sie sucht über `auth.uid()`, und
+ein Benutzerkonto gehört zu genau einem Mandanten.

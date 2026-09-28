@@ -539,3 +539,37 @@ wird benutzt, als wäre es geprüft — `CLAUDE.md` verbietet genau das.
 - `eigentuemer_benachrichtigung_queue` hat als einzige Warteschlange kein
   `mandant_id`. Sie ist in `mandanten_einstufung` als DIENST geführt; zu
   prüfen bleibt, ob das stimmt oder ob sie fachlich zum Mandanten gehört.
+
+## Die Vorlage ist einmandantig gebaut — was das noch heißen kann
+
+Zwischen `fork_14` und `fork_16` sind an einem Nachmittag **zwanzig** Stellen
+gefunden worden, an denen die Mandantengrenze nicht galt. Das ist kein Vorwurf
+an die Vorlage: sie war für **ein** Unternehmen geschrieben, und dort ist jede
+dieser Stellen richtig. Im Fork ist jede davon ein Loch.
+
+Das Muster, das sich durchzieht — als Suchhilfe für alles, was noch kommt:
+
+| Muster | Beispiel |
+|---|---|
+| `SECURITY DEFINER` nimmt eine fremde ID entgegen | `rechnung_startnummer_setzen` |
+| Verknüpfung zweier Mandantentabellen ohne Bedingung | `cross join kontakte` |
+| Zuordnung über **Namen** statt Kennung | `push_termin_erinnerungen_senden` |
+| Rückfallebene ohne Mandantenbezug | „der älteste Chef" |
+| Abgleich über **E-Mail-Adresse** | `eigentuemer_besichtigungen` |
+| Rechteprüfung über `current_user` in `SECURITY DEFINER` | `newsletter_empfaenger` |
+
+**Was geprüft ist:** alle Funktionen im Schema `public`. Drei Wachposten in
+den Migrationen schlagen an, wenn eine neue ungeprüfte dazukommt, und drei
+Tests im Gate weisen die Grenze nach (`tests/mandant.sql`,
+`tests/funktionen-mandant.sql`, `tests/hintergrund-mandant.sql`).
+
+**Was NICHT geprüft ist — und das ist die wichtigste offene Zeile dieses
+Dokuments:** die **139 Edge Functions**. Sie laufen mit dem `service_role`, für
+den die Grenze bewusst nicht gilt; sie müssen sie also selbst ziehen. Elf
+davon sind in Phase 2 angefasst worden (Storage-Hülle und `immoSetzeMandant`),
+die übrigen 128 sind auf dieses Muster **nicht** durchgesehen. Sie sind in
+TypeScript und lassen sich nicht wie SQL-Funktionen aus der Datenbank
+abfragen — das braucht einen eigenen, systematischen Durchgang.
+
+**Vor Gate 2 (Ende Phase 3) ist das zu erledigen.** Ein zweiter Mandant darf
+erst auf ein System, bei dem auch dieser Teil durchgesehen ist.

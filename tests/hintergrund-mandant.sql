@@ -138,6 +138,39 @@ begin
                  else 'der aelteste Chef der ganzen Datenbank waere zustaendig' end);
 end $$;
 
+-- Der Newsletter: ohne Anmeldung durfte niemand die Empfaengerliste sehen,
+-- und ein angemeldeter Chef nur die des eigenen Mandanten. Beides war offen.
+do $$
+declare n int;
+begin
+  insert into public.newsletter_anmeldungen (email, name, bestaetigt_am, mandant_id)
+  values ('interessent@alpha.example', 'Anna Alpha', now(), (select wert from wer where was='mandant_a')),
+         ('interessent@beta.example',  'Bert Beta',  now(), (select wert from wer where was='mandant_b'));
+
+  -- 1) Ohne Anmeldung: gar nichts.
+  perform set_config('request.jwt.claims', '{"role":"anon"}', true);
+  select count(*) into n from public.newsletter_empfaenger(null, null);
+  insert into befund (pruefung, bestanden, bemerkung)
+    values ('Ohne Anmeldung keine Newsletter-Empfaenger', n = 0, n || ' Empfaenger sichtbar');
+
+  -- 2) Als Chef von Alpha: nur die eigenen.
+  perform set_config('request.jwt.claims',
+    json_build_object('role', 'authenticated',
+                      'sub', (select wert from wer where was='nutzer_a'))::text, true);
+  select count(*) into n from public.newsletter_empfaenger(null, null)
+   where email like '%@beta.example';
+  insert into befund (pruefung, bestanden, bemerkung)
+    values ('Alphas Chef sieht keine Empfaenger von Beta', n = 0,
+            n || ' fremde(r) Empfaenger sichtbar');
+
+  select count(*) into n from public.newsletter_empfaenger(null, null)
+   where email like '%@alpha.example';
+  insert into befund (pruefung, bestanden, bemerkung)
+    values ('Alphas Chef sieht seine eigenen Empfaenger', n = 1,
+            n || ' eigene(r) Empfaenger sichtbar');
+  perform set_config('request.jwt.claims', '', true);
+end $$;
+
 select nr, case when bestanden then 'ok  ' else 'FEHL' end as ergebnis, pruefung, bemerkung
   from befund order by nr;
 
