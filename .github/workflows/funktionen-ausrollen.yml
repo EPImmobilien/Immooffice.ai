@@ -54,6 +54,13 @@ jobs:
       - uses: supabase/setup-cli@v1
         with:
           version: latest
+        env:
+          # Die Action fragt GitHub nach der neuesten Fassung. Unangemeldet
+          # laeuft sie dabei ins Rate-Limit des Runners ("Failed to resolve
+          # latest Supabase CLI release: rate limit exceeded") — passiert am
+          # 28.09.2026 beim ersten Lauf. Mit Token zaehlt die Anfrage auf ein
+          # eigenes, viel groesseres Kontingent.
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Ausrollen
         run: |
@@ -86,3 +93,34 @@ jobs:
             echo "::error::Fehlgeschlagen:$fehlerhafte"
             exit 1
           fi
+
+      - name: Nachzaehlen
+        run: |
+          set -euo pipefail
+          # Die Gegenprobe gehoert hierher und nicht in die Arbeitsumgebung:
+          # hier laeuft die CLI, und die Antwort ist eine Zeile statt 139
+          # Datensaetzen.
+          supabase functions list --project-ref "$PROJEKT" -o json > ist.json
+          python3 - <<'ENDE'
+          import json, sys, tomllib
+          with open('supabase/config.toml', 'rb') as f:
+              soll = {n: v['verify_jwt'] for n, v in tomllib.load(f)['functions'].items()}
+          ist = {f['name']: f['verify_jwt'] for f in json.load(open('ist.json'))
+                 if f.get('status') != 'REMOVED'}
+          fehlt  = sorted(set(soll) - set(ist))
+          fremd  = sorted(set(ist) - set(soll))
+          falsch = sorted(n for n in set(soll) & set(ist) if soll[n] != ist[n])
+          print(f'Soll {len(soll)}, ausgerollt {len(ist)}')
+          schlecht = False
+          for titel, liste in (('fehlen im Projekt', fehlt),
+                               ('im Projekt, aber nicht im Repository', fremd),
+                               ('falsches verify_jwt', falsch)):
+              if liste:
+                  schlecht = True
+                  print(f'::error::{len(liste)} {titel}: ' + ', '.join(liste[:20]))
+          if schlecht:
+              sys.exit(1)
+          offen = sum(1 for v in soll.values() if not v)
+          print(f'Alle {len(soll)} Funktionen ausgerollt, verify_jwt stimmt '
+                f'ueberall ({offen} ohne JWT-Pruefung).')
+          ENDE
