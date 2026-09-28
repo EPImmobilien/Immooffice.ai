@@ -36,6 +36,11 @@ ABGESICHERT = {
         'Schreibt Dateien; Mandant aus Immobilie beziehungsweise Dateisatz.'),
     'signatur-unterschreiben': ('immoSetzeMandant',
         'Mandant aus dem Signaturvorgang, den der Token benennt.'),
+    'web-lead': ('immoMandantAusAnfrage',
+        'Eingang fuer Bewertungsanfragen. Mandant aus der Anfrage, Chef und '
+        'Empfaenger aus dem Mandanten; Kontaktsuche und beide inserts sind '
+        'auf ihn begrenzt. Die fest eingebaute Benutzerkennung der Referenz '
+        'ist entfallen.'),
 }
 
 # --- Gelesen und fuer unbedenklich befunden, ohne Aenderung ---
@@ -73,7 +78,6 @@ NOCH_OFFEN = {
     'suchkriterien-newsletter': 'Verschickt Newsletter — nach fork_16 gepruefte '
                                 'Quelle, der Versandweg selbst aber ungelesen.',
     'upload-benachrichtigung-versenden': 'Versendet Benachrichtigungen.',
-    'web-lead': 'Nimmt Leads von der Webseite entgegen.',
 }
 
 

@@ -54,6 +54,13 @@ for _f in ('expose-pdf-erzeugen', 'mpe-pdf-erzeugen', 'energieausweis-anfrage',
            'bild-empfang', 'eigentuemer-report-pdf', 'signatur-vorgang-starten'):
     ERWEITERT[_f] = 'Storage-Huelle: Pfade tragen den Mandanten (Phase 2)'
 
+# Oeffentliche Endpunkte, die ihren Mandanten selbst bestimmen muessen. Sie
+# benutzen den service_role, fuer den RLS nicht gilt — die Grenze ziehen sie
+# also im Quelltext. Buch darueber fuehrt tests/funktionen-oeffentlich.py.
+for _f in ('oeffentliche-objekte', 'web-lead'):
+    ERWEITERT[_f] = ('Oeffentlicher Endpunkt: bestimmt seinen Mandanten '
+                     'selbst (Phase 2)')
+
 BLOCKZEILEN = {
     'mpe-pdf-erzeugen': {
         'const pins: Array<[number, number, string, string, string]> = [',

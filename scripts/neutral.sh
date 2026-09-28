@@ -101,6 +101,12 @@ pruefe "Keine Kennzeichen des Referenzunternehmens" "$MARKEN"
 pruefe "Keine Stammdaten des Referenzunternehmens"  "$STAMM"
 pruefe "Kein Verweis auf das fremde Supabase-Projekt" "$FREMD"
 pruefe_genau "Kein Vorsatz EP_ in Bezeichnern" '\bEP_[A-Z]'
+# Fest eingebaute Benutzerkennungen der Referenz. web-lead trug die des
+# Chefs im Quelltext; eine UUID enthaelt keinen Markennamen, deshalb ist
+# sie durch alle bisherigen Muster gefallen. Base64 wie die uebrigen:
+# im Repository soll kein lesbares Kennzeichen stehen.
+KENNUNGEN="$(printf %s 'OGUwNTI5ZjItNTFhYy00ZmE0LWFmNjYtZWRhNDczMTIyMDUz' | base64 -d)"
+pruefe "Keine Benutzerkennungen der Referenz" "$KENNUNGEN"
 # Nur pruefen, was auch versioniert wird. src/ entsteht beim Bauen aus
 # reference/ und ist derzeit ignoriert (siehe .gitignore); ein unversioniertes
 # Arbeitsergebnis darf das Gate weder retten noch reissen. Sobald die Datei

@@ -357,6 +357,145 @@ ERSETZUNGEN = [
      'oeffentliche-objekte: die eigenen Objekte nur vom eigenen Mandanten.',
      {'oeffentliche-objekte'}),
 
+    # =====================================================================
+    # FORK — web-lead: der Eingang fuer Bewertungsanfragen von der Webseite
+    #
+    # Vier Befunde in einer Datei:
+    #
+    # 1) CHEF_ID = "8e0529f2-…" — eine fest eingebaute Benutzerkennung DES
+    #    REFERENZUNTERNEHMENS. Das Neutralitaets-Gate hat sie nicht gesehen,
+    #    weil eine UUID keinen Markennamen enthaelt. Sie ist im Fork auch
+    #    funktionslos: diesen Benutzer gibt es nicht, der Fremdschluessel
+    #    scheitert, und weil der Aufruf in einem try steht, wird der Kontakt
+    #    still gar nicht erst angelegt.
+    #
+    # 2) Die Kontaktsuche lief ueber ALLE Mandanten. Eine Anfrage an Makler A
+    #    von jemandem, der bei Makler B schon Kontakt ist, haette B's Datensatz
+    #    geaendert: Rolle "eigentuemer" gesetzt und eine Notiz mit Adresse und
+    #    Nachricht angehaengt.
+    #
+    # 3) Die beiden inserts trugen keinen Mandanten. Der Standardwert
+    #    aktuelle_mandant_id() hilft nicht: die Funktion laeuft mit dem
+    #    service_role, dort ist auth.uid() leer und der Lead landete ohne
+    #    Mandanten.
+    #
+    # 4) Die Empfaengerliste stand fest im Quelltext. Jetzt kommt sie vom
+    #    Standort des Mandanten. Der ABSENDER bleibt die Plattform — die
+    #    Absenderdomaene muss beim Mailversand hinterlegt sein, und das ist
+    #    eine Sache des Betreibers, nicht des Mandanten.
+    # =====================================================================
+    ('FORK',
+     r'const sb = \(\) => createClient\(Deno\.env\.get\("SUPABASE_URL"\)!, Deno\.env\.get\("SUPABASE_SERVICE_ROLE_KEY"\)!\);',
+     'const sb = () => createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);\n'
+     '\n'
+     '// Welcher Mandant ist gemeint? Ausdrueckliche Angabe, sonst der einzige,\n'
+     '// sonst gar nichts. Dieselbe Reihenfolge wie in oeffentliche-objekte.\n'
+     'async function immoMandantAusAnfrage(req: Request, db: any, koerper: any): Promise<string | null> {\n'
+     '  let wunsch = "";\n'
+     '  try { wunsch = (new URL(req.url).searchParams.get("mandant") || "").trim(); } catch (_) { /* egal */ }\n'
+     '  if (!wunsch) wunsch = String(koerper?.mandant ?? "").trim();\n'
+     '  if (!wunsch) wunsch = (req.headers.get("x-immo-mandant") || "").trim();\n'
+     '  if (wunsch) {\n'
+     '    const spalte = /^[0-9a-f-]{36}$/i.test(wunsch) ? "id" : "slug";\n'
+     '    const { data } = await db.from("mandanten").select("id").eq(spalte, wunsch).maybeSingle();\n'
+     '    return data?.id ?? null;\n'
+     '  }\n'
+     '  const { data: alle } = await db.from("mandanten").select("id").limit(2);\n'
+     '  return (alle || []).length === 1 ? alle[0].id : null;\n'
+     '}\n'
+     '\n'
+     '// Der Chef des Mandanten. Ersetzt die fest eingebaute Kennung.\n'
+     'async function immoChefDesMandanten(db: any, mandant: string): Promise<string | null> {\n'
+     '  const { data } = await db.from("profiles").select("id")\n'
+     '    .eq("mandant_id", mandant).eq("role", "chef").order("created_at").limit(1).maybeSingle();\n'
+     '  return data?.id ?? null;\n'
+     '}',
+     'web-lead: Mandant aus der Anfrage, Chef aus dem Mandanten.',
+     {'web-lead'}),
+
+    # Die fest eingebaute Kennung faellt weg. Gleich viele Zeilen, damit die
+    # Zeilenbremse greift, wenn eine andere Regel danebengeht.
+    ('FORK',
+     r'const CHEF_ID = "8e0529f2-51ac-4fa4-af66-eda473122053";',
+     '// Die Vorlage hatte hier die Benutzerkennung ihres Chefs fest im\n'
+     '// Quelltext. Sie kommt jetzt je Anfrage aus dem Mandanten.\n'
+     '// Dasselbe gilt fuer die Empfaengerliste: sie steht am Standort.',
+     'web-lead: fest eingebaute Benutzerkennung der Referenz entfernt.',
+     {'web-lead'}),
+
+    # Die Liste wird nicht mehr gelesen — sie wuerde nur vortaeuschen, dass
+    # Post dorthin geht.
+    ('FORK',
+     r'const EMPFAENGER = \["[^"]*", "[^"]*"\];',
+     '// EMPFAENGER entfaellt: die Adressen kommen aus firma_stammdaten.',
+     'web-lead: tote Empfaengerliste entfernt.',
+     {'web-lead'}),
+
+    # Empfaenger vom Standort des Mandanten statt aus dem Quelltext.
+    ('FORK',
+     r'  const \{ data: l \} = await db\.from\("web_leads"\)\.select\("\*"\)\.eq\("id", leadId\)\.single\(\);\n  if \(!l \|\| l\.mail_am\) return;',
+     '  const { data: l } = await db.from("web_leads").select("*").eq("id", leadId).single();\n'
+     '  if (!l || l.mail_am) return;\n'
+     '  // Die Empfaenger stehen nicht mehr im Quelltext, sondern am Standort\n'
+     '  // des Mandanten, zu dem der Lead gehoert.\n'
+     '  const { data: stamm } = await db.from("firma_stammdaten").select("email")\n'
+     '    .eq("mandant_id", l.mandant_id).not("email", "is", null)\n'
+     '    .order("sortierung").limit(1).maybeSingle();\n'
+     '  const empfaenger = stamm?.email ? [stamm.email] : [];\n'
+     '  if (!empfaenger.length) {\n'
+     '    console.error("web-lead: kein Empfaenger fuer Mandant", l.mandant_id);\n'
+     '    return;\n'
+     '  }',
+     'web-lead: Empfaenger vom Standort des Mandanten.',
+     {'web-lead'}),
+
+    ('FORK',
+     r'      body: JSON\.stringify\(\{ from: ABSENDER, to: EMPFAENGER, reply_to: l\.email \|\| undefined,',
+     '      body: JSON.stringify({ from: ABSENDER, to: empfaenger, reply_to: l.email || undefined,',
+     'web-lead: an die Empfaenger des Mandanten senden.',
+     {'web-lead'}),
+
+    # Mandant im Handler bestimmen, bevor irgendetwas geschrieben wird.
+    ('FORK',
+     r'  if \(clean\(b\.website\)\) return json\(\{ ok: true \}\);\n  const db = sb\(\);',
+     '  if (clean(b.website)) return json({ ok: true });\n'
+     '  const db = sb();\n'
+     '  const mandant = await immoMandantAusAnfrage(req, db, b);\n'
+     '  if (!mandant) {\n'
+     '    return json({ ok: false, fehler: "Das Formular ist keinem Anbieter zugeordnet. '
+     'Bitte mandant mitgeben." }, 400);\n'
+     '  }\n'
+     '  const chefId = await immoChefDesMandanten(db, mandant);',
+     'web-lead: Mandant und Chef stehen fest, bevor etwas geschrieben wird.',
+     {'web-lead'}),
+
+    # Die Kontaktsuche bleibt im Mandanten.
+    ('FORK',
+     r'    let q = db\.from\("kontakte"\)\.select\("id, rollen, notiz"\)\.limit\(1\);',
+     '    let q = db.from("kontakte").select("id, rollen, notiz").eq("mandant_id", mandant).limit(1);',
+     'web-lead: Kontaktsuche nur im eigenen Mandanten.',
+     {'web-lead'}),
+
+    ('FORK',
+     r'        rollen: \["eigentuemer"\], quelle: "website", aktiv: true, notiz: notizZeile, zustaendig_id: CHEF_ID, ersteller_id: CHEF_ID,',
+     '        rollen: ["eigentuemer"], quelle: "website", aktiv: true, notiz: notizZeile,\n'
+     '        mandant_id: mandant, zustaendig_id: chefId, ersteller_id: chefId,',
+     'web-lead: neuer Kontakt traegt Mandant und Chef des Mandanten.',
+     {'web-lead'}),
+
+    ('FORK',
+     r'    user_agent: req\.headers\.get\("user-agent"\)\?\.slice\(0, 300\) \?\? null, ip: ip \|\| null, kontakt_id: kontaktId,',
+     '    user_agent: req.headers.get("user-agent")?.slice(0, 300) ?? null, ip: ip || null, kontakt_id: kontaktId,\n'
+     '    mandant_id: mandant,',
+     'web-lead: der Lead traegt seinen Mandanten.',
+     {'web-lead'}),
+
+    ('FORK',
+     r'    zielgruppe: "makler", empfaenger_user_id: CHEF_ID, typ: "web_lead",',
+     '    zielgruppe: "makler", empfaenger_user_id: chefId, mandant_id: mandant, typ: "web_lead",',
+     'web-lead: die Aktivitaet geht an den Chef des Mandanten.',
+     {'web-lead'}),
+
 ]
 
 # Drei Funktionen verdrahten die Portal-Adresse fest, statt sie wie alle

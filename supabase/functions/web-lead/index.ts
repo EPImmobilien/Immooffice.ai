@@ -8,14 +8,39 @@ const CORS = {
 const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...CORS, "content-type": "application/json" } });
 
-const CHEF_ID = "8e0529f2-51ac-4fa4-af66-eda473122053";
-const EMPFAENGER = ["info@immooffice.example", "le@immooffice.example"];
+// Die Vorlage hatte hier die Benutzerkennung ihres Chefs fest im
+// Quelltext. Sie kommt jetzt je Anfrage aus dem Mandanten.
+// Dasselbe gilt fuer die Empfaengerliste: sie steht am Standort.
+// EMPFAENGER entfaellt: die Adressen kommen aus firma_stammdaten.
 const ABSENDER = "Musterhaus Immobilien Website <info@immooffice.example>";
 const MAIL_VERZOEGERUNG_MS = 75_000; // Zeit für Schritt 2, danach geht die Mail mit allem raus, was da ist
 
 const clean = (v: unknown, max = 300) => String(v ?? "").replace(/\s+/g, " ").trim().slice(0, max);
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 const sb = () => createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+
+// Welcher Mandant ist gemeint? Ausdrueckliche Angabe, sonst der einzige,
+// sonst gar nichts. Dieselbe Reihenfolge wie in oeffentliche-objekte.
+async function immoMandantAusAnfrage(req: Request, db: any, koerper: any): Promise<string | null> {
+  let wunsch = "";
+  try { wunsch = (new URL(req.url).searchParams.get("mandant") || "").trim(); } catch (_) { /* egal */ }
+  if (!wunsch) wunsch = String(koerper?.mandant ?? "").trim();
+  if (!wunsch) wunsch = (req.headers.get("x-immo-mandant") || "").trim();
+  if (wunsch) {
+    const spalte = /^[0-9a-f-]{36}$/i.test(wunsch) ? "id" : "slug";
+    const { data } = await db.from("mandanten").select("id").eq(spalte, wunsch).maybeSingle();
+    return data?.id ?? null;
+  }
+  const { data: alle } = await db.from("mandanten").select("id").limit(2);
+  return (alle || []).length === 1 ? alle[0].id : null;
+}
+
+// Der Chef des Mandanten. Ersetzt die fest eingebaute Kennung.
+async function immoChefDesMandanten(db: any, mandant: string): Promise<string | null> {
+  const { data } = await db.from("profiles").select("id")
+    .eq("mandant_id", mandant).eq("role", "chef").order("created_at").limit(1).maybeSingle();
+  return data?.id ?? null;
+}
 
 const hits = new Map<string, number[]>();
 function limited(ip: string) {
@@ -34,6 +59,16 @@ async function mailSenden(leadId: string) {
   const db = sb();
   const { data: l } = await db.from("web_leads").select("*").eq("id", leadId).single();
   if (!l || l.mail_am) return;
+  // Die Empfaenger stehen nicht mehr im Quelltext, sondern am Standort
+  // des Mandanten, zu dem der Lead gehoert.
+  const { data: stamm } = await db.from("firma_stammdaten").select("email")
+    .eq("mandant_id", l.mandant_id).not("email", "is", null)
+    .order("sortierung").limit(1).maybeSingle();
+  const empfaenger = stamm?.email ? [stamm.email] : [];
+  if (!empfaenger.length) {
+    console.error("web-lead: kein Empfaenger fuer Mandant", l.mandant_id);
+    return;
+  }
   const key = Deno.env.get("RESEND_API_KEY");
   if (!key) return;
   const heiss = /schnell|sofort/i.test(l.verkaufszeitpunkt ?? "");
@@ -51,7 +86,7 @@ async function mailSenden(leadId: string) {
   try {
     const r = await fetch("https://api.resend.com/emails", {
       method: "POST", headers: { Authorization: `Bearer ${key}`, "content-type": "application/json" },
-      body: JSON.stringify({ from: ABSENDER, to: EMPFAENGER, reply_to: l.email || undefined,
+      body: JSON.stringify({ from: ABSENDER, to: empfaenger, reply_to: l.email || undefined,
         subject: `${flag} Lead: ${l.objektart || "Immobilie"} in ${l.adresse}${l.verkaufszeitpunkt ? " – " + l.verkaufszeitpunkt : ""} – ${l.name || l.telefon}`, html }),
     });
     if (!r.ok) { console.error("resend", r.status, await r.text()); return; }
@@ -68,6 +103,11 @@ Deno.serve(async (req) => {
   try { b = await req.json(); } catch { return json({ ok: false, fehler: "Ungültige Daten" }, 400); }
   if (clean(b.website)) return json({ ok: true });
   const db = sb();
+  const mandant = await immoMandantAusAnfrage(req, db, b);
+  if (!mandant) {
+    return json({ ok: false, fehler: "Das Formular ist keinem Anbieter zugeordnet. Bitte mandant mitgeben." }, 400);
+  }
+  const chefId = await immoChefDesMandanten(db, mandant);
 
   // ---------- Schritt 2: Qualifizierung ----------
   if (b.schritt === 2) {
@@ -108,7 +148,7 @@ Deno.serve(async (req) => {
   let kontaktId: string | null = null;
   try {
     const telNorm = telefon.replace(/[^\d+]/g, "");
-    let q = db.from("kontakte").select("id, rollen, notiz").limit(1);
+    let q = db.from("kontakte").select("id, rollen, notiz").eq("mandant_id", mandant).limit(1);
     if (email) q = q.ilike("email", email);
     else q = q.or(`telefon.ilike.%${telNorm.slice(-8)}%,mobil.ilike.%${telNorm.slice(-8)}%`);
     const { data: k } = await q;
@@ -120,7 +160,8 @@ Deno.serve(async (req) => {
     } else {
       const { data: neu } = await db.from("kontakte").insert({
         ...splitName(name), telefon, email: email || null, strasse: adresse,
-        rollen: ["eigentuemer"], quelle: "website", aktiv: true, notiz: notizZeile, zustaendig_id: CHEF_ID, ersteller_id: CHEF_ID,
+        rollen: ["eigentuemer"], quelle: "website", aktiv: true, notiz: notizZeile,
+        mandant_id: mandant, zustaendig_id: chefId, ersteller_id: chefId,
       }).select("id").single();
       kontaktId = neu?.id ?? null;
     }
@@ -130,11 +171,12 @@ Deno.serve(async (req) => {
     objektart, adresse, name, telefon, email: email || null, anlass, nachricht,
     gclid: clean(b.gclid, 200) || null, utm: b.utm ?? null, seite: clean(b.seite, 300) || null,
     user_agent: req.headers.get("user-agent")?.slice(0, 300) ?? null, ip: ip || null, kontakt_id: kontaktId,
+    mandant_id: mandant,
   }).select("id").single();
   if (error) { console.error(error); return json({ ok: false, fehler: "Speichern fehlgeschlagen" }, 500); }
 
   await db.from("aktivitaeten").insert({
-    zielgruppe: "makler", empfaenger_user_id: CHEF_ID, typ: "web_lead",
+    zielgruppe: "makler", empfaenger_user_id: chefId, mandant_id: mandant, typ: "web_lead",
     titel: `🔥 Neuer Bewertungs-Lead: ${objektart || "Objekt"} · ${adresse}`,
     text: `${name || "Ohne Name"} · ${telefon}${email ? " · " + email : ""}`,
     ref_tabelle: "web_leads", ref_id: lead.id,

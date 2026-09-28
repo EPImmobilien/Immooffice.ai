@@ -1201,3 +1201,31 @@ Die Liste `NOCH_OFFEN` darf nur kürzer werden, nie länger. Jeder Lauf von
 **Warum nicht einfach rot:** Ein Gate, das man abschalten muss, um arbeiten zu
 können, wird abgeschaltet. Ein Gate, das eine Zahl nennt, die kleiner werden
 muss, bleibt stehen.
+
+## 2026-09-28 · `web-lead`: vier Befunde in einer Datei
+
+Der Eingang für Bewertungsanfragen von der Webseite. Er entscheidet, in wessen
+Postfach eine Kundenanfrage landet.
+
+**1. Eine fest eingebaute Benutzerkennung der Referenz.**
+`const CHEF_ID = "8e0529f2-…"` — die UUID des Chefs des Referenzunternehmens,
+noch im Fork. Das Neutralitäts-Gate hat sie nicht gesehen, weil eine UUID
+keinen Markennamen enthält. Sie ist im Fork auch funktionslos: den Benutzer
+gibt es nicht, der Fremdschlüssel scheitert, und weil der Aufruf in einem
+`try` steht, wurde der Kontakt **still gar nicht erst angelegt**.
+
+Die Kennung steht jetzt auf der Blockliste (`scripts/neutral.sh`,
+base64-kodiert wie die übrigen Muster) — sie kann nicht zurückkommen.
+
+**2. Die Kontaktsuche lief über alle Mandanten.** Eine Anfrage an Makler A von
+jemandem, der bei Makler B schon Kontakt ist, hätte **B's Datensatz geändert**:
+Rolle „eigentuemer" gesetzt und eine Notiz mit Adresse und Nachricht angehängt.
+
+**3. Beide `insert` trugen keinen Mandanten.** Der Standardwert
+`aktuelle_mandant_id()` hilft hier nicht: die Funktion läuft mit dem
+`service_role`, dort ist `auth.uid()` leer — der Lead landete ohne Mandanten.
+
+**4. Die Empfängerliste stand im Quelltext.** Jetzt kommt sie vom Standort des
+Mandanten. Der **Absender** bleibt die Plattform: die Absenderdomäne muss beim
+Mailversand hinterlegt sein, und das ist Sache des Betreibers, nicht des
+Mandanten.
