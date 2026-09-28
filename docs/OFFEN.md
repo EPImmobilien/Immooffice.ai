@@ -274,7 +274,7 @@ Weg, weil er auch bei Registrierung über einen fremden Anbieter greift.
 
 Bis dahin muss ein Profil von Hand angelegt werden.
 
-## Adressbuch als CSV ausgeben — angefordert 28.09.2026
+## ~~Adressbuch als CSV ausgeben~~ — erledigt 28.09.2026
 
 Die Vorlage kann CSV für Akquise-Pipeline, Kosten/Kennzahlen und
 Newsletter-Anmeldungen. Für **Kontakte** gibt es keinen Export. Der Wunsch ist
@@ -290,8 +290,8 @@ also eine echte Erweiterung, keine Übernahme.
    Sichtbarkeitsbereich je Mitarbeiter (nur eigene / Standort / Gesellschaft /
    Konto). Ein Export, der vor diesen Regeln entsteht, ignoriert sie.
 
-**Gebaut wird er deshalb zusammen mit der Rechte-Matrix (1b)**, mit diesen
-Eigenschaften:
+**Gebaut mit der Rechte-Matrix (1b)**, mit genau diesen Eigenschaften — jede
+davon steht jetzt im Quelltext:
 
 - Semikolon als Trennzeichen, UTF-8 mit BOM — wie die drei vorhandenen
   Exporte der Vorlage, damit Excel die Umlaute richtig liest.
@@ -467,3 +467,21 @@ Richtlinie auf `storage.objects`, die `intern.*` aufruft, lässt sie scheitern.
 **Was noch offen ist:** `intern` verschwindet zusammen mit `altbestand`, wenn
 der geparkte Stand endgültig abgeräumt wird. Das ist eine Entscheidung des
 Betreibers, kein technischer Schritt — bis dahin bleibt beides liegen.
+
+## Was am Sichtbarkeitsbereich noch offen ist
+
+`fork_11` und die Bedienelemente stehen. Zwei Dinge fehlen noch:
+
+- **Der Hauptstandort des Mitarbeiters.** `profiles.firma_id` gibt es, und der
+  Rechte-Dialog setzt ihn. Aber `getProfile()` legt in `IMMO_STANDORT_ID`
+  weiterhin den *ersten* Standort nach Sortierung ab, nicht den des
+  Angemeldeten. Für die Feiertage im Urlaubsmodul heißt das: bei mehreren
+  Standorten in verschiedenen Bundesländern rechnet es mit dem falschen Land.
+  Die Datenbank ist davon nicht betroffen — `sichtbare_mitarbeiter()` liest
+  `firma_id` direkt aus dem Profil.
+- **Die übrigen Module.** `public.hat_recht()` ist gebaut und geprüft, gerufen
+  wird es bisher nur von `darf_exportieren()`. Die anderen fünfzehn Module
+  hängen weiterhin allein an `hatRecht()` in der Oberfläche. Das ist keine
+  Verschlechterung gegenüber der Vorlage, aber es ist auch noch nicht das,
+  was `CLAUDE.md` verlangt. Der Weg dahin ist gebahnt: die Funktion steht, es
+  fehlen die Richtlinien, die sie fragen.

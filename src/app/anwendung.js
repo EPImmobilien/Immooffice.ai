@@ -745,10 +745,32 @@ const MODULE = [{
     hinweis: "Liquidität & Rechnungen",
     sensibel: !0
   }, {
+    id: "export",
+    label: "Export",
+    hinweis: "Adressbuch als CSV herunterladen",
+    sensibel: !0
+  }, {
     id: "admin",
     label: "Admin-Bereich",
     hinweis: "Mitarbeiter & Rechte verwalten",
     sensibel: !0
+  }],
+  IMMO_SICHTBARKEIT = [{
+    id: "eigene",
+    label: "Nur eigene",
+    beschreibung: "Sieht nur, wofuer er selbst zustaendig ist."
+  }, {
+    id: "standort",
+    label: "Eigener Standort",
+    beschreibung: "Sieht alles, wofuer Kollegen am selben Standort zustaendig sind."
+  }, {
+    id: "gesellschaft",
+    label: "Eigene Gesellschaft",
+    beschreibung: "Sieht alle Standorte der eigenen Gesellschaft."
+  }, {
+    id: "konto",
+    label: "Ganzes Konto",
+    beschreibung: "Sieht alles im Unternehmen. Voreinstellung."
   }],
   STUFEN = [{
     id: "chef",
@@ -769,7 +791,7 @@ const MODULE = [{
   }],
   STUFEN_VORLAGE = {
     chef: MODULE.map(e => e.id),
-    standortleitung: ["immobilien", "marketing", "verkauf", "vermietung", "schmiede", "ki_agenten", "dokumente", "kalender", "onedrive", "kundenportal", "newsletter", "todos", "arbeitszeit", "werkzeuge", "objektkosten", "zinspreis", "posteingang", "akquise"],
+    standortleitung: ["immobilien", "marketing", "verkauf", "vermietung", "schmiede", "ki_agenten", "dokumente", "kalender", "onedrive", "kundenportal", "newsletter", "todos", "arbeitszeit", "werkzeuge", "objektkosten", "zinspreis", "posteingang", "akquise", "export"],
     makler: ["immobilien", "marketing", "verkauf", "vermietung", "schmiede", "ki_agenten", "dokumente", "kalender", "onedrive", "kundenportal", "newsletter", "todos", "arbeitszeit", "werkzeuge", "objektkosten", "zinspreis", "akquise"],
     assistenz: ["immobilien", "marketing", "dokumente", "kalender", "onedrive", "todos", "arbeitszeit", "werkzeuge", "zinspreis"]
   };
@@ -972,6 +994,49 @@ async function logAction(e, t, n, a, r = {}) {
   } catch (e) {
     console.warn("Aktivitäts-Log fehlgeschlagen:", e?.message || e)
   }
+}
+
+// Adressbuch als CSV. Spalten folgen der Kontaktliste, nicht der
+// Tabelle: was der Nutzer auf dem Schirm hat, findet er wieder.
+async function immoKontakteCsv(liste) {
+  const zellen = (w) => w.map((x) => '"' + String(x == null ? "" : x).replace(/"/g, '""') + '"').join(";");
+  let namen = {};
+  try {
+    const { data } = await window._sb.from("profiles").select("id, name");
+    (data || []).forEach((p) => { namen[p.id] = p.name || ""; });
+  } catch (f) {
+    console.warn("Zustaendige konnten nicht geladen werden:", f && f.message || f);
+  }
+  const kopf = ["Anrede", "Titel", "Vorname", "Nachname", "Firma", "Rollen",
+                "E-Mail", "Telefon", "Mobil", "Strasse", "PLZ", "Ort", "Land",
+                "Tags", "Zustaendig", "Quelle", "Werbung", "Newsletter",
+                "Angelegt am"];
+  // Widerrufene Werbeeinwilligung wird gekennzeichnet, nicht
+  // stillschweigend mitgeliefert: wer die Datei weiterverwendet, muss
+  // sehen, wem er nicht schreiben darf.
+  const zeilen = (liste || []).map((k) => zellen([
+    k.anrede || "", k.titel || "", k.vorname || "", k.nachname || "",
+    k.firma || "", (k.rollen || []).join(", "),
+    k.email || "", k.telefon || "", k.mobil || "",
+    k.strasse || "", k.plz || "", k.ort || "", k.land || "",
+    epKontaktWeitereText ? (epKontaktWeitereText(k) || "") : "",
+    namen[k.zustaendig_id] || "", k.quelle || "",
+    k.werbung_opt_out ? "widersprochen" : "",
+    k.newsletter_opt_in ? "angemeldet" + (k.newsletter_opt_in_am ? " am " + String(k.newsletter_opt_in_am).slice(0, 10) : "") : "",
+    String(k.created_at || "").slice(0, 10)
+  ]));
+  const text = [zellen(kopf)].concat(zeilen).join("\r\n");
+  const blob = new Blob(["\ufeff" + text], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "adressbuch-" + new Date().toISOString().slice(0, 10) + ".csv";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  await logAction("export", "kontakte", "", "Adressbuch als CSV", {
+    anzahl: (liste || []).length,
+    mit_werbewiderspruch: (liste || []).filter((k) => k.werbung_opt_out).length
+  });
 }
 
 function canDelete(e) {
@@ -38257,7 +38322,14 @@ function KontaktePage({
     style: primaryBtn
   }, React.createElement(Plus, {
     size: 14
-  }), " Neuer Kontakt"), React.createElement(NewsletterKnopf, {
+  }), " Neuer Kontakt"), hatRecht(e, "export") && React.createElement("button", {
+    onClick: () => immoKontakteCsv(b),
+    disabled: !b.length,
+    title: b.length
+      ? b.length + " angezeigte Kontakte als CSV herunterladen"
+      : "Keine Kontakte in der aktuellen Auswahl",
+    style: { ...secondaryBtn, opacity: b.length ? 1 : .5 }
+  }, "CSV-Export (" + b.length + ")"), React.createElement(NewsletterKnopf, {
     user: e
   }), React.createElement("input", {
     type: "text",
@@ -41760,6 +41832,21 @@ function AdminMitarbeiter({
       value: e.id
     }, e.firma_name, e.ort ? ` — ${e.ort}` : "")))), React.createElement("div", null, React.createElement("label", {
       style: labelStyle
+    }, "Sichtbarkeit"), React.createElement("select", {
+      value: f.sichtbarkeit || "konto",
+      onChange: e => {
+        const w = e.target.value;
+        p(s => ({ ...s, sichtbarkeit: w }))
+      },
+      style: R
+    }, IMMO_SICHTBARKEIT.map(e => React.createElement("option", {
+      key: e.id,
+      value: e.id
+    }, e.label))), React.createElement("div", {
+      style: { fontSize: 11, color: CI.muted, marginTop: 6, marginBottom: 12, lineHeight: 1.4 }
+    }, (IMMO_SICHTBARKEIT.find(e => e.id === (f.sichtbarkeit || "konto")) || {}).beschreibung),
+    React.createElement("label", {
+      style: labelStyle
     }, "Stufe (belegt die Häkchen vor)"), React.createElement("select", {
       value: f.stufe,
       onChange: e => {
@@ -41871,9 +41958,11 @@ function AdminMitarbeiter({
           await updateProfile(e.id, {
             firma_id: f.firma_id || null,
             stufe: f.stufe,
+            sichtbarkeit: f.sichtbarkeit || "konto",
             rechte: f.rechte
           }), await logAction("update", "mitarbeiter", e.id, e.name, {
             stufe: f.stufe,
+            sichtbarkeit: f.sichtbarkeit || "konto",
             firma: E(f.firma_id),
             module: MODULE.filter(e => f.rechte[e.id]).map(e => e.id)
           }), m(`Rechte für ${e.name} gespeichert.`), A(null), p(null), await y()

@@ -325,6 +325,178 @@ ERSETZUNGEN = [
     # Grossbuchstaben mit Unterstrich.
     #
     # Muss NACH der Logo-Regel stehen, die EP_LOGO_DATAURL beim Namen nennt.
+    # =====================================================================
+    # FORK — Abschnitt 1b: das Recht "Export" und der Sichtbarkeitsbereich
+    #
+    # Die Datenbank kennt beides seit fork_11 (public.hat_recht,
+    # public.sichtbare_mitarbeiter, profiles.sichtbarkeit). Hier bekommt die
+    # Oberflaeche die Bedienelemente dazu. Die Durchsetzung bleibt in der
+    # Datenbank — was hier steht, blendet nur aus, was ohnehin nicht ginge.
+    # =====================================================================
+
+    # Ein neues Modul in der Rechte-Matrix, vor dem Admin-Bereich und als
+    # sensibel gekennzeichnet: ein Export nimmt personenbezogene Daten aus
+    # dem System heraus.
+    ('FORK',
+     r'\{\n    id: "admin",\n    label: "Admin-Bereich",',
+     '{\n    id: "export",\n'
+     '    label: "Export",\n'
+     '    hinweis: "Adressbuch als CSV herunterladen",\n'
+     '    sensibel: !0\n'
+     '  }, {\n    id: "admin",\n    label: "Admin-Bereich",',
+     'Rechte-Matrix: neues Modul "Export" (Abschnitt 1b).'),
+
+    # Wer bekommt es aus der Vorlage? Chef ohnehin (MODULE.map). Bei den
+    # uebrigen drei Stufen bleibt es aus: ein Export ist der breiteste Weg,
+    # auf dem Kundendaten das Haus verlassen, und er laesst sich mit einem
+    # Haeckchen je Mitarbeiter freigeben. Genau dafuer gibt es Einzelrechte.
+    ('FORK',
+     r'"objektkosten", "zinspreis", "posteingang", "akquise"\],',
+     '"objektkosten", "zinspreis", "posteingang", "akquise", "export"],',
+     'Standortleitung bekommt das Export-Recht aus der Vorlage.'),
+
+    # Die vier Bereiche als eigene Liste neben STUFEN, damit Auswahlfeld und
+    # Erklaertext aus einer Quelle kommen.
+    ('FORK',
+     r'  STUFEN = \[\{',
+     '  IMMO_SICHTBARKEIT = [{\n'
+     '    id: "eigene",\n'
+     '    label: "Nur eigene",\n'
+     '    beschreibung: "Sieht nur, wofuer er selbst zustaendig ist."\n'
+     '  }, {\n'
+     '    id: "standort",\n'
+     '    label: "Eigener Standort",\n'
+     '    beschreibung: "Sieht alles, wofuer Kollegen am selben Standort zustaendig sind."\n'
+     '  }, {\n'
+     '    id: "gesellschaft",\n'
+     '    label: "Eigene Gesellschaft",\n'
+     '    beschreibung: "Sieht alle Standorte der eigenen Gesellschaft."\n'
+     '  }, {\n'
+     '    id: "konto",\n'
+     '    label: "Ganzes Konto",\n'
+     '    beschreibung: "Sieht alles im Unternehmen. Voreinstellung."\n'
+     '  }],\n'
+     '  STUFEN = [{',
+     'Die vier Sichtbarkeitsbereiche als eigene Liste.'),
+
+    # Das Auswahlfeld im Rechte-Dialog, direkt ueber der Stufe.
+    ('FORK',
+     r'\}, "Stufe \(belegt die Häkchen vor\)"\), React\.createElement\("select", \{',
+     '}, "Sichtbarkeit"), React.createElement("select", {\n'
+     '      value: f.sichtbarkeit || "konto",\n'
+     '      onChange: e => {\n'
+     '        const w = e.target.value;\n'
+     '        p(s => ({ ...s, sichtbarkeit: w }))\n'
+     '      },\n'
+     '      style: R\n'
+     '    }, IMMO_SICHTBARKEIT.map(e => React.createElement("option", {\n'
+     '      key: e.id,\n'
+     '      value: e.id\n'
+     '    }, e.label))), React.createElement("div", {\n'
+     '      style: { fontSize: 11, color: CI.muted, marginTop: 6, marginBottom: 12, lineHeight: 1.4 }\n'
+     '    }, (IMMO_SICHTBARKEIT.find(e => e.id === (f.sichtbarkeit || "konto")) || {}).beschreibung),\n'
+     '    React.createElement("label", {\n'
+     '      style: labelStyle\n'
+     '    }, "Stufe (belegt die Häkchen vor)"), React.createElement("select", {',
+     'Rechte-Dialog: Auswahlfeld fuer den Sichtbarkeitsbereich.'),
+
+    # Gespeichert und protokolliert wird er mit.
+    ('FORK',
+     r'            firma_id: f\.firma_id \|\| null,\n            stufe: f\.stufe,\n'
+     r'            rechte: f\.rechte\n          \}\), await logAction\("update", '
+     r'"mitarbeiter", e\.id, e\.name, \{\n            stufe: f\.stufe,',
+     '            firma_id: f.firma_id || null,\n'
+     '            stufe: f.stufe,\n'
+     '            sichtbarkeit: f.sichtbarkeit || "konto",\n'
+     '            rechte: f.rechte\n'
+     '          }), await logAction("update", "mitarbeiter", e.id, e.name, {\n'
+     '            stufe: f.stufe,\n'
+     '            sichtbarkeit: f.sichtbarkeit || "konto",',
+     'Rechte-Dialog: Sichtbarkeit speichern und protokollieren.'),
+
+    # =====================================================================
+    # FORK — Adressbuch als CSV, angefordert am 28.09.2026
+    #
+    # Die Vorlage kann CSV fuer Akquise, Objektkosten und
+    # Newsletter-Anmeldungen, fuer Kontakte nicht. Format und Vorgehen sind
+    # von dort uebernommen: Semikolon, UTF-8 mit BOM (sonst liest Excel die
+    # Umlaute falsch), Anfuehrungszeichen verdoppelt, CRLF.
+    #
+    # Ausgegeben wird GENAU die gefilterte und sortierte Liste, die der
+    # Nutzer vor sich hat — nicht eine zweite, weiter gefasste Abfrage. Was
+    # er nicht sehen darf, steht schon nicht in `b`: dafuer sorgen die
+    # Mandantentrennung (fork_07) und der Sichtbarkeitsbereich (fork_11) in
+    # der Datenbank, nicht dieser Quelltext.
+    #
+    # Der Knopf haengt am Recht "export" (fork_11). Er ist eine Bequemlichkeit,
+    # keine Sicherung: hat_recht('export') gilt serverseitig.
+    #
+    # Jeder Export landet im Aktivitaets-Log, mit Anzahl der Datensaetze. Ein
+    # Export personenbezogener Daten ist ein Vorgang, ueber den man Auskunft
+    # geben koennen muss.
+    # =====================================================================
+    ('FORK',
+     r'  \}\), " Neuer Kontakt"\), React\.createElement\(NewsletterKnopf, \{',
+     '  }), " Neuer Kontakt"), hatRecht(e, "export") && React.createElement("button", {\n'
+     '    onClick: () => immoKontakteCsv(b),\n'
+     '    disabled: !b.length,\n'
+     '    title: b.length\n'
+     '      ? b.length + " angezeigte Kontakte als CSV herunterladen"\n'
+     '      : "Keine Kontakte in der aktuellen Auswahl",\n'
+     '    style: { ...secondaryBtn, opacity: b.length ? 1 : .5 }\n'
+     '  }, "CSV-Export (" + b.length + ")"), React.createElement(NewsletterKnopf, {',
+     'Adressbuch: CSV-Knopf, nur mit dem Recht "export".'),
+
+    # Die Ausgabe selbst, neben logAction — dort steht schon alles, was sie
+    # braucht, und sie wird nur von einer Stelle gerufen.
+    ('FORK',
+     r'\nfunction canDelete\(e\) \{',
+     '\n'
+     '// Adressbuch als CSV. Spalten folgen der Kontaktliste, nicht der\n'
+     '// Tabelle: was der Nutzer auf dem Schirm hat, findet er wieder.\n'
+     'async function immoKontakteCsv(liste) {\n'
+     '  const zellen = (w) => w.map((x) => \'"\' + String(x == null ? "" : x).replace(/"/g, \'""\') + \'"\').join(";");\n'
+     '  let namen = {};\n'
+     '  try {\n'
+     '    const { data } = await window._sb.from("profiles").select("id, name");\n'
+     '    (data || []).forEach((p) => { namen[p.id] = p.name || ""; });\n'
+     '  } catch (f) {\n'
+     '    console.warn("Zustaendige konnten nicht geladen werden:", f && f.message || f);\n'
+     '  }\n'
+     '  const kopf = ["Anrede", "Titel", "Vorname", "Nachname", "Firma", "Rollen",\n'
+     '                "E-Mail", "Telefon", "Mobil", "Strasse", "PLZ", "Ort", "Land",\n'
+     '                "Tags", "Zustaendig", "Quelle", "Werbung", "Newsletter",\n'
+     '                "Angelegt am"];\n'
+     '  // Widerrufene Werbeeinwilligung wird gekennzeichnet, nicht\n'
+     '  // stillschweigend mitgeliefert: wer die Datei weiterverwendet, muss\n'
+     '  // sehen, wem er nicht schreiben darf.\n'
+     '  const zeilen = (liste || []).map((k) => zellen([\n'
+     '    k.anrede || "", k.titel || "", k.vorname || "", k.nachname || "",\n'
+     '    k.firma || "", (k.rollen || []).join(", "),\n'
+     '    k.email || "", k.telefon || "", k.mobil || "",\n'
+     '    k.strasse || "", k.plz || "", k.ort || "", k.land || "",\n'
+     '    epKontaktWeitereText ? (epKontaktWeitereText(k) || "") : "",\n'
+     '    namen[k.zustaendig_id] || "", k.quelle || "",\n'
+     '    k.werbung_opt_out ? "widersprochen" : "",\n'
+     '    k.newsletter_opt_in ? "angemeldet" + (k.newsletter_opt_in_am ? " am " + String(k.newsletter_opt_in_am).slice(0, 10) : "") : "",\n'
+     '    String(k.created_at || "").slice(0, 10)\n'
+     '  ]));\n'
+     '  const text = [zellen(kopf)].concat(zeilen).join("\\\\r\\\\n");\n'
+     '  const blob = new Blob(["\\\\ufeff" + text], { type: "text/csv;charset=utf-8" });\n'
+     '  const a = document.createElement("a");\n'
+     '  a.href = URL.createObjectURL(blob);\n'
+     '  a.download = "adressbuch-" + new Date().toISOString().slice(0, 10) + ".csv";\n'
+     '  document.body.appendChild(a);\n'
+     '  a.click();\n'
+     '  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);\n'
+     '  await logAction("export", "kontakte", "", "Adressbuch als CSV", {\n'
+     '    anzahl: (liste || []).length,\n'
+     '    mit_werbewiderspruch: (liste || []).filter((k) => k.werbung_opt_out).length\n'
+     '  });\n'
+     '}\n'
+     '\nfunction canDelete(e) {',
+     'Adressbuch: die CSV-Ausgabe samt Protokolleintrag.'),
+
     ('MARKE', r'\bEP_', 'IMMO_', 'Vorsatz EP_ in Bezeichnern der Oberflaeche.'),
 ]
 
