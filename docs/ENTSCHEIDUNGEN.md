@@ -604,3 +604,58 @@ jetzt, was `npm run check` nicht kann — echte Adressen, echter Browser, echte
 Anmeldung. Jeder Schritt schreibt seinen Befund in eine Datei, ein letzter gibt
 alle aus; sonst verschwindet das Ergebnis hinter den Fortschrittsbalken des
 Browser-Downloads.
+
+## 28.09.2026 — Phase 2, Auftakt: sieben Türen bleiben zu
+
+**Frage:** Der Auftrag vom 28.09. verlangt als ersten Schritt, „die 64
+Tabellen ohne Richtlinie bekommen Richtlinien".
+
+**Erste Feststellung: die Zahlen des Auftrags sind überholt.** Nachgemessen am
+selben Tag:
+
+| | Auftrag | tatsächlich |
+|---|---|---|
+| Tabellen in `public` | 167 | **187** |
+| Richtlinien | 215 | **344** |
+| ohne Richtlinie | 64 | **8** |
+| Funktionen | 85 | **104** |
+| mit `firma_id` | 2 | 2 ✓ |
+| `altbestand` | 110 | 110 ✓ |
+
+Sie stammen aus einem Stand vor dem Abschluss der Schema-Übernahme.
+
+**Zweite Feststellung: sieben der acht sollen gesperrt bleiben.** RLS an und
+keine Richtlinie heißt: für normale Nutzer vollständig zu, für `service_role`
+offen. Geprüft wurde, wer jede Tabelle tatsächlich anspricht — die Oberfläche,
+eine Edge Function oder niemand:
+
+| Tabelle | Wer greift zu | Ergebnis |
+|---|---|---|
+| `amt_vorlage` | Oberfläche | Richtlinie: Team liest, Chef pflegt |
+| `eigentuemer_benachrichtigung_queue` | nur Edge Function | bleibt zu |
+| `immobilie_datei_geloescht` | nur Edge Function | bleibt zu |
+| `onoffice_expose_pruefung` | nur Edge Function | bleibt zu |
+| `waechter_status` | nur Edge Function | bleibt zu |
+| `ea_accounts`, `ea_events`, `ea_orders` | niemand | bleibt zu |
+
+**Entscheidung:** Nur `amt_vorlage` bekommt Richtlinien. Die sieben übrigen
+behalten den gesperrten Zustand und bekommen stattdessen einen
+Tabellen-Kommentar, der festhält, dass das Absicht ist. Der Kommentar steht in
+der Datenbank, nicht nur hier — damit ihn auch findet, wer das Schema liest
+und nicht das Repository.
+
+**Grund:** Eine Richtlinie öffnet eine Tür. Sieben Türen zu öffnen, an die
+niemand klopft, vergrößert die Angriffsfläche und gewinnt nichts. Die Absicht
+des Auftrags — kein Datenzugriff bleibt unbedacht — ist damit erfüllt; sein
+Wortlaut nicht. Siehe `docs/AUTONOMIE.md`, Abschnitt „Aufträge sind nicht
+unfehlbar".
+
+**Nebenbefund, mitbehoben:** `aktuelle_rolle()` ist `SECURITY DEFINER` und
+lief als einzige der drei Rollen-Helfer **ohne** festen `search_path`. Wer in
+einem früher durchsuchten Schema eine eigene Tabelle `profiles` anlegen kann,
+entscheidet sonst mit, was die Funktion zurückgibt — und damit, was jede
+Richtlinie erlaubt, die sie aufruft. `ist_chef()` und `ist_team()` machen es
+seit jeher richtig. Jetzt alle drei.
+
+**Was offen bleibt:** Die Richtlinien trennen bisher nach Rolle, nicht nach
+Mandant. Das ist der nächste Schritt.
