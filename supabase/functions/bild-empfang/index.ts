@@ -58,6 +58,7 @@ Deno.serve(async (req) => {
     const bytes = new Uint8Array(await datei.arrayBuffer());
     const mime = datei.type || "image/jpeg";
     const name = String(meta.name || datei.name || "bild.jpg");
+    immoSetzeMandant((await admin.from("immobilien").select("mandant_id").eq("id", meta.immobilie_id).maybeSingle()).data?.mandant_id);
     const pfad = "immobilien/" + meta.immobilie_id + "/" + Date.now() + "_" + name.replace(/[^A-Za-z0-9._-]+/g, "_");
     const { error: upErr } = await admin.storage.from("immobilie-dateien").upload(pfad, bytes, { contentType: mime, upsert: false });
     if (upErr) throw new Error("Upload: " + upErr.message);

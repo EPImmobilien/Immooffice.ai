@@ -298,6 +298,28 @@ ERSETZUNGEN = [
 # durch die Datei einzelne Buchstaben treffen. Genau das ist beim Schreiben
 # dieses Skripts passiert.
 NACHBESSERN = [
+    # --- FORK: Mandant fuer die uebrigen Funktionen, die Dateien schreiben.
+    ('FORK',
+     'const { data: brief, error: bErr } = await admin.from("briefe").select("*").eq("id", brief_id).maybeSingle();',
+     'const { data: brief, error: bErr } = await admin.from("briefe").select("*").eq("id", brief_id).maybeSingle(); immoSetzeMandant(brief?.mandant_id);',
+     'Mandant aus dem Brief: brief-pdf-erzeugen.',
+     {'brief-pdf-erzeugen'}),
+    ('FORK',
+     'const { data: vorgang, error: vgErr } = await admin.from("signatur_vorgaenge").select("*").eq("id", empfaenger.vorgang_id).maybeSingle();',
+     'const { data: vorgang, error: vgErr } = await admin.from("signatur_vorgaenge").select("*").eq("id", empfaenger.vorgang_id).maybeSingle(); immoSetzeMandant(vorgang?.mandant_id);',
+     'Mandant aus dem Signaturvorgang: signatur-unterschreiben.',
+     {'signatur-unterschreiben'}),
+    ('FORK',
+     '    const pfad = "immobilien/" + meta.immobilie_id + "/"',
+     '    immoSetzeMandant((await admin.from("immobilien").select("mandant_id").eq("id", meta.immobilie_id).maybeSingle()).data?.mandant_id);\n    const pfad = "immobilien/" + meta.immobilie_id + "/"',
+     'Mandant aus der Ziel-Immobilie: bild-empfang.',
+     {'bild-empfang'}),
+    ('FORK',
+     '    const b = await req.json().catch(() => ({}));',
+     '    const { data: u } = await db.auth.getUser(\n      (req.headers.get("Authorization") || "").replace(/^Bearer\\s+/i, ""));\n    if (!u?.user) return new Response(JSON.stringify({ ok: false, fehler: "Nicht angemeldet" }),\n      { status: 401, headers: { "Content-Type": "application/json" } });\n    immoSetzeMandant((await db.from("profiles").select("mandant_id")\n      .eq("id", u.user.id).maybeSingle()).data?.mandant_id);\n    const b = await req.json().catch(() => ({}));',
+     'Mandant aus dem Profil des Aufrufers: web-asset-kopieren.',
+     {'web-asset-kopieren'}),
+
     # --- FORK: den Mandanten setzen, damit die Storage-Huelle greift.
     # Diese vier laden ohnehin direkt danach das Profil des Aufrufers.
     # Die Abfrage wird um mandant_id erweitert, statt eine zweite zu

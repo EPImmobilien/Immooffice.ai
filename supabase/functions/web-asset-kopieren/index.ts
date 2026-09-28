@@ -37,6 +37,12 @@ Deno.serve(async (req) => {
     };
   }
   try {
+    const { data: u } = await db.auth.getUser(
+      (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, ""));
+    if (!u?.user) return new Response(JSON.stringify({ ok: false, fehler: "Nicht angemeldet" }),
+      { status: 401, headers: { "Content-Type": "application/json" } });
+    immoSetzeMandant((await db.from("profiles").select("mandant_id")
+      .eq("id", u.user.id).maybeSingle()).data?.mandant_id);
     const b = await req.json().catch(() => ({}));
     const quelleBucket = String(b.quelle_bucket || "");
     const quellePfad = String(b.quelle_pfad || "");

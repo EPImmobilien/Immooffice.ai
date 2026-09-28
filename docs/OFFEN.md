@@ -379,7 +379,7 @@ danach einen anderen zurück, als er gespeichert hat.
 |---|---|
 | 1. Oberfläche stellt den Mandanten voran | **fertig** — eine Hülle um `storage.from()`, neun Prüfungen in `tests/storage-huelle.js` |
 | 2a. Hülle in den Edge Functions | **fertig** — 11 Funktionen, 22 Schreibstellen |
-| 2b. Jede Funktion ihren Mandanten ermitteln lassen | **5 von 11** — siehe Liste unten |
+| 2b. Jede Funktion ihren Mandanten ermitteln lassen | **9 von 11** — siehe Liste unten |
 | 3. Die 90 vorhandenen Dateien umziehen | offen |
 | 4. Restriktive Richtlinie auf `storage.objects` | offen — **erst nach 2 und 3**, sonst sperrt sie aus, was noch am alten Ort liegt |
 
@@ -405,11 +405,11 @@ Pfad baut, verlöre Dateien.
 | ~~`eigentuemer-dokument-uebernehmen`~~ | Nutzer (JWT) | **fertig**, dito |
 | ~~`eigentuemer-report-pdf`~~ | Nutzer (JWT) | **fertig**, dito |
 | ~~`signatur-vorgang-starten`~~ | Nutzer (JWT) | **fertig** — eigene Abfrage, weil sie ihren Client erst nach `getUser` erzeugt |
-| `brief-pdf-erzeugen` | Nutzer (JWT), kein `getUser` | aus dem Brief-Datensatz |
-| `web-asset-kopieren` | Nutzer (JWT), kein `getUser` | aus dem Zielpfad-Auftrag |
+| ~~`brief-pdf-erzeugen`~~ | Nutzer (JWT) | **fertig** — der Brief wird ohnehin mit `select("*")` geladen |
+| ~~`web-asset-kopieren`~~ | Nutzer (JWT) | **fertig** — neu mit `getUser`; sie prüfte vorher **gar nichts** außer dem Plattform-JWT |
 | `energieausweis-anfrage` | **öffentlich** | aus dem Standort, an den die Anfrage geht |
-| `signatur-unterschreiben` | **öffentlich** (Token) | aus dem Signaturvorgang |
-| `bild-empfang` | **öffentlich** (Token) | aus `immobilien.mandant_id` der Ziel-Immobilie |
+| ~~`signatur-unterschreiben`~~ | öffentlich (Token) | **fertig** — der Vorgang wird ohnehin mit `select("*")` geladen |
+| ~~`bild-empfang`~~ | öffentlich (Token) | **fertig** — Abfrage auf die Ziel-Immobilie |
 | `mail-anhaenge-diagnose` | **öffentlich** (Geheimnis) | aus dem Postfach |
 
 Die vier öffentlichen sind die heiklen: sie haben keinen angemeldeten Nutzer
@@ -417,3 +417,26 @@ und müssen den Mandanten aus dem Datensatz ableiten, den sie ohnehin laden.
 Wer das falsch macht, schreibt die Datei eines Mandanten in den Ordner eines
 anderen — und die Richtlinie aus Schritt 4 macht sie dann für den Falschen
 sichtbar.
+
+### Die letzten zwei — und eine Lücke, die kein Code schließt
+
+**`mail-anhaenge-diagnose`** schreibt an drei Stellen mit drei verschiedenen
+Quellen (`bild_transfer.immobilie_id`, `immobilie_datei.immobilie_id`, ein
+fester Diagnosepfad). Kein einzelner Aufruf von `immoSetzeMandant()` deckt
+alle drei ab; sie braucht je Schreibstelle einen. Machbar, nur nicht mit einer
+Regel.
+
+**`energieausweis-anfrage` ist der eigentliche Befund.** Sie ist ein
+**öffentliches Formular** auf der Webseite des Maklers — ohne Anmeldung, ohne
+Token. Sie kann gar nicht wissen, zu welchem Mandanten sie gehört: heute nimmt
+sie das erste aktive Postfach, was bei einem Mandanten stimmt und bei zweien
+rät.
+
+Das ist keine Sache des Quelltexts, sondern des Entwurfs: **ein öffentlicher
+Endpunkt muss den Mandanten mitbekommen.** Entweder über den Pfad
+(`…/energieausweis-anfrage?mandant=<slug>`), den die eingebettete Seite setzt,
+oder über einen Token je Mandant. Solange das nicht entschieden ist, bleibt
+die Funktion beim ersten Postfach und ist damit **nicht mandantenfähig**.
+
+Dasselbe gilt für jeden weiteren öffentlichen Endpunkt, der später dazukommt.
+Es lohnt, das einmal zu entscheiden und dann überall gleich zu machen.

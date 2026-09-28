@@ -187,7 +187,7 @@ Deno.serve(async (req) => {
     if (!empfaenger) throw new Error("Dieser Link ist ung\u00fcltig.");
     if (empfaenger.status === "unterschrieben") throw new Error("Sie haben bereits unterschrieben.");
 
-    const { data: vorgang, error: vgErr } = await admin.from("signatur_vorgaenge").select("*").eq("id", empfaenger.vorgang_id).maybeSingle();
+    const { data: vorgang, error: vgErr } = await admin.from("signatur_vorgaenge").select("*").eq("id", empfaenger.vorgang_id).maybeSingle(); immoSetzeMandant(vorgang?.mandant_id);
     if (vgErr) throw vgErr;
     if (!vorgang) throw new Error("Signatur-Vorgang nicht gefunden.");
     if (vorgang.ablauf_am && new Date(vorgang.ablauf_am).getTime() < Date.now()) throw new Error("Dieser Link ist abgelaufen.");

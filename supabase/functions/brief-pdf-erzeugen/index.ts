@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
     const { brief_id } = await req.json();
     if (!brief_id) throw new Error("brief_id fehlt.");
 
-    const { data: brief, error: bErr } = await admin.from("briefe").select("*").eq("id", brief_id).maybeSingle();
+    const { data: brief, error: bErr } = await admin.from("briefe").select("*").eq("id", brief_id).maybeSingle(); immoSetzeMandant(brief?.mandant_id);
     if (bErr) throw bErr;
     if (!brief) throw new Error("Brief nicht gefunden.");
 
