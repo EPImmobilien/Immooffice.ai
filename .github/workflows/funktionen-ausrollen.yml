@@ -25,6 +25,10 @@ on:
         description: 'Nur diese eine Funktion ausrollen (leer = alle)'
         required: false
         default: ''
+      loeschen:
+        description: 'Diese Funktion vom Projekt ENTFERNEN (Name genau wie im Projekt). Nur von Hand, nie automatisch.'
+        required: false
+        default: ''
   push:
     branches: ['claude/**']
     paths: ['supabase/functions/**']
@@ -62,7 +66,24 @@ jobs:
           # eigenes, viel groesseres Kontingent.
           GITHUB_TOKEN: ${{ github.token }}
 
+      # Absichtlich NUR bei workflow_dispatch und nur mit ausdruecklich
+      # eingetragenem Namen. Kein Abgleich, der von selbst aufraeumt: was auf
+      # dem Projekt liegt und nicht im Repository steht, meldet der Schritt
+      # "Nachzaehlen" — entfernt wird es von Hand, mit Blick auf den Namen.
+      - name: Funktion entfernen
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.loeschen != ''
+        run: |
+          set -euo pipefail
+          name='${{ github.event.inputs.loeschen }}'
+          if [ -d "supabase/functions/$name" ]; then
+            echo "::error::$name liegt im Repository. Erst dort entfernen, sonst rollt der naechste Lauf sie wieder aus."
+            exit 1
+          fi
+          supabase functions delete "$name" --project-ref "$PROJEKT"
+          echo "$name vom Projekt entfernt."
+
       - name: Ausrollen
+        if: github.event.inputs.loeschen == ''
         run: |
           set -uo pipefail
           # --use-api laesst Supabase buendeln. Ohne das braucht die CLI

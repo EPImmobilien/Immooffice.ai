@@ -867,3 +867,31 @@ erreichbar — Löschen wäre Datenverlust ohne Not.
 `intern` selbst wird nicht angefasst: 204 Richtlinien auf `altbestand`-Tabellen
 hängen daran, und dort ist der Fehler folgenlos, weil `altbestand` nicht
 exponiert ist und ein Fehler sperrt statt öffnet. Vermerkt in `docs/OFFEN.md`.
+
+## 2026-09-28 · Die Umzugsfunktion wird nach dem Umzug entfernt
+
+**Frage:** `storage-mandant-umzug` hat in `fork_08` die 91 vorhandenen Dateien
+ins Mandantenverzeichnis geschoben. Sie ist **ohne JWT** erreichbar, weil der
+Aufruf aus der Datenbank über `pg_net` kommt und dort kein Nutzer-Token
+existiert. Gesichert ist sie über ein Einmal-Token aus
+`public.storage_umzug_token`, das beim Aufruf gelöscht wird. Im Repository
+liegt sie nicht — deshalb hat der Schritt „Nachzählen" des Ausroll-Workflows
+angeschlagen: 140 auf dem Projekt, 139 im Repository.
+
+**Entscheidung:** vom Projekt entfernt, nicht ins Repository aufgenommen.
+Dafür hat der Workflow eine neue Eingabe `loeschen` bekommen — nur von Hand
+auslösbar, mit ausdrücklich eingetragenem Namen, und sie verweigert den Dienst,
+solange die Funktion noch im Repository liegt.
+
+**Grund:** Die Arbeit ist getan und wiederholt sich nicht: `storage_umzug_token`
+ist leer, `storage_ohne_mandant()` liefert null Zeilen. Ein frisches Projekt hat
+keine Altdateien, muss also nichts umziehen. Was bliebe, wäre ein Endpunkt ohne
+JWT-Prüfung, der Dateien verschieben kann — geschützt allein dadurch, dass
+niemand eine Token-Zeile anlegen kann. Das ist eine Annahme mehr, als nötig ist.
+Die Migration `fork_08` beschreibt den Weg vollständig; wer ihn je wieder
+braucht, baut die Funktion aus dieser Beschreibung neu.
+
+**Kein automatischer Abgleich:** Der Workflow räumt nicht von selbst auf. Was
+auf dem Projekt liegt und nicht im Repository steht, *meldet* er; entfernt wird
+es von Hand. Ein Abgleich, der löscht, was er nicht kennt, ist auf einem
+Produktivprojekt die falsche Richtung.
