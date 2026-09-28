@@ -1,0 +1,113 @@
+# Baut dist/ aus src/ und stellt es auf eine Netlify-Site.
+#
+# Warum hier und nicht aus der Arbeitsumgebung: derselbe Grund wie beim
+# Ausrollen der Edge Functions — der Netzfilter dort laesst weder Netlify noch
+# die CDNs durch. Ein Runner kann beides.
+#
+# Voraussetzung: zwei Repository-Geheimnisse.
+#   NETLIFY_AUTH_TOKEN  Netlify > User settings > Applications >
+#                       Personal access tokens > New access token
+#   NETLIFY_SITE_ID     Netlify > die Site > Site configuration > Site ID
+#
+# WICHTIG: Die Site muss dem Fork gehoeren. Die netlify.toml im Wurzelverzeichnis
+# richtet den Next.js-ALTBESTAND ein (publish = ".next", Next-Plugin) — ein
+# anderes Produkt. Deshalb wird hier aus einem eigenen Verzeichnis ohne
+# netlify.toml ausgeliefert: so greift keine dieser Einstellungen.
+#
+# Standardmaessig entsteht ein ENTWURF mit eigener Adresse. Die Produktion
+# will ausdruecklich angefordert werden.
+name: Oberflaeche ausliefern
+
+on:
+  workflow_dispatch:
+    inputs:
+      umgebung:
+        description: 'entwurf (eigene Vorschau-Adresse) oder produktion'
+        required: true
+        default: entwurf
+        type: choice
+        options: [entwurf, produktion]
+
+concurrency:
+  group: oberflaeche-ausliefern
+  cancel-in-progress: false
+
+jobs:
+  ausliefern:
+    runs-on: ubuntu-latest
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Zugangsdaten vorhanden?
+        run: |
+          fehlt=""
+          [ -z "$NETLIFY_AUTH_TOKEN" ] && fehlt="$fehlt NETLIFY_AUTH_TOKEN"
+          [ -z "$NETLIFY_SITE_ID" ]    && fehlt="$fehlt NETLIFY_SITE_ID"
+          if [ -n "$fehlt" ]; then
+            echo "::error::Es fehlen die Repository-Geheimnisse:$fehlt"
+            echo "Anzulegen unter Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+      - name: Bauen
+        run: |
+          set -euo pipefail
+          # Die beiden oeffentlichen Werte stehen genau einmal im Repository:
+          # in netlify.toml, mit der Begruendung daneben. Von dort geholt und
+          # nicht ein zweites Mal hinterlegt — zwei Quellen laufen auseinander.
+          eval "$(python3 - <<'ENDE'
+          import shlex, sys, tomllib
+          with open('netlify.toml', 'rb') as f:
+              u = tomllib.load(f)['build']['environment']
+          try:
+              url, key = u['NEXT_PUBLIC_SUPABASE_URL'], u['NEXT_PUBLIC_SUPABASE_ANON_KEY']
+          except KeyError:
+              sys.exit('::error::netlify.toml fuehrt NEXT_PUBLIC_SUPABASE_URL '
+                       'oder NEXT_PUBLIC_SUPABASE_ANON_KEY nicht mehr. Die '
+                       'Oberflaeche holt beides von dort.')
+          print(f'export IMMO_SUPABASE_URL={shlex.quote(url)}')
+          print(f'export IMMO_SUPABASE_KEY={shlex.quote(key)}')
+          ENDE
+          )"
+          python3 scripts/bauen.py
+          python3 tests/oberflaeche-rauchtest.py
+
+      - name: Nichts Halbfertiges ausliefern
+        run: |
+          set -euo pipefail
+          schlecht=0
+          for f in dist/index.html dist/sw.js dist/freigabe.html \
+                   dist/objekt.html dist/sonnenverlauf.html dist/_redirects; do
+            [ -s "$f" ] || { echo "::error::$f fehlt oder ist leer"; schlecht=1; }
+          done
+          # Ein stehengebliebener Platzhalter heisst: die Seite kann sich nicht
+          # anmelden. Lieber gar nicht ausliefern als kaputt.
+          if grep -rl '__IMMO_[A-Z_]*__' dist/ 2>/dev/null | grep -q .; then
+            echo "::error::In dist/ stehen noch Platzhalter:"
+            grep -rho '__IMMO_[A-Z_]*__' dist/ | sort -u
+            schlecht=1
+          fi
+          if grep -q 'window.IMMO_SUPABASE_URL = "";' dist/index.html; then
+            echo "::error::dist/index.html hat keine Projekt-Adresse."
+            schlecht=1
+          fi
+          exit $schlecht
+
+      - name: Auf Netlify stellen
+        run: |
+          set -euo pipefail
+          npm install --no-save netlify-cli@17
+          # Aus einem eigenen Verzeichnis, damit die netlify.toml des
+          # Altbestands nicht mitgelesen wird.
+          mkdir -p auslieferung && cp -r dist/. auslieferung/
+          cd auslieferung
+          if [ "${{ github.event.inputs.umgebung }}" = "produktion" ]; then
+            npx netlify deploy --dir . --site "$NETLIFY_SITE_ID" --prod \
+              --message "immoOffice.ai ${{ github.sha }}"
+          else
+            npx netlify deploy --dir . --site "$NETLIFY_SITE_ID" \
+              --message "Entwurf ${{ github.sha }}"
+          fi
