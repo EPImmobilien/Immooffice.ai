@@ -8,7 +8,7 @@ nicht lösbar ist. Nach Auftrag Abschnitt 9.
 | Punkt | Wirkung |
 |---|---|
 | Egress-Proxy sperrt `api.supabase.com` und beide `*.supabase.co` | Kein CLI-Export, kein `db push`. Schema nur über die Verwaltungsschnittstelle lesbar. |
-| Egress-Proxy sperrt `unpkg.com` und `cdn.jsdelivr.net` | Die tatsächlich aufgelösten CDN-Versionen sind nicht feststellbar; exakte Pins stehen aus. Ein lokaler Build kann die Bibliotheken nicht laden, der Smoke-Test also nur die Struktur prüfen, nicht das Laufverhalten. |
+| ~~Egress-Proxy sperrt `unpkg.com` und `cdn.jsdelivr.net`~~ | **Gelöst am 28.09.2026:** `.github/workflows/oberflaeche-pruefen.yml` ruft alle geladenen Adressen auf einem Runner ab und lädt die Seite in einem echten Chromium. Ergebnis: alle 14 Bibliotheken antworten mit 200, die Anwendung startet fehlerfrei, die Anmeldung geht durch. Die Sperre bleibt, aber sie blockiert den Nachweis nicht mehr. |
 | Kein Supabase-CLI, Installation ohne Netz nicht möglich | `supabase functions download`, `supabase secrets list`, `supabase db dump` entfallen. |
 | ~~Ausrollen der Edge Functions nur über das MCP-Werkzeug, Datei für Datei~~ | **Gelöst am 28.09.2026:** `.github/workflows/funktionen-ausrollen.yml`. Ein Actions-Runner hat freien Netzzugang und überträgt die Dateien so, wie sie im Repository liegen — byte-genau, ohne Abschrift. Braucht das Repository-Geheimnis `SUPABASE_ACCESS_TOKEN`. |
 
@@ -250,3 +250,26 @@ Einspielen des E&P-Schemas. Drei Wege in `docs/STATUS.md` Abschnitt 3.
    Quellprojekt überein. Das beweist, dass nichts verloren ging, nicht dass
    sich alles gleich verhält. Ein Verhaltensvergleich braucht die Oberfläche
    und die Edge Functions.
+
+## Selbstregistrierung legt kein Profil an — Phase 3
+
+Gefunden am 28.09.2026 beim ersten echten Anmeldeversuch des Betreibers.
+
+Die Oberfläche erlaubt die Registrierung; dabei entsteht ein Konto in
+`auth.users`, aber **kein Eintrag in `profiles`**. Es gibt keinen Trigger auf
+`auth.users`, und die Oberfläche schreibt selbst nie in `profiles` — sie liest
+nur. Wer sich registriert, meldet sich erfolgreich an und landet in einer
+Anwendung ohne Rolle und ohne Rechte. Von außen sieht das aus, als ginge die
+Anmeldung nicht.
+
+In der Vorlage fällt das nicht auf: dort legt der Chef Mitarbeiter über die
+Edge Function `mitarbeiter-anlegen` an, die Konto **und** Profil erzeugt. Eine
+Selbstregistrierung war dort nicht vorgesehen — sie ist eine Anforderung des
+Forks (Auftrag, Phase 3).
+
+**Was Phase 3 lösen muss:** Konto und Profil entstehen gemeinsam, das Profil
+trägt von Anfang an eine `firma_id`, und der erste Nutzer einer neuen Firma
+bekommt die Rolle `chef`. Ein Trigger auf `auth.users` ist der naheliegende
+Weg, weil er auch bei Registrierung über einen fremden Anbieter greift.
+
+Bis dahin muss ein Profil von Hand angelegt werden.

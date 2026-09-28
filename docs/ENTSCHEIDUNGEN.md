@@ -566,3 +566,41 @@ sie nur dort tilgt, wo sie sichtbar sind, zerlegt die Zuordnung.
 kein Beweis für Sauberkeit. Dieses hier hat 146 Zeilen übersehen, während es
 „sauber" meldete. Gefunden wurden sie nicht vom Gate, sondern beim Lesen einer
 einzelnen Datei vor dem Ausrollen.
+
+## 28.09.2026 — Gate 1: die Kopie läuft, und was die Diagnose gekostet hat
+
+**Stand:** Die neutralisierte Kopie läuft auf `usguiggfciavwzkdfjgt`. Der
+Browser-Nachweis: Titel `ImmoOffice – Musterhaus Immobilien GmbH`, Anmeldemaske,
+null Skriptfehler, null gescheiterte Anfragen; nach der Anmeldung das
+Arbeitszimmer mit Zeiterfassung, Terminen und Aufgaben. `auth.sessions` bestätigt
+es serverseitig. `npm run check` grün, 139 von 139 Edge Functions ausgerollt.
+
+**Der Weg dahin war zweimal falsch abgebogen, beide Male durch mich.**
+
+**Erster Fehlschluss — die leere Protokolltabelle.** Auf die Meldung „ich kann
+mich nicht einloggen" habe ich `auth.audit_log_entries` abgefragt, nichts
+gefunden und daraus geschlossen, kein Anmeldeversuch habe Supabase erreicht —
+also starte die Seite nicht. Das war falsch: dieses Projekt schreibt dort
+überhaupt keine Einträge, auch nicht für erfolgreiche Anmeldungen. Die richtige
+Tabelle ist `auth.sessions`, und dort standen die Versuche die ganze Zeit.
+
+Daraus folgt eine Regel für das weitere Vorgehen: **eine leere Tabelle ist kein
+Beweis.** Bevor ihr Schweigen etwas heißen soll, muss feststehen, dass sie im
+Erfolgsfall etwas enthielte.
+
+**Zweiter Fehlschluss — der eigene Test.** Der Diagnoselauf meldete zwei nicht
+erreichbare CDN-Adressen. Beide waren Fehlalarme: `fonts.googleapis.com` und
+`fonts.gstatic.com` stehen als `<link rel="preconnect">` ohne Pfad da und
+antworten deshalb mit 404. Ich hatte sie als ladbare Adressen eingesammelt.
+Ebenso `/_redirects`: Netlify wertet die Datei aus und liefert sie nicht aus —
+der 404 ist der Beweis, dass sie angekommen ist. Beides ist im Test korrigiert.
+
+**Die eigentliche Ursache** war keine von beiden. Der Betreiber hatte sich
+registriert; das Konto entstand, das Profil nicht. Die Anmeldung ging durch, die
+Anwendung blieb leer. Siehe `docs/OFFEN.md` — es ist eine Aufgabe für Phase 3.
+
+**Was daraus in die Werkzeuge eingegangen ist:** `oberflaeche-pruefen.yml` prüft
+jetzt, was `npm run check` nicht kann — echte Adressen, echter Browser, echte
+Anmeldung. Jeder Schritt schreibt seinen Befund in eine Datei, ein letzter gibt
+alle aus; sonst verschwindet das Ergebnis hinter den Fortschrittsbalken des
+Browser-Downloads.
