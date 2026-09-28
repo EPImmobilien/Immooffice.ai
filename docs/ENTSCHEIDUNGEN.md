@@ -488,3 +488,35 @@ Rechtstext, den niemand geprüft hat. `docs/NEUTRALITAET.md` Abschnitt 5
 verlangt ausdrücklich, Rechtstexte zu ersetzen statt zu übernehmen; bis es
 neutrale Muster gibt, ist „erzeugt nichts" der ehrliche Zustand. Beides steht
 in `docs/OFFEN.md`, damit es nicht in Vergessenheit gerät.
+
+
+## 28.09.2026 — Shop-TV entfernt, mit `node --check` als Netz
+
+**Frage:** Phase 1.4 streicht Digital Signage ersatzlos. In der Oberfläche war
+das kein Textschnipsel, sondern ein Modul über ein Dutzend Aufrufstellen: eine
+eigene Seite, eine Kachelkomponente, ein Marketing-Format mit eigenen
+Bildslots, die Kanalzeile der Objektseite, die Yodeck-Schnittstelle und eine
+Videoaufnahme, die an den Bürobildschirm überträgt. Die Oberfläche lässt sich
+in dieser Umgebung nicht starten — wie prüft man so einen Eingriff?
+
+**Entscheidung:** Mit `node --check`. Es liest 5 MB in 0,17 Sekunden und ist
+jetzt fester Abschnitt von `npm run check`.
+
+**Was es gebracht hat:** Es hat **vier** Fehler gefangen, die ich sonst
+eingecheckt hätte.
+1. Ein Objektschnitt, der Komma davor *und* dahinter entfernte: `}{`.
+2. Ein Eigenschaftsschnitt, der nur den Wert nahm: `shoptv: ,`.
+3. Ein Rückwärtssprung, der den Geschwister-Aufruf traf statt des gemeinten.
+4. Ein Zeilenschnitt, dessen Endmerkmal erst 15.218 Zeilen später zutraf.
+
+Der vierte ist der lehrreiche: Er hätte ein Drittel der Anwendung gelöscht,
+ohne dass irgendetwas außer dem Syntaxprüfer es gemerkt hätte. `zeilen_weg`
+begrenzt seitdem den Abstand und bricht ab, statt zu raten.
+
+**Grund für das Ganze:** Ohne Prüfung wäre der Eingriff nicht zu verantworten
+gewesen. Mit ihr ist er eine gewöhnliche Codeänderung.
+
+**Was bleibt:** Die Spalte `shoptv_veroeffentlichen` und ihr Prüfwert im
+Schema — Phase 9 verbietet das Entfernen von Spalten. Die Oberfläche liest und
+schreibt sie nicht mehr. Ebenso bleibt das Druckformat „Schaufenster-Aushang":
+ein Aushang aus Papier ist kein Digital Signage.

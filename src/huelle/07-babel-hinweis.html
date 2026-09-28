@@ -1,0 +1,13 @@
+<!-- @babel/standalone GEPINNT + klassische JSX-Runtime ERZWUNGEN.
+     Grund (Ausfall 17.06.2026): Neuere Babel-Versionen emittieren standardmaessig
+     `import { jsx } from "react/jsx-runtime"` (automatic runtime). Da der
+     transpilierte Code als klassisches <script> (NICHT type="module") eingehaengt
+     wird, wirft der Browser "Cannot use import statement outside a module" und die
+     GESAMTE App startet nicht mehr. Die HTML war unveraendert – das ungepinnte
+     CDN ("latest") hatte still die Default-Runtime gewechselt.
+     runtime:"classic" nutzt das globale React (UMD-CDN) via React.createElement
+     und kommt voellig ohne import aus. Version zusaetzlich gepinnt, damit sich der
+     Default nie wieder unbemerkt aendern kann. -->
+<!-- Babel-Standalone entfernt: JSX wird seit 19.07.2026 offline vorkompiliert (iOS-Speicherlimit) -->
+<!-- registerPreset entfernt (vorkompiliert) -->
+

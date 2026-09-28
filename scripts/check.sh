@@ -44,6 +44,28 @@ else
   echo "reference/epworld-src.html fehlt — nicht pruefbar (reference/ ist nicht versioniert)."
 fi
 
+abschnitt "Oberflaeche: dist/index.html bauen"
+if python3 scripts/bauen.py; then
+  :
+else
+  fehler=1
+fi
+
+abschnitt "Oberflaeche: Syntax"
+if [[ -d src ]]; then
+  syntaxfehler=0
+  for f in src/app/*.js src/start/*.js; do
+    node --check "$f" || syntaxfehler=1
+  done
+  if [[ $syntaxfehler -eq 0 ]]; then
+    echo "[ok] Alle Skripte der Oberflaeche sind syntaktisch gueltig."
+  else
+    fehler=1
+  fi
+else
+  echo "src/ fehlt — nichts zu pruefen."
+fi
+
 abschnitt "Edge Functions: nur Kennzeichen geaendert"
 if python3 tests/funktionen-unveraendert.py; then
   :
@@ -53,9 +75,8 @@ fi
 
 abschnitt "Noch nicht abgedeckt"
 cat <<'ENDE'
-- Build von dist/index.html          — kommt mit Phase 1 (es gibt noch keine Oberflaeche)
-- Syntaxpruefung der Oberflaeche     — dito
-- Rauchtest (ein App-Skript, ein createRoot, CDN-Pins, Bundle-Groesse) — dito
+- Rauchtest (ein App-Skript, ein createRoot, CDN-Pins, Bundle-Groesse) — kommt
+                                       mit dem ersten Start gegen das eigene Projekt
 - Syntaxpruefung der Edge Functions  — kein Deno und kein TypeScript in dieser
                                        Umgebung; geprueft wird nur, dass die
                                        Neutralisierung nichts anderes anfasst

@@ -45,12 +45,9 @@ npm-debug.log*
 .vscode/*
 !.vscode/extensions.json
 
-# --- Oberflaeche: vorerst nicht versioniert ---------------------------------
+# --- Oberflaeche ------------------------------------------------------------
 # src/ entsteht aus reference/epworld-src.html durch
-# scripts/oberflaeche-zerlegen.py. Es ist bewusst noch NICHT im Repository:
-# 58 % des Anwendungscodes liegen vorkompiliert vor, und in diesem Teil laesst
-# sich die Streichung aus Phase 1.4 (Shop-TV) nicht sauber ausfuehren. Ein
-# Zwischenstand, der das Neutralitaets-Gate nur mit einer Ausnahme passiert,
-# waere ein Gate mit einem Loch. Sobald der Quelltext der vorkompilierten
-# Abschnitte vorliegt, wird src/ versioniert. Siehe docs/OFFEN.md.
-src/
+# scripts/oberflaeche-zerlegen.py und ist seit dem 28.09.2026 versioniert:
+# neutralisiert, ohne Shop-TV, syntaktisch geprueft. Nicht von Hand aendern —
+# der naechste Lauf des Skripts verwirft die Aenderung. Aenderungen gehoeren
+# in das Skript, mit Grund.

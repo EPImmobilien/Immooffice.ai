@@ -1,0 +1,134 @@
+  * { box-sizing: border-box; }
+  html, body, #root { margin: 0; padding: 0; min-height: 100%; font-family: 'Montserrat', system-ui, sans-serif; }
+  body { background: #FAFAF7; }
+  #loadingScreen { 
+    position: fixed; inset: 0; 
+    background: linear-gradient(135deg, #263159 0%, #1a2342 100%);
+    display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 24px;
+    z-index: 9999; transition: opacity 0.5s;
+  }
+  #loadingScreen.hidden { opacity: 0; pointer-events: none; }
+  #loadingScreen .dot { 
+    width: 12px; height: 12px; background: #D4A567; border-radius: 50%;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  #loadingScreen .dot:nth-child(2) { animation-delay: 0.2s; }
+  #loadingScreen .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes pulse { 0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); } 40% { opacity: 1; transform: scale(1); } }
+  #loadingScreen .dots { display: flex; gap: 12px; }
+  #loadingScreen .text { color: #D4A567; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; font-weight: 600; }
+  #errorOverlay {
+    position: fixed; inset: 0; background: #FAFAF7; padding: 24px;
+    display: none; align-items: center; justify-content: center; z-index: 10000;
+    font-family: 'Montserrat', sans-serif;
+  }
+  #errorOverlay .card {
+    max-width: 600px; background: #fff; padding: 40px;
+    border: 1px solid #E8E4DA; border-left: 4px solid #c0392b;
+  }
+  #errorOverlay h1 { color: #c0392b; font-size: 22px; margin-top: 0; }
+  #errorOverlay pre { background: #FAFAF7; padding: 16px; overflow: auto; font-size: 11px; max-height: 240px; white-space: pre-wrap; word-break: break-word; }
+
+  /* ===================== Mobile-Fixes (iPhone, schmale Bildschirme) =====================
+     Die App ist mit Inline-Styles gebaut, deshalb greifen normale CSS-Regeln nicht.
+     Mit !important in einer Media Query lassen sich Inline-Styles aber ueberstimmen —
+     genau das passiert hier. */
+  @media (max-width: 768px) {
+    /* 1) Explizit gesetzte Klasse (Bestand, bleibt gueltig) */
+    .mob-stack { grid-template-columns: 1fr !important; }
+
+    /* 2) ALLE per Inline-Style fest mehrspaltigen Raster einspaltig stapeln.
+          Raster mit repeat(auto-fill/auto-fit, minmax(...)) sind bereits von sich
+          aus responsiv und werden bewusst NICHT angefasst.
+          WICHTIG: minmax(0, 1fr) statt 1fr — sonst greift der Grid-Blowout
+          (siehe unten) und die Spalte wird so breit wie ihr laengster Inhalt.
+          Wer eine Zeile auch auf dem Handy nebeneinander braucht (z. B. Betrag +
+          Waehrung), setzt am Element className="mob-keep". */
+    [style*="grid-template-columns"]:not([style*="auto-fi"]):not(.mob-keep) {
+      grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    /* 2c) GRID-/FLEX-BLOWOUT: Kinder eines Grid oder Flex haben von Haus aus
+           min-width:auto und duerfen deshalb NICHT unter ihre Inhaltsbreite
+           schrumpfen. Eine lange Betreffzeile mit white-space:nowrap blaeht so
+           das ganze Layout auf — die Seite wird breiter als der Bildschirm und
+           iOS zoomt sie heraus (winzige Schrift, Kopfleiste passt nicht mehr).
+           min-width:0 erlaubt das Schrumpfen, dann greifen overflow:hidden und
+           text-overflow:ellipsis wie vorgesehen. */
+    [style*="display: grid"] > *,
+    [style*="display: flex"] > * { min-width: 0; }
+
+    /* 2d) Letztes Netz: nichts darf horizontal ueber den Bildschirm hinausragen,
+           sonst skaliert iOS die gesamte Seite herunter. */
+    html, body { overflow-x: hidden; max-width: 100%; }
+
+    /* 2b) Kleine Kachel-Raster (repeat(3,1fr), Farbfelder, KPI-Zahlen) wuerden
+           einspaltig unnoetig lang — die bleiben zweispaltig. */
+    [style*="grid-template-columns: repeat("]:not([style*="auto-fi"]):not(.mob-keep) {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    /* 2e) HORIZONTALE SCROLL-ZEILEN (Tab-Leisten, Chip-Reihen, Balkendiagramm):
+           Regel 2c erlaubt Flex-Kindern das Schrumpfen (min-width:0) — in bewusst
+           scrollbaren Zeilen (overflow-x:auto) ist das falsch: die nowrap-Tabs
+           quetschen sich uebereinander, statt dass die Zeile scrollt (am iPhone
+           erst am 20.07.2026 sichtbar geworden, vorher stuerzte iOS beim Laden ab).
+           Kinder solcher Container behalten ihre Inhaltsbreite und schrumpfen nicht.
+           Zweiter Selektor: Zeilen, die erst durch Regel 5 scrollbar werden. */
+    [style*="overflow-x: auto"] > *,
+    #root [style*="border-bottom"][style*="display: flex"] > * {
+      min-width: auto; flex-shrink: 0;
+    }
+
+    /* 3) Lange E-Mail-Adressen, IBANs und URLs sprengen keine Karten mehr */
+    #root { overflow-wrap: break-word; }
+
+    /* 4) Bilder, Canvas und Vorschauen bleiben im Rahmen */
+    img, canvas, video, svg { max-width: 100%; }
+
+    /* 5) Tab-Leisten und breite Zeilen horizontal scrollbar statt gequetscht */
+    #root [style*="border-bottom"][style*="display: flex"] { overflow-x: auto; }
+
+    body { font-size: 14px; }
+  }
+
+  /* ===================== Cockpit-Startseite (31.08.2026, Etappe 1) =====================
+     Das Kachelgitter kommt bewusst aus dem Stylesheet statt aus Inline-Styles:
+     nur so lassen sich Spaltenzahl und Kachelhoehe je Bildschirmbreite steuern.
+     className="mob-keep" haelt die globale Mobil-Regel (einspaltig stapeln) fern. */
+  .ep-kachelgitter {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+    gap: 14px;
+  }
+  .ep-kachel { padding: 16px 18px; min-height: 90px; }
+  .ep-kachel-titel { font-size: 16px; }
+
+  @media (min-width: 1400px) {
+    .ep-kachelgitter { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  }
+  /* Ohne Breiten-Deckel wuerden fuenf Spalten auf grossen Monitoren zu
+     plakatartig breiten Kacheln fuehren — ab hier eine sechste. */
+  @media (min-width: 1900px) {
+    .ep-kachelgitter { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  }
+  /* Zuletzt bearbeitet: die EINZIGE bewusst quer scrollende Zeile der Startseite */
+  .ep-zuletzt { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; -webkit-overflow-scrolling: touch; }
+  .ep-zuletzt > * { flex-shrink: 0; }
+
+  /* Heute-Zone: am Desktop drei Spalten, mobil EINE gestapelte Spalte.
+     Eigene Klasse statt Inline-Grid, weil die globale Mobil-Regel repeat()-Raster
+     sonst auf zwei Spalten zwingt. */
+  .ep-heute { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
+  @media (max-width: 767px) {
+    .ep-heute { grid-template-columns: minmax(0, 1fr) !important; gap: 10px !important; }
+  }
+
+  @media (max-width: 767px) {
+    /* Mobil zwei Spalten statt einer Kachelwurst; Unterzeile faellt weg */
+    .ep-kachelgitter { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
+    .ep-kachel { padding: 10px 11px !important; min-height: 76px !important; }
+    .ep-kachel-titel { font-size: 13px !important; }
+    .ep-kachel-sub { display: none !important; }
+    .ep-kachel-zahl { font-size: 15px !important; }
+  }

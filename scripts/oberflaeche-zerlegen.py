@@ -87,6 +87,15 @@ ERSETZUNGEN = [
      'Name des Geschaeftsfuehrers als Vorgabewert und als Suchbegriff in den '
      'Word-Vorlagen. Ein Platzhalter statt eines leeren Werts: die Suche darf '
      'weiterhin ins Leere laufen, nicht auf Position 0 treffen.'),
+    ('PHASE14',
+     r'/engfer/i\.test\(t\.bearbeiter\) && /lasse/i\.test\(t\.bearbeiter\) && '
+     r'\(t\.zusatz = "[^"]*"\), ',
+     '',
+     'Fest verdrahteter Titel samt Registriernummer fuer eine namentlich '
+     'genannte Person, mit Bewertungsdienst. Person und Dienst entfallen; der '
+     'Zusatz kommt aus dem Profil.'),
+    ('PHASE14', r' \(Sprengnetter\)', '',
+     'Anbietername im Platzhalter eines Eingabefeldes.'),
     ('MARKE', r'moveLasseEngferLeft', 'moveNamenszeileLinks',
      'Funktionsname mit dem Namen des Geschaeftsfuehrers der Referenz.'),
 
@@ -296,6 +305,393 @@ def signatur_neutralisieren(inhalt):
     return inhalt[:kopf_ab] + ersatz + inhalt[trenner:], 1
 
 
+# ---------------------------------------------------------------- Phase 1.4
+# Shop-TV / Digital Signage entfaellt nach Phase 1.4 des Auftrags ersatzlos.
+# Das ist keine Textersetzung, sondern eine Modulentfernung ueber acht
+# Aufrufstellen. Moeglich wurde sie erst durch das Ausformatieren — vorher lag
+# alles davon in einer 2,4-MB-Zeile.
+#
+# Reihenfolge: erst die Aufrufer, dann die Funktionen. Andersherum stuende
+# zwischendurch ein Aufruf ins Leere, und ein Abbruch mittendrin hinterliesse
+# eine Datei, die nicht mehr laedt.
+#
+# Geprueft wird das Ergebnis mit `node --check` (Teil von npm run check). Ohne
+# diese Pruefung waere der Eingriff nicht zu verantworten: die Oberflaeche
+# laesst sich in dieser Umgebung nicht starten.
+
+
+def _spring(text, i):
+    """Ueberspringt ab i eine Zeichenkette oder einen Kommentar; sonst None.
+
+    Ohne diese Ruecksicht zaehlt ein Klammernzaehler die Klammern mit, die in
+    Texten und Kommentaren stehen — und schneidet an der falschen Stelle.
+    """
+    z = text[i]
+    if z in '"\'`':
+        j = i + 1
+        while j < len(text):
+            if text[j] == '\\':
+                j += 2
+                continue
+            if text[j] == z:
+                return j + 1
+            j += 1
+        sys.exit('ABBRUCH: unbeendete Zeichenkette beim Suchen der Klammern.')
+    if text.startswith('//', i):
+        j = text.find('\n', i)
+        return len(text) if j < 0 else j
+    if text.startswith('/*', i):
+        j = text.find('*/', i)
+        if j < 0:
+            sys.exit('ABBRUCH: unbeendeter Kommentar.')
+        return j + 2
+    return None
+
+
+def _ende_ab(text, a, auf, zu):
+    i = text.index(auf, a)
+    tiefe = 0
+    while i < len(text):
+        s = _spring(text, i)
+        if s is not None:
+            i = s
+            continue
+        if text[i] == auf:
+            tiefe += 1
+        elif text[i] == zu:
+            tiefe -= 1
+            if tiefe == 0:
+                return i + 1
+        i += 1
+    sys.exit('ABBRUCH: keine schliessende Klammer gefunden.')
+
+
+def aufruf_weg(inhalt, anker, ebenen=0, start='React.createElement('):
+    """Entfernt den React-Aufruf, in dem `anker` steht — samt folgendem Komma.
+
+    `ebenen` steigt in den umschliessenden Aufruf. Rueckwaerts steht dabei oft
+    ein Geschwister und kein Elternteil, deshalb wird weitergesucht, bis einer
+    gefunden ist, der hinter dem inneren endet.
+    """
+    pos = inhalt.index(anker)
+    # Der Anker kann selbst am Anfang des Aufrufs stehen; rindex wuerde dann den
+    # davorstehenden Geschwister-Aufruf treffen.
+    a = pos if inhalt.startswith(start, pos) else inhalt.rindex(start, 0, pos)
+    b = _ende_ab(inhalt, a, '(', ')')
+    for _ in range(ebenen):
+        suche = a
+        while True:
+            suche = inhalt.rindex(start, 0, suche)
+            ende = _ende_ab(inhalt, suche, '(', ')')
+            if ende >= b:
+                a, b = suche, ende
+                break
+    while inhalt[b:b + 2] == ', ':
+        b += 2
+    return inhalt[:a] + inhalt[b:]
+
+
+def objekt_weg(inhalt, anker):
+    """Entfernt das Objektliteral, in dem `anker` steht — samt Trennkomma."""
+    pos = inhalt.index(anker)
+    a = inhalt.rindex('{', 0, pos)
+    b = _ende_ab(inhalt, a, '{', '}')
+    # Genau EIN Trennzeichen faellt mit: bevorzugt das dahinter, sonst das
+    # davor. Beide zu nehmen schweisst die Nachbarn zusammen ("}{") — genau
+    # daran ist der erste Versuch gescheitert.
+    if inhalt[b:b + 2] == ', ':
+        b += 2
+    elif inhalt[a - 2:a] == ', ':
+        a -= 2
+    return inhalt[:a] + inhalt[b:]
+
+
+def zeilen_weg(inhalt, von, bis=None, hoechstens=40, genau_einmal=True):
+    """Entfernt ganze Zeilen: die mit `von`, bis einschliesslich der mit `bis`.
+
+    `hoechstens` begrenzt den Abstand. Ohne die Grenze trifft ein unscharfes
+    Endmerkmal irgendeine spaetere Zeile und reisst hunderte Zeilen mit — still,
+    und erst der Syntaxpruefer merkt es, an einer ganz anderen Stelle.
+    """
+    zeilen = inhalt.split('\n')
+    treffer = [i for i, l in enumerate(zeilen) if von in l]
+    if not treffer:
+        sys.exit(f'ABBRUCH: {von!r} kommt nicht vor.')
+    if genau_einmal and len(treffer) != 1:
+        sys.exit(f'ABBRUCH: {von!r} kommt {len(treffer)}-mal vor, erwartet genau einmal.')
+    a = treffer[0]
+    if bis is None:
+        b = a
+    else:
+        kandidaten = [i for i in range(a, len(zeilen)) if bis in zeilen[i]]
+        if not kandidaten:
+            sys.exit(f'ABBRUCH: {bis!r} nach {von!r} nicht gefunden.')
+        b = kandidaten[0]
+        if b - a > hoechstens:
+            sys.exit(f'ABBRUCH: von {von!r} bis {bis!r} liegen {b - a} Zeilen. '
+                     f'Erlaubt sind {hoechstens}. Das Endmerkmal trifft zu frueh '
+                     'oder zu spaet.')
+    return '\n'.join(zeilen[:a] + zeilen[b + 1:])
+
+
+def zuweisung_weg(inhalt, anker):
+    """Entfernt eine Zuweisung `name = async (...) => { ... }` aus einer Kette.
+
+    Die Vorlage bindet mehrere Funktionen in einer einzigen const-Kette. Die
+    Klammern der Parameterliste zaehlen dabei nicht — gesucht wird der Koerper
+    hinter dem Pfeil.
+    """
+    a = inhalt.index(anker)
+    pfeil = inhalt.index(' => {', a)
+    b = _ende_ab(inhalt, pfeil + 4, '{', '}')
+    if inhalt[b:b + 2] == ', ':
+        b += 2
+    elif inhalt[a - 2:a] == ', ':
+        a -= 2
+    return inhalt[:a] + inhalt[b:]
+
+
+def ternaer_zweig_weg(inhalt, bedingung):
+    """Entfernt `<bedingung> ? React.createElement(...) : ` aus einer Kette.
+
+    Nur den Aufruf zu entfernen genuegt nicht — Bedingung, Fragezeichen und
+    Doppelpunkt bleiben sonst als Rumpf stehen.
+    """
+    a = inhalt.index(bedingung)
+    frage = inhalt.index(' ? ', a)
+    ausdruck = frage + 3
+    if not inhalt.startswith('React.createElement(', ausdruck):
+        sys.exit(f'ABBRUCH: hinter {bedingung!r} steht kein React-Aufruf.')
+    b = _ende_ab(inhalt, ausdruck, '(', ')')
+    if inhalt[b:b + 3] != ' : ':
+        sys.exit(f'ABBRUCH: hinter dem Zweig zu {bedingung!r} fehlt der Doppelpunkt.')
+    return inhalt[:a] + inhalt[b + 3:]
+
+
+def und_zweig_weg(inhalt, bedingung):
+    """Entfernt `<bedingung> && <ausdruck>` samt Trennkomma.
+
+    Der Ausdruck ist mal ein React-Aufruf, mal eine sofort ausgefuehrte
+    Funktion `(() => {...})()`. Beide beginnen mit einer Klammer, also wird ab
+    der ersten Klammer hinter dem && gezaehlt — und ein angehaengtes ()
+    mitgenommen.
+    """
+    a = inhalt.index(bedingung)
+    ruf = inhalt.index('(', inhalt.index(' && ', a))
+    b = _ende_ab(inhalt, ruf, '(', ')')
+    if inhalt[b:b + 2] == '()':
+        b += 2
+    if inhalt[a - 2:a] == ', ':
+        a -= 2
+    elif inhalt[b:b + 2] == ', ':
+        b += 2
+    return inhalt[:a] + inhalt[b:]
+
+
+def bindung_weg(inhalt, name):
+    """Entfernt `NAME = [ ... ],` aus einer const-Kette, ueber Klammernzaehlung.
+
+    Ein Zeilenmerkmal als Ende ist hier untauglich: schliessende Klammern in
+    dieser Einrueckung gibt es tausendfach.
+    """
+    a = inhalt.index(f'{name} = [')
+    b = _ende_ab(inhalt, a, '[', ']')
+    if inhalt[b:b + 2] in (',\n', ', '):
+        b += 2
+    else:
+        # Letzte Bindung der Kette: dann faellt das Komma davor, sonst bleibt
+        # ein einsames Semikolon stehen.
+        for trenner in (',\n  ', ', '):
+            if inhalt[a - len(trenner):a] == trenner:
+                a -= len(trenner)
+                break
+    return inhalt[:a] + inhalt[b:]
+
+
+def shoptv_entfernen(inhalt):
+    """Streicht Shop-TV / Digital Signage nach Phase 1.4 des Auftrags.
+
+    Erst die Aufrufer, dann die Funktionen: andersherum stuende zwischendurch
+    ein Aufruf ins Leere. Was NICHT faellt: die Spalte
+    shoptv_veroeffentlichen und der Pruefwert im Schema (Phase 9 verbietet das
+    Entfernen von Spalten) und das Druckformat "Schaufenster-Aushang" — ein
+    Aushang aus Papier ist kein Digital Signage.
+    """
+    schritte = []
+
+    # --- Oberflaeche: Kacheln, Listen, Routen
+    inhalt = zeilen_weg(inhalt, '    shoptv: "Schaufenster-TV"')
+    schritte.append('Beschriftung in der Portalstatus-Anzeige')
+    inhalt = objekt_weg(inhalt, 'id: "shoptv",\n    label: "Schaufenster-TV"')
+    schritte.append('Eintrag in der Auswahlliste der Vermarktungsorte')
+    inhalt = aufruf_weg(inhalt, 'feld: "shoptv_veroeffentlichen"', ebenen=1)
+    schritte.append('Karte "Im Schaufenster-TV zeigen" in der Objektseite')
+    inhalt = aufruf_weg(inhalt, 'kanal: "shoptv"')
+    schritte.append('Kanalzeile Schaufenster-TV in der Objektseite')
+    # Hier faellt die ganze Eigenschaft, nicht nur ihr Wert: objekt_weg wuerde
+    # "shoptv: ," stehen lassen.
+    inhalt = zeilen_weg(inhalt, '  shoptv: {', '  },')
+    schritte.append('Marketing-Format "Shop TV"')
+    inhalt = inhalt.replace('r("shoptv", "\U0001f4fa", "Shop TV", '
+                            '"Hochformat f\u00fcr den B\u00fcrobildschirm"), ', '')
+    schritte.append('Knopf "Shop TV" in der Formatauswahl')
+    inhalt = objekt_weg(inhalt, 'id: "shoptv",\n      label: "Shop TV",')
+    schritte.append('Kachel "Shop TV" in der Marketing-Uebersicht')
+    # --- Erst die Bedingungen entschaerfen: "shop-tv" kann kein Format mehr
+    # sein, also faellt der Zweig. Das muss VOR der Zweig-Schleife laufen,
+    # sonst bleibt sie an einer Zahlenbedingung haengen.
+    for a, b, was in [
+        ('"coming-soon-story" === t || "shop-tv" === t',
+         '"coming-soon-story" === t', 'Formatpruefung in der Kachelvorschau'),
+        ('"coming-soon-story" === d || "shop-tv" === d ? 1920 : 1080',
+         '"coming-soon-story" === d ? 1920 : 1080', 'Hoehe der Vorschauflaeche'),
+        (' && "shop-tv" !== d', '', 'Ausschluss in der Werkzeugleiste'),
+        ('("schaufenster" === d || "shop-tv" === d)', '("schaufenster" === d)',
+         'gemeinsamer Zweig mit dem Schaufenster-Aushang'),
+        ('"shop-tv" !== d && ', '', 'Ausschluss am Knopf'),
+    ]:
+        if a in inhalt:
+            inhalt = inhalt.replace(a, b)
+            schritte.append(f'Bedingung: {was}')
+
+    n = 0
+    while True:
+        i = inhalt.find('"shop-tv" === d ?')
+        if i < 0:
+            break
+        if not inhalt.startswith('React.createElement(', inhalt.index(' ? ', i) + 3):
+            print('  [HINWEIS] Zweig mit anderem Aufbau, bleibt vorerst stehen:\n'
+                  f'    …{inhalt[i:i+140]}…')
+            break
+        inhalt = ternaer_zweig_weg(inhalt, '"shop-tv" === d ?')
+        n += 1
+    schritte.append(f'Vorschau-Zweige der Shop-TV-Kachel ({n})')
+    inhalt = inhalt.replace(', "shoptv" === t && React.createElement(ShopTvPage, {\n'
+                            '    user: e\n  })', '')
+    schritte.append('Route zur Shop-TV-Seite')
+    inhalt = inhalt.replace('"shop-tv" === t ? ShopTvKachelModern : ', '')
+    schritte.append('Shop-TV-Zweig in der Kachelauswahl')
+    inhalt = zuweisung_weg(inhalt, 'ie = async ({')
+    schritte.append('Uebertragung an den Buerobildschirm (Video + Yodeck-Upload)')
+    inhalt = aufruf_weg(inhalt, 'Direkt auf Shop TV (Live)', ebenen=1)
+    schritte.append('Knopf "Direkt auf Shop TV"')
+
+    # --- Die beiden Seiten selbst
+    for name in ('ShopTvPage', 'ShopTvKachelModern'):
+        inhalt, n = funktion_entfernen(inhalt, name)
+        if not n:
+            sys.exit(f'ABBRUCH: {name} nicht gefunden.')
+        schritte.append(f'Funktion {name} ({n} Zeilen)')
+
+    # --- Yodeck-Anbindung im Kanal-Baustein
+    inhalt = inhalt.replace('const EP_KANAL_LABEL = { website: "Eigene Internetseite", '
+                            'shoptv: "Schaufenster-TV" };',
+                            'const EP_KANAL_LABEL = { website: "Eigene Internetseite" };')
+    for name in ('epShopTvPasst', 'epShopTvAbgleich'):
+        inhalt, n = funktion_entfernen(inhalt, name)
+        if not n:
+            sys.exit(f'ABBRUCH: {name} nicht gefunden.')
+        schritte.append(f'Funktion {name} ({n} Zeilen)')
+    inhalt = inhalt.replace('const erg = { website: null, shoptv: null, yodeck: null };',
+                            'const erg = { website: null };')
+    inhalt = inhalt.replace('const paare = [["website", "website_veroeffentlichen"], '
+                            '["shoptv", "shoptv_veroeffentlichen"]];',
+                            'const paare = [["website", "website_veroeffentlichen"]];')
+    inhalt = zeilen_weg(inhalt, 'if (portal === "shoptv") erg.yodeck')
+    inhalt = zeilen_weg(inhalt, 'if (erg.yodeck && erg.yodeck.ok')
+    schritte.append('Yodeck-Abgleich beim Speichern der Kanaele')
+    inhalt = zeilen_weg(inhalt, 'const [live, setLive] = useState(null);',
+                        '}, [kanal, objekt && objekt.id]);')
+    inhalt = zeilen_weg(inhalt, 'if (kanal === "shoptv" && live !== null)')
+    inhalt = zeilen_weg(inhalt, 'kanal === "shoptv" && onKachel &&')
+    schritte.append('Live-Anzeige und Kachel-Knopf in der Kanalzeile')
+    inhalt, n = funktion_entfernen(inhalt, 'yodeckCall')
+    if n:
+        schritte.append(f'Yodeck-Schnittstelle yodeckCall ({n} Zeilen)')
+    inhalt = zeilen_weg(inhalt, 'const YODECK_SCREEN_ID =', 'YODECK_PLAYLIST_TEST =')
+    schritte.append('Kennungen des Yodeck-Bildschirms')
+
+    # --- Der Rest ist Zubehoer des Formats im Marketing-Editor: Bildslots,
+    # Standardwerte, Hinweistexte. Ohne das Format ist es toter Code.
+    while '"shop-tv" === d &&' in inhalt:
+        inhalt = und_zweig_weg(inhalt, '"shop-tv" === d &&')
+    schritte.append('Bildslot-Bereich und Aufnahmeknopf des Shop-TV-Formats')
+    inhalt = inhalt.replace('(Instagram, Schaufenster, Shop-TV \u2026)',
+                            '(Instagram, Schaufenster \u2026)')
+    inhalt = objekt_weg(inhalt, 'id: "shoptv",\n    title: "Shop TV",')
+    schritte.append('Kachel "Shop TV" in der Werkzeuguebersicht')
+    inhalt = bindung_weg(inhalt, 'MKT_SHOPTV_SLOTS')
+    inhalt = inhalt.replace('MKT_SHOPTV_SLOTS.map(', '[].map(')
+    schritte.append('Auswahlliste der Shop-TV-Bildslots')
+    inhalt = inhalt.replace('useState("shopTvBildHero")', 'useState("")')
+    inhalt = inhalt.replace('i = "shop-tv" === t,', 'i = !1,')
+    for marke in ('shopTvBildHero:', 'shopTvBild2:', 'shopTvBild3:'):
+        while any(marke in z for z in inhalt.split('\n')):
+            inhalt = zeilen_weg(inhalt, marke, genau_einmal=False)
+    inhalt = inhalt.replace(
+        '!b.shopTvBildHero && "Hauptbild", !b.shopTvBild2 && "weiteres Foto (1)", '
+        '!b.shopTvBild3 && "weiteres Foto (2)"', '')
+    schritte.append('Bildslots und ihre Standardwerte')
+    for marke in ('shoptv_veroeffentlichen',):
+        while any(marke in z for z in inhalt.split('\n')):
+            inhalt = zeilen_weg(inhalt, marke, genau_einmal=False)
+    schritte.append('Lesen und Schreiben der Spalte shoptv_veroeffentlichen '
+                    '(die Spalte selbst bleibt, Phase 9)')
+    # Phase 1.4 streicht auch den Bewertungsdienst-Zugang.
+    inhalt = aufruf_weg(inhalt, 'service: "sprengnetter"', ebenen=1)
+    schritte.append('Kachel fuer den Zugang zum Bewertungsdienst')
+    inhalt = inhalt.replace('(z. B. Sprengnetter, PDF)', '(PDF)')
+    inhalt = inhalt.replace('"Sprengnetter", ', '')
+    inhalt = inhalt.replace(' (z. B. Sprengnetter)', '')
+    schritte.append('Anbietername im Hinweistext der Gutachten-Auslese')
+    inhalt = inhalt.replace('shopTvQrGroesse', 'qrGroesse')
+    schritte.append('Feldname der QR-Groesse entkoppelt (gilt auch fuer den Aushang)')
+
+    # --- Kommentarzeilen, die nur noch Entferntes beschreiben
+    for zeile in ('// Passt ein Yodeck-Medien-/Playlist-Name zum Objekt?',
+                  '// Live-Playlist mit dem Schalter abgleichen:'):
+        if zeile in inhalt:
+            inhalt = zeilen_weg(inhalt, zeile)
+    inhalt = inhalt.replace(
+        '// ===== Stufe 94: Vermarktungskanaele Eigene Internetseite / Schaufenster-TV (Auftrag 13) =====',
+        '// ===== Stufe 94: Vermarktungskanal Eigene Internetseite (Auftrag 13) =====\n'
+        '// Schaufenster-TV/Yodeck ist nach Phase 1.4 des Auftrags entfallen.')
+    inhalt = inhalt.replace(
+        '// Beim Speichern: geaenderte Schalter als Portal-Status spiegeln, Shop-TV mit Yodeck abgleichen.',
+        '// Beim Speichern: geaenderte Schalter als Portal-Status spiegeln.')
+    return inhalt, schritte
+
+
+def funktion_entfernen(inhalt, name):
+    """Entfernt eine Funktion der obersten Ebene samt Koerper.
+
+    Nach dem Ausformatieren beginnt jede Funktion der obersten Ebene in Spalte 1
+    und endet mit einer Zeile, die nur aus } besteht. Das ist verlaesslich genug,
+    um ohne Parser auszukommen — und es wird nachgeprueft: zwischen Anfang und
+    Ende darf keine weitere Funktion der obersten Ebene liegen.
+    """
+    zeilen = inhalt.split('\n')
+    koepfe = (f'function {name}(', f'async function {name}(')
+    anfang = None
+    for i, l in enumerate(zeilen):
+        if l.startswith(koepfe):
+            anfang = i
+            break
+    if anfang is None:
+        return inhalt, 0
+    ende = None
+    for i in range(anfang + 1, len(zeilen)):
+        if zeilen[i] == '}':
+            ende = i
+            break
+        if zeilen[i].startswith(('function ', 'async function ')):
+            sys.exit(f'ABBRUCH: zwischen {name} und seinem Ende steht '
+                     f'{zeilen[i][:40]!r}. Die Grenzen stimmen nicht.')
+    if ende is None:
+        sys.exit(f'ABBRUCH: kein Ende fuer {name} gefunden.')
+    return '\n'.join(zeilen[:anfang] + zeilen[ende + 1:]), ende - anfang + 1
+
+
 def pruefe_haeufigkeit(n, bemerkung, datei):
     """Notbremse gegen Regeln, die versehentlich zu breit greifen."""
     if n > 400:
@@ -339,6 +735,10 @@ def main():
             if n_signatur:
                 print('  [MARKE]    1x  Geschaeftsbriefkopf in der Mail-Signatur '
                       'durch Platzhalter ersetzt.')
+            if datei == 'app/anwendung.js':
+                inhalt, schritte = shoptv_entfernen(inhalt)
+                for s in schritte:
+                    print(f'  [PHASE14]     {s}')
             for grund, muster, ersatz, bemerkung in ERSETZUNGEN:
                 inhalt, n = re.subn(muster, ersatz, inhalt)
                 pruefe_haeufigkeit(n, bemerkung, datei)
