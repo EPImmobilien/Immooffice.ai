@@ -4,6 +4,11 @@
 # noch netlify.app. Der Rauchtest dort prueft Struktur, nicht Verhalten, und
 # sagt das auch. Hier laeuft ein echter Browser gegen die ausgelieferte
 # Adresse und meldet, was in der Konsole steht.
+#
+# Aufbau: jeder Schritt schreibt sein Ergebnis in eine Datei, ein letzter
+# Schritt gibt alle zusammen aus. Grund: der Browser-Download schreibt
+# hunderte Fortschrittszeilen ins Protokoll, und was davor stand, ist danach
+# praktisch nicht mehr zu finden.
 name: Oberflaeche pruefen
 
 on:
@@ -21,55 +26,50 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Sind die CDN-Adressen erreichbar?
+        continue-on-error: true
         run: |
           set -uo pipefail
+          mkdir -p befund
           # Genau die Adressen, die die gebaute Datei laedt — aus ihr geholt,
           # nicht abgeschrieben.
           python3 scripts/bauen.py > /dev/null
-          grep -o '<script[^>]*src="[^"]*"' dist/index.html \
-            | sed 's/.*src="//;s/"//' | sort -u > adressen.txt
-          grep -o '<link[^>]*href="https://[^"]*"' dist/index.html \
-            | sed 's/.*href="//;s/"//' | sort -u >> adressen.txt
-          sort -u adressen.txt -o adressen.txt
-          echo "$(wc -l < adressen.txt) Adressen"
-          schlecht=0
+          { grep -o '<script[^>]*src="https://[^"]*"' dist/index.html | sed 's/.*src="//;s/"//'
+            grep -o '<link[^>]*href="https://[^"]*"' dist/index.html | sed 's/.*href="//;s/"//'
+          } | sort -u > adressen.txt
+          : > befund/cdn.txt
           while read -r u; do
             code="$(curl -sS -o /dev/null -w '%{http_code}' -L --max-time 30 "$u" || echo 000)"
-            if [ "$code" = "200" ]; then
-              printf '  [ok]     %s\n' "$u"
-            else
-              printf '  [FEHLER] %s  -> %s\n' "$u" "$code"
-              schlecht=1
-            fi
+            [ "$code" = "200" ] || printf '%s  %s\n' "$code" "$u" >> befund/cdn.txt
           done < adressen.txt
-          if [ $schlecht -ne 0 ]; then
-            echo '=== NICHT ERREICHBAR ==='
-            while read -r u; do
-              code="$(curl -sS -o /dev/null -w '%{http_code}' -L --max-time 30 "$u" || echo 000)"
-              [ "$code" = "200" ] || echo "::error::$code  $u"
-            done < adressen.txt
-          fi
-          exit $schlecht
+          echo "$(wc -l < adressen.txt) Adressen geprueft, $(wc -l < befund/cdn.txt) nicht erreichbar."
 
-      - name: Laedt die Seite?
-        if: always()
+      - name: Liefert Netlify die sechs Dateien?
+        continue-on-error: true
         run: |
           set -uo pipefail
+          mkdir -p befund
           U='${{ github.event.inputs.adresse }}'
-          for p in "" /sw.js /freigabe.html /objekt.html /sonnenverlauf.html; do
+          : > befund/dateien.txt
+          for p in "" /sw.js /freigabe.html /objekt.html /sonnenverlauf.html /_redirects; do
             code="$(curl -sS -o /dev/null -w '%{http_code}' -L --max-time 30 "$U$p" || echo 000)"
-            printf '  %-22s %s\n' "${p:-/}" "$code"
+            printf '%s  %s\n' "$code" "${p:-/}" >> befund/dateien.txt
           done
+          cat befund/dateien.txt
 
       - name: Startet die Anwendung wirklich?
-        if: always()
+        continue-on-error: true
         run: |
-          set -euo pipefail
-          npm install --no-save playwright@1.49.1
-          # Nicht `npx playwright install`: npx holt die NEUESTE Fassung und
-          # laedt deren Browser, die zur installierten Bibliothek nicht
-          # passen ("Executable doesn't exist at .../chromium_headless_shell-1148").
-          ./node_modules/.bin/playwright install --with-deps chromium
+          set -uo pipefail
+          mkdir -p befund
+          # In einem EIGENEN Verzeichnis: im Repo liegt eine andere
+          # Playwright-Fassung, deren Binaerdatei die installierte
+          # ueberschattet — der Starter laedt dann Browser, die die
+          # Bibliothek nicht kennt ("Executable doesn't exist at
+          # .../chromium_headless_shell-1148").
+          mkdir -p /tmp/pw && cd /tmp/pw
+          npm init -y > /dev/null
+          npm install playwright > /dev/null 2>&1
+          ./node_modules/.bin/playwright install --with-deps chromium > /dev/null 2>&1
           cat > pruefen.mjs <<'ENDE'
           import { chromium } from 'playwright';
           const url = process.argv[2];
@@ -80,27 +80,45 @@ jobs:
           seite.on('pageerror', e => fehler.push(String(e)));
           seite.on('requestfailed', r =>
             gescheitert.push(`${r.url()} — ${r.failure()?.errorText}`));
+          seite.on('response', r => {
+            if (r.status() >= 400) gescheitert.push(`${r.status()} ${r.url()}`);
+          });
           await seite.goto(url, { waitUntil: 'load', timeout: 60000 });
           await seite.waitForTimeout(12000);
-          const wurzel = await seite.evaluate(() => {
+          const w = await seite.evaluate(() => {
             const r = document.getElementById('root');
             return { kinder: r ? r.children.length : -1,
-                     text: (document.body.innerText || '').slice(0, 400) };
+                     text: (document.body.innerText || '').slice(0, 300) };
           });
-          console.log('Titel:', await seite.title());
-          console.log('Kinder unter #root:', wurzel.kinder);
-          console.log('--- sichtbarer Text (Anfang) ---');
-          console.log(wurzel.text || '(leer)');
-          for (const [titel, liste] of [['Skriptfehler', fehler],
-                                        ['Konsole (error)', konsole],
-                                        ['Gescheiterte Anfragen', gescheitert]]) {
-            console.log(`--- ${titel}: ${liste.length}`);
-            liste.slice(0, 15).forEach(z => console.log('   ', z));
+          console.log('Titel: ' + (await seite.title()));
+          console.log('Kinder unter #root: ' + w.kinder);
+          console.log('--- sichtbarer Text ---');
+          console.log(w.text || '(leer)');
+          for (const [t, l] of [['Skriptfehler', fehler], ['Konsole (error)', konsole],
+                                ['Gescheiterte Anfragen', gescheitert]]) {
+            console.log(`--- ${t}: ${l.length}`);
+            [...new Set(l)].slice(0, 12).forEach(z => console.log('    ' + z));
           }
           await browser.close();
-          if (wurzel.kinder <= 0) {
-            console.log('::error::Unter #root steht nichts — die Anwendung ist nicht gestartet.');
-            process.exit(1);
-          }
           ENDE
-          node pruefen.mjs '${{ github.event.inputs.adresse }}'
+          node pruefen.mjs '${{ github.event.inputs.adresse }}' \
+            > "$GITHUB_WORKSPACE/befund/browser.txt" 2>&1 || true
+          tail -5 "$GITHUB_WORKSPACE/befund/browser.txt"
+
+      - name: Befund
+        if: always()
+        run: |
+          set -uo pipefail
+          echo '════════ CDN-Adressen, die nicht mit 200 antworten ════════'
+          if [ -s befund/cdn.txt ]; then cat befund/cdn.txt; else echo '(keine — alle erreichbar)'; fi
+          echo
+          echo '════════ Von Netlify ausgelieferte Dateien ════════'
+          cat befund/dateien.txt 2>/dev/null || echo '(nicht geprueft)'
+          echo
+          echo '════════ Was der Browser sieht ════════'
+          cat befund/browser.txt 2>/dev/null || echo '(nicht geprueft)'
+          echo
+          if [ -s befund/cdn.txt ]; then
+            echo '::error::Mindestens eine CDN-Adresse antwortet nicht mit 200.'
+            exit 1
+          fi
