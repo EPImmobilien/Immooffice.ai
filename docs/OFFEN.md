@@ -320,3 +320,30 @@ Gehört mit Abschnitt 1b erledigt: dort bekommt jeder Mitarbeiter einen
 Hauptstandort, und dann ist das Land eine Eigenschaft des Mitarbeiters, nicht
 des ersten gefundenen Standorts. Beides jetzt zu bauen hieße, es zweimal zu
 bauen.
+
+## Eigene Vertragsvorlagen je Makler — angefordert 28.09.2026
+
+Jeder Mandant soll eigene Vorlagen für **Maklerverträge, Vollmachten,
+Objektnachweise und Reservierungen** hinterlegen können.
+
+**Stand:** Die Vorlage führt zwei Word-Vorlagen als Base64 im Quelltext —
+`VORLAGE_MAKLERVERTRAG` und `VORLAGE_OBJEKTNACHWEIS`. Beide sind im Fork
+**geleert**, weil sie Briefkopf und Vertragstext der Referenz trugen und
+`docs/NEUTRALITAET.md` Abschnitt 5 Rechtstexte der Referenz ersetzen, nicht
+übernehmen lässt. Es entstehen derzeit also gar keine Verträge. Vollmacht und
+Reservierung haben in der Vorlage überhaupt keine hinterlegbare Vorlage.
+
+**Was zu bauen ist:**
+
+- Tabelle `vertragsvorlagen` mit `mandant_id`, `gesellschaft_id` (optional),
+  Art (`maklervertrag`, `vollmacht`, `objektnachweis`, `reservierung`),
+  Datei im Storage unter `vorlagen/{mandant_id}/…`, Version, aktiv.
+- Die Erzeugung liest die Vorlage des Mandanten; fehlt sie, eine neutrale
+  Musterfassung mit dem Pflichthinweis auf anwaltliche Prüfung.
+- Platzhalter wie `{firma_name}`, `{geschaeftsfuehrer}`, `{strasse}` — die
+  Liste steht schon im Quelltext der Vorlage und wird dort gefiltert.
+- Rechte: nur mit „Firmendaten bearbeiten" (Abschnitt 1b).
+
+**Reihenfolge:** nach der Mandantentrennung. Eine Vorlagenverwaltung ohne
+`mandant_id` auf der Tabelle und ohne Trennung im Storage wäre genau die Art
+Tür, die man später nicht mehr zubekommt.

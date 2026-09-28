@@ -54,26 +54,23 @@ with vorlage(bereich, soll) as (values
 ),
 -- Angemeldeter Zuwachs des Forks gegenueber der Vorlage.
 zuwachs(bereich, mehr, grund) as (values
-  ('Richtlinien', 2, 'fork_01: amt_vorlage — Team liest, Chef pflegt'),
-  -- fork_02: konten und gesellschaften, dazu die Verweise nach oben.
-  ('Tabellen', 2, 'fork_02: konten, gesellschaften'),
-  ('Tabellen mit RLS', 2, 'fork_02: dieselben beiden'),
-  ('Richtlinien', 4, 'fork_02: je zwei fuer konten und gesellschaften'),
-  ('Funktionen', 1, 'fork_02: aktuelle_konto_id()'),
-  ('Spalten', 24, 'fork_02: konten 11, gesellschaften 10, '
-                  'firma_stammdaten +konto_id +gesellschaft_id, profiles +konto_id'),
-  ('Fremdschluessel', 4, 'fork_02: gesellschaften->konten, firma_stammdaten->konten, '
-                         'firma_stammdaten->gesellschaften, profiles->konten'),
-  ('Primaer- und Eindeutigkeitsschluessel', 3,
-     'fork_02: zwei Primaerschluessel, konten.slug eindeutig'),
-  ('Pruefbedingungen', 1, 'fork_02: konten.abo_status'),
-  -- fork_03: das Bundesland des Standorts.
-  ('Spalten', 1, 'fork_03: firma_stammdaten.bundesland'),
-  ('Pruefbedingungen', 1, 'fork_03: bundesland aus den 16 Kuerzeln'),
-  ('Indizes ohne Constraint', 1, 'fork_03: firma_stammdaten_bundesland_idx'),
-  ('Indizes ohne Constraint', 5,
-     'fork_02: gesellschaften_ein_standard, gesellschaften_konto_idx, '
-     'firma_stammdaten_konto_idx, firma_stammdaten_gesellschaft_idx, profiles_konto_idx')
+  -- Gemessen gegen das laufende Projekt nach fork_05. Eine Zeile je Kennzahl,
+  -- damit sie nicht in Teilbetraegen auseinanderlaeuft; welche Migration was
+  -- beigetragen hat, steht im Kopf der jeweiligen Datei.
+  ('Tabellen', 3, 'mandanten, gesellschaften, mandanten_einstufung'),
+  ('Tabellen mit RLS', 3, 'dieselben drei'),
+  ('Richtlinien', 7, 'amt_vorlage 2, mandanten 2, gesellschaften 2, einstufung 1'),
+  ('Funktionen', 1, 'aktuelle_mandant_id()'),
+  ('Spalten', 199, 'mandanten 11, gesellschaften 10, mandanten_einstufung 3, '
+                   'firma_stammdaten +mandant_id +gesellschaft_id +bundesland, '
+                   'profiles +mandant_id, mandant_id auf 171 Mandantentabellen'),
+  ('Fremdschluessel', 175, 'mandant_id -> mandanten auf 171 Tabellen, dazu '
+                           'gesellschaften, firma_stammdaten (zweimal), profiles'),
+  ('Primaer- und Eindeutigkeitsschluessel', 4,
+     'drei Primaerschluessel, mandanten.slug eindeutig'),
+  ('Pruefbedingungen', 3, 'mandanten.abo_status, bundesland, einstufung.gruppe'),
+  ('Indizes ohne Constraint', 180, 'je ein Index auf mandant_id, dazu '
+                                   'gesellschaft_id, bundesland, ein Standard')
 ),
 soll(bereich, soll) as (
   select v.bereich,

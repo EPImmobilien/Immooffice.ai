@@ -29,6 +29,13 @@ else
   fehler=1
 fi
 
+abschnitt "Mandantentrennung: jede Tabelle eingestuft"
+if scripts/lokale-db.sh psql -q -f tests/mandant-einstufung.sql; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Oberflaeche: Zerlegung verliert nichts"
 if [[ -f reference/epworld-src.html ]]; then
   roh="$(mktemp -d)"
