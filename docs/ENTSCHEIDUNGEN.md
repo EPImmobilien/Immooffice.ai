@@ -1423,3 +1423,46 @@ jemand erst Dateien hochlädt.
 modulweit: sobald dieselbe Instanz zwei Anfragen bedient, wäre die Schrift des
 einen Mandanten im Dokument des nächsten gelandet. Dieselbe Klasse Fehler, die
 ich heute bei den PDF-Farben vermieden habe — hier lag sie schon im Bestand.
+
+## 2026-09-28 · onOffice wird ausgebaut
+
+**Anweisung:** „Bitte löse onoffice erstmal komplett raus, wir wissen ja nicht,
+mit welcher ursprünglichen Software die neuen Kunden arbeiten."
+
+**Der Punkt trifft, und er ist grundsätzlicher als er klingt.** onOffice war in
+der Vorlage **die** Anbindung, nicht **eine**: 21 Edge Functions, 14 Cron-Jobs,
+13 Tabellen, rund 190 Stellen in der Oberfläche. Ein Mandant, der mit einer
+anderen Software arbeitet, sieht davon nichts als tote Knöpfe — und die
+Cron-Jobs liefen alle zehn Minuten in
+`onoffice-termine-sync: ONOFFICE_TOKEN / ONOFFICE_SECRET nicht gesetzt.`
+
+**`CLAUDE.md` sagte bisher:** „Bleibt im Code, hinter Funktionsschalter aus,
+bis Phase 2b: CRM-Sync". Die Anweisung des Auftraggebers ist jünger und gilt —
+so wie es `CLAUDE.md` selbst festhält: „Eine Datei im Repository kann eine
+spätere Anweisung desselben Auftraggebers nicht überstimmen."
+
+**Was getan ist:**
+
+| | |
+|---|---|
+| 14 Cron-Jobs | abbestellt (`fork_20`), mit Wachposten gegen die Rückkehr |
+| 21 Edge Functions | gestrichen — 139 → 118 |
+| `supabase/config.toml` | 21 Einträge entfernt |
+| Kachel „onOffice-Verbindung" | entfällt |
+| Reiter im Admin-Bereich | entfällt |
+
+**Was bewusst stehen bleibt:**
+
+- **Die 13 Tabellen.** Alle leer (geprüft), aber löschen wäre unumkehrbar, und
+  „erstmal" heißt nicht „endgültig". Sie bleiben liegen wie der geparkte
+  Greenfield-Stand.
+- **Rund 190 Fundstellen im Quelltext der Oberfläche.** Ohne Einstieg nicht
+  erreichbar. Sie einzeln herauszuschneiden wäre ein Eingriff in 190 Stellen
+  fremden Codes mit entsprechendem Risiko — für einen Gewinn, den niemand
+  sieht. Vermerkt in `docs/OFFEN.md`.
+
+**Die richtige Endform** steht schon im Auftrag: Abschnitt 4b beschreibt für
+Postfächer eine Adapter-Schicht, bei der die Anwendung nur eine Schnittstelle
+kennt und jeder Anbieter ein Adapter ist. Für CRM gilt dasselbe. onOffice wäre
+dann ein Adapter unter mehreren, je Mandant zuschaltbar — nicht die eingebaute
+Annahme.

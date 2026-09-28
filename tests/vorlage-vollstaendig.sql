@@ -140,7 +140,10 @@ zuwachs(bereich, mehr, grund) as (values
   ('Richtlinien', 6, 'fork_19: je lesen, pflegen, mandant_trennung'),
   ('Funktionen', 5, 'fork_19: zahlungsbedingung_text(), '
                     'rechnung_braucht_freigabe(), rechnung_zur_freigabe(), '
-                    'rechnung_freigeben(), rechnung_faelligkeit()')
+                    'rechnung_freigeben(), rechnung_faelligkeit()'),
+  -- fork_20: onOffice abgeschaltet. Vierzehn Cron-Jobs weniger — das ist eine
+  -- Abnahme, kein Zuwachs, deshalb eine negative Zahl.
+  ('Cron-Jobs', -14, 'fork_20: die onOffice-Jobs sind abbestellt')
 ),
 soll(bereich, soll) as (
   select v.bereich,

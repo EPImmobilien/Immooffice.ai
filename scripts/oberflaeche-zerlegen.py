@@ -1287,6 +1287,39 @@ ERSETZUNGEN = [
      '// Die Gesellschaften eines Mandanten. Zwischen Konto und Standort: ein',
      'Einstellungen: die Seite EinstBelegnummern mit Live-Vorschau.'),
 
+    # =====================================================================
+    # FORK — onOffice aus der Oberflaeche nehmen
+    #
+    # Anweisung vom 28.09.2026: "Bitte loese onoffice erstmal komplett raus,
+    # wir wissen ja nicht, mit welcher urspruenglichen Software die neuen
+    # Kunden arbeiten."
+    #
+    # Die 21 Edge Functions sind gestrichen (scripts/neutralisieren-funktionen.py),
+    # die 14 Cron-Jobs abbestellt (fork_20). Hier fallen die beiden Stellen
+    # weg, ueber die man ueberhaupt hinkommt: die Kachel "onOffice-Verbindung"
+    # im Werkzeugkasten und der Reiter im Admin-Bereich.
+    #
+    # Die uebrigen rund 190 Fundstellen bleiben vorerst im Quelltext. Sie sind
+    # ohne Einstieg nicht erreichbar, und sie einzeln herauszuschneiden waere
+    # ein Eingriff in 190 Stellen fremden Codes mit entsprechendem Risiko —
+    # fuer einen Gewinn, den niemand sieht. Vermerkt in docs/OFFEN.md.
+    # =====================================================================
+    ('FORK',
+     r'  !e \|\| "chef" !== e\.role && "mitarbeiter" !== e\.role \|\| a\.push\(\{\n    id: "onoffice",\n    gruppe: "Verbindungen",\n    icon: "🔌",\n    titel: "onOffice-Verbindung",\n    text: "API-Zugang testen und erste Objekte abrufen\."\n  \}\);',
+     '  // Die Kachel "onOffice-Verbindung" ist am 28.09.2026 entfallen: onOffice\n'
+     '  // war in der Vorlage DIE Anbindung, nicht EINE, und welche Software ein\n'
+     '  // neuer Mandant benutzt, weiss niemand. Die Edge Functions sind\n'
+     '  // gestrichen, die Cron-Jobs abbestellt (fork_20).',
+     'onOffice: die Kachel im Werkzeugkasten entfaellt.'),
+
+    ('FORK',
+     r'  \}, React\.createElement\("button", \{\n    onClick: \(\) => b\("onoffice"\),\n    style: \{\n      background: "onoffice" === h \? CI\.blau : "transparent",\n      color: "onoffice" === h \? "#fff" : CI\.blau,',
+     '  }, false && React.createElement("button", {\n'
+     '    onClick: () => b("onoffice"),\n'
+     '    style: {\n'
+     '      background: "onoffice" === h ? CI.blau : "transparent",\n'
+     '      color: "onoffice" === h ? "#fff" : CI.blau,',
+     'onOffice: der Reiter im Admin-Bereich entfaellt.'),
     ('MARKE', r'\bEP_', 'IMMO_', 'Vorsatz EP_ in Bezeichnern der Oberflaeche.'),
 ]
 

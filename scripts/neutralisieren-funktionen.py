@@ -33,6 +33,30 @@ ZIEL = WURZEL / 'supabase' / 'functions'
 # im Auftrag unter „entfaellt" und hat im Fork keinen Platz.
 ENTFAELLT = {'jotform-poll', 'jotform-webhook', 'yodeck-api', 'yodeck-test'}
 
+# --------------------------------------------------------------- 28.09.2026
+# onOffice entfaellt ebenfalls. Anweisung des Auftraggebers: "Bitte loese
+# onoffice erstmal komplett raus, wir wissen ja nicht, mit welcher
+# urspruenglichen Software die neuen Kunden arbeiten."
+#
+# Der Punkt trifft: onOffice war in der Vorlage DIE Anbindung, nicht EINE. Ein
+# Mandant mit einer anderen Software sieht davon nur tote Knoepfe, und die
+# Cron-Jobs liefen alle zehn Minuten in "ONOFFICE_TOKEN nicht gesetzt".
+#
+# CLAUDE.md sagte bisher "bleibt im Code, hinter Funktionsschalter aus". Die
+# Anweisung ist juenger und gilt; begruendet in docs/ENTSCHEIDUNGEN.md. Die
+# 13 Tabellen bleiben stehen — sie sind leer, und "erstmal" heisst nicht
+# "endgueltig".
+ONOFFICE_ENTFAELLT = {
+    'onoffice-adress-diagnose', 'onoffice-adressen', 'onoffice-agreement-diagnose',
+    'onoffice-bild-diagnose', 'onoffice-bilder', 'onoffice-expose-abgleich',
+    'onoffice-felder-werte-diagnose', 'onoffice-import', 'onoffice-nachtrag-test',
+    'onoffice-objekt-anlegen', 'onoffice-objekt-speichern', 'onoffice-portal-diagnose',
+    'onoffice-status-uebertragen', 'onoffice-suchkriterien', 'onoffice-sync',
+    'onoffice-termin-schreiben', 'onoffice-termine-sync', 'onoffice-test',
+    'onoffice-upload-diagnose', 'onoffice-vorlagen-import', 'onoffice-waechter',
+}
+ENTFAELLT = ENTFAELLT | ONOFFICE_ENTFAELLT
+
 # Ein Platzhalter-Host nach RFC 2606: die Endung .example ist reserviert und
 # kann keinem echten Unternehmen gehoeren. Besser als eine erfundene Domain,
 # die es morgen geben koennte.

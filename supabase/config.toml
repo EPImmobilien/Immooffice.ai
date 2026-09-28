@@ -67,11 +67,7 @@ verify_jwt = false
 [functions.oeffentliche-objekte]
 verify_jwt = false
 
-[functions.onoffice-expose-abgleich]
-verify_jwt = false
 
-[functions.onoffice-suchkriterien]
-verify_jwt = false
 
 [functions.portal-ftp-diagnose]
 verify_jwt = false
@@ -298,62 +294,24 @@ verify_jwt = true
 [functions.objekt-wissen-auslesen]
 verify_jwt = true
 
-[functions.onoffice-adress-diagnose]
-verify_jwt = true
 
-[functions.onoffice-adressen]
-verify_jwt = true
 
-[functions.onoffice-agreement-diagnose]
-verify_jwt = true
 
-[functions.onoffice-bild-diagnose]
-verify_jwt = true
 
-[functions.onoffice-bilder]
-verify_jwt = true
 
-[functions.onoffice-felder-werte-diagnose]
-verify_jwt = true
 
-[functions.onoffice-import]
-verify_jwt = true
 
-[functions.onoffice-nachtrag-test]
-verify_jwt = true
 
-[functions.onoffice-objekt-anlegen]
-verify_jwt = true
 
-[functions.onoffice-objekt-speichern]
-verify_jwt = true
 
-[functions.onoffice-portal-diagnose]
-verify_jwt = true
 
-[functions.onoffice-status-uebertragen]
-verify_jwt = true
 
-[functions.onoffice-sync]
-verify_jwt = true
 
-[functions.onoffice-termin-schreiben]
-verify_jwt = true
 
-[functions.onoffice-termine-sync]
-verify_jwt = true
 
-[functions.onoffice-test]
-verify_jwt = true
 
-[functions.onoffice-upload-diagnose]
-verify_jwt = true
 
-[functions.onoffice-vorlagen-import]
-verify_jwt = true
 
-[functions.onoffice-waechter]
-verify_jwt = true
 
 [functions.parse-einwertung]
 verify_jwt = true

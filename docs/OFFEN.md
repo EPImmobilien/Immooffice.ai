@@ -591,3 +591,18 @@ nicht.** Dafür braucht es einen Lauf mit echten parallelen Verbindungen, etwa
 Rechnungsfreigabe mit Verantwortlichem, Mahnstufen, Buchungskonten (SKR03/04),
 Steuersätze und Reverse Charge, SEPA-Gläubiger-ID, DATEV-Export, ZUGFeRD und
 XRechnung. Gebaut ist bisher nur der Nummernkreis.
+
+## onOffice: was noch im Quelltext steht
+
+Ausgebaut sind die Wege hinein: Cron-Jobs abbestellt, 21 Edge Functions
+gestrichen, Kachel und Admin-Reiter entfernt.
+
+**Rund 190 Fundstellen bleiben im Quelltext der Oberfläche** und 13 leere
+Tabellen in der Datenbank. Beides ist ohne Einstieg nicht erreichbar. Das
+aufzuräumen lohnt erst, wenn die Adapter-Schicht aus Abschnitt 4b steht — dann
+wird daraus entweder ein Adapter unter mehreren oder es fällt ganz weg.
+
+**Zu prüfen, bevor ein Mandant mit einem anderen CRM startet:** ob eine dieser
+Fundstellen beim Laden einer Ansicht eine der gestrichenen Funktionen ruft. Ein
+Aufruf ins Leere liefert 404 und sollte abgefangen sein — geprüft ist das
+nicht.

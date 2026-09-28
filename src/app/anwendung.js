@@ -19414,13 +19414,10 @@ function WerkzeugePage({
     titel: "Objektkosten",
     text: "Kosten je Objekt aus Terminen, Fahrten, Telefonaten und Pauschalen — mit erwarteter Provision und Deckungsbeitrag."
   });
-  !e || "chef" !== e.role && "mitarbeiter" !== e.role || a.push({
-    id: "onoffice",
-    gruppe: "Verbindungen",
-    icon: "🔌",
-    titel: "onOffice-Verbindung",
-    text: "API-Zugang testen und erste Objekte abrufen."
-  });
+  // Die Kachel "onOffice-Verbindung" ist am 28.09.2026 entfallen: onOffice
+  // war in der Vorlage DIE Anbindung, nicht EINE, und welche Software ein
+  // neuer Mandant benutzt, weiss niemand. Die Edge Functions sind
+  // gestrichen, die Cron-Jobs abbestellt (fork_20).
   const r = a.find(e => e.id === t) || null,
     l = [];
   return a.forEach(e => {
@@ -28311,7 +28308,7 @@ function BestandsImmobilienPage({
       border: `1px solid ${CI.gold}`,
       width: "fit-content"
     }
-  }, React.createElement("button", {
+  }, false && React.createElement("button", {
     onClick: () => b("onoffice"),
     style: {
       background: "onoffice" === h ? CI.blau : "transparent",
