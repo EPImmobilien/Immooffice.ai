@@ -78,6 +78,81 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
     const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    // --- Storage: Pfade tragen den Mandanten als erstes Segment -----------
+    // Gleiche Bauart wie die Huelle der Oberflaeche. Sie steht IM Handler und
+    // nicht auf Modulebene: eine Mandantenvariable auf Modulebene ueberlebt in
+    // Deno die Anfrage und traegt den Mandanten des einen Aufrufers in den
+    // naechsten. Genau das waere ein Leck statt einer Trennung.
+    // Solange immoMandant null ist, bleibt jeder Pfad unveraendert — die
+    // Funktion verhaelt sich dann wie bisher.
+    let immoMandant: string | null = null;
+    const immoSetzeMandant = (m: unknown) => { immoMandant = (typeof m === "string" && m) ? m : null; };
+    // Schriften sind Plattform-Gut, kein Mandanten-Branding. Sie liegen im
+    // Wurzelverzeichnis des Eimers unter fonts/. Fehlt eine, wird sie beim
+    // ersten Bedarf von ihrer Quelle geholt und dort abgelegt — danach nie
+    // wieder. Ein Mandant, der eine eigene Hausschrift hochlaedt, legt sie
+    // unter {mandant}/fonts/… und uebersteuert damit die der Plattform.
+    const IMMO_SCHRIFTEN: Record<string, string> = {
+      "fonts/Montserrat-Regular.ttf":        "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Regular.ttf",
+      "fonts/Montserrat-Bold.ttf":           "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Bold.ttf",
+      "fonts/Montserrat-Light.ttf":          "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Light.ttf",
+      "fonts/Montserrat-Medium.ttf":         "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Medium.ttf",
+      "fonts/Montserrat-SemiBold.ttf":       "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-SemiBold.ttf",
+      "fonts/Montserrat-Italic.ttf":         "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Italic.ttf",
+      "fonts/Montserrat-SemiBoldItalic.ttf": "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-SemiBoldItalic.ttf",
+      "fonts/Marcellus-Regular.ttf":         "https://raw.githubusercontent.com/google/fonts/main/ofl/marcellus/Marcellus-Regular.ttf",
+      "fonts/GreatVibes-Regular.ttf":        "https://raw.githubusercontent.com/google/fonts/main/ofl/greatvibes/GreatVibes-Regular.ttf",
+    };
+    {
+      const immoEcht = admin.storage.from.bind(admin.storage);
+      const immoVorne = (pf: unknown): unknown =>
+        (typeof pf !== "string" || !pf || !immoMandant) ? pf
+          : (pf === immoMandant || pf.startsWith(immoMandant + "/") ? pf : immoMandant + "/" + pf);
+      const immoViele = (pf: unknown): unknown => Array.isArray(pf) ? pf.map(immoVorne) : immoVorne(pf);
+      (admin.storage as any).from = (eimer: string) => {
+        const api: any = immoEcht(eimer);
+        const h: any = Object.create(api);
+        for (const n of ["upload", "remove", "createSignedUrl",
+                         "createSignedUrls", "getPublicUrl", "info", "exists"]) {
+          if (typeof api[n] === "function") h[n] = (pf: unknown, ...r: unknown[]) => api[n](immoViele(pf), ...r);
+        }
+        // Lesen in drei Stufen: die Datei des Mandanten, sonst die der
+        // Plattform, sonst — bei einer Schrift — einmal von der Quelle.
+        // Geschrieben wird dabei nur ins Wurzelverzeichnis und nur eine
+        // Schrift; Mandantendateien kann diese Stufe nicht anfassen.
+        if (typeof api.download === "function") h.download = async (pf: unknown, ...r: unknown[]) => {
+          const hole = async (p: unknown) => {
+            try { return await api.download(p, ...r); } catch (e) { return { data: null, error: e }; }
+          };
+          const erst = await hole(immoViele(pf));
+          if (erst?.data) return erst;
+          if (typeof pf === "string" && immoMandant) {
+            const zweit = await hole(pf);
+            if (zweit?.data) return zweit;
+          }
+          if (eimer === "branding-assets" && typeof pf === "string" && IMMO_SCHRIFTEN[pf]) {
+            try {
+              const a = await fetch(IMMO_SCHRIFTEN[pf]);
+              if (a.ok) {
+                const roh = new Uint8Array(await a.arrayBuffer());
+                try { await api.upload(pf, roh, { contentType: "font/ttf", upsert: true }); }
+                catch (_e) { /* beim naechsten Mal wieder */ }
+                console.log("Schrift nachgeladen:", pf, roh.byteLength);
+                return { data: new Blob([roh]), error: null };
+              }
+            } catch (e) { console.warn("Schrift nicht erreichbar:", pf, String(e)); }
+          }
+          return erst;
+        };
+        if (typeof api.list === "function") {
+          h.list = (pf?: string, ...r: unknown[]) => api.list(pf ? (immoVorne(pf) as string) : (immoMandant ?? pf), ...r);
+        }
+        for (const n of ["move", "copy"]) {
+          if (typeof api[n] === "function") h[n] = (a: unknown, b: unknown, ...r: unknown[]) => api[n](immoVorne(a), immoVorne(b), ...r);
+        }
+        return h;
+      };
+    }
     const { reservierung_id } = await req.json();
     if (!reservierung_id) {
       return new Response(JSON.stringify({ ok: false, error: "reservierung_id fehlt." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -86,6 +161,7 @@ Deno.serve(async (req) => {
     const { data: res, error: resErr } = await admin.from("reservierungen_neubau").select("*").eq("id", reservierung_id).maybeSingle();
     if (resErr) throw new Error(`DB-Fehler: ${resErr.message}`);
     if (!res) throw new Error("Reservierung nicht gefunden.");
+    immoSetzeMandant(res.mandant_id);
 
     let firma: any = null;
     if (res.absender_firma_id) {

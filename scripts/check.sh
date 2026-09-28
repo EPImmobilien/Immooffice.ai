@@ -168,6 +168,13 @@ else
   fehler=1
 fi
 
+abschnitt "Edge Functions: Syntax"
+if node tests/funktionen-syntax.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Edge Functions: verify_jwt fuer jede festgelegt"
 if python3 tests/funktionen-config.py; then
   :
@@ -179,9 +186,8 @@ abschnitt "Noch nicht abgedeckt"
 cat <<'ENDE'
 - Erster Start gegen das eigene Projekt — braucht ausgerollte Edge Functions
                                        und einen Ort, an dem die Datei liegt
-- Syntaxpruefung der Edge Functions  — kein Deno und kein TypeScript in dieser
-                                       Umgebung; geprueft wird nur, dass die
-                                       Neutralisierung nichts anderes anfasst
+- Typen und Importe der Edge Functions — der Parser liest die Dateien, aber
+                                       aufloesen kann sie nur Deno mit Netz
 ENDE
 
 printf '\n'

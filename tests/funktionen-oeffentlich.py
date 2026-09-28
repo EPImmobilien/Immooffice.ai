@@ -68,8 +68,6 @@ NOCH_OFFEN = {
     'expose-freigabe': 'Gibt Exposes frei; Token-gebunden, aber ungelesen.',
     'ki-bildbearbeitung': 'Schreibt Bilder, 44 kB, ungelesen.',
     'news-briefing-erstellen': 'Erzeugt Briefings.',
-    'onoffice-expose-abgleich': 'Fremdanbindung.',
-    'onoffice-suchkriterien': 'Fremdanbindung.',
     'portal-ftp-diagnose': 'Diagnose.',
     'projekt-daten': 'Neubauportal.',
     'projekt-interaktion': 'Neubauportal.',

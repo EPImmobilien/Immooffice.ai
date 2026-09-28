@@ -64,6 +64,91 @@ HOST = 'immooffice.example'
 
 # ---------------------------------------------------------------- Ersetzungen
 # (Grund, Muster, Ersatz, Bemerkung) — Muster ist ein regulaerer Ausdruck.
+# ===========================================================================
+# Die Storage-Huelle, als eigener Text statt als Einzeiler in der Regel:
+# sie ist inzwischen zu lang, um in einer Zeile noch lesbar zu sein.
+#
+# \1 ist die Einrueckung der Fundstelle, \2 die Zeile selbst, \3 der Name des
+# Clients (admin oder db).
+# ===========================================================================
+SPEICHER_HUELLE = r"""\1\2
+\1// --- Storage: Pfade tragen den Mandanten als erstes Segment -----------
+\1// Gleiche Bauart wie die Huelle der Oberflaeche. Sie steht IM Handler und
+\1// nicht auf Modulebene: eine Mandantenvariable auf Modulebene ueberlebt in
+\1// Deno die Anfrage und traegt den Mandanten des einen Aufrufers in den
+\1// naechsten. Genau das waere ein Leck statt einer Trennung.
+\1// Solange immoMandant null ist, bleibt jeder Pfad unveraendert — die
+\1// Funktion verhaelt sich dann wie bisher.
+\1let immoMandant: string | null = null;
+\1const immoSetzeMandant = (m: unknown) => { immoMandant = (typeof m === "string" && m) ? m : null; };
+\1// Schriften sind Plattform-Gut, kein Mandanten-Branding. Sie liegen im
+\1// Wurzelverzeichnis des Eimers unter fonts/. Fehlt eine, wird sie beim
+\1// ersten Bedarf von ihrer Quelle geholt und dort abgelegt — danach nie
+\1// wieder. Ein Mandant, der eine eigene Hausschrift hochlaedt, legt sie
+\1// unter {mandant}/fonts/… und uebersteuert damit die der Plattform.
+\1const IMMO_SCHRIFTEN: Record<string, string> = {
+\1  "fonts/Montserrat-Regular.ttf":        "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Regular.ttf",
+\1  "fonts/Montserrat-Bold.ttf":           "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Bold.ttf",
+\1  "fonts/Montserrat-Light.ttf":          "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Light.ttf",
+\1  "fonts/Montserrat-Medium.ttf":         "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Medium.ttf",
+\1  "fonts/Montserrat-SemiBold.ttf":       "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-SemiBold.ttf",
+\1  "fonts/Montserrat-Italic.ttf":         "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Italic.ttf",
+\1  "fonts/Montserrat-SemiBoldItalic.ttf": "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-SemiBoldItalic.ttf",
+\1  "fonts/Marcellus-Regular.ttf":         "https://raw.githubusercontent.com/google/fonts/main/ofl/marcellus/Marcellus-Regular.ttf",
+\1  "fonts/GreatVibes-Regular.ttf":        "https://raw.githubusercontent.com/google/fonts/main/ofl/greatvibes/GreatVibes-Regular.ttf",
+\1};
+\1{
+\1  const immoEcht = \3.storage.from.bind(\3.storage);
+\1  const immoVorne = (pf: unknown): unknown =>
+\1    (typeof pf !== "string" || !pf || !immoMandant) ? pf
+\1      : (pf === immoMandant || pf.startsWith(immoMandant + "/") ? pf : immoMandant + "/" + pf);
+\1  const immoViele = (pf: unknown): unknown => Array.isArray(pf) ? pf.map(immoVorne) : immoVorne(pf);
+\1  (\3.storage as any).from = (eimer: string) => {
+\1    const api: any = immoEcht(eimer);
+\1    const h: any = Object.create(api);
+\1    for (const n of ["upload", "remove", "createSignedUrl",
+\1                     "createSignedUrls", "getPublicUrl", "info", "exists"]) {
+\1      if (typeof api[n] === "function") h[n] = (pf: unknown, ...r: unknown[]) => api[n](immoViele(pf), ...r);
+\1    }
+\1    // Lesen in drei Stufen: die Datei des Mandanten, sonst die der
+\1    // Plattform, sonst — bei einer Schrift — einmal von der Quelle.
+\1    // Geschrieben wird dabei nur ins Wurzelverzeichnis und nur eine
+\1    // Schrift; Mandantendateien kann diese Stufe nicht anfassen.
+\1    if (typeof api.download === "function") h.download = async (pf: unknown, ...r: unknown[]) => {
+\1      const hole = async (p: unknown) => {
+\1        try { return await api.download(p, ...r); } catch (e) { return { data: null, error: e }; }
+\1      };
+\1      const erst = await hole(immoViele(pf));
+\1      if (erst?.data) return erst;
+\1      if (typeof pf === "string" && immoMandant) {
+\1        const zweit = await hole(pf);
+\1        if (zweit?.data) return zweit;
+\1      }
+\1      if (eimer === "branding-assets" && typeof pf === "string" && IMMO_SCHRIFTEN[pf]) {
+\1        try {
+\1          const a = await fetch(IMMO_SCHRIFTEN[pf]);
+\1          if (a.ok) {
+\1            const roh = new Uint8Array(await a.arrayBuffer());
+\1            try { await api.upload(pf, roh, { contentType: "font/ttf", upsert: true }); }
+\1            catch (_e) { /* beim naechsten Mal wieder */ }
+\1            console.log("Schrift nachgeladen:", pf, roh.byteLength);
+\1            return { data: new Blob([roh]), error: null };
+\1          }
+\1        } catch (e) { console.warn("Schrift nicht erreichbar:", pf, String(e)); }
+\1      }
+\1      return erst;
+\1    };
+\1    if (typeof api.list === "function") {
+\1      h.list = (pf?: string, ...r: unknown[]) => api.list(pf ? (immoVorne(pf) as string) : (immoMandant ?? pf), ...r);
+\1    }
+\1    for (const n of ["move", "copy"]) {
+\1      if (typeof api[n] === "function") h[n] = (a: unknown, b: unknown, ...r: unknown[]) => api[n](immoVorne(a), immoVorne(b), ...r);
+\1    }
+\1    return h;
+\1  };
+\1}"""
+
+
 ERSETZUNGEN = [
     # --- MARKE: vertrag-pdf traegt die drei Standorte der Referenz als Tabelle
     # im Quelltext — mit den Ortsnamen als Schluessel. Ein Block, eine Regel:
@@ -293,19 +378,47 @@ ERSETZUNGEN = [
      r'.order("sortierung").limit(1).maybeSingle()).data?.bundesland ?? null;',
      'Bundesland des Standorts einmal je Lauf laden.'),
 
-    # --- FORK: Storage-Huelle in jeder Funktion, die Dateien schreibt.
+    # --- FORK: Storage-Huelle in jeder Funktion, die Dateien anfasst.
     # Die Huelle stellt jedem Pfad den Mandanten voran, sobald
     # immoSetzeMandant() ihn kennt. Vorher bleibt alles wie bisher — eine
     # Funktion, die ihren Mandanten noch nicht ermittelt, schreibt weiter
     # an den alten Ort und geht nicht kaputt.
+    #
+    # SEIT DEM 28.09.2026 kann sie auch LESEN, und das ist der Grund, warum
+    # die Liste unten laenger geworden ist. Gemeldet war: "man kann keine
+    # Exposes generieren, keine PDFs, keine Rechnungen". Die Ursache stand im
+    # Protokoll: expose-pdf-erzeugen bricht mit 500 "Basis-Fonts fehlen in
+    # branding-assets" ab, weil Montserrat-Regular, Montserrat-Bold und
+    # Marcellus im Eimer schlicht nicht liegen — die Vorlage hatte sie, der
+    # Fork hat sie nie bekommen. Dazu kam mein eigener Fehler aus fork_08:
+    # der Umzug ins Mandantenverzeichnis, ohne dass die lesenden Funktionen
+    # davon wussten.
+    #
+    # Beides loest die Huelle an einer Stelle statt in zehn:
+    #
+    #   1. LESEN faellt auf das Wurzelverzeichnis zurueck. Schriften sind
+    #      Plattform-Gut, kein Mandanten-Branding — sie 450 KB weise fuer
+    #      jeden neuen Mandanten zu kopieren waere Unfug. Sie liegen unter
+    #      fonts/, ein Mandant uebersteuert sie spaeter mit einer eigenen
+    #      Datei unter {mandant}/fonts/… (Abschnitt 2a des Auftrags).
+    #      Kein Leck: unter der Wurzel liegt seit fork_08 nichts
+    #      Mandantenbezogenes mehr, und SCHREIBEN bleibt praefixiert.
+    #
+    #   2. Fehlt eine Plattform-Schrift ganz, wird sie einmal von ihrer
+    #      Quelle geholt und abgelegt. Das ist nicht neu erfunden: genau so
+    #      heilen sich expose-pdf-erzeugen und mpe-pdf-erzeugen in der
+    #      Vorlage schon selbst (FONT_QUELLEN). Neu ist nur, dass es fuer
+    #      alle Schnitte gilt und in jeder Funktion.
     ('FORK',
      r'(?m)^([ \t]*)(const (admin|db) = createClient\(.*\);)$',
-     '\\1\\2\n\\1// --- Storage: Pfade tragen den Mandanten als erstes Segment -----------\n\\1// Gleiche Bauart wie die Huelle der Oberflaeche. Sie steht IM Handler und\n\\1// nicht auf Modulebene: eine Mandantenvariable auf Modulebene ueberlebt in\n\\1// Deno die Anfrage und traegt den Mandanten des einen Aufrufers in den\n\\1// naechsten. Genau das waere ein Leck statt einer Trennung.\n\\1// Solange immoMandant null ist, bleibt jeder Pfad unveraendert — die\n\\1// Funktion verhaelt sich dann wie bisher.\n\\1let immoMandant: string | null = null;\n\\1const immoSetzeMandant = (m: unknown) => { immoMandant = (typeof m === "string" && m) ? m : null; };\n\\1{\n\\1  const immoEcht = \\3.storage.from.bind(\\3.storage);\n\\1  const immoVorne = (pf: unknown): unknown =>\n\\1    (typeof pf !== "string" || !pf || !immoMandant) ? pf\n\\1      : (pf === immoMandant || pf.startsWith(immoMandant + "/") ? pf : immoMandant + "/" + pf);\n\\1  const immoViele = (pf: unknown): unknown => Array.isArray(pf) ? pf.map(immoVorne) : immoVorne(pf);\n\\1  (\\3.storage as any).from = (eimer: string) => {\n\\1    const api: any = immoEcht(eimer);\n\\1    const h: any = Object.create(api);\n\\1    for (const n of ["upload", "download", "remove", "createSignedUrl",\n\\1                     "createSignedUrls", "getPublicUrl", "info", "exists"]) {\n\\1      if (typeof api[n] === "function") h[n] = (pf: unknown, ...r: unknown[]) => api[n](immoViele(pf), ...r);\n\\1    }\n\\1    if (typeof api.list === "function") {\n\\1      h.list = (pf?: string, ...r: unknown[]) => api.list(pf ? (immoVorne(pf) as string) : (immoMandant ?? pf), ...r);\n\\1    }\n\\1    for (const n of ["move", "copy"]) {\n\\1      if (typeof api[n] === "function") h[n] = (a: unknown, b: unknown, ...r: unknown[]) => api[n](immoVorne(a), immoVorne(b), ...r);\n\\1    }\n\\1    return h;\n\\1  };\n\\1}',
-     'Storage-Huelle in den Funktionen, die Dateien schreiben.',
+     SPEICHER_HUELLE,
+     'Storage-Huelle: Mandantenpfad, Rueckfall auf die Plattform, Selbstheilung der Schriften.',
      {'expose-pdf-erzeugen', 'mpe-pdf-erzeugen', 'energieausweis-anfrage',
       'eigentuemer-dokument-uebernehmen', 'signatur-unterschreiben',
       'mail-anhaenge-diagnose', 'brief-pdf-erzeugen', 'web-asset-kopieren',
-      'bild-empfang', 'eigentuemer-report-pdf', 'signatur-vorgang-starten'}),
+      'bild-empfang', 'eigentuemer-report-pdf', 'signatur-vorgang-starten',
+      'rechnung-pdf-erzeugen', 'vertrag-pdf', 'mietvertrag-pdf',
+      'reservierung-pdf-erzeugen', 'reservierung-word-erzeugen'}),
 
     # --- FREMD: Verweise auf das Supabase-Projekt der Vorlage
     ('FREMD', r'yazwkzzjiquprtjpurur', 'usguiggfciavwzkdfjgt',
@@ -918,124 +1031,71 @@ ERSETZUNGEN = [
 
 
     # =====================================================================
-    # FORK — die Dokumente fanden weder Schriften noch Logo
+    # FORK — die Funktionen, die Dokumente bauen, muessen ihren Mandanten
+    # kennen, sonst greift die Storage-Huelle ins Leere.
     #
-    # GEMELDET am 28.09.2026: "man kann keine Exposés generieren, keine PDFs,
-    # keine Rechnungen". Das Protokoll der Rechnungsfunktion sagt genau, warum:
+    # Fuenf von ihnen hatten die Huelle bisher nicht, weil sie nur LESEN und
+    # die Huelle fuers Schreiben gedacht war. Seit sie auch das Lesen regelt
+    # (Kommentar an der Regel oben), brauchen sie sie — und damit die eine
+    # Zeile, die ihr sagt, fuer wen gearbeitet wird.
     #
-    #   Fonts geladen: Montserrat-Regular: FEHLT  Montserrat-Bold: FEHLT
-    #                  Marcellus: FEHLT
-    #   Logo-Download Fehler: Object not found
-    #
-    # ZWEI URSACHEN, die sich ueberlagert haben:
-    #
-    # 1) MEIN FEHLER. fork_08 hat alle Dateien im Speicher ins
-    #    Mandantenverzeichnis verschoben. Elf Funktionen, die Dateien
-    #    SCHREIBEN, haben damals die Speicher-Huelle bekommen. Die Funktionen,
-    #    die Schriften und Logo LESEN, nicht — sie suchen weiter unter
-    #    "fonts/Montserrat-Regular.ttf" statt "{mandant}/fonts/…".
-    #
-    # 2) Die gesuchten Dateien gibt es ueberhaupt nicht. Im Eimer liegen
-    #    Montserrat Light, Medium, SemiBold, Italic und SemiBoldItalic sowie
-    #    GreatVibes — aber weder Regular noch Bold noch Marcellus. Die Vorlage
-    #    hatte sie, der Fork hat sie nie bekommen.
-    #
-    # Deshalb hier BEIDES: der Mandantenpfad, und eine Ersatzkette auf das,
-    # was tatsaechlich da ist. Medium statt Regular und SemiBold statt Bold
-    # sehen im Satz naeher am Gewollten aus als Helvetica.
-    #
-    # Der Zwischenspeicher wird nach Mandant getrennt. Vorher war er
-    # modulweit: die Schrift des einen Mandanten waere im Dokument des
-    # naechsten gelandet, sobald dieselbe Instanz zwei Anfragen bedient.
+    # Der Stand vom 28.09.2026 davor: rechnung-pdf-erzeugen hatte eigene
+    # Hilfsfunktionen fuer denselben Zweck (immoBrandingDatei, immoSchrift,
+    # ein Zwischenspeicher je Mandant). Sie sind hier entfallen. Zwei Wege
+    # zum selben Ziel sind einer zu viel — und der zweite ist der, den man
+    # beim naechsten Mal vergisst.
     # =====================================================================
+
+    # Rechnung: die Firma traegt den Mandanten. Vor dem Laden der Schriften.
     ('FORK',
-     r'// Font-Pfade im Storage-Bucket branding-assets\nconst FONT_MONTSERRAT_REGULAR = "fonts/Montserrat-Regular\.ttf";\nconst FONT_MONTSERRAT_BOLD    = "fonts/Montserrat-Bold\.ttf";\nconst FONT_MARCELLUS          = "fonts/Marcellus-Regular\.ttf";',
-     '// Schriften im Eimer branding-assets. Je Schnitt eine Reihe von\n'
-     '// Kandidaten: der erste, den es gibt, wird genommen.\n'
-     'const IMMO_SCHRIFT_REGULAR  = ["fonts/Montserrat-Regular.ttf",\n'
-     '                               "fonts/Montserrat-Medium.ttf",\n'
-     '                               "fonts/Montserrat-Light.ttf"];\n'
-     'const IMMO_SCHRIFT_BOLD     = ["fonts/Montserrat-Bold.ttf",\n'
-     '                               "fonts/Montserrat-SemiBold.ttf",\n'
-     '                               "fonts/Montserrat-Medium.ttf"];\n'
-     'const IMMO_SCHRIFT_HEADLINE = ["fonts/Marcellus-Regular.ttf"];\n'
-     '\n'
-     '// Eine Datei aus branding-assets, mit dem Mandanten davor. Seit fork_08\n'
-     '// liegt dort alles unter {mandant}/…; der zweite Versuch ohne Praefix\n'
-     '// ist fuer Bestaende, die den Umzug nie mitgemacht haben.\n'
-     'async function immoBrandingDatei(admin: any, mandant: string | null, pfad: string) {\n'
-     '  const wege = mandant ? [mandant + "/" + pfad, pfad] : [pfad];\n'
-     '  for (const w of wege) {\n'
-     '    try {\n'
-     '      const { data } = await admin.storage.from("branding-assets").download(w);\n'
-     '      if (data) return await data.arrayBuffer();\n'
-     '    } catch (_) { /* naechster Weg */ }\n'
-     '  }\n'
-     '  return null;\n'
-     '}\n'
-     '\n'
-     '// Der erste Kandidat, den es gibt.\n'
-     'async function immoSchrift(admin: any, mandant: string | null, kandidaten: string[]) {\n'
-     '  for (const k of kandidaten) {\n'
-     '    const b = await immoBrandingDatei(admin, mandant, k);\n'
-     '    if (b) return { puffer: b, quelle: k };\n'
-     '  }\n'
-     '  return null;\n'
-     '}',
-     'PDF: Schriften mit Mandantenpfad und Ersatzkette (Rechnung).',
+     r'(    if \(!firma\) throw new Error\("Firmen-Stammdaten nicht gefunden\."\);)',
+     r'\1\n    immoSetzeMandant(firma.mandant_id);',
+     'Rechnung: den Mandanten aus der Absenderfirma setzen.',
      {'rechnung-pdf-erzeugen'}),
 
-    # Der Zwischenspeicher haelt jetzt je Mandant einen Satz.
+    # Maklervertrag und Mietvertrag: der Mandant steht im Profil des
+    # Anmeldenden. Beide Dateien haben die Zeile wortgleich.
     ('FORK',
-     r'// In-Memory-Cache fuer Fonts und Logo \(ueberlebt mehrere Aufrufe in der Edge Function Instance\)\nlet cachedFonts: \{\n  montserratRegular\?: ArrayBuffer;\n  montserratBold\?: ArrayBuffer;\n  marcellus\?: ArrayBuffer;\n\} = \{\};',
-     '// Zwischenspeicher je Mandant. Vorher war er modulweit — die Schrift des\n'
-     '// einen Mandanten waere im Dokument des naechsten gelandet, sobald\n'
-     '// dieselbe Instanz zwei Anfragen bedient.\n'
+     r'(const \{ data: profil \} = await admin\.from\("profiles"\)\.select\("\*"\)\.eq\("id", userData\.user\.id\)\.maybeSingle\(\);)',
+     r'\1 immoSetzeMandant(profil?.mandant_id);',
+     'Vertrags-PDF: den Mandanten aus dem Profil setzen.',
+     {'vertrag-pdf', 'mietvertrag-pdf'}),
+
+    # Der Zwischenspeicher der Schriften haelt je Mandant einen Satz.
+    #
+    # In der Vorlage steht er auf Modulebene, und heute faellt das niemandem
+    # auf: die Schriften kommen fuer alle aus demselben Wurzelverzeichnis.
+    # Sobald ein Mandant eine eigene Hausschrift hochlaedt (Abschnitt 2a),
+    # waere die Schrift des einen in der Rechnung des naechsten — sobald
+    # dieselbe Instanz zwei Anfragen bedient. Das ist keine Sichtbarkeits-
+    # frage, die man spaeter nachzieht, sondern ein Leck; deshalb jetzt.
+    ('FORK',
+     r'let cachedFonts: \{\n  montserratRegular\?: ArrayBuffer;\n  montserratBold\?: ArrayBuffer;\n  marcellus\?: ArrayBuffer;\n\} = \{\};',
      'const immoSchriftCache = new Map<string, {\n'
      '  montserratRegular?: ArrayBuffer;\n'
      '  montserratBold?: ArrayBuffer;\n'
      '  marcellus?: ArrayBuffer;\n'
      '}>();',
-     'PDF: Zwischenspeicher der Schriften je Mandant.',
-     {'rechnung-pdf-erzeugen'}),
+     'Schriften-Zwischenspeicher je Mandant statt modulweit.',
+     {'rechnung-pdf-erzeugen', 'reservierung-pdf-erzeugen'}),
 
     ('FORK',
-     r'    if \(fontkit && !cachedFonts\.montserratRegular\) \{\n      try \{\n        const results = await Promise\.allSettled\(\[\n          admin\.storage\.from\("branding-assets"\)\.download\(FONT_MONTSERRAT_REGULAR\),\n          admin\.storage\.from\("branding-assets"\)\.download\(FONT_MONTSERRAT_BOLD\),\n          admin\.storage\.from\("branding-assets"\)\.download\(FONT_MARCELLUS\),\n        \]\);\n        if \(results\[0\]\.status === "fulfilled" && results\[0\]\.value\.data\) \{\n          cachedFonts\.montserratRegular = await results\[0\]\.value\.data\.arrayBuffer\(\);\n        \}\n        if \(results\[1\]\.status === "fulfilled" && results\[1\]\.value\.data\) \{\n          cachedFonts\.montserratBold = await results\[1\]\.value\.data\.arrayBuffer\(\);\n        \}\n        if \(results\[2\]\.status === "fulfilled" && results\[2\]\.value\.data\) \{\n          cachedFonts\.marcellus = await results\[2\]\.value\.data\.arrayBuffer\(\);\n        \}\n        console\.log\("Fonts geladen:",\n          "Montserrat-Regular:", cachedFonts\.montserratRegular\?\.byteLength \|\| "FEHLT",\n          "Montserrat-Bold:", cachedFonts\.montserratBold\?\.byteLength \|\| "FEHLT",\n          "Marcellus:", cachedFonts\.marcellus\?\.byteLength \|\| "FEHLT"\);\n      \} catch \(e\) \{\n        console\.warn\("Font-Download fehlgeschlagen:", e instanceof Error \? e\.message : String\(e\)\);\n      \}\n    \}',
-     '    const immoMandantKey = String(firma.mandant_id || "ohne");\n'
-     '    let cachedFonts = immoSchriftCache.get(immoMandantKey);\n'
-     '    if (!cachedFonts) { cachedFonts = {}; immoSchriftCache.set(immoMandantKey, cachedFonts); }\n'
-     '    if (fontkit && !cachedFonts.montserratRegular) {\n'
-     '      try {\n'
-     '        const [r, b, h] = await Promise.all([\n'
-     '          immoSchrift(admin, firma.mandant_id, IMMO_SCHRIFT_REGULAR),\n'
-     '          immoSchrift(admin, firma.mandant_id, IMMO_SCHRIFT_BOLD),\n'
-     '          immoSchrift(admin, firma.mandant_id, IMMO_SCHRIFT_HEADLINE),\n'
-     '        ]);\n'
-     '        if (r) cachedFonts.montserratRegular = r.puffer;\n'
-     '        if (b) cachedFonts.montserratBold = b.puffer;\n'
-     '        if (h) cachedFonts.marcellus = h.puffer;\n'
-     '        console.log("Schriften geladen:",\n'
-     '          "Fliesstext:", r ? r.quelle : "FEHLT",\n'
-     '          "fett:", b ? b.quelle : "FEHLT",\n'
-     '          "Ueberschrift:", h ? h.quelle : "FEHLT (nimmt fett)");\n'
-     '      } catch (e) {\n'
-     '        console.warn("Schrift-Download fehlgeschlagen:", e instanceof Error ? e.message : String(e));\n'
-     '      }\n'
-     '    }',
-     'PDF: Schriften je Mandant laden, mit Ersatzkette (Rechnung).',
-     {'rechnung-pdf-erzeugen'}),
+     r'(    if \(fontkit && !cachedFonts\.montserratRegular\) \{)',
+     '    const immoSchriftSchluessel = String(immoMandant || "plattform");\n'
+     '    let cachedFonts = immoSchriftCache.get(immoSchriftSchluessel);\n'
+     '    if (!cachedFonts) { cachedFonts = {}; immoSchriftCache.set(immoSchriftSchluessel, cachedFonts); }\n'
+     r'\1',
+     'Den Satz des eigenen Mandanten aus dem Zwischenspeicher holen.',
+     {'rechnung-pdf-erzeugen', 'reservierung-pdf-erzeugen'}),
 
-    # Das Logo liest schon firma.logo_pfad — es fehlte nur der Mandant davor.
+    # Reservierung: der Mandant steht am Vorgang. Beide Dateien, Wort fuer
+    # Wort dieselbe Stelle.
     ('FORK',
-     r'        const \{ data: logoBlob, error: logoErr \} = await admin\.storage\n          \.from\("branding-assets"\)\n          \.download\(firma\.logo_pfad\);\n        if \(logoErr\) \{\n          console\.warn\("Logo-Download Fehler:", logoErr\.message\);\n        \} else if \(logoBlob\) \{\n          const logoBytes = await logoBlob\.arrayBuffer\(\);',
-     '        // logo_pfad ist mandantenrelativ gespeichert; seit fork_08 liegt\n'
-     '        // die Datei unter {mandant}/…\n'
-     '        const logoBytes = await immoBrandingDatei(admin, firma.mandant_id, firma.logo_pfad);\n'
-     '        if (!logoBytes) {\n'
-     '          console.warn("Logo nicht gefunden:", firma.logo_pfad);\n'
-     '        } else {',
-     'PDF: das Logo mit dem Mandantenpfad holen (Rechnung).',
-     {'rechnung-pdf-erzeugen'}),
+     r'(if \(!res\) throw new Error\("Reservierung nicht gefunden\."\);)',
+     r'\1\n    immoSetzeMandant(res.mandant_id);',
+     'Reservierung: den Mandanten aus dem Vorgang setzen.',
+     {'reservierung-pdf-erzeugen', 'reservierung-word-erzeugen'}),
+
 
 ]
 
@@ -1279,8 +1339,13 @@ def main():
             # FORK-Regel erweitert die Vorlage und darf das sehr wohl —
             # deshalb nur fuer sie ein weiterer Rahmen, und die Zahl wird
             # ausgegeben, damit sie nicht unbemerkt waechst.
+            #
+            # 28.09.2026 von 80 auf 140 angehoben: die Storage-Huelle regelt
+            # jetzt auch das Lesen und bringt die Liste der Plattform-
+            # Schriften mit. Sie allein sind 75 Zeilen. Die Grenze soll
+            # unbemerktes Wachstum melden, nicht bewusstes verhindern.
             zeilen_delta = inhalt.count('\n') - zeilen_vorher
-            unten, oben = (-2, 80) if erweitert else (-2, 0)
+            unten, oben = (-2, 140) if erweitert else (-2, 0)
             if not unten <= zeilen_delta <= oben:
                 sys.exit(f'ABBRUCH: {datei} hat {zeilen_delta:+d} Zeilen '
                          f'(erlaubt: {unten} bis {oben}). '

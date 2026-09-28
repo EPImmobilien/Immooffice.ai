@@ -45,14 +45,19 @@ ERWEITERT = {
     'urlaub-hinweise': 'Feiertage aller sechzehn Bundeslaender statt nur '
                        'Mecklenburg-Vorpommern (Auftrag 28.09.2026)',
 }
-# Die elf Funktionen, die Dateien schreiben, bekommen die Storage-Huelle.
-# Sie ist untaetig, solange immoSetzeMandant() den Mandanten nicht kennt —
-# deshalb aendert sie kein Verhalten, nur den Quelltext.
+# Die sechzehn Funktionen, die Dateien anfassen, bekommen die Storage-Huelle.
+# Beim Schreiben stellt sie den Mandanten voran, sobald immoSetzeMandant()
+# ihn kennt. Beim Lesen faellt sie auf das Wurzelverzeichnis zurueck, wo die
+# Schriften der Plattform liegen, und holt eine fehlende Schrift einmal von
+# ihrer Quelle. Ohne diesen Rueckfall brach expose-pdf-erzeugen mit
+# "Basis-Fonts fehlen in branding-assets" ab (gemeldet 28.09.2026).
 for _f in ('expose-pdf-erzeugen', 'mpe-pdf-erzeugen', 'energieausweis-anfrage',
            'eigentuemer-dokument-uebernehmen', 'signatur-unterschreiben',
            'mail-anhaenge-diagnose', 'brief-pdf-erzeugen', 'web-asset-kopieren',
-           'bild-empfang', 'eigentuemer-report-pdf', 'signatur-vorgang-starten'):
-    ERWEITERT[_f] = 'Storage-Huelle: Pfade tragen den Mandanten (Phase 2)'
+           'bild-empfang', 'eigentuemer-report-pdf', 'signatur-vorgang-starten',
+           'vertrag-pdf', 'mietvertrag-pdf'):
+    ERWEITERT[_f] = ('Storage-Huelle: Mandantenpfad, Rueckfall auf die '
+                     'Plattform, Selbstheilung der Schriften (Phase 2)')
 
 # Oeffentliche Endpunkte, die ihren Mandanten selbst bestimmen muessen. Sie
 # benutzen den service_role, fuer den RLS nicht gilt — die Grenze ziehen sie
@@ -66,7 +71,8 @@ for _f in ('oeffentliche-objekte', 'web-lead', 'objekt-landing', 'akq-lead-einga
 # 28.09.2026).
 for _f in ('rechnung-pdf-erzeugen', 'reservierung-pdf-erzeugen',
            'reservierung-word-erzeugen'):
-    ERWEITERT[_f] = 'CI und Briefkopf aus dem Mandanten (Phase 2)'
+    ERWEITERT[_f] = ('CI, Briefkopf und Schriften aus dem Mandanten, '
+                     'Storage-Huelle (Phase 2)')
 
 BLOCKZEILEN = {
     'mpe-pdf-erzeugen': {

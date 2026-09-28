@@ -606,3 +606,20 @@ wird daraus entweder ein Adapter unter mehreren oder es fällt ganz weg.
 Fundstellen beim Laden einer Ansicht eine der gestrichenen Funktionen ruft. Ein
 Aufruf ins Leere liefert 404 und sollte abgefangen sein — geprüft ist das
 nicht.
+
+## Drei Dokumente suchen ein Logo, das es nicht gibt
+
+`vertrag-pdf`, `mietvertrag-pdf` und `signatur-vorgang-starten` holen ihr Logo
+aus einem fest verdrahteten `const LOGO_PFAD = "logo.png"`. Diese Datei liegt
+weder im Wurzelverzeichnis des Eimers noch bei einem Mandanten — die drei
+Dokumente entstehen also ohne Logo. Kaputt sind sie deshalb nicht: der
+Download scheitert still, das PDF wird gebaut.
+
+Die übrigen Dokumente lesen `firma.logo_pfad` aus `firma_stammdaten`, also das
+Logo des Mandanten. Diese drei laden `firma_stammdaten` gar nicht erst. Das
+sauber nachzuziehen heißt, ihnen den Firmensatz mitzugeben — ein Eingriff in
+fremden Code, der über das hinausgeht, was der gemeldete Fehler verlangt.
+
+**Gehört zu Abschnitt 2c des Auftrags** („zwei Logo-Plätze, ein einziger
+Dienst `getBranding()`"): dort wird die Logoherkunft ohnehin an eine Stelle
+gezogen. Dann fällt `LOGO_PFAD` mit weg.

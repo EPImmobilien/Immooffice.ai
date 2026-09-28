@@ -36,42 +36,12 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-// Schriften im Eimer branding-assets. Je Schnitt eine Reihe von
-// Kandidaten: der erste, den es gibt, wird genommen.
-const IMMO_SCHRIFT_REGULAR  = ["fonts/Montserrat-Regular.ttf",
-                               "fonts/Montserrat-Medium.ttf",
-                               "fonts/Montserrat-Light.ttf"];
-const IMMO_SCHRIFT_BOLD     = ["fonts/Montserrat-Bold.ttf",
-                               "fonts/Montserrat-SemiBold.ttf",
-                               "fonts/Montserrat-Medium.ttf"];
-const IMMO_SCHRIFT_HEADLINE = ["fonts/Marcellus-Regular.ttf"];
+// Font-Pfade im Storage-Bucket branding-assets
+const FONT_MONTSERRAT_REGULAR = "fonts/Montserrat-Regular.ttf";
+const FONT_MONTSERRAT_BOLD    = "fonts/Montserrat-Bold.ttf";
+const FONT_MARCELLUS          = "fonts/Marcellus-Regular.ttf";
 
-// Eine Datei aus branding-assets, mit dem Mandanten davor. Seit fork_08
-// liegt dort alles unter {mandant}/…; der zweite Versuch ohne Praefix
-// ist fuer Bestaende, die den Umzug nie mitgemacht haben.
-async function immoBrandingDatei(admin: any, mandant: string | null, pfad: string) {
-  const wege = mandant ? [mandant + "/" + pfad, pfad] : [pfad];
-  for (const w of wege) {
-    try {
-      const { data } = await admin.storage.from("branding-assets").download(w);
-      if (data) return await data.arrayBuffer();
-    } catch (_) { /* naechster Weg */ }
-  }
-  return null;
-}
-
-// Der erste Kandidat, den es gibt.
-async function immoSchrift(admin: any, mandant: string | null, kandidaten: string[]) {
-  for (const k of kandidaten) {
-    const b = await immoBrandingDatei(admin, mandant, k);
-    if (b) return { puffer: b, quelle: k };
-  }
-  return null;
-}
-
-// Zwischenspeicher je Mandant. Vorher war er modulweit — die Schrift des
-// einen Mandanten waere im Dokument des naechsten gelandet, sobald
-// dieselbe Instanz zwei Anfragen bedient.
+// In-Memory-Cache fuer Fonts und Logo (ueberlebt mehrere Aufrufe in der Edge Function Instance)
 const immoSchriftCache = new Map<string, {
   montserratRegular?: ArrayBuffer;
   montserratBold?: ArrayBuffer;
@@ -130,6 +100,81 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const admin = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
+    // --- Storage: Pfade tragen den Mandanten als erstes Segment -----------
+    // Gleiche Bauart wie die Huelle der Oberflaeche. Sie steht IM Handler und
+    // nicht auf Modulebene: eine Mandantenvariable auf Modulebene ueberlebt in
+    // Deno die Anfrage und traegt den Mandanten des einen Aufrufers in den
+    // naechsten. Genau das waere ein Leck statt einer Trennung.
+    // Solange immoMandant null ist, bleibt jeder Pfad unveraendert — die
+    // Funktion verhaelt sich dann wie bisher.
+    let immoMandant: string | null = null;
+    const immoSetzeMandant = (m: unknown) => { immoMandant = (typeof m === "string" && m) ? m : null; };
+    // Schriften sind Plattform-Gut, kein Mandanten-Branding. Sie liegen im
+    // Wurzelverzeichnis des Eimers unter fonts/. Fehlt eine, wird sie beim
+    // ersten Bedarf von ihrer Quelle geholt und dort abgelegt — danach nie
+    // wieder. Ein Mandant, der eine eigene Hausschrift hochlaedt, legt sie
+    // unter {mandant}/fonts/… und uebersteuert damit die der Plattform.
+    const IMMO_SCHRIFTEN: Record<string, string> = {
+      "fonts/Montserrat-Regular.ttf":        "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Regular.ttf",
+      "fonts/Montserrat-Bold.ttf":           "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Bold.ttf",
+      "fonts/Montserrat-Light.ttf":          "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Light.ttf",
+      "fonts/Montserrat-Medium.ttf":         "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Medium.ttf",
+      "fonts/Montserrat-SemiBold.ttf":       "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-SemiBold.ttf",
+      "fonts/Montserrat-Italic.ttf":         "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Italic.ttf",
+      "fonts/Montserrat-SemiBoldItalic.ttf": "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-SemiBoldItalic.ttf",
+      "fonts/Marcellus-Regular.ttf":         "https://raw.githubusercontent.com/google/fonts/main/ofl/marcellus/Marcellus-Regular.ttf",
+      "fonts/GreatVibes-Regular.ttf":        "https://raw.githubusercontent.com/google/fonts/main/ofl/greatvibes/GreatVibes-Regular.ttf",
+    };
+    {
+      const immoEcht = admin.storage.from.bind(admin.storage);
+      const immoVorne = (pf: unknown): unknown =>
+        (typeof pf !== "string" || !pf || !immoMandant) ? pf
+          : (pf === immoMandant || pf.startsWith(immoMandant + "/") ? pf : immoMandant + "/" + pf);
+      const immoViele = (pf: unknown): unknown => Array.isArray(pf) ? pf.map(immoVorne) : immoVorne(pf);
+      (admin.storage as any).from = (eimer: string) => {
+        const api: any = immoEcht(eimer);
+        const h: any = Object.create(api);
+        for (const n of ["upload", "remove", "createSignedUrl",
+                         "createSignedUrls", "getPublicUrl", "info", "exists"]) {
+          if (typeof api[n] === "function") h[n] = (pf: unknown, ...r: unknown[]) => api[n](immoViele(pf), ...r);
+        }
+        // Lesen in drei Stufen: die Datei des Mandanten, sonst die der
+        // Plattform, sonst — bei einer Schrift — einmal von der Quelle.
+        // Geschrieben wird dabei nur ins Wurzelverzeichnis und nur eine
+        // Schrift; Mandantendateien kann diese Stufe nicht anfassen.
+        if (typeof api.download === "function") h.download = async (pf: unknown, ...r: unknown[]) => {
+          const hole = async (p: unknown) => {
+            try { return await api.download(p, ...r); } catch (e) { return { data: null, error: e }; }
+          };
+          const erst = await hole(immoViele(pf));
+          if (erst?.data) return erst;
+          if (typeof pf === "string" && immoMandant) {
+            const zweit = await hole(pf);
+            if (zweit?.data) return zweit;
+          }
+          if (eimer === "branding-assets" && typeof pf === "string" && IMMO_SCHRIFTEN[pf]) {
+            try {
+              const a = await fetch(IMMO_SCHRIFTEN[pf]);
+              if (a.ok) {
+                const roh = new Uint8Array(await a.arrayBuffer());
+                try { await api.upload(pf, roh, { contentType: "font/ttf", upsert: true }); }
+                catch (_e) { /* beim naechsten Mal wieder */ }
+                console.log("Schrift nachgeladen:", pf, roh.byteLength);
+                return { data: new Blob([roh]), error: null };
+              }
+            } catch (e) { console.warn("Schrift nicht erreichbar:", pf, String(e)); }
+          }
+          return erst;
+        };
+        if (typeof api.list === "function") {
+          h.list = (pf?: string, ...r: unknown[]) => api.list(pf ? (immoVorne(pf) as string) : (immoMandant ?? pf), ...r);
+        }
+        for (const n of ["move", "copy"]) {
+          if (typeof api[n] === "function") h[n] = (a: unknown, b: unknown, ...r: unknown[]) => api[n](immoVorne(a), immoVorne(b), ...r);
+        }
+        return h;
+      };
+    }
 
     // v27: Interner Aufruf (SQL/Cron) ueber x-intern-secret, Wert liegt nur im Vault.
     let internAufruf = false;
@@ -185,6 +230,7 @@ Deno.serve(async (req) => {
       firma = data;
     }
     if (!firma) throw new Error("Firmen-Stammdaten nicht gefunden.");
+    immoSetzeMandant(firma.mandant_id);
 
     // Die CI des Mandanten, sonst die der Plattform.
     const ciBlau = immoCiFarbe(firma.ci_primaer, CI.blau);
@@ -193,25 +239,31 @@ Deno.serve(async (req) => {
     const istTest = rechnung.ist_test === true;
 
     // ---- Fonts aus Storage laden (Cache pro Instance) ----
-    const immoMandantKey = String(firma.mandant_id || "ohne");
-    let cachedFonts = immoSchriftCache.get(immoMandantKey);
-    if (!cachedFonts) { cachedFonts = {}; immoSchriftCache.set(immoMandantKey, cachedFonts); }
+    const immoSchriftSchluessel = String(immoMandant || "plattform");
+    let cachedFonts = immoSchriftCache.get(immoSchriftSchluessel);
+    if (!cachedFonts) { cachedFonts = {}; immoSchriftCache.set(immoSchriftSchluessel, cachedFonts); }
     if (fontkit && !cachedFonts.montserratRegular) {
       try {
-        const [r, b, h] = await Promise.all([
-          immoSchrift(admin, firma.mandant_id, IMMO_SCHRIFT_REGULAR),
-          immoSchrift(admin, firma.mandant_id, IMMO_SCHRIFT_BOLD),
-          immoSchrift(admin, firma.mandant_id, IMMO_SCHRIFT_HEADLINE),
+        const results = await Promise.allSettled([
+          admin.storage.from("branding-assets").download(FONT_MONTSERRAT_REGULAR),
+          admin.storage.from("branding-assets").download(FONT_MONTSERRAT_BOLD),
+          admin.storage.from("branding-assets").download(FONT_MARCELLUS),
         ]);
-        if (r) cachedFonts.montserratRegular = r.puffer;
-        if (b) cachedFonts.montserratBold = b.puffer;
-        if (h) cachedFonts.marcellus = h.puffer;
-        console.log("Schriften geladen:",
-          "Fliesstext:", r ? r.quelle : "FEHLT",
-          "fett:", b ? b.quelle : "FEHLT",
-          "Ueberschrift:", h ? h.quelle : "FEHLT (nimmt fett)");
+        if (results[0].status === "fulfilled" && results[0].value.data) {
+          cachedFonts.montserratRegular = await results[0].value.data.arrayBuffer();
+        }
+        if (results[1].status === "fulfilled" && results[1].value.data) {
+          cachedFonts.montserratBold = await results[1].value.data.arrayBuffer();
+        }
+        if (results[2].status === "fulfilled" && results[2].value.data) {
+          cachedFonts.marcellus = await results[2].value.data.arrayBuffer();
+        }
+        console.log("Fonts geladen:",
+          "Montserrat-Regular:", cachedFonts.montserratRegular?.byteLength || "FEHLT",
+          "Montserrat-Bold:", cachedFonts.montserratBold?.byteLength || "FEHLT",
+          "Marcellus:", cachedFonts.marcellus?.byteLength || "FEHLT");
       } catch (e) {
-        console.warn("Schrift-Download fehlgeschlagen:", e instanceof Error ? e.message : String(e));
+        console.warn("Font-Download fehlgeschlagen:", e instanceof Error ? e.message : String(e));
       }
     }
 
@@ -264,12 +316,13 @@ Deno.serve(async (req) => {
     let embeddedLogo: any = null;
     if (firma.logo_pfad) {
       try {
-        // logo_pfad ist mandantenrelativ gespeichert; seit fork_08 liegt
-        // die Datei unter {mandant}/…
-        const logoBytes = await immoBrandingDatei(admin, firma.mandant_id, firma.logo_pfad);
-        if (!logoBytes) {
-          console.warn("Logo nicht gefunden:", firma.logo_pfad);
-        } else {
+        const { data: logoBlob, error: logoErr } = await admin.storage
+          .from("branding-assets")
+          .download(firma.logo_pfad);
+        if (logoErr) {
+          console.warn("Logo-Download Fehler:", logoErr.message);
+        } else if (logoBlob) {
+          const logoBytes = await logoBlob.arrayBuffer();
           const pfadLower = firma.logo_pfad.toLowerCase();
           if (pfadLower.endsWith(".jpg") || pfadLower.endsWith(".jpeg")) {
             embeddedLogo = await pdf.embedJpg(logoBytes);

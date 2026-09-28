@@ -1466,3 +1466,72 @@ Postfächer eine Adapter-Schicht, bei der die Anwendung nur eine Schnittstelle
 kennt und jeder Anbieter ein Adapter ist. Für CRM gilt dasselbe. onOffice wäre
 dann ein Adapter unter mehreren, je Mandant zuschaltbar — nicht die eingebaute
 Annahme.
+
+---
+
+## Schriften gehören der Plattform, nicht dem Mandanten (28.09.2026)
+
+**Gemeldet:** „Man kann keine Exposés generieren, keine PDFs, keine
+Rechnungen." Im Protokoll von `expose-pdf-erzeugen` stand der Grund in einer
+Zeile: `500 — Basis-Fonts fehlen in branding-assets`.
+
+**Zwei Ursachen lagen übereinander.**
+
+1. **Die Dateien gab es nicht.** Im Eimer lagen Montserrat Light, Medium,
+   SemiBold, Italic, SemiBoldItalic und GreatVibes — aber weder
+   Montserrat-Regular noch Montserrat-Bold noch Marcellus. Genau die drei,
+   die Rechnung, Exposé und Reservierung verlangen. Die Vorlage hatte sie,
+   der Fork hat sie nie bekommen.
+2. **Mein Fehler aus `fork_08`.** Der Umzug hat alle Dateien ins
+   Mandantenverzeichnis geschoben. Die elf Funktionen, die Dateien
+   **schreiben**, haben damals die Storage-Hülle bekommen. Die Funktionen,
+   die Schriften und Logo **lesen**, nicht — sie suchten weiter unter
+   `fonts/…` statt `{mandant}/fonts/…`.
+
+**Entscheidung: Schriften sind Plattform-Gut, kein Mandanten-Branding.** Sie
+liegen im Wurzelverzeichnis des Eimers unter `fonts/`. Sie 450 KB weise für
+jeden neuen Mandanten zu kopieren wäre Unfug — es sind für alle dieselben
+Dateien, und ein Mandant, der eine eigene Hausschrift mitbringt, legt sie
+unter `{mandant}/fonts/…` und übersteuert sie damit (Abschnitt 2a des
+Auftrags).
+
+**Gelöst an einer Stelle statt in zehn.** Die Storage-Hülle regelt jetzt auch
+das Lesen, in drei Stufen:
+
+| Stufe | | |
+|---|---|---|
+| 1 | `{mandant}/pfad` | die Datei des Mandanten |
+| 2 | `pfad` | die der Plattform |
+| 3 | Quelle im Netz | nur Schriften, nur einmal — danach liegt sie unter (2) |
+
+Stufe 3 ist nicht neu erfunden: `expose-pdf-erzeugen` und `mpe-pdf-erzeugen`
+heilen sich in der Vorlage schon selbst (`FONT_QUELLEN`). Neu ist nur, dass
+es für alle Schnitte gilt und in jeder Funktion.
+
+**Kein Leck.** Unter der Wurzel liegt seit `fork_08` nichts
+Mandantenbezogenes mehr; **geschrieben** wird weiterhin ausschließlich mit
+Mandantenpräfix, und die restriktive Richtlinie aus `fork_09` hält angemeldete
+Nutzer ohnehin von der Wurzel fern. Nur der `service_role` der Edge Functions
+kommt dorthin — und legt dort nur eine Schrift ab.
+
+**Die Hülle haben jetzt sechzehn statt elf Funktionen:** dazu gekommen sind
+`rechnung-pdf-erzeugen`, `vertrag-pdf`, `mietvertrag-pdf`,
+`reservierung-pdf-erzeugen` und `reservierung-word-erzeugen`. Die
+Sonderbehandlung, die `rechnung-pdf-erzeugen` am selben Tag bekommen hatte
+(eigene Hilfsfunktionen `immoBrandingDatei`/`immoSchrift`), ist damit
+entfallen. Zwei Wege zum selben Ziel sind einer zu viel — und der zweite ist
+der, den man beim nächsten Mal vergisst.
+
+**Nebenbei geschlossen:** der Schriften-Zwischenspeicher in
+`rechnung-pdf-erzeugen` und `reservierung-pdf-erzeugen` lag auf Modulebene.
+Heute fällt das niemandem auf, weil alle dieselben Schriften bekommen. Sobald
+ein Mandant eine eigene hochlädt, wäre seine Schrift in der Rechnung des
+nächsten, sobald dieselbe Instanz zwei Anfragen bedient. Der Speicher hält
+jetzt je Mandant einen Satz.
+
+**Neues Gate:** `tests/funktionen-syntax.js` liest alle 118 Funktionen mit dem
+TypeScript-Parser. Bis heute stand im Bericht „kein Deno und kein TypeScript
+in dieser Umgebung" — das erste stimmt, das zweite nicht. Der Parser braucht
+weder Deno noch auflösbare Importe und fängt genau den Fehler, den ein
+Generator macht: eine Regel, die eine Klammer zerschneidet. Typen prüft er
+nicht; dafür bräuchte es Deno mit Netz.
