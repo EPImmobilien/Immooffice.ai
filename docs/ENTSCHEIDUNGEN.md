@@ -1067,3 +1067,53 @@ PostgREST als `request.jwt.claims` setzt. Kein JWT heißt Cron, Wartung oder
 direkte Verbindung — dort gibt es keinen Mandanten, an dem zu messen wäre.
 `service_role` bleibt ausgenommen: sie umgeht RLS ohnehin überall, das ist der
 Weg der Edge Functions.
+
+## 2026-09-28 · Die Hintergrundjobs haben Mandanten verkuppelt
+
+**Befund, der schwerste bisher:** `fork_14` hat die *Argumente* der
+`SECURITY DEFINER`-Funktionen abgesichert. Was diese Funktionen **innen**
+verknüpfen, war damit noch nicht geprüft — und dort lag der eigentliche Fehler.
+
+`public.suchkriterien_abgleich` enthielt:
+
+```sql
+from immobilien o
+cross join kontakte k
+```
+
+Ein Kreuzprodukt **aller** Objekte mit **allen** Kontakten, ohne
+Mandantenbedingung. Die Funktion ist `SECURITY DEFINER`, also greift RLS in ihr
+nicht — weder beim Cron-Lauf alle 15 Minuten noch beim Knopf in der Oberfläche.
+Sie schreibt Treffer in `suchkriterien_treffer`, und
+`suchkriterien_abgleich_lauf` meldet diese Treffer danach **per Push an den
+zuständigen Makler, mit den Namen der passenden Interessenten**. Über
+Mandantengrenzen hinweg heißt das: fremde Kundennamen auf dem Telefon eines
+fremden Maklers.
+
+Drei weitere Wege über dieselbe Grenze:
+
+- `push_termin_erinnerungen_senden` verknüpft Termin und Profil über den
+  **Namen** des Teilnehmers. Zwei Mandanten mit je einem „Thomas Mustermann" —
+  und der eine bekommt die Termine des anderen.
+- `expose_nachfass_aufgaben` fällt zurück auf
+  `(select id from profiles where role='chef' order by created_at limit 1)` —
+  den ältesten Chef der **ganzen Datenbank**. Die daraus erzeugte Aufgabe trägt
+  Namen und E-Mail des Interessenten.
+- `kontakte_zustaendig_abgleichen` ordnet über die onOffice-Kennung zu, ohne zu
+  prüfen, ob Adresse und Zuordnung zum selben Mandanten gehören.
+
+**Entscheidung:** je Stelle eine Bedingung ergänzt, chirurgisch — die Körper
+der Vorlage bleiben sonst unberührt. Jede Ersetzung prüft vorher, dass die
+gesuchte Stelle genau einmal vorkommt, und danach, dass sie angekommen ist.
+Ein Wachposten in der Migration schlägt an, wenn die Vorlage eine der
+Funktionen einmal neu schreibt.
+
+**Der Test war zuerst zahnlos.** `tests/hintergrund-mandant.sql` hat die
+Terminerinnerung anfangs mit einer *hier nachgebauten* Abfrage geprüft — die
+trug die Bedingung natürlich, also leuchtete sie auch ohne `fork_15` grün.
+Jetzt liest der Test den Quelltext der Funktion. Nachgewiesen ist beides: mit
+`fork_15` bestehen alle fünf Prüfungen, ohne sie fallen vier durch.
+
+**Warum die Prüfung „innerhalb eines Mandanten findet er weiterhin" dazugehört:**
+Ein Abgleich, der gar nichts mehr findet, wäre kein Datenschutz, sondern ein
+Ausfall — und von außen nicht zu unterscheiden.

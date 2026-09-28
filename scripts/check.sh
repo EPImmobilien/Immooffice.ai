@@ -50,6 +50,13 @@ else
   fehler=1
 fi
 
+abschnitt "Mandantengrenze: verkuppeln die Hintergrundjobs?"
+if scripts/lokale-db.sh psql -q -f tests/hintergrund-mandant.sql; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Rechte: Sichtbarkeitsbereich und Modulrechte"
 if scripts/lokale-db.sh psql -q -f tests/rechte.sql; then
   :
