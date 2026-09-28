@@ -1535,3 +1535,19 @@ in dieser Umgebung" — das erste stimmt, das zweite nicht. Der Parser braucht
 weder Deno noch auflösbare Importe und fängt genau den Fehler, den ein
 Generator macht: eine Regel, die eine Klammer zerschneidet. Typen prüft er
 nicht; dafür bräuchte es Deno mit Netz.
+
+**Nachgewiesen am 28.09.2026, gegen das eigene Projekt, nicht im Trockenen.**
+Beide Funktionen wurden mit dem Anmelde-Token eines echten Benutzers gerufen
+(über `pg_net` aus der Datenbank, weil der Netzfilter der Arbeitsumgebung
+`*.supabase.co` sperrt):
+
+| | |
+|---|---|
+| `rechnung-pdf-erzeugen` | `200` · `RE-2026-001.pdf` im Mandantenordner |
+| `expose-pdf-erzeugen` | `200` · `Expose_1_2026-09-28.pdf` im Mandantenordner |
+
+Vorher: `500 — Basis-Fonts fehlen in branding-assets`. Im Eimer liegen jetzt
+die drei fehlenden Schriften unter `fonts/` — von der Funktion selbst geholt,
+Zeitstempel 16:33:38, ohne dass jemand etwas hochgeladen hat. Die sechs
+Schriften, die der Mandant schon hatte, wurden weiterhin unter
+`{mandant}/fonts/` gefunden: Stufe 1 vor Stufe 2, wie gebaut.
