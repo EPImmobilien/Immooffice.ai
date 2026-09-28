@@ -2616,6 +2616,125 @@ ERSETZUNGEN = [
      r'\1',
      'Vorlagen fuellen: stempeln im PDF, Textstelle ersetzen im Word.'),
 
+    # =====================================================================
+    # FORK — die Erzeugung benutzt die Markierungen, und die Anker fallen weg
+    #
+    # Damit schliesst sich, was am 28.09.2026 aufgefallen ist: die drei
+    # Word-Erzeuger fuellten die Vorlage nicht ueber Platzhalter, sondern
+    # indem sie sechsundfuenfzig woertliche Saetze aus EINEM Beispielvertrag
+    # der Referenz suchten und ersetzten.
+    #
+    # Zwei Folgen hatte das, und beide sind hiermit erledigt:
+    #
+    #   1. Im Quelltext standen Namen, Anschriften, Geburtsdaten und
+    #      AUSWEISNUMMERN von Vertragsparteien.
+    #   2. Eine eigene Vorlage konnte so gar nicht funktionieren — der Text
+    #      eines anderen Maklers enthaelt diese Saetze nicht, die Ersetzung
+    #      fand nichts, und das Dokument kam unveraendert heraus. Ohne
+    #      Fehlermeldung.
+    #
+    # An ihre Stelle tritt immoVorlageFuellen(): stempeln im PDF, Textstelle
+    # ersetzen im Word — beides an den Stellen, die der Makler selbst
+    # markiert hat.
+    #
+    # Die Namenslogik fuer die Datei bleibt, sie war nie das Problem.
+    #
+    # NICHT dabei: fillMietvertrag. Der Mietvertrag ist in
+    # vertragsvorlagen.art nicht vorgesehen und hat damit keinen Weg ueber
+    # eine eigene Vorlage. Seine sechs Fundstellen stehen in docs/OFFEN.md.
+    # =====================================================================
+    ('FORK',
+     # Kein Leerzeile zwischen den beiden Funktionen — der Vorausblick
+     # darf also keine erwarten.
+     r'(?s)async function fillMaklervertrag\(e\) \{.*?\n\}\n(?=async function fillMietvertrag)',
+     '// Eine fertige Datei zum Herunterladen anbieten.\n'
+     'function immoDateiAnbieten(bytes, name, endung) {\n'
+     '  const typ = endung === "pdf" ? "application/pdf"\n'
+     '    : "application/vnd.openxmlformats-officedocument.wordprocessingml.document";\n'
+     '  const blob = new Blob([bytes], { type: typ });\n'
+     '  const url = URL.createObjectURL(blob);\n'
+     '  const a = document.createElement("a");\n'
+     '  a.href = url; a.download = name;\n'
+     '  document.body.appendChild(a); a.click(); a.remove();\n'
+     '  setTimeout(() => URL.revokeObjectURL(url), 1000);\n'
+     '}\n'
+     '\n'
+     '// Warnungen aus der Erzeugung sichtbar machen. Ein Wert, der auf der Anlage\n'
+     '// gelandet ist, oder eine Markierung, die ins Leere zeigt, darf nicht still\n'
+     '// bleiben — sonst unterschreibt jemand ein Dokument mit einer leeren Stelle.\n'
+     'function immoVorlageWarnungen(warnungen) {\n'
+     '  if (warnungen && warnungen.length) {\n'
+     '    window.alert("Hinweis zur Vorlage:\\\\n\\\\n" + warnungen.join("\\\\n"));\n'
+     '  }\n'
+     '}\n'
+     '\n'
+     'async function fillMaklervertrag(e) {\n'
+     '  // Seit dem 28.09.2026 kommt der Inhalt aus den Stellen, die der Makler in\n'
+     '  // seiner eigenen Vorlage markiert hat (fork_24, fork_25).\n'
+     '  //\n'
+     '  // Der alte Weg suchte woertliche Saetze aus EINEM Mustervertrag der\n'
+     '  // Vorlage und ersetzte sie — den Namen der Vertragsparteien, ihre\n'
+     '  // Strasse, ihren Ort. Fuer die Vorlage eines anderen Maklers traf davon\n'
+     '  // nichts, und das Dokument kam unveraendert heraus, ohne dass es jemand\n'
+     '  // gemerkt haette.\n'
+     '  // Im Quelltext standen dafuer Namen, Anschriften und Ausweisnummern\n'
+     '  // echter Vertragsparteien; die sind damit ebenfalls weg.\n'
+     '  const firma = STANDORTE[e.standort || "musterstadt"] || {};\n'
+     '  const { bytes, endung, warnungen } = await immoVorlageFuellen("maklervertrag", e, firma);\n'
+     '\n'
+     '  let p = "";\n'
+     '  if ((e.verkaeufer_typ === "erben" || e.verkaeufer_typ === "mehrere")\n'
+     '      && Array.isArray(e.erben) && e.erben.length > 0) {\n'
+     '    p = e.erben.map((x) => {\n'
+     '      const t = String(x.name || "").trim().split(/\\\\s+/);\n'
+     '      return t[t.length - 1] || "";\n'
+     '    }).filter(Boolean).join("+");\n'
+     '  } else if (e.verkaeufer_typ === "firma") {\n'
+     '    p = e.verkaeufer_name || "";\n'
+     '  } else {\n'
+     '    const t = String(e.verkaeufer_name || "").trim();\n'
+     '    if (t) { const w = t.split(/\\\\s+/); p = w[w.length - 1] || ""; }\n'
+     '  }\n'
+     '  if (!p) p = "Verkaeufer";\n'
+     '\n'
+     '  immoDateiAnbieten(bytes, `Maklervertrag_${fileObjekt(e)}_${fileSafe(p)}.${endung}`, endung);\n'
+     '  immoVorlageWarnungen(warnungen);\n'
+     '}\n'     '\n'
+     "",
+     'Maklervertrag: Inhalt aus den markierten Stellen statt aus Ankern.'),
+
+    ('FORK',
+     r'(?s)async function fillObjektnachweis\(e\) \{.*?\n\}\n(?=\nfunction exportText)',
+     'async function fillObjektnachweis(e) {\n'
+     '  // Wie beim Maklervertrag: der Inhalt kommt aus den markierten Stellen.\n'
+     '  // Hier standen achtunddreissig woertliche Anker aus einem Mustervertrag,\n'
+     '  // darunter Namen, Anschriften, Geburtsdaten und Ausweisnummern der\n'
+     '  // Vertragsparteien. Alle weg.\n'
+     '  const firma = STANDORTE[e.standort || "musterstadt"] || {};\n'
+     '  const { bytes, endung, warnungen } = await immoVorlageFuellen("objektnachweis", e, firma);\n'
+     '  const kaeufer = Array.isArray(e.kaeufer) ? e.kaeufer : [];\n'
+     '  const namen = kaeufer.map((k) => k.nachname || "").filter(Boolean).join("+") || "Kaeufer";\n'
+     '  immoDateiAnbieten(bytes, `Objektnachweis_${fileObjekt(e)}_${fileSafe(namen)}.${endung}`, endung);\n'
+     '  immoVorlageWarnungen(warnungen);\n'
+     '}\n'     '\n'
+     "",
+     'Objektnachweis: Inhalt aus den markierten Stellen statt aus Ankern.'),
+
+    # --- MARKE: Beispielnamen der Referenz in zwei Kommentaren.
+    # Sie erklaeren, wie zwei Eheleute zu einem Namen zusammengefasst
+    # werden — und tun das am Beispiel eines echten Paares aus den
+    # Musterdaten. Die Erklaerung bleibt, das Paar geht.
+    ('MARKE',
+     r'// Beim Ehepaar ist der gemeinsame Nachname der Normalfall: Wer nur "Erich" eintraegt, meint\n  // "Erich Stecker"\. Gespeichert bleibt trotzdem genau das, was getippt wurde\.',
+     '// Beim Ehepaar ist der gemeinsame Nachname der Normalfall: Wer beim zweiten\n'
+     '  // nur den Vornamen eintraegt, meint den Nachnamen des ersten. Gespeichert\n'
+     '  // bleibt trotzdem genau das, was getippt wurde.',
+     'Beispielnamen der Referenz im Kommentar zur Namenszusammenfassung.'),
+    ('MARKE',
+     r'// "Anke & Erich Stecker" bei gemeinsamem Nachnamen, sonst "Anke Müller & Erich Stecker"\.',
+     '// Bei gemeinsamem Nachnamen "Vorname & Vorname Nachname", sonst beide Namen voll.',
+     'Beispielnamen der Referenz im Kommentar zum Personentext.'),
+
     ('MARKE', r'\bEP_', 'IMMO_', 'Vorsatz EP_ in Bezeichnern der Oberflaeche.'),
 
     # --- MARKE: das Kuerzel in der Erkennung interner Umbuchungen.

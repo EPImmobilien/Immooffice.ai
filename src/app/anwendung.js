@@ -1733,76 +1733,60 @@ async function immoVertragsvorlage(art, eingebaut) {
     + "Einstellungen → Vertragsvorlagen.");
 }
 
-async function fillMaklervertrag(e) {
-  const t = await immoVertragsvorlage("maklervertrag", VORLAGE_MAKLERVERTRAG),
-    n = await t.arrayBuffer(),
-    a = await window.JSZip.loadAsync(n);
-  let r = await a.file("word/document.xml").async("string");
-  const l = a.file("word/header1.xml");
-  if (l) {
-    let e = await l.async("string");
-    e = adjustLogoPosition(e), a.file("word/header1.xml", e)
-  }
-  r = moveNamenszeileLinks(r);
-  r = flattenParagraphs(r, ["verkaufen diese Immobilie als Verbraucher", "verkaufen diese Immobilie nicht als Verbraucher", "alleiniger Eigentümer der Immobilie", "Mit-Eigentümer der Immobilie", "Musterstadt,", "Vermittlung der Immobilie:", "Als Angebotspreis wird für diese Immobilie festgesetzt:", "{strasse}", "vertreten durch {geschaeftsfuehrer}", "12345", "3,57", "656c", "Dauer von", "Nebengelass"]);
-  const i = STANDORTE[e.standort || "musterstadt"],
-    o = (new Date).toLocaleDateString("de-DE");
-  if (("erben" === e.verkaeufer_typ || "mehrere" === e.verkaeufer_typ) && e.erben && e.erben.length > 0) {
-    r = r.split("Eheleute").join("erben" === e.verkaeufer_typ ? "Erbengemeinschaft - bestehend aus:" : "Verkäufer:");
-    const t = e.erben[0];
-    if (r = r.split("Anke &amp; Erich Stecker").join(escapeXml(t.name || "")), r = r.split("Dorfstraße 17").join(escapeXml(t.strasse || "")), r = r.split("19386 Werder").join(escapeXml(`${t.plz||""} ${t.ort||""}`.trim())), e.erben.length > 1) {
-      const n = e.erben.slice(1).flatMap(e => ["", `${e.name||""}`, `${e.strasse||""}`, `${e.plz||""} ${e.ort||""}`.trim()]).join("\n"),
-        a = escapeXml(`${t.plz||""} ${t.ort||""}`.trim()),
-        l = textToWordXmlInline("\n" + n);
-      r = r.replace(new RegExp(`(${a.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")})`, ""), `$1${l}`)
-    }
-  } else if ("firma" === e.verkaeufer_typ) {
-    r = r.split("Eheleute").join(escapeXml(e.verkaeufer_name || ""));
-    const t = [e.verkaeufer_vertreter ? `vertreten durch ${e.verkaeufer_vertreter}` : "", e.verkaeufer_register || ""].filter(Boolean).join("\n");
-    r = r.split("Anke &amp; Erich Stecker").join(t ? textToWordXmlInline(t) : ""), r = r.split("Dorfstraße 17").join(escapeXml(e.verkaeufer_strasse || "")), r = r.split("19386 Werder").join(escapeXml(`${e.verkaeufer_plz||""} ${e.verkaeufer_ort||""}`.trim()))
-  } else {
-    const t = "eheleute" === e.verkaeufer_typ ? "Eheleute" : "herr" === e.verkaeufer_typ ? "Herr" : "frau" === e.verkaeufer_typ ? "Frau" : "Eheleute";
-    r = r.split("Eheleute").join(escapeXml(t)), r = r.split("Anke &amp; Erich Stecker").join(escapeXml(e.verkaeufer_name || "")), r = r.split("Dorfstraße 17").join(escapeXml(e.verkaeufer_strasse || "")), r = r.split("19386 Werder").join(escapeXml(`${e.verkaeufer_plz||""} ${e.verkaeufer_ort||""}`.trim()))
-  }
-  r = r.split("Musterhaus Immobilien GmbH").join(escapeXml(i.name)), r = r.split("ImmoOffice Immobilien GmbH").join(escapeXml(i.firma)), r = r.split("12345 Musterstadt").join(escapeXml(i.plz_ort)), r = r.split("Einfamilienhaus mit Nebengelass - ").join(epVertragObjektKopf(e, escapeXml));
-  const s = epVertragObjektAdresse(e);
-  r = r.split("Louis-Fürnberg-Straße 38, 18356 Barth").join(escapeXml(s || "")), "vermietung" === e.vertragsart && (r = r.split("Vermittlung der Immobilie:").join("Vermittlung der Vermietung der Immobilie:")), r = r.split("Musterstadt, 11.05.2026").join(`${escapeXml(i.stadt)}, ${escapeXml(o)}`);
-  const c = e.angebotspreis ? formatMoneyDE(e.angebotspreis) : "____________________________",
-    d = "Als Angebotspreis wird für diese Immobilie festgesetzt: ";
-  r = r.replace(new RegExp(d.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "_+", ""), d + escapeXml(c));
-  const u = escapeXml(e.laufzeit_monate || "6");
-  r = r.replace(/(Dauer von\s*)6(\s*Monaten)/, `$1${u}$2`), r = r.split(">6<").join(`>${u}<`);
-  const m = escapeXml(e.provision || "3,57"),
-    g = e.provisionsmodell || "teilung",
-    A = "Der Immobilienmakler wird mit dem Käufer einen provisionspflichtigen Maklervertrag in gleicher Provisionshöhe abschließen (§ 656c BGB).";
-  if ("kaeufer" === g) {
-    const e = /Der\s+Verkäufer\s+ist\s+bei\s+Beurkundung\s+eines\s+Kaufvertrags\s+über\s+die\s+Immobilie\s+zur\s+Zahlung\s+einer\s+Verkäufer-Provision\s+in\s+Höhe\s+von\s+3,57\s*%\s+inkl\.\s+19%\s+MwSt\.\s+vom\s+beurkundeten\s+Kaufpreis\s+verpflichtet\.\s+Die\s+Verkäufer-Provision\s+ist\s+verdient\s+und\s+fällig\s+mit\s+der\s+Beurkundung\s+des\s+notariellen\s+Kaufvertrages\.\s+Sollte\s+der\s+beurkundete\s+vom\s+tatsächlichen\s+Kaufpreis\s+abweichen,\s+ist\s+der\s+tatsächliche\s+Kaufpreis\s+maßgeblich,\s+soweit\s+dies\s+gesetzlich\s+zulässig\s+ist\./;
-    r = e.test(r) ? r.replace(e, `Die Tätigkeit des Immobilienmaklers ist für den Verkäufer provisionsfrei; eine Verkäufer-Provision wird nicht erhoben. Der Immobilienmakler wird mit dem Käufer einen provisionspflichtigen Maklervertrag über eine Käufer-Provision in Höhe von ${m}% inkl. 19% MwSt. vom beurkundeten Kaufpreis abschließen.`) : r.replace(/(Provision in Höhe von\s*)3,57(\s*%)/, `$1${m}$2`), r = r.split(A).join("")
-  } else r = r.replace(/(Provision in Höhe von\s*)3,57(\s*%)/, `$1${m}$2`), "verkaeufer" === g && (r = r.split(A).join("Für den Käufer ist der Erwerb provisionsfrei; eine Käufer-Provision wird nicht erhoben."));
-  "mit" === e.eigentum && (r = r.replace(/\(\s*x\s*\)\s*alleiniger Eigentümer der Immobilie/, "(   ) alleiniger Eigentümer der Immobilie"), r = r.replace(/\(\s*\)\s*Mit-Eigentümer der Immobilie/, "( x ) Mit-Eigentümer der Immobilie")), "nein" === e.verbraucher && (r = r.replace(/\(\s*x\s*\)\s*ich\/wir verkaufen diese Immobilie als Verbraucher/, "(   ) ich/wir verkaufen diese Immobilie als Verbraucher"), r = r.replace(/\(\s*\)\s*ich\/wir verkaufen diese Immobilie nicht als Verbraucher/, "( x ) ich/wir verkaufen diese Immobilie nicht als Verbraucher")), r = docxLayoutAufraeumen(r), a.file("word/document.xml", r);
-  const f = await a.generateAsync({
-    type: "blob",
-    mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-  });
-  let p = "";
-  if (("erben" === e.verkaeufer_typ || "mehrere" === e.verkaeufer_typ) && Array.isArray(e.erben) && e.erben.length > 0) p = e.erben.map(e => {
-    const t = (e.name || "").trim().split(/\s+/);
-    return t[t.length - 1] || ""
-  }).filter(Boolean).join("+");
-  else if ("firma" === e.verkaeufer_typ) p = e.verkaeufer_name || "";
-  else {
-    const t = (e.verkaeufer_name || "").trim();
-    if (t) {
-      const e = t.split(/\s+/);
-      p = e[e.length - 1] || ""
-    }
-  }
-  p || (p = "Verkaeufer");
-  const h = `Maklervertrag_${fileObjekt(e)}_${fileSafe(p)}.docx`,
-    b = URL.createObjectURL(f),
-    y = document.createElement("a");
-  y.href = b, y.download = h, y.click(), setTimeout(() => URL.revokeObjectURL(b), 1e3)
+// Eine fertige Datei zum Herunterladen anbieten.
+function immoDateiAnbieten(bytes, name, endung) {
+  const typ = endung === "pdf" ? "application/pdf"
+    : "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+  const blob = new Blob([bytes], { type: typ });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+
+// Warnungen aus der Erzeugung sichtbar machen. Ein Wert, der auf der Anlage
+// gelandet ist, oder eine Markierung, die ins Leere zeigt, darf nicht still
+// bleiben — sonst unterschreibt jemand ein Dokument mit einer leeren Stelle.
+function immoVorlageWarnungen(warnungen) {
+  if (warnungen && warnungen.length) {
+    window.alert("Hinweis zur Vorlage:\n\n" + warnungen.join("\n"));
+  }
+}
+
+async function fillMaklervertrag(e) {
+  // Seit dem 28.09.2026 kommt der Inhalt aus den Stellen, die der Makler in
+  // seiner eigenen Vorlage markiert hat (fork_24, fork_25).
+  //
+  // Der alte Weg suchte woertliche Saetze aus EINEM Mustervertrag der
+  // Vorlage und ersetzte sie — den Namen der Vertragsparteien, ihre
+  // Strasse, ihren Ort. Fuer die Vorlage eines anderen Maklers traf davon
+  // nichts, und das Dokument kam unveraendert heraus, ohne dass es jemand
+  // gemerkt haette.
+  // Im Quelltext standen dafuer Namen, Anschriften und Ausweisnummern
+  // echter Vertragsparteien; die sind damit ebenfalls weg.
+  const firma = STANDORTE[e.standort || "musterstadt"] || {};
+  const { bytes, endung, warnungen } = await immoVorlageFuellen("maklervertrag", e, firma);
+
+  let p = "";
+  if ((e.verkaeufer_typ === "erben" || e.verkaeufer_typ === "mehrere")
+      && Array.isArray(e.erben) && e.erben.length > 0) {
+    p = e.erben.map((x) => {
+      const t = String(x.name || "").trim().split(/\s+/);
+      return t[t.length - 1] || "";
+    }).filter(Boolean).join("+");
+  } else if (e.verkaeufer_typ === "firma") {
+    p = e.verkaeufer_name || "";
+  } else {
+    const t = String(e.verkaeufer_name || "").trim();
+    if (t) { const w = t.split(/\s+/); p = w[w.length - 1] || ""; }
+  }
+  if (!p) p = "Verkaeufer";
+
+  immoDateiAnbieten(bytes, `Maklervertrag_${fileObjekt(e)}_${fileSafe(p)}.${endung}`, endung);
+  immoVorlageWarnungen(warnungen);
+}
+
 async function fillMietvertrag(e) {
   const t = base64ToBlob(VORLAGE_MIETVERTRAG),
     n = await t.arrayBuffer(),
@@ -2038,129 +2022,18 @@ async function fillVollmacht(e) {
   E.href = y, E.download = b, E.click(), setTimeout(() => URL.revokeObjectURL(y), 1e3)
 }
 async function fillObjektnachweis(e) {
-  const t = await immoVertragsvorlage("objektnachweis", VORLAGE_OBJEKTNACHWEIS),
-    n = await t.arrayBuffer(),
-    a = await window.JSZip.loadAsync(n);
-  let r = await a.file("word/document.xml").async("string");
-  r = moveNamenszeileLinks(r);
-  const l = e => {
-      const t = e instanceof Date ? e : new Date(e);
-      if (isNaN(t.getTime())) return "";
-      return `${String(t.getDate()).padStart(2,"0")}.${String(t.getMonth()+1).padStart(2,"0")}.${t.getFullYear()}`
-    },
-    i = STANDORTE[e.standort || "musterstadt"],
-    o = l(new Date),
-    s = e.angebotsdatum ? l(e.angebotsdatum) : o;
-  let c = Array.isArray(e.kaeufer) ? e.kaeufer.filter(e => e && (e.nachname || e.vorname)) : [];
-  0 === c.length && e.k1_nachname && (c = [{
-    anrede: e.k1_anrede || "Frau",
-    vorname: e.k1_vorname || "",
-    nachname: e.k1_nachname || "",
-    strasse: e.k1_strasse || "",
-    plz: e.k1_plz || "",
-    ort: e.k1_ort || "",
-    geburt: e.k1_geburt || "",
-    staat: e.k1_staat || "Deutsch",
-    ausweis: e.k1_ausweis || ""
-  }], e.k2_nachname && c.push({
-    anrede: e.k2_anrede || "Herr",
-    vorname: e.k2_vorname || "",
-    nachname: e.k2_nachname || "",
-    strasse: e.k2_strasse || "",
-    plz: e.k2_plz || "",
-    ort: e.k2_ort || "",
-    geburt: e.k2_geburt || "",
-    staat: e.k2_staat || "Deutsch",
-    ausweis: e.k2_ausweis || ""
-  })), 0 === c.length && (c = [{
-    anrede: "Frau",
-    titel: "",
-    vorname: "",
-    nachname: "",
-    strasse: "",
-    plz: "",
-    ort: "",
-    geburt: "",
-    staat: "Deutsch",
-    ausweis: ""
-  }]);
-  r = flattenParagraphs(r, ["Kaufangebotes vom", "Name/Vorname:", "Anschrift:", "Ort und Datum der Geburt:", "Staatsangehörigkeit:", "Ausweis- oder Reisepassnummer:", "Provision in Höhe von", "Einfamilienhaus mit Einliegerwohnung", "Sehr geehrte Frau Schellhorn", "Notariat", "{strasse}", "vertreten durch {geschaeftsfuehrer}", "12345"]), r = r.split("Musterhaus Immobilien GmbH").join(escapeXml(i.name)), r = r.split("ImmoOffice Immobilien GmbH").join(escapeXml(i.firma)), r = r.split("12345 Musterstadt").join(escapeXml(i.plz_ort)), r = r.split("Musterstadt, 01.05.2026").join(`${escapeXml(i.stadt)}, ${escapeXml(o)}`), r = r.split("Kaufangebotes vom 30.04.2026").join(`Kaufangebotes vom ${escapeXml(s)}`);
-  const d = formatMoneyDE(e.kaufpreis);
-  r = r.split("Einfamilienhaus mit Einliegerwohnung – Mittelweg 36B in 19386 Passow zu einem Kaufpreis von 395.000€.").join(`${escapeXml(e.objekt_bezeichnung||"")} – ${escapeXml(e.objekt_adresse||"")} zu einem Kaufpreis von ${escapeXml(d)}.`);
-  const u = c[0],
-    m = c[1],
-    g = c.slice(2);
-  if (r = r.split("Name/Vorname: Schellhorn, Anne").join(`Name/Vorname: ${escapeXml([(u.titel||"").trim(),(u.nachname||"").trim()].filter(Boolean).join(" "))}, ${escapeXml(u.vorname||"")}`), r = r.split("Anschrift:  Am Mühlenberg 14, 19370 Parchim").join(`Anschrift: ${escapeXml(u.strasse||"")}, ${escapeXml(`${u.plz||""} ${u.ort||""}`.trim())}`), r = r.split("Ort und Datum der Geburt: 05.02.1986").join(`Ort und Datum der Geburt: ${escapeXml(u.geburt||"")}`), r = r.split("Ausweis- oder Reisepassnummer: LZ4C5782L").join(`Ausweis- oder Reisepassnummer: ${escapeXml(u.ausweis||"")}`), m) r = r.split("Name/Vorname: Rathmann, Sebastian").join(`Name/Vorname: ${escapeXml([(m.titel||"").trim(),(m.nachname||"").trim()].filter(Boolean).join(" "))}, ${escapeXml(m.vorname||"")}`), r = r.split("Anschrift: Ziegeleiweg 45 A, 19386 Passow").join(`Anschrift: ${escapeXml(m.strasse||"")}, ${escapeXml(`${m.plz||""} ${m.ort||""}`.trim())}`), r = r.split("Ort und Datum der Geburt: Lübz, 12.04.19980").join(`Ort und Datum der Geburt: ${escapeXml(m.geburt||"")}`), r = r.split("Ausweis- oder Reisepassnummer: L0GMH35PL").join(`Ausweis- oder Reisepassnummer: ${escapeXml(m.ausweis||"")}`);
-  else {
-    const e = ["Name/Vorname: Rathmann, Sebastian", "Anschrift: Ziegeleiweg 45 A, 19386 Passow", "Ort und Datum der Geburt: Lübz, 12.04.19980", "Ausweis- oder Reisepassnummer: L0GMH35PL"];
-    for (const t of e) {
-      const e = r.indexOf(t);
-      if (e < 0) continue;
-      const n = r.slice(0, e).lastIndexOf("<w:p ");
-      if (n < 0) continue;
-      const a = r.slice(e).indexOf("</w:p>");
-      if (a < 0) continue;
-      const l = e + a + 6;
-      r = r.slice(0, n) + r.slice(l)
-    }
-    const t = r.lastIndexOf("Staatsangehörigkeit:");
-    if (t !== r.indexOf("Staatsangehörigkeit:") && t >= 0) {
-      const e = r.slice(0, t).lastIndexOf("<w:p "),
-        n = r.slice(t).indexOf("</w:p>");
-      if (e >= 0 && n >= 0) {
-        const a = t + n + 6;
-        r = r.slice(0, e) + r.slice(a)
-      }
-    }
-  }
-  if (g.length > 0) {
-    const e = m ? `Ausweis- oder Reisepassnummer: ${escapeXml(m.ausweis||"")}` : `Ausweis- oder Reisepassnummer: ${escapeXml(u.ausweis||"")}`,
-      t = escapeXml("\n" + g.map(e => [`Name/Vorname: ${[(e.titel||"").trim(),(e.nachname||"").trim()].filter(Boolean).join(" ")}, ${e.vorname||""}`, `Anschrift: ${e.strasse||""}, ${e.plz||""} ${e.ort||""}`, `Ort und Datum der Geburt: ${e.geburt||""}`, `Staatsangehörigkeit: ${e.staat||"Deutsch"}`, `Ausweis- oder Reisepassnummer: ${e.ausweis||""}`].join("\n")).join("\n")).split("\n").join('</w:t><w:br/><w:t xml:space="preserve">'),
-      n = r.indexOf(e);
-    n >= 0 && (r = r.slice(0, n + e.length) + t + r.slice(n + e.length))
-  }
-  const A = [u.titel, u.vorname, u.nachname].map(e => (e || "").trim()).filter(Boolean).join(" ");
-  if (r = r.split("Anne Schellhorn").join(escapeXml(A)), r = r.split("Am Mühlenberg 14").join(escapeXml(u.strasse || "")), r = r.split("19370 Parchim").join(escapeXml(`${u.plz||""} ${u.ort||""}`.trim())), m) {
-    const e = [m.titel, m.vorname, m.nachname].map(e => (e || "").trim()).filter(Boolean).join(" ");
-    r = r.split("Sebastian Rathmann").join(escapeXml(e)), r = r.split("Ziegeleiweg 45 A").join(escapeXml(m.strasse || "")), r = r.split("19386 Passow").join(escapeXml(`${m.plz||""} ${m.ort||""}`.trim()))
-  } else r = r.split("Sebastian Rathmann").join(""), r = r.split("Ziegeleiweg 45 A").join(""), r = r.split("19386 Passow").join("");
-  const f = escapeXml(A);
-  if (f && (r = r.split(`Frau${f}`).join(`${escapeXml(u.anrede)}${f}`), r = r.split(`Frau ${f}`).join(`${escapeXml(u.anrede)} ${f}`)), m) {
-    const e = escapeXml([m.titel, m.vorname, m.nachname].map(e => (e || "").trim()).filter(Boolean).join(" "));
-    e && (r = r.split(`Herr ${e}`).join(`${escapeXml(m.anrede)} ${e}`), r = r.split(`Herr${e}`).join(`${escapeXml(m.anrede)}${e}`))
-  }
-  if (g.length > 0) {
-    const e = escapeXml(m ? `${m.plz||""} ${m.ort||""}`.trim() : `${u.plz||""} ${u.ort||""}`.trim()),
-      t = escapeXml("\n" + g.map(e => `${e.anrede} ${[e.titel,e.vorname,e.nachname].map(e=>(e||"").trim()).filter(Boolean).join(" ")}\n${e.strasse}\n${e.plz} ${e.ort}`.trim()).join("\n")).split("\n").join('</w:t><w:br/><w:t xml:space="preserve">'),
-      n = r.indexOf(e);
-    n >= 0 && e && (r = r.slice(0, n + e.length) + t + r.slice(n + e.length))
-  }
-  const p = e => [(e.titel || "").trim(), (e.nachname || "").trim()].filter(Boolean).join(" ");
-  let h;
-  if (1 === c.length) {
-    h = [`${"Frau"===u.anrede?"Sehr geehrte Frau":"Sehr geehrter Herr"} ${p(u)},`]
-  } else if (2 === c.length) {
-    h = [`${"Frau"===u.anrede?`Sehr geehrte Frau ${p(u)}`:`Sehr geehrter Herr ${p(u)}`},`, `${"Frau"===m.anrede?`sehr geehrte Frau ${p(m)}`:`sehr geehrter Herr ${p(m)}`},`]
-  } else h = c.map((e, t) => `${0===t?"Frau"===e.anrede?"Sehr geehrte Frau":"Sehr geehrter Herr":"Frau"===e.anrede?"sehr geehrte Frau":"sehr geehrter Herr"} ${p(e)},`);
-  const b = h.map(e => escapeXml(e)).join('</w:t><w:br/><w:t xml:space="preserve">'),
-    y = /Sehr geehrte Frau Schellhorn,<\/w:t><w:br\/><w:t(?:\s[^>]*)?>sehr geehrter Herr Rathmann/;
-  y.test(r) ? r = r.replace(y, b) : (r = r.split("Sehr geehrte Frau Schellhorn,sehr geehrter Herr Rathmann").join(b), r.indexOf("Sehr geehrte Frau Schellhorn,") >= 0 && (r = r.split("Sehr geehrte Frau Schellhorn,").join(b), r = r.replace(/<w:br\/><w:t(?:\s[^>]*)?>sehr geehrter Herr Rathmann<\/w:t>/g, ""), r = r.split("sehr geehrter Herr Rathmann").join(""))), m || (r = r.replace(/<w:t(?:\s[^>]*)?>Herr <\/w:t>/g, '<w:t xml:space="preserve"></w:t>'), r = r.replace(/<w:t(?:\s[^>]*)?>Herr<\/w:t>/g, '<w:t xml:space="preserve"></w:t>'));
-  const E = e.provision || immoVorgabe("objektnachweis", "provision", "3,00");
-  if (r = r.split("Provision in Höhe von 2,00%").join(`Provision in Höhe von ${escapeXml(E)}%`), e.notar_name) {
-    const t = e.notar_adresse ? `${e.notar_name}, ${e.notar_adresse}` : e.notar_name;
-    r = r.split("__________________________________________").join(escapeXml(t))
-  }
-  a.file("word/document.xml", r);
-  const v = await a.generateAsync({
-      type: "blob",
-      mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    }),
-    k = c.map(e => e.nachname || "").filter(Boolean).join("+") || "Kaeufer",
-    w = `Objektnachweis_${fileObjekt(e)}_${fileSafe(k)}.docx`,
-    R = URL.createObjectURL(v),
-    x = document.createElement("a");
-  x.href = R, x.download = w, x.click(), setTimeout(() => URL.revokeObjectURL(R), 1e3)
+  // Wie beim Maklervertrag: der Inhalt kommt aus den markierten Stellen.
+  // Hier standen achtunddreissig woertliche Anker aus einem Mustervertrag,
+  // darunter Namen, Anschriften, Geburtsdaten und Ausweisnummern der
+  // Vertragsparteien. Alle weg.
+  const firma = STANDORTE[e.standort || "musterstadt"] || {};
+  const { bytes, endung, warnungen } = await immoVorlageFuellen("objektnachweis", e, firma);
+  const kaeufer = Array.isArray(e.kaeufer) ? e.kaeufer : [];
+  const namen = kaeufer.map((k) => k.nachname || "").filter(Boolean).join("+") || "Kaeufer";
+  immoDateiAnbieten(bytes, `Objektnachweis_${fileObjekt(e)}_${fileSafe(namen)}.${endung}`, endung);
+  immoVorlageWarnungen(warnungen);
 }
+
 
 function exportText(e, t) {
   const n = new Blob([t], {
@@ -132985,14 +132858,15 @@ function epPersonListe(k) {
     strasse: k.strasse || "", plz: k.plz || "", ort: k.ort || "" };
   const typ = epKontaktTyp(k);
   if (typ !== "eheleute" && typ !== "erben") return [haupt];
-  // Beim Ehepaar ist der gemeinsame Nachname der Normalfall: Wer nur "Erich" eintraegt, meint
-  // "Erich Stecker". Gespeichert bleibt trotzdem genau das, was getippt wurde.
+  // Beim Ehepaar ist der gemeinsame Nachname der Normalfall: Wer beim zweiten
+  // nur den Vornamen eintraegt, meint den Nachnamen des ersten. Gespeichert
+  // bleibt trotzdem genau das, was getippt wurde.
   const weitere = epPersonenBereinigen(k.weitere_personen).map((p) => ({ ...p,
     nachname: p.nachname || String(k.nachname || "").trim(),
     strasse: k.strasse || "", plz: k.plz || "", ort: k.ort || "" }));
   return [haupt].concat(weitere);
 }
-// "Anke & Erich Stecker" bei gemeinsamem Nachnamen, sonst "Anke Müller & Erich Stecker".
+// Bei gemeinsamem Nachnamen "Vorname & Vorname Nachname", sonst beide Namen voll.
 function epKontaktPersonenText(k) {
   const personen = epPersonListe(k), namen = personen.map(epPersonName).filter(Boolean);
   if (namen.length < 2) return namen[0] || "";

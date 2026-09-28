@@ -693,7 +693,18 @@ Leere.
 stehen und ersetzt werden. Damit funktioniert jede Vorlage, die diese Marken
 enthält — und es steht kein fremder Vertragstext mehr im Programm.
 
-**Zu tun:** `fillMaklervertrag`, `fillObjektnachweis` und `fillMietvertrag`
-auf Platzhalter umstellen und die 56 Anker samt der personenbezogenen Daten
-entfernen. Der alte Weg ist im Fork ohnehin tot: die beiden eingebauten
-Word-Dateien sind seit `fork_12` geleert.
+**Erledigt am 28.09.2026 für zwei der drei:** `fillMaklervertrag` und
+`fillObjektnachweis` holen ihren Inhalt jetzt aus den markierten Stellen
+(`immoVorlageFuellen`). Neunundvierzig Anker sind damit weg, darunter alle
+Namen, Anschriften, Geburtsdaten und Ausweisnummern.
+
+**Offen: `fillMietvertrag`.** Sechs Anker stehen noch, darunter die Anschrift
+und das Kreditinstitut aus einem Mustermietvertrag. Der Grund ist nicht
+Bequemlichkeit: `vertragsvorlagen.art` kennt nur Maklervertrag, Vollmacht,
+Objektnachweis und Reservierung. Der Mietvertrag hat damit **keinen Weg über
+eine eigene Vorlage** und kann nicht auf dieselbe Weise umgestellt werden.
+
+Dafür braucht es eine eigene Migration: `mietvertrag` als fünfte Art, ein
+Feldkatalog dafür (Mieter, Miete, Kaution, Übergabe, Laufzeit) und dann
+dieselbe Umstellung. Solange das aussteht, bleiben die sechs Anker — und mit
+ihnen die Musterdaten.

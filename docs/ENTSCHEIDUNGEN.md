@@ -1918,3 +1918,31 @@ sonst stünde die Erbengemeinschaft in einer Zeile.
 Dreizehn Prüfungen, darunter der über drei Läufe zerschnittene Treffer, das
 zweite von drei Vorkommen, und die Erbengemeinschaft, die auch bei 7 pt nicht
 in den Kasten passt.
+
+---
+
+## Die Anker sind weg — für zwei der drei (28.09.2026)
+
+`fillMaklervertrag` und `fillObjektnachweis` holen ihren Inhalt jetzt aus
+`immoVorlageFuellen()`. Damit fallen **49 der 56 wörtlichen Anker** weg,
+darunter sämtliche Namen, Anschriften, Geburtsdaten und **Ausweisnummern**
+der Vertragsparteien aus den Musterverträgen.
+
+Die Namenslogik für den Dateinamen bleibt — sie war nie das Problem.
+
+**Zwei Kommentare mussten noch hinterher.** Sie erklärten am Beispiel eines
+echten Paares aus den Musterdaten, wie zwei Eheleute zu einem Namen
+zusammengefasst werden. Die Erklärung ist geblieben, das Paar ist gegangen.
+Und in meinem eigenen neuen Kommentar stand der Name noch einmal — beim
+Beschreiben dessen, was ich gerade entfernte. `CLAUDE.md` nennt „Kommentar"
+ausdrücklich; das gilt auch für den Kommentar, der die Bereinigung erklärt.
+
+**Offen bleibt `fillMietvertrag`** mit sechs Ankern. Der Grund ist nicht
+Bequemlichkeit: `vertragsvorlagen.art` kennt den Mietvertrag nicht, er hat
+also gar keinen Weg über eine eigene Vorlage. Das braucht eine eigene
+Migration mit eigenem Feldkatalog — steht in `docs/OFFEN.md`.
+
+**Die Blockliste wächst erst mit.** Die verbliebenen Ortsangaben jetzt schon
+aufzunehmen würde das Gate rot färben, solange `fillMietvertrag` sie noch
+trägt — ein Gate, das man abschalten muss, um arbeiten zu können, wird
+abgeschaltet. Sie kommen mit dem Umbau des Mietvertrags dazu.
