@@ -21,7 +21,8 @@
     "bauen": "python3 scripts/bauen.py",
     "db": "scripts/lokale-db.sh",
     "db:test": "scripts/lokale-db.sh neu && scripts/lokale-db.sh migrieren && scripts/lokale-db.sh psql -q -f tests/vorlage-vollstaendig.sql",
-    "check": "scripts/check.sh"
+    "check": "scripts/check.sh",
+    "nebenseiten": "python3 scripts/nebenseiten.py"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",

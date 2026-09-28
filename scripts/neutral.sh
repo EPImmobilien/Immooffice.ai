@@ -20,6 +20,7 @@ AUS=(--glob '!reference/**' --glob '!docs/**' --glob '!CLAUDE.md'
      --glob '!scripts/neutralisieren-funktionen.py'
      --glob '!tests/funktionen-unveraendert.py'
      --glob '!scripts/oberflaeche-zerlegen.py' --glob '!scripts/bauen.py'
+     --glob '!scripts/nebenseiten.py'
      --glob '!scripts/check.sh'
      --glob '!scripts/analyse-referenz.sh'
      --glob '!.git/**' --glob '!node_modules/**' --glob '!.next/**')

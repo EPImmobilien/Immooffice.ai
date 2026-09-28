@@ -1,0 +1,339 @@
+<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ihre Objektseite – Musterhaus Immobilien GmbH</title><meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--blau:#263159;--gold:#D4A567;--grau:#f4f5f9;--linie:#e6e8ef;--text:#1a1f36;--muted:#6b7280;--r:16px;--schatten:0 6px 24px rgba(38,49,89,.08)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Montserrat,Arial,sans-serif;background:var(--grau);color:var(--text);font-size:15px;line-height:1.55}
+a{color:var(--blau)}img{display:block}
+.kopf{background:linear-gradient(135deg,#1d2646,#2f3b6e);color:#fff;padding:22px 20px 18px;text-align:center}.kopf .n{font-weight:700;letter-spacing:.04em;font-size:18px}.kopf .n span{color:var(--gold)}.kopf .u{color:var(--gold);font-size:10px;letter-spacing:.35em}
+.box{max-width:760px;margin:24px auto;background:#fff;border:1px solid var(--linie);border-radius:var(--r);box-shadow:var(--schatten);padding:28px 30px}
+@media(max-width:640px){.box{margin:0;border:none;padding:18px 16px}}
+h1{font-size:22px;color:var(--blau);margin:0 0 6px;letter-spacing:-.01em}h2{font-size:13px;color:var(--blau);margin:22px 0 10px;text-transform:uppercase;letter-spacing:.12em;display:flex;align-items:center;gap:10px}h2::after{content:"";flex:1;height:1px;background:var(--linie)}
+.muted{color:var(--muted);font-size:13px}
+.obj{display:flex;gap:16px;align-items:flex-start;border:1px solid var(--linie);padding:14px;margin:14px 0 6px;background:#fafbfd}.obj img{width:150px;height:105px;object-fit:cover;flex-shrink:0;background:#e5e7eb}.obj .t{font-weight:700;color:var(--blau)}.obj .a{font-size:13px;color:var(--muted);margin:2px 0 6px}.obj .f{font-size:13px}
+@media(max-width:480px){.obj{flex-direction:column}.obj img{width:100%;height:160px}}
+.pro{background:#fff7d6;border-left:4px solid var(--gold);padding:12px 14px;margin:8px 0 4px;font-size:14px}
+.wichtig{background:var(--blau);color:#fff;padding:14px 16px;margin:10px 0 4px;font-size:15px;font-weight:700;line-height:1.5}.wichtig span{color:var(--gold)}
+.txt{border:1px solid var(--linie);background:#fafbfd;padding:12px 14px;font-size:12.5px;white-space:pre-wrap;max-height:230px;overflow:auto;color:#374151}
+label.f{display:block;margin:8px 0;font-size:13px;color:#374151}label.f input,label.f select,label.f textarea{display:block;width:100%;margin-top:4px;padding:11px 13px;border:1px solid #c9cdd8;border-radius:10px;font:inherit;font-size:15px;background:#fff}label.f input:focus,label.f select:focus,label.f textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,165,103,.2)}
+label.h{display:flex;gap:10px;align-items:flex-start;margin:12px 0;font-size:14px;cursor:pointer}label.h input{margin-top:3px;width:18px;height:18px;flex-shrink:0}
+.btn{display:inline-block;background:var(--gold);color:#fff;border:none;padding:14px 26px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;text-decoration:none;margin-top:8px;border-radius:999px;box-shadow:0 4px 14px rgba(212,165,103,.35);transition:transform .12s,box-shadow .12s}.btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(212,165,103,.4)}.btn[disabled]{opacity:.45;cursor:not-allowed}.btn.blau{background:var(--blau)}.btn.hell{background:#fff;color:var(--blau);border:2px solid var(--blau);padding:12px 24px}.btn.klein{font-size:13px;padding:10px 16px}.btn.gross{font-size:17px;padding:16px 30px}
+.ok{background:#e6f4ea;border-left:4px solid #1e7e34;padding:14px;margin:12px 0;border-radius:10px}.err{background:#fde6e6;border-left:4px solid #c83c3c;padding:12px;margin:12px 0;border-radius:10px}.warn{background:#fff7d6;border-left:4px solid var(--gold);padding:12px;margin:12px 0;border-radius:10px}
+.fuss{max-width:1060px;margin:0 auto 30px;padding:0 20px;font-size:11.5px;color:var(--muted);text-align:center}
+.seite{max-width:1060px;margin:0 auto;padding:0 16px 40px}
+.hero{position:relative;margin:18px 0 0;background:#2c3557;overflow:hidden;border-radius:var(--r);box-shadow:var(--schatten)}.hero img{width:100%;height:440px;object-fit:cover;background:#2c3557}
+.hero .ueber{position:absolute;left:0;right:0;bottom:0;padding:26px 24px;background:linear-gradient(transparent,rgba(20,26,50,.92));color:#fff}
+.hero .ueber h1{color:#fff;font-size:26px;margin:0 0 4px}.hero .ueber .adr{font-size:14px;opacity:.9}.hero .preis{position:absolute;top:18px;right:18px;background:rgba(212,165,103,.95);backdrop-filter:blur(6px);color:#fff;font-weight:700;font-size:20px;padding:10px 18px;border-radius:999px}
+@media(max-width:640px){.hero img{height:260px}.hero .ueber h1{font-size:19px}.hero .preis{font-size:16px;padding:8px 12px}}
+.eck{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px}
+.eck div{background:#fff;padding:14px 16px;border-radius:12px;border:1px solid var(--linie);box-shadow:0 2px 8px rgba(38,49,89,.04)}.eck b{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}.eck span{font-size:16px;font-weight:700;color:var(--blau)}
+.zwei{display:grid;grid-template-columns:1fr 340px;gap:22px;margin-top:22px}@media(max-width:860px){.zwei{grid-template-columns:1fr}}.zwei>*{min-width:0}.karte{min-width:0}.thumbs{max-width:100%}
+/* PC: volle Breite, Kacheln paarweise nebeneinander, Seitenleiste rechts */
+@media(min-width:1200px){.seite{max-width:1600px;padding:0 28px 40px}.zwei{grid-template-columns:1fr 1fr 360px;grid-auto-flow:row dense;align-items:start;gap:22px}.zwei>div:first-child{display:contents}.zwei>aside{grid-column:3;grid-row:1/span 12}.karte{margin-bottom:0}.karte#sonne,.karte#galerie,.karte#besichtigung{grid-column:1/span 2}.karte#beschreibung,.karte#suche{grid-column:1}.karte#chat,.karte#unterlagen{grid-column:2}.besi-innen{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}.besi-innen .absage{margin-top:8px}.hero img{height:520px}.eck{grid-template-columns:repeat(8,1fr)}}
+@media(min-width:1500px){.seite{max-width:1800px}}
+.karte{background:#fff;border:1px solid var(--linie);border-radius:var(--r);box-shadow:var(--schatten);padding:24px 26px;margin-bottom:22px;align-self:start}.karte h2{margin-top:0}
+.nav{position:sticky;top:0;z-index:20;display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border:1px solid var(--linie);border-radius:999px;padding:8px;margin-top:14px;box-shadow:var(--schatten)}
+.nav::-webkit-scrollbar{display:none}.nav a{flex:0 0 auto;white-space:nowrap;font-size:12.5px;font-weight:600;text-decoration:none;color:var(--blau);padding:8px 14px;background:#f3f4f8;border-radius:999px}.nav a:hover{background:var(--gold);color:#fff}
+.galerie{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}.galerie figure{margin:0;cursor:zoom-in;position:relative}.galerie img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#e5e7eb}
+.galerie figcaption{position:absolute;left:0;right:0;bottom:0;font-size:11px;padding:4px 8px;background:rgba(20,26,50,.72);color:#fff}
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--linie);margin-bottom:12px;flex-wrap:wrap}.tabs button{border:none;background:none;font:inherit;font-weight:600;font-size:13.5px;padding:10px 14px;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px}.tabs button.aktiv{color:var(--blau);border-bottom-color:var(--gold)}
+.beschr{white-space:pre-line;font-size:14.5px}.beschr ul{padding-left:18px;margin:0}.beschr li{margin:3px 0}
+.makler{display:flex;gap:16px;align-items:center}.makler img,.makler .ini{box-shadow:0 4px 14px rgba(38,49,89,.15);width:96px;height:96px;border-radius:50%;object-fit:cover;background:var(--gold);border:3px solid var(--gold);flex-shrink:0;color:#fff;font-weight:700;font-size:30px;display:flex;align-items:center;justify-content:center}.makler .nm{font-weight:700;color:var(--blau);font-size:16px}.makler .fk{font-size:12.5px;color:var(--muted);margin-bottom:6px}.makler a{display:block;font-size:13.5px;text-decoration:none;margin:2px 0}
+.dok{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--linie);border-radius:12px;padding:12px 14px;margin:8px 0;background:#fafbfd;font-size:14px}.dok .ic{width:36px;height:36px;border-radius:10px;background:#eef1f8;color:var(--blau);display:flex;align-items:center;justify-content:center;flex-shrink:0}.dok .ic svg{width:20px;height:20px}.dok>div{display:flex;gap:10px;align-items:center;min-width:0}.dok small{display:block;color:var(--muted);font-size:12px}.dok a{white-space:nowrap}
+.slots{display:grid;grid-template-columns:1fr 1fr;gap:8px}@media(max-width:480px){.slots{grid-template-columns:1fr}}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.chips button{border:1px solid var(--blau);background:#fff;color:var(--blau);font:inherit;font-size:12.5px;padding:6px 12px;cursor:pointer;border-radius:999px}.chips button:hover,.chips button.an{background:var(--blau);color:#fff}
+.chat{border:1px solid var(--linie);border-radius:14px;background:#fafbfd;height:320px;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.faqliste{margin:10px 0 14px}.faqkat{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin:12px 0 4px}.faqliste details{border-top:1px solid var(--linie)}.faqliste details:last-of-type{border-bottom:1px solid var(--linie)}.faqliste summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 2px;font-weight:600;font-size:14px;color:var(--blau)}.faqliste summary::-webkit-details-marker{display:none}.faqliste summary::after{content:"+";font-size:18px;line-height:1;color:var(--gold);flex-shrink:0}.faqliste details[open] summary::after{content:"–"}.faqliste .faqa{padding:0 2px 12px;font-size:14px;line-height:1.55;white-space:pre-wrap}.faqliste .faqa small{display:block;margin-top:5px;color:var(--muted);font-size:11.5px;white-space:normal}.faqmehr{background:none;border:none;color:var(--blau);font:inherit;font-size:13px;font-weight:600;cursor:pointer;padding:8px 2px;text-decoration:underline}
+.chat .m{max-width:85%;padding:10px 14px;font-size:13.5px;line-height:1.45;white-space:pre-line;border-radius:14px}.chat .k{align-self:flex-end;background:var(--blau);color:#fff}.chat .b{align-self:flex-start;background:#fff;border:1px solid var(--linie)}.chat .b .q{display:block;margin-top:5px;font-size:11px;color:var(--muted)}
+.chatzeile{display:flex;gap:6px;margin-top:8px}.chatzeile input{flex:1;padding:12px 14px;border:1px solid #c9cdd8;border-radius:999px;font:inherit;min-width:0}
+.absage{border:1px dashed #c83c3c;border-radius:12px;padding:14px;margin-top:14px;background:#fff8f8}.radio{display:flex;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.wunsch{border:1px solid var(--linie);background:#fafbfd;padding:10px 12px;margin:6px 0;font-size:13.5px}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;z-index:100;flex-direction:column}.lightbox.offen{display:flex}.lightbox img{max-width:94vw;max-height:82vh;object-fit:contain}.lightbox .lc{color:#fff;margin-top:10px;font-size:14px}.lightbox button{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.15);color:#fff;border:none;font-size:34px;width:54px;height:80px;cursor:pointer}.lightbox .l{left:8px}.lightbox .r{right:8px}.lightbox .x{top:14px;right:14px;transform:none;height:44px;width:44px;font-size:24px}
+.pill{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;background:#eef1f8;color:var(--blau);margin-left:6px;vertical-align:middle}
+iframe.karte-map{width:100%;aspect-ratio:4/3;border:0;background:#e5e7eb;border-radius:12px}
+iframe.sonne{width:100%;height:560px;border:0;background:#e5e7eb;border-radius:12px}@media(max-width:640px){iframe.sonne{height:520px}}
+.pdfv{position:fixed;inset:0;height:100dvh;background:#1a1f36;z-index:110;display:none;flex-direction:column}.pdfv.offen{display:flex}
+.pdfv .kopfz{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--blau);color:#fff;flex-wrap:nowrap;flex-shrink:0;padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}.pdfv .kopfz .t{flex:1;min-width:0;font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pdfv .kopfz a,.pdfv .kopfz button{display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#fff;border:none;font:inherit;font-size:13px;font-weight:700;padding:9px 14px;border-radius:999px;cursor:pointer;text-decoration:none}.pdfv .kopfz button.x{background:rgba(255,255,255,.15)}.pdfv .kopfz a.hell{background:rgba(255,255,255,.15)}.pdfv .kopfz svg{width:16px;height:16px}
+.pdfv iframe{flex:1;min-height:0;border:0;background:#fff;width:100%}.pdfv .seiten{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:8px;display:none}.pdfv.seitenweise .seiten{display:block}.pdfv.seitenweise iframe{display:none}.pdfv .seiten canvas{display:block;width:100%;height:auto;margin:0 auto 8px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.35)}.pdfv .seiten .lade{color:#fff;text-align:center;padding:30px 12px;font-size:14px}.pdfv .kopfz .lbl{white-space:nowrap}@media(max-width:640px),(max-height:500px){.pdfv .kopfz a,.pdfv .kopfz button{padding:8px 10px}.pdfv .kopfz .lbl{display:none}.pdfv .kopfz .t{font-size:13px}}
+.cta{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin-top:14px}.cta a{flex:1 1 260px;display:flex;align-items:center;gap:14px;text-decoration:none;padding:16px 20px;background:var(--gold);color:#fff;font-weight:700;font-size:16px;border:2px solid var(--gold);border-radius:14px;box-shadow:0 6px 18px rgba(212,165,103,.3);cursor:pointer}.cta a.zweit{background:#fff;color:var(--blau);border-color:var(--blau)}.cta a svg{width:38px;height:38px;flex-shrink:0}.cta a small{display:block;font-weight:500;font-size:12px;opacity:.9}
+.nav a.gold{background:var(--gold);color:#fff}
+.galHaupt{position:relative;cursor:zoom-in;background:#e5e7eb;border-radius:12px;overflow:hidden}.galHaupt img{width:100%;aspect-ratio:3/2;object-fit:cover;max-height:520px}.galHaupt .cap{position:absolute;left:0;right:0;bottom:0;padding:8px 12px;background:rgba(20,26,50,.72);color:#fff;font-size:12.5px;display:flex;justify-content:space-between}.galHaupt .pf{position:absolute;top:50%;transform:translateY(-50%);background:rgba(20,26,50,.55);color:#fff;border:none;font-size:28px;width:42px;height:64px;cursor:pointer}.galHaupt .pf.l{left:6px}.galHaupt .pf.r{right:6px}
+.thumbs{display:flex;gap:6px;overflow-x:auto;padding:8px 0 4px;scrollbar-width:thin}.thumbs img{width:96px;height:68px;object-fit:cover;flex-shrink:0;cursor:pointer;opacity:.7;background:#e5e7eb;border-radius:8px}.thumbs img.an{opacity:1;outline:3px solid var(--gold)}
+.grundrisse{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}.grundrisse figure{margin:0;cursor:zoom-in;position:relative}.grundrisse img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#e5e7eb}.grundrisse figcaption{position:absolute;left:0;right:0;bottom:0;font-size:11px;padding:4px 8px;background:rgba(20,26,50,.72);color:#fff}
+.vorschau{position:sticky;top:0;z-index:60;background:#fff3cd;color:#5a4300;border-bottom:2px solid #d4a017;padding:10px 16px;font-size:13px;text-align:center;line-height:1.45}
+.vorschau a{color:#5a4300;font-weight:700;margin-left:8px}
+</style></head><body>
+<div class="kopf"><div class="n">MUSTERHAUS <span>&amp;</span> PARTNER</div><div class="u">IMMOBILIEN</div></div>
+<div id="wurzel"><div class="box"><div class="muted">Lädt …</div></div></div>
+<div class="fuss" id="fuss"></div>
+<div class="pdfv" id="pdfv"><div class="kopfz"><span class="t" id="pdfTitel"></span><a id="pdfDl" href="#" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><span class="lbl">Herunterladen</span></a><a id="pdfNeu" class="hell" href="#" target="_blank" rel="noopener" title="Im neuen Tab öffnen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg><span class="lbl">Im neuen Tab</span></a><button class="x" type="button" onclick="pdfZu()" title="Schließen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg><span class="lbl">Schließen</span></button></div><iframe id="pdfRahmen" title="Dokument"></iframe><div class="seiten" id="pdfSeiten"></div></div>
+<div class="lightbox" id="lb"><button class="x" onclick="lbZu()">×</button><button class="l" onclick="lbWeiter(-1)">‹</button><img id="lbimg" alt=""><div class="lc" id="lbc"></div><button class="r" onclick="lbWeiter(1)">›</button></div>
+<script>
+const BASIS="__IMMO_SUPABASE_URL__/functions/v1/";
+const P=new URLSearchParams(location.search);const T=(P.get("t")||P.get("expose")||"").trim();
+// Mitarbeiter-Vorschau (Stufe 74): objekt.html?vorschau=<Objekt-ID> – nutzt die Portal-Anmeldung derselben Herkunft, keine Schreibaktionen
+const V=/^[0-9a-f-]{36}$/i.test(P.get("vorschau")||"")?P.get("vorschau"):"";
+function vorschauToken(){try{const roh=localStorage.getItem("sb-__IMMO_PROJEKT_REF__-auth-token");if(!roh)return "";const j=JSON.parse(roh);return (j&&(j.access_token||(j.currentSession&&j.currentSession.access_token)))||"";}catch(e){return "";}}
+const wurzel=document.getElementById("wurzel"),fuss=document.getElementById("fuss");
+const esc=s=>String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const eur=n=>n==null||n===""?"":new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(Number(n));
+const zahl=n=>n==null||n===""?"":Number(n).toLocaleString("de-DE",{maximumFractionDigits:1});
+const dt=s=>s?new Date(s).toLocaleString("de-DE",{timeZone:"Europe/Berlin",day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):"";
+const dat=s=>s?new Date(String(s).slice(0,10)+"T12:00:00").toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"}):"";
+async function api(fn,body){
+  if(V){if(!(body&&body.aktion==="laden"))return {ok:false,fehler:"Vorschau: Diese Aktion ist in der Mitarbeiter-Vorschau ausgeschaltet."};
+    const tok=vorschauToken();if(!tok)return {ok:false,fehler:"Bitte zuerst im Portal anmelden – die Vorschau nutzt Ihre Anmeldung.",art:"vorschau"};
+    const rv=await fetch(BASIS+fn,{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+tok},body:JSON.stringify({aktion:"laden",vorschau_immobilie_id:V})});let jv;try{jv=await rv.json();}catch(e){throw new Error("Antwort unlesbar ("+rv.status+")");}return jv;}
+  const r=await fetch(BASIS+fn,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});let j;try{j=await r.json();}catch(e){throw new Error("Antwort unlesbar ("+r.status+")");}return j;}
+let D=null,FOTOS=[],lbIdx=0;
+function fehlerSeite(m,art){
+  if(art==="vorschau"){wurzel.innerHTML='<div class="box"><h1>Vorschau nicht möglich</h1><div class="warn">'+esc(m||"Bitte zuerst im Portal anmelden.")+'</div><div class="muted">Die Vorschau der Objektseite nutzt Ihre Anmeldung in ImmoOffice. Öffnen Sie das Portal in diesem Browser, melden Sie sich an und starten Sie die Vorschau erneut aus dem Objekt (Reiter Vermarktung).</div></div>';return;}
+  if(art==="ungueltig")wurzel.innerHTML='<div class="box"><h1>Link ungültig</h1><div class="err">'+esc(m||"Dieser Link ist nicht (mehr) gültig.")+' Bitte wenden Sie sich an info@immooffice.example – wir senden Ihnen gern einen neuen Zugang.</div></div>';
+  else if(art==="weg")wurzel.innerHTML='<div class="box"><h1>Objekt nicht mehr verfügbar</h1><div class="warn">'+esc(m)+'</div><div class="muted">Gern informieren wir Sie über vergleichbare Objekte: info@immooffice.example</div></div>';
+  else if(art==="widerrufen")wurzel.innerHTML='<div class="box"><h1>Zugang nicht mehr gültig</h1><div class="warn">'+esc(m||"Sie haben den Maklervertrag widerrufen – dieser Zugang ist nicht mehr gültig.")+'</div><div class="muted">Sollten Sie sich später erneut für die Immobilie interessieren, melden Sie sich gern: info@immooffice.example</div></div>';
+  else wurzel.innerHTML='<div class="box"><h1>Seite konnte nicht geladen werden</h1><div class="err">Ihr Link ist in Ordnung, aber die Verbindung zu unserem Server ist gerade fehlgeschlagen'+(m?' ('+esc(m)+')':'')+'.</div><button class="btn" onclick="laden()">Erneut versuchen</button></div>';
+}
+function fussZeile(firma){if(!firma)return;fuss.innerHTML=esc(firma.firma_name)+' · '+esc(firma.strasse)+' · '+esc(firma.plz)+' '+esc(firma.ort)+(firma.geschaeftsfuehrer?' · Geschäftsführer: '+esc(firma.geschaeftsfuehrer):"")+(firma.hrb?' · '+esc(firma.registergericht||"")+' '+esc(firma.hrb):"")+' · <a href="https://immooffice.example/impressum">Impressum</a> · <a href="https://immooffice.example/datenschutz">Datenschutz</a> · <a href="https://immooffice.example/agb">AGB</a>';}
+async function laden(){
+  if(!T&&!V)return fehlerSeite("",'ungueltig');
+  let d;try{d=await api("objekt-landing",{token:T,aktion:"laden"});}catch(e){return fehlerSeite(e.message);}
+  if(!d.ok){fussZeile(d.firma);return fehlerSeite(d.fehler,d.art||"");}
+  D=d;fussZeile(d.firma);
+  if(V){vorschauBanner();seite(d);return;}
+  if(!d.f.bestaetigt_am)gate(d);else seite(d);
+}
+function vorschauBanner(){if(document.getElementById("vorschau"))return;document.body.insertAdjacentHTML("afterbegin",'<div class="vorschau" id="vorschau">👁 <b>Vorschau für Mitarbeiter</b> – so sieht der Interessent die Objektseite nach seiner Bestätigung. Besichtigungsanfragen, Absagen, Fragen und Suchkriterien sind hier ausgeschaltet; es wird nichts gespeichert.<a href="#" onclick="window.close();return false">Schließen</a></div>');}
+// ---------- Schritt 1: Bestätigung ----------
+function objKarte(im,f){
+  const istMiete=/miet/i.test(String(im.vertragsart||""));
+  const adresse=[im.strasse?(im.strasse+" "+(im.hausnummer||"")).trim():"",[im.plz,im.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+  const preis=istMiete?(im.kaltmiete?eur(im.kaltmiete)+" Kaltmiete":""):(im.angebotspreis?eur(im.angebotspreis)+" Kaufpreis":"Kaufpreis auf Anfrage");
+  const fakten=[preis,im.wohnflaeche?zahl(im.wohnflaeche)+" m² Wohnfläche":"",im.zimmer?zahl(im.zimmer)+" Zimmer":"",im.grundstueck&&Number(im.grundstueck)>0?zahl(im.grundstueck)+" m² Grundstück":""].filter(Boolean);
+  return '<div class="obj">'+(im.hauptbild_url?'<img src="'+esc(im.hauptbild_url)+'" alt="">':"")+'<div><div class="t">'+esc(im.objekttitel||im.bezeichnung||"Immobilie")+'</div><div class="a">'+esc(adresse)+(im.immo_nr?' · Objekt-Nr. '+esc(im.immo_nr):"")+'</div><div class="f">'+esc(fakten.join(" · "))+'</div></div></div>';
+}
+function gate(d){
+  const {f,im,firma,makler,texte}=d;const braucht=f.provisionsmodell==="kaeufer";
+  const abgelaufen=f.gueltig_bis&&new Date(f.gueltig_bis)<new Date();
+  let h='<div class="box"><h1>Ihr Zugang zur Objektseite</h1><div class="muted">'+esc(f.name?"Guten Tag "+f.name+", ":"")+'vielen Dank für Ihr Interesse'+(makler?' – Ihr Ansprechpartner: '+esc(makler.name)+(makler.telefon?", "+esc(makler.telefon):""):"")+'. Bitte bestätigen Sie die folgenden Punkte – anschließend öffnet sich Ihre persönliche Objektseite mit allen Eckdaten, Bildern, dem Exposé und den Unterlagen.</div>';
+  h+=objKarte(im,f);
+  if(abgelaufen){h+='<div class="err">Dieser Link ist abgelaufen. Bitte wenden Sie sich an '+esc(makler&&makler.email||firma.email)+'.</div></div>';wurzel.innerHTML=h;return;}
+  h+='<h2>Provision</h2><div class="pro">'+esc(f.provision_text)+'</div>';
+  h+=braucht?'<div class="wichtig"><span>WICHTIG:</span> Eine Provision fällt ausschließlich dann an, wenn Sie diese Immobilie tatsächlich kaufen – also erst mit Abschluss des notariellen Kaufvertrags. Das Öffnen der Objektseite, das Ansehen der Unterlagen und eine Besichtigung sind für Sie kostenfrei.</div>':'';
+  h+='<h2>Widerrufsbelehrung</h2><div class="txt">'+esc(texte.widerrufsbelehrung)+'</div>';
+  h+='<h2>Ihre Angaben</h2><form id="frm" onsubmit="return false"><div class="muted">Name: <strong>'+esc(f.name||"–")+'</strong> · E-Mail: <strong>'+esc(f.email)+'</strong></div>';
+  h+='<label class="h"><input type="checkbox" name="agb" required> Ich habe die <a href="'+esc(texte.agb_url)+'" target="_blank" rel="noopener">Allgemeinen Geschäftsbedingungen</a> von '+esc(firma.firma_name)+' gelesen und akzeptiere sie.</label>';
+  h+='<label class="h"><input type="checkbox" name="datenschutz" required> Ich habe die <a href="'+esc(texte.datenschutz_url)+'" target="_blank" rel="noopener">Datenschutzerklärung</a> zur Kenntnis genommen.</label>';
+  h+='<label class="h"><input type="checkbox" name="widerruf" required> Ich habe die Widerrufsbelehrung gelesen und zur Kenntnis genommen.</label>';
+  h+='<label class="h"><input type="checkbox" name="beginn" required> '+esc(texte.beginn_text)+'</label>';
+  h+=braucht?'<label class="h"><input type="checkbox" name="provision" required> Ich habe die oben genannte Provisionsvereinbarung gelesen und akzeptiere sie. Ich erhalte den Zugang zur Objektseite und das Exposé auf Grundlage dieser Vereinbarung.</label>':'<label class="h" style="display:none"><input type="checkbox" name="provision" checked></label>';
+  h+='<label class="h"><input type="checkbox" name="newsletter"> Ja, informieren Sie mich gelegentlich per E-Mail über weitere passende Immobilienangebote (jederzeit widerrufbar).</label>';
+  h+='<div class="muted" style="margin:8px 0 4px">Ihre Bestätigung wird mit Datum, Uhrzeit und IP-Adresse protokolliert. Eine Kopie der Belehrung und der Vereinbarung senden wir Ihnen an '+esc(f.email)+'.</div>';
+  const knopf=braucht?'Makler provisionspflichtig beauftragen & Objektseite öffnen':'Makler beauftragen (für Sie provisionsfrei) & Objektseite öffnen';
+  h+='<div class="muted" style="margin:10px 0 2px">Mit Klick auf den folgenden Button beauftragen Sie '+esc(firma.firma_name)+' als Makler'+(braucht?' – provisionspflichtig ausschließlich im Fall des notariellen Kaufs':'')+'.</div>';
+  h+='<button class="btn gross" id="go" disabled>'+knopf+'</button><div id="fehler"></div></form></div>';
+  wurzel.innerHTML=h;
+  const frm=document.getElementById("frm"),go=document.getElementById("go"),fe=document.getElementById("fehler");
+  const req=[...frm.querySelectorAll("input[required]")];const chk=()=>{go.disabled=!req.every(i=>i.checked)};frm.addEventListener("change",chk);
+  go.addEventListener("click",async()=>{go.disabled=true;go.textContent="Wird gespeichert …";fe.innerHTML="";
+    try{const haken={};frm.querySelectorAll("input[type=checkbox]").forEach(i=>haken[i.name]=i.checked);
+      const j=await api("expose-freigabe",{token:T,aktion:"bestaetigen",haken,newsletter:!!haken.newsletter});
+      if(!j.ok)throw new Error(j.fehler||"Fehler");
+      await laden();window.scrollTo(0,0);
+    }catch(e){fe.innerHTML='<div class="err">'+esc(e.message||e)+'</div>';go.disabled=false;go.textContent=knopf;}
+  });
+}
+// ---------- Schritt 2: Objektseite ----------
+const ZEITFENSTER=["egal","vormittags (9–12)","mittags (12–15)","nachmittags (15–18)","abends (ab 18)"];
+const ARTEN=["Wohnung","Haus","Mehrfamilienhaus","Grundstück","Gewerbe","Sonstiges"];
+function absaetze(t){return esc(t||"").replace(/\n{2,}/g,"\n\n");}
+function liste(t){const z=String(t||"").split(/\n|(?:\s*[•\-–]\s+)/).map(x=>x.trim()).filter(x=>x.length>1);return z.length>1?'<ul>'+z.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul>':absaetze(t);}
+function seite(d){
+  const {f,im,firma,makler,fotos,lage}=d;const istMiete=/miet/i.test(String(im.vertragsart||""));
+  FOTOS=(fotos||[]).filter(x=>x.art==="foto");const grundrisse=(fotos||[]).filter(x=>x.art==="grundriss");
+  const titel=im.objekttitel||im.bezeichnung||"Immobilie";
+  const adresse=[im.strasse?(im.strasse+" "+(im.hausnummer||"")).trim():"",[im.plz,im.ort].filter(Boolean).join(" ")].filter(Boolean).join(" · ");
+  const preis=istMiete?(im.kaltmiete?eur(im.kaltmiete)+" kalt":"Miete auf Anfrage"):(im.angebotspreis?eur(im.angebotspreis):"Kaufpreis auf Anfrage");
+  const gesperrt=!!f.widerrufen_am;const abgesagt=!!f.abgesagt_am;
+  const eck=[[istMiete?"Kaltmiete":"Kaufpreis",preis],["Wohnfläche",im.wohnflaeche?"ca. "+zahl(im.wohnflaeche)+" m²":""],["Grundstück",im.grundstueck&&Number(im.grundstueck)>0?"ca. "+zahl(im.grundstueck)+" m²":""],["Nutzfläche",im.nutzflaeche?"ca. "+zahl(im.nutzflaeche)+" m²":""],["Zimmer",im.zimmer?zahl(im.zimmer):""],["Baujahr",im.baujahr||""],["Objektart",[im.objektart,im.objekttyp].filter(Boolean).join(" · ")],["Energie",[im.energie_klasse?"Klasse "+im.energie_klasse:"",im.energie_kennwert?zahl(im.energie_kennwert)+" kWh/(m²·a)":""].filter(Boolean).join(" · ")],["Heizung",[im.heizungsart,im.energie_traeger].filter(Boolean).join(" · ")],["Nebenkosten",im.nebenkosten?eur(im.nebenkosten)+" mtl.":""],["Hausgeld",im.hausgeld?eur(im.hausgeld)+" mtl.":""],["Verfügbar ab",im.verfuegbar_ab?dat(im.verfuegbar_ab):""],["Stellplatz",[im.stellplatz_anzahl,im.stellplatz_art].filter(Boolean).join(" × ")],["Provision",f.provisionsmodell==="kaeufer"?(f.provision_text.match(/Höhe von ([^ ]+ %)/)||[])[1]||"siehe Vereinbarung":f.provisionsmodell==="miete"?"keine (Bestellerprinzip)":"provisionsfrei"]].filter(x=>x[1]);
+  let h='<div class="seite">';
+  if(gesperrt)h+='<div class="err" style="margin-top:18px"><strong>Sie haben den Maklervertrag widerrufen</strong> ('+dt(f.widerrufen_am)+' Uhr). Downloads, Besichtigungsanfragen und der Frage-Assistent sind deaktiviert. Bei Fragen: '+esc(firma.email)+'</div>';
+  else if(abgesagt&&/angebot/i.test(f.absage_grund||""))h+='<div class="ok" style="margin-top:18px"><strong>Vielen Dank für Ihr Angebot</strong> ('+dt(f.abgesagt_am)+' Uhr)'+(f.absage_text?': „'+esc(f.absage_text)+'“':'')+'. '+esc(makler?makler.name:"Ihr Ansprechpartner")+' meldet sich bei Ihnen.</div>';
+  else if(abgesagt)h+='<div class="warn" style="margin-top:18px"><strong>Sie haben für dieses Objekt abgesagt</strong> ('+dt(f.abgesagt_am)+' Uhr'+(f.absage_grund?', '+esc(f.absage_grund):'')+').'+(f.absage_text?' Ihre Nachricht: „'+esc(f.absage_text)+'“.':'')+' Sie erhalten dazu keine weiteren Nachrichten. Ihre Suchkriterien können Sie unten weiterhin pflegen – wir melden uns mit passenden Alternativen.</div>';
+  else h+='<div class="ok" style="margin-top:18px"><strong>'+esc(f.name?"Vielen Dank, "+f.name:"Vielen Dank")+' – Ihre Bestätigung liegt uns vor</strong> ('+dt(f.bestaetigt_am)+' Uhr). Diese Seite ist Ihr persönlicher Zugang zur Immobilie – der Link bleibt gültig, solange das Objekt angeboten wird.</div>';
+  h+='<div class="hero"><img id="heroimg" src="'+esc((FOTOS[0]&&FOTOS[0].url)||im.hauptbild_url||"")+'" alt=""><div class="preis">'+esc(preis)+'</div><div class="ueber"><h1>'+esc(titel)+'</h1><div class="adr">'+esc([adresse,im.immo_nr?"Objekt-Nr. "+im.immo_nr:"",[im.objekttyp||im.objektart,istMiete?"zur Miete":"zum Kauf"].filter(Boolean).join(" ")].filter(Boolean).join(" · "))+(im.adresse_freigeben===false?' · genaue Adresse bei Besichtigung':'')+'</div></div></div>';
+  h+='<div class="eck">'+eck.slice(0,8).map(x=>'<div><b>'+esc(x[0])+'</b><span>'+esc(x[1])+'</span></div>').join("")+'</div>';
+  const expo=(d.downloads||[]).find(x=>/expos/i.test(x.typ||"")||/expos/i.test(x.name||""))||(d.downloads||[])[0];
+  const pdfSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M12 11v6"/><path d="m9.5 14.5 2.5 2.5 2.5-2.5"/></svg>';
+  if(!gesperrt)h+='<div class="cta">'+(expo?'<a href="#unterlagen" id="ctaExpose" onclick="pdfAuf('+(d.downloads||[]).indexOf(expo)+');return false">'+pdfSvg+'<span>Exposé ansehen &amp; herunterladen<small>'+esc(expo.name)+((d.downloads||[]).length>1?' · +'+((d.downloads||[]).length-1)+' weitere Unterlagen':'')+'</small></span></a>':'<a href="#unterlagen">'+pdfSvg+'<span>Exposé<small>wird gerade fertiggestellt – wir senden es Ihnen zu</small></span></a>')+(abgesagt?'':'<a class="zweit" href="#besichtigung"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><path d="m9 15 2 2 4-4"/></svg><span>Besichtigung anfragen<small>Wunschtermine vorschlagen</small></span></a>')+'</div>';
+  h+='<nav class="nav">'+(gesperrt?'':'<a href="#unterlagen" class="gold">Exposé</a>')+'<a href="#galerie">Bilder</a><a href="#beschreibung">Beschreibung</a>'+(gesperrt?'':'<a href="#chat">Fragen</a>')+'<a href="#unterlagen">Exposé &amp; Unterlagen</a>'+(lage?'<a href="#sonne">Sonnenverlauf</a>':'')+(gesperrt?'':'<a href="#besichtigung">Besichtigung</a><a href="#suche">Meine Suchkriterien</a>')+'<a href="#ansprechpartner">Ansprechpartner</a></nav>';
+  h+='<div class="zwei"><div>';
+  // Galerie
+  h+='<div class="karte" id="galerie"><h2>Bildergalerie <span class="pill">'+FOTOS.length+' Bilder</span></h2>'+(FOTOS.length?'<div class="galHaupt" id="galHaupt"><img id="galBild" src="'+esc(FOTOS[0].url)+'" alt="" onclick="lbAuf(galIdx)">'+(FOTOS.length>1?'<button class="pf l" type="button" onclick="galWeiter(-1)" aria-label="zurück">‹</button><button class="pf r" type="button" onclick="galWeiter(1)" aria-label="weiter">›</button>':'')+'<div class="cap"><span id="galCap"></span><span id="galNr"></span></div></div><div class="thumbs" id="thumbs">'+FOTOS.map((x,i)=>'<img loading="lazy" src="'+esc(x.url)+'" alt="" class="'+(i?'':'an')+'" onclick="galZeig('+i+')">').join("")+'</div><div class="muted" style="margin-top:4px">Bild antippen für Vollbild · Pfeiltasten oder Wischen zum Blättern</div>':'<div class="muted">Bilder folgen in Kürze.</div>')+(grundrisse.length?'<h2>Grundrisse</h2><div class="grundrisse">'+grundrisse.map(x=>'<figure onclick="window.open(\''+esc(x.url)+'\',\'_blank\')"><img loading="lazy" src="'+esc(x.url)+'" alt="">'+(x.titel?'<figcaption>'+esc(x.titel)+'</figcaption>':'')+'</figure>').join("")+'</div>':'')+'</div>';
+  // Beschreibung
+  const tabs=[["objekt","Objekt",absaetze(im.beschreibung_objekt)],["lage","Lage",absaetze(im.beschreibung_lage)],["ausstattung","Ausstattung",liste(im.beschreibung_ausstattung)],["sonstiges","Sonstiges",absaetze(im.beschreibung_sonstiges)]].filter(x=>x[2]);
+  if(tabs.length)h+='<div class="karte" id="beschreibung"><h2>Beschreibung</h2><div class="tabs">'+tabs.map((x,i)=>'<button class="'+(i?'':'aktiv')+'" data-t="'+x[0]+'">'+x[1]+'</button>').join("")+'</div><div class="beschr" id="beschr"></div></div>';
+  // Fragen zum Objekt – direkt unter der Beschreibung (Wunsch 20.09.)
+  if(!gesperrt){
+    h+='<div class="karte" id="chat"><h2>Fragen zum Objekt</h2><div class="muted" style="margin-bottom:6px">Unser Objekt-Assistent antwortet aus den hinterlegten Objektinformationen. Was er nicht sicher weiß, leitet er an '+esc(makler?makler.name:"Ihren Ansprechpartner")+' weiter. Antworten des Assistenten sind automatisch erstellt und unverbindlich.</div>';
+    h+=faqHtml(d.faq||[])+'<div class="chat" id="verlauf"></div><div class="chatzeile"><input id="frage" type="text" maxlength="600" placeholder="Ihre Frage, z. B. „Wie hoch sind die Heizkosten?“"><button class="btn klein" style="margin-top:0" id="fgo">Senden</button></div><div id="ffehler"></div></div>';
+  }
+  // Unterlagen
+  h+='<div class="karte" id="unterlagen"><h2>Exposé &amp; Unterlagen</h2>';
+  if(gesperrt)h+='<div class="muted">Nach dem Widerruf stehen keine Downloads mehr zur Verfügung.</div>';
+  else if(d.downloads&&d.downloads.length)h+=d.downloads.map((x,i)=>'<div class="dok"><div><span class="ic">'+(/\.pdf$/i.test(x.name||"")?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="16" cy="8" r="1.5"/></svg>')+'</span><span style="min-width:0"><strong>'+esc(x.typ||"Unterlage")+'</strong><small style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(x.name)+'</small></span></div><button type="button" class="btn klein'+(i?' blau':'')+'" onclick="pdfAuf('+i+')">Ansehen</button></div>').join("")+'<div class="muted" style="margin-top:8px">Zum Herunterladen erst ansehen, dann oben „Herunterladen“ wählen. Die Links sind 7 Tage gültig – danach einfach die Seite neu laden.</div>';
+  else h+='<div class="muted">Das Exposé wird gerade fertiggestellt – wir senden es Ihnen zu.</div>';
+  h+='</div>';
+  // Besichtigung
+  if(!gesperrt){
+    h+='<div class="karte" id="besichtigung"><h2>Besichtigung anfragen</h2>';
+    const offen=(d.wuensche||[]).filter(w=>w.status==="offen"),best=(d.wuensche||[]).filter(w=>w.status==="bestaetigt");
+    best.forEach(w=>{h+='<div class="ok"><strong>Besichtigung bestätigt</strong> – Sie haben eine Einladung per E-Mail erhalten.</div>';});
+    offen.forEach(w=>{h+='<div class="wunsch"><strong>Ihre Wunschtermine vom '+dt(w.created_at)+' Uhr:</strong><br>'+(w.termine||[]).map(x=>esc(dat(x.datum))+' · '+esc(x.zeitfenster)).join("<br>")+'<div class="muted">Wir melden uns innerhalb eines Werktags.</div></div>';});
+    if(!abgesagt){
+      h+='<div class="besi-innen"><div><div class="muted" style="margin:8px 0">Nennen Sie uns bis zu drei Wunschtermine. Wir melden uns innerhalb eines Werktags mit einer Bestätigung oder einem Alternativvorschlag.</div><form id="wfrm" onsubmit="return false"><div class="slots">';
+      for(let i=1;i<=3;i++)h+='<label class="f">'+i+'. Wunschtermin<input type="date" name="d'+i+'" min="'+new Date().toISOString().slice(0,10)+'"></label><label class="f">Uhrzeit<select name="z'+i+'">'+ZEITFENSTER.map(z=>'<option>'+z+'</option>').join("")+'</select></label>';
+      h+='</div><label class="f">Telefonnummer für Rückfragen<input type="tel" name="telefon" placeholder="z. B. 0171 1234567"></label><label class="f">Anmerkungen (optional)<textarea name="anmerkung" rows="2"></textarea></label><button class="btn" id="wgo">Wunschtermine senden</button><div id="wfehler"></div></form></div>';
+      h+='<div class="absage" id="absage"><strong>Passt nicht – oder haben Sie ein Angebot?</strong> <span class="muted">Sagen Sie uns kurz ab oder nennen Sie uns Ihre Preisvorstellung. Bei einer Absage erhalten Sie zu diesem Objekt keine weiteren Nachrichten.</span><div style="margin-top:8px">'+["Preis passt nicht","Lage passt nicht","Größe / Zuschnitt passt nicht","Habe bereits etwas gefunden","Ich möchte ein Angebot abgeben","Sonstiges"].map(g=>'<label class="radio"><input type="radio" name="grund" value="'+esc(g)+'"> '+esc(g)+'</label>').join("")+'</div><label class="f" id="atextLabel">Begründung oder Ihr Angebot (z. B. Kaufpreisvorstellung)<textarea id="atext" rows="3" maxlength="2000" placeholder="z. B. Wir könnten uns 275.000 € vorstellen, wenn die Einbauküche bleibt."></textarea></label><button class="btn hell klein" id="ago">Absage / Angebot senden</button><div id="afehler"></div></div></div>';
+    }
+    h+='</div>';
+  }
+  // Sonnenverlauf 3D am Objekt (eigenstaendiges Werkzeug sonnenverlauf.html, Lage per URL-Parameter)
+  if(lage){const svUrl="sonnenverlauf.html?"+new URLSearchParams({lat:String(lage.lat),lng:String(lage.lon),adresse:svAdresse(im)}).toString();
+    h+='<div class="karte" id="sonne"><h2>Sonnenverlauf am Objekt</h2><div class="muted" style="margin-bottom:8px">Wo steht die Sonne morgens, mittags, abends – im Sommer und im Winter? Datum und Uhrzeit lassen sich im Werkzeug verschieben.'+(lage.ungefaehr?' Ungefähre Lage, solange die genaue Adresse noch nicht freigegeben ist.':'')+'</div><iframe class="sonne" id="sonneRahmen" data-lat="'+esc(lage.lat)+'" data-lng="'+esc(lage.lon)+'" data-adresse="'+esc(svAdresse(im))+'" title="Sonnenverlauf 3D" allow="fullscreen"></iframe><div class="muted" style="margin-top:6px"><a href="'+esc(svUrl)+'" target="_blank" rel="noopener">Im großen Fenster öffnen</a></div></div>';}
+  if(!gesperrt){
+    // Suchkriterien – Felder und Datenform identisch mit dem Adressbuch-Dialog „Suchkriterium“ (kontakte.such_profil)
+    const sp=d.suchprofil||{};const spVa=Array.isArray(sp.vermarktungsart)?sp.vermarktungsart:(sp.vermarktungsart?[sp.vermarktungsart]:[istMiete?"miete":"kauf"]);
+    const spArten=Array.isArray(sp.objektarten)&&sp.objektarten.length?sp.objektarten:(ARTEN.includes(im.objektart)?[im.objektart]:[]);
+    const uk=sp.umkreis&&typeof sp.umkreis==="object"?sp.umkreis:{};
+    h+='<div class="karte" id="suche"><h2>Meine Suchkriterien</h2><div class="muted" style="margin-bottom:8px">Was suchen Sie? Ihre Angaben landen direkt in Ihrem Suchprofil bei uns – wir gleichen laufend unseren Bestand ab und melden uns mit passenden Objekten.</div><form id="sfrm" onsubmit="return false">';
+    h+='<div class="slots"><label class="f">Vermarktungsart<div class="chips" id="sva" style="margin:6px 0 0"><button type="button" data-v="kauf" class="'+(spVa.includes("kauf")?"an":"")+'">Kauf</button><button type="button" data-v="miete" class="'+(spVa.includes("miete")?"an":"")+'">Miete</button></div></label>';
+    h+='<label class="f">Status<select name="status"><option value="aktiv"'+((sp.status||"aktiv")==="aktiv"?" selected":"")+'>aktiv – wird abgeglichen</option><option value="pausiert"'+(sp.status==="pausiert"?" selected":"")+'>pausiert</option><option value="erfuellt"'+(sp.status==="erfuellt"?" selected":"")+'>erfüllt – ich habe gefunden</option></select></label></div>';
+    h+='<label class="f">Objektarten<div class="chips" id="arten" style="margin:6px 0 0">'+ARTEN.map(a=>'<button type="button" data-a="'+a+'" class="'+(spArten.includes(a)?"an":"")+'">'+a+'</button>').join("")+'</div></label>';
+    h+='<div class="slots" style="grid-template-columns:2fr 1fr"><label class="f">Orte / Regionen<input type="text" name="orte" value="'+esc(sp.orte||"")+'" placeholder="z. B. Musterstadt, Musterdorf, Bad Doberan"></label><label class="f">PLZ-Bereich<input type="text" name="plz" value="'+esc(sp.plz||"")+'" placeholder="z. B. 180, 181"></label></div>';
+    h+='<div class="slots" style="grid-template-columns:2fr 1fr"><label class="f">Umkreis um Ort (optional)<input type="text" name="umkreis_label" value="'+esc(uk.label||"")+'" placeholder="z. B. Musterstadt oder 12345 Musterdorf"></label><label class="f">Radius km<input type="number" name="umkreis_km" value="'+esc(uk.km||20)+'" min="1" max="200"></label></div>';
+    h+='<div class="slots"><label class="f">Preis von €<input type="text" inputmode="decimal" name="preis_von" value="'+esc(sp.preis_von||"")+'"></label><label class="f">Preis bis €<input type="text" inputmode="decimal" name="preis_bis" value="'+esc(sp.preis_bis||"")+'"></label><label class="f">Zimmer ab<input type="text" inputmode="decimal" name="zimmer_von" value="'+esc(sp.zimmer_von||"")+'"></label><label class="f">Fläche ab m²<input type="text" inputmode="decimal" name="flaeche_von" value="'+esc(sp.flaeche_von||"")+'"></label></div>';
+    h+='<label class="f">Besonderheiten<textarea name="notiz" rows="2" placeholder="Balkon, Garten, barrierefrei, Zeitrahmen, Finanzierung …">'+esc(sp.notiz||"")+'</textarea></label>';
+    h+='<div class="muted" style="margin:4px 0 8px">Abgeglichen wird, sobald eine Lage (Orte, PLZ, Umkreis) oder ein Budget angegeben ist.</div><button class="btn blau" id="sgo">Suchkriterien speichern</button><div id="sfehler"></div></form></div>';
+  }
+  h+='</div><aside>';
+  // Ansprechpartner
+  h+='<div class="karte" id="ansprechpartner"><h2>Ihr Ansprechpartner</h2>';
+  if(makler){const ini=String(makler.name||"").split(/\s+/).map(x=>x[0]||"").join("").slice(0,2).toUpperCase();
+    h+='<div class="makler">'+(makler.foto?'<img src="'+esc(makler.foto)+'" alt="" onerror="this.outerHTML=\'<div class=ini>'+esc(ini)+'</div>\'">':'<div class="ini">'+esc(ini)+'</div>')+'<div><div class="nm">'+esc(makler.name)+'</div><div class="fk">'+esc(makler.funktion||"")+'</div>'+(makler.telefon?'<a href="tel:'+esc(String(makler.telefon).replace(/[^+\d]/g,""))+'">📞 '+esc(makler.telefon)+'</a>':'')+(makler.email?'<a href="mailto:'+esc(makler.email)+'">✉ '+esc(makler.email)+'</a>':'')+'</div></div>';}
+  else h+='<div class="muted">'+esc(firma.firma_name)+' · '+esc(firma.email)+'</div>';
+  if(!gesperrt)h+='<a class="btn blau klein" style="width:100%;text-align:center;margin-top:14px" href="#besichtigung">Besichtigung anfragen</a>';
+  h+='<button class="btn klein" style="width:100%;margin-top:6px" id="rgo">Rückruf erbitten</button><div id="rfehler"></div></div>';
+  // Lage
+  const dist=Array.isArray(im.lage_distanzen)?im.lage_distanzen.filter(x=>x&&x.wert):[];
+  if(lage||dist.length){h+='<div class="karte"><h2>Lage</h2>';
+    if(lage){const dl=lage.ungefaehr?0.03:0.006;const bb=[lage.lon-dl,lage.lat-dl*0.6,lage.lon+dl,lage.lat+dl*0.6].join(",");h+='<iframe class="karte-map" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox='+bb+'&amp;layer=mapnik'+(lage.ungefaehr?'':'&amp;marker='+lage.lat+','+lage.lon)+'"></iframe><div class="muted" style="margin-top:6px">'+(lage.ungefaehr?'Ungefähre Lage – die genaue Adresse erhalten Sie zur Besichtigung.':'<a href="https://www.openstreetmap.org/?mlat='+lage.lat+'&mlon='+lage.lon+'#map=16/'+lage.lat+'/'+lage.lon+'" target="_blank" rel="noopener">Größere Karte öffnen</a>')+'</div>';}
+    if(dist.length)h+='<div class="beschr" style="font-size:13px;margin-top:8px">'+dist.map(x=>'<div style="display:flex;justify-content:space-between;border-top:1px solid #eef1f8;padding:3px 0"><span>'+esc(x.label)+'</span><strong>'+esc(x.wert)+'</strong></div>').join("")+'</div>';
+    h+='</div>';}
+  // Rechtliches
+  h+='<div class="karte"><h2>Rechtliches</h2><div class="muted">Ihre Bestätigung vom '+dt(f.bestaetigt_am)+' Uhr: AGB, Datenschutz, Widerrufsbelehrung, Beginn vor Ablauf der Widerrufsfrist'+(f.provisionsmodell==="kaeufer"?', Provisionsvereinbarung':'')+'. Die Texte haben Sie per E-Mail erhalten.'+(gesperrt?'':' <a href="#" id="wid">Widerruf erklären</a>')+'</div><div id="widfehler"></div></div>';
+  h+='</aside></div></div>';
+  wurzel.innerHTML=h;
+  // Verhalten
+  galIdx=0;galZeig(0);
+  sonneEinbetten();
+  const tabBtns=[...document.querySelectorAll(".tabs button")];const beschr=document.getElementById("beschr");
+  const tab=t=>{tabBtns.forEach(b=>b.classList.toggle("aktiv",b.dataset.t===t));const x=tabs.find(y=>y[0]===t);if(beschr&&x)beschr.innerHTML=x[2];};
+  tabBtns.forEach(b=>b.onclick=()=>tab(b.dataset.t));if(tabs.length)tab(tabs[0][0]);
+  const zeig=(id,m,ok)=>{const e=document.getElementById(id);if(e)e.innerHTML='<div class="'+(ok?'ok':'err')+'">'+esc(m)+'</div>';};
+  const wgo=document.getElementById("wgo");if(wgo)wgo.onclick=async()=>{const frm=document.getElementById("wfrm");const termine=[1,2,3].map(i=>({datum:frm["d"+i].value,zeitfenster:frm["z"+i].value})).filter(x=>x.datum);
+    if(!termine.length)return zeig("wfehler","Bitte mindestens einen Wunschtermin angeben.");wgo.disabled=true;
+    try{const j=await api("objekt-landing",{token:T,aktion:"wunschtermine",termine,telefon:frm.telefon.value,anmerkung:frm.anmerkung.value});if(!j.ok)throw new Error(j.fehler);await laden();document.getElementById("besichtigung").scrollIntoView();}
+    catch(e){zeig("wfehler",e.message||e);wgo.disabled=false;}};
+  const ago=document.getElementById("ago");if(ago)ago.onclick=async()=>{const g=(document.querySelector("input[name=grund]:checked")||{}).value||"";const tx=(document.getElementById("atext")||{}).value||"";const angebot=/angebot/i.test(g);
+    if(!g)return zeig("afehler","Bitte wählen Sie einen Grund aus.");if(angebot&&!tx.trim())return zeig("afehler","Bitte tragen Sie Ihr Angebot in das Textfeld ein.");
+    if(!confirm(angebot?"Ihr Angebot wird an "+(D&&D.makler?D.makler.name:"Ihren Ansprechpartner")+" übermittelt. Fortfahren?":"Möchten Sie für dieses Objekt absagen? Sie erhalten dann keine weiteren Nachrichten dazu."))return;ago.disabled=true;
+    try{const j=await api("objekt-landing",{token:T,aktion:"absage",grund:g,text:tx.trim()});if(!j.ok)throw new Error(j.fehler);await laden();window.scrollTo(0,0);}catch(e){zeig("afehler",e.message||e);ago.disabled=false;}};
+  document.querySelectorAll("input[name=grund]").forEach(r=>r.addEventListener("change",()=>{const l=document.getElementById("atextLabel");if(l)l.firstChild.textContent=/angebot/i.test(r.value)?"Ihr Angebot (Pflichtfeld, z. B. Kaufpreisvorstellung und Bedingungen)":"Begründung oder Ihr Angebot (optional)";}));
+  const arten=document.getElementById("arten");if(arten)arten.querySelectorAll("button").forEach(b=>b.onclick=()=>b.classList.toggle("an"));
+  const sva=document.getElementById("sva");if(sva)sva.querySelectorAll("button").forEach(b=>b.onclick=()=>b.classList.toggle("an"));
+  const sgo=document.getElementById("sgo");if(sgo)sgo.onclick=async()=>{const frm=document.getElementById("sfrm");sgo.disabled=true;
+    const profil={vermarktungsart:[...sva.querySelectorAll("button.an")].map(b=>b.dataset.v),objektarten:[...arten.querySelectorAll("button.an")].map(b=>b.dataset.a),status:frm.status.value,orte:frm.orte.value,plz:frm.plz.value,umkreis_label:frm.umkreis_label.value,umkreis_km:frm.umkreis_km.value,preis_von:frm.preis_von.value,preis_bis:frm.preis_bis.value,zimmer_von:frm.zimmer_von.value,flaeche_von:frm.flaeche_von.value,notiz:frm.notiz.value};
+    try{const j=await api("objekt-landing",{token:T,aktion:"suchkriterien",profil});if(!j.ok)throw new Error(j.fehler);zeig("sfehler","Vielen Dank – Ihre Suchkriterien sind gespeichert. Wir melden uns mit passenden Objekten.",true);}catch(e){zeig("sfehler",e.message||e);}sgo.disabled=false;};
+  const verlauf=document.getElementById("verlauf");
+  const bubble=(t,wer,q)=>{if(!verlauf)return;const el=document.createElement("div");el.className="m "+wer;el.textContent=t;if(q){const s=document.createElement("span");s.className="q";s.textContent=q;el.appendChild(s);}verlauf.appendChild(el);verlauf.scrollTop=verlauf.scrollHeight;};
+  if(verlauf){bubble("Guten Tag"+(f.name?" "+f.name:"")+"! Ich bin der Objekt-Assistent zu „"+titel+"“. Fragen Sie mich zu Ausstattung, Lage, Kosten oder Unterlagen.","b");
+    (d.fragen||[]).forEach(q=>{bubble(q.frage,"k");if(q.antwort)bubble(q.antwort,"b",q.antwort_quelle==="team"?"Antwort von "+(makler?makler.name:"Ihrem Ansprechpartner")+(q.beantwortet_am?" · "+dt(q.beantwortet_am):""):q.weitergeleitet?"Weitergeleitet – Antwort folgt per E-Mail":(q.quellen&&q.quellen.length?"Quellen: "+q.quellen.join(", "):"Objekt-Assistent"));});
+    const fragen=async()=>{const inp=document.getElementById("frage");const fr=inp.value.trim();if(!fr)return;const fgo=document.getElementById("fgo");fgo.disabled=true;bubble(fr,"k");inp.value="";const warte=document.createElement("div");warte.className="m b";warte.textContent="…";verlauf.appendChild(warte);
+      try{const j=await api("objekt-landing",{token:T,aktion:"frage",frage:fr});warte.remove();if(!j.ok)throw new Error(j.fehler);const q=j.frage;bubble(q.antwort,"b",q.weitergeleitet?"Weitergeleitet – Antwort folgt per E-Mail":(q.quellen&&q.quellen.length?"Quellen: "+q.quellen.join(", "):"Objekt-Assistent"));}
+      catch(e){warte.remove();zeig("ffehler",e.message||e);}fgo.disabled=false;};
+    document.getElementById("fgo").onclick=fragen;document.getElementById("frage").addEventListener("keydown",e=>{if(e.key==="Enter")fragen();});
+    const mehr=document.getElementById("faqMehr");if(mehr)mehr.onclick=()=>{document.querySelectorAll("#faq details[hidden]").forEach(x=>x.hidden=false);mehr.remove();};}
+  const rgo=document.getElementById("rgo");if(rgo)rgo.onclick=async()=>{const tel=prompt("Unter welcher Telefonnummer erreichen wir Sie am besten?","");if(tel===null)return;rgo.disabled=true;try{const j=await api("objekt-landing",{token:T,aktion:"rueckruf",telefon:tel});if(!j.ok)throw new Error(j.fehler);zeig("rfehler","Vielen Dank – wir rufen Sie zurück.",true);}catch(e){zeig("rfehler",e.message||e);rgo.disabled=false;}};
+  const wid=document.getElementById("wid");if(wid)wid.onclick=async e=>{e.preventDefault();if(!confirm("Möchten Sie den Maklervertrag widerrufen? Downloads und weitere Funktionen dieser Seite werden dann deaktiviert. Sie erhalten eine Eingangsbestätigung per E-Mail."))return;try{const j=await api("objekt-landing",{token:T,aktion:"widerruf"});if(!j.ok)throw new Error(j.fehler);await laden();window.scrollTo(0,0);}catch(e2){zeig("widfehler",e2.message||e2);}};
+}
+// Häufige Fragen (v9): Standardfragen je Objekt, von der KI aus Eckdaten, Exposé und freigegebenen Unterlagen
+// beantwortet, dazu die vom Team gepflegten FAQ – nach Kategorie gruppiert, Antworten aufklappbar. Ab 8 Fragen
+// zunächst eingeklappt („Alle Fragen anzeigen“), damit die Kachel nicht endlos wird.
+function faqHtml(faq){if(!faq.length)return '<div class="faqliste" id="faq"></div>';
+  const REIHE=["Kosten","Rechtliches","Zustand & Technik","Nutzung & Verfügbarkeit","Lage","Ablauf"];
+  const gruppen=new Map();for(const q of faq){const k=q.kategorie||"Allgemein";if(!gruppen.has(k))gruppen.set(k,[]);gruppen.get(k).push(q);}
+  const kats=[...gruppen.keys()].sort((a,b)=>{const ia=REIHE.indexOf(a),ib=REIHE.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib)||a.localeCompare(b);});
+  let n=0,versteckt=0,h='<div class="faqliste" id="faq"><div class="muted" style="margin-bottom:2px">Häufige Fragen zu diesem Objekt – Antworten aus Exposé, Eckdaten und freigegebenen Unterlagen'+(faq.some(q=>q.quelle==="ki")?', automatisch zusammengestellt'+(faq.some(q=>q.geprueft)?' und vom Team geprüft':'')+'. Verbindlich sind die Angaben in den Unterlagen.':'.')+'</div>';
+  for(const k of kats){const zeilen=gruppen.get(k);const hid=n>=8;if(hid)versteckt+=zeilen.length;
+    h+='<div class="faqkat"'+(hid?' hidden':'')+'>'+esc(k)+'</div>';
+    for(const q of zeilen){n++;const q2=n>8;if(q2&&!hid)versteckt++;
+      const quellen=Array.isArray(q.quellen)&&q.quellen.length?'Quelle: '+q.quellen.map(esc).join(", "):'';
+      const herkunft=q.quelle==="ki"?(q.geprueft?'Automatisch erstellt, vom Team geprüft':'Automatisch aus den Objektunterlagen erstellt'):'';
+      h+='<details'+((hid||q2)?' hidden':'')+'><summary>'+esc(q.frage)+'</summary><div class="faqa">'+esc(q.antwort)+((quellen||herkunft)?'<small>'+[herkunft,quellen].filter(Boolean).join(' · ')+'</small>':'')+'</div></details>';}}
+  if(versteckt>0)h+='<button type="button" class="faqmehr" id="faqMehr">Alle '+n+' Fragen anzeigen</button>';
+  return h+'</div>';}
+// Sonnenverlauf: Werkzeug-Datei laden, Objektlage einsetzen und über eine Blob-Adresse einbetten (wie im Portal).
+// Nicht als srcdoc: dort heißt das Dokument „about:srcdoc“ und MapLibre bekommt seinen Web Worker nicht ans Laufen –
+// Stil, Bedienelemente und Quellenangabe erscheinen, aber keine Kachel wird je fertig, die Karte bleibt still leer
+// (so gesehen am 20.09.2026). Die Blob-Adresse erbt den Ursprung der Seite, damit läuft der Worker.
+// Rückfälle: srcdoc (sehr alte WebViews ohne createObjectURL), zuletzt die normale URL mit Parametern.
+// Adresse für die Geokodierung im Sonnenverlauf: Ortsteil-Zusätze („Mühl Rosin OT Kirch Rosin“) kennt die
+// Adresssuche (Nominatim) nicht – sie liefert dann „nicht gefunden“. Deshalb nur Straße, Hausnummer, PLZ und Hauptort.
+function svAdresse(im){const ort=String(im.ort||"").replace(/\s+(OT|Ortsteil)\s+.*$/i,"").replace(/\s*[\/,(].*$/,"").trim();
+  return [im.strasse?(im.strasse+" "+(im.hausnummer||"")).trim():"",[im.plz,ort].filter(Boolean).join(" ")].filter(Boolean).join(", ");}
+async function sonneEinbetten(){const f=document.getElementById("sonneRahmen");if(!f)return;
+  const konfig={lat:Number(f.dataset.lat),lng:Number(f.dataset.lng),adresse:f.dataset.adresse||""};
+  try{const r=await fetch("sonnenverlauf.html",{cache:"no-store"});if(!r.ok)throw new Error("HTTP "+r.status);let s=await r.text();
+    if(!/Sonnenverlauf/.test(s)||/<title>ImmoOffice<\/title>/.test(s))throw new Error("falsche Datei");
+    const inj='<script>window.SV_KONFIG='+JSON.stringify(konfig).replace(/</g,"\\u003c")+';<\/script>';
+    s=/<head[^>]*>/i.test(s)?s.replace(/<head[^>]*>/i,m=>m+inj):inj+s;
+    let blobUrl=null;try{blobUrl=URL.createObjectURL(new Blob([s],{type:"text/html"}));}catch(e){blobUrl=null;}
+    if(blobUrl){if(f.dataset.blob){try{URL.revokeObjectURL(f.dataset.blob);}catch(e){}}f.dataset.blob=blobUrl;f.removeAttribute("srcdoc");f.src=blobUrl;}
+    else f.srcdoc=s;}
+  catch(e){f.src="sonnenverlauf.html?"+new URLSearchParams({lat:String(konfig.lat),lng:String(konfig.lng),adresse:konfig.adresse}).toString();}}
+// PDF-/Dokument-Betrachter: erst ansehen, Download über die Kopfleiste (wie im Neubauportal)
+function pdfAuf(i){const x=D&&D.downloads&&D.downloads[i];if(!x)return;if(!/\.pdf$/i.test(x.name||"")){window.open(x.url,"_blank","noopener");return;}
+  document.getElementById("pdfTitel").textContent=(x.typ?x.typ+" · ":"")+x.name;document.getElementById("pdfDl").href=x.url_download||x.url;document.getElementById("pdfNeu").href=x.url;
+  const v=document.getElementById("pdfv");v.classList.add("offen");document.body.style.overflow="hidden";
+  if(pdfSeitenweise()){v.classList.add("seitenweise");pdfSeitenRendern(x.url);}
+  else{v.classList.remove("seitenweise");document.getElementById("pdfRahmen").src=x.url+"#toolbar=0&navpanes=0";}}
+function pdfZu(){const v=document.getElementById("pdfv");v.classList.remove("offen");v.classList.remove("seitenweise");document.getElementById("pdfRahmen").src="about:blank";document.getElementById("pdfSeiten").innerHTML="";pdfLauf++;document.body.style.overflow="";}
+// Handy und Tablet zeigen PDFs im Rahmen nur als erste Seite ohne Blättern (Safari) – dort seitenweise mit pdf.js
+// rendern (gleiche Bibliothek wie im Portal). Schlägt das Laden fehl, bleibt der normale Rahmen.
+function pdfSeitenweise(){return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Macintosh/.test(navigator.userAgent))||window.matchMedia("(pointer:coarse)").matches;}
+let pdfLauf=0,pdfLib=null;
+function pdfBibliothek(){if(pdfLib)return pdfLib;pdfLib=new Promise((ok,nein)=>{if(window.pdfjsLib)return ok(window.pdfjsLib);const sc=document.createElement("script");sc.src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js";sc.onload=()=>{if(!window.pdfjsLib)return nein(new Error("pdf.js fehlt"));window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";ok(window.pdfjsLib);};sc.onerror=()=>nein(new Error("pdf.js nicht ladbar"));document.head.appendChild(sc);}).catch(e=>{pdfLib=null;throw e;});return pdfLib;}
+async function pdfSeitenRendern(url){const lauf=++pdfLauf;const box=document.getElementById("pdfSeiten");box.innerHTML='<div class="lade">Dokument wird geladen …</div>';
+  try{const lib=await pdfBibliothek();const doc=await lib.getDocument({url,withCredentials:false}).promise;if(lauf!==pdfLauf)return;box.innerHTML="";
+    const breite=Math.min(box.clientWidth-16,1000)*(window.devicePixelRatio||1);
+    for(let n=1;n<=doc.numPages;n++){if(lauf!==pdfLauf)return;const seite=await doc.getPage(n);const vp0=seite.getViewport({scale:1});const skala=breite/vp0.width;const vp=seite.getViewport({scale:skala});
+      const c=document.createElement("canvas");c.width=Math.floor(vp.width);c.height=Math.floor(vp.height);c.style.maxWidth=Math.floor(vp.width/(window.devicePixelRatio||1))+"px";box.appendChild(c);
+      await seite.render({canvasContext:c.getContext("2d"),viewport:vp}).promise;}
+    if(!doc.numPages)throw new Error("leer");}
+  catch(e){if(lauf!==pdfLauf)return;const v=document.getElementById("pdfv");v.classList.remove("seitenweise");document.getElementById("pdfRahmen").src=url+"#toolbar=0&navpanes=0";}}
+// Galerie (Hauptbild + Vorschauleiste)
+let galIdx=0;
+function galZeig(i){if(!FOTOS.length)return;galIdx=(i+FOTOS.length)%FOTOS.length;const x=FOTOS[galIdx];const b=document.getElementById("galBild");if(!b)return;b.src=x.url;document.getElementById("galCap").textContent=x.titel||"";document.getElementById("galNr").textContent=(galIdx+1)+" / "+FOTOS.length;
+  document.querySelectorAll("#thumbs img").forEach((t,j)=>{t.classList.toggle("an",j===galIdx);if(j===galIdx)t.scrollIntoView({block:"nearest",inline:"center",behavior:"smooth"});});}
+function galWeiter(d){galZeig(galIdx+d);}
+(function(){let x0=null;document.addEventListener("touchstart",e=>{if(e.target.closest&&e.target.closest("#galHaupt"))x0=e.touches[0].clientX;},{passive:true});document.addEventListener("touchend",e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>40)galWeiter(dx<0?1:-1);});})();
+// Lightbox
+function lbAuf(i){lbIdx=i;lbZeig();document.getElementById("lb").classList.add("offen");}
+function lbZu(){document.getElementById("lb").classList.remove("offen");galZeig(lbIdx);}
+function lbWeiter(d){if(!FOTOS.length)return;lbIdx=(lbIdx+d+FOTOS.length)%FOTOS.length;lbZeig();}
+function lbZeig(){const x=FOTOS[lbIdx];if(!x)return;document.getElementById("lbimg").src=x.url;document.getElementById("lbc").textContent=(lbIdx+1)+" / "+FOTOS.length+(x.titel?" · "+x.titel:"");}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.getElementById("pdfv").classList.contains("offen"))return pdfZu();if(!document.getElementById("lb").classList.contains("offen"))return;if(e.key==="Escape")lbZu();if(e.key==="ArrowRight")lbWeiter(1);if(e.key==="ArrowLeft")lbWeiter(-1);});
+laden();
+</script>
+</body></html>

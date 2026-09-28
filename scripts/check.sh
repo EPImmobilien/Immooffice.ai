@@ -54,7 +54,8 @@ fi
 abschnitt "Oberflaeche: Syntax"
 if [[ -d src ]]; then
   syntaxfehler=0
-  for f in src/app/*.js src/start/*.js; do
+  for f in src/app/*.js src/start/*.js src/seiten/sw.js; do
+    [[ -e "$f" ]] || continue
     node --check "$f" || syntaxfehler=1
   done
   if [[ $syntaxfehler -eq 0 ]]; then

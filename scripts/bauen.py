@@ -91,6 +91,54 @@ def zugang_einsetzen(inhalt):
     return inhalt, gesetzt, fehlend
 
 
+# --- Nebenseiten ------------------------------------------------------------
+# Die Anwendung ist nicht nur index.html: sie registriert sw.js, die
+# Netlify-Umschreibung zeigt auf freigabe.html, und aus Exposés wird
+# objekt.html und sonnenverlauf.html verlinkt. src/seiten/ entsteht aus
+# scripts/nebenseiten.py; hier werden nur noch die Platzhalter gefuellt.
+SEITEN = SRC / 'seiten'
+
+
+def stand_von(inhalt):
+    """Die Marke, unter der der Service Worker seinen Zwischenspeicher fuehrt.
+
+    Aus dem Inhalt der ausgelieferten Datei, nicht aus der Uhr: der
+    Zwischenspeicher soll genau dann wechseln, wenn sich etwas geaendert hat.
+    Eine Zeitmarke wechselte auch bei einem unveraenderten Bau und zwaenge
+    jedem Nutzer einen Neuladen auf, der nichts bringt.
+    """
+    return hashlib.sha256(inhalt.encode()).hexdigest()[:12]
+
+
+def nebenseiten_ausliefern(stand):
+    if not SEITEN.is_dir():
+        print('HINWEIS: src/seiten/ fehlt — erst `npm run nebenseiten`. Die '
+              'Auslieferung bestuende dann nur aus index.html; sw.js und die '
+              'Kundenseiten fehlten.')
+        return []
+    url = os.environ.get('IMMO_SUPABASE_URL', '').strip()
+    ref = url.split('//')[-1].split('.')[0] if url else ''
+    geschrieben, offen = [], set()
+    for p in sorted(SEITEN.iterdir()):
+        if not p.is_file():
+            continue
+        inhalt = p.read_text(encoding='utf-8')
+        for marke, wert in (('__IMMO_SUPABASE_URL__', url),
+                            ('__IMMO_PROJEKT_REF__', ref),
+                            ('__IMMO_STAND__', stand)):
+            if marke in inhalt:
+                if wert:
+                    inhalt = inhalt.replace(marke, wert)
+                else:
+                    offen.add(marke)
+        (ZIEL.parent / p.name).write_text(inhalt, encoding='utf-8')
+        geschrieben.append((p.name, len(inhalt.encode())))
+    if offen:
+        print('HINWEIS: ' + ', '.join(sorted(offen)) + ' bleibt in den '
+              'Nebenseiten stehen — IMMO_SUPABASE_URL ist nicht gesetzt.')
+    return geschrieben
+
+
 def main():
     quelle = None
     if '--aus' in sys.argv:
@@ -108,6 +156,10 @@ def main():
     ZIEL.write_text(inhalt, encoding='utf-8')
     print(f'{ZIEL.relative_to(WURZEL)}: {len(inhalt):,} Zeichen, '
           f'{inhalt.count(chr(10)):,} Zeilen')
+
+    if '--roh' not in sys.argv and '--aus' not in sys.argv:
+        for name, groesse in nebenseiten_ausliefern(stand_von(inhalt)):
+            print(f'{(ZIEL.parent / name).relative_to(WURZEL)}: {groesse:,} B')
 
     if '--pruefen' in sys.argv:
         if not VORLAGE.exists():
