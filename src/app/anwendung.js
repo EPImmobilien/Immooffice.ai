@@ -1282,6 +1282,348 @@ function flattenParagraphs(e, t) {
   })
 }
 
+// Die Vorlage fuellen — an den Stellen, die der Makler markiert hat.
+//
+// Bis zum 28.09.2026 ging das anders: die Erzeugung suchte woertliche Saetze
+// aus EINEM Mustervertrag und ersetzte sie. Fuer eine fremde Vorlage traf
+// davon nichts, und im Quelltext standen dafuer Namen, Anschriften und
+// Ausweisnummern echter Vertragsparteien. Beides loest sich hier auf:
+// gesucht wird, was in vorlagen_felder steht, und das hat der Makler selbst
+// markiert.
+
+// --- Was in ein Dokument gehoert ------------------------------------------
+// Ein Feld kann ein einzelner Wert sein oder ein Block aus N Beteiligten.
+// Welcher es ist, sagt der Katalog; wie der Block aussieht, entscheidet
+// buildVerkaeuferBlock — dieselbe Funktion, die ihn immer schon gebaut hat.
+function immoWerteFuerVorgang(art, v, firma) {
+  const f = firma || {};
+  const heute = new Date().toLocaleDateString("de-DE");
+  const firmenAnschrift = [f.strasse || "", `${f.plz || ""} ${f.ort || ""}`.trim()]
+    .filter(Boolean).join("\n");
+  const gemeinsam = {
+    firma_name: f.firma_name || f.name || "",
+    firma_anschrift: firmenAnschrift,
+    makler_name: (window._currentUserName || ""),
+    datum_heute: heute
+  };
+  if (art === "maklervertrag" || art === "vollmacht") {
+    return {
+      ...gemeinsam,
+      verkaeufer_block: buildVerkaeuferBlock(v),
+      verkaeufer_name: v.verkaeufer_name || "",
+      verkaeufer_vertreter: v.verkaeufer_vertreter || "",
+      verkaeufer_strasse: v.verkaeufer_strasse || "",
+      verkaeufer_plz: v.verkaeufer_plz || "",
+      verkaeufer_ort: v.verkaeufer_ort || "",
+      objekt_bezeichnung: v.objekt_bezeichnung || "",
+      objekt_adresse: v.objekt_adresse || epVertragObjektAdresse(v) || "",
+      angebotspreis: v.angebotspreis || "",
+      laufzeit_monate: v.laufzeit_monate || "",
+      provision: v.provision || "",
+      provisionsmodell: v.provisionsmodell || ""
+    };
+  }
+  if (art === "objektnachweis") {
+    const k = Array.isArray(v.kaeufer) ? v.kaeufer : [];
+    const person = (p) => [
+      [p.anrede, p.titel, p.vorname, p.nachname].filter(Boolean).join(" ").trim(),
+      p.strasse || "",
+      `${p.plz || ""} ${p.ort || ""}`.trim(),
+      p.geburtsdatum || p.geburt ? "geboren am " + (p.geburtsdatum || p.geburt) : "",
+      p.ausweis ? "Ausweis " + p.ausweis : ""
+    ].filter(Boolean).join("\n");
+    const eins = k[0] || {}, zwei = k[1] || {};
+    const name = (p) => [p.anrede, p.titel, p.vorname, p.nachname].filter(Boolean).join(" ").trim();
+    const anschrift = (p) => [p.strasse || "", `${p.plz || ""} ${p.ort || ""}`.trim()]
+      .filter(Boolean).join("\n");
+    return {
+      ...gemeinsam,
+      kaeufer_block: k.map(person).filter(Boolean).join("\n\n"),
+      k1_name: name(eins), k1_anschrift: anschrift(eins),
+      k1_geburt: eins.geburtsdatum || eins.geburt || "", k1_ausweis: eins.ausweis || "",
+      k2_name: name(zwei), k2_anschrift: anschrift(zwei),
+      k2_geburt: zwei.geburtsdatum || zwei.geburt || "", k2_ausweis: zwei.ausweis || "",
+      objekt_bezeichnung: v.objekt_bezeichnung || "",
+      objekt_adresse: v.objekt_adresse || "",
+      kaufpreis: v.kaufpreis || "",
+      provision: v.provision || "",
+      angebotsdatum: v.angebotsdatum || "",
+      notar_name: v.notar_name || "",
+      notar_adresse: v.notar_adresse || ""
+    };
+  }
+  if (art === "reservierung") {
+    const anschrift = [v.kaeufer_strasse || "",
+      `${v.kaeufer_plz || ""} ${v.kaeufer_ort || ""}`.trim(),
+      v.kaeufer_land && v.kaeufer_land !== "Deutschland" ? v.kaeufer_land : ""]
+      .filter(Boolean).join("\n");
+    const vorsatz = v.kaeufer_typ === "eheleute" ? "Eheleute"
+      : v.kaeufer_typ === "firma" ? "" : "";
+    return {
+      ...gemeinsam,
+      kaeufer_block: [vorsatz, v.kaeufer_name || "", anschrift].filter(Boolean).join("\n"),
+      kaeufer_name: v.kaeufer_name || "",
+      kaeufer_anschrift: anschrift,
+      projektname: v.projektname || "",
+      wohneinheit_nr: v.wohneinheit_nr || "",
+      etage: v.etage || "",
+      wohnflaeche_m2: v.wohnflaeche_m2 == null ? "" : String(v.wohnflaeche_m2),
+      objekt_adresse: [v.objekt_strasse || "",
+        `${v.objekt_plz || ""} ${v.objekt_ort || ""}`.trim()].filter(Boolean).join("\n"),
+      kaufpreis: v.kaufpreis == null ? "" : String(v.kaufpreis),
+      reservierungsgebuehr_brutto: v.reservierungsgebuehr_brutto == null ? "" : String(v.reservierungsgebuehr_brutto),
+      reservierungsdauer_bis: v.reservierungsdauer_bis || "",
+      zahlungsfrist_werktage: v.zahlungsfrist_werktage == null ? "" : String(v.zahlungsfrist_werktage),
+      ort_unterzeichnung: v.ort_unterzeichnung || "",
+      datum_unterzeichnung: v.datum_unterzeichnung || ""
+    };
+  }
+  return gemeinsam;
+}
+
+// --- PDF: in das markierte Rechteck stempeln -------------------------------
+// Umbrechen auf die Breite des Kastens. Ein Wort, das allein schon zu breit
+// ist, wird nicht zerschnitten — es ragt lieber heraus, als in der Mitte
+// eines Namens zu brechen.
+function immoZeilenUmbrechen(text, schrift, groesse, breite) {
+  const raus = [];
+  for (const absatz of String(text).split("\n")) {
+    const worte = absatz.split(/\s+/).filter(Boolean);
+    if (!worte.length) { raus.push(""); continue; }
+    let zeile = worte[0];
+    for (let i = 1; i < worte.length; i++) {
+      const versuch = zeile + " " + worte[i];
+      if (schrift.widthOfTextAtSize(versuch, groesse) <= breite) zeile = versuch;
+      else { raus.push(zeile); zeile = worte[i]; }
+    }
+    raus.push(zeile);
+  }
+  return raus;
+}
+
+// Verkleinern, bis es passt — aber nicht unter die Untergrenze. Was dann noch
+// nicht passt, kommt auf eine Anlage: ein abgeschnittener Wert in einem
+// Vertrag ist ein Rechtsmangel, keine Schoenheitsfrage.
+function immoPasstEs(text, schrift, feld) {
+  const hoehe = Number(feld.hoehe), breite = Number(feld.breite);
+  const unten = Number(feld.mindest_schriftgroesse) || 7;
+  let groesse = Number(feld.schriftgroesse) || 11;
+  while (groesse >= unten) {
+    const zeilen = immoZeilenUmbrechen(text, schrift, groesse, breite);
+    const braucht = zeilen.length * groesse * 1.2;
+    const zuBreit = zeilen.some((z) => schrift.widthOfTextAtSize(z, groesse) > breite + 0.5);
+    if (braucht <= hoehe && !zuBreit) return { groesse, zeilen };
+    groesse = Math.round((groesse - 0.5) * 2) / 2;
+  }
+  return null;
+}
+
+async function immoPdfStempeln(bytes, felder, werte) {
+  const pdf = await PDFLib.PDFDocument.load(bytes);
+  const schrift = await pdf.embedFont(PDFLib.StandardFonts.Helvetica);
+  const seiten = pdf.getPages();
+  const anlage = [];
+  const warnungen = [];
+
+  for (const f of felder) {
+    if (f.zeiger_art !== "rechteck") continue;
+    const wert = String(werte[f.feld] == null ? "" : werte[f.feld]).trim();
+    if (!wert) continue;
+    const seite = seiten[f.seite];
+    if (!seite) { warnungen.push(`Seite ${f.seite + 1} gibt es in der Vorlage nicht.`); continue; }
+
+    const passt = immoPasstEs(wert, schrift, f);
+    const x = Number(f.x), y = Number(f.y), b = Number(f.breite), h = Number(f.hoehe);
+    if (!passt) {
+      // Der Verweis muss selbst passen — er ist kurz, aber die Vorsicht
+      // kostet nichts.
+      anlage.push({ feld: f.feld, wert });
+      const verweis = "siehe Anlage " + anlage.length;
+      const klein = Number(f.mindest_schriftgroesse) || 7;
+      seite.drawText(verweis, { x, y: y + h - klein, size: klein, font: schrift,
+        color: PDFLib.rgb(0, 0, 0) });
+      warnungen.push(`„${f.feld}" passte nicht und steht auf Anlage ${anlage.length}.`);
+      continue;
+    }
+    const zeilenhoehe = passt.groesse * 1.2;
+    passt.zeilen.forEach((zeile, i) => {
+      const breiteZeile = schrift.widthOfTextAtSize(zeile, passt.groesse);
+      const versatz = f.ausrichtung === "mitte" ? (b - breiteZeile) / 2
+        : f.ausrichtung === "rechts" ? (b - breiteZeile) : 0;
+      seite.drawText(zeile, {
+        x: x + Math.max(0, versatz),
+        // Von oben nach unten setzen: y ist die UNTERE Kante des Kastens.
+        y: y + h - zeilenhoehe * (i + 1) + zeilenhoehe * 0.25,
+        size: passt.groesse, font: schrift, color: PDFLib.rgb(0, 0, 0)
+      });
+    });
+  }
+
+  if (anlage.length) {
+    const fett = await pdf.embedFont(PDFLib.StandardFonts.HelveticaBold);
+    const seite = pdf.addPage();
+    const { width, height } = seite.getSize();
+    let y = height - 72;
+    seite.drawText("Anlage zu diesem Dokument", { x: 72, y, size: 14, font: fett });
+    y -= 12;
+    seite.drawText("Die folgenden Angaben passten nicht in das dafür vorgesehene Feld.",
+      { x: 72, y: y - 12, size: 9, font: schrift });
+    y -= 40;
+    anlage.forEach((a, i) => {
+      seite.drawText("Anlage " + (i + 1) + " — " + a.feld, { x: 72, y, size: 11, font: fett });
+      y -= 16;
+      for (const zeile of immoZeilenUmbrechen(a.wert, schrift, 10, width - 144)) {
+        if (y < 72) return;
+        seite.drawText(zeile, { x: 72, y, size: 10, font: schrift });
+        y -= 13;
+      }
+      y -= 12;
+    });
+  }
+  return { bytes: await pdf.save(), warnungen };
+}
+
+// --- Word: die markierte Textstelle ersetzen -------------------------------
+// Word zerlegt einen Satz oft in mehrere <w:t>-Laeufe — mitten im Wort, wenn
+// die Rechtschreibpruefung dazwischenkam. Die markierte Stelle steht im XML
+// also selten am Stueck. Deshalb wird erst der Text aller Laeufe eines
+// Absatzes aneinandergelegt, darin gesucht, und dann werden genau die Laeufe
+// angefasst, ueber die sich der Treffer erstreckt.
+// Die Rechnung darin ist rein: gegeben die Texte der Laeufe eines Absatzes
+// und ein Suchtext — ueber welche Laeufe erstreckt sich das n-te Vorkommen,
+// und was bleibt vorn und hinten stehen? Ausgelagert, damit sie sich ohne
+// Browser pruefen laesst; im Browser haengt nur noch das Setzen der Knoten
+// daran (tests/vorlagen-fuellen.js).
+function immoTrefferInLaeufen(texte, suche, schonGesehen, gesucht) {
+  const ganz = texte.join("");
+  let gesehen = schonGesehen, ab = 0;
+  for (;;) {
+    const treffer = ganz.indexOf(suche, ab);
+    if (treffer < 0) return { gesehen, fund: null };
+    gesehen += 1;
+    ab = treffer + suche.length;
+    if (gesehen !== gesucht) continue;
+    const ende = treffer + suche.length;
+    let pos = 0, von = -1, bis = -1, vorne = "", hinten = "";
+    for (let i = 0; i < texte.length; i++) {
+      const start = pos, stop = pos + texte[i].length;
+      if (stop > treffer && start < ende) {
+        if (von < 0) { von = i; vorne = texte[i].slice(0, treffer - start); }
+        bis = i; hinten = texte[i].slice(ende - start);
+      }
+      pos = stop;
+    }
+    if (von < 0) return { gesehen, fund: null };
+    return { gesehen, fund: { von, bis, vorne, hinten } };
+  }
+}
+
+function immoDocxErsetzen(xml, felder, werte) {
+  const doc = new DOMParser().parseFromString(xml, "application/xml");
+  const warnungen = [];
+
+  for (const f of felder) {
+    if (f.zeiger_art !== "textstelle") continue;
+    const wert = String(werte[f.feld] == null ? "" : werte[f.feld]);
+    const suche = String(f.suchtext || "");
+    if (!suche) continue;
+    const gesucht = Number(f.vorkommen) || 1;
+
+    let gesehen = 0, erledigt = false;
+    const absaetze = doc.getElementsByTagName("w:p");
+    for (let p = 0; p < absaetze.length && !erledigt; p++) {
+      const tListe = absaetze[p].getElementsByTagName("w:t");
+      const knoten = [], texte = [];
+      for (let i = 0; i < tListe.length; i++) {
+        knoten.push(tListe[i]);
+        texte.push(tListe[i].textContent || "");
+      }
+      const erg = immoTrefferInLaeufen(texte, suche, gesehen, gesucht);
+      gesehen = erg.gesehen;
+      if (!erg.fund) continue;
+      const { von, bis, vorne, hinten } = erg.fund;
+      // Die Laeufe hinter dem ersten leeren; der letzte behaelt seinen Rest.
+      for (let i = von + 1; i <= bis; i++) {
+        knoten[i].textContent = (i === bis) ? hinten : "";
+        knoten[i].setAttribute("xml:space", "preserve");
+      }
+      immoWordZeilen(doc, knoten[von], vorne, wert, von === bis ? hinten : "");
+      erledigt = true;
+    }
+    if (!erledigt) {
+      warnungen.push("„" + f.feld + "\u201c: die markierte Stelle steht nicht mehr in der Vorlage.");
+    }
+  }
+  return { xml: new XMLSerializer().serializeToString(doc), warnungen };
+}
+
+// Mehrzeiliges in einen Lauf schreiben. Ein "\n" ist in Word kein Zeichen,
+// sondern ein <w:br/> — sonst stuende die Erbengemeinschaft in einer Zeile.
+function immoWordZeilen(doc, knoten, vorne, wert, hinten) {
+  const zeilen = String(wert).split("\n");
+  knoten.textContent = vorne + zeilen[0];
+  knoten.setAttribute("xml:space", "preserve");
+  let danach = knoten;
+  for (let i = 1; i < zeilen.length; i++) {
+    const br = doc.createElementNS(knoten.namespaceURI, "w:br");
+    danach.parentNode.insertBefore(br, danach.nextSibling);
+    const t = doc.createElementNS(knoten.namespaceURI, "w:t");
+    t.setAttribute("xml:space", "preserve");
+    t.textContent = zeilen[i];
+    br.parentNode.insertBefore(t, br.nextSibling);
+    danach = t;
+  }
+  if (hinten) {
+    const t = doc.createElementNS(knoten.namespaceURI, "w:t");
+    t.setAttribute("xml:space", "preserve");
+    t.textContent = hinten;
+    danach.parentNode.insertBefore(t, danach.nextSibling);
+  }
+}
+
+// --- Der Weg von der Vorlage zum fertigen Dokument -------------------------
+async function immoVorlageFuellen(art, vorgang, firma) {
+  const { data: vorlagen, error: vErr } = await window._sb.from("vertragsvorlagen")
+    .select("*").eq("art", art).eq("aktiv", true).order("version", { ascending: false });
+  if (vErr) throw vErr;
+  const eigene = (vorlagen || []);
+  // Die der Gesellschaft sticht die des Mandanten — dieselbe Reihenfolge wie
+  // bei den Vorgaben (fork_23), damit Werte und Text zusammenpassen.
+  const vorlage = eigene.filter((v) => v.gesellschaft_id
+      && v.gesellschaft_id === (window.IMMO_GESELLSCHAFT_ID || null))[0]
+    || eigene.filter((v) => !v.gesellschaft_id)[0] || null;
+  if (!vorlage) {
+    throw new Error("Für „" + art + "“ ist keine Vorlage hinterlegt. "
+      + "Unter Einstellungen → Vertragsvorlagen kannst du eine hochladen.");
+  }
+
+  const { data: felder, error: fErr } = await window._sb.from("vorlagen_felder")
+    .select("*").eq("vorlage_id", vorlage.id);
+  if (fErr) throw fErr;
+  if (!felder || !felder.length) {
+    throw new Error("In dieser Vorlage ist noch keine Stelle markiert. "
+      + "Ohne Markierung bliebe das Dokument, wie es ist — "
+      + "unter Einstellungen → Vertragsvorlagen auf „Felder markieren“.");
+  }
+
+  const { data: datei, error: dErr } = await window._sb.storage
+    .from("vertragsvorlagen").download(vorlage.storage_pfad);
+  if (dErr) throw dErr;
+  const puffer = await datei.arrayBuffer();
+  const werte = immoWerteFuerVorgang(art, vorgang, firma);
+
+  if (vorlage.dateiformat === "pdf") {
+    const { bytes, warnungen } = await immoPdfStempeln(puffer, felder, werte);
+    return { bytes, endung: "pdf", warnungen, vorlage };
+  }
+  const zip = await window.JSZip.loadAsync(puffer);
+  const alt = await zip.file("word/document.xml").async("string");
+  const { xml, warnungen } = immoDocxErsetzen(alt, felder, werte);
+  zip.file("word/document.xml", xml);
+  const bytes = await zip.generateAsync({ type: "uint8array" });
+  return { bytes, endung: "docx", warnungen, vorlage };
+}
+
 function buildVerkaeuferBlock(e) {
   if (("erben" === e.verkaeufer_typ || "mehrere" === e.verkaeufer_typ) && e.erben && e.erben.length > 0) {
     const t = "erben" === e.verkaeufer_typ ? ["Erbengemeinschaft"] : [];

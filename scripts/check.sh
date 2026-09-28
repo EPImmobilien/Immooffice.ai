@@ -161,6 +161,13 @@ else
   echo "src/ fehlt — nichts zu pruefen."
 fi
 
+abschnitt "Vorlagen fuellen: die Rechnung dahinter"
+if node tests/vorlagen-fuellen.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Oberflaeche: Storage-Huelle"
 if node tests/storage-huelle.js; then
   :

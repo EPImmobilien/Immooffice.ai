@@ -1878,3 +1878,43 @@ Vorlage hochlädt.
 zurückkommt — mit einer erlaubten Ausnahme, dem Alphabet der
 Buchstabenhäufigkeit, das absichtlich in Einzelzeichen zerfällt.
 Nachgewiesen an einem eingefügten zweiten Vorkommen.
+
+---
+
+## Die Vorlage füllen — an den markierten Stellen (28.09.2026)
+
+Der Gegenpart zur Markierung. Vier Bauteile, und die drei mit Rechnung darin
+sind absichtlich **ohne Browser prüfbar** — `tests/vorlagen-fuellen.js` holt
+sie sich aus `src/app/anwendung.js` und lässt sie in einem Sandkasten laufen.
+
+**`immoTrefferInLaeufen`** — die Hürde beim Word. Word zerlegt einen Satz
+gern in mehrere `<w:t>`-Läufe, mitten im Wort, wenn die Rechtschreibprüfung
+dazwischenkam. „Dauer von 6 Monaten" steht im XML dann als
+`["Dauer von ", "6 Mo", "naten"]`. Die Funktion sagt, über welche Läufe sich
+das *n*-te Vorkommen erstreckt und was vorn und hinten stehen bleibt. Die
+Zählung läuft über Absatzgrenzen hinweg — sonst träfe „Musterstadt" den
+falschen Satz.
+
+**`immoZeilenUmbrechen`** — Umbruch auf die Breite des Kastens. Ein Wort, das
+allein schon zu breit ist, wird **nicht** zerschnitten: ein in der Mitte
+gebrochener Name wäre schlimmer als ein Überstand.
+
+**`immoPasstEs`** — verkleinern in halben Punkten bis zur Untergrenze. Was
+auch dann nicht passt, liefert kein Ergebnis, und der Aufrufer schreibt den
+Wert auf die Anlage statt ihn abzuschneiden.
+
+**`immoVorlageFuellen`** — der Weg: aktive Vorlage suchen (Gesellschaft vor
+Mandant, dieselbe Reihenfolge wie bei den Vorgaben), Markierungen laden,
+Datei holen, je nach Format stempeln oder ersetzen.
+
+**Zwei Fälle, die ausdrücklich abbrechen statt still nichts zu tun:** keine
+Vorlage hinterlegt, und eine Vorlage ohne jede Markierung. Beides mit dem
+Hinweis, wo es einzurichten ist. Ein Dokument, das unverändert
+herauskommt und wie ein fertiges aussieht, ist die schlechtere Antwort.
+
+**Mehrzeiliges im Word** wird zu `<w:br/>`, nicht zu einem `\n`-Zeichen —
+sonst stünde die Erbengemeinschaft in einer Zeile.
+
+Dreizehn Prüfungen, darunter der über drei Läufe zerschnittene Treffer, das
+zweite von drei Vorkommen, und die Erbengemeinschaft, die auch bei 7 pt nicht
+in den Kasten passt.
