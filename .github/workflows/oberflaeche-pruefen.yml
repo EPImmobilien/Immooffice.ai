@@ -1,0 +1,97 @@
+# Prueft, ob die ausgelieferte Oberflaeche tatsaechlich startet.
+#
+# Das kann `npm run check` nicht: die Arbeitsumgebung erreicht weder die CDNs
+# noch netlify.app. Der Rauchtest dort prueft Struktur, nicht Verhalten, und
+# sagt das auch. Hier laeuft ein echter Browser gegen die ausgelieferte
+# Adresse und meldet, was in der Konsole steht.
+name: Oberflaeche pruefen
+
+on:
+  workflow_dispatch:
+    inputs:
+      adresse:
+        description: 'Adresse der ausgelieferten Oberflaeche'
+        required: true
+        default: 'https://immoofficeai.netlify.app'
+
+jobs:
+  pruefen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sind die CDN-Adressen erreichbar?
+        run: |
+          set -uo pipefail
+          # Genau die Adressen, die die gebaute Datei laedt — aus ihr geholt,
+          # nicht abgeschrieben.
+          python3 scripts/bauen.py > /dev/null
+          grep -o '<script[^>]*src="[^"]*"' dist/index.html \
+            | sed 's/.*src="//;s/"//' | sort -u > adressen.txt
+          grep -o '<link[^>]*href="https://[^"]*"' dist/index.html \
+            | sed 's/.*href="//;s/"//' | sort -u >> adressen.txt
+          sort -u adressen.txt -o adressen.txt
+          echo "$(wc -l < adressen.txt) Adressen"
+          schlecht=0
+          while read -r u; do
+            code="$(curl -sS -o /dev/null -w '%{http_code}' -L --max-time 30 "$u" || echo 000)"
+            if [ "$code" = "200" ]; then
+              printf '  [ok]     %s\n' "$u"
+            else
+              printf '  [FEHLER] %s  -> %s\n' "$u" "$code"
+              schlecht=1
+            fi
+          done < adressen.txt
+          [ $schlecht -eq 0 ] || echo "::error::Mindestens eine CDN-Adresse antwortet nicht mit 200."
+          exit $schlecht
+
+      - name: Laedt die Seite?
+        if: always()
+        run: |
+          set -uo pipefail
+          U='${{ github.event.inputs.adresse }}'
+          for p in "" /sw.js /freigabe.html /objekt.html /sonnenverlauf.html; do
+            code="$(curl -sS -o /dev/null -w '%{http_code}' -L --max-time 30 "$U$p" || echo 000)"
+            printf '  %-22s %s\n' "${p:-/}" "$code"
+          done
+
+      - name: Startet die Anwendung wirklich?
+        if: always()
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright@1.49.1
+          npx playwright install --with-deps chromium
+          cat > pruefen.mjs <<'ENDE'
+          import { chromium } from 'playwright';
+          const url = process.argv[2];
+          const browser = await chromium.launch();
+          const seite = await browser.newPage();
+          const konsole = [], fehler = [], gescheitert = [];
+          seite.on('console', m => { if (m.type() === 'error') konsole.push(m.text()); });
+          seite.on('pageerror', e => fehler.push(String(e)));
+          seite.on('requestfailed', r =>
+            gescheitert.push(`${r.url()} — ${r.failure()?.errorText}`));
+          await seite.goto(url, { waitUntil: 'load', timeout: 60000 });
+          await seite.waitForTimeout(12000);
+          const wurzel = await seite.evaluate(() => {
+            const r = document.getElementById('root');
+            return { kinder: r ? r.children.length : -1,
+                     text: (document.body.innerText || '').slice(0, 400) };
+          });
+          console.log('Titel:', await seite.title());
+          console.log('Kinder unter #root:', wurzel.kinder);
+          console.log('--- sichtbarer Text (Anfang) ---');
+          console.log(wurzel.text || '(leer)');
+          for (const [titel, liste] of [['Skriptfehler', fehler],
+                                        ['Konsole (error)', konsole],
+                                        ['Gescheiterte Anfragen', gescheitert]]) {
+            console.log(`--- ${titel}: ${liste.length}`);
+            liste.slice(0, 15).forEach(z => console.log('   ', z));
+          }
+          await browser.close();
+          if (wurzel.kinder <= 0) {
+            console.log('::error::Unter #root steht nichts — die Anwendung ist nicht gestartet.');
+            process.exit(1);
+          }
+          ENDE
+          node pruefen.mjs '${{ github.event.inputs.adresse }}'
