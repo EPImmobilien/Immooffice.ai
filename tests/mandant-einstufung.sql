@@ -51,6 +51,17 @@ with tabellen as (
      and exists (select 1 from information_schema.columns k
                   where k.table_schema = 'public' and k.table_name = e.tabelle
                     and k.column_name = 'mandant_id')
+  union all
+  -- Ohne Vorgabewert traegt jede neue Zeile mandant_id = null. Unter RLS ist
+  -- sie damit fuer jeden unsichtbar — kein Sicherheitsloch, aber stiller
+  -- Datenverlust, und der faellt erst auf, wenn jemand seine Daten sucht.
+  select 'MANDANT ohne Vorgabewert auf mandant_id', e.tabelle
+    from public.mandanten_einstufung e
+   where e.gruppe = 'MANDANT'
+     and exists (select 1 from information_schema.columns k
+                  where k.table_schema = 'public' and k.table_name = e.tabelle
+                    and k.column_name = 'mandant_id'
+                    and coalesce(k.column_default, '') <> 'aktuelle_mandant_id()')
 )
 select * from befund;
 
