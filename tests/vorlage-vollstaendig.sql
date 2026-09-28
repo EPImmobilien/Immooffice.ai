@@ -110,7 +110,12 @@ zuwachs(bereich, mehr, grund) as (values
   ('Spalten', 3, 'fork_13: ci_primaer, ci_akzent, ci_font'),
   ('Pruefbedingungen', 1, 'firma_stammdaten_ci_farben_check'),
   -- fork_14: die Mandantengrenze in den Funktionen.
-  ('Funktionen', 2, 'fork_14: mandant_sichern(), mandant_grenze_gilt()')
+  ('Funktionen', 2, 'fork_14: mandant_sichern(), mandant_grenze_gilt()'),
+  -- fork_17: zehn Eindeutigkeitsregeln werden je Mandant statt global. Die
+  -- Regel verschwindet (und mit ihr ihr Index), ein eigener Index kommt.
+  ('Primaer- und Eindeutigkeitsschluessel', -10, 'fork_17: zehn Regeln '
+     'ersetzt durch Indizes ueber (mandant_id, Spalte)'),
+  ('Indizes ohne Constraint', 10, 'fork_17: dieselben zehn als eigener Index')
 ),
 soll(bereich, soll) as (
   select v.bereich,

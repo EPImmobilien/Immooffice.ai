@@ -43,6 +43,13 @@ else
   fehler=1
 fi
 
+abschnitt "Kann der zweite Mandant dieselben Namen fuehren?"
+if scripts/lokale-db.sh psql -q -f tests/eindeutig-je-mandant.sql; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Mandantengrenze: halten auch die Funktionen?"
 if scripts/lokale-db.sh psql -q -f tests/funktionen-mandant.sql; then
   :

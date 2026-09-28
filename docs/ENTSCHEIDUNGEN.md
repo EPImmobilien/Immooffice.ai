@@ -1229,3 +1229,46 @@ Rolle „eigentuemer" gesetzt und eine Notiz mit Adresse und Nachricht angehäng
 Mandanten. Der **Absender** bleibt die Plattform: die Absenderdomäne muss beim
 Mailversand hinterlegt sein, und das ist Sache des Betreibers, nicht des
 Mandanten.
+
+## 2026-09-28 · Zehn Eindeutigkeitsregeln galten global statt je Mandant
+
+**Befund, ein Blocker für Phase 3:** 41 Eindeutigkeitsregeln auf
+Mandantentabellen enthalten `mandant_id` nicht. Die meisten zu Recht — ein
+Zufallstoken, eine Fremdkennung oder ein zusammengesetzter Schlüssel über eine
+ohnehin mandantengebundene Elterntabelle ist richtig global eindeutig.
+
+**Zehn nicht.** Sie tragen einen *Namen*, den ein zweiter Mandant mit demselben
+Recht führen will. Solange die Regel global gilt, nimmt der erste ihn dem
+zweiten weg — und der zweite bekommt beim Anlegen eine Fehlermeldung, die
+nichts erklärt.
+
+| Regel | was der zweite Mandant nicht mehr kann |
+|---|---|
+| `rechnungen.rechnungsnummer` | **abrechnen** — zwei Mandanten mit Präfix „RE" kollidieren ab der ersten Rechnung |
+| `external_credentials.service` | eine eigene CRM-Anbindung haben — genau das, was der Auftrag je Mandant verlangt |
+| `portal_zugaenge.portal` | ein eigenes Portalkonto |
+| `firma_kennzahlen.jahr` | ein eigenes Geschäftsjahr |
+| `news_briefings.briefing_datum` | ein Briefing am selben Tag |
+| `firma_stammdaten.slug` | einen Standort „standard" |
+| `akq_quellen.slug` | eine Quelle „website" |
+| `checkliste_vorlagen.name` | eine Checkliste „Eigentumswohnung" |
+| `projekte.slug` | ein Projektkürzel wiederverwenden |
+| `liquid_kategorisierung.match_key` | eigene Buchungsregeln |
+
+**Entscheidung:** Regel weg, eindeutiger Index über `(mandant_id, Spalte)` hin.
+Keine der zehn wird von einem Fremdschlüssel gebraucht — geprüft, und die
+Migration bricht ab, falls sich das ändert.
+
+**Nachgewiesen:** `tests/eindeutig-je-mandant.sql` legt beide Mandanten an und
+lässt sie dieselben Namen führen. Mit `fork_17` gehen alle zehn durch, ohne sie
+kollidieren alle zehn. Die elfte Prüfung ist die Gegenprobe: **innerhalb** eines
+Mandanten bleibt der Name eindeutig — ein Index, der alles durchlässt, ist
+keine Eindeutigkeit.
+
+**Der Test war zuerst wertlos, zum zweiten Mal an einem Tag.** Er baute die
+Einfügungen in einer Schleife per `format()`; der Bezeichner `wert` war dabei
+mehrdeutig (Hilfstabelle *und* Variable), alle zehn scheiterten aus dem
+**falschen** Grund, und ein `when others`-Zweig zählte das als bestanden.
+Jetzt steht jede Einfügung ausgeschrieben, mit allen Pflichtfeldern, und nur
+`unique_violation` zählt als Kollision; alles andere gilt als **nicht
+gelaufener Testfall** und damit als Fehler.
