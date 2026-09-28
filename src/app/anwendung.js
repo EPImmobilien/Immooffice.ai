@@ -98397,7 +98397,7 @@ function LiquidityPage({
     const e = await liquidTransaktionenRepo.list(),
       t = await liquidKontenRepo.list(),
       n = new Set(t.map(e => (e.iban || "").replace(/\s/g, "").toUpperCase()).filter(Boolean)),
-      a = ["e&p", "musterhaus", "immobilien gmbh", "interne ueberweisung", "interne überweisung", "internal transfer", "umbuchung"],
+      a = ["interne ueberweisung", "interne überweisung", "internal transfer", "umbuchung"],
       r = [],
       l = new Set;
     for (let t = 0; t < e.length; t++) {

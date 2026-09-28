@@ -29,7 +29,12 @@ AUS=(--glob '!reference/**' --glob '!docs/**' --glob '!CLAUDE.md'
 # ep-immobilien fehlte bis zum 28.09.2026: das Muster verlangte entweder ein
 # kaufmaennisches Und oder gar kein Trennzeichen. Der Slug lag neunmal im
 # Quelltext. Deshalb jetzt [-_ ]? an jeder Fuge.
-MARKEN='engfer|engferundpartner|e ?& ?p ?[-_ ]?immobilien|e ?& ?p ?[-_ ]?world|ep[-_ ]?world|epworld|ep[-_ ]?immobilien|epimmobilien'
+# Das Kuerzel allein fehlte bis zum 28.09.2026: das Muster verlangte
+# dahinter entweder "World" oder "Immobilien". Vier Stellen trugen es
+# ohne beides — darunter eine Frage im Bewerbertest, die einem Bewerber
+# unter die Augen kommt. docs/NEUTRALITAET.md fuehrt es seit jeher als
+# eigenes Kennzeichen; jetzt prueft das Gate es auch so.
+MARKEN='engfer|engferundpartner|\be ?& ?p\b|e ?& ?p ?[-_ ]?immobilien|e ?& ?p ?[-_ ]?world|ep[-_ ]?world|epworld|ep[-_ ]?immobilien|epimmobilien'
 # Personen-, Anschrift- und Ortsangaben der Referenz, die in Standardwerten
 # steckten. Sie stehen hier BASE64-kodiert, nicht im Klartext: eine Datei, die
 # ein Kennzeichen sucht, darf es nicht selbst lesbar enthalten (CLAUDE.md,

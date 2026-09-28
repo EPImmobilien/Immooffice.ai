@@ -1,7 +1,7 @@
 // ============================================================================
 // energieausweis-anfrage v3 — oeffentlicher Fragebogen Verbrauchsausweis
 // ----------------------------------------------------------------------------
-// v3: HTML-Mails im E&P-Design (Navy/Gold, Logo), Text-Fassung als Fallback,
+// v3: HTML-Mails im Design des Mandanten (Navy/Gold, Logo), Text-Fassung als Fallback,
 //     Anhaenge (Fotos, Rechnungen, Unterschrift) an beide Mails.
 // verify_jwt: FALSE. Schutz: Honeypot + Rate-Limit (5/h je IP).
 // ============================================================================

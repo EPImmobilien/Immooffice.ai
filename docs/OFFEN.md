@@ -626,3 +626,41 @@ fremden Code, der über das hinausgeht, was der gemeldete Fehler verlangt.
 **Gehört zu Abschnitt 2c des Auftrags** („zwei Logo-Plätze, ein einziger
 Dienst `getBranding()`"): dort wird die Logoherkunft ohnehin an eine Stelle
 gezogen. Dann fällt `LOGO_PFAD` mit weg.
+
+## Die Umbuchungs-Erkennung kennt den eigenen Firmennamen nicht
+
+In der Liquiditätsplanung gelten zwei Buchungen als interne Umbuchung, wenn
+Betrag, Datum und Konten zusammenpassen **und** entweder eine eigene IBAN
+beteiligt ist **oder** ein Stichwort im Verwendungszweck steht.
+
+Die Stichwortliste enthielt bis zum 28.09.2026 den Namen des
+Referenzunternehmens. Er ist entfernt; geblieben sind die vier Begriffe, die
+eine Umbuchung wirklich beschreiben („interne Überweisung", „internal
+transfer", „Umbuchung"). Der verlässliche Zweig — die eigene IBAN — war nie
+betroffen.
+
+**Offen:** die Liste um den **eigenen** Firmennamen zu ergänzen. Das braucht
+ihn an dieser Stelle im Quelltext und gehört damit zu `getBranding()` aus
+Abschnitt 2c.
+
+## Das KI-Modell steht an 28 Stellen im Quelltext
+
+41 Edge Functions rufen Anthropic, und der Modellname ist jedes Mal fest
+eingetragen — in fünf verschiedenen Fassungen:
+
+| Fassung | Fundstellen |
+|---|---|
+| `claude-sonnet-4-6` | 19 |
+| `claude-sonnet-4-5` | 3 |
+| `claude-sonnet-4-5-20250929` | 2 |
+| `claude-haiku-4-5-20251001` | 2 |
+| `large-v3` (Transkription) | 2 |
+
+`CLAUDE.md` sagt für Preise und Limits: *„nicht an vielen Stellen im Code
+verdrahtet"*. Für das Modell gilt dasselbe Argument — wechselt der Anbieter
+eine Bezeichnung, sind heute 28 Stellen zu finden. Es gehört an eine Stelle,
+über den Plattform-Admin einstellbar, mit einem vernünftigen Standardwert.
+
+**Noch nicht geprüft, ob die Namen überhaupt gültig sind.** Der erste Versuch
+scheiterte vorher am Schlüssel (siehe `docs/SECRETS.md`); die Anfrage kam nie
+so weit, dass das Modell geprüft worden wäre.

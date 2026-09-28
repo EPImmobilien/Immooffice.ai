@@ -1625,6 +1625,32 @@ ERSETZUNGEN = [
      '      color: "onoffice" === h ? "#fff" : CI.blau,',
      'onOffice: der Reiter im Admin-Bereich entfaellt.'),
     ('MARKE', r'\bEP_', 'IMMO_', 'Vorsatz EP_ in Bezeichnern der Oberflaeche.'),
+
+    # --- MARKE: das Kuerzel in der Erkennung interner Umbuchungen.
+    #
+    # Gefunden am 28.09.2026, nachdem das Neutralitaets-Gate auch das blosse
+    # Kuerzel prueft. In der Liquiditaetsplanung stand:
+    #
+    #   ["e&p", "musterhaus", "immobilien gmbh", "interne ueberweisung", …]
+    #
+    # Zwei Buchungen gelten als Umbuchung, wenn Betrag, Datum und Konten
+    # passen UND entweder eine eigene IBAN beteiligt ist ODER einer dieser
+    # Begriffe im Verwendungszweck steht. Die drei Namen sind der Name der
+    # Referenz — "musterhaus" und "immobilien gmbh" sind nur seine schon
+    # ersetzte Fassung. Fuer jeden anderen Mandanten treffen sie entweder gar
+    # nichts oder das Falsche.
+    #
+    # Sie entfallen; die vier Begriffe, die eine Umbuchung wirklich
+    # beschreiben, bleiben. Der verlaessliche Weg — die eigene IBAN — ist
+    # ohnehin der andere Zweig und unberuehrt.
+    #
+    # Richtig waere, die Liste um den EIGENEN Firmennamen zu ergaenzen. Das
+    # braucht ihn an dieser Stelle im Quelltext und gehoert zu getBranding()
+    # aus Abschnitt 2c. Vermerkt in docs/OFFEN.md.
+    ('MARKE',
+     r'a = \["e&p", "musterhaus", "immobilien gmbh", "interne ueberweisung"',
+     'a = ["interne ueberweisung"',
+     'Name der Referenz in der Erkennung interner Umbuchungen.'),
 ]
 
 

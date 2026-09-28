@@ -15,7 +15,9 @@ Geprüft wird ohne Rücksicht auf Groß- und Kleinschreibung.
 ### Namen und Marken
 ```
 Engfer
-E&P
+E&P  ← seit 28.09.2026 auch fuer sich allein geprueft, nicht nur
+      vor "World" oder "Immobilien". Fuenf Fundstellen hatte das alte
+      Muster durchgelassen.
 EP World
 EPWorld
 epworld

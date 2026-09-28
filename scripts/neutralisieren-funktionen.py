@@ -205,6 +205,34 @@ ERSETZUNGEN = [
      'Produktname ohne kaufmaennisches Und — steht als sendersoftware im '
      'OpenImmo-Export und in einem User-Agent.'),
     ('MARKE', r'\bE&P\s*Immobilien\b', 'Musterhaus Immobilien GmbH', 'Firmenname kurz.'),
+
+    # --- MARKE: das Kuerzel allein.
+    #
+    # Gefunden am 28.09.2026 beim Lesen der oeffentlichen Endpunkte. Vier
+    # Stellen tragen "E&P" ohne "World" und ohne "Immobilien" dahinter — zwei
+    # Kommentare, eine Regel in einem KI-Auftrag und, am schlimmsten, eine
+    # Testfrage im Bewerberfragebogen, die einem Bewerber unter die Augen
+    # kommt: "Frau Peters beauftragt E&P, einen Nachmieter zu finden."
+    #
+    # docs/NEUTRALITAET.md fuehrt "E&P" seit jeher als eigenes Kennzeichen.
+    # Das Gate hat es trotzdem durchgelassen: sein Muster verlangte hinter
+    # dem Kuerzel entweder "World" oder "Immobilien". scripts/neutral.sh
+    # prueft es jetzt fuer sich allein.
+    #
+    # Die vier Ersetzungen stehen einzeln statt als eine Regel auf "E&P",
+    # weil jede etwas anderes an die Stelle setzen muss. Eine pauschale
+    # Ersetzung haette aus "die E&P-Regel" "die ImmoOffice-Regel" gemacht —
+    # ein Produktname, wo eine Hausregel gemeint ist.
+    ('MARKE', r'HTML-Mails im E&P-Design', 'HTML-Mails im Design des Mandanten',
+     'Kuerzel der Referenz im Kommentar zum Mail-Entwurf.'),
+    ('MARKE', r'Frau Peters beauftragt E&P, einen Nachmieter',
+     'Frau Peters beauftragt ein Maklerbüro, einen Nachmieter',
+     'Kuerzel der Referenz in einer Frage des Bewerbertests.'),
+    ('MARKE', r'gegen die E&P-Regel je Objektart',
+     'gegen die Provisionsregel des Hauses je Objektart',
+     'Kuerzel der Referenz in der Anweisung an die Expose-Pruefung.'),
+    ('MARKE', r'explizite Freigabe im\n//   E&P-World-Portal', 'explizite Freigabe im\n//   Neubauportal',
+     'Kuerzel der Referenz im Kommentar des Neubauportals.'),
     # Was nach den Regeln oben noch uebrig bleibt, ist der blosse Nachname.
     ('MARKE', r'\bEngfer\b', 'Musterhaus', 'Nachname der Referenz, Restfaelle.'),
     ('MARKE', r'\bengfer\b', 'musterhaus', 'wie oben, klein geschrieben'),

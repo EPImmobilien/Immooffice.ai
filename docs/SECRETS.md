@@ -140,3 +140,30 @@ Dazu 3 Werte, die Supabase selbst in jede Funktion setzt und die niemand eintrag
 Eintragen unter *Project Settings → Edge Functions → Secrets* oder mit
 `supabase secrets set NAME=wert --project-ref usguiggfciavwzkdfjgt`.
 <!-- INVENTAR-ENDE -->
+
+## ANTHROPIC_API_KEY — der Schlüssel muss zu einem Workspace gehören
+
+Am 28.09.2026 war der Schlüssel gesetzt, und trotzdem kam aus jeder
+KI-Funktion eine 400 zurück:
+
+```
+This API key is not scoped to a workspace, so this request must include
+the anthropic-workspace-id header with the ID of the workspace to use.
+```
+
+Das ist kein Fehler im Code. Die Anthropic-Konsole kennt zwei Arten von
+Schlüsseln: einen auf Ebene der Organisation und einen, der zu einem
+**Workspace** gehört. Nur der zweite funktioniert ohne zusätzlichen Header.
+
+**Richtig anlegen:** Console → *Settings → API Keys* → beim Anlegen einen
+Workspace auswählen (der vorhandene „Default" genügt) → der neue Schlüssel
+beginnt mit `sk-ant-` und ersetzt den alten unter *Supabase → Edge Functions
+→ Secrets*.
+
+Der Weg über den Header `anthropic-workspace-id` wäre der andere — er müsste
+in 41 Funktionen eingetragen werden und bringt nichts, was der richtige
+Schlüssel nicht auch könnte.
+
+**Nachgewiesen wird das so:** `generate-text` mit einem echten Anmelde-Token
+rufen. Kommt `502 Anthropic-API: 400 …not scoped to a workspace`, ist es
+dieser Fall. Kommt ein Text zurück, greift der Schlüssel.

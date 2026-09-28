@@ -4,7 +4,7 @@
 //   v6: Ordner, v7: Zahlungsplan/Maengel raus, v8: ansprechpartner + kontakte,
 //   v9: persoenliche Dateien (zugang_id), v10: nachrichten (Chat).
 //   NEU v11: Dateien nur noch mit freigegeben = true (explizite Freigabe im
-//   E&P-World-Portal); Rolle 'zurueckgetreten' sieht nur Interessenten-Stufe.
+//   Neubauportal); Rolle 'zurueckgetreten' sieht nur Interessenten-Stufe.
 // ============================================================================
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";

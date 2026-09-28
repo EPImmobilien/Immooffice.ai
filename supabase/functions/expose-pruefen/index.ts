@@ -41,7 +41,7 @@ Fehlt eine Angabe → KRITISCH. Offensichtliche Widersprüche zwischen den Angab
 ZUSÄTZLICH, wenn dir Objektdaten aus dem Portal mitgegeben werden: gleiche die Zahlen im Exposé dagegen ab (Kaufpreis, Flächen, Zimmer, Baujahr, Energiewerte). Widerspruch Exposé ↔ Portaldaten → WICHTIG; die Portaldaten sind die maßgebliche Quelle.
 
 ## 2. Provisionshöhe plausibel?
-Prüfe die ausgewiesene Käuferprovision gegen die E&P-Regel je Objektart:
+Prüfe die ausgewiesene Käuferprovision gegen die Provisionsregel des Hauses je Objektart:
 - Einfamilienhaus (EFH) und Eigentumswohnung (ETW): in der Regel Courtageteilung — Käuferprovision 3,57 % inkl. MwSt., der Verkäufer zahlt ebenfalls. Abweichende Höhe → HINWEIS (kann individuell vereinbart sein). Steht dort eine deutlich höhere reine Käuferprovision (z. B. 7,14 % als „nur Außenprovision“) → WICHTIG, denn bei EFH/ETW mit Privatkäufern ist eine einseitige Käuferprovision unzulässig (§ 656d BGB).
 - Mehrfamilienhaus, Gewerbeobjekt, Grundstück: oft 7,14 % inkl. MwSt. als reine Außenprovision (nur der Käufer zahlt). Abweichung → HINWEIS.
 Immer prüfen: Prozentsatz mit „inkl. MwSt.“ ausgewiesen und im gesamten Exposé einheitlich (Datenblock, Fließtext, AGB-Seite). Uneinheitliche Angaben → WICHTIG.
