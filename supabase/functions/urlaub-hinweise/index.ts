@@ -21,14 +21,48 @@ function osterSonntag(jahr: number): Date {   // Gauß/Meeus
   const monat = Math.floor((h + l - 7 * m + 114) / 31), tag = ((h + l - 7 * m + 114) % 31) + 1;
   return new Date(Date.UTC(jahr, monat - 1, tag));
 }
-function feiertageMV(jahr: number): Set<string> {
+function feiertage(jahr: number, land?: string | null): Set<string> {
+  // Gesetzliche Feiertage eines Bundeslandes. Gleiche Rechnung wie in der
+  // Oberflaeche (src/app/anwendung.js) — laufen die beiden auseinander,
+  // widerspricht die Erinnerung des Chefs dem, was der Mitarbeiter sieht.
+  //
+  // Ohne Land bleiben die neun bundesweiten Feiertage stehen: lieber zu
+  // wenige als falsche. Das Land kommt aus firma_stammdaten.bundesland des
+  // Standorts.
+  //
+  // Nicht enthalten, weil nicht landesweit gesetzlich: Fronleichnam in
+  // Sachsen und Thueringen, Mariae Himmelfahrt in Bayern (je nur in
+  // bestimmten Gemeinden) und das Augsburger Friedensfest.
+  const code = String(land || "").toUpperCase();
   const iso = (d: Date) => d.toISOString().slice(0, 10);
   const plus = (d: Date, n: number) => { const x = new Date(d.getTime()); x.setUTCDate(x.getUTCDate() + n); return x; };
   const o = osterSonntag(jahr);
-  const fest = [`${jahr}-01-01`, `${jahr}-03-08`, `${jahr}-05-01`, `${jahr}-10-03`, `${jahr}-10-31`, `${jahr}-12-25`, `${jahr}-12-26`];   // Neujahr, Frauentag (MV seit 2023), Tag der Arbeit, Einheit, Reformationstag, Weihnachten
-  const beweglich = [plus(o, -2), plus(o, 1), plus(o, 39), plus(o, 50)].map(iso);   // Karfreitag, Ostermontag, Himmelfahrt, Pfingstmontag
-  return new Set([...fest, ...beweglich]);
+  const tage = [`${jahr}-01-01`, `${jahr}-05-01`, `${jahr}-10-03`, `${jahr}-12-25`, `${jahr}-12-26`,
+                iso(plus(o, -2)), iso(plus(o, 1)), iso(plus(o, 39)), iso(plus(o, 50))];
+  const wenn = (laender: string[], wert: string) => { if (laender.indexOf(code) >= 0) tage.push(wert); };
+  wenn(["BW", "BY", "ST"], `${jahr}-01-06`);
+  wenn(["BE", "MV"], `${jahr}-03-08`);
+  wenn(["BB"], iso(o));
+  wenn(["BB"], iso(plus(o, 49)));
+  wenn(["BW", "BY", "HE", "NW", "RP", "SL"], iso(plus(o, 60)));
+  wenn(["SL"], `${jahr}-08-15`);
+  wenn(["TH"], `${jahr}-09-20`);
+  wenn(["BB", "HB", "HH", "MV", "NI", "SN", "ST", "SH"], `${jahr}-10-31`);
+  wenn(["BW", "BY", "NW", "RP", "SL"], `${jahr}-11-01`);
+  if (code === "SN") {
+    for (let tag = 16; tag <= 22; tag++) {
+      const d = new Date(Date.UTC(jahr, 10, tag));
+      if (d.getUTCDay() === 3) { tage.push(d.toISOString().slice(0, 10)); break; }
+    }
+  }
+  return new Set(tage);
 }
+function feiertageMV(jahr: number): Set<string> {
+  // Alter Name, damit die Aufrufstellen unveraendert bleiben. Das Land setzt
+  // urlaubBundesland, einmal je Lauf aus firma_stammdaten gelesen.
+  return feiertage(jahr, urlaubBundesland);
+}
+let urlaubBundesland: string | null = null;
 // Arbeitstage Mo–Fr ohne Feiertage (MV) zwischen zwei ISO-Daten (inklusive)
 function urlaubArbeitstage(von: string, bis?: string | null): number {
   if (!von) return 0;
@@ -102,6 +136,7 @@ Deno.serve(async (req) => {
     const heute = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(new Date());
     const monat = parseInt(heute.slice(5, 7), 10);
     const modus = body.modus || (monat >= 9 ? "jahresende" : "uebertrag");
+    urlaubBundesland = (await db.from("firma_stammdaten").select("bundesland").not("bundesland", "is", null).order("sortierung").limit(1).maybeSingle()).data?.bundesland ?? null;
     const jahr = Number(body.jahr) || parseInt(heute.slice(0, 4), 10);
     const frist = modus === "jahresende" ? `${jahr}-12-31` : `${jahr}-03-31`;
 

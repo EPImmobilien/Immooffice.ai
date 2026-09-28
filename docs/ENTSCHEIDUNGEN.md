@@ -715,3 +715,55 @@ Verwechslungen ein. Gleiche Bauart wie die Geschwister — `stable`,
 verschoben, keine Spalte `NOT NULL`. Das erste Konto, der Backfill und die
 Pflichtfelder folgen in `fork_03`; erst danach lassen sich die 185 übrigen
 Tabellen sinnvoll mit `konto_id` versehen.
+
+## 28.09.2026 — Feiertage: alle sechzehn Länder statt eines
+
+**Frage:** Die Urlaubsverwaltung rechnet Arbeitstage „ohne die Feiertage in
+Mecklenburg-Vorpommern" — fest im Quelltext, an zwei Stellen: `feiertageMV()`
+in der Oberfläche und noch einmal in der Edge Function `urlaub-hinweise`.
+
+**Warum das mehr ist als ein Schönheitsfehler:** Ein Mandant in Bayern bekäme
+drei Feiertage zu wenig (Heilige Drei Könige, Fronleichnam, Allerheiligen) und
+einen zu viel (Frauentag). Das Ergebnis ist eine Urlaubsbilanz, die falsch ist
+und **plausibel aussieht** — niemand zählt Feiertage nach.
+
+**Entscheidung:** `feiertage(jahr, land)` für alle sechzehn Länder, dieselbe
+Rechnung in Oberfläche und Edge Function. Das Land kommt vom **Standort**
+(`firma_stammdaten.bundesland`), nicht vom Konto: ein Mandant mit Büros in
+Rostock und München hat zwei Feiertagskalender.
+
+Ohne hinterlegtes Land bleiben die neun bundesweiten Feiertage stehen — lieber
+zu wenige als falsche —, und der Hinweistext sagt das ausdrücklich. Ein
+erfundener Vorgabewert wäre hier besonders heikel.
+
+**Nicht enthalten, weil nicht landesweit gesetzlich:** Fronleichnam in Sachsen
+und Thüringen, Mariä Himmelfahrt in Bayern (je nur in bestimmten Gemeinden),
+Augsburger Friedensfest (nur Stadtgebiet). Ostersonntag und Pfingstsonntag
+sind nur in Brandenburg gesetzlich; sie fallen ohnehin auf einen Sonntag und
+ändern an Arbeitstagen nichts, stehen aber der Vollständigkeit halber drin.
+
+Nachgerechnet für 2026: MV 11 Tage, BY 12, BE 10, SN 11 (Buß- und Bettag
+18.11.), ohne Land 9. Fronleichnam BY am 04.06.2026.
+
+**Zwei Nebenbefunde:**
+
+1. **Der Slug `ep-immobilien` lag neunmal im Quelltext** und ist dem Gate
+   entgangen: sein Muster verlangte ein kaufmännisches Und (`e&p immobilien`)
+   oder gar kein Trennzeichen (`epimmobilien`). Der Bindestrich fiel durch.
+   Das Muster hat jetzt `[-_ ]?` an jeder Fuge.
+2. **Eine Regel griff in siebzehn Dateien statt in einer.** Der erste Versuch,
+   das Bundesland zu laden, hängte die Zeile hinter die `antwort`-Hilfsfunktion
+   — die steht wortgleich in siebzehn Edge Functions, und sechzehn davon kennen
+   die Variable nicht. Die Häufigkeitsbremse greift dort nicht, weil es je
+   Datei nur ein Treffer ist. Der Anker heißt jetzt `jahresende`, ein Wort, das
+   in genau dieser einen Funktion vorkommt.
+
+**Neu als Werkzeug:** die Kategorie `FORK` neben `MARKE`, `PHASE14` und
+`FREMD`. Sie kennzeichnet Änderungen, die den Fork **erweitern** statt ihn zu
+neutralisieren. Die Zeilenbremse der Neutralisierung („fügt keine Zeilen
+hinzu") gilt für sie nicht — für alle anderen unverändert.
+
+**Was offen bleibt:** `window.IMMO_BUNDESLAND` wird in der Oberfläche noch
+nicht gesetzt; bis dahin rechnet sie mit den neun bundesweiten Feiertagen.
+Die Zuordnung Mitarbeiter → Standort kommt mit Abschnitt 1b, und dann gehört
+das Land an den Mitarbeiter, nicht an den ersten gefundenen Standort.

@@ -3006,7 +3006,7 @@ function ReservierungenPage({
       try {
         const {
           data: fi
-        } = await window._sb.from("firma_stammdaten").select("*").eq("slug", "ep-immobilien").maybeSingle(), k = v.kontakt || {}, o = (v.objekte || [])[0] || {}, heute = (new Date).toISOString().slice(0, 10), bis = new Date(Date.now() + 2592e6).toISOString().slice(0, 10);
+        } = await window._sb.from("firma_stammdaten").select("*").eq("slug", "standard").maybeSingle(), k = v.kontakt || {}, o = (v.objekte || [])[0] || {}, heute = (new Date).toISOString().slice(0, 10), bis = new Date(Date.now() + 2592e6).toISOString().slice(0, 10);
         i({
           absender_firma_id: fi?.id || null,
           kaeufer_typ: epKontaktReservierungTyp(k),
@@ -3261,7 +3261,7 @@ function ReservierungenPage({
     onClick: async () => {
       const {
         data: e
-      } = await window._sb.from("firma_stammdaten").select("*").eq("slug", "ep-immobilien").maybeSingle(), t = (new Date).toISOString().slice(0, 10), n = new Date(Date.now() + 2592e6).toISOString().slice(0, 10);
+      } = await window._sb.from("firma_stammdaten").select("*").eq("slug", "standard").maybeSingle(), t = (new Date).toISOString().slice(0, 10), n = new Date(Date.now() + 2592e6).toISOString().slice(0, 10);
       i({
         absender_firma_id: e?.id || null,
         kaeufer_typ: "eheleute",
@@ -27234,7 +27234,7 @@ function NeubauProjekteBereich({
               try {
                 const {
                   data: a
-                } = await window._sb.from("firma_stammdaten").select("id").eq("slug", "ep-immobilien").maybeSingle(), {
+                } = await window._sb.from("firma_stammdaten").select("id").eq("slug", "standard").maybeSingle(), {
                   error: r
                 } = await window._sb.from("reservierungen_neubau").insert({
                   absender_firma_id: a?.id || null,
@@ -72153,15 +72153,52 @@ function ArbeitszeitPage({
   }, "Zeile anklicken zum Eintragen. Feiertage in Mecklenburg-Vorpommern und genehmigter Urlaub aus dem Kalender stehen automatisch drin und gelten als erfüllt. ", "„Überstundenabbau“ bucht null Stunden und zieht das Soll vom Saldo ab. Tage ohne Eintrag zählen nicht mit, damit die Zukunft den Saldo nicht ins Minus zieht.")))
 }
 
-function feiertageMV(e) {
-  const t = (e, t) => {
-      const n = new Date(e.getTime());
-      return n.setUTCDate(n.getUTCDate() + t), n
-    },
-    n = osterSonntag(e),
-    a = [`${e}-01-01`, `${e}-03-08`, `${e}-05-01`, `${e}-10-03`, `${e}-10-31`, `${e}-12-25`, `${e}-12-26`],
-    r = [t(n, -2), t(n, 1), t(n, 39), t(n, 50)].map(e => e.toISOString().slice(0, 10));
-  return new Set([...a, ...r])
+function feiertage(jahr, land) {
+  // Gesetzliche Feiertage eines Bundeslandes.
+  //
+  // Ohne Angabe gilt das Bundesland des Standorts (window.IMMO_BUNDESLAND,
+  // gesetzt aus firma_stammdaten.bundesland). Ist keines hinterlegt, bleiben
+  // die neun bundesweiten Feiertage stehen — lieber zu wenige als falsche,
+  // und die Urlaubsansicht weist darauf hin.
+  //
+  // Nicht enthalten, weil nicht landesweit gesetzlich: Fronleichnam in
+  // Sachsen und Thueringen (nur in bestimmten Gemeinden), Mariae Himmelfahrt
+  // in Bayern (nur in ueberwiegend katholischen Gemeinden) und das
+  // Augsburger Friedensfest (nur im Stadtgebiet Augsburg).
+  const code = String(land || window.IMMO_BUNDESLAND || "").toUpperCase();
+  const iso = (d) => d.toISOString().slice(0, 10);
+  const plus = (d, n) => { const x = new Date(d.getTime()); x.setUTCDate(x.getUTCDate() + n); return x; };
+  const o = osterSonntag(jahr);
+  const tage = [
+    `${jahr}-01-01`, `${jahr}-05-01`, `${jahr}-10-03`, `${jahr}-12-25`, `${jahr}-12-26`,
+    iso(plus(o, -2)), iso(plus(o, 1)), iso(plus(o, 39)), iso(plus(o, 50))
+  ];
+  const wenn = (laender, wert) => { if (laender.indexOf(code) >= 0) tage.push(wert); };
+  wenn(["BW", "BY", "ST"], `${jahr}-01-06`);
+  wenn(["BE", "MV"], `${jahr}-03-08`);
+  wenn(["BB"], iso(o));
+  wenn(["BB"], iso(plus(o, 49)));
+  wenn(["BW", "BY", "HE", "NW", "RP", "SL"], iso(plus(o, 60)));
+  wenn(["SL"], `${jahr}-08-15`);
+  wenn(["TH"], `${jahr}-09-20`);
+  wenn(["BB", "HB", "HH", "MV", "NI", "SN", "ST", "SH"], `${jahr}-10-31`);
+  wenn(["BW", "BY", "NW", "RP", "SL"], `${jahr}-11-01`);
+  if (code === "SN") tage.push(bussUndBettag(jahr));
+  return new Set(tage);
+}
+
+function bussUndBettag(jahr) {
+  // Der Mittwoch vor dem 23. November, also der Mittwoch im Fenster 16. bis 22.
+  for (let tag = 16; tag <= 22; tag++) {
+    const d = new Date(Date.UTC(jahr, 10, tag));
+    if (d.getUTCDay() === 3) return d.toISOString().slice(0, 10);
+  }
+  return "";
+}
+
+function feiertageMV(jahr) {
+  // Alter Name, damit die sechs Aufrufstellen unveraendert bleiben.
+  return feiertage(jahr);
 }
 
 function urlaubArbeitstage(e, t) {
@@ -72750,7 +72787,7 @@ function UrlaubBilanzKarte({
       color: CI.muted,
       marginTop: 10
     }
-  }, "Gezählt werden Arbeitstage Montag bis Freitag ohne die Feiertage in Mecklenburg-Vorpommern. Urlaub trägst du im Kalender als Termin der Art „Urlaub“ ein; er gilt nach Genehmigung durch die Geschaeftsfuehrung. Nicht genommene Tage gehen ins nächste Jahr über und müssen bis zum 31. März genommen werden (§ 7 Abs. 3 BUrlG)."));
+  }, "Gezählt werden Arbeitstage Montag bis Freitag ohne die gesetzlichen Feiertage des Bundeslandes deines Standorts (ist dort keines hinterlegt, zaehlen nur die neun bundesweiten). Urlaub trägst du im Kalender als Termin der Art „Urlaub“ ein; er gilt nach Genehmigung durch die Geschaeftsfuehrung. Nicht genommene Tage gehen ins nächste Jahr über und müssen bis zum 31. März genommen werden (§ 7 Abs. 3 BUrlG)."));
   var R, x
 }
 const KAL_ARTEN = ["Besichtigung", "Objektaufnahme", "Beratung", "Besuch des Kunden im Beratungsbüro", "Notartermin", "Übergabe", "Teammeeting", "Urlaub", "Sonstiges"],
@@ -93200,7 +93237,7 @@ function BriefeBereich({
     }
   }, "Briefe im Kanzlei-Briefpapier — Empfänger und Text eintragen, PDF erzeugen, fertig."), React.createElement("button", {
     onClick: () => {
-      const t = a.find(e => "ep-immobilien" === e.slug) || a[0];
+      const t = a.find(e => "standard" === e.slug) || a[0];
       i({
         absender_firma_id: t?.id || null,
         empfaenger_name: "",

@@ -225,6 +225,23 @@ ERSETZUNGEN = [
      'Musterhaus Immobilien Beispielstadt GmbH',
      'doppeltes GmbH, das erst durch die Ortsersetzung entsteht.'),
 
+    # --- MARKE: der Slug des Hauptstandorts der Referenz. Er steht neunmal
+    # im Quelltext als fester Schluessel in .eq("slug", ...). Das Gate hat ihn
+    # bis zum 28.09.2026 nicht gesehen — sein Muster verlangte ein
+    # kaufmaennisches Und oder gar kein Trennzeichen.
+    ('MARKE', r'"ep-immobilien"', '"standard"',
+     'Slug des Hauptstandorts der Referenz.'),
+
+    # --- FORK: der Hinweistext der Urlaubsverwaltung nannte fest
+    # Mecklenburg-Vorpommern. Er nennt jetzt das Bundesland des Standorts —
+    # und sagt es ausdruecklich, wenn keines hinterlegt ist. Eine Zahl, die
+    # auf dem falschen Feiertagskalender beruht, sieht genauso plausibel aus
+    # wie eine richtige.
+    ('FORK', r'ohne die Feiertage in Mecklenburg-Vorpommern',
+     'ohne die gesetzlichen Feiertage des Bundeslandes deines Standorts '
+     '(ist dort keines hinterlegt, zaehlen nur die neun bundesweiten)',
+     'Hinweistext der Urlaubsverwaltung nennt das Bundesland des Standorts.'),
+
     # --- MARKE: eingebettete Dateien. Sie stehen als Base64 im Quelltext und
     # sind fuer das Neutralitaets-Gate unsichtbar — es liest Text, nicht Bilder.
     # Vier Logos der Referenz in zwei Bloecken, zweimal dieselbe Wortmarke in
@@ -755,6 +772,92 @@ def shoptv_entfernen(inhalt):
     return inhalt, schritte
 
 
+def funktion_ersetzen(inhalt, name, neu):
+    """Ersetzt eine Funktion der obersten Ebene durch neuen Text.
+
+    Gegenstueck zu funktion_entfernen, gleiche Grenzen und gleiche Kontrolle:
+    zwischen Anfang und Ende darf keine weitere Funktion der obersten Ebene
+    liegen. Trifft der Name nicht, wird abgebrochen — eine Erweiterung, die
+    still ins Leere greift, ist schlimmer als keine.
+    """
+    zeilen = inhalt.split('\n')
+    koepfe = (f'function {name}(', f'async function {name}(')
+    anfang = None
+    for i, l in enumerate(zeilen):
+        if l.startswith(koepfe):
+            anfang = i
+            break
+    if anfang is None:
+        sys.exit(f'ABBRUCH: Funktion {name} nicht gefunden. Die Vorlage hat '
+                 f'sich geaendert.')
+    ende = None
+    for i in range(anfang + 1, len(zeilen)):
+        if zeilen[i] == '}':
+            ende = i
+            break
+        if zeilen[i].startswith(('function ', 'async function ')):
+            sys.exit(f'ABBRUCH: zwischen {name} und seinem Ende steht '
+                     f'{zeilen[i][:40]!r}. Die Grenzen stimmen nicht.')
+    if ende is None:
+        sys.exit(f'ABBRUCH: kein Ende fuer {name} gefunden.')
+    return '\n'.join(zeilen[:anfang] + neu.split('\n') + zeilen[ende + 1:])
+
+
+# Die Feiertage der Vorlage gelten nur fuer Mecklenburg-Vorpommern. Der Fork
+# rechnet fuer alle sechzehn Laender; welches gilt, sagt der Standort.
+FEIERTAGE_ALLE_LAENDER = """function feiertage(jahr, land) {
+  // Gesetzliche Feiertage eines Bundeslandes.
+  //
+  // Ohne Angabe gilt das Bundesland des Standorts (window.IMMO_BUNDESLAND,
+  // gesetzt aus firma_stammdaten.bundesland). Ist keines hinterlegt, bleiben
+  // die neun bundesweiten Feiertage stehen — lieber zu wenige als falsche,
+  // und die Urlaubsansicht weist darauf hin.
+  //
+  // Nicht enthalten, weil nicht landesweit gesetzlich: Fronleichnam in
+  // Sachsen und Thueringen (nur in bestimmten Gemeinden), Mariae Himmelfahrt
+  // in Bayern (nur in ueberwiegend katholischen Gemeinden) und das
+  // Augsburger Friedensfest (nur im Stadtgebiet Augsburg).
+  const code = String(land || window.IMMO_BUNDESLAND || "").toUpperCase();
+  const iso = (d) => d.toISOString().slice(0, 10);
+  const plus = (d, n) => { const x = new Date(d.getTime()); x.setUTCDate(x.getUTCDate() + n); return x; };
+  const o = osterSonntag(jahr);
+  const tage = [
+    `${jahr}-01-01`, `${jahr}-05-01`, `${jahr}-10-03`, `${jahr}-12-25`, `${jahr}-12-26`,
+    iso(plus(o, -2)), iso(plus(o, 1)), iso(plus(o, 39)), iso(plus(o, 50))
+  ];
+  const wenn = (laender, wert) => { if (laender.indexOf(code) >= 0) tage.push(wert); };
+  wenn(["BW", "BY", "ST"], `${jahr}-01-06`);
+  wenn(["BE", "MV"], `${jahr}-03-08`);
+  wenn(["BB"], iso(o));
+  wenn(["BB"], iso(plus(o, 49)));
+  wenn(["BW", "BY", "HE", "NW", "RP", "SL"], iso(plus(o, 60)));
+  wenn(["SL"], `${jahr}-08-15`);
+  wenn(["TH"], `${jahr}-09-20`);
+  wenn(["BB", "HB", "HH", "MV", "NI", "SN", "ST", "SH"], `${jahr}-10-31`);
+  wenn(["BW", "BY", "NW", "RP", "SL"], `${jahr}-11-01`);
+  if (code === "SN") tage.push(bussUndBettag(jahr));
+  return new Set(tage);
+}
+
+function bussUndBettag(jahr) {
+  // Der Mittwoch vor dem 23. November, also der Mittwoch im Fenster 16. bis 22.
+  for (let tag = 16; tag <= 22; tag++) {
+    const d = new Date(Date.UTC(jahr, 10, tag));
+    if (d.getUTCDay() === 3) return d.toISOString().slice(0, 10);
+  }
+  return "";
+}
+
+function feiertageMV(jahr) {
+  // Alter Name, damit die sechs Aufrufstellen unveraendert bleiben.
+  return feiertage(jahr);
+}"""
+
+
+def feiertage_alle_laender(inhalt):
+    return funktion_ersetzen(inhalt, 'feiertageMV', FEIERTAGE_ALLE_LAENDER)
+
+
 def funktion_entfernen(inhalt, name):
     """Entfernt eine Funktion der obersten Ebene samt Koerper.
 
@@ -832,6 +935,9 @@ def main():
                 inhalt, schritte = shoptv_entfernen(inhalt)
                 for s in schritte:
                     print(f'  [PHASE14]     {s}')
+                inhalt = feiertage_alle_laender(inhalt)
+                print('  [FORK]        Feiertage: alle sechzehn Bundeslaender '
+                      'statt nur Mecklenburg-Vorpommern.')
             for grund, muster, ersatz, bemerkung in ERSETZUNGEN:
                 inhalt, n = re.subn(muster, ersatz, inhalt)
                 pruefe_haeufigkeit(n, bemerkung, datei)

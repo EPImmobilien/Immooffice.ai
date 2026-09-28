@@ -196,6 +196,10 @@ ERSETZUNGEN = [
      'Standortzeile im Fuss der Expose- und MPE-PDFs.'),
     ('MARKE', r'"rostock"', '"standard"',
      'Slug des Hauptstandorts der Referenz — Rueckfall bei firma_stammdaten.'),
+    ('MARKE', r'"ep-immobilien"', '"standard"',
+     'Derselbe Standort unter seinem zweiten Slug. Das Gate hat ihn bis zum '
+     '28.09.2026 nicht gesehen: sein Muster verlangte ein kaufmaennisches Und '
+     'oder gar kein Trennzeichen.'),
     ('MARKE', r'gesperrt\("ROSTOCK   -   SCHWERIN   -   BERLIN"', 'gesperrt(""',
      'Standortzeile im Briefkopf von brief-pdf-erzeugen.'),
 
@@ -233,6 +237,37 @@ ERSETZUNGEN = [
      'const BUERO_TELEFON = "";   // Rueckfall, wenn die Gesellschaft keine '
      'Bueronummer hinterlegt hat',
      'Umlaute im Kommentar daneben — nur Kosmetik, damit die Zeile lesbar bleibt.'),
+
+    # --- FORK: Feiertage fuer alle sechzehn Bundeslaender.
+    # Die Vorlage rechnet nur mit Mecklenburg-Vorpommern — dem Sitz der
+    # Referenz. Ein Mandant in Bayern bekaeme damit zwei Feiertage zu
+    # wenig und einen zu viel, und niemand saehe es: die Zahl sieht
+    # plausibel aus. Dieselbe Rechnung steht in der Oberflaeche
+    # (scripts/oberflaeche-zerlegen.py, feiertage_alle_laender).
+    ('FORK',
+     r'(?s)function feiertageMV\(jahr: number\): Set<string> \{.*?\n\}',
+     'function feiertage(jahr: number, land?: string | null): Set<string> {\n  // Gesetzliche Feiertage eines Bundeslandes. Gleiche Rechnung wie in der\n  // Oberflaeche (src/app/anwendung.js) — laufen die beiden auseinander,\n  // widerspricht die Erinnerung des Chefs dem, was der Mitarbeiter sieht.\n  //\n  // Ohne Land bleiben die neun bundesweiten Feiertage stehen: lieber zu\n  // wenige als falsche. Das Land kommt aus firma_stammdaten.bundesland des\n  // Standorts.\n  //\n  // Nicht enthalten, weil nicht landesweit gesetzlich: Fronleichnam in\n  // Sachsen und Thueringen, Mariae Himmelfahrt in Bayern (je nur in\n  // bestimmten Gemeinden) und das Augsburger Friedensfest.\n  const code = String(land || "").toUpperCase();\n  const iso = (d: Date) => d.toISOString().slice(0, 10);\n  const plus = (d: Date, n: number) => { const x = new Date(d.getTime()); x.setUTCDate(x.getUTCDate() + n); return x; };\n  const o = osterSonntag(jahr);\n  const tage = [`${jahr}-01-01`, `${jahr}-05-01`, `${jahr}-10-03`, `${jahr}-12-25`, `${jahr}-12-26`,\n                iso(plus(o, -2)), iso(plus(o, 1)), iso(plus(o, 39)), iso(plus(o, 50))];\n  const wenn = (laender: string[], wert: string) => { if (laender.indexOf(code) >= 0) tage.push(wert); };\n  wenn(["BW", "BY", "ST"], `${jahr}-01-06`);\n  wenn(["BE", "MV"], `${jahr}-03-08`);\n  wenn(["BB"], iso(o));\n  wenn(["BB"], iso(plus(o, 49)));\n  wenn(["BW", "BY", "HE", "NW", "RP", "SL"], iso(plus(o, 60)));\n  wenn(["SL"], `${jahr}-08-15`);\n  wenn(["TH"], `${jahr}-09-20`);\n  wenn(["BB", "HB", "HH", "MV", "NI", "SN", "ST", "SH"], `${jahr}-10-31`);\n  wenn(["BW", "BY", "NW", "RP", "SL"], `${jahr}-11-01`);\n  if (code === "SN") {\n    for (let tag = 16; tag <= 22; tag++) {\n      const d = new Date(Date.UTC(jahr, 10, tag));\n      if (d.getUTCDay() === 3) { tage.push(d.toISOString().slice(0, 10)); break; }\n    }\n  }\n  return new Set(tage);\n}\nfunction feiertageMV(jahr: number): Set<string> {\n  // Alter Name, damit die Aufrufstellen unveraendert bleiben. Das Land setzt\n  // urlaubBundesland, einmal je Lauf aus firma_stammdaten gelesen.\n  return feiertage(jahr, urlaubBundesland);\n}\nlet urlaubBundesland: string | null = null;',
+     'Feiertage: alle sechzehn Bundeslaender statt nur Mecklenburg-Vorpommern.'),
+
+    # --- FORK: das Bundesland einmal je Lauf laden.
+    # Ohne diese Zeile bliebe urlaubBundesland null, und die Funktion rechnete
+    # mit den neun bundesweiten Feiertagen — richtig, aber unvollstaendig.
+    #
+    # Der Anker ist mit Bedacht gewaehlt: "jahresende" steht in genau dieser
+    # einen Funktion. Der erste Versuch haengte die Zeile hinter die
+    # antwort-Hilfsfunktion — die steht wortgleich in siebzehn Funktionen, und
+    # sechzehn davon kennen urlaubBundesland nicht. Die Haeufigkeitsbremse
+    # greift dort nicht, weil es je Datei nur ein Treffer ist.
+    #
+    # Solange ein Konto nur einen Standort hat, ist firma_stammdaten die
+    # richtige Quelle; sobald Mitarbeiter einem Standort zugeordnet sind
+    # (Auftrag 1b), gehoert das Land an den Mitarbeiter. Steht in docs/OFFEN.md.
+    ('FORK',
+     r'(const modus = body\.modus \|\| \(monat >= 9 \? "jahresende" : "uebertrag"\);)',
+     r'\1\n    urlaubBundesland = (await db.from("firma_stammdaten")'
+     r'.select("bundesland").not("bundesland", "is", null)'
+     r'.order("sortierung").limit(1).maybeSingle()).data?.bundesland ?? null;',
+     'Bundesland des Standorts einmal je Lauf laden.'),
 
     # --- FREMD: Verweise auf das Supabase-Projekt der Vorlage
     ('FREMD', r'yazwkzzjiquprtjpurur', 'usguiggfciavwzkdfjgt',
@@ -353,23 +388,34 @@ def main():
             rel = datei.relative_to(ordner)
             inhalt = datei.read_text(encoding='utf-8')
             zeilen_vorher = inhalt.count('\n')
+            erweitert = False
             for grund, muster, ersatz, bemerkung in ERSETZUNGEN:
                 inhalt, n = re.subn(muster, ersatz, inhalt)
                 pruefe_haeufigkeit(n, bemerkung, datei)
                 if n:
                     zaehler[(grund, muster)] = zaehler.get((grund, muster), 0) + n
+                    if grund == 'FORK':
+                        erweitert = True
             for grund, muster, ersatz, bemerkung in NACHBESSERN:
                 n = inhalt.count(muster)
                 pruefe_haeufigkeit(n, bemerkung, datei)
                 if n:
                     inhalt = inhalt.replace(muster, ersatz)
                     zaehler[(grund, muster)] = zaehler.get((grund, muster), 0) + n
-            # Zweite Notbremse: eine Neutralisierung fuegt keine Zeilen hinzu
-            # und entfernt hoechstens die beiden Standortzeilen.
+            # Zweite Notbremse: eine NEUTRALISIERUNG fuegt keine Zeilen hinzu
+            # und entfernt hoechstens die beiden Standortzeilen. Eine
+            # FORK-Regel erweitert die Vorlage und darf das sehr wohl —
+            # deshalb nur fuer sie ein weiterer Rahmen, und die Zahl wird
+            # ausgegeben, damit sie nicht unbemerkt waechst.
             zeilen_delta = inhalt.count('\n') - zeilen_vorher
-            if not -2 <= zeilen_delta <= 0:
-                sys.exit(f'ABBRUCH: {datei} hat {zeilen_delta:+d} Zeilen. '
+            unten, oben = (-2, 80) if erweitert else (-2, 0)
+            if not unten <= zeilen_delta <= oben:
+                sys.exit(f'ABBRUCH: {datei} hat {zeilen_delta:+d} Zeilen '
+                         f'(erlaubt: {unten} bis {oben}). '
                          'Eine Regel greift anders als gedacht.')
+            if erweitert:
+                print(f'  [FORK]     {zeilen_delta:+d} Zeilen in '
+                      f'{datei.parent.name}/{datei.name}')
             ziel = ziel_ordner / rel
             ziel.parent.mkdir(parents=True, exist_ok=True)
             ziel.write_text(inhalt, encoding='utf-8')

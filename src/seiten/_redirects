@@ -1,8 +1,0 @@
-# Netlify: Exposé-Links zeigen die kleine Bestätigungsseite (freigabe.html) statt der
-# 4,8-MB-Portaldatei. Rewrite mit 200! – das Ausrufezeichen ist Pflicht: ohne „!“ wendet
-# Netlify eine Umschreibung nicht an, wenn unter dem Pfad bereits eine Datei liegt
-# (hier index.html für „/“). Genau daran scheiterte die Regel bis 16.09.2026 – Kunden
-# bekamen die Portaldatei mit der wackligen Ersatzseite statt freigabe.html.
-# Die Adresse in der Leiste bleibt unverändert (immooffice.netlify.app/?expose=…).
-# Fehlt diese Datei beim Hochladen, baut die index.html die Seite selbst (Rückfallebene).
-/  expose=:t  /freigabe.html  200!

@@ -67,6 +67,10 @@ zuwachs(bereich, mehr, grund) as (values
   ('Primaer- und Eindeutigkeitsschluessel', 3,
      'fork_02: zwei Primaerschluessel, konten.slug eindeutig'),
   ('Pruefbedingungen', 1, 'fork_02: konten.abo_status'),
+  -- fork_03: das Bundesland des Standorts.
+  ('Spalten', 1, 'fork_03: firma_stammdaten.bundesland'),
+  ('Pruefbedingungen', 1, 'fork_03: bundesland aus den 16 Kuerzeln'),
+  ('Indizes ohne Constraint', 1, 'fork_03: firma_stammdaten_bundesland_idx'),
   ('Indizes ohne Constraint', 5,
      'fork_02: gesellschaften_ein_standard, gesellschaften_konto_idx, '
      'firma_stammdaten_konto_idx, firma_stammdaten_gesellschaft_idx, profiles_konto_idx')

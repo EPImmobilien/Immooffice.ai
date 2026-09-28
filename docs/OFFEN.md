@@ -305,3 +305,18 @@ Eigenschaften:
   muss.
 - Widerrufene Newsletter-Kontakte werden gekennzeichnet, nicht stillschweigend
   mitgeliefert.
+
+## Feiertage: das Bundesland erreicht die Oberfläche noch nicht
+
+`feiertage(jahr, land)` rechnet für alle sechzehn Länder, und
+`firma_stammdaten.bundesland` trägt den Wert. Die Edge Function
+`urlaub-hinweise` liest ihn einmal je Lauf.
+
+**Die Oberfläche noch nicht:** sie liest `window.IMMO_BUNDESLAND`, und das
+setzt bisher niemand. Bis dahin rechnet sie mit den neun bundesweiten
+Feiertagen — richtig, aber unvollständig, und der Hinweistext sagt es.
+
+Gehört mit Abschnitt 1b erledigt: dort bekommt jeder Mitarbeiter einen
+Hauptstandort, und dann ist das Land eine Eigenschaft des Mitarbeiters, nicht
+des ersten gefundenen Standorts. Beides jetzt zu bauen hieße, es zweimal zu
+bauen.

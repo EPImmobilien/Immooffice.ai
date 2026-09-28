@@ -29,7 +29,7 @@ FORK = WURZEL / 'supabase' / 'functions'
 # 28.09.2026 genauso und aus demselben Grund. Wer die Liste lesen will:
 #   python3 -c "import base64;print(base64.b64decode('...').decode())"
 KENNZEICHEN = re.compile(
-    base64.b64decode('ZW5nZmVyfGVwd29ybGR8ZXAtd29ybGR8RVAgV29ybGR8RSZQfEUmYW1wO1B8RU5HRkVSfFYow7Z8b2V8XFx1MDBmNilnZW50ZWljaHxWb2VnZW50ZWljaHxSb3N0b2NrfFNjaHdlcmlufEJlcmxpbnxIYW1idXJnfFdhcm5lbSjDvHx1ZSluZGV8TWFya2dyYWZlbmhlaWRlfDE4MDU1fDE4MDU3fDE5MDU1fFB1c2Noa2lufDAzODFbIC8uLV0/MzZbIC8uLV0/NzdbIC8uLV0/OTlbIC8uLV0/ODh8c3ByZW5nbmV0dGVyfFNQUkVOR05FVFRFUnxqb3Rmb3JtfHNpcGdhdGV8eW9kZWNrfHNob3AtP3R2fHlhendrenpqaXF1cHJ0anB1cnVyfFNUQU5ET1JURVxbfFNUQU5ET1JURVwu').decode(),
+    base64.b64decode('ZW5nZmVyfGVwd29ybGR8ZXBbLV8gXT9pbW1vYmlsaWVufGVwLXdvcmxkfEVQIFdvcmxkfEUmUHxFJmFtcDtQfEVOR0ZFUnxWKMO2fG9lfFxcdTAwZjYpZ2VudGVpY2h8Vm9lZ2VudGVpY2h8Um9zdG9ja3xTY2h3ZXJpbnxCZXJsaW58SGFtYnVyZ3xXYXJuZW0ow7x8dWUpbmRlfE1hcmtncmFmZW5oZWlkZXwxODA1NXwxODA1N3wxOTA1NXxQdXNjaGtpbnwwMzgxWyAvLi1dPzM2WyAvLi1dPzc3WyAvLi1dPzk5WyAvLi1dPzg4fHNwcmVuZ25ldHRlcnxTUFJFTkdORVRURVJ8am90Zm9ybXxzaXBnYXRlfHlvZGVja3xzaG9wLT90dnx5YXp3a3p6amlxdXBydGpwdXJ1cnxTVEFORE9SVEVcW3xTVEFORE9SVEVcLg==').decode(),
     re.IGNORECASE)
 
 # Zeilen, die nur verschwinden, weil sie zu einem Block gehoeren, dessen
@@ -37,6 +37,15 @@ KENNZEICHEN = re.compile(
 # Standortkarte in mpe-pdf-erzeugen. Ihre vier Kartenpunkte markieren die
 # Bueros der Referenz; die beiden Klammerzeilen tragen selbst kein
 # Kennzeichen, koennen aber nicht stehen bleiben, wenn die Punkte gehen.
+# Funktionen, die der Fork nicht nur neutralisiert, sondern ERWEITERT. Bei
+# ihnen traegt nicht jede geaenderte Zeile ein Kennzeichen — das ist der Sinn
+# einer Erweiterung. Sie werden trotzdem gezaehlt und benannt, damit die Liste
+# kurz bleibt und niemand hier heimlich Verhalten aendert.
+ERWEITERT = {
+    'urlaub-hinweise': 'Feiertage aller sechzehn Bundeslaender statt nur '
+                       'Mecklenburg-Vorpommern (Auftrag 28.09.2026)',
+}
+
 BLOCKZEILEN = {
     'mpe-pdf-erzeugen': {
         'const pins: Array<[number, number, string, string, string]> = [',
@@ -52,6 +61,7 @@ def main():
         return 0
 
     beanstandet = []
+    erweitert = []
     geprueft = 0
     for ordner in sorted(FORK.iterdir()):
         if not ordner.is_dir():
@@ -62,6 +72,9 @@ def main():
             alt = VORLAGE / ordner.name / neu.relative_to(ordner)
             if not alt.exists():
                 beanstandet.append((str(neu), 0, 'hat keine Entsprechung in der Vorlage'))
+                continue
+            if ordner.name in ERWEITERT:
+                erweitert.append(ordner.name)
                 continue
             geprueft += 1
             a = alt.read_text(encoding='utf-8').splitlines()
@@ -98,6 +111,9 @@ def main():
 
     print(f'[ok] {geprueft} Dateien verglichen — jede Aenderung entfernt ein '
           f'Kennzeichen der Vorlage.')
+    for name in sorted(set(erweitert)):
+        print(f'     erweitert, deshalb nicht Zeile fuer Zeile geprueft: '
+              f'{name} — {ERWEITERT[name]}')
     return 0
 
 

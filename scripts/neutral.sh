@@ -26,7 +26,10 @@ AUS=(--glob '!reference/**' --glob '!docs/**' --glob '!CLAUDE.md'
      --glob '!.git/**' --glob '!node_modules/**' --glob '!.next/**')
 
 # Kennzeichen des Referenzunternehmens und seiner Anwendung.
-MARKEN='engfer|engferundpartner|e&p ?world|e&p ?immobilien|ep-?world|epworld|epimmobilien'
+# ep-immobilien fehlte bis zum 28.09.2026: das Muster verlangte entweder ein
+# kaufmaennisches Und oder gar kein Trennzeichen. Der Slug lag neunmal im
+# Quelltext. Deshalb jetzt [-_ ]? an jeder Fuge.
+MARKEN='engfer|engferundpartner|e ?& ?p ?[-_ ]?immobilien|e ?& ?p ?[-_ ]?world|ep[-_ ]?world|epworld|ep[-_ ]?immobilien|epimmobilien'
 # Personen-, Anschrift- und Ortsangaben der Referenz, die in Standardwerten
 # steckten. Sie stehen hier BASE64-kodiert, nicht im Klartext: eine Datei, die
 # ein Kennzeichen sucht, darf es nicht selbst lesbar enthalten (CLAUDE.md,
