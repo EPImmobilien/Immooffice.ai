@@ -43,6 +43,13 @@ else
   fehler=1
 fi
 
+abschnitt "Rechnungen: Zahlungsbedingungen und Freigabe"
+if scripts/lokale-db.sh psql -q -f tests/rechnung-freigabe.sql; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Belegnummern: Muster, Ruecksetzung, Lueckenlosigkeit"
 if scripts/lokale-db.sh psql -q -f tests/belegnummern.sql; then
   :

@@ -1352,3 +1352,37 @@ aufsteigende Nummern ergeben. Der Aufbau als ein `update … returning` ist das,
 was auch unter Gleichzeitigkeit trägt — aber ein Lesen-dann-Schreiben wäre in
 diesem Test ebenfalls grün und im Betrieb trotzdem falsch. Vermerkt in
 `docs/OFFEN.md`.
+
+## 2026-09-28 · Rechnungsfreigabe: nur der Benannte, auch nicht die Chefin
+
+**Abschnitt 3c:** „Ist jemand gesetzt, gehen Rechnungen erst nach dessen
+Freigabe raus: Entwurf → zur Freigabe → freigegeben → versendet."
+
+**Entscheidung:** Die beiden neuen Zustände schieben sich **zwischen** die
+vorhandenen. `entwurf → gestellt → bezahlt` der Vorlage bleibt unberührt, und
+ohne eingerichteten Verantwortlichen ändert sich nichts: `rechnung_stellen()`
+nimmt weiter einen Entwurf entgegen. Eine Freigabe, die immer nötig wäre, wäre
+eine Verhaltensänderung für jeden bestehenden Mandanten.
+
+**Auch ein Chef darf nicht freigeben, wenn er nicht der Benannte ist.** Das war
+eine echte Entscheidung: die naheliegende Bequemlichkeit wäre „der Chef darf es
+auch". Dann wäre die Freigabe aber eine Empfehlung und keine Kontrolle — und
+genau als Kontrolle richtet man sie ein. Wer die Zuständigkeit ändern will,
+ändert die Einstellung; das steht im Protokoll.
+
+**Die Betragsgrenze entscheidet dieselbe Funktion, die es anzeigt.**
+`rechnung_braucht_freigabe()` wird von `rechnung_stellen()` gefragt **und** von
+der Oberfläche. Zwei Fassungen liefen auseinander; bei `hat_recht()` ist genau
+das schon passiert.
+
+## 2026-09-28 · Zahlungsbedingungen: Skontoziel nach Fälligkeit ist ein Fehler
+
+Eine Prüfbedingung verlangt `skonto_tage <= netto_tage`. Ein Skontoziel nach
+dem Fälligkeitsdatum ergibt keinen Sinn, und die Datenbank sagt das lieber
+sofort, als es zuzulassen und später eine Rechnung mit unsinnigem Text zu
+erzeugen.
+
+Der Satz auf dem Beleg kommt aus `zahlungsbedingung_text()`: ein eigener Text
+schlägt die Zahlen, sonst wird er daraus gebildet („Zahlbar innerhalb von 7
+Tagen mit 2 % Skonto, innerhalb von 30 Tagen ohne Abzug."). Rein rechnend,
+damit Vorschau und Beleg denselben Satz zeigen.

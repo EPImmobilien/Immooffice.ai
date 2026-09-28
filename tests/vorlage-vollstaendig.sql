@@ -125,7 +125,22 @@ zuwachs(bereich, mehr, grund) as (values
   ('Fremdschluessel', 2, 'mandant_id, gesellschaft_id'),
   ('Indizes ohne Constraint', 2, 'belegnummernkreise: eindeutig und mandant_id'),
   ('Richtlinien', 3, 'fork_18: lesen, pflegen, mandant_trennung'),
-  ('Funktionen', 2, 'fork_18: belegnummer_aus_muster(), naechste_belegnummer()')
+  ('Funktionen', 2, 'fork_18: belegnummer_aus_muster(), naechste_belegnummer()'),
+  -- fork_19: Zahlungsbedingungen und Rechnungsfreigabe.
+  ('Tabellen', 2, 'fork_19: zahlungsbedingungen, rechnung_einstellungen'),
+  ('Tabellen mit RLS', 2, 'dieselben zwei'),
+  ('Spalten', 20, 'zahlungsbedingungen 13, rechnung_einstellungen 6, '
+                  'rechnungen.zahlungsbedingung_id'),
+  ('Primaer- und Eindeutigkeitsschluessel', 2, 'je ein Primaerschluessel'),
+  ('Pruefbedingungen', 2, 'zahlungsbedingungen: Tage und Skonto'),
+  ('Fremdschluessel', 6, 'je mandant_id und gesellschaft_id, freigabe_durch, '
+                         'rechnungen.zahlungsbedingung_id'),
+  ('Indizes ohne Constraint', 4, 'je mandant_id, Standard-Bedingung, '
+                                 'Eindeutigkeit der Einstellungen'),
+  ('Richtlinien', 6, 'fork_19: je lesen, pflegen, mandant_trennung'),
+  ('Funktionen', 5, 'fork_19: zahlungsbedingung_text(), '
+                    'rechnung_braucht_freigabe(), rechnung_zur_freigabe(), '
+                    'rechnung_freigeben(), rechnung_faelligkeit()')
 ),
 soll(bereich, soll) as (
   select v.bereich,
