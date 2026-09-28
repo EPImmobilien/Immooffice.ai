@@ -78,6 +78,13 @@ else
   fehler=1
 fi
 
+abschnitt "Vorlagen: Laufzeit, Provision, Fristen"
+if scripts/lokale-db.sh psql -q -f tests/vorlagen-vorgaben.sql; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Mandant aus dem Elternsatz"
 if scripts/lokale-db.sh psql -q -f tests/mandant-aus-eltern.sql; then
   :

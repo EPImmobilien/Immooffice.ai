@@ -1803,7 +1803,7 @@ async function fillObjektnachweis(e) {
   const b = h.map(e => escapeXml(e)).join('</w:t><w:br/><w:t xml:space="preserve">'),
     y = /Sehr geehrte Frau Schellhorn,<\/w:t><w:br\/><w:t(?:\s[^>]*)?>sehr geehrter Herr Rathmann/;
   y.test(r) ? r = r.replace(y, b) : (r = r.split("Sehr geehrte Frau Schellhorn,sehr geehrter Herr Rathmann").join(b), r.indexOf("Sehr geehrte Frau Schellhorn,") >= 0 && (r = r.split("Sehr geehrte Frau Schellhorn,").join(b), r = r.replace(/<w:br\/><w:t(?:\s[^>]*)?>sehr geehrter Herr Rathmann<\/w:t>/g, ""), r = r.split("sehr geehrter Herr Rathmann").join(""))), m || (r = r.replace(/<w:t(?:\s[^>]*)?>Herr <\/w:t>/g, '<w:t xml:space="preserve"></w:t>'), r = r.replace(/<w:t(?:\s[^>]*)?>Herr<\/w:t>/g, '<w:t xml:space="preserve"></w:t>'));
-  const E = e.provision || "3,00";
+  const E = e.provision || immoVorgabe("objektnachweis", "provision", "3,00");
   if (r = r.split("Provision in Höhe von 2,00%").join(`Provision in Höhe von ${escapeXml(E)}%`), e.notar_name) {
     const t = e.notar_adresse ? `${e.notar_name}, ${e.notar_adresse}` : e.notar_name;
     r = r.split("__________________________________________").join(escapeXml(t))
@@ -3287,7 +3287,7 @@ function ReservierungenPage({
       try {
         const {
           data: fi
-        } = await window._sb.from("firma_stammdaten").select("*").eq("slug", "standard").maybeSingle(), k = v.kontakt || {}, o = (v.objekte || [])[0] || {}, heute = (new Date).toISOString().slice(0, 10), bis = new Date(Date.now() + 2592e6).toISOString().slice(0, 10);
+        } = await window._sb.from("firma_stammdaten").select("*").eq("slug", "standard").maybeSingle(), k = v.kontakt || {}, o = (v.objekte || [])[0] || {}, heute = (new Date).toISOString().slice(0, 10), bis = new Date(Date.now() + (Number(immoVorgabe("reservierung", "reservierungsdauer_tage", "30")) || 30) * 864e5).toISOString().slice(0, 10);
         i({
           absender_firma_id: fi?.id || null,
           kaeufer_typ: epKontaktReservierungTyp(k),
@@ -3307,9 +3307,9 @@ function ReservierungenPage({
           objekt_plz: o.plz || "",
           objekt_ort: o.ort || "",
           kaufpreis: o.angebotspreis || "",
-          reservierungsgebuehr_brutto: "1000",
+          reservierungsgebuehr_brutto: immoVorgabe("reservierung", "reservierungsgebuehr_brutto", "1000"),
           reservierungsdauer_bis: bis,
-          zahlungsfrist_werktage: 5,
+          zahlungsfrist_werktage: Number(immoVorgabe("reservierung", "zahlungsfrist_werktage", "5")) || 5,
           ort_unterzeichnung: "Musterstadt",
           datum_unterzeichnung: heute,
           status: "entwurf",
@@ -3542,7 +3542,7 @@ function ReservierungenPage({
     onClick: async () => {
       const {
         data: e
-      } = await window._sb.from("firma_stammdaten").select("*").eq("slug", "standard").maybeSingle(), t = (new Date).toISOString().slice(0, 10), n = new Date(Date.now() + 2592e6).toISOString().slice(0, 10);
+      } = await window._sb.from("firma_stammdaten").select("*").eq("slug", "standard").maybeSingle(), t = (new Date).toISOString().slice(0, 10), n = new Date(Date.now() + (Number(immoVorgabe("reservierung", "reservierungsdauer_tage", "30")) || 30) * 864e5).toISOString().slice(0, 10);
       i({
         absender_firma_id: e?.id || null,
         kaeufer_typ: "eheleute",
@@ -3562,9 +3562,9 @@ function ReservierungenPage({
         objekt_plz: "",
         objekt_ort: "",
         kaufpreis: "",
-        reservierungsgebuehr_brutto: "1000",
+        reservierungsgebuehr_brutto: immoVorgabe("reservierung", "reservierungsgebuehr_brutto", "1000"),
         reservierungsdauer_bis: n,
-        zahlungsfrist_werktage: 5,
+        zahlungsfrist_werktage: Number(immoVorgabe("reservierung", "zahlungsfrist_werktage", "5")) || 5,
         ort_unterzeichnung: "Musterstadt",
         datum_unterzeichnung: t,
         status: "entwurf",
@@ -60720,9 +60720,9 @@ function MaklervertragImportModal({
               objekt_ort: e.objekt_ort || "",
               objekt_adresse: e.objekt_adresse || [e.objekt_strasse, [e.objekt_plz, e.objekt_ort].filter(Boolean).join(" ")].filter(Boolean).join(", "),
               angebotspreis: e.angebotspreis || "",
-              laufzeit_monate: e.laufzeit_monate || epEinst("laufzeit_monate_standard", "6"),
-              provision: e.provision || epEinst("provision_verkaeufer_standard", "3,57"),
-              provisionsmodell: e.provisionsmodell || epEinst("provisionsmodell_standard", "teilung"),
+              laufzeit_monate: e.laufzeit_monate || immoVorgabe("maklervertrag", "laufzeit_monate", "6"),
+              provision: e.provision || immoVorgabe("maklervertrag", "provision", "3,57"),
+              provisionsmodell: e.provisionsmodell || immoVorgabe("maklervertrag", "provisionsmodell", "teilung"),
               eigentum: e.eigentum || "allein",
               verbraucher: e.verbraucher || "ja",
               vollmacht_mitgenerieren: !1
@@ -61616,9 +61616,9 @@ function VertraegePage({
     objekt_ort: "",
     objekt_adresse: "",
     angebotspreis: "",
-    laufzeit_monate: epEinst("laufzeit_monate_standard", "6"),
-    provision: epEinst("provision_verkaeufer_standard", "3,57"),
-    provisionsmodell: epEinst("provisionsmodell_standard", "teilung"),
+    laufzeit_monate: immoVorgabe("maklervertrag", "laufzeit_monate", "6"),
+    provision: immoVorgabe("maklervertrag", "provision", "3,57"),
+    provisionsmodell: immoVorgabe("maklervertrag", "provisionsmodell", "teilung"),
     eigentum: "allein",
     verbraucher: "ja",
     vollmacht_mitgenerieren: !1
@@ -62897,7 +62897,7 @@ function ObjektnachweisImportModal({
               objekt_ort: e.objekt_ort || "",
               objekt_adresse: e.objekt_adresse || [e.objekt_strasse, [e.objekt_plz, e.objekt_ort].filter(Boolean).join(" ")].filter(Boolean).join(", "),
               kaufpreis: e.kaufpreis || "",
-              provision: e.provision || "3,00",
+              provision: e.provision || immoVorgabe("objektnachweis", "provision", "3,00"),
               notar_name: e.notar_name || "",
               notar_adresse: e.notar_adresse || "",
               ...l
@@ -62970,7 +62970,7 @@ function ObjektnachweisePage({
     objekt_ort: "",
     objekt_adresse: "",
     kaufpreis: "",
-    provision: "3,00",
+    provision: immoVorgabe("objektnachweis", "provision", "3,00"),
     notar_name: "",
     notar_adresse: "",
     maklervertrag_id: null
@@ -63882,7 +63882,7 @@ function ObjektnachweisePage({
           objekt_strasse: e.objekt_strasse || "",
           objekt_plz: e.objekt_plz || "",
           objekt_ort: e.objekt_ort || "",
-          provision: e.provision || "3,00",
+          provision: e.provision || immoVorgabe("objektnachweis", "provision", "3,00"),
           notar_name: e.notar_name || "",
           notar_adresse: e.notar_adresse || ""
         }), R(e.id), i(!0), window.scrollTo({
@@ -132744,6 +132744,16 @@ function KontaktPersonenBlock({ form, onFeld }) {
 window.__epEinst = window.__epEinst || null;
 window.__epFirmen = window.__epFirmen || null;
 
+// Was fuer einen neuen Vertrag/Nachweis/Reservierung gilt. Gerechnet hat
+// es die Datenbank (vorlage_vorgaben); hier steht nur der Zugriff und
+// der Notnagel, falls der Aufruf beim Start ausgefallen ist.
+window.__immoVorgaben = window.__immoVorgaben || null;
+function immoVorgabe(art, feld, ersatz) {
+  const alle = window.__immoVorgaben;
+  const wert = alle && alle[art] ? alle[art][feld] : undefined;
+  if (wert === null || wert === undefined || wert === "") return ersatz;
+  return String(wert);
+}
 function epEinst(schluessel, vorgabe) {
   const alle = window.__epEinst;
   if (!alle || !(schluessel in alle)) return vorgabe;
@@ -132753,8 +132763,9 @@ function epEinst(schluessel, vorgabe) {
 }
 async function epEinstSetzen(schluessel, wert) {
   const { error } = await window._sb.from("portal_einstellungen").upsert(
-    { schluessel, wert, updated_at: new Date().toISOString(), updated_by: window._currentUserId || null },
-    { onConflict: "schluessel" });
+    { mandant_id: window.IMMO_MANDANT_ID || null, schluessel, wert,
+      updated_at: new Date().toISOString(), updated_by: window._currentUserId || null },
+    { onConflict: "mandant_id,schluessel" });
   if (error) throw error;
   window.__epEinst = { ...(window.__epEinst || {}), [schluessel]: wert };
 }
@@ -132790,6 +132801,16 @@ async function epStammLaden(erneut) {
         window.__epEinst = m;
       }
     } catch (e) { console.warn("Einstellungen laden:", (e && e.message) || e); }
+    try {
+      const arten = ["maklervertrag", "objektnachweis", "reservierung"];
+      const ergebnis = {};
+      for (const art of arten) {
+        const { data } = await window._sb.rpc("vorlage_vorgaben", {
+          p_art: art, p_gesellschaft: window.IMMO_GESELLSCHAFT_ID || null });
+        if (data) ergebnis[art] = data;
+      }
+      window.__immoVorgaben = ergebnis;
+    } catch (e) { console.warn("Vorgaben der Vorlagen laden:", (e && e.message) || e); }
     try {
       const { data, error } = await window._sb.from("firma_stammdaten").select("*").order("sortierung");
       if (error) throw error;
@@ -133455,6 +133476,33 @@ function EinstGesellschaften({ user }) {
 // hat; das erzwingen die Richtlinien aus fork_12 in der Datenbank und im
 // Dateispeicher. Was hier steht, blendet nur aus, was ohnehin scheitern
 // wuerde.
+// Welche Werte zu welcher Vorlagenart gehoeren. Die Liste ist die der
+// Vorlage — nachgesehen, nicht erfunden: der Maklervertrag kennt Laufzeit,
+// Provision und Provisionsmodell, der Objektnachweis die Kaeuferprovision,
+// die Reservierung Gebuehr, Dauer und Zahlungsfrist. Eine Vollmacht hat
+// keine solchen Werte.
+//
+// Dieselben Schluessel prueft die Datenbank in
+// vertragsvorlagen_vorgaben_check. Ein Tippfehler hier wird dort abgewiesen
+// statt still geschluckt.
+const IMMO_VORLAGE_FELDER = {
+  maklervertrag: [
+    ["laufzeit_monate", "Laufzeit (Monate)", "6"],
+    ["provision", "Provision (%)", "3,57"],
+    ["provisionsmodell", "Provisionsmodell", "teilung",
+      [["teilung", "Teilung"], ["innen", "Innenprovision"], ["aussen", "Außenprovision"]]]
+  ],
+  objektnachweis: [
+    ["provision", "Käuferprovision (%)", "3,00"]
+  ],
+  reservierung: [
+    ["reservierungsgebuehr_brutto", "Reservierungsgebühr (€ brutto)", "1000"],
+    ["reservierungsdauer_tage", "Reservierungsdauer (Tage)", "30"],
+    ["zahlungsfrist_werktage", "Zahlungsfrist (Werktage)", "5"]
+  ],
+  vollmacht: []
+};
+
 const IMMO_VERTRAGSARTEN = [
   ["maklervertrag", "Maklervertrag", "Der Auftrag des Eigentümers. Platzhalter: {firma_name}, {geschaeftsfuehrer}, {strasse}, {plz_ort}."],
   ["vollmacht", "Vollmacht", "Die Vollmacht des Auftraggebers."],
@@ -133469,6 +133517,39 @@ function EinstVertragsvorlagen({ user }) {
   const [fehler, setFehler] = useState("");
   const [beschaeftigt, setBeschaeftigt] = useState("");
   const darfPflegen = hatRecht(user, "admin");
+  const [vorgabenEntwurf, setVorgabenEntwurf] = useState({});
+  // Nur die Felder DIESER Art werden geschrieben. Ein Wert, der zu
+  // einer anderen Art gehoert, weist die Datenbank ohnehin ab — aber
+  // es waere ein Fehler, der erst dort auffaellt.
+  const werteSichern = async (art, zeile) => {
+    setFehler(""); setMeldung(""); setBeschaeftigt("werte-" + art);
+    try {
+      const neu = {};
+      for (const [feld, , ersatz] of (IMMO_VORLAGE_FELDER[art] || [])) {
+        const schluessel = art + "." + feld;
+        const w = String(vorgabenEntwurf[schluessel] !== undefined
+          ? vorgabenEntwurf[schluessel]
+          : ((zeile.vorgaben && zeile.vorgaben[feld]) || immoVorgabe(art, feld, ersatz))).trim();
+        if (w) neu[feld] = w;
+      }
+      const { error } = await window._sb.from("vertragsvorlagen")
+        .update({ vorgaben: neu, geaendert_am: new Date().toISOString() }).eq("id", zeile.id);
+      if (error) throw error;
+      await logAction("update", "vertragsvorlage", zeile.id, art, neu);
+      // Damit die Formulare sofort den neuen Wert sehen und nicht erst
+      // nach dem naechsten Anmelden.
+      try {
+        const { data } = await window._sb.rpc("vorlage_vorgaben", {
+          p_art: art, p_gesellschaft: window.IMMO_GESELLSCHAFT_ID || null });
+        if (data) window.__immoVorgaben = { ...(window.__immoVorgaben || {}), [art]: data };
+      } catch (_) { /* beim naechsten Start */ }
+      setMeldung("Werte gespeichert.");
+      await laden();
+    } catch (f) {
+      setFehler("Speichern fehlgeschlagen: " + (f.message || f));
+    }
+    setBeschaeftigt("");
+  };
   const laden = async () => {
     setLaedt(true);
     try {
@@ -133498,8 +133579,10 @@ function EinstVertragsvorlagen({ user }) {
       if (uErr) throw uErr;
       // Die neue Fassung gilt, die alten bleiben liegen.
       await window._sb.from("vertragsvorlagen").update({ aktiv: false }).eq("art", art);
+      const vorher_aktiv = vorher.filter((z) => z.aktiv)[0] || vorher[0] || null;
       const { error: iErr } = await window._sb.from("vertragsvorlagen").insert({
         art, storage_pfad: pfad, dateiname: datei.name || "", version, aktiv: true,
+        vorgaben: (vorher_aktiv && vorher_aktiv.vorgaben) || {},
         gesellschaft_id: window.IMMO_GESELLSCHAFT_ID || null,
         hochgeladen_von: window._currentUserId || null
       });
@@ -133539,6 +133622,33 @@ function EinstVertragsvorlagen({ user }) {
             color: jetzt ? CI.blau : CI.muted } },
             jetzt ? ("Fassung " + jetzt.version + (jetzt.dateiname ? " — " + jetzt.dateiname : ""))
                   : "Noch keine Vorlage hinterlegt."),
+          (jetzt && (IMMO_VORLAGE_FELDER[art] || []).length) ? React.createElement("div",
+            { style: { marginTop: 12, paddingTop: 12, borderTop: `1px solid ${CI.border}` } },
+            React.createElement("div", { style: { fontSize: 11, color: CI.gold, letterSpacing: "0.12em",
+              textTransform: "uppercase", fontWeight: 600, marginBottom: 8 } }, "Werte zu diesem Text"),
+            IMMO_VORLAGE_FELDER[art].map(([feld, beschriftung, ersatz, auswahl]) => {
+              const schluessel = art + "." + feld;
+              const wert = vorgabenEntwurf[schluessel] !== undefined
+                ? vorgabenEntwurf[schluessel]
+                : ((jetzt.vorgaben && jetzt.vorgaben[feld]) || immoVorgabe(art, feld, ersatz));
+              return React.createElement("div", { key: feld, style: { marginBottom: 8 } },
+                React.createElement("label", { style: labelStyle }, beschriftung),
+                auswahl
+                  ? React.createElement("select", { style: inputStyle, value: wert,
+                      "data-vorlagenwert": schluessel, disabled: !darfPflegen,
+                      onChange: (ev) => setVorgabenEntwurf((a) => ({ ...a, [schluessel]: ev.target.value })) },
+                      auswahl.map(([w, l]) => React.createElement("option", { key: w, value: w }, l)))
+                  : React.createElement("input", { style: inputStyle, value: wert,
+                      "data-vorlagenwert": schluessel, disabled: !darfPflegen,
+                      onChange: (ev) => setVorgabenEntwurf((a) => ({ ...a, [schluessel]: ev.target.value })) }));
+            }),
+            darfPflegen ? React.createElement("button", {
+              onClick: () => werteSichern(art, jetzt), disabled: beschaeftigt === "werte-" + art,
+              style: { ...secondaryBtn, padding: "7px 14px", fontSize: 12.5, marginTop: 4 } },
+              beschaeftigt === "werte-" + art ? "Speichert …" : "Werte speichern") : null,
+            React.createElement("div", { style: { fontSize: 11, color: CI.muted, marginTop: 8, lineHeight: 1.5 } },
+              "Diese Werte werden in neue Vorgänge übernommen. Sie müssen zu dem passen, ",
+              "was im Text dieser Vorlage steht.")) : null,
           darfPflegen ? React.createElement("label", { style: { ...secondaryBtn, display: "inline-flex",
             marginTop: 12, cursor: beschaeftigt === art ? "wait" : "pointer",
             opacity: beschaeftigt === art ? .6 : 1 } },
@@ -133613,6 +133723,10 @@ function EinstVorgaben() {
     { key: "provision_verkaeufer_standard", label: "Provision im Maklervertrag", vorgabe: "3,57", hinweis: "In Prozent, ohne Zeichen." },
     { key: "provisionsmodell_standard", label: "Provisionsmodell", vorgabe: "teilung", auswahl: [["teilung", "Teilung"], ["innen", "Innenprovision"], ["aussen", "Außenprovision"]] },
     { key: "laufzeit_monate_standard", label: "Laufzeit des Maklervertrags (Monate)", vorgabe: "6" },
+    { key: "reservierung_gebuehr_standard", label: "Reservierungsgebühr (€ brutto)", vorgabe: "1000",
+      hinweis: "Gilt, solange an der Reservierungsvorlage nichts anderes hinterlegt ist." },
+    { key: "reservierung_dauer_tage_standard", label: "Reservierungsdauer (Tage)", vorgabe: "30" },
+    { key: "reservierung_zahlungsfrist_standard", label: "Zahlungsfrist der Reservierung (Werktage)", vorgabe: "5" },
     { key: "standort_standard", label: "Vorgeschlagener Standort", vorgabe: "musterstadt",
       auswahl: Object.keys(STANDORTE).map((s) => [s, (STANDORTE[s] && STANDORTE[s].name) || s]) },
     { key: "expose_vorlage_kauf_geteilt", label: "Exposé-Anschreiben: Kauf mit geteilter Provision (Vorlagentitel)", vorgabe: "Beantwortung Portalanfrage Kauf geteilte Provision", hinweis: "Titel einer E-Mail-Vorlage (Posteingang → Vorlage einfügen)." },
@@ -133926,7 +134040,7 @@ function epExposeModell(o) {
   const innen = parseFloat(String(x.provision_innen || "").replace(",", "."));
   if (innen > 0) return "geteilt";
   if (x.provision_innen !== null && x.provision_innen !== undefined && String(x.provision_innen).trim() !== "" && !(innen > 0)) return "aussen";
-  return epEinst("provisionsmodell_standard", "teilung") === "aussen" ? "aussen" : "geteilt";
+  return immoVorgabe("maklervertrag", "provisionsmodell", "teilung") === "aussen" ? "aussen" : "geteilt";
 }
 async function epExposeVorlagenListe() {
   const c = window.__epExposeVorlagen;

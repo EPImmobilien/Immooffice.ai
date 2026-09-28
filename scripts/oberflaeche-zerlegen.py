@@ -1624,6 +1624,245 @@ ERSETZUNGEN = [
      '      background: "onoffice" === h ? CI.blau : "transparent",\n'
      '      color: "onoffice" === h ? "#fff" : CI.blau,',
      'onOffice: der Reiter im Admin-Bereich entfaellt.'),
+    # =====================================================================
+    # FORK — Laufzeit, Provision und Fristen gehoeren zur Vorlage
+    #
+    # ANWEISUNG vom 28.09.2026: "wenn wir die Maklervertrag Vorlage
+    # hochladen, da muss auf jeden Fall Laufzeit und Provision auch noch
+    # definiert werden. Gleiches gilt fuer Reservierung und Objektnachweis."
+    #
+    # Die Erzeugung ersetzt diese Zahlen im Word-Text — "Dauer von 6 Monaten"
+    # wird zu "Dauer von 9 Monaten". Wer seine EIGENE Vorlage hochlaedt, hat
+    # dort seinen eigenen Satz stehen, und die Zahl muss dazu passen.
+    #
+    # Die Rechnung macht die Datenbank (fork_23, vorlage_vorgaben): vier
+    # Stufen, die innerste gewinnt — eingebaut, Vorgaben des Mandanten,
+    # Vorlage des Mandanten, Vorlage der Gesellschaft. Die Oberflaeche fragt
+    # nur nach dem Ergebnis. Sie selbst zu rechnen hiesse, die Regel zweimal
+    # zu haben.
+    # =====================================================================
+
+    # Die Einstellungen sind seit fork_23 je Mandant eindeutig, nicht mehr
+    # je Plattform. Bliebe der Konfliktschluessel "schluessel" allein, hiesse
+    # jedes Speichern: "es gibt die Zeile schon" — und traefe die des
+    # falschen Mandanten oder liefe auf einen Fehler.
+    ('FORK',
+     r'\{ schluessel, wert, updated_at: new Date\(\)\.toISOString\(\), updated_by: window\._currentUserId \|\| null \},\n    \{ onConflict: "schluessel" \}\);',
+     '{ mandant_id: window.IMMO_MANDANT_ID || null, schluessel, wert,\n'
+     '      updated_at: new Date().toISOString(), updated_by: window._currentUserId || null },\n'
+     '    { onConflict: "mandant_id,schluessel" });',
+     'Vorgaben werden je Mandant gespeichert, nicht je Plattform.'),
+
+    # Die Vorgaben der vier Vorlagenarten einmal beim Start holen. Gleiche
+    # Bauart wie __epEinst daneben: faellt der Aufruf aus, bleibt der
+    # eingebaute Wert stehen und es entsteht trotzdem ein Vertrag.
+    ('FORK',
+     r'        window\.__epEinst = m;\n      \}\n    \} catch \(e\) \{ console\.warn\("Einstellungen laden:", \(e && e\.message\) \|\| e\); \}',
+     '        window.__epEinst = m;\n'
+     '      }\n'
+     '    } catch (e) { console.warn("Einstellungen laden:", (e && e.message) || e); }\n'
+     '    try {\n'
+     '      const arten = ["maklervertrag", "objektnachweis", "reservierung"];\n'
+     '      const ergebnis = {};\n'
+     '      for (const art of arten) {\n'
+     '        const { data } = await window._sb.rpc("vorlage_vorgaben", {\n'
+     '          p_art: art, p_gesellschaft: window.IMMO_GESELLSCHAFT_ID || null });\n'
+     '        if (data) ergebnis[art] = data;\n'
+     '      }\n'
+     '      window.__immoVorgaben = ergebnis;\n'
+     '    } catch (e) { console.warn("Vorgaben der Vorlagen laden:", (e && e.message) || e); }',
+     'Die Vorgaben der Vorlagen einmal beim Start holen.'),
+
+    ('FORK',
+     r'(function epEinst\(schluessel, vorgabe\) \{)',
+     '// Was fuer einen neuen Vertrag/Nachweis/Reservierung gilt. Gerechnet hat\n'
+     '// es die Datenbank (vorlage_vorgaben); hier steht nur der Zugriff und\n'
+     '// der Notnagel, falls der Aufruf beim Start ausgefallen ist.\n'
+     'window.__immoVorgaben = window.__immoVorgaben || null;\n'
+     'function immoVorgabe(art, feld, ersatz) {\n'
+     '  const alle = window.__immoVorgaben;\n'
+     '  const wert = alle && alle[art] ? alle[art][feld] : undefined;\n'
+     '  if (wert === null || wert === undefined || wert === "") return ersatz;\n'
+     '  return String(wert);\n'
+     '}\n'
+     r'\1',
+     'Zugriff auf die Vorgaben der Vorlagen.'),
+
+    # --- Die drei Formulare fragen nach den Vorgaben ihrer Vorlage.
+    # Der Ersatzwert hinter dem Komma ist jeweils das, was die Vorlage heute
+    # einsetzt — faellt der Aufruf beim Start aus, aendert sich nichts.
+    ('FORK',
+     r'epEinst\("laufzeit_monate_standard", "6"\)',
+     'immoVorgabe("maklervertrag", "laufzeit_monate", "6")',
+     'Maklervertrag: Laufzeit aus der Vorlage.'),
+    ('FORK',
+     r'epEinst\("provision_verkaeufer_standard", "3,57"\)',
+     'immoVorgabe("maklervertrag", "provision", "3,57")',
+     'Maklervertrag: Provision aus der Vorlage.'),
+    # Die dritte Fundstelle von provisionsmodell_standard steht in einer
+    # Hilfsfunktion, die nur "aussen" von "geteilt" unterscheidet — auch sie
+    # soll der Vorlage folgen.
+    ('FORK',
+     r'epEinst\("provisionsmodell_standard", "teilung"\)',
+     'immoVorgabe("maklervertrag", "provisionsmodell", "teilung")',
+     'Maklervertrag: Provisionsmodell aus der Vorlage.'),
+
+    ('FORK',
+     r'provision: "3,00",',
+     'provision: immoVorgabe("objektnachweis", "provision", "3,00"),',
+     'Objektnachweis: Provision aus der Vorlage.'),
+    ('FORK',
+     r'e\.provision \|\| "3,00"',
+     'e.provision || immoVorgabe("objektnachweis", "provision", "3,00")',
+     'Objektnachweis: Provision aus der Vorlage, auch beim Nachtragen.'),
+
+    ('FORK',
+     r'reservierungsgebuehr_brutto: "1000",',
+     'reservierungsgebuehr_brutto: immoVorgabe("reservierung", "reservierungsgebuehr_brutto", "1000"),',
+     'Reservierung: Gebuehr aus der Vorlage.'),
+    ('FORK',
+     r'zahlungsfrist_werktage: 5,',
+     'zahlungsfrist_werktage: Number(immoVorgabe("reservierung", "zahlungsfrist_werktage", "5")) || 5,',
+     'Reservierung: Zahlungsfrist aus der Vorlage.'),
+    # 2592e6 Millisekunden sind dreissig Tage. Die Zahl stand zweimal im
+    # Quelltext; jetzt steht die Dauer in der Vorlage und die Rechnung hier.
+    ('FORK',
+     r'new Date\(Date\.now\(\) \+ 2592e6\)\.toISOString\(\)\.slice\(0, 10\)',
+     'new Date(Date.now() + (Number(immoVorgabe("reservierung", "reservierungsdauer_tage", "30")) || 30) * 864e5).toISOString().slice(0, 10)',
+     'Reservierung: Dauer aus der Vorlage.'),
+
+    # --- Die Felder an der Vorlage selbst, im Reiter "Vertragsvorlagen".
+    ('FORK',
+     r'(const IMMO_VERTRAGSARTEN = \[)',
+     '// Welche Werte zu welcher Vorlagenart gehoeren. Die Liste ist die der\n'
+     '// Vorlage — nachgesehen, nicht erfunden: der Maklervertrag kennt Laufzeit,\n'
+     '// Provision und Provisionsmodell, der Objektnachweis die Kaeuferprovision,\n'
+     '// die Reservierung Gebuehr, Dauer und Zahlungsfrist. Eine Vollmacht hat\n'
+     '// keine solchen Werte.\n'
+     '//\n'
+     '// Dieselben Schluessel prueft die Datenbank in\n'
+     '// vertragsvorlagen_vorgaben_check. Ein Tippfehler hier wird dort abgewiesen\n'
+     '// statt still geschluckt.\n'
+     'const IMMO_VORLAGE_FELDER = {\n'
+     '  maklervertrag: [\n'
+     '    ["laufzeit_monate", "Laufzeit (Monate)", "6"],\n'
+     '    ["provision", "Provision (%)", "3,57"],\n'
+     '    ["provisionsmodell", "Provisionsmodell", "teilung",\n'
+     '      [["teilung", "Teilung"], ["innen", "Innenprovision"], ["aussen", "Außenprovision"]]]\n'
+     '  ],\n'
+     '  objektnachweis: [\n'
+     '    ["provision", "Käuferprovision (%)", "3,00"]\n'
+     '  ],\n'
+     '  reservierung: [\n'
+     '    ["reservierungsgebuehr_brutto", "Reservierungsgebühr (€ brutto)", "1000"],\n'
+     '    ["reservierungsdauer_tage", "Reservierungsdauer (Tage)", "30"],\n'
+     '    ["zahlungsfrist_werktage", "Zahlungsfrist (Werktage)", "5"]\n'
+     '  ],\n'
+     '  vollmacht: []\n'
+     '};\n'     '\n'
+     r'\1',
+     'Vertragsvorlagen: welche Werte zu welcher Art gehoeren.'),
+
+    # Beim Hochladen einer neuen Fassung die Werte der alten uebernehmen.
+    # Sonst stuenden nach jedem Austausch des Word-Textes wieder die
+    # eingebauten Zahlen da, und niemand wuerde es merken, bis ein Vertrag
+    # mit sechs statt zwoelf Monaten beim Eigentuemer liegt.
+    ('FORK',
+     r'      const \{ error: iErr \} = await window\._sb\.from\("vertragsvorlagen"\)\.insert\(\{\n        art, storage_pfad: pfad, dateiname: datei\.name \|\| "", version, aktiv: true,',
+     '      const vorher_aktiv = vorher.filter((z) => z.aktiv)[0] || vorher[0] || null;\n'
+     '      const { error: iErr } = await window._sb.from("vertragsvorlagen").insert({\n'
+     '        art, storage_pfad: pfad, dateiname: datei.name || "", version, aktiv: true,\n'
+     '        vorgaben: (vorher_aktiv && vorher_aktiv.vorgaben) || {},',
+     'Vertragsvorlagen: eine neue Fassung erbt die Werte der alten.'),
+
+    # Die Eingabefelder unter jeder Karte. Sie erscheinen erst, wenn eine
+    # Vorlage da ist — die Werte gehoeren zu EINEM Text, und ohne Text gibt
+    # es nichts, wozu sie gehoeren koennten. Wer keine eigene Vorlage hat,
+    # stellt dieselben Werte unter "Vorgaben" fuer den ganzen Mandanten ein.
+    ('FORK',
+     r'          darfPflegen \? React\.createElement\("label", \{ style: \{ \.\.\.secondaryBtn, display: "inline-flex",',
+     '          (jetzt && (IMMO_VORLAGE_FELDER[art] || []).length) ? React.createElement("div",\n'
+     '            { style: { marginTop: 12, paddingTop: 12, borderTop: `1px solid ${CI.border}` } },\n'
+     '            React.createElement("div", { style: { fontSize: 11, color: CI.gold, letterSpacing: "0.12em",\n'
+     '              textTransform: "uppercase", fontWeight: 600, marginBottom: 8 } }, "Werte zu diesem Text"),\n'
+     '            IMMO_VORLAGE_FELDER[art].map(([feld, beschriftung, ersatz, auswahl]) => {\n'
+     '              const schluessel = art + "." + feld;\n'
+     '              const wert = vorgabenEntwurf[schluessel] !== undefined\n'
+     '                ? vorgabenEntwurf[schluessel]\n'
+     '                : ((jetzt.vorgaben && jetzt.vorgaben[feld]) || immoVorgabe(art, feld, ersatz));\n'
+     '              return React.createElement("div", { key: feld, style: { marginBottom: 8 } },\n'
+     '                React.createElement("label", { style: labelStyle }, beschriftung),\n'
+     '                auswahl\n'
+     '                  ? React.createElement("select", { style: inputStyle, value: wert,\n'
+     '                      "data-vorlagenwert": schluessel, disabled: !darfPflegen,\n'
+     '                      onChange: (ev) => setVorgabenEntwurf((a) => ({ ...a, [schluessel]: ev.target.value })) },\n'
+     '                      auswahl.map(([w, l]) => React.createElement("option", { key: w, value: w }, l)))\n'
+     '                  : React.createElement("input", { style: inputStyle, value: wert,\n'
+     '                      "data-vorlagenwert": schluessel, disabled: !darfPflegen,\n'
+     '                      onChange: (ev) => setVorgabenEntwurf((a) => ({ ...a, [schluessel]: ev.target.value })) }));\n'
+     '            }),\n'
+     '            darfPflegen ? React.createElement("button", {\n'
+     '              onClick: () => werteSichern(art, jetzt), disabled: beschaeftigt === "werte-" + art,\n'
+     '              style: { ...secondaryBtn, padding: "7px 14px", fontSize: 12.5, marginTop: 4 } },\n'
+     '              beschaeftigt === "werte-" + art ? "Speichert …" : "Werte speichern") : null,\n'
+     '            React.createElement("div", { style: { fontSize: 11, color: CI.muted, marginTop: 8, lineHeight: 1.5 } },\n'
+     '              "Diese Werte werden in neue Vorgänge übernommen. Sie müssen zu dem passen, ",\n'
+     '              "was im Text dieser Vorlage steht.")) : null,\n'
+     '          darfPflegen ? React.createElement("label", { style: { ...secondaryBtn, display: "inline-flex",',
+     'Vertragsvorlagen: Laufzeit, Provision und Fristen an der Vorlage pflegen.'),
+
+    # Zustand und Speichern dafuer.
+    ('FORK',
+     r'(  const \[beschaeftigt, setBeschaeftigt\] = useState\(""\);\n  const darfPflegen = hatRecht\(user, "admin"\);)',
+     r'\1\n'
+     '  const [vorgabenEntwurf, setVorgabenEntwurf] = useState({});\n'
+     '  // Nur die Felder DIESER Art werden geschrieben. Ein Wert, der zu\n'
+     '  // einer anderen Art gehoert, weist die Datenbank ohnehin ab — aber\n'
+     '  // es waere ein Fehler, der erst dort auffaellt.\n'
+     '  const werteSichern = async (art, zeile) => {\n'
+     '    setFehler(""); setMeldung(""); setBeschaeftigt("werte-" + art);\n'
+     '    try {\n'
+     '      const neu = {};\n'
+     '      for (const [feld, , ersatz] of (IMMO_VORLAGE_FELDER[art] || [])) {\n'
+     '        const schluessel = art + "." + feld;\n'
+     '        const w = String(vorgabenEntwurf[schluessel] !== undefined\n'
+     '          ? vorgabenEntwurf[schluessel]\n'
+     '          : ((zeile.vorgaben && zeile.vorgaben[feld]) || immoVorgabe(art, feld, ersatz))).trim();\n'
+     '        if (w) neu[feld] = w;\n'
+     '      }\n'
+     '      const { error } = await window._sb.from("vertragsvorlagen")\n'
+     '        .update({ vorgaben: neu, geaendert_am: new Date().toISOString() }).eq("id", zeile.id);\n'
+     '      if (error) throw error;\n'
+     '      await logAction("update", "vertragsvorlage", zeile.id, art, neu);\n'
+     '      // Damit die Formulare sofort den neuen Wert sehen und nicht erst\n'
+     '      // nach dem naechsten Anmelden.\n'
+     '      try {\n'
+     '        const { data } = await window._sb.rpc("vorlage_vorgaben", {\n'
+     '          p_art: art, p_gesellschaft: window.IMMO_GESELLSCHAFT_ID || null });\n'
+     '        if (data) window.__immoVorgaben = { ...(window.__immoVorgaben || {}), [art]: data };\n'
+     '      } catch (_) { /* beim naechsten Start */ }\n'
+     '      setMeldung("Werte gespeichert.");\n'
+     '      await laden();\n'
+     '    } catch (f) {\n'
+     '      setFehler("Speichern fehlgeschlagen: " + (f.message || f));\n'
+     '    }\n'
+     '    setBeschaeftigt("");\n'
+     '  };',
+     'Vertragsvorlagen: die Werte speichern.'),
+
+    # --- Die Reservierung hatte im Reiter "Vorgaben" gar nichts stehen:
+    # Gebuehr, Dauer und Zahlungsfrist standen als 1000, 2592e6 und 5 im
+    # Quelltext. Wer keine eigene Vorlage hochlaedt, stellt sie jetzt hier
+    # fuer den ganzen Mandanten ein.
+    ('FORK',
+     r'    \{ key: "laufzeit_monate_standard", label: "Laufzeit des Maklervertrags \(Monate\)", vorgabe: "6" \},',
+     '    { key: "laufzeit_monate_standard", label: "Laufzeit des Maklervertrags (Monate)", vorgabe: "6" },\n'
+     '    { key: "reservierung_gebuehr_standard", label: "Reservierungsgebühr (€ brutto)", vorgabe: "1000",\n'
+     '      hinweis: "Gilt, solange an der Reservierungsvorlage nichts anderes hinterlegt ist." },\n'
+     '    { key: "reservierung_dauer_tage_standard", label: "Reservierungsdauer (Tage)", vorgabe: "30" },\n'
+     '    { key: "reservierung_zahlungsfrist_standard", label: "Zahlungsfrist der Reservierung (Werktage)", vorgabe: "5" },',
+     'Vorgaben: Gebuehr, Dauer und Zahlungsfrist der Reservierung.'),
+
     ('MARKE', r'\bEP_', 'IMMO_', 'Vorsatz EP_ in Bezeichnern der Oberflaeche.'),
 
     # --- MARKE: das Kuerzel in der Erkennung interner Umbuchungen.

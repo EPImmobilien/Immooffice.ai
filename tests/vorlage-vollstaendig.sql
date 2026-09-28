@@ -150,7 +150,11 @@ zuwachs(bereich, mehr, grund) as (values
   -- fork_22: ein Wachposten, der mandant_id aus dem Elternsatz fuellt, an
   -- sechzehn Tabellen. Sechzehn Trigger, eine Funktion.
   ('Funktionen', 1, 'fork_22: mandant_aus_eltern()'),
-  ('Trigger', 16, 'fork_22: mandant_aus_eltern an sechzehn Tabellen')
+  ('Trigger', 16, 'fork_22: mandant_aus_eltern an sechzehn Tabellen'),
+  -- fork_23: die Vorgaben an der Vorlage (Laufzeit, Provision, Fristen).
+  ('Spalten', 1, 'fork_23: vertragsvorlagen.vorgaben'),
+  ('Pruefbedingungen', 1, 'fork_23: erlaubte Schluessel je Vorlagenart'),
+  ('Funktionen', 1, 'fork_23: vorlage_vorgaben()')
 ),
 soll(bereich, soll) as (
   select v.bereich,

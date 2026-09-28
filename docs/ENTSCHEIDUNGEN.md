@@ -1665,3 +1665,50 @@ Anbindung ohnehin wegfällt. Jede braucht eine eigene Quelle im Quelltext.
 **Nebenbei:** die erste Fassung der Prüfung sah nur `insert`, nicht `upsert`.
 Drei Fundstellen mehr kamen dabei heraus, darunter die Merkliste des
 Neubauportals.
+
+---
+
+## Laufzeit, Provision und Fristen gehören zur Vorlage (28.09.2026)
+
+**Anweisung:** „Wenn wir die Maklervertrag-Vorlage hochladen, da muss auf
+jeden Fall Laufzeit und Provision auch noch definiert werden. Orientiere dich
+an der E&P World, was wir dort für Felder haben. Gleiches gilt für
+Reservierung und Objektnachweis."
+
+**Nachgesehen, was die Vorlage hat** — nicht erfunden:
+
+| Dokument | Felder | woher der Vorschlag heute kommt |
+|---|---|---|
+| Maklervertrag | `laufzeit_monate`, `provision`, `provisionsmodell` (Teilung / Innen / Außen) | `portal_einstellungen`: 6 Monate, 3,57 %, Teilung |
+| Objektnachweis | `provision` | fest im Quelltext: `"3,00"` |
+| Reservierung | Gebühr, Dauer, Zahlungsfrist | fest im Quelltext: 1000 €, 30 Tage, 5 Werktage |
+
+Die Erzeugung ersetzt diese Werte im Word-Text. Lädt ein Makler seine
+**eigene** Vorlage hoch, steht darin sein eigener Satz — und die Zahl muss
+dazu passen. Deshalb gehören die Werte an die Vorlage.
+
+**Vier Stufen, die innerste gewinnt:** eingebaut → Vorgaben des Mandanten →
+Vorlage des Mandanten → Vorlage der Gesellschaft. Wer nichts einstellt,
+bekommt genau das bisherige Verhalten. Gerechnet wird in der Datenbank
+(`vorlage_vorgaben`), nicht in der Oberfläche — sonst gäbe es die Regel
+zweimal.
+
+Eine neue Fassung einer Vorlage **erbt die Werte der alten**. Sonst stünden
+nach jedem Austausch des Word-Textes wieder die eingebauten Zahlen da, und
+niemand merkte es, bis ein Vertrag mit sechs statt zwölf Monaten beim
+Eigentümer liegt.
+
+### Ein Fehler, der dem im Weg stand
+
+`portal_einstellungen` trägt seit `fork_05` eine `mandant_id` — aber ihr
+**Primärschlüssel war `(schluessel)`**. Eine Zeile je Schlüssel, für die
+ganze Plattform. Die Oberfläche schreibt mit
+`upsert(..., onConflict: "schluessel")`: **der zweite Mandant, der seine
+Provision einstellt, überschreibt die des ersten.**
+
+`fork_17` hat genau diese Klasse Fehler aufgeräumt und einen Wachposten
+dagegen gestellt — der prüft aber nur `contype = 'u'`, also
+Eindeutigkeitsregeln. Ein Primärschlüssel ist `contype = 'p'` und ist ihm
+durchgegangen. Beides ist nachgezogen; der Wachposten sieht jetzt beide
+Arten, mit fünfzehn benannten Ausnahmen (Schlüssel auf einer bereits
+mandantengebundenen Elterntabelle, und die leeren onOffice-Tabellen).
