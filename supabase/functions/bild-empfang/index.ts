@@ -13,6 +13,37 @@ const antwort = (o: unknown, status = 200) => new Response(JSON.stringify(o), { 
 
 Deno.serve(async (req) => {
   const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  // --- Storage: Pfade tragen den Mandanten als erstes Segment -----------
+  // Gleiche Bauart wie die Huelle der Oberflaeche. Sie steht IM Handler und
+  // nicht auf Modulebene: eine Mandantenvariable auf Modulebene ueberlebt in
+  // Deno die Anfrage und traegt den Mandanten des einen Aufrufers in den
+  // naechsten. Genau das waere ein Leck statt einer Trennung.
+  // Solange immoMandant null ist, bleibt jeder Pfad unveraendert — die
+  // Funktion verhaelt sich dann wie bisher.
+  let immoMandant: string | null = null;
+  const immoSetzeMandant = (m: unknown) => { immoMandant = (typeof m === "string" && m) ? m : null; };
+  {
+    const immoEcht = admin.storage.from.bind(admin.storage);
+    const immoVorne = (pf: unknown): unknown =>
+      (typeof pf !== "string" || !pf || !immoMandant) ? pf
+        : (pf === immoMandant || pf.startsWith(immoMandant + "/") ? pf : immoMandant + "/" + pf);
+    const immoViele = (pf: unknown): unknown => Array.isArray(pf) ? pf.map(immoVorne) : immoVorne(pf);
+    (admin.storage as any).from = (eimer: string) => {
+      const api: any = immoEcht(eimer);
+      const h: any = Object.create(api);
+      for (const n of ["upload", "download", "remove", "createSignedUrl",
+                       "createSignedUrls", "getPublicUrl", "info", "exists"]) {
+        if (typeof api[n] === "function") h[n] = (pf: unknown, ...r: unknown[]) => api[n](immoViele(pf), ...r);
+      }
+      if (typeof api.list === "function") {
+        h.list = (pf?: string, ...r: unknown[]) => api.list(pf ? (immoVorne(pf) as string) : (immoMandant ?? pf), ...r);
+      }
+      for (const n of ["move", "copy"]) {
+        if (typeof api[n] === "function") h[n] = (a: unknown, b: unknown, ...r: unknown[]) => api[n](immoVorne(a), immoVorne(b), ...r);
+      }
+      return h;
+    };
+  }
   try {
     const token = req.headers.get("x-transfer-token") || "";
     if (!token) return antwort({ ok: false, error: "Kein Token." }, 401);

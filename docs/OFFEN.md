@@ -378,7 +378,8 @@ danach einen anderen zurück, als er gespeichert hat.
 | Schritt | Stand |
 |---|---|
 | 1. Oberfläche stellt den Mandanten voran | **fertig** — eine Hülle um `storage.from()`, neun Prüfungen in `tests/storage-huelle.js` |
-| 2. Edge Functions ebenso | offen — 12 Dateien, sie arbeiten mit `service_role` und kennen den Mandanten nicht von selbst |
+| 2a. Hülle in den Edge Functions | **fertig** — 11 Funktionen, 22 Schreibstellen |
+| 2b. Jede Funktion ihren Mandanten ermitteln lassen | offen — siehe Liste unten |
 | 3. Die 90 vorhandenen Dateien umziehen | offen |
 | 4. Restriktive Richtlinie auf `storage.objects` | offen — **erst nach 2 und 3**, sonst sperrt sie aus, was noch am alten Ort liegt |
 
@@ -389,3 +390,30 @@ neuen Ort, während die Edge Functions am alten schreiben.
 **Die Hülle ist Bequemlichkeit, nicht die Sicherung.** Sie erspart es, 51
 Aufrufstellen anzufassen — aber wer sie umgeht, kommt an Pfade ohne Präfix.
 Gesichert wird erst in Schritt 4, in der Datenbank.
+
+### Schritt 2b: welche Funktion woher ihren Mandanten bekommt
+
+Die Hülle steht in allen elf und ist **untätig**, solange
+`immoSetzeMandant()` nicht gerufen wurde — die Funktionen schreiben bis dahin
+wie bisher. Das ist Absicht: eine Hülle, die ohne Mandanten einen erfundenen
+Pfad baut, verlöre Dateien.
+
+| Funktion | Aufruf | Quelle des Mandanten |
+|---|---|---|
+| `expose-pdf-erzeugen` | Nutzer (JWT) | `auth.getUser` → `profiles.mandant_id` |
+| `mpe-pdf-erzeugen` | Nutzer (JWT) | dito |
+| `eigentuemer-dokument-uebernehmen` | Nutzer (JWT) | dito |
+| `eigentuemer-report-pdf` | Nutzer (JWT) | dito |
+| `signatur-vorgang-starten` | Nutzer (JWT) | dito |
+| `brief-pdf-erzeugen` | Nutzer (JWT), kein `getUser` | aus dem Brief-Datensatz |
+| `web-asset-kopieren` | Nutzer (JWT), kein `getUser` | aus dem Zielpfad-Auftrag |
+| `energieausweis-anfrage` | **öffentlich** | aus dem Standort, an den die Anfrage geht |
+| `signatur-unterschreiben` | **öffentlich** (Token) | aus dem Signaturvorgang |
+| `bild-empfang` | **öffentlich** (Token) | aus `immobilien.mandant_id` der Ziel-Immobilie |
+| `mail-anhaenge-diagnose` | **öffentlich** (Geheimnis) | aus dem Postfach |
+
+Die vier öffentlichen sind die heiklen: sie haben keinen angemeldeten Nutzer
+und müssen den Mandanten aus dem Datensatz ableiten, den sie ohnehin laden.
+Wer das falsch macht, schreibt die Datei eines Mandanten in den Ordner eines
+anderen — und die Richtlinie aus Schritt 4 macht sie dann für den Falschen
+sichtbar.

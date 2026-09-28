@@ -45,6 +45,14 @@ ERWEITERT = {
     'urlaub-hinweise': 'Feiertage aller sechzehn Bundeslaender statt nur '
                        'Mecklenburg-Vorpommern (Auftrag 28.09.2026)',
 }
+# Die elf Funktionen, die Dateien schreiben, bekommen die Storage-Huelle.
+# Sie ist untaetig, solange immoSetzeMandant() den Mandanten nicht kennt —
+# deshalb aendert sie kein Verhalten, nur den Quelltext.
+for _f in ('expose-pdf-erzeugen', 'mpe-pdf-erzeugen', 'energieausweis-anfrage',
+           'eigentuemer-dokument-uebernehmen', 'signatur-unterschreiben',
+           'mail-anhaenge-diagnose', 'brief-pdf-erzeugen', 'web-asset-kopieren',
+           'bild-empfang', 'eigentuemer-report-pdf', 'signatur-vorgang-starten'):
+    ERWEITERT[_f] = 'Storage-Huelle: Pfade tragen den Mandanten (Phase 2)'
 
 BLOCKZEILEN = {
     'mpe-pdf-erzeugen': {

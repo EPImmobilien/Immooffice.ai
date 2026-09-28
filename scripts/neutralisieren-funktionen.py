@@ -269,6 +269,20 @@ ERSETZUNGEN = [
      r'.order("sortierung").limit(1).maybeSingle()).data?.bundesland ?? null;',
      'Bundesland des Standorts einmal je Lauf laden.'),
 
+    # --- FORK: Storage-Huelle in jeder Funktion, die Dateien schreibt.
+    # Die Huelle stellt jedem Pfad den Mandanten voran, sobald
+    # immoSetzeMandant() ihn kennt. Vorher bleibt alles wie bisher — eine
+    # Funktion, die ihren Mandanten noch nicht ermittelt, schreibt weiter
+    # an den alten Ort und geht nicht kaputt.
+    ('FORK',
+     r'(?m)^([ \t]*)(const (admin|db) = createClient\(.*\);)$',
+     '\\1\\2\n\\1// --- Storage: Pfade tragen den Mandanten als erstes Segment -----------\n\\1// Gleiche Bauart wie die Huelle der Oberflaeche. Sie steht IM Handler und\n\\1// nicht auf Modulebene: eine Mandantenvariable auf Modulebene ueberlebt in\n\\1// Deno die Anfrage und traegt den Mandanten des einen Aufrufers in den\n\\1// naechsten. Genau das waere ein Leck statt einer Trennung.\n\\1// Solange immoMandant null ist, bleibt jeder Pfad unveraendert — die\n\\1// Funktion verhaelt sich dann wie bisher.\n\\1let immoMandant: string | null = null;\n\\1const immoSetzeMandant = (m: unknown) => { immoMandant = (typeof m === "string" && m) ? m : null; };\n\\1{\n\\1  const immoEcht = \\3.storage.from.bind(\\3.storage);\n\\1  const immoVorne = (pf: unknown): unknown =>\n\\1    (typeof pf !== "string" || !pf || !immoMandant) ? pf\n\\1      : (pf === immoMandant || pf.startsWith(immoMandant + "/") ? pf : immoMandant + "/" + pf);\n\\1  const immoViele = (pf: unknown): unknown => Array.isArray(pf) ? pf.map(immoVorne) : immoVorne(pf);\n\\1  (\\3.storage as any).from = (eimer: string) => {\n\\1    const api: any = immoEcht(eimer);\n\\1    const h: any = Object.create(api);\n\\1    for (const n of ["upload", "download", "remove", "createSignedUrl",\n\\1                     "createSignedUrls", "getPublicUrl", "info", "exists"]) {\n\\1      if (typeof api[n] === "function") h[n] = (pf: unknown, ...r: unknown[]) => api[n](immoViele(pf), ...r);\n\\1    }\n\\1    if (typeof api.list === "function") {\n\\1      h.list = (pf?: string, ...r: unknown[]) => api.list(pf ? (immoVorne(pf) as string) : (immoMandant ?? pf), ...r);\n\\1    }\n\\1    for (const n of ["move", "copy"]) {\n\\1      if (typeof api[n] === "function") h[n] = (a: unknown, b: unknown, ...r: unknown[]) => api[n](immoVorne(a), immoVorne(b), ...r);\n\\1    }\n\\1    return h;\n\\1  };\n\\1}',
+     'Storage-Huelle in den Funktionen, die Dateien schreiben.',
+     {'expose-pdf-erzeugen', 'mpe-pdf-erzeugen', 'energieausweis-anfrage',
+      'eigentuemer-dokument-uebernehmen', 'signatur-unterschreiben',
+      'mail-anhaenge-diagnose', 'brief-pdf-erzeugen', 'web-asset-kopieren',
+      'bild-empfang', 'eigentuemer-report-pdf', 'signatur-vorgang-starten'}),
+
     # --- FREMD: Verweise auf das Supabase-Projekt der Vorlage
     ('FREMD', r'yazwkzzjiquprtjpurur', 'usguiggfciavwzkdfjgt',
      'Projektkennung der Vorlage durch die eigene ersetzt.'),
@@ -389,7 +403,14 @@ def main():
             inhalt = datei.read_text(encoding='utf-8')
             zeilen_vorher = inhalt.count('\n')
             erweitert = False
-            for grund, muster, ersatz, bemerkung in ERSETZUNGEN:
+            for regel in ERSETZUNGEN:
+                grund, muster, ersatz, bemerkung = regel[:4]
+                # Fuenftes Element: nur diese Funktionen. Zweimal ist eine
+                # Regel breiter geraten als gedacht — einmal in siebzehn
+                # Dateien, einmal in sechsundachtzig. Die Haeufigkeitsbremse
+                # greift dort nicht, weil es je Datei nur ein Treffer ist.
+                if len(regel) > 4 and ordner.name not in regel[4]:
+                    continue
                 inhalt, n = re.subn(muster, ersatz, inhalt)
                 pruefe_haeufigkeit(n, bemerkung, datei)
                 if n:
