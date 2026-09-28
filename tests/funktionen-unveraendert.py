@@ -61,6 +61,13 @@ for _f in ('oeffentliche-objekte', 'web-lead', 'objekt-landing', 'akq-lead-einga
     ERWEITERT[_f] = ('Oeffentlicher Endpunkt: bestimmt seinen Mandanten '
                      'selbst (Phase 2)')
 
+# Dokumente: Farben und Briefkopf kommen aus dem Mandanten statt aus einer
+# festen Palette beziehungsweise einem festen Slug (Phase 2, gemeldet
+# 28.09.2026).
+for _f in ('rechnung-pdf-erzeugen', 'reservierung-pdf-erzeugen',
+           'reservierung-word-erzeugen'):
+    ERWEITERT[_f] = 'CI und Briefkopf aus dem Mandanten (Phase 2)'
+
 BLOCKZEILEN = {
     'mpe-pdf-erzeugen': {
         'const pins: Array<[number, number, string, string, string]> = [',

@@ -48,9 +48,19 @@ let cachedFonts: {
   marcellus?: ArrayBuffer;
 } = {};
 
+// #rrggbb in rgb() von pdf-lib. Unbrauchbares faellt auf den Ersatz
+// zurueck — ein Dokument in unlesbaren Farben waere schlimmer als eines
+// in den Plattformfarben.
+function immoCiFarbe(hex: unknown, ersatz: any) {
+  if (typeof hex !== "string" || !/^#[0-9A-Fa-f]{6}$/.test(hex)) return ersatz;
+  return rgb(parseInt(hex.slice(1, 3), 16) / 255,
+             parseInt(hex.slice(3, 5), 16) / 255,
+             parseInt(hex.slice(5, 7), 16) / 255);
+}
+
 const CI = {
-  blau: rgb(0.039, 0.165, 0.30),  // ca. #0A2A4D
-  gold: rgb(0.78, 0.64, 0.33),    // ca. #C7A455
+  blau: rgb(0.106, 0.165, 0.278),  // #1B2A47, Plattform-CI aus CLAUDE.md
+  gold: rgb(0.710, 0.576, 0.310),  // #B5934F, dito
   text: rgb(0.05, 0.05, 0.05),
   hellGrau: rgb(0.95, 0.95, 0.95),
   mittelGrau: rgb(0.6, 0.6, 0.6),
@@ -145,6 +155,10 @@ Deno.serve(async (req) => {
       firma = data;
     }
     if (!firma) throw new Error("Firmen-Stammdaten nicht gefunden.");
+
+    // Die CI des Mandanten, sonst die der Plattform.
+    const ciBlau = immoCiFarbe(firma.ci_primaer, CI.blau);
+    const ciGold = immoCiFarbe(firma.ci_akzent, CI.gold);
 
     const istTest = rechnung.ist_test === true;
 
@@ -248,7 +262,7 @@ Deno.serve(async (req) => {
 
     // ---- Titel + Logo ----
     drawText("Rechnung", {
-      x: margin, y: y - 35, size: 32, font: fontHeadline, color: CI.blau,
+      x: margin, y: y - 35, size: 32, font: fontHeadline, color: ciBlau,
     });
     // Logo rechts oben, ueber dem Empfaenger-Block
     if (embeddedLogo) {
@@ -367,7 +381,7 @@ Deno.serve(async (req) => {
     // Header-Hintergrund
     page.drawRectangle({
       x: margin, y: y - 18, width: width - 2 * margin, height: 22,
-      color: CI.blau,
+      color: ciBlau,
     });
 
     drawText("Beschreibung", {
@@ -482,7 +496,7 @@ Deno.serve(async (req) => {
     y -= 16;
 
     drawText("Gesamt (inkl. MwSt.)", { x: sumLabelX, y, size: 11, font: fontBold, color: CI.text });
-    drawText(eur(Number(rechnung.bruttobetrag)), { x: sumValueX, y, size: 11, font: fontBold, color: CI.blau });
+    drawText(eur(Number(rechnung.bruttobetrag)), { x: sumValueX, y, size: 11, font: fontBold, color: ciBlau });
     y -= 35;
 
     // ---- Faelligkeit ----
@@ -517,7 +531,7 @@ Deno.serve(async (req) => {
 
     // Spalte 1: Firma
     let fy = footerY + 50;
-    drawText(firma.firma_name, { x: margin, y: fy, size: footerSize, font: fontBold, color: CI.blau });
+    drawText(firma.firma_name, { x: margin, y: fy, size: footerSize, font: fontBold, color: ciBlau });
     fy -= footerZeile;
     drawText(strasseTxt, { x: margin, y: fy, size: footerSize, font: fontRegular, color: CI.footerGrau });
     fy -= footerZeile;

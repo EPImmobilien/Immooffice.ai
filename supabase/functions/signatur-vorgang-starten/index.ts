@@ -41,8 +41,12 @@ const MAKLER_SIGNATUR_PFADE   = ["unterschrift-lasse.png", "unterschrift.png"];
 const MAKLER_NAME             = "Lasse Musterhaus";
 
 const CI = {
-  blau: rgb(0.149, 0.192, 0.349),
-  gold: rgb(0.831, 0.647, 0.404),
+  // Hier standen bis zum 28.09.2026 rgb(0.149, 0.192, 0.349) und
+  // rgb(0.831, 0.647, 0.404) — das sind #263159 und #D4A567, die Farben
+  // der Referenz. In Fliesskomma-Schreibweise hat das Neutralitaets-Gate
+  // sie nicht gefunden.
+  blau: rgb(0.106, 0.165, 0.278),  // #1B2A47, Plattform-CI aus CLAUDE.md
+  gold: rgb(0.710, 0.576, 0.310),  // #B5934F, dito
   text: rgb(0.08, 0.08, 0.08),
   mittelGrau: rgb(0.55, 0.55, 0.55),
   dunkelGrau: rgb(0.32, 0.32, 0.32),
@@ -372,6 +376,13 @@ function buildVollmachtAbsaetze(vertrag: any, standort: typeof STANDORTE["standa
 }
 
 // ---- Reservierungsvereinbarung (Neubau) \u2014 Text identisch zum PDF-Export ----
+function immoCiFarbe(hex: unknown, ersatz: any) {
+  if (typeof hex !== "string" || !/^#[0-9A-Fa-f]{6}$/.test(hex)) return ersatz;
+  return rgb(parseInt(hex.slice(1, 3), 16) / 255,
+             parseInt(hex.slice(3, 5), 16) / 255,
+             parseInt(hex.slice(5, 7), 16) / 255);
+}
+
 function buildReservierungAbsaetze(res: any, firma: any): Absatz[] {
   const objektart = res.objektart === "haus" ? "Haus" :
                     res.objektart === "reihenhaus" ? "Reihenhaus" :
@@ -691,10 +702,15 @@ Deno.serve(async (req) => {
         firma = data;
       }
       if (!firma) {
-        const { data } = await admin.from("firma_stammdaten").select("*").eq("slug", "standard").maybeSingle();
+        const { data } = await admin.from("firma_stammdaten").select("*")
+          .eq("mandant_id", immoMandant).order("sortierung").limit(1).maybeSingle();
         firma = data;
       }
       if (!firma) throw new Error("Firma-Stammdaten fehlen.");
+
+      // Die CI des Mandanten, sonst die der Plattform.
+      const ciBlau = immoCiFarbe(firma.ci_primaer, CI.blau);
+      const ciGold = immoCiFarbe(firma.ci_akzent, CI.gold);
       if (!vertrag.kaufpreis || !vertrag.reservierungsgebuehr_brutto || !vertrag.reservierungsdauer_bis) {
         throw new Error("Bitte zuerst Kaufpreis, Reservierungsgeb\u00fchr und Reservierungsdauer in der Vereinbarung ausf\u00fcllen.");
       }
@@ -901,7 +917,7 @@ Deno.serve(async (req) => {
         if (abs.pageBreakBefore) seitenumbruch();
         const size = abs.size || (abs.heading ? (wordLayout ? 11 : 15) : 10);
         const font = abs.bold || abs.heading ? fontBold : fontRegular;
-        const color = (wordLayout || !abs.heading) ? CI.text : CI.gold;
+        const color = (wordLayout || !abs.heading) ? CI.text : ciGold;
         const indent = abs.indent || 0;
         const lineHeight = size * (wordLayout ? 1.4 : 1.35);
         const textFixed = fix(abs.text);
@@ -943,7 +959,7 @@ Deno.serve(async (req) => {
       drawSicher(fix("Unterschriften"), {
         x: margin, y, size: wordLayout ? 11 : 13,
         font: wordLayout ? fontBold : fontHeadline,
-        color: wordLayout ? CI.text : CI.blau,
+        color: wordLayout ? CI.text : ciBlau,
       });
       frischeSeite = false;
       y -= (wordLayout ? 18 : 10);
@@ -980,7 +996,7 @@ Deno.serve(async (req) => {
       drawSicher(fix("F\u00fcr den Makler"), {
         x: margin, y, size: 11,
         font: wordLayout ? fontBold : fontHeadline,
-        color: wordLayout ? CI.text : CI.blau,
+        color: wordLayout ? CI.text : ciBlau,
       });
       frischeSeite = false;
       y -= (wordLayout ? 16 : 8);
@@ -1011,7 +1027,7 @@ Deno.serve(async (req) => {
         let sigSize = 30;
         while (sigSize > 14 && sicherBreite(sigFont, MAKLER_NAME, sigSize) > feldBreite - 16) sigSize -= 1;
         drawSicher(MAKLER_NAME, {
-          x: margin + 8, y: boxBottom + 10, size: sigSize, font: sigFont, color: CI.blau,
+          x: margin + 8, y: boxBottom + 10, size: sigSize, font: sigFont, color: ciBlau,
         });
       }
 

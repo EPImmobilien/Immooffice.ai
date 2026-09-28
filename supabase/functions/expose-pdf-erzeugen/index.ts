@@ -600,7 +600,7 @@ if (data) ap = data;
 const apName = [ap.titel, ap.name].map((x: any) => (x || "").trim()).filter(Boolean).join(" ");
 let firma: any = null;
 if (ap.firma_id) { const { data } = await admin.from("firma_stammdaten").select("*").eq("id", ap.firma_id).maybeSingle(); if (data && data.aktiv !== false) firma = data; }
-if (!firma) { const { data } = await admin.from("firma_stammdaten").select("*").eq("slug", "standard").maybeSingle(); firma = data; }
+if (!firma) { const { data } = await admin.from("firma_stammdaten").select("*").eq("mandant_id", immoMandant).order("sortierung").limit(1).maybeSingle(); firma = data; }
 if (!firma) { const { data } = await admin.from("firma_stammdaten").select("*").eq("aktiv", true).order("sortierung").limit(1).maybeSingle(); firma = data; }
 if (!firma) return jsonErr(500, "Firma-Stammdaten fehlen");
 const pdf = await PDFDocument.create();

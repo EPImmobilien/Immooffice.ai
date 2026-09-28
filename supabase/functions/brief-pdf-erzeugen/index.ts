@@ -93,7 +93,8 @@ Deno.serve(async (req) => {
       firma = data;
     }
     if (!firma) {
-      const { data } = await admin.from("firma_stammdaten").select("*").eq("slug", "standard").maybeSingle();
+      const { data } = await admin.from("firma_stammdaten").select("*")
+        .eq("mandant_id", immoMandant).order("sortierung").limit(1).maybeSingle();
       firma = data;
     }
     if (!firma) throw new Error("Firma-Stammdaten fehlen.");

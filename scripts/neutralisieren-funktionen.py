@@ -700,6 +700,199 @@ ERSETZUNGEN = [
      'akq-lead-eingang: die Aufrufstelle kennt die neue Signatur.',
      {'akq-lead-eingang'}),
 
+    # =====================================================================
+    # FORK — der Briefkopf kam ueber einen festen Slug
+    #
+    # Fuenf Funktionen erzeugen ein Dokument mit Briefkopf und holten den
+    # Standort dafuer so:
+    #     .from("firma_stammdaten").select("*").eq("slug", "standard")
+    # In der Vorlage stand dort der Slug der Referenz; die Neutralisierung hat
+    # ihn auf "standard" gesetzt. Beides ist eine feste Zeichenkette.
+    #
+    # Bis fork_17 war firma_stammdaten.slug global eindeutig, die Abfrage traf
+    # also genau einen Standort — irgendeinen. Seit fork_17 ist er je Mandant
+    # eindeutig; ab dem zweiten Mandanten traefe maybeSingle() zwei Zeilen und
+    # braeche ab. Mit einem Mandanten faellt davon nichts auf, deshalb steht
+    # die Sache in tests/mandant-nachzug.py.
+    #
+    # Der Standort kommt jetzt aus dem Mandanten des Datensatzes, den die
+    # Funktion ohnehin geladen hat. Es bleibt eine Rueckfallebene: der Weg
+    # darueber (absender_firma_id beziehungsweise firma_id) hat Vorrang und
+    # ist unveraendert.
+    #
+    # Diese Regel MUSS nach den MARKE-Regeln stehen, die den Slug der Referenz
+    # auf "standard" setzen — sonst findet sie ihre Stelle nicht.
+    # =====================================================================
+
+    # Drei Funktionen fuehren seit Phase 2 immoMandant (Storage-Huelle).
+    ('FORK',
+     r'      const \{ data \} = await admin\.from\("firma_stammdaten"\)\.select\("\*"\)\.eq\("slug", "standard"\)\.maybeSingle\(\);\n        firma = data;',
+     '      const { data } = await admin.from("firma_stammdaten").select("*")\n'
+     '          .eq("mandant_id", immoMandant).order("sortierung").limit(1).maybeSingle();\n'
+     '        firma = data;',
+     'Briefkopf: Standort aus dem Mandanten statt ueber einen festen Slug '
+     '(mit immoMandant).',
+     {'signatur-vorgang-starten'}),
+
+    ('FORK',
+     r'if \(!firma\) \{ const \{ data \} = await admin\.from\("firma_stammdaten"\)\.select\("\*"\)\.eq\("slug", "standard"\)\.maybeSingle\(\); firma = data; \}',
+     'if (!firma) { const { data } = await admin.from("firma_stammdaten").select("*")'
+     '.eq("mandant_id", immoMandant).order("sortierung").limit(1).maybeSingle(); firma = data; }',
+     'Briefkopf: dasselbe in expose-pdf-erzeugen.',
+     {'expose-pdf-erzeugen'}),
+
+    ('FORK',
+     r'      const \{ data \} = await admin\.from\("firma_stammdaten"\)\.select\("\*"\)\.eq\("slug", "standard"\)\.maybeSingle\(\);\n      firma = data;\n    \}\n    if \(!firma\) throw new Error\("Firma-Stammdaten fehlen\."\);',
+     '      const { data } = await admin.from("firma_stammdaten").select("*")\n'
+     '        .eq("mandant_id", res.mandant_id).order("sortierung").limit(1).maybeSingle();\n'
+     '      firma = data;\n'
+     '    }\n'
+     '    if (!firma) throw new Error("Firma-Stammdaten fehlen.");',
+     'Briefkopf: Standort aus dem Mandanten der Reservierung.',
+     {'reservierung-pdf-erzeugen', 'reservierung-word-erzeugen'}),
+
+    ('FORK',
+     r'      const \{ data \} = await admin\.from\("firma_stammdaten"\)\.select\("\*"\)\.eq\("slug", "standard"\)\.maybeSingle\(\);',
+     '      const { data } = await admin.from("firma_stammdaten").select("*")\n'
+     '        .eq("mandant_id", immoMandant).order("sortierung").limit(1).maybeSingle();',
+     'Briefkopf: dasselbe in brief-pdf-erzeugen.',
+     {'brief-pdf-erzeugen'}),
+
+    # =====================================================================
+    # FORK — die Dokumente trugen nicht die CI des Mandanten
+    #
+    # Gemeldet am 28.09.2026: "die ci farben werden nicht in die rechnungen
+    # uebernommen". Stimmt. fork_13 hat ci_primaer und ci_akzent an
+    # firma_stammdaten gelegt und die OBERFLAECHE liest sie. Die Dokumente
+    # nicht: jede PDF-Funktion fuehrt ihre eigene Palette im Quelltext.
+    #
+    # Dabei kam noch etwas heraus. Drei Paletten, keine davon die Plattform-CI:
+    #   signatur-vorgang-starten  rgb(0.149, 0.192, 0.349) = #263159
+    #                             rgb(0.831, 0.647, 0.404) = #D4A567
+    #                             -> das sind die Farben DER REFERENZ, noch im
+    #                                Fork. In Fliesskomma-Schreibweise, deshalb
+    #                                hat das Neutralitaets-Gate sie nie gesehen.
+    #   rechnung-pdf-erzeugen     #0A2A4D / #C7A455
+    #   reservierung-pdf-erzeugen dieselben
+    #
+    # Ab hier: Vorgabe ist die Plattform-CI aus CLAUDE.md, und wenn der Standort
+    # eigene Farben hat, gelten seine. Die firma-Zeile wird ohnehin mit
+    # select("*") geladen, die Spalten sind also schon da.
+    #
+    # Bewusst LOKALE Variablen, keine Aenderung am modulweiten CI-Objekt: eine
+    # Edge Function kann mehrere Anfragen gleichzeitig bedienen, und ein
+    # geteilter Zustand haette die Farben des einen Mandanten in das Dokument
+    # des anderen getragen.
+    # =====================================================================
+
+    # Der Umrechner, einmal je Datei. Haengt an der Palette, die es ueberall
+    # schon gibt.
+    ('FORK',
+     r'const CI = \{\n  blau: rgb\(0\.039, 0\.165, 0\.30\),  // ca\. #0A2A4D\n  gold: rgb\(0\.78, 0\.64, 0\.33\),    // ca\. #C7A455',
+     '// #rrggbb in rgb() von pdf-lib. Unbrauchbares faellt auf den Ersatz\n'
+     '// zurueck — ein Dokument in unlesbaren Farben waere schlimmer als eines\n'
+     '// in den Plattformfarben.\n'
+     'function immoCiFarbe(hex: unknown, ersatz: any) {\n'
+     '  if (typeof hex !== "string" || !/^#[0-9A-Fa-f]{6}$/.test(hex)) return ersatz;\n'
+     '  return rgb(parseInt(hex.slice(1, 3), 16) / 255,\n'
+     '             parseInt(hex.slice(3, 5), 16) / 255,\n'
+     '             parseInt(hex.slice(5, 7), 16) / 255);\n'
+     '}\n'
+     '\n'
+     'const CI = {\n'
+     '  blau: rgb(0.106, 0.165, 0.278),  // #1B2A47, Plattform-CI aus CLAUDE.md\n'
+     '  gold: rgb(0.710, 0.576, 0.310),  // #B5934F, dito',
+     'PDF: Plattform-CI statt dritter Palette, dazu der Farbumrechner '
+     '(Rechnung).',
+     {'rechnung-pdf-erzeugen'}),
+
+    # Dieselben Werte, aber ohne die Kommentare — deshalb ein eigenes Muster.
+    ('FORK',
+     r'const CI = \{\n  blau: rgb\(0\.039, 0\.165, 0\.30\),\n  gold: rgb\(0\.78, 0\.64, 0\.33\),',
+     '// #rrggbb in rgb() von pdf-lib. Unbrauchbares faellt auf den Ersatz\n'
+     '// zurueck — ein Dokument in unlesbaren Farben waere schlimmer als eines\n'
+     '// in den Plattformfarben.\n'
+     'function immoCiFarbe(hex: unknown, ersatz: any) {\n'
+     '  if (typeof hex !== "string" || !/^#[0-9A-Fa-f]{6}$/.test(hex)) return ersatz;\n'
+     '  return rgb(parseInt(hex.slice(1, 3), 16) / 255,\n'
+     '             parseInt(hex.slice(3, 5), 16) / 255,\n'
+     '             parseInt(hex.slice(5, 7), 16) / 255);\n'
+     '}\n'
+     '\n'
+     'const CI = {\n'
+     '  blau: rgb(0.106, 0.165, 0.278),  // #1B2A47, Plattform-CI aus CLAUDE.md\n'
+     '  gold: rgb(0.710, 0.576, 0.310),  // #B5934F, dito',
+     'PDF: Plattform-CI statt dritter Palette (Reservierung).',
+     {'reservierung-pdf-erzeugen'}),
+
+    ('FORK',
+     r'  blau: rgb\(0\.149, 0\.192, 0\.349\),\n  gold: rgb\(0\.831, 0\.647, 0\.404\),',
+     '  // Hier standen bis zum 28.09.2026 rgb(0.149, 0.192, 0.349) und\n'
+     '  // rgb(0.831, 0.647, 0.404) — das sind #263159 und #D4A567, die Farben\n'
+     '  // der Referenz. In Fliesskomma-Schreibweise hat das Neutralitaets-Gate\n'
+     '  // sie nicht gefunden.\n'
+     '  blau: rgb(0.106, 0.165, 0.278),  // #1B2A47, Plattform-CI aus CLAUDE.md\n'
+     '  gold: rgb(0.710, 0.576, 0.310),  // #B5934F, dito',
+     'PDF: die Farben der Referenz in signatur-vorgang-starten ersetzt.',
+     {'signatur-vorgang-starten'}),
+
+    ('FORK',
+     r'function buildReservierungAbsaetze\(res: any, firma',
+     'function immoCiFarbe(hex: unknown, ersatz: any) {\n'
+     '  if (typeof hex !== "string" || !/^#[0-9A-Fa-f]{6}$/.test(hex)) return ersatz;\n'
+     '  return rgb(parseInt(hex.slice(1, 3), 16) / 255,\n'
+     '             parseInt(hex.slice(3, 5), 16) / 255,\n'
+     '             parseInt(hex.slice(5, 7), 16) / 255);\n'
+     '}\n'
+     '\n'
+     'function buildReservierungAbsaetze(res: any, firma',
+     'PDF: der Farbumrechner in signatur-vorgang-starten.',
+     {'signatur-vorgang-starten'}),
+
+    # ZUERST die Verwendungsstellen umstellen, DANN die Zuweisung einfuegen.
+    # Andersherum trifft die Ersetzung die Zeile, die sie selbst erzeugt hat:
+    # `const ciBlau = immoCiFarbe(firma.ci_primaer, ciBlau)` — ein Verweis auf
+    # sich selbst. Genau so beim ersten Durchlauf passiert.
+    ('FORK', r'\bCI\.blau\b', 'ciBlau',
+     'PDF: die Ueberschriften nehmen die Mandantenfarbe.',
+     {'rechnung-pdf-erzeugen', 'reservierung-pdf-erzeugen', 'signatur-vorgang-starten'}),
+    ('FORK', r'\bCI\.gold\b', 'ciGold',
+     'PDF: die Akzente nehmen die Mandantenfarbe.',
+     {'signatur-vorgang-starten'}),
+
+    # Je Anfrage die Farben des Standorts bestimmen, direkt hinter der Stelle,
+    # an der feststeht, welcher Standort es ist.
+    ('FORK',
+     r'    if \(!firma\) throw new Error\("Firmen-Stammdaten nicht gefunden\."\);',
+     '    if (!firma) throw new Error("Firmen-Stammdaten nicht gefunden.");\n'
+     '\n'
+     '    // Die CI des Mandanten, sonst die der Plattform.\n'
+     '    const ciBlau = immoCiFarbe(firma.ci_primaer, CI.blau);\n'
+     '    const ciGold = immoCiFarbe(firma.ci_akzent, CI.gold);',
+     'Rechnung: die Farben des Standorts gelten fuer dieses Dokument.',
+     {'rechnung-pdf-erzeugen'}),
+
+    ('FORK',
+     r'    if \(!firma\) throw new Error\("Firma-Stammdaten fehlen\."\);',
+     '    if (!firma) throw new Error("Firma-Stammdaten fehlen.");\n'
+     '\n'
+     '    // Die CI des Mandanten, sonst die der Plattform.\n'
+     '    const ciBlau = immoCiFarbe(firma.ci_primaer, CI.blau);\n'
+     '    const ciGold = immoCiFarbe(firma.ci_akzent, CI.gold);',
+     'Reservierung: die Farben des Standorts gelten fuer dieses Dokument.',
+     {'reservierung-pdf-erzeugen'}),
+
+    ('FORK',
+     r'      if \(!firma\) throw new Error\("Firma-Stammdaten fehlen\."\);',
+     '      if (!firma) throw new Error("Firma-Stammdaten fehlen.");\n'
+     '\n'
+     '      // Die CI des Mandanten, sonst die der Plattform.\n'
+     '      const ciBlau = immoCiFarbe(firma.ci_primaer, CI.blau);\n'
+     '      const ciGold = immoCiFarbe(firma.ci_akzent, CI.gold);',
+     'Signaturvorgang: die Farben des Standorts gelten fuer dieses Dokument.',
+     {'signatur-vorgang-starten'}),
+
+
 ]
 
 # Drei Funktionen verdrahten die Portal-Adresse fest, statt sie wie alle

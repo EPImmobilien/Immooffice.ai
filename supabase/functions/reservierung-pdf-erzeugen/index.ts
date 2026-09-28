@@ -39,9 +39,19 @@ let cachedFonts: {
   marcellus?: ArrayBuffer;
 } = {};
 
+// #rrggbb in rgb() von pdf-lib. Unbrauchbares faellt auf den Ersatz
+// zurueck — ein Dokument in unlesbaren Farben waere schlimmer als eines
+// in den Plattformfarben.
+function immoCiFarbe(hex: unknown, ersatz: any) {
+  if (typeof hex !== "string" || !/^#[0-9A-Fa-f]{6}$/.test(hex)) return ersatz;
+  return rgb(parseInt(hex.slice(1, 3), 16) / 255,
+             parseInt(hex.slice(3, 5), 16) / 255,
+             parseInt(hex.slice(5, 7), 16) / 255);
+}
+
 const CI = {
-  blau: rgb(0.039, 0.165, 0.30),
-  gold: rgb(0.78, 0.64, 0.33),
+  blau: rgb(0.106, 0.165, 0.278),  // #1B2A47, Plattform-CI aus CLAUDE.md
+  gold: rgb(0.710, 0.576, 0.310),  // #B5934F, dito
   text: rgb(0.05, 0.05, 0.05),
   hellGrau: rgb(0.95, 0.95, 0.95),
   mittelGrau: rgb(0.6, 0.6, 0.6),
@@ -106,10 +116,15 @@ Deno.serve(async (req) => {
       firma = data;
     }
     if (!firma) {
-      const { data } = await admin.from("firma_stammdaten").select("*").eq("slug", "standard").maybeSingle();
+      const { data } = await admin.from("firma_stammdaten").select("*")
+        .eq("mandant_id", res.mandant_id).order("sortierung").limit(1).maybeSingle();
       firma = data;
     }
     if (!firma) throw new Error("Firma-Stammdaten fehlen.");
+
+    // Die CI des Mandanten, sonst die der Plattform.
+    const ciBlau = immoCiFarbe(firma.ci_primaer, CI.blau);
+    const ciGold = immoCiFarbe(firma.ci_akzent, CI.gold);
 
     // Fonts aus Storage laden
     if (fontkit && !cachedFonts.montserratRegular) {
@@ -234,7 +249,7 @@ Deno.serve(async (req) => {
 
     // Titel
     page.drawText(fix("Reservierungsvereinbarung"), {
-      x: margin, y: y - 30, size: 28, font: fontHeadline, color: CI.blau,
+      x: margin, y: y - 30, size: 28, font: fontHeadline, color: ciBlau,
     });
     y -= 70;
 
@@ -296,7 +311,7 @@ Deno.serve(async (req) => {
     // ----------------------------------------------------------------------
     function paragraph(titel: string, text: string, startY: number): number {
       let yp = startY;
-      page.drawText(fix(titel), { x: margin, y: yp, size: 13, font: fontBold, color: CI.blau });
+      page.drawText(fix(titel), { x: margin, y: yp, size: 13, font: fontBold, color: ciBlau });
       yp -= 18;
       const lines = drawWrappedText(page, text, margin, yp, contentBreite, {
         size: 11, font: fontRegular, color: CI.text, lineHeight: 15,
@@ -306,7 +321,7 @@ Deno.serve(async (req) => {
 
     // §1 — speziell aufgebaut
     page.drawText(fix("1. Gegenstand der Reservierung"), {
-      x: margin, y, size: 13, font: fontBold, color: CI.blau,
+      x: margin, y, size: 13, font: fontBold, color: ciBlau,
     });
     y -= 18;
     page.drawText(fix("Der Käufer reserviert verbindlich folgende Immobilie:"), {
@@ -377,7 +392,7 @@ Deno.serve(async (req) => {
 
     // §6 Reservierungsgebuehr
     page.drawText(fix("6. Reservierungsgebühr"), {
-      x: margin, y, size: 13, font: fontBold, color: CI.blau,
+      x: margin, y, size: 13, font: fontBold, color: ciBlau,
     });
     y -= 18;
     const gebuehrText1 =
@@ -420,7 +435,7 @@ Deno.serve(async (req) => {
 
     // §9 Ruecktrittsrecht
     page.drawText(fix("9. Rücktrittsrecht des Verkäufers/Maklers"), {
-      x: margin, y, size: 13, font: fontBold, color: CI.blau,
+      x: margin, y, size: 13, font: fontBold, color: ciBlau,
     });
     y -= 18;
     const ruecktritt1 = "Der Verkäufer bzw. Makler ist berechtigt, von dieser Reservierungsvereinbarung zurückzutreten, wenn";
