@@ -377,3 +377,24 @@ Vollständig und je Stelle begründet in `scripts/neutralisieren.py`. In Summe:
 Nicht geändert: kein Tabellen- oder Spaltenname, keine Richtlinie, kein
 Trigger, keine Prüfbedingung. Auch nicht das `signatur_*`-Loch — das gehört
 in Phase 2.3.
+
+---
+
+## Nachtrag 28.09.2026 — Edge Functions laufen auf dem eigenen Projekt
+
+| Gegenstand | Stand |
+|---|---|
+| Edge Functions ausgerollt | **139 von 139** (`usguiggfciavwzkdfjgt`) |
+| `verify_jwt` | für jede Funktion aus `supabase/config.toml`, 30 bewusst ohne JWT-Prüfung |
+| Gegenprobe | `supabase functions list` gegen `config.toml` — Teil des Workflows, bricht bei Abweichung ab |
+| Weg | `.github/workflows/funktionen-ausrollen.yml`, nicht Datei für Datei über die Verwaltungsschnittstelle |
+
+**Was davon noch nicht läuft:** die Funktionen antworten, aber die meisten
+brauchen Geheimnisse, die im Projekt noch nicht gesetzt sind — 22 Namen,
+aufgelistet in `docs/SECRETS.md`. Ohne `ANTHROPIC_API_KEY` antwortet jede der
+41 KI-Funktionen mit einem Fehler; ohne `RESEND_API_KEY` beziehungsweise die
+`SMTP_*`-Werte geht keine Mail hinaus.
+
+**Was für Gate 1 noch fehlt:** ein Ort, an dem `dist/index.html` liegt, und
+der erste echte Anmeldeversuch dagegen. Beides braucht eine Entscheidung des
+Betreibers (siehe `docs/OFFEN.md`).
