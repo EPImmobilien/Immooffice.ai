@@ -15,8 +15,16 @@ und Koordinaten zu jedem Objekt jedes Maklers, fuer jeden Angemeldeten.
 
 Diese Datei zaehlt, findet neue Faelle und haelt fest, was geprueft ist.
 Die Liste NOCH_OFFEN darf nur kuerzer werden.
+
+ZUM UMFANG (29.09.2026, nachgeschaerft): Die erste Fassung hat nur die
+Funktionen gefuehrt, in denen eine Kennung als body.irgendwas_id im
+Quelltext steht. Das waren 40 — aber es ist ein Muster, kein Kriterium:
+const { brief_id } = body faellt durch, und ein .from("x").select("*") ohne
+jede Kennung liefert unter dem service_role gleich ALLE Mandanten.
+Gefuehrt wird deshalb jede Funktion mit JWT-Pruefung, die den service_role
+benutzt — 63 statt 40. Was geprueft und harmlos ist, steht unter
+UNBEDENKLICH, nicht ausserhalb der Liste.
 """
-import re
 import sys
 import tomllib
 from pathlib import Path
@@ -131,10 +139,31 @@ UNBEDENKLICH = {}
 # --- Gelesen oder erkannt, Befund offen ------------------------------------
 # Diese Liste darf kuerzer werden, nie laenger.
 NOCH_OFFEN = {
+    'akq-ki-vorlage': 'Textvorlage der Akquise',
+    'bewerbertest-einladen': 'Bewerbereinladung',
+    'brief-pdf-erzeugen': 'Brief als PDF',
+    'credentials-speichern': 'Zugangsdaten schreiben',
+    'ea-mailtest': 'Postfachtest',
+    'eigentuemer-link-erneut-senden': 'Anmeldelink erneut',
+    'eigentuemer-loeschen': 'Eigentuemer loeschen',
+    'energieausweis-auslesen': 'Energieausweis auslesen',
+    'expose-erinnerung': 'Erinnerung an offene Exposes',
+    'expose-rueckmeldung-melden': 'Rueckmeldung zum Expose',
+    'mail-abwesenheit-verarbeiten': 'Abwesenheitsnotizen',
+    'mail-postfach-pull': 'IMAP-Abruf',
+    'mail-postfach-speichern': 'Postfach speichern',
+    'mail-senden': 'Mailversand',
+    'mail-zu-mietanfrage': 'Mail zu Mietanfrage',
+    'makler-nachricht-senden': 'Nachricht an den Eigentuemer',
+    'objekt-wissen-auslesen': 'Objektwissen auslesen',
+    'projekt-datei-benachrichtigung': 'Neubauportal, Dateimeldung',
+    'reservierung-pdf-erzeugen': 'Reservierung als PDF',
+    'reservierung-word-erzeugen': 'Reservierung als Word',
+    'upload_benachrichtigung_planen': 'Upload-Meldung einreihen',
+    'urlaub-hinweise': 'Urlaubshinweise',
+    'web-asset-kopieren': 'Web-Dateien kopieren',
 }
 
-# Kennung aus dem Anfragekoerper: body.x_id, body?.x_id, const xId = body...
-KENNUNG = re.compile(r'body[\.\?]{1,2}(?:[a-z_]*_)?id\b|body\??\.[a-z_]*_id\b')
 
 
 def main():
@@ -151,8 +180,6 @@ def main():
         text = datei.read_text(encoding='utf-8')
         if 'SUPABASE_SERVICE_ROLE_KEY' not in text:
             continue
-        if not KENNUNG.search(text):
-            continue
         betroffen.append(name)
 
     gefuehrt = set(ABGESICHERT) | set(UNBEDENKLICH) | set(NOCH_OFFEN)
@@ -168,8 +195,8 @@ def main():
         if not datei.is_file() or marke not in datei.read_text(encoding='utf-8'):
             ohne_kennzeichen.append(f'{name} (erwartet: {marke})')
 
-    print(f'{len(betroffen)} Funktionen mit JWT-Pruefung, service_role '
-          f'und einer Kennung aus dem Anfragekoerper:')
+    print(f'{len(betroffen)} Funktionen mit JWT-Pruefung, die den '
+          f'service_role benutzen:')
     print(f'  abgesichert  {len(ABGESICHERT):4d}')
     print(f'  unbedenklich {len(UNBEDENKLICH):4d}')
     print(f'  noch offen   {len(NOCH_OFFEN):4d}')
