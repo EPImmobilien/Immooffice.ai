@@ -112,6 +112,14 @@ ABGESICHERT = {
         'Im Kundenbereich eines fremden Bautraegers antworten.'),
     'termin-fahrzeit': ('immoMandantSichern',
         'Fahrzeit und Entfernung zu einem fremden Termin.'),
+    'besichtigung-nachfassen': ('t.mandant_id',
+        'Dasselbe Zeitfenster. Ob nachgefasst wird, entschied der Posteingang ALLER Mandanten — gesucht wurde ueber die E-Mail-Adresse —, und der Betreff der fremden Mail stand im Protokoll der Antwort.'),
+    'eigentuemer-einladung-nachfassen': ('firmaFuer',
+        'Der Briefkopf kam aus der ERSTEN aktiven Zeile in firma_stammdaten — fuer alle Mandanten derselbe Firmenname und dieselbe Absenderadresse. Jetzt je Mandant, dazu der Ansprechpartner und der Waechter fuer body.eigentuemer_id.'),
+    'termin-erinnerung': ('t.mandant_id',
+        'Laeuft ueber ein Zeitfenster, also ueber alle Mandanten — das darf sie. Der Absender wurde aber ueber den NAMEN des Teilnehmers gesucht, und der Rueckfall nahm irgendeinen Chef: die Erinnerung waere ueber ein fremdes Postfach hinausgegangen. Dazu der Waechter fuer body.termin_id.'),
+    'termin-serie': ('aufruferMandant',
+        'serie_id ist keine Kennung einer Zeile, sondern eine Gruppierung ueber termine.serie_id; ein Waechter greift dort ins Leere. Der einzige Fall in beiden Bloecken, in dem LOESCHEN moeglich war: die Terminserie eines fremden Maklers, Termin fuer Termin. Jede Abfrage haengt jetzt am Mandanten des Aufrufers.'),
     'fahrt-ermitteln': ('aufruferMandant',
         'Der erste Fund dieser Art (29.09.2026). Prueft jetzt erst das '
         'Objekt und den Mandanten, dann den Zwischenspeicher.'),
@@ -123,10 +131,6 @@ UNBEDENKLICH = {}
 # --- Gelesen oder erkannt, Befund offen ------------------------------------
 # Diese Liste darf kuerzer werden, nie laenger.
 NOCH_OFFEN = {
-    'besichtigung-nachfassen': 'termin_id',
-    'eigentuemer-einladung-nachfassen': 'eigentuemer_id',
-    'termin-erinnerung': 'termin_id',
-    'termin-serie': 'serie_id',
 }
 
 # Kennung aus dem Anfragekoerper: body.x_id, body?.x_id, const xId = body...

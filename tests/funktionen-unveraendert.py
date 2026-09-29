@@ -164,7 +164,11 @@ for _f in ('credentials-anzeigen', 'mitarbeiter-loeschen',
            'mail-anfrage-verarbeiten', 'mail-ki-vorschlag',
            'mail-postfach-backfill', 'mail-rechnung-weiterleiten',
            'mail-zu-todo', 'mitarbeiter-anlegen', 'newsletter-senden',
-           'projekt-nachricht-antwort', 'termin-fahrzeit'):
+           'projekt-nachricht-antwort', 'termin-fahrzeit',
+           # Runde 4: die vier anderer Bauart — Zeitfenster statt Kennung,
+           # und termin-serie konnte sogar fremde Termine loeschen.
+           'termin-erinnerung', 'besichtigung-nachfassen', 'termin-serie',
+           'eigentuemer-einladung-nachfassen'):
     ERWEITERT[_f] = ('Prueft Kennungen aus dem Anfragekoerper gegen den '
                      'Mandanten des Aufrufers (Phase 2)')
 

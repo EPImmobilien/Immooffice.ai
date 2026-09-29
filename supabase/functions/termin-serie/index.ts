@@ -26,6 +26,49 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
+// Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
+// und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist
+// damit ungeprueft: sie kann auf einen Satz eines anderen Mandanten zeigen.
+//
+// public.mandant_sichern() aus fork_14 zieht genau diese Grenze. Sie muss
+// aber MIT DEM TOKEN DES AUFRUFERS gerufen werden — unter dem service_role
+// laesst sie jeden durch (mandant_grenze_gilt() ist dort false, mit Absicht:
+// Cron und Wartung haben keinen Mandanten). Deshalb ein zweiter Client, der
+// nur den mitgebrachten Kopf weiterreicht.
+//
+// Ohne Anmeldekopf oder mit dem Dienstschluessel passiert nichts — das sind
+// die internen Wege, und die sind nicht die Grenze, die hier gezogen wird.
+async function immoMandantSichern(req: Request, paare: Array<[string, unknown]>): Promise<void> {
+  const kopf = req.headers.get("Authorization") || "";
+  if (!/^Bearer\s+/i.test(kopf)) return;
+  const zuPruefen = paare.filter(([, id]) =>
+    typeof id === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));
+  if (!zuPruefen.length) return;
+  const nutzer = createClient(
+    Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: kopf } }, auth: { persistSession: false } });
+  for (const [tabelle, id] of zuPruefen) {
+    const { error } = await nutzer.rpc("mandant_sichern", { p_tabelle: tabelle, p_id: id });
+    if (error) throw new Error("Kein Zugriff auf Daten eines anderen Mandanten.");
+  }
+}
+
+// Wessen Mandant ist der Aufrufer? Fuer die Faelle, in denen nicht eine
+// Kennung, sondern ein PFAD aus dem Anfragekoerper kommt — das erste
+// Pfadsegment im Dateispeicher ist seit fork_09 die Mandantenkennung.
+async function immoMandantDesAufrufers(req: Request): Promise<string | null> {
+  const kopf = req.headers.get("Authorization") || "";
+  if (!/^Bearer\s+/i.test(kopf)) return null;
+  const nutzer = createClient(
+    Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: kopf } }, auth: { persistSession: false } });
+  const { data: u } = await nutzer.auth.getUser(kopf.replace(/^Bearer\s+/i, ""));
+  if (!u?.user) return null;
+  const { data: prof } = await nutzer.from("profiles").select("mandant_id").eq("id", u.user.id).maybeSingle();
+  return prof?.mandant_id ? String(prof.mandant_id) : null;
+}
+
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -114,12 +157,20 @@ Deno.serve(async (req) => {
   try {
     const jwt = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
     let nutzerId: string | null = null;
+    // serie_id ist KEINE Kennung einer Zeile, sondern eine Gruppierung ueber
+    // termine.serie_id. mandant_sichern() greift dort ins Leere — hier muss
+    // jede Abfrage selbst begrenzt werden. Ohne diese Grenze liess sich die
+    // Serie eines fremden Maklers aendern und LOESCHEN.
+    let aufruferMandant: string | null = null;
+    const nurEigene = (q: any) => aufruferMandant ? q.eq("mandant_id", aufruferMandant) : q;
     if (jwt && jwt !== Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) {
       const { data: u } = await db.auth.getUser(jwt);
       if (!u?.user) return antwort({ ok: false, fehler: "Nicht angemeldet." }, 401);
       nutzerId = u.user.id;
-      const { data: p } = await db.from("profiles").select("role").eq("id", u.user.id).maybeSingle();
+      const { data: p } = await db.from("profiles").select("role, mandant_id").eq("id", u.user.id).maybeSingle();
       if (!p || !["chef", "mitarbeiter"].includes(p.role)) return antwort({ ok: false, fehler: "Keine Berechtigung." }, 403);
+      aufruferMandant = p.mandant_id || null;
+      if (!aufruferMandant) return antwort({ ok: false, fehler: "Konto ohne Mandanten." }, 403);
     }
 
     const body = await req.json().catch(() => ({}));
@@ -189,7 +240,7 @@ Deno.serve(async (req) => {
     if (aktion === "uebertragen") {
       const limit = Math.min(Math.max(Number(body.limit) || 6, 1), 20);
       const heute = new Date().toISOString().slice(0, 10);
-      let q = db.from("termine").select("id, datum, onoffice_id, immobilie_id, ort, ganztags, uhrzeit")
+      let q = nurEigene(db.from("termine").select("id, datum, onoffice_id, immobilie_id, ort, ganztags, uhrzeit"))
         .eq("serie_id", serieId).neq("status", "storniert").order("datum");
       if (body.ab_datum) q = q.gte("datum", String(body.ab_datum));
       if (body.modus !== "alle") q = q.is("onoffice_id", null);
@@ -218,7 +269,7 @@ Deno.serve(async (req) => {
       for (const k of erlaubt) if (k in a) patch[k] = a[k];
       if (!Object.keys(patch).length) return antwort({ ok: false, fehler: "Nichts zu ändern." }, 400);
       patch.updated_at = new Date().toISOString();
-      const { data: betroffen, error } = await db.from("termine").update(patch)
+      const { data: betroffen, error } = await nurEigene(db.from("termine").update(patch))
         .eq("serie_id", serieId).gte("datum", ab).neq("status", "storniert").is("fahrt_zu_termin_id", null)
         .select("id");
       if (error) throw error;
@@ -228,7 +279,7 @@ Deno.serve(async (req) => {
     // ---------------------------------------------------------------- Loeschen
     if (aktion === "loeschen") {
       const ab = body.ab_datum ? String(body.ab_datum) : null;
-      let q = db.from("termine").select("id, onoffice_id, datum").eq("serie_id", serieId).order("datum");
+      let q = nurEigene(db.from("termine").select("id, onoffice_id, datum")).eq("serie_id", serieId).order("datum");
       if (ab) q = q.gte("datum", ab);
       const { data: zeilen, error } = await q;
       if (error) throw error;

@@ -16,6 +16,49 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
+// Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
+// und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist
+// damit ungeprueft: sie kann auf einen Satz eines anderen Mandanten zeigen.
+//
+// public.mandant_sichern() aus fork_14 zieht genau diese Grenze. Sie muss
+// aber MIT DEM TOKEN DES AUFRUFERS gerufen werden — unter dem service_role
+// laesst sie jeden durch (mandant_grenze_gilt() ist dort false, mit Absicht:
+// Cron und Wartung haben keinen Mandanten). Deshalb ein zweiter Client, der
+// nur den mitgebrachten Kopf weiterreicht.
+//
+// Ohne Anmeldekopf oder mit dem Dienstschluessel passiert nichts — das sind
+// die internen Wege, und die sind nicht die Grenze, die hier gezogen wird.
+async function immoMandantSichern(req: Request, paare: Array<[string, unknown]>): Promise<void> {
+  const kopf = req.headers.get("Authorization") || "";
+  if (!/^Bearer\s+/i.test(kopf)) return;
+  const zuPruefen = paare.filter(([, id]) =>
+    typeof id === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));
+  if (!zuPruefen.length) return;
+  const nutzer = createClient(
+    Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: kopf } }, auth: { persistSession: false } });
+  for (const [tabelle, id] of zuPruefen) {
+    const { error } = await nutzer.rpc("mandant_sichern", { p_tabelle: tabelle, p_id: id });
+    if (error) throw new Error("Kein Zugriff auf Daten eines anderen Mandanten.");
+  }
+}
+
+// Wessen Mandant ist der Aufrufer? Fuer die Faelle, in denen nicht eine
+// Kennung, sondern ein PFAD aus dem Anfragekoerper kommt — das erste
+// Pfadsegment im Dateispeicher ist seit fork_09 die Mandantenkennung.
+async function immoMandantDesAufrufers(req: Request): Promise<string | null> {
+  const kopf = req.headers.get("Authorization") || "";
+  if (!/^Bearer\s+/i.test(kopf)) return null;
+  const nutzer = createClient(
+    Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: kopf } }, auth: { persistSession: false } });
+  const { data: u } = await nutzer.auth.getUser(kopf.replace(/^Bearer\s+/i, ""));
+  if (!u?.user) return null;
+  const { data: prof } = await nutzer.from("profiles").select("mandant_id").eq("id", u.user.id).maybeSingle();
+  return prof?.mandant_id ? String(prof.mandant_id) : null;
+}
+
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -105,8 +148,9 @@ Deno.serve(async (req) => {
     const ziel = datumPlus(heute, -tage);          // Besichtigung vor N Tagen
     const fensterVon = datumPlus(ziel, -4);         // Nachholfenster, falls ein Lauf ausfiel
 
+    await immoMandantSichern(req, [["termine", String(body.termin_id || "")]]);
     let q = db.from("termine")
-      .select("id, titel, art, datum, uhrzeit, ende, ersteller_id, ersteller_name, teilnehmer, kontakt_id, immobilie_id, status, nachfassen, nachfass_status, quelle")
+      .select("id, titel, art, datum, uhrzeit, ende, ersteller_id, ersteller_name, teilnehmer, kontakt_id, immobilie_id, status, nachfassen, nachfass_status, quelle, mandant_id")
       .ilike("art", "%besichtigung%").eq("nachfassen", true).is("nachfass_status", null).not("kontakt_id", "is", null)
       .neq("status", "storniert");
     if (body.termin_id) q = q.eq("id", body.termin_id); else q = q.gte("datum", fensterVon).lte("datum", ziel);
@@ -132,12 +176,16 @@ Deno.serve(async (req) => {
         const besichtigungIso = new Date(`${t.datum}T${zeit}:00+02:00`).toISOString();   // Ende der Besichtigung (Sommerzeit-Näherung reicht)
 
         // A) Kunde hat sich gemeldet
-        const { data: vonKunde } = await db.from("mail_eingang").select("id, betreff, gesendet_am").ilike("absender_email", mail).neq("ordner", "gesendet").gt("gesendet_am", besichtigungIso).order("gesendet_am", { ascending: false }).limit(1);
+        // Gesucht wird ueber die E-Mail-Adresse — die gibt es bei mehreren
+        // Maklern. Ohne Mandanten haette der Posteingang des einen
+        // entschieden, ob der andere nachfasst, und der Betreff der fremden
+        // Mail stuende im Protokoll der Antwort.
+        const { data: vonKunde } = await db.from("mail_eingang").select("id, betreff, gesendet_am").eq("mandant_id", t.mandant_id).ilike("absender_email", mail).neq("ordner", "gesendet").gt("gesendet_am", besichtigungIso).order("gesendet_am", { ascending: false }).limit(1);
         if (vonKunde && vonKunde.length) { eintrag.mail = vonKunde[0]; await markiere("uebersprungen", "kunde_hat_sich_gemeldet"); uebersprungen++; log.push(eintrag); continue; }
         // B) wir haben ihm geschrieben (Portal-Versand oder Gesendet-Ordner aus Outlook/onOffice)
         const [{ data: vonUnsPortal }, { data: vonUnsServer }] = await Promise.all([
-          db.from("mail_versendet").select("id, betreff, gesendet_am").eq("status", "gesendet").ilike("empfaenger_email", `%${mail}%`).gt("gesendet_am", besichtigungIso).limit(1),
-          db.from("mail_eingang").select("id, betreff, gesendet_am").eq("ordner", "gesendet").ilike("empfaenger_email", `%${mail}%`).gt("gesendet_am", besichtigungIso).limit(1)]);
+          db.from("mail_versendet").select("id, betreff, gesendet_am").eq("mandant_id", t.mandant_id).eq("status", "gesendet").ilike("empfaenger_email", `%${mail}%`).gt("gesendet_am", besichtigungIso).limit(1),
+          db.from("mail_eingang").select("id, betreff, gesendet_am").eq("mandant_id", t.mandant_id).eq("ordner", "gesendet").ilike("empfaenger_email", `%${mail}%`).gt("gesendet_am", besichtigungIso).limit(1)]);
         const vonUns = (vonUnsPortal && vonUnsPortal[0]) || (vonUnsServer && vonUnsServer[0]);
         if (vonUns) { eintrag.mail = vonUns; await markiere("uebersprungen", "bereits_angeschrieben"); uebersprungen++; log.push(eintrag); continue; }
 

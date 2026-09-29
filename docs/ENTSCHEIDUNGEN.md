@@ -2481,4 +2481,30 @@ verschicken, im Kundenbereich eines fremden Bauträgers antworten.
 eine Kennung prüft, greift dort ins Leere. Diese vier brauchen, was der
 Objekt-Newsletter schon bekommen hat: **einen Lauf je Mandant**.
 
-**Stand: 36 abgesichert, 4 offen.**
+### Runde 4: die vier anderer Bauart — und der einzige Löschfall
+
+Sie arbeiten über ein **Zeitfenster** statt über eine Kennung, und ein
+Wächter, der eine Kennung prüft, greift dort ins Leere.
+
+- **`termin-erinnerung`** und **`besichtigung-nachfassen`** laufen über alle
+  Mandanten — das dürfen sie, es sind Cron-Läufe. Aber der Absender wurde
+  über den **Namen** des Teilnehmers gesucht und fiel sonst auf
+  „irgendeinen Chef" zurück: die Erinnerung wäre über ein fremdes Postfach
+  hinausgegangen. Und ob nachgefasst wird, entschied bei
+  `besichtigung-nachfassen` der Posteingang **aller** Mandanten — gesucht
+  wurde über die E-Mail-Adresse —, wobei der Betreff der fremden Mail im
+  Protokoll der Antwort landete.
+- **`eigentuemer-einladung-nachfassen`** nahm den Briefkopf aus der
+  **ersten aktiven Zeile** in `firma_stammdaten`: für alle Mandanten
+  derselbe Firmenname und dieselbe Absenderadresse.
+- **`termin-serie`** ist der **einzige Fall in beiden Blöcken, in dem
+  Löschen möglich war**. `serie_id` ist keine Kennung einer Zeile, sondern
+  eine Gruppierung über `termine.serie_id` — es gibt dazu keine Tabelle, an
+  der sich ein Wächter festmachen könnte. Ein angemeldeter Nutzer konnte
+  damit die Terminserie eines fremden Maklers ändern und **Termin für
+  Termin löschen**. Jede Abfrage hängt jetzt am Mandanten des Aufrufers.
+
+**Stand: 40 abgesichert, 0 offen.** Beide Blöcke sind damit durch: 28
+öffentliche Endpunkte und 40 angemeldete. `tests/funktionen-oeffentlich.py`
+und `tests/funktionen-angemeldet.py` melden jeden neuen Fall, der
+dazukommt.

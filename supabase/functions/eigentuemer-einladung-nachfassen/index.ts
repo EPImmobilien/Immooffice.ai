@@ -7,6 +7,49 @@
 // status angenommen gesetzt. Ohne RESEND_API_KEY: Rueckfall auf die Supabase-Auth-Mail (inviteUserByEmail / OTP).
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+
+// --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
+// Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
+// und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist
+// damit ungeprueft: sie kann auf einen Satz eines anderen Mandanten zeigen.
+//
+// public.mandant_sichern() aus fork_14 zieht genau diese Grenze. Sie muss
+// aber MIT DEM TOKEN DES AUFRUFERS gerufen werden — unter dem service_role
+// laesst sie jeden durch (mandant_grenze_gilt() ist dort false, mit Absicht:
+// Cron und Wartung haben keinen Mandanten). Deshalb ein zweiter Client, der
+// nur den mitgebrachten Kopf weiterreicht.
+//
+// Ohne Anmeldekopf oder mit dem Dienstschluessel passiert nichts — das sind
+// die internen Wege, und die sind nicht die Grenze, die hier gezogen wird.
+async function immoMandantSichern(req: Request, paare: Array<[string, unknown]>): Promise<void> {
+  const kopf = req.headers.get("Authorization") || "";
+  if (!/^Bearer\s+/i.test(kopf)) return;
+  const zuPruefen = paare.filter(([, id]) =>
+    typeof id === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));
+  if (!zuPruefen.length) return;
+  const nutzer = createClient(
+    Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: kopf } }, auth: { persistSession: false } });
+  for (const [tabelle, id] of zuPruefen) {
+    const { error } = await nutzer.rpc("mandant_sichern", { p_tabelle: tabelle, p_id: id });
+    if (error) throw new Error("Kein Zugriff auf Daten eines anderen Mandanten.");
+  }
+}
+
+// Wessen Mandant ist der Aufrufer? Fuer die Faelle, in denen nicht eine
+// Kennung, sondern ein PFAD aus dem Anfragekoerper kommt — das erste
+// Pfadsegment im Dateispeicher ist seit fork_09 die Mandantenkennung.
+async function immoMandantDesAufrufers(req: Request): Promise<string | null> {
+  const kopf = req.headers.get("Authorization") || "";
+  if (!/^Bearer\s+/i.test(kopf)) return null;
+  const nutzer = createClient(
+    Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: kopf } }, auth: { persistSession: false } });
+  const { data: u } = await nutzer.auth.getUser(kopf.replace(/^Bearer\s+/i, ""));
+  if (!u?.user) return null;
+  const { data: prof } = await nutzer.from("profiles").select("mandant_id").eq("id", u.user.id).maybeSingle();
+  return prof?.mandant_id ? String(prof.mandant_id) : null;
+}
 import { anredeZeile, baueEinladungsMail, zugangUrlAus } from "./einladung-mail.ts";
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
@@ -24,6 +67,7 @@ Deno.serve(async (req) => {
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
     const body = await req.json().catch(() => ({}));
     const gezielt: string | null = body.eigentuemer_id || null;
+    await immoMandantSichern(req, [["eigentuemer", String(gezielt || "")]]);
     const erzwingen = !!body.erzwingen || !!gezielt;
     const jetzt = new Date();
 
@@ -35,13 +79,25 @@ Deno.serve(async (req) => {
     const jeEig = new Map<string, any>();
     for (const e of einladungen || []) if (!jeEig.has(e.eigentuemer_id)) jeEig.set(e.eigentuemer_id, e);
 
-    const { data: firmaRow } = await admin.from("firma_stammdaten").select("firma_name, email, web").eq("aktiv", true).order("sortierung").limit(1).maybeSingle();
-    const firma = firmaRow?.firma_name || "Musterhaus Immobilien GmbH";
-    const fromEmail = Deno.env.get("SMTP_FROM_EMAIL") || firmaRow?.email || "info@immooffice.example";
+    // Der Briefkopf gehoert dem Mandanten der Einladung, nicht der ersten
+    // Firma in der Tabelle. Er wird deshalb je Mandant geholt und gemerkt.
+    const firmenCache = new Map<string, any>();
+    const firmaFuer = async (mandant: string | null) => {
+      if (!mandant) return null;
+      if (!firmenCache.has(mandant)) {
+        const { data } = await admin.from("firma_stammdaten").select("firma_name, email, web")
+          .eq("mandant_id", mandant).eq("aktiv", true).order("sortierung").limit(1).maybeSingle();
+        firmenCache.set(mandant, data || null);
+      }
+      return firmenCache.get(mandant) || null;
+    };
 
     const details: any[] = []; let gesendet = 0, uebersprungen = 0, angenommen = 0;
     for (const einl of jeEig.values()) {
       const info: any = { eigentuemer_id: einl.eigentuemer_id, email: einl.email };
+      const firmaRow = await firmaFuer(einl.mandant_id || null);
+      const firma = firmaRow?.firma_name || "Musterhaus Immobilien GmbH";
+      const fromEmail = Deno.env.get("SMTP_FROM_EMAIL") || firmaRow?.email || "info@immooffice.example";
       try {
         const { data: eig } = await admin.from("eigentuemer").select("id, anrede, titel, vorname, nachname, email, user_id, aktiv").eq("id", einl.eigentuemer_id).maybeSingle();
         if (!eig || eig.aktiv === false || !eig.email) { uebersprungen++; info.grund = "Eigentümer inaktiv oder ohne E-Mail"; details.push(info); continue; }
@@ -63,7 +119,7 @@ Deno.serve(async (req) => {
           if (einl.erinnert_am && (jetzt.getTime() - new Date(einl.erinnert_am).getTime()) / 864e5 < MIN_ABSTAND_TAGE) { uebersprungen++; info.grund = "zuletzt vor weniger als 3 Tagen erinnert"; details.push(info); continue; }
         }
         // Ansprechpartner
-        const { data: eo } = await admin.from("eigentuemer_objekte").select("ansprechpartner_id").eq("eigentuemer_id", eig.id).not("ansprechpartner_id", "is", null).order("created_at", { ascending: false }).limit(1).maybeSingle();
+        const { data: eo } = await admin.from("eigentuemer_objekte").select("ansprechpartner_id").eq("mandant_id", einl.mandant_id).eq("eigentuemer_id", eig.id).not("ansprechpartner_id", "is", null).order("created_at", { ascending: false }).limit(1).maybeSingle();
         const { data: makler } = eo?.ansprechpartner_id ? await admin.from("profiles").select("id, name, email, telefon, titel").eq("id", eo.ansprechpartner_id).maybeSingle() : { data: null as any };
         const maklerName = makler?.name || firma;
         const anrede = anredeZeile(eig.anrede || "", eig.titel || "", eig.vorname || "", eig.nachname || "");
