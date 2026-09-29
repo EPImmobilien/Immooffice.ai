@@ -32,8 +32,8 @@ Supabase: **Edge Functions → Secrets** (in älteren Oberflächen:
 
 | Name | Wert |
 |---|---|
-| `PORTAL_URL` | `https://immoofficeai.netlify.app` — ohne Schrägstrich am Ende. Später die eigene Domain. |
-| `EXPOSE_FREIGABE_BASIS` | `https://immoofficeai.netlify.app/freigabe.html` |
+| `PORTAL_URL` | `https://immoofficeeai.netlify.app` — ohne Schrägstrich am Ende. Später die eigene Domain. |
+| `EXPOSE_FREIGABE_BASIS` | `https://immoofficeeai.netlify.app/freigabe.html` |
 | `MAIL_SECRET_KEY` | selbst erzeugen: `openssl rand -base64 32` |
 | `CREDENTIALS_OBF_SECRET` | selbst erzeugen: `openssl rand -base64 32` |
 
@@ -46,6 +46,29 @@ nicht im Repository.
 *Ohne `PORTAL_URL`:* Jeder Einladungs- und Freigabelink zeigt auf
 `https://immooffice.example` — eine nach RFC 2606 reservierte Domain, die
 nirgendwohin führt.
+
+---
+
+## Schritt 2b — Auf die richtige Netlify-Site zeigen (5 Minuten)
+
+*Am 29.09.2026 gab es zwei Sites mit fast gleichem Namen:
+`immoofficeai.netlify.app` (ein `e`) und `immoofficeeai.netlify.app` (zwei).
+Die Auslieferung ging auf die erste, benutzt wurde die zweite — auf der lief
+der **Altbestand**, dessen Registrierung eine Datenbankfunktion ruft, die es
+in diesem Projekt nicht gibt. Deshalb die Fehlermeldung „Das Unternehmen
+konnte nicht angelegt werden".*
+
+Maßgeblich ist jetzt **`immoofficeeai.netlify.app`**. Damit die Auslieferung
+dort ankommt:
+
+1. Netlify → die Site `immoofficeeai` → *Site configuration → General* →
+   **Site ID** kopieren.
+2. GitHub → das Repository → *Settings → Secrets and variables → Actions* →
+   **`NETLIFY_SITE_ID`** auf diesen Wert ändern.
+
+Die `netlify.toml` baut seit dem 29.09.2026 **immoOffice.ai** statt des
+Altbestands. Ein Bau aus dem Repository liefert damit dasselbe wie der
+Workflow — die Seite kann sich nicht mehr gegenseitig überschreiben.
 
 ---
 
@@ -64,7 +87,7 @@ liegen bereits im Repository — die Entwürfe sind damit gelaufen.
 
 ## Schritt 4 — Ausprobieren (5 Minuten)
 
-`https://immoofficeai.netlify.app` öffnen. Unten auf der Anmeldeseite steht
+`https://immoofficeeai.netlify.app` öffnen. Unten auf der Anmeldeseite steht
 **„Noch kein Konto? Firma registrieren"**.
 
 1. Firma, Name, E-Mail, Passwort eingeben.
@@ -110,7 +133,7 @@ angezeigten DNS-Einträge (SPF, DKIM, DMARC) bei **IONOS** setzen, wo die Zone
 liegt. Danach **API Keys → Create API Key**, und den Wert in Supabase als
 `RESEND_API_KEY` hinterlegen.
 
-**Wichtig:** `immoofficeai.netlify.app` lässt sich **nicht** verifizieren —
+**Wichtig:** `immoofficeeai.netlify.app` lässt sich **nicht** verifizieren —
 die DNS-Zone gehört Netlify, nicht Ihnen. Es muss `immooffice.ai` sein.
 
 *Ohne Resend:* Keine Mail aus der Anwendung geht hinaus — keine

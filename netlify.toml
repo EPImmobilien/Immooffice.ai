@@ -3,13 +3,29 @@
 # Ausfuehrlich: docs/DEPLOYMENT_NETLIFY.md
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# GEBAUT WIRD immoOffice.ai, NICHT DER ALTBESTAND (29.09.2026)
+#
+# Bis hierher stand hier die Next.js-Anwendung aus altbestand/: command
+# "npm run build", publish ".next", dazu das Next-Plugin. Nach CLAUDE.md ist
+# sie Altbestand und kein Produktbestandteil — und solange sie hier stand,
+# hat jeder Bau aus dem Repository die ausgelieferte Oberflaeche wieder
+# ueberschrieben. Genau das ist am 29.09.2026 passiert: auf der Seite stand
+# die Registrierung des Altbestands, die eine Datenbankfunktion ruft
+# (registriere_mandant), die es in diesem Projekt nicht gibt.
+#
+# Jetzt bauen beide Wege dasselbe: der Workflow
+# .github/workflows/oberflaeche-ausliefern.yml und ein Bau aus dem
+# Repository. Die beiden oeffentlichen Werte stehen weiterhin genau einmal
+# hier; das Baukommando reicht sie unter den Namen weiter, die
+# scripts/bauen.py liest.
+# ---------------------------------------------------------------------------
 [build]
-  command = "npm run build"
-  publish = ".next"
+  command = "IMMO_SUPABASE_URL=\"$NEXT_PUBLIC_SUPABASE_URL\" IMMO_SUPABASE_KEY=\"$NEXT_PUBLIC_SUPABASE_ANON_KEY\" python3 scripts/bauen.py && python3 tests/oberflaeche-rauchtest.py"
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "22"
-  # Schriften werden zur Bauzeit geladen und selbst gehostet.
   NEXT_TELEMETRY_DISABLED = "1"
 
   # -------------------------------------------------------------------------
@@ -39,8 +55,8 @@
   # die Datenbank nicht erreichen. Nur diese beiden Namen sind ausgenommen.
   SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY"
 
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+# Kein Next-Plugin mehr: es gehoerte zum Altbestand. immoOffice.ai ist eine
+# einzelne index.html mit React ueber CDN — da gibt es nichts einzurichten.
 
 # Hinweis: [[headers]] laesst sich in netlify.toml NICHT je Kontext setzen.
 # Ein pauschales noindex haette auch die Produktion aus dem Index gehalten.

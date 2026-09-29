@@ -2719,3 +2719,53 @@ Schreiben Arbeit gekostet haben:
 - **Ein zweiter Anlauf mit den Textspalten aus den Prüfbedingungen.** Regeln
   der Art „eines von beidem muss dastehen" (`kontakte_hat_namen`) scheitern
   an einer Spalte, die gar nicht Pflicht ist. Das kostete weitere vier.
+
+---
+
+## Zwei Netlify-Sites, ein Buchstabe Unterschied (29.09.2026)
+
+Gemeldet wurde: die Registrierung meldet „Das Unternehmen konnte nicht
+angelegt werden. Bitte erneut versuchen."
+
+Die Maske im Bild war nicht unsere. Sie stammt aus
+`altbestand/next-app/app/(auth)/registrieren/unternehmen/` — der alten
+Next.js-Anwendung, die `CLAUDE.md` als Altbestand führt. Sie ruft
+`registriere_mandant()`, eine Funktion ihres **eigenen** Schemas. Dieses
+Projekt trägt das Schema der Vorlage plus die fork-Migrationen; die Funktion
+gibt es dort nicht, also kann sie dort nicht funktionieren. Unsere heißt
+`registrierung_abschliessen()` (`fork_30`).
+
+Der Grund, warum sie überhaupt zu sehen war: **es gibt zwei Netlify-Sites**,
+deren Namen sich um einen Buchstaben unterscheiden.
+
+| Adresse | Was dort lief |
+|---|---|
+| `immoofficeai.netlify.app` | immoOffice.ai — dorthin lieferte der Workflow aus |
+| `immoofficeeai.netlify.app` | der Altbestand — dort wurde gearbeitet |
+
+`immoofficeeai` kam im ganzen Repository kein einziges Mal vor. Der
+Deploy-Workflow hat also nie gelogen; er hat nur woanders hingeliefert.
+
+**Entscheidung des Auftraggebers:** maßgeblich ist
+`immoofficeeai.netlify.app`. Alle Dokumente, der Prüf-Workflow und die
+empfohlenen Werte für `PORTAL_URL` und `EXPOSE_FREIGABE_BASIS` sind darauf
+umgestellt. Das `NETLIFY_SITE_ID` im Repository muss der Betreiber tauschen —
+eine Site-ID steht nicht im Quelltext.
+
+### Und die Falle, die das erst möglich gemacht hat
+
+Die `netlify.toml` im Wurzelverzeichnis richtete den **Altbestand** ein:
+`command = "npm run build"`, `publish = ".next"`, dazu das Next-Plugin.
+Solange das so stand, hat **jeder** Bau aus dem Repository die ausgelieferte
+Oberfläche wieder überschrieben — ein Deploy-Workflow, der erfolgreich
+meldet, und eine Seite, auf der etwas anderes steht.
+
+Sie baut jetzt immoOffice.ai: `python3 scripts/bauen.py`, `publish = "dist"`,
+Next-Plugin entfernt, dazu der Rauchtest. Beide Wege liefern damit dasselbe.
+Die beiden öffentlichen Supabase-Werte stehen weiterhin genau einmal dort;
+das Baukommando reicht sie unter den Namen weiter, die `scripts/bauen.py`
+liest.
+
+Der Altbestand ist damit über Netlify nicht mehr erreichbar. Nach
+`CLAUDE.md` ist er kein Produktbestandteil; er bleibt im Repository, aber er
+wird nicht mehr ausgeliefert.

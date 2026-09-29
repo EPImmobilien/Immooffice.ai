@@ -17,7 +17,7 @@ on:
       adresse:
         description: 'Adresse der ausgelieferten Oberflaeche'
         required: true
-        default: 'https://immoofficeai.netlify.app'
+        default: 'https://immoofficeeai.netlify.app'
       konto:
         description: 'E-Mail fuer den Anmeldeversuch (leer = nur laden)'
         required: false
