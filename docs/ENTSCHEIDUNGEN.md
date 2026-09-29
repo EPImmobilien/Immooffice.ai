@@ -2769,3 +2769,45 @@ liest.
 Der Altbestand ist damit über Netlify nicht mehr erreichbar. Nach
 `CLAUDE.md` ist er kein Produktbestandteil; er bleibt im Repository, aber er
 wird nicht mehr ausgeliefert.
+
+---
+
+## „Fast geschafft" war gelogen (29.09.2026)
+
+Gemeldet: die Registrierung legt kein Konto an. Das Protokoll von Supabase
+sagt genau, was passiert ist:
+
+```
+"action": "user_repeated_signup", "path": "/signup"
+```
+
+Die verwendete Adresse **hatte bereits ein Konto** — in derselben Minute
+wurde damit angemeldet. Supabase legt bei einer Registrierung mit einer
+vorhandenen, bestätigten Adresse **nichts an und verschickt nichts**, meldet
+aber auch **keinen Fehler**: sonst könnte man über das Formular
+herausfinden, welche Adressen es gibt.
+
+Meine Maske hat das nicht erkannt und „Fast geschafft — wir haben Ihnen eine
+E-Mail geschickt" angezeigt. Das ist der schlechteste Fall einer
+Rückmeldung: eine Zusicherung, die nicht stimmt, und ein Anwender, der auf
+Post wartet, die nie kommen kann.
+
+Erkennbar ist der Fall allein an der **leeren Liste der Identitäten** im
+zurückgegebenen Benutzer — `data.user.identities.length === 0`. Danach wird
+jetzt gefragt, und die Maske sagt: *„Zu dieser E-Mail-Adresse gibt es bereits
+ein Konto."*
+
+**Die Abwägung, offen:** damit verrät das Formular, dass es die Adresse gibt
+— genau das, was Supabase vermeiden will. Eine Sackgasse ohne jede
+Rückmeldung ist aber schlechter als diese Auskunft, zumal die Anmeldemaske
+daneben dieselbe Auskunft ohnehin gibt: wer eine vorhandene Adresse mit
+falschem Passwort einträgt, bekommt eine andere Fehlermeldung als bei einer
+unbekannten.
+
+Der Rauchtest prüft die Abfrage jetzt mit.
+
+**Was dabei sonst nachgemessen wurde und in Ordnung ist:**
+`disable_signup: false`, `email: true`, `mailer_autoconfirm: false` — die
+Registrierung ist freigegeben und die Bestätigung verlangt. Beide
+Netlify-Adressen liefern dieselbe vollständige Oberfläche aus; die
+`netlify.toml`-Umstellung hat gewirkt.

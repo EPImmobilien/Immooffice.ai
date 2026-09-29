@@ -59,6 +59,11 @@ def pruefungen(html):
            'Der Mandant wird beim ersten Anmelden angelegt')
     pruefe('Firma registrieren' in html,
            'Von der Anmeldung fuehrt ein Weg zur Registrierung')
+    # Supabase meldet eine Anmeldung mit vorhandener Adresse NICHT als
+    # Fehler. Ohne diese Abfrage sagt die Maske "wir haben Ihnen eine
+    # E-Mail geschickt", und es kommt nie eine.
+    pruefe('identities.length === 0' in html,
+           'Eine bereits vorhandene Adresse wird erkannt')
     pruefe(html.count('function Registrieren(') == 1,
            'Das Registrierungsformular steht genau einmal',
            f"gefunden: {html.count('function Registrieren(')}")

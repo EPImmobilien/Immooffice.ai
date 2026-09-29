@@ -76220,12 +76220,29 @@ function Registrieren({ onZurueck }) {
     if (feld.passwort !== feld.passwort2) return setzeFehler("Die beiden Passwörter stimmen nicht überein.");
     setzeLaeuft(true);
     try {
-      const { error } = await window._sb.auth.signUp({
+      const { data, error } = await window._sb.auth.signUp({
         email: feld.email.trim().toLowerCase(),
         password: feld.passwort,
         options: { data: { firma: feld.firma.trim(), name: feld.name.trim() } }
       });
       if (error) throw error;
+      // Eine Anmeldung mit einer BEREITS VORHANDENEN Adresse meldet Supabase
+      // nicht als Fehler — das wuerde verraten, welche Adressen es gibt. Es
+      // legt dann aber auch nichts an und verschickt nichts. Erkennbar ist
+      // der Fall allein an der leeren Liste der Identitaeten.
+      //
+      // Ohne diese Abfrage stand hier "Wir haben Ihnen eine E-Mail
+      // geschickt", und der Anmeldende wartete auf Post, die nie kommen
+      // konnte. Am 29.09.2026 genau so passiert.
+      //
+      // Ja, das verraet jetzt, dass es die Adresse gibt. Das ist die
+      // Abwaegung: eine Sackgasse ohne jede Rueckmeldung ist schlechter als
+      // die Auskunft, dass hier schon jemand ist — zumal die Anmeldemaske
+      // daneben dieselbe Auskunft ohnehin gibt.
+      if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        setzeLaeuft(false);
+        return setzeFehler("Zu dieser E-Mail-Adresse gibt es bereits ein Konto. Bitte melden Sie sich an — oder nehmen Sie eine andere Adresse, wenn Sie ein weiteres Unternehmen anlegen möchten.");
+      }
       setzeFertig(true);
     } catch (e) {
       setzeFehler(e.message || "Die Registrierung ist fehlgeschlagen.");
