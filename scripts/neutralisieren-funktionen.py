@@ -2040,6 +2040,58 @@ NACHBESSERN = [
     ('FORK', '    const { path, publicUrl } = await ladeNachStorage(\n      bildUrl,\n      body.funktion,\n      userId,\n      body.dateiname || "bild",\n    );', '    const { path, publicUrl } = await ladeNachStorage(\n      bildUrl,\n      body.funktion,\n      userId,\n      mandant,\n      body.dateiname || "bild",\n    );',
      'KI-Bildbearbeitung: Aufruf mit Mandant (ladeNachStorage).',
      {'ki-bildbearbeitung'}),
+
+    # =====================================================================
+    # FORK — JWT geprueft, service_role benutzt, Kennung aus dem Koerper
+    #        geglaubt
+    #
+    # Die 28 Funktionen ohne JWT-Pruefung sind durch. Die andere Haelfte hat
+    # dasselbe Muster: das JWT wird geprueft, danach arbeitet die Funktion
+    # mit dem service_role — und nimmt eine Kennung aus dem Anfragekoerper,
+    # ohne zu fragen, wem der Satz gehoert. Ein angemeldeter Nutzer des einen
+    # Maklers erreicht damit die Daten des anderen.
+    #
+    # 63 der 90 JWT-gepruefen Funktionen benutzen den service_role, 40 davon
+    # nehmen eine Kennung entgegen. Diese Runde nimmt sich die acht vor, bei
+    # denen am meisten daran haengt. tests/funktionen-angemeldet.py fuehrt
+    # Buch; die Liste darf nur kuerzer werden.
+    #
+    # Der Weg ist der von fork_14: nicht die Koerper neu schreiben, sondern
+    # EINE Zeile vorne einziehen. Die Pruefung selbst steht schon in der
+    # Datenbank.
+    # =====================================================================
+    ('FORK',
+     'import { createClient } from "jsr:@supabase/supabase-js@2";',
+     'import { createClient } from "jsr:@supabase/supabase-js@2";\n\n// --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------\n// Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —\n// und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist\n// damit ungeprueft: sie kann auf einen Satz eines anderen Mandanten zeigen.\n//\n// public.mandant_sichern() aus fork_14 zieht genau diese Grenze. Sie muss\n// aber MIT DEM TOKEN DES AUFRUFERS gerufen werden — unter dem service_role\n// laesst sie jeden durch (mandant_grenze_gilt() ist dort false, mit Absicht:\n// Cron und Wartung haben keinen Mandanten). Deshalb ein zweiter Client, der\n// nur den mitgebrachten Kopf weiterreicht.\n//\n// Ohne Anmeldekopf oder mit dem Dienstschluessel passiert nichts — das sind\n// die internen Wege, und die sind nicht die Grenze, die hier gezogen wird.\nasync function immoMandantSichern(req: Request, paare: Array<[string, unknown]>): Promise<void> {\n  const kopf = req.headers.get("Authorization") || "";\n  if (!/^Bearer\\s+/i.test(kopf)) return;\n  const zuPruefen = paare.filter(([, id]) =>\n    typeof id === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));\n  if (!zuPruefen.length) return;\n  const nutzer = createClient(\n    Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!,\n    { global: { headers: { Authorization: kopf } }, auth: { persistSession: false } });\n  for (const [tabelle, id] of zuPruefen) {\n    const { error } = await nutzer.rpc("mandant_sichern", { p_tabelle: tabelle, p_id: id });\n    if (error) throw new Error("Kein Zugriff auf Daten eines anderen Mandanten.");\n  }\n}',
+     'Waechter fuer Kennungen aus dem Anfragekoerper eingezogen.',
+     {'mitarbeiter-loeschen', 'mail-anhaenge-extrahieren', 'credentials-anzeigen', 'mail-gelesen-setzen', 'eigentuemer-person-hinzufuegen', 'rechnung-pdf-erzeugen', 'eigentuemer-nachricht-senden', 'expose-freigabe-erstellen'}),
+    ('FORK', '    const query = admin.from("external_credentials").select("*").eq("aktiv", true);', '    // Der schwerste Fall dieser Runde: die Antwort enthaelt das\n    // ENTSCHLUESSELTE Passwort. Mit einer credential_id aus dem Koerper waere\n    // das der FTP- oder Portalzugang eines fremden Maklers im Klartext.\n    await immoMandantSichern(req, [["external_credentials", credentialId]]);\n\n    const query = admin.from("external_credentials").select("*").eq("mandant_id", profil.mandant_id).eq("aktiv", true);',
+     'Zugangsdaten: nur die des eigenen Mandanten.',
+     {'credentials-anzeigen'}),
+    ('FORK', '      .from("profiles").select("role, name").eq("id", userData.user.id).maybeSingle();', '      .from("profiles").select("role, name, mandant_id").eq("id", userData.user.id).maybeSingle();',
+     'Zugangsdaten: der Mandant des Aufrufers.',
+     {'credentials-anzeigen'}),
+    ('FORK', '      .from("profiles").select("id, name, role").eq("id", mitarbeiterId).maybeSingle();', '      .from("profiles").select("id, name, role").eq("id", mitarbeiterId).maybeSingle();\n    // Ein Chef darf seine Leute loeschen — nicht die eines anderen Hauses.\n    await immoMandantSichern(req, [["profiles", mitarbeiterId],\n                                   ["profiles", neuerVerantwortlicherId]]);',
+     'Mitarbeiter loeschen: nur im eigenen Haus.',
+     {'mitarbeiter-loeschen'}),
+    ('FORK', '    const rechnungId = (body.rechnung_id || "").toString().trim();', '    const rechnungId = (body.rechnung_id || "").toString().trim();\n    await immoMandantSichern(req, [["rechnungen", rechnungId]]);',
+     'Rechnungs-PDF: nur eigene Rechnungen.',
+     {'rechnung-pdf-erzeugen'}),
+    ('FORK', '    const mailId = String(body?.mail_id || "").trim();', '    const mailId = String(body?.mail_id || "").trim();\n    await immoMandantSichern(req, [["mail_eingang", mailId]]);',
+     'Mail als gelesen: nur eigene Mails.',
+     {'mail-gelesen-setzen'}),
+    ('FORK', '    const mail_id = body?.mail_id;', '    const mail_id = body?.mail_id;\n    await immoMandantSichern(req, [["mail_eingang", mail_id]]);',
+     'Anhaenge auslesen: nur aus eigenen Mails.',
+     {'mail-anhaenge-extrahieren'}),
+    ('FORK', '    const eigentuemer_id = body.eigentuemer_id;', '    const eigentuemer_id = body.eigentuemer_id;\n    await immoMandantSichern(req, [["eigentuemer", eigentuemer_id]]);',
+     'Nachricht an den Eigentuemer: nur an den eigenen.',
+     {'eigentuemer-nachricht-senden'}),
+    ('FORK', '    const eigentuemerId = (body.eigentuemer_id || "").toString().trim();', '    const eigentuemerId = (body.eigentuemer_id || "").toString().trim();\n    await immoMandantSichern(req, [["eigentuemer", eigentuemerId]]);',
+     'Person hinzufuegen: nur an einem eigenen Eigentuemer.',
+     {'eigentuemer-person-hinzufuegen'}),
+    ('FORK', '    const immobilieId = String(body.immobilie_id || "").trim();', '    const immobilieId = String(body.immobilie_id || "").trim();\n    await immoMandantSichern(req, [["immobilien", immobilieId],\n                                   ["kontakte", String(body.kontakt_id || "")]]);',
+     'Expose-Freigabe: nur zu eigenen Objekten und Kontakten.',
+     {'expose-freigabe-erstellen'}),
 ]
 
 

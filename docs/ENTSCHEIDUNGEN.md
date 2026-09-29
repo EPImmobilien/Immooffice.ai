@@ -2387,3 +2387,56 @@ Funktionen **mit** JWT-Prüfung, die danach ebenfalls den `service_role`
 benutzen und eine Kennung aus dem Anfragekörper glauben. `fahrt-ermitteln`
 war der erste Fund dieser Art (siehe oben); wie viele weitere es sind, ist
 nicht gezählt. Das steht in `docs/OFFEN.md` und ist der nächste Block.
+
+---
+
+## Der zweite Block: JWT geprüft, `service_role` benutzt, Kennung geglaubt (29.09.2026)
+
+Die 28 Funktionen ohne JWT-Prüfung sind durch. Die andere Hälfte hat
+dasselbe Muster in anderer Verkleidung:
+
+> JWT geprüft → `service_role` benutzt → Kennung aus dem Anfragekörper
+> geglaubt
+
+Der `service_role` umgeht RLS. Eine uuid, die der Aufrufer mitschickt, ist
+damit ungeprüft — sie kann auf einen Satz eines anderen Mandanten zeigen.
+Von den 90 JWT-geprüften Funktionen benutzen 63 den `service_role`, und **40
+nehmen eine Kennung entgegen**. `tests/funktionen-angemeldet.py` führt
+darüber jetzt Buch, nach demselben Muster wie bei den öffentlichen: die
+Liste darf nur kürzer werden.
+
+**Der Weg ist der von `fork_14`:** nicht die Körper neu schreiben, sondern
+eine Zeile vorne einziehen. Die Prüfung selbst steht seit `fork_14` in der
+Datenbank — `public.mandant_sichern(tabelle, id)` bricht mit `42501` ab,
+wenn die Kennung einem anderen Mandanten gehört.
+
+Ein Haken war dabei zu umgehen: `mandant_sichern()` lässt unter dem
+`service_role` **jeden durch** — mit Absicht, denn Cron und Wartung haben
+keinen Mandanten. Gerufen aus einer Edge Function mit dem Dienstschlüssel
+wäre der Wächter also wirkungslos. Der eingezogene Helfer
+`immoMandantSichern()` baut deshalb einen **zweiten Client**, der nur den
+Anmeldekopf des Aufrufers weiterreicht. Ohne Anmeldekopf oder mit dem
+Dienstschlüssel passiert nichts — das sind die internen Wege.
+
+`tests/funktionen-mandant.sql` prüft genau diesen Aufrufweg jetzt mit vier
+zusätzlichen Fragen: fremde Kennung abgewiesen, eigene durchgelassen,
+unbekannte nicht abgebrochen, und unter `service_role` gilt die Grenze
+nicht.
+
+### Diese Runde: die acht, an denen am meisten hängt
+
+| Funktion | Was möglich war |
+|---|---|
+| **`credentials-anzeigen`** | Die Antwort enthält das **entschlüsselte Passwort**. Mit einer `credential_id` aus dem Körper war das der FTP- oder Portalzugang eines fremden Maklers im Klartext. |
+| `mitarbeiter-loeschen` | Einen Mitarbeiter eines anderen Hauses löschen. |
+| `rechnung-pdf-erzeugen` | Die Rechnung eines fremden Mandanten als PDF — Empfänger, Positionen, Beträge. |
+| `mail-gelesen-setzen` | Fremde Mails als gelesen markieren. |
+| `mail-anhaenge-extrahieren` | Anhänge aus einer fremden Mail auslesen und ablegen. |
+| `eigentuemer-nachricht-senden` | Eine Nachricht an den Eigentümer eines fremden Maklers. |
+| `eigentuemer-person-hinzufuegen` | Eine Person an einem fremden Eigentümer anlegen — mit Zugang zum Portal. |
+| `expose-freigabe-erstellen` | Eine Exposé-Freigabe zu einem fremden Objekt, auf einen fremden Kontakt ausgestellt. |
+
+`credentials-anzeigen` hat zusätzlich die Suche über den Dienstnamen an den
+Mandanten des Aufrufers gebunden.
+
+**Stand: 9 abgesichert, 31 offen.**

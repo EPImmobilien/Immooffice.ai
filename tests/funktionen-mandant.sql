@@ -134,6 +134,77 @@ begin
   reset role;
 end $$;
 
+-- --- Der Waechter, wie ihn die Edge Functions rufen -----------------------
+-- Die angemeldeten Edge Functions arbeiten mit dem service_role und nehmen
+-- eine Kennung aus dem Anfragekoerper entgegen. Sie ziehen deshalb
+-- mandant_sichern() vorne ein — aber ueber einen ZWEITEN Client, der den
+-- Anmeldekopf des Aufrufers weiterreicht. Genau dieser Aufrufweg wird hier
+-- nachgestellt: als authenticated, mit dem Anspruch des Nutzers.
+do $$
+declare meldung text; ok_fremd boolean; ok_eigen boolean; ok_unbekannt boolean;
+begin
+  perform set_config('request.jwt.claims',
+    json_build_object('sub', (select wert from wer where was='nutzer_a'),
+                      'role', 'authenticated')::text, true);
+  set local role authenticated;
+
+  begin
+    perform public.mandant_sichern('rechnungen', (select wert from wer where was='rechnung_b'));
+    ok_fremd := false;
+  exception when insufficient_privilege then
+    ok_fremd := true;
+  when others then
+    get stacked diagnostics meldung = message_text;
+    ok_fremd := false;
+  end;
+
+  begin
+    perform public.mandant_sichern('rechnungen', (select wert from wer where was='rechnung_a'));
+    ok_eigen := true;
+  exception when others then
+    ok_eigen := false;
+  end;
+
+  -- Eine Kennung, die es nicht gibt: der Waechter zieht nur die Grenze, die
+  -- Fachlichkeit bleibt bei der Funktion. Er darf hier nicht abbrechen.
+  begin
+    perform public.mandant_sichern('rechnungen', gen_random_uuid());
+    ok_unbekannt := true;
+  exception when others then
+    ok_unbekannt := false;
+  end;
+
+  reset role;
+
+  insert into befund (pruefung, bestanden, bemerkung) values
+    ('mandant_sichern weist eine fremde Rechnung ab', ok_fremd,
+     case when ok_fremd then 'abgewiesen (42501)' else coalesce('durchgelassen: ' || meldung, 'durchgelassen') end),
+    ('mandant_sichern laesst die eigene durch', ok_eigen,
+     case when ok_eigen then 'durchgelassen' else 'faelschlich abgewiesen' end),
+    ('mandant_sichern bricht bei unbekannter Kennung nicht ab', ok_unbekannt,
+     case when ok_unbekannt then 'durchgelassen' else 'abgebrochen' end);
+end $$;
+
+-- Und die Gegenprobe zur Falle aus fork_14: unter service_role gilt die
+-- Grenze NICHT. Das ist der Weg der Hintergrundjobs — waere es anders,
+-- stuende jeder Cron-Lauf still.
+do $$
+declare ok boolean;
+begin
+  perform set_config('request.jwt.claims',
+    json_build_object('role', 'service_role')::text, true);
+  begin
+    perform public.mandant_sichern('rechnungen', (select wert from wer where was='rechnung_b'));
+    ok := true;
+  exception when others then
+    ok := false;
+  end;
+  perform set_config('request.jwt.claims', '', true);
+  insert into befund (pruefung, bestanden, bemerkung)
+    values ('Unter service_role gilt die Grenze nicht', ok,
+            case when ok then 'durchgelassen, wie vorgesehen' else 'abgewiesen — Cron stuende still' end);
+end $$;
+
 select nr, case when bestanden is true then 'ok  ' else 'FEHL' end as ergebnis, pruefung, bemerkung
   from befund order by nr;
 

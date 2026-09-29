@@ -14,6 +14,34 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
+// Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
+// und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist
+// damit ungeprueft: sie kann auf einen Satz eines anderen Mandanten zeigen.
+//
+// public.mandant_sichern() aus fork_14 zieht genau diese Grenze. Sie muss
+// aber MIT DEM TOKEN DES AUFRUFERS gerufen werden — unter dem service_role
+// laesst sie jeden durch (mandant_grenze_gilt() ist dort false, mit Absicht:
+// Cron und Wartung haben keinen Mandanten). Deshalb ein zweiter Client, der
+// nur den mitgebrachten Kopf weiterreicht.
+//
+// Ohne Anmeldekopf oder mit dem Dienstschluessel passiert nichts — das sind
+// die internen Wege, und die sind nicht die Grenze, die hier gezogen wird.
+async function immoMandantSichern(req: Request, paare: Array<[string, unknown]>): Promise<void> {
+  const kopf = req.headers.get("Authorization") || "";
+  if (!/^Bearer\s+/i.test(kopf)) return;
+  const zuPruefen = paare.filter(([, id]) =>
+    typeof id === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));
+  if (!zuPruefen.length) return;
+  const nutzer = createClient(
+    Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: kopf } }, auth: { persistSession: false } });
+  for (const [tabelle, id] of zuPruefen) {
+    const { error } = await nutzer.rpc("mandant_sichern", { p_tabelle: tabelle, p_id: id });
+    if (error) throw new Error("Kein Zugriff auf Daten eines anderen Mandanten.");
+  }
+}
+
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const LINK_BASIS = (Deno.env.get("EXPOSE_FREIGABE_BASIS") || "https://immooffice.example/?expose=").replace(/\/\?expose=$/, "/freigabe.html?expose=");
 const OBJEKT_BASIS = LINK_BASIS.replace(/freigabe\.html\?expose=$/, "objekt.html?t=");
@@ -38,6 +66,8 @@ Deno.serve(async (req) => {
     if (!p || !["chef", "mitarbeiter"].includes(p.role)) return antwort({ ok: false, fehler: "Keine Berechtigung." }, 403);
     const body = await req.json().catch(() => ({}));
     const immobilieId = String(body.immobilie_id || "").trim();
+    await immoMandantSichern(req, [["immobilien", immobilieId],
+                                   ["kontakte", String(body.kontakt_id || "")]]);
     const email = String(body.email || "").replace(/^.*<([^>]+)>.*$/, "$1").trim().toLowerCase();
     if (!immobilieId) throw new Error("immobilie_id fehlt.");
     if (!email || !email.includes("@")) throw new Error("Gültige E-Mail-Adresse des Interessenten fehlt.");

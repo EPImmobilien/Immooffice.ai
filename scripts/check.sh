@@ -99,6 +99,13 @@ else
   fehler=1
 fi
 
+abschnitt "Angemeldete Endpunkte: Kennung aus dem Anfragekoerper"
+if python3 tests/funktionen-angemeldet.py; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Einstellungen je Mandant"
 if scripts/lokale-db.sh psql -q -f tests/einstellungen-je-mandant.sql; then
   :

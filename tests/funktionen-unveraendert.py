@@ -140,6 +140,18 @@ ERWEITERT['projekt-wohnungen'] = (
 ERWEITERT['ki-bildbearbeitung'] = (
     'Storage-Pfade mit Mandanten davor (Phase 2)')
 
+# Angemeldete Endpunkte, die den service_role benutzen und eine Kennung aus
+# dem Anfragekoerper entgegennehmen. Sie bekommen den Waechter
+# immoMandantSichern() vorne eingezogen — die Pruefung selbst steht seit
+# fork_14 in der Datenbank. Buch darueber fuehrt
+# tests/funktionen-angemeldet.py.
+for _f in ('credentials-anzeigen', 'mitarbeiter-loeschen',
+           'rechnung-pdf-erzeugen', 'mail-gelesen-setzen',
+           'mail-anhaenge-extrahieren', 'eigentuemer-nachricht-senden',
+           'eigentuemer-person-hinzufuegen', 'expose-freigabe-erstellen'):
+    ERWEITERT[_f] = ('Prueft Kennungen aus dem Anfragekoerper gegen den '
+                     'Mandanten des Aufrufers (Phase 2)')
+
 BLOCKZEILEN = {
     'mpe-pdf-erzeugen': {
         'const pins: Array<[number, number, string, string, string]> = [',

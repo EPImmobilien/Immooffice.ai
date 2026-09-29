@@ -19,6 +19,34 @@
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+
+// --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
+// Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
+// und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist
+// damit ungeprueft: sie kann auf einen Satz eines anderen Mandanten zeigen.
+//
+// public.mandant_sichern() aus fork_14 zieht genau diese Grenze. Sie muss
+// aber MIT DEM TOKEN DES AUFRUFERS gerufen werden — unter dem service_role
+// laesst sie jeden durch (mandant_grenze_gilt() ist dort false, mit Absicht:
+// Cron und Wartung haben keinen Mandanten). Deshalb ein zweiter Client, der
+// nur den mitgebrachten Kopf weiterreicht.
+//
+// Ohne Anmeldekopf oder mit dem Dienstschluessel passiert nichts — das sind
+// die internen Wege, und die sind nicht die Grenze, die hier gezogen wird.
+async function immoMandantSichern(req: Request, paare: Array<[string, unknown]>): Promise<void> {
+  const kopf = req.headers.get("Authorization") || "";
+  if (!/^Bearer\s+/i.test(kopf)) return;
+  const zuPruefen = paare.filter(([, id]) =>
+    typeof id === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));
+  if (!zuPruefen.length) return;
+  const nutzer = createClient(
+    Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: kopf } }, auth: { persistSession: false } });
+  for (const [tabelle, id] of zuPruefen) {
+    const { error } = await nutzer.rpc("mandant_sichern", { p_tabelle: tabelle, p_id: id });
+    if (error) throw new Error("Kein Zugriff auf Daten eines anderen Mandanten.");
+  }
+}
 import { PDFDocument, rgb, PageSizes, degrees, StandardFonts } from "npm:pdf-lib@1.17.1";
 
 // fontkit defensiv importieren - kann in Deno gelegentlich fehlschlagen
@@ -204,6 +232,7 @@ Deno.serve(async (req) => {
 
     const body = await req.json();
     const rechnungId = (body.rechnung_id || "").toString().trim();
+    await immoMandantSichern(req, [["rechnungen", rechnungId]]);
     if (!rechnungId) throw new Error("rechnung_id ist Pflicht.");
 
     // Rechnung + Positionen + Firma laden
