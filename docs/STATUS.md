@@ -398,3 +398,45 @@ aufgelistet in `docs/SECRETS.md`. Ohne `ANTHROPIC_API_KEY` antwortet jede der
 **Was für Gate 1 noch fehlt:** ein Ort, an dem `dist/index.html` liegt, und
 der erste echte Anmeldeversuch dagegen. Beides braucht eine Entscheidung des
 Betreibers (siehe `docs/OFFEN.md`).
+
+## Nachtrag 29.09.2026 — die öffentlichen Endpunkte sind durch
+
+Am 28.09. hat ein Durchgang durch die 28 Edge Functions, die **ohne
+JWT-Prüfung** mit dem `service_role` arbeiten, 19 Stellen aufgeworfen, an
+denen die Mandantengrenze beim **Lesen** nicht gezogen war.
+`tests/funktionen-oeffentlich.py` hat darüber Buch geführt; die Liste durfte
+nur kürzer werden.
+
+**Sie ist leer.** 24 abgesichert, 4 unbedenklich, 0 offen.
+
+Was dabei gefunden wurde, in der Reihenfolge des Gewichts:
+
+| Fund | Wirkung |
+|---|---|
+| `push-antworten` | Mit der Rolle „chef" ließ sich **jede Mail jedes Maklers** beantworten — über dessen Postfach, mit dessen Absender, zitierter Fremdtext inklusive |
+| `expose-freigabe` | Das Exposé trug ein **fremdes Impressum** (Slug „standard"), und ein Download setzte die Newsletter-Zustimmung am Kontakt eines fremden Mandanten |
+| `suchkriterien-newsletter` | Ein Klick des einen Chefs verschickte die Newsletter **aller** Makler und legte ihm deren Empfängerlisten vor |
+| `upload-benachrichtigung-versenden` | Jede Upload-Meldung ging an die Büroleitung **aller** Mandanten, mit Eigentümername und Dokumenttiteln |
+| `eigentuemer-zugang-anfordern` | Der Rückfall „irgendein Chef" traf die ganze Plattform; dessen Name und Telefonnummer standen in der Mail |
+| `push-senden` | Anlass und Empfänger wurden nie verglichen — die Mail des einen konnte im Sperrbildschirm des anderen aufleuchten |
+| `projekt-wohnungen` | Ein **Kundenprojekt im Quelltext**, und die Wohnungen wurden über Straße und Ort ohne Mandanten gesucht |
+| Neubauportal-Postfächer | Einladungen gingen über den SMTP-Zugang eines fremden Mandanten hinaus |
+| `ki-bildbearbeitung` | Bilder lagen außerhalb des Mandantenordners — unsichtbar für die Anwendung, nicht mehr löschbar |
+| `signatur-token-validieren` | Las das PDF ohne Mandantenpfad; der signierte Link zeigte ins Leere |
+| `news-briefing-erstellen`, `portal-ftp-diagnose` | Kein Leck, aber ab dem zweiten Mandanten schlicht kaputt |
+
+Dazu zwei Schema-Migrationen:
+
+- **`fork_28`** — `push_einstellungen`, `kosten_saetze`, `liquid_settings` und
+  `akq_einstellungen` hatten **eine Zeile für die ganze Plattform**. Jetzt je
+  Mandant eine, plus `mandant_grundeinstellungen(uuid)` für neue Mandanten.
+- **`fork_29`** — `projekte.slug` ist wieder plattformweit eindeutig. Er ist
+  die öffentliche Adresse des Neubauportals; das ist ein globaler Namensraum
+  wie eine Subdomain, kein Mandantenname.
+
+**Was als Nächstes ansteht:** dieselbe Frage für die **90 Funktionen mit**
+JWT-Prüfung. `fahrt-ermitteln` war der erste Fund dieser Art: JWT geprüft,
+danach `service_role`, und eine `immobilie_id` aus dem Anfragekörper
+geglaubt — Entfernung, Fahrzeit und Koordinaten zu jedem Objekt jedes
+Maklers. Wie viele weitere es sind, ist nicht gezählt. Steht in
+`docs/OFFEN.md`.
