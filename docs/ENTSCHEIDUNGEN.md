@@ -2665,3 +2665,57 @@ Formularwerte.
 („Enable email signups") und die Bestätigung eingeschaltet lassen. Ohne
 Bestätigung weist `registrierung_abschliessen()` ab — mit Absicht, denn
 sonst wäre jede fremde Adresse ein Mandant. Steht in `docs/OFFEN.md`.
+
+---
+
+## Der Rundumschlag — der Nachweis für Gate 2 (29.09.2026)
+
+`tests/mandant.sql` prüft die Mandantentrennung gründlich, aber an **drei**
+Tabellen: `mandanten`, `profiles`, `immobilien`. Für Gate 2 („Mandantenfähigkeit
+nachgewiesen") ist das zu wenig — die Frage ist nicht, ob es *dort* hält,
+sondern ob es **irgendwo** nicht hält.
+
+`tests/mandant-rundumschlag.sql` macht es mechanisch:
+
+1. Zwei Mandanten, je ein Chef.
+2. In **jede** der 176 Mandantentabellen wird eine Zeile für *Beta* gelegt
+   und eine für *Alpha*. Pflichtspalten werden dabei gefüllt:
+   Fremdschlüssel mit einer vorhandenen Zeile der Zieltabelle **desselben
+   Mandanten**, Aufzählungen (`check spalte = any (array[…])`) mit ihrem
+   ersten erlaubten Wert, alles Übrige mit einem Platzhalter, der den
+   Mandanten in sich trägt. Was am Fremdschlüssel scheitert, klappt oft im
+   nächsten Durchgang, wenn der Elternsatz da ist — deshalb mehrere.
+3. Als Chef Alpha, unter RLS: in jeder Tabelle nachzählen, wie viele Zeilen
+   von Beta sichtbar sind. **Jede einzelne muss null ergeben.**
+
+**Warum auch Alphas eigene Zeile gezählt wird.** Ein Test, der nur „sieht
+nichts Fremdes" prüft, würde auch dann grün leuchten, wenn die Richtlinien
+*alles* verbieten. Gezählt wird deshalb mit, in wie vielen Tabellen Alpha
+seine **eigene** Zeile sieht. Nur diese Tabellen sind ein Nachweis.
+
+**Ergebnis: 159 von 176 Mandantentabellen wirklich geprüft, keine einzige
+fremde Zeile sichtbar.**
+
+- 3 Tabellen sind vom Rechtemodell der Vorlage ohnehin verdeckt (auch die
+  eigene Zeile ist für einen Chef nicht sichtbar) — sie beweisen nichts und
+  werden getrennt gezählt.
+- 14 ließen sich nicht füllen und werden **namentlich ausgegeben**: über sie
+  sagt der Rundumschlag nichts. Es sind vor allem die `mail_*`-Tabellen, die
+  ein echtes Postfach voraussetzen, dazu Arbeitszeit, Notizen und der
+  Rechnungsnummernkreis.
+
+Eine Untergrenze von 150 steht im Test. Fällt die Zahl darunter, hat sich
+etwas geändert — eine neue Tabelle, die sich nicht füllen lässt, oder eine
+Richtlinie, die mehr verdeckt als vorher. Beides will gesehen werden, bevor
+es zur Gewohnheit wird.
+
+Zwei Dinge, die diese Prüfung erst scharf gemacht haben, und die beim
+Schreiben Arbeit gekostet haben:
+
+- **Der Platzhalter muss den Mandanten tragen.** Mit einem festen Wert
+  kollidierten Alpha und Beta an jeder eindeutigen Textspalte
+  (`projekte.slug`, `kontakte.email`) — und genau die Tabellen fielen
+  stillschweigend aus der Prüfung. Das kostete 31 Tabellen.
+- **Ein zweiter Anlauf mit den Textspalten aus den Prüfbedingungen.** Regeln
+  der Art „eines von beidem muss dastehen" (`kontakte_hat_namen`) scheitern
+  an einer Spalte, die gar nicht Pflicht ist. Das kostete weitere vier.

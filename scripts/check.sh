@@ -113,6 +113,13 @@ else
   fehler=1
 fi
 
+abschnitt "Mandantentrennung: Rundumschlag ueber alle Tabellen"
+if scripts/lokale-db.sh psql -q -f tests/mandant-rundumschlag.sql; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Selbstregistrierung"
 if scripts/lokale-db.sh psql -q -f tests/selbstregistrierung.sql; then
   :
