@@ -73,6 +73,26 @@ ABGESICHERT = {
         'Empfaenger demselben Mandanten gehoeren — sonst leuchtet die Mail '
         'des einen Maklers im Sperrbildschirm des anderen auf, mit '
         'Absender, Betreff und Textanfang.'),
+    'push-antworten': ('profil.mandant_id',
+        'Ausweis ist der Geraetetoken. Danach stand nur noch die Rolle: ein '
+        'Chef durfte jedes Postfach bedienen — und dass daneben andere '
+        'Haeuser stehen, war kein Gedanke. Die Mandantengrenze wird jetzt '
+        'VOR der Rolle gezogen.'),
+    'suchkriterien-newsletter': ('for (const mandant of mandanten)',
+        'Cron und Chef endeten in derselben Abfrage ueber alle Kontakte '
+        'aller Mandanten. Der Lauf ist jetzt je Mandant: einer beim Chef, '
+        'alle nacheinander beim Cron, mit getrenntem Schalter, Postfach und '
+        'Protokoll.'),
+    'news-briefing-erstellen': ('wieViele',
+        'Der Inhalt ist oeffentliche Presse und fuer alle derselbe — das ist '
+        'keine Mandantenfrage. Die Buchfuehrung darum schon: je Mandant eine '
+        'Zeile, und weder die Idempotenzpruefung noch das Schreiben gehen '
+        'mehr von genau einer aus.'),
+    'portal-ftp-diagnose': ('mandantWunsch',
+        'Werkzeug des Betreibers, gegen das Vault-Geheimnis der Plattform — '
+        'es darf absichtlich in jeden Mandanten sehen. Nur nicht raten: der '
+        'Mandant wird benannt, sonst meldet die Funktion, dass mehrere in '
+        'Frage kommen.'),
     'web-lead': ('immoMandantAusAnfrage',
         'Eingang fuer Bewertungsanfragen. Mandant aus der Anfrage, Chef und '
         'Empfaenger aus dem Mandanten; Kontaktsuche und beide inserts sind '
@@ -110,8 +130,6 @@ NOCH_OFFEN = {
     # KI-Auswertung keine fremden Daten mitschickt.
     'bewerbertest-abgeben': 'Token-gebunden; KI-Auswertung ungelesen.',
     'ki-bildbearbeitung': 'Schreibt Bilder, 44 kB, ungelesen.',
-    'news-briefing-erstellen': 'Erzeugt Briefings.',
-    'portal-ftp-diagnose': 'Diagnose.',
     # Neubauportal. Der Postfach-Griff ist geschlossen (28.09.2026): die
     # drei versendenden Funktionen nehmen das Postfach des eigenen
     # Mandanten oder gar keines. Offen bleibt der Zugang ueber den Slug —
@@ -124,9 +142,6 @@ NOCH_OFFEN = {
     'projekt-login': 'Neubauportal, Anmeldung; Zugang ueber den Slug ungeklaert.',
     'projekt-upload': 'Neubauportal, Dateien; Postfach begrenzt.',
     'projekt-wohnungen': 'Neubauportal.',
-    'push-antworten': 'Push.',
-    'suchkriterien-newsletter': 'Verschickt Newsletter — nach fork_16 gepruefte '
-                                'Quelle, der Versandweg selbst aber ungelesen.',
 }
 
 

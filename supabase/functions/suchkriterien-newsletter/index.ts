@@ -59,34 +59,60 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const trocken = body.trocken === true;
     const vomCron = !nutzerId; // per Geheimnis, nicht per Chef-JWT
-    if (vomCron && !trocken) {
-      const { data: e } = await db.from("portal_einstellungen").select("wert").eq("schluessel", "newsletter_automatisch").maybeSingle();
-      const schalter = e?.wert === true || String(e?.wert ?? "").toLowerCase() === "ja";
-      if (!schalter) return antwort({ ok: true, gesendet: 0, uebersprungen: true, grund: "Automatischer Versand ist ausgeschaltet (Einstellungen -> Vorgaben -> Objekt-Newsletter). Nichts gesendet." });
-    }
     const resendKey = Deno.env.get("RESEND_API_KEY");
     if (!resendKey && !trocken) throw new Error("RESEND_API_KEY nicht gesetzt");
 
+    // Ein Lauf gehoert einem Mandanten. Der Chef-Weg: seinem eigenen. Der
+    // Cron-Weg: allen, aber jedem fuer sich — Schalter, Empfaenger,
+    // Postfaecher und Protokoll bleiben getrennt.
+    //
+    // Vorher lief beides ueber ALLE Kontakte ALLER Mandanten. Ein Chef, der
+    // auf "Objektvorschlaege senden" klickt, haette damit die Newsletter der
+    // anderen Makler verschickt — mit deren Objekten, ueber deren
+    // Postfaecher — und die Antwort haette ihm deren Empfaengerlisten mit
+    // Namen und E-Mail-Adressen zurueckgegeben.
+    let mandanten: string[] = [];
+    if (nutzerId) {
+      const { data: mp } = await db.from("profiles").select("mandant_id").eq("id", nutzerId).maybeSingle();
+      if (!mp?.mandant_id) return antwort({ ok: false, fehler: "Konto ohne Mandanten." });
+      mandanten = [String(mp.mandant_id)];
+    } else {
+      const { data: alle } = await db.from("mandanten").select("id").order("erstellt_am");
+      mandanten = (alle || []).map((m: any) => String(m.id));
+    }
+
+    const log: any[] = []; let gesendet = 0, ohneTreffer = 0, empfaengerGesamt = 0, ohneSchalter = 0;
+    // Die Schleife laesst die Einrueckung darunter, wie sie war — so bleibt
+    // der Unterschied zur Vorlage lesbar und beschraenkt sich auf das, was
+    // sich wirklich aendert.
+    for (const mandant of mandanten) {
+    if (vomCron && !trocken) {
+      const { data: e } = await db.from("portal_einstellungen").select("wert").eq("mandant_id", mandant).eq("schluessel", "newsletter_automatisch").maybeSingle();
+      const schalter = e?.wert === true || String(e?.wert ?? "").toLowerCase() === "ja";
+      if (!schalter) { ohneSchalter++; continue; }
+    }
+
     // Empfaenger
     let q = db.from("kontakte").select("id, anrede, titel, vorname, nachname, firma, email, zustaendig_id, ersteller_id, such_profil")
+      .eq("mandant_id", mandant)
       .eq("aktiv", true).eq("newsletter_opt_in", true).eq("werbung_opt_out", false).not("email", "is", null).not("such_profil", "is", null);
     if (body.kontakt_id) q = q.eq("id", body.kontakt_id);
     const { data: kontakte, error: kErr } = await q.limit(500);
     if (kErr) throw kErr;
     const empfaenger = (kontakte || []).filter((k: any) => !k.such_profil?.status || k.such_profil.status === "aktiv");
+    empfaengerGesamt += empfaenger.length;
 
     // Chef-Postfach als Rueckfall
-    const { data: chefPf } = await db.from("mail_postfaecher").select("*, profiles!inner(role)").eq("aktiv", true).eq("profiles.role", "chef").order("standard_zum_senden", { ascending: false }).limit(1);
+    const { data: chefPf } = await db.from("mail_postfaecher").select("*, profiles!inner(role)").eq("mandant_id", mandant).eq("aktiv", true).eq("profiles.role", "chef").order("standard_zum_senden", { ascending: false }).limit(1);
     const rueckfall = chefPf && chefPf[0] || null;
     const pfCache = new Map<string, any>();
     const postfachFuer = async (profilId: string | null) => {
       if (!profilId) return rueckfall;
       if (pfCache.has(profilId)) return pfCache.get(profilId);
-      const { data } = await db.from("mail_postfaecher").select("*").eq("benutzer_id", profilId).eq("aktiv", true).order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false }).limit(1);
+      const { data } = await db.from("mail_postfaecher").select("*").eq("mandant_id", mandant).eq("benutzer_id", profilId).eq("aktiv", true).order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false }).limit(1);
       const pf = data && data[0] || rueckfall; pfCache.set(profilId, pf); return pf;
     };
 
-    const log: any[] = []; let gesendet = 0, ohneTreffer = 0;
     for (const k of empfaenger) {
       const eintrag: any = { kontakt: [k.vorname, k.nachname].filter(Boolean).join(" ") || k.firma, email: k.email };
       try {
@@ -119,7 +145,7 @@ Deno.serve(async (req) => {
                 : `Im Falle des Erwerbs der Immobilie zahlen Sie als Käufer eine Maklerprovision in Höhe von ${provision} inkl. der gesetzlichen Mehrwertsteuer, berechnet auf den beurkundeten Kaufpreis. Die Provision ist ausschließlich dann verdient und fällig, wenn ein notarieller Kaufvertrag über diese Immobilie mit Ihnen zustande kommt. Das Anfordern des Exposés, Besichtigungen und unsere Beratung sind für Sie kostenfrei – entscheiden Sie sich gegen den Kauf, entstehen Ihnen keinerlei Kosten.`;
               let firmaSlug = "standard";
               const { data: zp } = await db.from("profiles").select("firma_id").eq("id", o.zustaendig_id || pf.benutzer_id).maybeSingle();
-              if (zp?.firma_id) { const { data: f } = await db.from("firma_stammdaten").select("slug").eq("id", zp.firma_id).maybeSingle(); if (f?.slug) firmaSlug = f.slug; }
+              if (zp?.firma_id) { const { data: f } = await db.from("firma_stammdaten").select("slug").eq("mandant_id", mandant).eq("id", zp.firma_id).maybeSingle(); if (f?.slug) firmaSlug = f.slug; }
               const tok = token();
               const { error: fe } = await db.from("expose_freigaben").insert({
                 token: tok, immobilie_id: o.id, kontakt_id: k.id, email: String(k.email).toLowerCase(), name: eintrag.kontakt || null,
@@ -133,7 +159,7 @@ Deno.serve(async (req) => {
         }
         let abmeldeLink = `${ABMELDE_BASIS}`;
         try {
-          const { data: an } = await db.from("newsletter_anmeldungen").select("abmelde_token").ilike("email", String(k.email).trim()).is("widerrufen_am", null).order("angemeldet_am", { ascending: false }).limit(1);
+          const { data: an } = await db.from("newsletter_anmeldungen").select("abmelde_token").eq("mandant_id", mandant).ilike("email", String(k.email).trim()).is("widerrufen_am", null).order("angemeldet_am", { ascending: false }).limit(1);
           let tokenAb = an && an[0] ? an[0].abmelde_token : null;
           if (!tokenAb) { const { data: neu } = await db.from("newsletter_anmeldungen").insert({ kontakt_id: k.id, email: String(k.email).trim().toLowerCase(), name: eintrag.kontakt || null, quelle: "kontakt" }).select("abmelde_token").single(); tokenAb = neu?.abmelde_token || null; }
           if (tokenAb) abmeldeLink = `${ABMELDE_BASIS}?t=${tokenAb}`;
@@ -159,6 +185,7 @@ Deno.serve(async (req) => {
       } catch (e) { eintrag.fehler = e instanceof Error ? e.message : String(e); }
       log.push(eintrag);
     }
-    return antwort({ ok: true, empfaenger: empfaenger.length, gesendet, ohne_treffer: ohneTreffer, trocken, log: log.slice(0, 200) });
+    }
+    return antwort({ ok: true, mandanten: mandanten.length, empfaenger: empfaengerGesamt, gesendet, ohne_treffer: ohneTreffer, ohne_schalter: ohneSchalter, trocken, log: log.slice(0, 200) });
   } catch (e) { return antwort({ ok: false, fehler: e instanceof Error ? e.message : String(e) }); }
 });

@@ -118,6 +118,17 @@ for _f in ('push-senden', 'fahrt-ermitteln'):
     ERWEITERT[_f] = ('Einstellungen und Anlass aus dem eigenen Mandanten '
                      '(Phase 2, fork_28)')
 
+# Vier weitere oeffentliche Endpunkte, die ueber alle Mandanten hinweg
+# gelesen oder verschickt haben.
+ERWEITERT['push-antworten'] = (
+    'Die Mail muss dem Mandanten des Geraets gehoeren (Phase 2)')
+ERWEITERT['suchkriterien-newsletter'] = (
+    'Ein Lauf je Mandant statt einer ueber alle (Phase 2)')
+ERWEITERT['news-briefing-erstellen'] = (
+    'Vertraegt mehrere Mandanten (Phase 2)')
+ERWEITERT['portal-ftp-diagnose'] = (
+    'Der Mandant wird benannt, nicht geraten (Phase 2)')
+
 BLOCKZEILEN = {
     'mpe-pdf-erzeugen': {
         'const pins: Array<[number, number, string, string, string]> = [',

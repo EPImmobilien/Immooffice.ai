@@ -2248,3 +2248,49 @@ JWT-geprüft, und für jede davon gilt dieselbe Frage. Das ist der nächste
 Block nach den öffentlichen; er steht in `docs/OFFEN.md`.
 
 **Abgesichert 13, unbedenklich 4, noch offen 11.**
+
+---
+
+## Vier Endpunkte, die über alle Mandanten hinweg gelesen und verschickt haben (29.09.2026)
+
+**`push-antworten`** — der schwerste Fund des Tages. Die Funktion weist sich
+über den APNs-Gerätetoken aus, das ist in Ordnung. Danach stand nur noch:
+
+```
+if (pf.benutzer_id !== profil.id && profil.role !== "chef") … 403
+```
+
+Ein Chef darf jedes Postfach *seines* Hauses bedienen — dass daneben andere
+Häuser stehen könnten, war beim Schreiben kein Gedanke. Damit hätte ein Chef
+mit gültigem Gerät zu **jeder** `mail_id` antworten können: die Antwort ginge
+über das fremde Postfach hinaus, mit fremder Absenderadresse; der zitierte
+Ursprungstext der fremden Mail stünde darin; die fremde Mail wäre danach als
+gelesen markiert, und der Beleg läge im fremden Gesendet-Ordner. Die
+Mandantengrenze wird jetzt **vor** der Rollenprüfung gezogen; die Rolle
+entscheidet nur noch innerhalb des eigenen Hauses.
+
+**`suchkriterien-newsletter`** — zwei Wege hinein, Cron und Chef, und beide
+endeten in derselben Abfrage: alle Kontakte mit `newsletter_opt_in`, ohne
+Mandantengrenze. Der Chef-Weg ist der schlimmere, weil ihn ein Mensch
+auslöst: ein Klick auf „Objektvorschläge senden", und die Kunden der anderen
+Makler bekommen Post — mit deren Objekten, über deren Postfächer — und die
+Antwort legt dem Klickenden deren Empfängerlisten mit Namen und
+E-Mail-Adressen vor. Der Lauf ist jetzt je Mandant: einer beim Chef, alle
+nacheinander beim Cron, mit getrenntem Schalter, Postfach und Protokoll.
+
+**`news-briefing-erstellen`** — kein Leck. Der Inhalt ist öffentliche Presse
+und für alle derselbe. Die Buchführung darum war aber ab dem zweiten
+Mandanten schlicht kaputt: `fork_16` schreibt eine Zeile je Mandant, die
+Funktion las die Idempotenz noch mit `.limit(1).maybeSingle()` und schloss
+das Schreiben mit `.select().single()` ab. Bei zwei Mandanten liefert der
+`upsert` zwei Zeilen, und `.single()` bricht ab — der Cron wäre jeden Morgen
+mit einem Fehler zurückgekommen. Gezählt wird jetzt: erledigt ist es erst,
+wenn jeder Mandant seine Zeile hat.
+
+**`portal-ftp-diagnose`** — ein Werkzeug des Betreibers, das gegen das
+Vault-Geheimnis der Plattform läuft und absichtlich in jeden Mandanten sehen
+darf. Nur raten darf es nicht: `.eq("portal", portal).maybeSingle()` bricht
+ab dem zweiten Mandanten ab. Der Mandant wird jetzt mit `?mandant=…` benannt;
+kommen mehrere in Frage und ist keiner benannt, sagt die Funktion das.
+
+**Abgesichert 17, unbedenklich 4, noch offen 7.**

@@ -71,16 +71,21 @@ Deno.serve(async (req) => {
 
     const { data: geraet } = await db.from("push_geraete").select("id, profile_id, aktiv").eq("token", token).maybeSingle();
     if (!geraet || !geraet.aktiv) return antwort({ ok: false, fehler: "Gerät nicht registriert — bitte in der App antworten." }, 401);
-    const { data: profil } = await db.from("profiles").select("id, name, role").eq("id", geraet.profile_id).maybeSingle();
+    const { data: profil } = await db.from("profiles").select("id, name, role, mandant_id").eq("id", geraet.profile_id).maybeSingle();
     if (!profil || !["chef", "mitarbeiter"].includes(profil.role)) return antwort({ ok: false, fehler: "Keine Berechtigung." }, 403);
+    if (!profil.mandant_id) return antwort({ ok: false, fehler: "Keine Berechtigung." }, 403);
 
+    // Die Mail muss dem Mandanten des Geraets gehoeren. Ohne diese Zeile
+    // reichte die Rolle "chef", um jede Mail jedes Maklers zu beantworten —
+    // ueber dessen Postfach, mit dessen Absenderadresse, und der zitierte
+    // Ursprungstext ging dabei gleich mit hinaus.
     const { data: mail } = await db.from("mail_eingang")
       .select("id, postfach_id, absender_email, absender_name, betreff, message_id, text, html, gesendet_am")
-      .eq("id", mailId).maybeSingle();
+      .eq("mandant_id", profil.mandant_id).eq("id", mailId).maybeSingle();
     if (!mail) return antwort({ ok: false, fehler: "Mail nicht gefunden." }, 404);
     if (!mail.absender_email) return antwort({ ok: false, fehler: "Die Mail hat keine Absenderadresse." }, 400);
 
-    const { data: pf } = await db.from("mail_postfaecher").select("*").eq("id", mail.postfach_id).maybeSingle();
+    const { data: pf } = await db.from("mail_postfaecher").select("*").eq("mandant_id", profil.mandant_id).eq("id", mail.postfach_id).maybeSingle();
     if (!pf) return antwort({ ok: false, fehler: "Postfach nicht gefunden." }, 404);
     if (pf.benutzer_id !== profil.id && profil.role !== "chef") return antwort({ ok: false, fehler: "Keine Berechtigung für dieses Postfach." }, 403);
     if (!pf.aktiv) return antwort({ ok: false, fehler: "Postfach ist deaktiviert." }, 400);
@@ -130,10 +135,10 @@ Deno.serve(async (req) => {
     }
 
     const { data: log } = await db.from("mail_versendet").insert({
-      postfach_id: pf.id, versendet_von_user_id: profil.id, absender_email: pf.email_adresse, absender_name: pf.absender_name,
+      mandant_id: profil.mandant_id, postfach_id: pf.id, versendet_von_user_id: profil.id, absender_email: pf.email_adresse, absender_name: pf.absender_name,
       empfaenger_email: an, empfaenger_name: anName, betreff, body_text: text, status: "gesendet", smtp_message_id: messageId,
     }).select("id").single();
-    await db.from("mail_eingang").update({ gelesen: true }).eq("id", mail.id);
+    await db.from("mail_eingang").update({ gelesen: true }).eq("mandant_id", profil.mandant_id).eq("id", mail.id);
 
     return antwort({ ok: true, an, an_name: anName, betreff, versandweg: versandWeg, id: log?.id || null });
   } catch (e) {

@@ -1858,6 +1858,101 @@ NACHBESSERN = [
     ('FORK', '    const satz = {\n      immobilie_id: immobilieId,', '    const satz = {\n      immobilie_id: immobilieId,\n      mandant_id: immo.mandant_id,',
      'Fahrtzeit: der Zwischenspeicher wird mit Mandanten geschrieben.',
      {'fahrt-ermitteln'}),
+
+    # =====================================================================
+    # FORK — mit der Rolle "chef" liess sich jede Mail jedes Maklers
+    #        beantworten
+    #
+    # push-antworten weist sich ueber den APNs-Geraetetoken aus. Das ist in
+    # Ordnung. Danach aber stand:
+    #
+    #   if (pf.benutzer_id !== profil.id && profil.role !== "chef") ...
+    #
+    # Ein Chef darf jedes Postfach SEINES Hauses bedienen — dass daneben
+    # noch andere Haeuser stehen koennten, war beim Schreiben kein Gedanke.
+    # Damit haette ein Chef mit gueltigem Geraet zu jeder mail_id antworten
+    # koennen: die Antwort ginge ueber das fremde Postfach hinaus, mit
+    # fremder Absenderadresse, und der zitierte Ursprungstext der fremden
+    # Mail stuende darin. Die fremde Mail waere danach als gelesen markiert
+    # und der Beleg laege im fremden Gesendet-Ordner.
+    #
+    # Die Mandantengrenze wird jetzt VOR der Rollenpruefung gezogen; die
+    # Rolle entscheidet nur noch innerhalb des eigenen Hauses.
+    # =====================================================================
+    ('FORK', '    const { data: profil } = await db.from("profiles").select("id, name, role").eq("id", geraet.profile_id).maybeSingle();\n    if (!profil || !["chef", "mitarbeiter"].includes(profil.role)) return antwort({ ok: false, fehler: "Keine Berechtigung." }, 403);\n\n    const { data: mail } = await db.from("mail_eingang")\n      .select("id, postfach_id, absender_email, absender_name, betreff, message_id, text, html, gesendet_am")\n      .eq("id", mailId).maybeSingle();', '    const { data: profil } = await db.from("profiles").select("id, name, role, mandant_id").eq("id", geraet.profile_id).maybeSingle();\n    if (!profil || !["chef", "mitarbeiter"].includes(profil.role)) return antwort({ ok: false, fehler: "Keine Berechtigung." }, 403);\n    if (!profil.mandant_id) return antwort({ ok: false, fehler: "Keine Berechtigung." }, 403);\n\n    // Die Mail muss dem Mandanten des Geraets gehoeren. Ohne diese Zeile\n    // reichte die Rolle "chef", um jede Mail jedes Maklers zu beantworten —\n    // ueber dessen Postfach, mit dessen Absenderadresse, und der zitierte\n    // Ursprungstext ging dabei gleich mit hinaus.\n    const { data: mail } = await db.from("mail_eingang")\n      .select("id, postfach_id, absender_email, absender_name, betreff, message_id, text, html, gesendet_am")\n      .eq("mandant_id", profil.mandant_id).eq("id", mailId).maybeSingle();',
+     'Push-Antwort: die Mail muss dem Mandanten des Geraets gehoeren.',
+     {'push-antworten'}),
+    ('FORK', '    const { data: pf } = await db.from("mail_postfaecher").select("*").eq("id", mail.postfach_id).maybeSingle();', '    const { data: pf } = await db.from("mail_postfaecher").select("*").eq("mandant_id", profil.mandant_id).eq("id", mail.postfach_id).maybeSingle();',
+     'Push-Antwort: auch das Postfach nur aus dem eigenen Mandanten.',
+     {'push-antworten'}),
+    ('FORK', '    const { data: log } = await db.from("mail_versendet").insert({\n      postfach_id: pf.id, versendet_von_user_id: profil.id,', '    const { data: log } = await db.from("mail_versendet").insert({\n      mandant_id: profil.mandant_id, postfach_id: pf.id, versendet_von_user_id: profil.id,',
+     'Push-Antwort: der Beleg traegt den Mandanten.',
+     {'push-antworten'}),
+    ('FORK', '    await db.from("mail_eingang").update({ gelesen: true }).eq("id", mail.id);', '    await db.from("mail_eingang").update({ gelesen: true }).eq("mandant_id", profil.mandant_id).eq("id", mail.id);',
+     'Push-Antwort: gelesen wird nur die eigene Mail gesetzt.',
+     {'push-antworten'}),
+
+    # portal-ftp-diagnose laeuft gegen das Vault-Geheimnis der Plattform —
+    # ein Werkzeug des Betreibers, das absichtlich in jeden Mandanten sehen
+    # darf. Nur: .eq("portal", portal).maybeSingle() sucht sich den Zugang
+    # nicht aus, es bricht ab dem zweiten Mandanten ab. Der Mandant wird
+    # deshalb benannt, nicht geraten.
+    ('FORK', '  const { data: z } = await db.from("portal_zugaenge").select("*").eq("portal", portal).maybeSingle();\n  if (!z) {\n    return new Response(JSON.stringify({ ok: false, fehler: "kein Zugang" }), {\n      status: 404, headers: { ...cors, "Content-Type": "application/json" },\n    });\n  }', '  const mandantWunsch = url.searchParams.get("mandant") || "";\n  let zFrage = db.from("portal_zugaenge").select("*").eq("portal", portal);\n  if (/^[0-9a-f-]{36}$/i.test(mandantWunsch)) zFrage = zFrage.eq("mandant_id", mandantWunsch);\n  const { data: zZeilen } = await zFrage.limit(2);\n  const z = (zZeilen || [])[0];\n  if (!z) {\n    return new Response(JSON.stringify({ ok: false, fehler: "kein Zugang" }), {\n      status: 404, headers: { ...cors, "Content-Type": "application/json" },\n    });\n  }\n  if ((zZeilen || []).length > 1) {\n    return new Response(JSON.stringify({ ok: false, fehler: "Mehrere Mandanten haben einen Zugang zu diesem Portal. Bitte mit ?mandant=... genau einen benennen." }), {\n      status: 409, headers: { ...cors, "Content-Type": "application/json" },\n    });\n  }',
+     'Portal-Diagnose: der Mandant wird benannt, nicht geraten.',
+     {'portal-ftp-diagnose'}),
+
+    # =====================================================================
+    # FORK — der Objekt-Newsletter lief ueber alle Mandanten auf einmal
+    #
+    # suchkriterien-newsletter kennt zwei Wege hinein: den Cron mit dem
+    # Vault-Geheimnis und den Chef mit seinem JWT. Beide endeten in
+    # DERSELBEN Abfrage: alle Kontakte mit newsletter_opt_in, ohne
+    # Mandantengrenze.
+    #
+    # Der Chef-Weg ist der schlimmere, weil ihn ein Mensch ausloest: ein
+    # Klick auf "Objektvorschlaege senden", und die Kunden der anderen
+    # Makler bekommen Post — mit deren Objekten, ueber deren Postfaecher —
+    # und die Antwort legt dem Klickenden deren Empfaengerlisten mit Namen
+    # und E-Mail-Adressen vor.
+    #
+    # Der Lauf ist deshalb je Mandant: einer beim Chef, alle nacheinander
+    # beim Cron. Auch der Schalter "automatischer Versand" gehoert seit
+    # fork_23 dem Mandanten — er wurde global gelesen, und maybeSingle()
+    # waere ab dem zweiten Mandanten ohnehin abgebrochen.
+    # =====================================================================
+    ('FORK', '    const vomCron = !nutzerId; // per Geheimnis, nicht per Chef-JWT\n    if (vomCron && !trocken) {\n      const { data: e } = await db.from("portal_einstellungen").select("wert").eq("schluessel", "newsletter_automatisch").maybeSingle();\n      const schalter = e?.wert === true || String(e?.wert ?? "").toLowerCase() === "ja";\n      if (!schalter) return antwort({ ok: true, gesendet: 0, uebersprungen: true, grund: "Automatischer Versand ist ausgeschaltet (Einstellungen -> Vorgaben -> Objekt-Newsletter). Nichts gesendet." });\n    }\n    const resendKey = Deno.env.get("RESEND_API_KEY");\n    if (!resendKey && !trocken) throw new Error("RESEND_API_KEY nicht gesetzt");\n\n    // Empfaenger\n    let q = db.from("kontakte").select("id, anrede, titel, vorname, nachname, firma, email, zustaendig_id, ersteller_id, such_profil")\n      .eq("aktiv", true).eq("newsletter_opt_in", true).eq("werbung_opt_out", false).not("email", "is", null).not("such_profil", "is", null);\n    if (body.kontakt_id) q = q.eq("id", body.kontakt_id);\n    const { data: kontakte, error: kErr } = await q.limit(500);\n    if (kErr) throw kErr;\n    const empfaenger = (kontakte || []).filter((k: any) => !k.such_profil?.status || k.such_profil.status === "aktiv");\n\n    // Chef-Postfach als Rueckfall\n    const { data: chefPf } = await db.from("mail_postfaecher").select("*, profiles!inner(role)").eq("aktiv", true).eq("profiles.role", "chef").order("standard_zum_senden", { ascending: false }).limit(1);\n    const rueckfall = chefPf && chefPf[0] || null;\n    const pfCache = new Map<string, any>();\n    const postfachFuer = async (profilId: string | null) => {\n      if (!profilId) return rueckfall;\n      if (pfCache.has(profilId)) return pfCache.get(profilId);\n      const { data } = await db.from("mail_postfaecher").select("*").eq("benutzer_id", profilId).eq("aktiv", true).order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false }).limit(1);\n      const pf = data && data[0] || rueckfall; pfCache.set(profilId, pf); return pf;\n    };\n\n    const log: any[] = []; let gesendet = 0, ohneTreffer = 0;\n    for (const k of empfaenger) {', '    const vomCron = !nutzerId; // per Geheimnis, nicht per Chef-JWT\n    const resendKey = Deno.env.get("RESEND_API_KEY");\n    if (!resendKey && !trocken) throw new Error("RESEND_API_KEY nicht gesetzt");\n\n    // Ein Lauf gehoert einem Mandanten. Der Chef-Weg: seinem eigenen. Der\n    // Cron-Weg: allen, aber jedem fuer sich — Schalter, Empfaenger,\n    // Postfaecher und Protokoll bleiben getrennt.\n    //\n    // Vorher lief beides ueber ALLE Kontakte ALLER Mandanten. Ein Chef, der\n    // auf "Objektvorschlaege senden" klickt, haette damit die Newsletter der\n    // anderen Makler verschickt — mit deren Objekten, ueber deren\n    // Postfaecher — und die Antwort haette ihm deren Empfaengerlisten mit\n    // Namen und E-Mail-Adressen zurueckgegeben.\n    let mandanten: string[] = [];\n    if (nutzerId) {\n      const { data: mp } = await db.from("profiles").select("mandant_id").eq("id", nutzerId).maybeSingle();\n      if (!mp?.mandant_id) return antwort({ ok: false, fehler: "Konto ohne Mandanten." });\n      mandanten = [String(mp.mandant_id)];\n    } else {\n      const { data: alle } = await db.from("mandanten").select("id").order("erstellt_am");\n      mandanten = (alle || []).map((m: any) => String(m.id));\n    }\n\n    const log: any[] = []; let gesendet = 0, ohneTreffer = 0, empfaengerGesamt = 0, ohneSchalter = 0;\n    // Die Schleife laesst die Einrueckung darunter, wie sie war — so bleibt\n    // der Unterschied zur Vorlage lesbar und beschraenkt sich auf das, was\n    // sich wirklich aendert.\n    for (const mandant of mandanten) {\n    if (vomCron && !trocken) {\n      const { data: e } = await db.from("portal_einstellungen").select("wert").eq("mandant_id", mandant).eq("schluessel", "newsletter_automatisch").maybeSingle();\n      const schalter = e?.wert === true || String(e?.wert ?? "").toLowerCase() === "ja";\n      if (!schalter) { ohneSchalter++; continue; }\n    }\n\n    // Empfaenger\n    let q = db.from("kontakte").select("id, anrede, titel, vorname, nachname, firma, email, zustaendig_id, ersteller_id, such_profil")\n      .eq("mandant_id", mandant)\n      .eq("aktiv", true).eq("newsletter_opt_in", true).eq("werbung_opt_out", false).not("email", "is", null).not("such_profil", "is", null);\n    if (body.kontakt_id) q = q.eq("id", body.kontakt_id);\n    const { data: kontakte, error: kErr } = await q.limit(500);\n    if (kErr) throw kErr;\n    const empfaenger = (kontakte || []).filter((k: any) => !k.such_profil?.status || k.such_profil.status === "aktiv");\n    empfaengerGesamt += empfaenger.length;\n\n    // Chef-Postfach als Rueckfall\n    const { data: chefPf } = await db.from("mail_postfaecher").select("*, profiles!inner(role)").eq("mandant_id", mandant).eq("aktiv", true).eq("profiles.role", "chef").order("standard_zum_senden", { ascending: false }).limit(1);\n    const rueckfall = chefPf && chefPf[0] || null;\n    const pfCache = new Map<string, any>();\n    const postfachFuer = async (profilId: string | null) => {\n      if (!profilId) return rueckfall;\n      if (pfCache.has(profilId)) return pfCache.get(profilId);\n      const { data } = await db.from("mail_postfaecher").select("*").eq("mandant_id", mandant).eq("benutzer_id", profilId).eq("aktiv", true).order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false }).limit(1);\n      const pf = data && data[0] || rueckfall; pfCache.set(profilId, pf); return pf;\n    };\n\n    for (const k of empfaenger) {',
+     'Objekt-Newsletter: ein Lauf je Mandant statt einer ueber alle.',
+     {'suchkriterien-newsletter'}),
+    ('FORK', '          const { data: an } = await db.from("newsletter_anmeldungen").select("abmelde_token").ilike("email", String(k.email).trim()).is("widerrufen_am", null).order("angemeldet_am", { ascending: false }).limit(1);', '          const { data: an } = await db.from("newsletter_anmeldungen").select("abmelde_token").eq("mandant_id", mandant).ilike("email", String(k.email).trim()).is("widerrufen_am", null).order("angemeldet_am", { ascending: false }).limit(1);',
+     'Objekt-Newsletter: der Abmelde-Token des eigenen Mandanten.',
+     {'suchkriterien-newsletter'}),
+    ('FORK', 'const { data: f } = await db.from("firma_stammdaten").select("slug").eq("id", zp.firma_id).maybeSingle(); if (f?.slug) firmaSlug = f.slug;', 'const { data: f } = await db.from("firma_stammdaten").select("slug").eq("mandant_id", mandant).eq("id", zp.firma_id).maybeSingle(); if (f?.slug) firmaSlug = f.slug;',
+     'Objekt-Newsletter: der Standort des eigenen Mandanten.',
+     {'suchkriterien-newsletter'}),
+    ('FORK', '      log.push(eintrag);\n    }\n    return antwort({ ok: true, empfaenger: empfaenger.length, gesendet, ohne_treffer: ohneTreffer, trocken, log: log.slice(0, 200) });', '      log.push(eintrag);\n    }\n    }\n    return antwort({ ok: true, mandanten: mandanten.length, empfaenger: empfaengerGesamt, gesendet, ohne_treffer: ohneTreffer, ohne_schalter: ohneSchalter, trocken, log: log.slice(0, 200) });',
+     'Objekt-Newsletter: die Schleife wird geschlossen, gezaehlt wird ueber alle.',
+     {'suchkriterien-newsletter'}),
+
+    # =====================================================================
+    # FORK — das News-Briefing brach ab dem zweiten Mandanten ab
+    #
+    # Der Inhalt ist oeffentliche Presse und fuer alle derselbe; das ist
+    # keine Mandantenfrage. Die Buchfuehrung darum schon: fork_16 schreibt
+    # eine Zeile je Mandant, aber die Funktion las die Idempotenz noch mit
+    # .limit(1).maybeSingle() und schloss das Schreiben mit .select().single()
+    # ab. Bei einem Mandanten geht das auf. Bei zwei liefert der upsert zwei
+    # Zeilen — und .single() bricht ab. Der Cron waere also ab dem zweiten
+    # Mandanten jeden Morgen mit einem Fehler zurueckgekommen.
+    # =====================================================================
+    ('FORK', '    if (!force) {\n      const { data: existing } = await admin\n        .from("news_briefings").select("id").eq("briefing_datum", heute).limit(1).maybeSingle();\n      if (existing?.id) {\n        return jsonResponse({\n          ok: true,\n          briefing_id: existing.id,\n          info: "Briefing fuer heute existiert bereits. Nutze {force: true} zum Ueberschreiben.",\n        });\n      }\n    }', '    if (!force) {\n      // Gezaehlt statt geschaut: eine einzelne Zeile hiesse frueher "fuer\n      // alle erledigt". Ein Mandant, der heute dazugekommen ist, haette\n      // dann bis morgen kein Briefing.\n      const { count: schon } = await admin\n        .from("news_briefings").select("id", { count: "exact", head: true }).eq("briefing_datum", heute);\n      const { count: wieViele } = await admin\n        .from("mandanten").select("id", { count: "exact", head: true });\n      if ((wieViele || 0) > 0 && (schon || 0) >= (wieViele || 0)) {\n        return jsonResponse({\n          ok: true,\n          mandanten: wieViele || 0,\n          info: "Briefing fuer heute existiert bereits. Nutze {force: true} zum Ueberschreiben.",\n        });\n      }\n    }',
+     'News-Briefing: erledigt ist es erst, wenn jeder Mandant seine Zeile hat.',
+     {'news-briefing-erstellen'}),
+    ('FORK', '    const { data: briefing, error: insErr } = await admin\n      .from("news_briefings")', '    // Eine Zeile je Mandant — .single() hat ab dem zweiten abgebrochen.\n    const { data: briefingZeilen, error: insErr } = await admin\n      .from("news_briefings")',
+     'News-Briefing: die Antwort erwartet nicht mehr genau eine Zeile.',
+     {'news-briefing-erstellen'}),
+    ('FORK', '      })), { onConflict: "mandant_id,briefing_datum" })\n      .select()\n      .single();\n\n    if (insErr) throw insErr;\n\n    return jsonResponse({\n      ok: true,\n      briefing_id: briefing.id,', '      })), { onConflict: "mandant_id,briefing_datum" })\n      .select("id");\n\n    if (insErr) throw insErr;\n\n    return jsonResponse({\n      ok: true,\n      mandanten: (briefingZeilen || []).length,\n      briefing_id: (briefingZeilen || [])[0]?.id ?? null,',
+     'News-Briefing: gezaehlt wird, was geschrieben wurde.',
+     {'news-briefing-erstellen'}),
 ]
 
 

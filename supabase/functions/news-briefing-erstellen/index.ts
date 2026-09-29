@@ -135,12 +135,17 @@ Deno.serve(async (req) => {
 
     // Schon ein Briefing heute? (Idempotenz)
     if (!force) {
-      const { data: existing } = await admin
-        .from("news_briefings").select("id").eq("briefing_datum", heute).limit(1).maybeSingle();
-      if (existing?.id) {
+      // Gezaehlt statt geschaut: eine einzelne Zeile hiesse frueher "fuer
+      // alle erledigt". Ein Mandant, der heute dazugekommen ist, haette
+      // dann bis morgen kein Briefing.
+      const { count: schon } = await admin
+        .from("news_briefings").select("id", { count: "exact", head: true }).eq("briefing_datum", heute);
+      const { count: wieViele } = await admin
+        .from("mandanten").select("id", { count: "exact", head: true });
+      if ((wieViele || 0) > 0 && (schon || 0) >= (wieViele || 0)) {
         return jsonResponse({
           ok: true,
-          briefing_id: existing.id,
+          mandanten: wieViele || 0,
           info: "Briefing fuer heute existiert bereits. Nutze {force: true} zum Ueberschreiben.",
         });
       }
@@ -268,7 +273,8 @@ Erstelle das Tagesbriefing.`;
     }
 
     // ---- 4. Speichern (upsert auf briefing_datum) ----
-    const { data: briefing, error: insErr } = await admin
+    // Eine Zeile je Mandant — .single() hat ab dem zweiten abgebrochen.
+    const { data: briefingZeilen, error: insErr } = await admin
       .from("news_briefings")
       .upsert(((await admin.from("mandanten").select("id")).data || []).map((m: any) => ({
         mandant_id: m.id,
@@ -284,14 +290,14 @@ Erstelle das Tagesbriefing.`;
         anzahl_artikel: alleArtikel.length,
         modell,
       })), { onConflict: "mandant_id,briefing_datum" })
-      .select()
-      .single();
+      .select("id");
 
     if (insErr) throw insErr;
 
     return jsonResponse({
       ok: true,
-      briefing_id: briefing.id,
+      mandanten: (briefingZeilen || []).length,
+      briefing_id: (briefingZeilen || [])[0]?.id ?? null,
       anzahl_artikel: alleArtikel.length,
       anzahl_themen: themen.length,
       quellen: quellenInfo,

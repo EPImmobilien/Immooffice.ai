@@ -55,10 +55,19 @@ Deno.serve(async (req) => {
   const ordner = url.searchParams.get("ordner") || "";
   const datei = url.searchParams.get("datei") || "";
 
-  const { data: z } = await db.from("portal_zugaenge").select("*").eq("portal", portal).maybeSingle();
+  const mandantWunsch = url.searchParams.get("mandant") || "";
+  let zFrage = db.from("portal_zugaenge").select("*").eq("portal", portal);
+  if (/^[0-9a-f-]{36}$/i.test(mandantWunsch)) zFrage = zFrage.eq("mandant_id", mandantWunsch);
+  const { data: zZeilen } = await zFrage.limit(2);
+  const z = (zZeilen || [])[0];
   if (!z) {
     return new Response(JSON.stringify({ ok: false, fehler: "kein Zugang" }), {
       status: 404, headers: { ...cors, "Content-Type": "application/json" },
+    });
+  }
+  if ((zZeilen || []).length > 1) {
+    return new Response(JSON.stringify({ ok: false, fehler: "Mehrere Mandanten haben einen Zugang zu diesem Portal. Bitte mit ?mandant=... genau einen benennen." }), {
+      status: 409, headers: { ...cors, "Content-Type": "application/json" },
     });
   }
 
