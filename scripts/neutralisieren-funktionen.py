@@ -1953,6 +1953,42 @@ NACHBESSERN = [
     ('FORK', '      })), { onConflict: "mandant_id,briefing_datum" })\n      .select()\n      .single();\n\n    if (insErr) throw insErr;\n\n    return jsonResponse({\n      ok: true,\n      briefing_id: briefing.id,', '      })), { onConflict: "mandant_id,briefing_datum" })\n      .select("id");\n\n    if (insErr) throw insErr;\n\n    return jsonResponse({\n      ok: true,\n      mandanten: (briefingZeilen || []).length,\n      briefing_id: (briefingZeilen || [])[0]?.id ?? null,',
      'News-Briefing: gezaehlt wird, was geschrieben wurde.',
      {'news-briefing-erstellen'}),
+
+    # =====================================================================
+    # FORK/MARKE — projekt-wohnungen trug ein Kundenprojekt im Quelltext
+    #
+    # Die Funktion beliefert die Wohnungsuebersicht einer Neubau-Microsite.
+    # In der Vorlage stand das Projekt FEST EINGEBAUT: ein Name, eine
+    # Strasse, ein Ort, eine Liste von Haeusern. Zwei Dinge sind daran
+    # falsch. Erstens sind das die Daten eines einzelnen Kunden, und
+    # CLAUDE.md nennt Beispieldaten und Standardwerte ausdruecklich.
+    # Zweitens kann die Seite so nie ein zweites Projekt zeigen.
+    #
+    # Gesucht wurden die Wohnungen ueber Strasse und Ort — ohne Mandanten.
+    # Zwei Makler mit Objekten in derselben Strasse haetten sie vermischt,
+    # und die Microsite des einen haette die Mieten des anderen angezeigt.
+    #
+    # Jetzt kommt das Projekt aus der Tabelle projekte (der Slug ist seit
+    # fork_29 plattformweit eindeutig, weil er die oeffentliche Adresse
+    # ist), und die Wohnungen kommen aus seinem Mandanten.
+    # =====================================================================
+    ('FORK', '// ---------------------------------------------------------------------------\n// Bekannte Projekte. Schluessel = ?projekt=<slug>\n// ---------------------------------------------------------------------------\ntype Projekt = {\n  name: string;\n  strasse: string;\n  ort: string;\n  // Reihenfolge der Haeuser auf der Seite. Haeuser ausserhalb dieser Liste\n  // werden hinten angehaengt, damit ein neues Haus nicht unsichtbar bleibt.\n  haeuser: string[];\n};', '// ---------------------------------------------------------------------------\n// Das Projekt kommt aus der Tabelle projekte, nicht aus dem Quelltext.\n//\n// Die Vorlage trug hier EIN Projekt fest eingebaut: Name, Strasse, Ort und\n// die Reihenfolge der Haeuser. Das ist im Fork aus zwei Gruenden nichts:\n// es sind Daten eines einzelnen Kunden im Produkt, und mehr als dieses eine\n// Projekt kann die Seite damit nie zeigen.\n//\n// Die Reihenfolge der Haeuser steht damit nicht mehr im Quelltext. Sie\n// ergibt sich aus den Hausnummern, natuerlich sortiert — "6-8" vor "10-12".\n// ---------------------------------------------------------------------------\ntype Projekt = {\n  name: string;\n  strasse: string;\n  ort: string;\n  mandant_id: string | null;\n};\n\nconst hausWert = (h: string): number => {\n  const m = String(h || "").match(/(\\d+)/);\n  return m ? Number(m[1]) : 99999;\n};',
+     'Neubau-Wohnungen: das Projekt kommt aus der Tabelle, nicht aus dem Quelltext.',
+     {'projekt-wohnungen'}),
+    ('FORK', '    const slug = url.searchParams.get("projekt") || "";\n    const projekt = PROJEKTE[slug];\n    if (!projekt) {\n      return json({ ok: false, error: "Unbekanntes Projekt", bekannt: Object.keys(PROJEKTE) }, 404);\n    }\n\n    const db = createClient(\n      Deno.env.get("SUPABASE_URL")!,\n      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,\n      { auth: { persistSession: false } },\n    );\n', '    const slug = url.searchParams.get("projekt") || "";\n    if (!slug) return json({ ok: false, error: "Unbekanntes Projekt" }, 404);\n\n    const db = createClient(\n      Deno.env.get("SUPABASE_URL")!,\n      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,\n      { auth: { persistSession: false } },\n    );\n\n    // Der Slug ist seit fork_29 plattformweit eindeutig — er ist die\n    // oeffentliche Adresse dieser Seite.\n    const { data: projektZeile } = await db.from("projekte")\n      .select("name, strasse, ort, mandant_id").eq("slug", slug).eq("status", "aktiv").maybeSingle();\n    if (!projektZeile || !projektZeile.mandant_id) {\n      return json({ ok: false, error: "Unbekanntes Projekt" }, 404);\n    }\n    const projekt: Projekt = {\n      name: String(projektZeile.name || ""),\n      strasse: String(projektZeile.strasse || ""),\n      ort: String(projektZeile.ort || ""),\n      mandant_id: String(projektZeile.mandant_id),\n    };\n    if (!projekt.strasse || !projekt.ort) {\n      return json({ ok: false, error: "Dem Projekt fehlt die Adresse; ohne sie lassen sich die Wohnungen nicht zuordnen." }, 409);\n    }\n',
+     'Neubau-Wohnungen: der Slug schlaegt das Projekt nach.',
+     {'projekt-wohnungen'}),
+    ('FORK', '      .in("status", ["vermarktung", "reserviert", "archiviert"])\n      .ilike("strasse", projekt.strasse)', '      .in("status", ["vermarktung", "reserviert", "archiviert"])\n      // Strasse und Ort allein reichen nicht: zwei Makler koennen Objekte in\n      // derselben Strasse fuehren, und die Seite haette sie vermischt.\n      .eq("mandant_id", projekt.mandant_id)\n      .ilike("strasse", projekt.strasse)',
+     'Neubau-Wohnungen: nur Objekte des eigenen Mandanten.',
+     {'projekt-wohnungen'}),
+    ('FORK', '    // Reihenfolge festlegen, damit die Seite die Haeuser stabil anzeigt.\n    const reihenfolge = [...projekt.haeuser];\n    for (const i of data || []) {\n      const h = String(i.hausnummer || "").trim();\n      if (h && !reihenfolge.includes(h)) reihenfolge.push(h);\n    }', '    // Reihenfolge festlegen, damit die Seite die Haeuser stabil anzeigt.\n    // Ohne Liste im Quelltext: nach der ersten Zahl der Hausnummer.\n    const reihenfolge: string[] = [];\n    for (const i of data || []) {\n      const h = String(i.hausnummer || "").trim();\n      if (h && !reihenfolge.includes(h)) reihenfolge.push(h);\n    }\n    reihenfolge.sort((x, y) => hausWert(x) - hausWert(y) || x.localeCompare(y, "de"));',
+     'Neubau-Wohnungen: die Reihenfolge ergibt sich aus den Hausnummern.',
+     {'projekt-wohnungen'}),
+    # Und die Liste selbst: ein einzelnes Kundenprojekt mit Name, Strasse
+    # und Ort im Quelltext eines Produkts, das an andere verkauft wird.
+    ('MARKE', 'const PROJEKTE: Record<string, Projekt> = {\n  "muehlenblick-teterow": {\n    name: "Wohnquartier Mühlenblick",\n    strasse: "Mühlenblick",\n    ort: "Teterow",\n    haeuser: ["6-8", "10-12", "14-16"],\n  },\n};\n\n', '',
+     'Fest eingebautes Kundenprojekt in projekt-wohnungen entfernt.',
+     {'projekt-wohnungen'}),
 ]
 
 

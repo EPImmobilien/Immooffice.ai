@@ -85078,10 +85078,10 @@ function MietanfragenPage({
             n = ["immoscout", "immowelt", "kleinanzeigen", "portal", "mail"],
             a = {
               selbstauskunft: e.filter(e => t.includes(e.quelle || "manuell")).length,
-              teterow: e.filter(e => "teterow" === e.quelle).length,
+              sonstige: e.filter(e => e.quelle && !t.includes(e.quelle) && !n.includes(e.quelle)).length,
               online: e.filter(e => n.includes(e.quelle)).length,
               neu_selbstauskunft: e.filter(e => t.includes(e.quelle || "manuell") && "neu" === e.status).length,
-              neu_teterow: e.filter(e => "teterow" === e.quelle && "neu" === e.status).length,
+              neu_sonstige: e.filter(e => e.quelle && !t.includes(e.quelle) && !n.includes(e.quelle) && "neu" === e.status).length,
               neu_online: e.filter(e => n.includes(e.quelle) && "neu" === e.status).length
             };
           r(a)
@@ -85094,9 +85094,9 @@ function MietanfragenPage({
     kategorie: "selbstauskunft",
     onZurueck: () => n(null)
   });
-  if ("teterow" === t) return React.createElement(MietanfragenListe, {
+  if ("sonstige" === t) return React.createElement(MietanfragenListe, {
     user: e,
-    kategorie: "teterow",
+    kategorie: "sonstige",
     onZurueck: () => n(null)
   });
   if ("online" === t) return React.createElement(MietanfragenListe, {
@@ -85113,12 +85113,12 @@ function MietanfragenPage({
     neu: a.neu_selbstauskunft,
     num: "01"
   }, {
-    id: "teterow",
-    title: "Selbstauskunft Teterow",
-    subtitle: "Eingaben aus dem Teterow-Bauprojekt",
+    id: "sonstige",
+    title: "Weitere Quellen",
+    subtitle: "Anfragen aus anderen Formularen und Bauprojekten",
     icon: "🏗️",
-    count: a.teterow,
-    neu: a.neu_teterow,
+    count: a.sonstige,
+    neu: a.neu_sonstige,
     num: "02"
   }, {
     id: "online",
@@ -85300,7 +85300,7 @@ function MietanfragenListe({
       let e = window._sb.from("mietanfragen").select("*").order("eingegangen_am", {
         ascending: !1
       });
-      "selbstauskunft" === t ? e = e.in("quelle", ["jotform", "selbstauskunft", "manuell"]) : "teterow" === t ? e = e.eq("quelle", "teterow") : "online" === t && (e = e.in("quelle", ["immoscout", "immowelt", "kleinanzeigen", "portal", "mail"]));
+      "selbstauskunft" === t ? e = e.in("quelle", ["jotform", "selbstauskunft", "manuell"]) : "sonstige" === t ? e = e.not("quelle", "in", "(jotform,selbstauskunft,manuell,immoscout,immowelt,kleinanzeigen,portal,mail)") : "online" === t && (e = e.in("quelle", ["immoscout", "immowelt", "kleinanzeigen", "portal", "mail"]));
       const {
         data: n,
         error: a
@@ -85411,13 +85411,13 @@ function MietanfragenListe({
       color: CI.blau,
       fontWeight: 600
     }
-  }, "selbstauskunft" === t ? "Selbstauskunft-Antworten" : "online" === t ? "Online-Anfragen" : "teterow" === t ? "Selbstauskunft Teterow" : "Mietanfragen")), React.createElement("div", {
+  }, "selbstauskunft" === t ? "Selbstauskunft-Antworten" : "online" === t ? "Online-Anfragen" : "sonstige" === t ? "Weitere Quellen" : "Mietanfragen")), React.createElement("div", {
     style: {
       display: "flex",
       gap: 8,
       flexWrap: "wrap"
     }
-  }, ("selbstauskunft" === t || "teterow" === t || !t) && React.createElement("button", {
+  }, ("selbstauskunft" === t || "sonstige" === t || !t) && React.createElement("button", {
     onClick: async () => {
       k(!0), A("");
       try {
@@ -95046,7 +95046,7 @@ function MietvertraegeTab({
     }
   }, "×"))), React.createElement("button", {
     onClick: async () => {
-      const t = prompt("Name des neuen Ordners (z.B. „Mühlenblick Teterow“):");
+      const t = prompt("Name des neuen Ordners (z.B. „Wohnpark am See“):");
       if (t && t.trim()) try {
         const n = await mietvertragOrdnerRepo.insert({
           name: t.trim(),

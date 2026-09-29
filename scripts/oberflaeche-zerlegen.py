@@ -2879,6 +2879,37 @@ ERSETZUNGEN = [
      r'a = \["e&p", "musterhaus", "immobilien gmbh", "interne ueberweisung"',
      'a = ["interne ueberweisung"',
      'Name der Referenz in der Erkennung interner Umbuchungen.'),
+
+    # =====================================================================
+    # MARKE — ein einzelnes Bauprojekt der Referenz stand als Kachel in der
+    #         Oberflaeche
+    #
+    # Die Mietanfragen haben drei Kacheln: Selbstauskunft, ein NAMENTLICH
+    # genanntes Bauprojekt, Online-Anfragen. Die mittlere traegt den Ort und
+    # den Namen eines Kundenprojekts im Seitentitel, in der Unterzeile, im
+    # Wegweiser und in der Abfrage (quelle = '...').
+    #
+    # Ersatzlos streichen ginge nicht: Zeilen mit dieser Quelle waeren dann
+    # nirgends mehr zu sehen. Die Kachel wird deshalb zu "Weitere Quellen"
+    # und faengt alles, was in keine der beiden anderen Listen faellt. Jede
+    # Zeile bleibt erreichbar, und kein Projektname steht mehr im Produkt.
+    # =====================================================================
+    ('MARKE', '\\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ teterow:\\ e\\.filter\\(e\\ =>\\ "teterow"\\ ===\\ e\\.quelle\\)\\.length,', '              sonstige: e.filter(e => e.quelle && !t.includes(e.quelle) && !n.includes(e.quelle)).length,',
+     'Zaehler der dritten Kachel: alles, was in keine der beiden Listen faellt.'),
+    ('MARKE', '\\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ neu_teterow:\\ e\\.filter\\(e\\ =>\\ "teterow"\\ ===\\ e\\.quelle\\ \\&\\&\\ "neu"\\ ===\\ e\\.status\\)\\.length,', '              neu_sonstige: e.filter(e => e.quelle && !t.includes(e.quelle) && !n.includes(e.quelle) && "neu" === e.status).length,',
+     'dasselbe fuer die ungelesenen.'),
+    ('MARKE', '\\ \\ if\\ \\("teterow"\\ ===\\ t\\)\\ return\\ React\\.createElement\\(MietanfragenListe,\\ \\{\\\n\\ \\ \\ \\ user:\\ e,\\\n\\ \\ \\ \\ kategorie:\\ "teterow",\\\n\\ \\ \\ \\ onZurueck:\\ \\(\\)\\ =>\\ n\\(null\\)\\\n\\ \\ \\}\\);', '  if ("sonstige" === t) return React.createElement(MietanfragenListe, {\n    user: e,\n    kategorie: "sonstige",\n    onZurueck: () => n(null)\n  });',
+     'Wegweiser zur dritten Kachel.'),
+    ('MARKE', '\\ \\ \\ \\ id:\\ "teterow",\\\n\\ \\ \\ \\ title:\\ "Selbstauskunft\\ Teterow",\\\n\\ \\ \\ \\ subtitle:\\ "Eingaben\\ aus\\ dem\\ Teterow\\-Bauprojekt",\\\n\\ \\ \\ \\ icon:\\ "🏗️",\\\n\\ \\ \\ \\ count:\\ a\\.teterow,\\\n\\ \\ \\ \\ neu:\\ a\\.neu_teterow,', '    id: "sonstige",\n    title: "Weitere Quellen",\n    subtitle: "Anfragen aus anderen Formularen und Bauprojekten",\n    icon: "🏗️",\n    count: a.sonstige,\n    neu: a.neu_sonstige,',
+     'Kachel eines einzelnen Bauprojekts durch eine allgemeine ersetzt.'),
+    ('MARKE', '"selbstauskunft"\\ ===\\ t\\ \\?\\ e\\ =\\ e\\.in\\("quelle",\\ \\["jotform",\\ "selbstauskunft",\\ "manuell"\\]\\)\\ :\\ "teterow"\\ ===\\ t\\ \\?\\ e\\ =\\ e\\.eq\\("quelle",\\ "teterow"\\)\\ :\\ "online"\\ ===\\ t\\ \\&\\&\\ \\(e\\ =\\ e\\.in\\("quelle",\\ \\["immoscout",\\ "immowelt",\\ "kleinanzeigen",\\ "portal",\\ "mail"\\]\\)\\);', '"selbstauskunft" === t ? e = e.in("quelle", ["jotform", "selbstauskunft", "manuell"]) : "sonstige" === t ? e = e.not("quelle", "in", "(jotform,selbstauskunft,manuell,immoscout,immowelt,kleinanzeigen,portal,mail)") : "online" === t && (e = e.in("quelle", ["immoscout", "immowelt", "kleinanzeigen", "portal", "mail"]));',
+     'Abfrage der dritten Kachel: der Rest statt eines benannten Projekts.'),
+    ('MARKE', '"selbstauskunft"\\ ===\\ t\\ \\?\\ "Selbstauskunft\\-Antworten"\\ :\\ "online"\\ ===\\ t\\ \\?\\ "Online\\-Anfragen"\\ :\\ "teterow"\\ ===\\ t\\ \\?\\ "Selbstauskunft\\ Teterow"\\ :\\ "Mietanfragen"', '"selbstauskunft" === t ? "Selbstauskunft-Antworten" : "online" === t ? "Online-Anfragen" : "sonstige" === t ? "Weitere Quellen" : "Mietanfragen"',
+     'Ueberschrift der Liste.'),
+    ('MARKE', '\\("selbstauskunft"\\ ===\\ t\\ \\|\\|\\ "teterow"\\ ===\\ t\\ \\|\\|\\ !t\\)\\ \\&\\&\\ React\\.createElement\\("button",\\ \\{', '("selbstauskunft" === t || "sonstige" === t || !t) && React.createElement("button", {',
+     'Schaltflaeche, die es auf beiden Selbstauskunft-Listen gibt.'),
+    ('MARKE', 'const\\ t\\ =\\ prompt\\("Name\\ des\\ neuen\\ Ordners\\ \\(z\\.B\\.\\ „Mühlenblick\\ Teterow“\\):"\\);', 'const t = prompt("Name des neuen Ordners (z.B. „Wohnpark am See“):");',
+     'Beispiel im Eingabefenster: ein Bauprojekt der Referenz.'),
 ]
 
 

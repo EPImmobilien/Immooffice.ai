@@ -58,6 +58,26 @@ exception
       values (was, false, 'Testfall lief nicht: ' || left(meldung, 60));
 end $$;
 
+-- Das Gegenstueck: hier IST die globale Eindeutigkeit gewollt. Geht die
+-- zweite Zeile durch, ist die Regel weg — und die oeffentliche Adresse
+-- mehrdeutig.
+create or replace function pg_temp.probe_global(was text, anweisung text) returns void
+language plpgsql as $$
+declare meldung text;
+begin
+  execute anweisung;
+  insert into befund (pruefung, bestanden, bemerkung)
+    values (was, false, 'zweimal angelegt — die Adresse waere mehrdeutig');
+exception
+  when unique_violation then
+    insert into befund (pruefung, bestanden, bemerkung)
+      values (was, true, 'der zweite wird abgewiesen');
+  when others then
+    get stacked diagnostics meldung = message_text;
+    insert into befund (pruefung, bestanden, bemerkung)
+      values (was, false, 'Testfall lief nicht: ' || left(meldung, 60));
+end $$;
+
 do $$
 declare a uuid := (select mandant from paar where rolle='a');
         b uuid := (select mandant from paar where rolle='b');
@@ -91,7 +111,11 @@ begin
     $q$insert into public.news_briefings (briefing_datum, zusammenfassung, mandant_id)
        values ('2026-09-28', 'Text', %L), ('2026-09-28', 'Text', %L)$q$, a, b));
 
-  perform pg_temp.probe('Projektkuerzel "neubau-nord"', format(
+  -- projekte.slug ist seit fork_29 WIEDER plattformweit eindeutig — mit
+  -- Absicht: er ist die oeffentliche Adresse des Neubauportals und wird ohne
+  -- Anmeldung aufgerufen. Geprueft wird deshalb das Gegenteil: dass zwei
+  -- Mandanten denselben Slug NICHT beide bekommen.
+  perform pg_temp.probe_global('Projektkuerzel "neubau-nord" bleibt plattformweit vergeben', format(
     $q$insert into public.projekte (slug, name, mandant_id)
        values ('neubau-nord', 'Neubau Nord', %L), ('neubau-nord', 'Neubau Nord', %L)$q$, a, b));
 

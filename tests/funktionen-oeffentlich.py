@@ -93,6 +93,24 @@ ABGESICHERT = {
         'es darf absichtlich in jeden Mandanten sehen. Nur nicht raten: der '
         'Mandant wird benannt, sonst meldet die Funktion, dass mehrere in '
         'Frage kommen.'),
+    'projekt-daten': ('projekt.id',
+        'Der Slug ist seit fork_29 plattformweit eindeutig — er IST die '
+        'oeffentliche Adresse. Alles Weitere haengt an projekt_id oder am '
+        'Sitzungstoken, und beide benennen genau eine Zeile.'),
+    'projekt-interaktion': ('projekt.mandant_id',
+        'Wie projekt-daten; der Versand geht ueber das Postfach des '
+        'Mandanten, dem das Projekt gehoert.'),
+    'projekt-login': ('projekt.mandant_id',
+        'Anmeldung am Projekt-Kundenbereich. Slug eindeutig, alles Weitere '
+        'am Zugang; Post nur ueber das eigene Postfach.'),
+    'projekt-upload': ('z.mandant_id',
+        'Dateien des Kundenbereichs. Pfad und Zugang haengen an der '
+        'Sitzung, der Versand am Mandanten des Zugangs.'),
+    'projekt-wohnungen': ('projekt.mandant_id',
+        'Trug ein einzelnes Kundenprojekt im Quelltext und suchte die '
+        'Wohnungen ueber Strasse und Ort — ohne Mandanten haetten zwei '
+        'Makler mit Objekten in derselben Strasse sich vermischt. Projekt '
+        'jetzt aus der Tabelle, Wohnungen aus dessen Mandanten.'),
     'web-lead': ('immoMandantAusAnfrage',
         'Eingang fuer Bewertungsanfragen. Mandant aus der Anfrage, Chef und '
         'Empfaenger aus dem Mandanten; Kontaktsuche und beide inserts sind '
@@ -130,18 +148,6 @@ NOCH_OFFEN = {
     # KI-Auswertung keine fremden Daten mitschickt.
     'bewerbertest-abgeben': 'Token-gebunden; KI-Auswertung ungelesen.',
     'ki-bildbearbeitung': 'Schreibt Bilder, 44 kB, ungelesen.',
-    # Neubauportal. Der Postfach-Griff ist geschlossen (28.09.2026): die
-    # drei versendenden Funktionen nehmen das Postfach des eigenen
-    # Mandanten oder gar keines. Offen bleibt der Zugang ueber den Slug —
-    # seit fork_17 ist er nur noch JE MANDANT eindeutig, und die
-    # oeffentliche Projektadresse traegt nichts Mandantenspezifisches.
-    # Zwei Bautraeger mit einem Projekt "am-park" waeren nicht zu
-    # unterscheiden. Steht in tests/mandant-nachzug.py.
-    'projekt-daten': 'Neubauportal; Zugang ueber den Slug ungeklaert.',
-    'projekt-interaktion': 'Neubauportal; Zugang ueber den Slug ungeklaert.',
-    'projekt-login': 'Neubauportal, Anmeldung; Zugang ueber den Slug ungeklaert.',
-    'projekt-upload': 'Neubauportal, Dateien; Postfach begrenzt.',
-    'projekt-wohnungen': 'Neubauportal.',
 }
 
 

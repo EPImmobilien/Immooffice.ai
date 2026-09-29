@@ -129,6 +129,12 @@ ERWEITERT['news-briefing-erstellen'] = (
 ERWEITERT['portal-ftp-diagnose'] = (
     'Der Mandant wird benannt, nicht geraten (Phase 2)')
 
+# projekt-wohnungen trug ein einzelnes Kundenprojekt im Quelltext — Name,
+# Strasse, Ort, Hausliste — und suchte die Wohnungen ueber Strasse und Ort
+# ohne Mandanten.
+ERWEITERT['projekt-wohnungen'] = (
+    'Projekt aus der Tabelle, Wohnungen aus dessen Mandanten (Phase 2)')
+
 BLOCKZEILEN = {
     'mpe-pdf-erzeugen': {
         'const pins: Array<[number, number, string, string, string]> = [',

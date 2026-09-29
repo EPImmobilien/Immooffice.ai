@@ -2294,3 +2294,62 @@ ab dem zweiten Mandanten ab. Der Mandant wird jetzt mit `?mandant=…` benannt;
 kommen mehrere in Frage und ist keiner benannt, sagt die Funktion das.
 
 **Abgesichert 17, unbedenklich 4, noch offen 7.**
+
+---
+
+## Der Projekt-Slug bleibt plattformweit eindeutig (29.09.2026)
+
+Die offene Frage aus dem Neubauportal ist entschieden — ohne Rückfrage, weil
+`CLAUDE.md` für genau diesen Fall sagt: die Entscheidung treffen, die dem
+heutigen Verhalten der Vorlage am nächsten kommt, und sie protokollieren.
+
+`fork_17` hat zehn global eindeutige Regeln auf „je Mandant" umgestellt, weil
+sie Namen tragen, die ein zweiter Mandant mit demselben Recht führen will.
+Für neun stimmt das. Für `projekte.slug` nicht: er ist kein interner Name,
+sondern die **öffentliche Adresse** des Portals — `/?projekt=am-park`,
+aufgerufen ohne Anmeldung, ohne Token, ohne irgendeinen Hinweis darauf, wer
+gemeint ist.
+
+Zwei Auswege standen zur Wahl:
+
+- **a)** Die Adresse trägt den Mandanten: `/?p={mandant}/{slug}`.
+- **b)** Der Slug bleibt plattformweit eindeutig, wie in der Vorlage.
+
+**(b)**, aus zwei Gründen. Es ist das Verhalten der Vorlage, und der Auftrag
+sagt: nichts neu erfinden, keine Verhaltensänderung. Und eine öffentliche
+Adresse ist ihrer Natur nach ein globaler Namensraum — wie eine Subdomain.
+Ein belegter Slug wird damit zu einer Meldung beim Anlegen („diese Adresse
+ist vergeben") statt zu einem Zufall zur Laufzeit. Kein Leck: der Slug
+benennt genau ein Projekt, und dessen Daten gehören dem Mandanten, dem das
+Projekt gehört. (a) bleibt später möglich, ohne dass etwas zurückgebaut
+werden müsste.
+
+`fork_29` stellt die Regel wieder her, mit einer Vorprüfung auf doppelt
+vergebene Slugs. Der Wachposten in `tests/eindeutig-je-mandant.sql` prüft
+für diesen einen Fall jetzt das Gegenteil: dass der zweite Mandant den Slug
+**nicht** bekommt.
+
+Damit sind auch `projekt-daten`, `projekt-interaktion`, `projekt-login` und
+`projekt-upload` abgehakt — alles Weitere hängt dort an `projekt_id` oder am
+Sitzungstoken, und beide benennen genau eine Zeile.
+
+### Und ein Kundenprojekt, das im Quelltext stand
+
+`projekt-wohnungen` trug ein **einzelnes Bauprojekt fest eingebaut**: Name,
+Straße, Ort und die Reihenfolge der Häuser. Gesucht wurden die Wohnungen
+dann über Straße und Ort — ohne Mandanten. Zwei Makler mit Objekten in
+derselben Straße hätten sich vermischt, und die Microsite des einen hätte
+die Mieten des anderen angezeigt. Das Projekt kommt jetzt aus `projekte`,
+die Wohnungen aus dessen Mandanten, und die Reihenfolge der Häuser ergibt
+sich aus den Hausnummern statt aus einer Liste im Quelltext.
+
+Dasselbe in der Oberfläche: die Mietanfragen hatten drei Kacheln, und die
+mittlere trug den Namen eines Bauprojekts der Referenz — im Seitentitel, in
+der Unterzeile, im Wegweiser und in der Abfrage (`quelle = '…'`). Ersatzlos
+streichen ginge nicht, dann wären Zeilen mit dieser Quelle nirgends mehr zu
+sehen. Die Kachel heißt jetzt **„Weitere Quellen"** und fängt alles, was in
+keine der beiden anderen Listen fällt. Jede Zeile bleibt erreichbar, kein
+Projektname steht mehr im Produkt.
+
+**Abgesichert 22, unbedenklich 4, noch offen 2** — `bewerbertest-abgeben`
+und `ki-bildbearbeitung`.

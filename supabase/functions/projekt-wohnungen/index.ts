@@ -25,24 +25,26 @@ const corsHeaders = {
 };
 
 // ---------------------------------------------------------------------------
-// Bekannte Projekte. Schluessel = ?projekt=<slug>
+// Das Projekt kommt aus der Tabelle projekte, nicht aus dem Quelltext.
+//
+// Die Vorlage trug hier EIN Projekt fest eingebaut: Name, Strasse, Ort und
+// die Reihenfolge der Haeuser. Das ist im Fork aus zwei Gruenden nichts:
+// es sind Daten eines einzelnen Kunden im Produkt, und mehr als dieses eine
+// Projekt kann die Seite damit nie zeigen.
+//
+// Die Reihenfolge der Haeuser steht damit nicht mehr im Quelltext. Sie
+// ergibt sich aus den Hausnummern, natuerlich sortiert — "6-8" vor "10-12".
 // ---------------------------------------------------------------------------
 type Projekt = {
   name: string;
   strasse: string;
   ort: string;
-  // Reihenfolge der Haeuser auf der Seite. Haeuser ausserhalb dieser Liste
-  // werden hinten angehaengt, damit ein neues Haus nicht unsichtbar bleibt.
-  haeuser: string[];
+  mandant_id: string | null;
 };
 
-const PROJEKTE: Record<string, Projekt> = {
-  "muehlenblick-teterow": {
-    name: "Wohnquartier Mühlenblick",
-    strasse: "Mühlenblick",
-    ort: "Teterow",
-    haeuser: ["6-8", "10-12", "14-16"],
-  },
+const hausWert = (h: string): number => {
+  const m = String(h || "").match(/(\d+)/);
+  return m ? Number(m[1]) : 99999;
 };
 
 // ---------------------------------------------------------------------------
@@ -91,10 +93,7 @@ Deno.serve(async (req) => {
   try {
     const url = new URL(req.url);
     const slug = url.searchParams.get("projekt") || "";
-    const projekt = PROJEKTE[slug];
-    if (!projekt) {
-      return json({ ok: false, error: "Unbekanntes Projekt", bekannt: Object.keys(PROJEKTE) }, 404);
-    }
+    if (!slug) return json({ ok: false, error: "Unbekanntes Projekt" }, 404);
 
     const db = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -102,12 +101,32 @@ Deno.serve(async (req) => {
       { auth: { persistSession: false } },
     );
 
+    // Der Slug ist seit fork_29 plattformweit eindeutig — er ist die
+    // oeffentliche Adresse dieser Seite.
+    const { data: projektZeile } = await db.from("projekte")
+      .select("name, strasse, ort, mandant_id").eq("slug", slug).eq("status", "aktiv").maybeSingle();
+    if (!projektZeile || !projektZeile.mandant_id) {
+      return json({ ok: false, error: "Unbekanntes Projekt" }, 404);
+    }
+    const projekt: Projekt = {
+      name: String(projektZeile.name || ""),
+      strasse: String(projektZeile.strasse || ""),
+      ort: String(projektZeile.ort || ""),
+      mandant_id: String(projektZeile.mandant_id),
+    };
+    if (!projekt.strasse || !projekt.ort) {
+      return json({ ok: false, error: "Dem Projekt fehlt die Adresse; ohne sie lassen sich die Wohnungen nicht zuordnen." }, 409);
+    }
+
     const { data, error } = await db.from("immobilien")
       .select("id, immo_nr, wohnungsnr, etage, zimmer, wohnflaeche, kaltmiete, nebenkosten, heizkosten, stellplatzmiete, stellplatz_anzahl, status, vermietet, hausnummer, verfuegbar_ab")
       // Tor fuer die Microsite ist der Vermarktungsstand, NICHT die Spalte
       // website_veroeffentlichen — die steuert die Hauptseite immooffice.example.
       // Sonst haette ein Projekt-Auftritt ungewollt die Hauptwebsite mitbefuellt.
       .in("status", ["vermarktung", "reserviert", "archiviert"])
+      // Strasse und Ort allein reichen nicht: zwei Makler koennen Objekte in
+      // derselben Strasse fuehren, und die Seite haette sie vermischt.
+      .eq("mandant_id", projekt.mandant_id)
       .ilike("strasse", projekt.strasse)
       .ilike("ort", projekt.ort)
       .limit(500);
@@ -117,11 +136,13 @@ Deno.serve(async (req) => {
     let gesamt = 0, verfuegbar = 0, reserviert = 0, vermietet = 0;
 
     // Reihenfolge festlegen, damit die Seite die Haeuser stabil anzeigt.
-    const reihenfolge = [...projekt.haeuser];
+    // Ohne Liste im Quelltext: nach der ersten Zahl der Hausnummer.
+    const reihenfolge: string[] = [];
     for (const i of data || []) {
       const h = String(i.hausnummer || "").trim();
       if (h && !reihenfolge.includes(h)) reihenfolge.push(h);
     }
+    reihenfolge.sort((x, y) => hausWert(x) - hausWert(y) || x.localeCompare(y, "de"));
 
     for (const h of reihenfolge) {
       const drin = (data || []).filter((i) => String(i.hausnummer || "").trim() === h);

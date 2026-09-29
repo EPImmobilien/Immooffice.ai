@@ -179,7 +179,11 @@ zuwachs(bereich, mehr, grund) as (values
   -- fork_28: vier Einstellungstabellen gehoeren jetzt dem Mandanten. Die
   -- Primaerschluessel werden nur umgebaut, nicht vermehrt — dazukommt eine
   -- Funktion, die einem neuen Mandanten seine vier Zeilen anlegt.
-  ('Funktionen', 1, 'fork_28: mandant_grundeinstellungen()')
+  ('Funktionen', 1, 'fork_28: mandant_grundeinstellungen()'),
+  -- fork_29: projekte.slug ist wieder plattformweit eindeutig — der Index
+  -- aus fork_17 weicht der Regel der Vorlage.
+  ('Indizes ohne Constraint', -1, 'fork_29: projekte_mandant_slug_idx entfaellt'),
+  ('Primaer- und Eindeutigkeitsschluessel', 1, 'fork_29: projekte_slug_key kehrt zurueck')
 ),
 soll(bereich, soll) as (
   select v.bereich,
