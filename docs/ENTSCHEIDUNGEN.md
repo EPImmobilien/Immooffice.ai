@@ -2183,3 +2183,68 @@ Mandanten dieselbe. Das ist bekannt und steht als Punkt 1 in
 `docs/OFFEN.md`.
 
 **Abgesichert 12, unbedenklich 4, noch offen 12.**
+
+---
+
+## Vier Schalter, die der Plattform gehörten statt dem Mandanten (29.09.2026)
+
+Der Wachposten aus `fork_23` prüft jeden Primärschlüssel einer
+Mandantentabelle und lässt ihn durch, sobald eine seiner Spalten
+`mandant_id` **oder `id`** heißt. Die Ausnahme für `id` war für die übliche
+Bauart gedacht: eine uuid je Zeile, global eindeutig, harmlos.
+
+Vier Tabellen heißen anders. Sie haben eine Spalte `id`, aber die ist keine
+Kennung, sondern ein Riegel:
+
+| Tabelle | Riegel | was daran hängt |
+|---|---|---|
+| `push_einstellungen` | `check (id = 1)` | ob Push-Mitteilungen überhaupt rausgehen |
+| `kosten_saetze` | `check (id = 1)` | Firmensitz und Kilometersätze, nach denen abgerechnet wird |
+| `liquid_settings` | `check (id = 1)` | Vorgaben der Liquiditätsplanung |
+| `akq_einstellungen` | `check (id)` | Spanne, Startpreisfaktor und Provisionssatz der Wertschätzung |
+
+Eine Zeile. Für die ganze Plattform. In der Vorlage ist das richtig — dort
+gibt es genau eine Firma. Im Fork heißt es: wer den Push-Schalter umlegt,
+legt ihn für alle um. Wer seinen Firmensitz einträgt, trägt ihn für alle
+ein. Und der Provisionssatz, mit dem die Wertschätzung an den Interessenten
+geht, ist der, den zuletzt jemand gespeichert hat.
+
+`fork_28` macht den Schlüssel zu `(mandant_id, id)`. Der Riegel bleibt: je
+Mandant genau eine Zeile. Dazu `mandant_grundeinstellungen(uuid)`, die einem
+Mandanten seine vier Zeilen anlegt — ohne sie hätte ein neuer Mandant stumme
+Schalter, denn die Oberfläche schreibt mit `update … .eq("id", 1)` und legt
+nichts an. Die Selbstregistrierung in Phase 3 ruft sie auf.
+
+Und die Ausnahme im Wachposten gilt nur noch, wo `id` wirklich eine Kennung
+ist: eine uuid oder ein Zähler aus einer Sequenz.
+
+**Drei Funktionen lesen diese Tabellen mit dem `service_role`**, für den RLS
+nicht gilt — sie mussten mitziehen:
+
+- **`push-senden`** las den Schalter ganz am Anfang, bevor überhaupt
+  feststand, wer die Mitteilung bekommt. Jetzt erst danach, und für den
+  Mandanten des Empfängers. Dabei ist die zweite Hälfte aufgefallen: die
+  Funktion nimmt `termin_id` und `profile_id` **getrennt** aus dem Körper
+  entgegen und prüfte nie, ob beide zusammengehören. Die aufrufende
+  Datenbankfunktion verbindet sie richtig (`p.mandant_id = t.mandant_id`) —
+  aber eine Mitteilung mit Absender, Betreff und Textanfang im
+  Sperrbildschirm eines fremden Maklers darf nicht daran hängen, dass der
+  Aufrufer es gut meint. Anlass und Empfänger werden jetzt verglichen.
+- **`akq-lead-eingang`** rechnete mit den Werten irgendeines Mandanten; jetzt
+  mit denen, an den die Anfrage ging.
+- **`fahrt-ermitteln`** ist angemeldet aufrufbar, benutzt aber ebenfalls den
+  `service_role`. Sie nahm eine `immobilie_id` aus dem Körper und gab
+  Entfernung, Fahrzeit und Koordinaten zurück, ohne zu fragen, wem das
+  Objekt gehört — der Blick in den Zwischenspeicher kam sogar **vor** dem
+  Blick auf das Objekt. Die Reihenfolge ist umgedreht: erst das Objekt, dann
+  die Mandantenprüfung, dann alles Weitere.
+
+**Damit ist eine größere Baustelle sichtbar geworden.** Die zwölf offenen
+Endpunkte in `tests/funktionen-oeffentlich.py` sind die **ohne**
+JWT-Prüfung. `fahrt-ermitteln` gehört nicht dazu — sie prüft das JWT und ist
+trotzdem angreifbar, weil sie danach mit dem `service_role` arbeitet und
+eine Kennung aus dem Körper glaubt. Von den 118 Funktionen sind 90
+JWT-geprüft, und für jede davon gilt dieselbe Frage. Das ist der nächste
+Block nach den öffentlichen; er steht in `docs/OFFEN.md`.
+
+**Abgesichert 13, unbedenklich 4, noch offen 11.**

@@ -99,6 +99,13 @@ else
   fehler=1
 fi
 
+abschnitt "Einstellungen je Mandant"
+if scripts/lokale-db.sh psql -q -f tests/einstellungen-je-mandant.sql; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Rechte: Sichtbarkeitsbereich und Modulrechte"
 if scripts/lokale-db.sh psql -q -f tests/rechte.sql; then
   :

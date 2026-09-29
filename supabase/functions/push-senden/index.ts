@@ -168,13 +168,17 @@ Deno.serve(async (req) => {
       if (body.test !== true) return antwort({ ok: false, fehler: "Ohne Trigger-Geheimnis ist nur { test: true } erlaubt." }, 403);
     }
 
-    const { data: global } = await db.from("push_einstellungen").select("aktiv").eq("id", 1).maybeSingle();
-    if (global && global.aktiv === false && !body.test) return antwort({ ok: true, uebersprungen: "global aus" });
+    // Der Push-Schalter gehoert seit fork_28 dem Mandanten, nicht der
+    // Plattform. Er wird deshalb weiter unten gelesen — vorher steht der
+    // Empfaenger und damit sein Mandant nicht fest.
 
     // ---- Empfaenger und Inhalt bestimmen
     type Typ = "test" | "mail" | "termin" | "hinweis";
     let typ: Typ, profilId: string, titel: string, text: string, untertitel: string | null = null;
     let refId: string | null = null, url: string | null = null, collapse: string, kategorie: string, thread: string;
+    // Woher der Anlass kommt. Empfaenger und Anlass muessen demselben
+    // Mandanten gehoeren; bei test und hinweis gibt es keinen Quellsatz.
+    let quellMandant: string | null = null;
     let extra: Record<string, unknown> = {};
     if (body.test === true) {
       typ = "test"; profilId = nutzerId!;
@@ -194,9 +198,10 @@ Deno.serve(async (req) => {
       const zielProfil = String(body.profile_id || "");
       if (!zielProfil) return antwort({ ok: false, fehler: "Feld „profile_id“ fehlt." }, 400);
       const { data: t } = await db.from("termine")
-        .select("id, titel, art, datum, uhrzeit, ende, ort, immobilie_id, status, ganztags")
+        .select("id, titel, art, datum, uhrzeit, ende, ort, immobilie_id, status, ganztags, mandant_id")
         .eq("id", String(body.termin_id)).maybeSingle();
       if (!t) return antwort({ ok: false, fehler: "Termin nicht gefunden." }, 404);
+      quellMandant = t.mandant_id || null;
       if (t.status === "storniert") return antwort({ ok: true, uebersprungen: "Termin storniert" });
       profilId = zielProfil;
       const zeit = t.uhrzeit ? String(t.uhrzeit).slice(0, 5) : "";
@@ -206,7 +211,7 @@ Deno.serve(async (req) => {
       untertitel = t.art && t.art !== "Sonstiges" ? String(t.art).slice(0, 60) : null;
       let ort = String(t.ort || "").trim();
       if (!ort && t.immobilie_id) {
-        const { data: o } = await db.from("immobilien").select("strasse, hausnummer, plz, ort").eq("id", t.immobilie_id).maybeSingle();
+        const { data: o } = await db.from("immobilien").select("strasse, hausnummer, plz, ort").eq("mandant_id", t.mandant_id).eq("id", t.immobilie_id).maybeSingle();
         if (o) ort = [[o.strasse, o.hausnummer].filter(Boolean).join(" "), [o.plz, o.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ");
       }
       const spanne = zeit ? zeit + (t.ende ? "–" + String(t.ende).slice(0, 5) : "") + " Uhr" : "ganztags";
@@ -222,8 +227,9 @@ Deno.serve(async (req) => {
         .eq("id", mailId).maybeSingle();
       if (!mail) return antwort({ ok: false, fehler: "Mail nicht gefunden." }, 404);
       if (mail.ordner !== "posteingang" || mail.gelesen || mail.archiviert) return antwort({ ok: true, uebersprungen: "nicht im Posteingang oder schon gelesen" });
-      const { data: pf } = await db.from("mail_postfaecher").select("benutzer_id, email_adresse").eq("id", mail.postfach_id).maybeSingle();
+      const { data: pf } = await db.from("mail_postfaecher").select("benutzer_id, email_adresse, mandant_id").eq("id", mail.postfach_id).maybeSingle();
       if (!pf?.benutzer_id) return antwort({ ok: true, uebersprungen: "Postfach ohne Benutzer" });
+      quellMandant = pf.mandant_id || null;
       profilId = pf.benutzer_id;
       const name = String(mail.absender_name || "").trim();
       titel = (name || mail.absender_email || "Neue E-Mail").slice(0, 60);
@@ -234,7 +240,18 @@ Deno.serve(async (req) => {
     }
 
     // ---- Nutzerschalter und Ruhezeit
-    const { data: profil } = await db.from("profiles").select("push_mails, push_termine, push_treffer, push_stumm_von, push_stumm_bis").eq("id", profilId).maybeSingle();
+    const { data: profil } = await db.from("profiles").select("push_mails, push_termine, push_treffer, push_stumm_von, push_stumm_bis, mandant_id").eq("id", profilId).maybeSingle();
+    if (!profil?.mandant_id) return antwort({ ok: true, uebersprungen: "Profil ohne Mandanten" });
+    // Eine Mail des einen Maklers darf nicht auf dem Telefon des anderen
+    // aufleuchten — mit Absender, Betreff und Textanfang im Sperrbildschirm.
+    if (quellMandant && quellMandant !== profil.mandant_id) {
+      return antwort({ ok: true, uebersprungen: "Anlass und Empfaenger sind verschiedene Mandanten" });
+    }
+    const { data: schalter } = await db.from("push_einstellungen").select("aktiv")
+      .eq("mandant_id", profil.mandant_id).eq("id", 1).maybeSingle();
+    if (schalter && schalter.aktiv === false && !body.test) {
+      return antwort({ ok: true, uebersprungen: "fuer diesen Mandanten aus" });
+    }
     if (typ !== "test") {
       if (typ === "mail" && profil && profil.push_mails === false) return antwort({ ok: true, uebersprungen: "Nutzer hat Mail-Push aus" });
       if (typ === "termin" && profil && profil.push_termine === false) return antwort({ ok: true, uebersprungen: "Nutzer hat Termin-Erinnerung aus" });

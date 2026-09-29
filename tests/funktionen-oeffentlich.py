@@ -66,6 +66,13 @@ ABGESICHERT = {
         'vorher EINMAL geladen, ueber die ganze Plattform, und bekamen jede '
         'Meldung: Name des Eigentuemers, Zahl und Titel der Dokumente. Jetzt '
         'je Mandant, und ohne Mandanten kein Versand.'),
+    'push-senden': ('quellMandant',
+        'Der Schalter push_einstellungen galt bis fork_28 fuer die ganze '
+        'Plattform; er wird jetzt je Mandant gelesen, und zwar erst, wenn '
+        'der Empfaenger feststeht. Dazu die Gegenprobe, dass Anlass und '
+        'Empfaenger demselben Mandanten gehoeren — sonst leuchtet die Mail '
+        'des einen Maklers im Sperrbildschirm des anderen auf, mit '
+        'Absender, Betreff und Textanfang.'),
     'web-lead': ('immoMandantAusAnfrage',
         'Eingang fuer Bewertungsanfragen. Mandant aus der Anfrage, Chef und '
         'Empfaenger aus dem Mandanten; Kontaktsuche und beide inserts sind '
@@ -118,7 +125,6 @@ NOCH_OFFEN = {
     'projekt-upload': 'Neubauportal, Dateien; Postfach begrenzt.',
     'projekt-wohnungen': 'Neubauportal.',
     'push-antworten': 'Push.',
-    'push-senden': 'Push — verschickt an Geraete.',
     'suchkriterien-newsletter': 'Verschickt Newsletter — nach fork_16 gepruefte '
                                 'Quelle, der Versandweg selbst aber ungelesen.',
 }

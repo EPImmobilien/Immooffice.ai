@@ -1786,6 +1786,78 @@ NACHBESSERN = [
     ('FORK', '        const { data: dokumente } = await supabase\n          .from("eigentuemer_dokumente")\n          .select("name, kategorie, created_at")\n          .eq("eigentuemer_id", eintrag.eigentuemer_id)', '        const { data: dokumente } = await supabase\n          .from("eigentuemer_dokumente")\n          .select("name, kategorie, created_at")\n          .eq("mandant_id", mandant)\n          .eq("eigentuemer_id", eintrag.eigentuemer_id)',
      'Upload-Meldung: die Dokumente aus dem eigenen Mandanten.',
      {'upload-benachrichtigung-versenden'}),
+
+    # =====================================================================
+    # FORK — der Push-Schalter galt fuer alle, und niemand pruefte, ob
+    #        Anlass und Empfaenger zusammengehoeren
+    #
+    # push_einstellungen hatte bis fork_28 EINE Zeile fuer die ganze
+    # Plattform (check id = 1). Wer den Push ausschaltete, schaltete ihn fuer
+    # alle aus. Jetzt gibt es die Zeile je Mandant — gelesen wird sie erst,
+    # wenn der Empfaenger feststeht, denn vorher ist nicht klar, wessen
+    # Schalter gilt.
+    #
+    # Dazu die zweite Haelfte: die Funktion nahm termin_id und profile_id
+    # getrennt aus dem Koerper entgegen und pruefte nie, ob beide demselben
+    # Mandanten gehoeren. Die aufrufende Datenbankfunktion verbindet sie
+    # richtig — aber eine Mitteilung mit Absender, Betreff und Textanfang im
+    # Sperrbildschirm eines fremden Maklers darf nicht daran haengen, dass
+    # der Aufrufer es gut meint.
+    # =====================================================================
+    ('FORK', '    const { data: global } = await db.from("push_einstellungen").select("aktiv").eq("id", 1).maybeSingle();\n    if (global && global.aktiv === false && !body.test) return antwort({ ok: true, uebersprungen: "global aus" });', '    // Der Push-Schalter gehoert seit fork_28 dem Mandanten, nicht der\n    // Plattform. Er wird deshalb weiter unten gelesen — vorher steht der\n    // Empfaenger und damit sein Mandant nicht fest.',
+     'Push: der Schalter wird erst gelesen, wenn der Empfaenger feststeht.',
+     {'push-senden'}),
+    ('FORK', '    let refId: string | null = null, url: string | null = null, collapse: string, kategorie: string, thread: string;', '    let refId: string | null = null, url: string | null = null, collapse: string, kategorie: string, thread: string;\n    // Woher der Anlass kommt. Empfaenger und Anlass muessen demselben\n    // Mandanten gehoeren; bei test und hinweis gibt es keinen Quellsatz.\n    let quellMandant: string | null = null;',
+     'Push: der Mandant des Anlasses wird mitgefuehrt.',
+     {'push-senden'}),
+    ('FORK', '      const { data: t } = await db.from("termine")\n        .select("id, titel, art, datum, uhrzeit, ende, ort, immobilie_id, status, ganztags")\n        .eq("id", String(body.termin_id)).maybeSingle();\n      if (!t) return antwort({ ok: false, fehler: "Termin nicht gefunden." }, 404);', '      const { data: t } = await db.from("termine")\n        .select("id, titel, art, datum, uhrzeit, ende, ort, immobilie_id, status, ganztags, mandant_id")\n        .eq("id", String(body.termin_id)).maybeSingle();\n      if (!t) return antwort({ ok: false, fehler: "Termin nicht gefunden." }, 404);\n      quellMandant = t.mandant_id || null;',
+     'Push: der Termin bringt seinen Mandanten mit.',
+     {'push-senden'}),
+    ('FORK', '        const { data: o } = await db.from("immobilien").select("strasse, hausnummer, plz, ort").eq("id", t.immobilie_id).maybeSingle();', '        const { data: o } = await db.from("immobilien").select("strasse, hausnummer, plz, ort").eq("mandant_id", t.mandant_id).eq("id", t.immobilie_id).maybeSingle();',
+     'Push: die Adresse zum Termin nur aus dessen Mandanten.',
+     {'push-senden'}),
+    ('FORK', '      const { data: pf } = await db.from("mail_postfaecher").select("benutzer_id, email_adresse").eq("id", mail.postfach_id).maybeSingle();\n      if (!pf?.benutzer_id) return antwort({ ok: true, uebersprungen: "Postfach ohne Benutzer" });', '      const { data: pf } = await db.from("mail_postfaecher").select("benutzer_id, email_adresse, mandant_id").eq("id", mail.postfach_id).maybeSingle();\n      if (!pf?.benutzer_id) return antwort({ ok: true, uebersprungen: "Postfach ohne Benutzer" });\n      quellMandant = pf.mandant_id || null;',
+     'Push: das Postfach bringt seinen Mandanten mit.',
+     {'push-senden'}),
+    ('FORK', '    const { data: profil } = await db.from("profiles").select("push_mails, push_termine, push_treffer, push_stumm_von, push_stumm_bis").eq("id", profilId).maybeSingle();\n    if (typ !== "test") {', '    const { data: profil } = await db.from("profiles").select("push_mails, push_termine, push_treffer, push_stumm_von, push_stumm_bis, mandant_id").eq("id", profilId).maybeSingle();\n    if (!profil?.mandant_id) return antwort({ ok: true, uebersprungen: "Profil ohne Mandanten" });\n    // Eine Mail des einen Maklers darf nicht auf dem Telefon des anderen\n    // aufleuchten — mit Absender, Betreff und Textanfang im Sperrbildschirm.\n    if (quellMandant && quellMandant !== profil.mandant_id) {\n      return antwort({ ok: true, uebersprungen: "Anlass und Empfaenger sind verschiedene Mandanten" });\n    }\n    const { data: schalter } = await db.from("push_einstellungen").select("aktiv")\n      .eq("mandant_id", profil.mandant_id).eq("id", 1).maybeSingle();\n    if (schalter && schalter.aktiv === false && !body.test) {\n      return antwort({ ok: true, uebersprungen: "fuer diesen Mandanten aus" });\n    }\n    if (typ !== "test") {',
+     'Push: Schalter je Mandant, und Anlass und Empfaenger muessen zusammenpassen.',
+     {'push-senden'}),
+
+    # akq_einstellungen: seit fork_28 je Mandant eine Zeile. Die Spanne, der
+    # Startpreisfaktor und der Provisionssatz, mit denen die Schaetzung an
+    # den Interessenten geht, sind die des Maklers, an den die Anfrage ging.
+    ('FORK', 'const { data: einst } = await db.from("akq_einstellungen").select("*").eq("id", true).maybeSingle();', 'const { data: einst } = await db.from("akq_einstellungen").select("*").eq("mandant_id", mandant).eq("id", true).maybeSingle();',
+     'Akquise: die Rechenwerte des eigenen Mandanten.',
+     {'akq-lead-eingang'}),
+
+    # =====================================================================
+    # FORK — fahrt-ermitteln rechnete vom Firmensitz der Plattform
+    #
+    # Die Funktion ist zwar angemeldet aufrufbar, benutzt aber den
+    # service_role. Sie nahm eine immobilie_id aus dem Koerper und gab
+    # Entfernung, Fahrzeit und Koordinaten zurueck, ohne zu fragen, wem das
+    # Objekt gehoert — der Blick in den Zwischenspeicher kam sogar VOR dem
+    # Blick auf das Objekt. Und der Firmensitz, von dem aus gerechnet wurde,
+    # stand in kosten_saetze, das es bis fork_28 nur einmal gab.
+    #
+    # Die Reihenfolge ist deshalb umgedreht: erst das Objekt, dann die
+    # Mandantenpruefung, dann alles Weitere.
+    # =====================================================================
+    ('FORK', '  try {\n    const jwt = (req.headers.get("Authorization") || "").replace(/^Bearer\\s+/i, "");', '  try {\n    // Wer fragt. Beim Aufruf mit dem Dienstschluessel (Cron) bleibt es leer;\n    // dann entscheidet allein der Mandant des Objekts.\n    let aufruferMandant: string | null = null;\n    const jwt = (req.headers.get("Authorization") || "").replace(/^Bearer\\s+/i, "");',
+     'Fahrtzeit: der Mandant des Aufrufers wird gemerkt.',
+     {'fahrt-ermitteln'}),
+    ('FORK', '      const { data: p } = await db.from("profiles").select("role").eq("id", u.user.id).maybeSingle();\n      if (!p || !["chef", "mitarbeiter"].includes(p.role)) return antwort({ ok: false, fehler: "Keine Berechtigung." }, 403);\n    }', '      const { data: p } = await db.from("profiles").select("role, mandant_id").eq("id", u.user.id).maybeSingle();\n      if (!p || !["chef", "mitarbeiter"].includes(p.role)) return antwort({ ok: false, fehler: "Keine Berechtigung." }, 403);\n      aufruferMandant = p.mandant_id || null;\n    }',
+     'Fahrtzeit: das Profil bringt den Mandanten mit.',
+     {'fahrt-ermitteln'}),
+    ('FORK', '    const { data: immo } = await db.from("immobilien")\n      .select("id, strasse, hausnummer, plz, ort, lage_koordinaten").eq("id", immobilieId).maybeSingle();\n    if (!immo) return antwort({ ok: false, fehler: "Objekt nicht gefunden." }, 404);\n\n    const { data: saetze } = await db.from("kosten_saetze").select("firmen_adresse, firmen_koordinaten").eq("id", 1).maybeSingle();', '    // Der Firmensitz, von dem aus gerechnet wird, gehoert dem Mandanten des\n    // Objekts. Bis fork_28 gab es ihn einmal fuer die ganze Plattform.\n    const { data: saetze } = await db.from("kosten_saetze").select("firmen_adresse, firmen_koordinaten").eq("mandant_id", immo.mandant_id).eq("id", 1).maybeSingle();',
+     'Fahrtzeit: der Firmensitz des eigenen Mandanten.',
+     {'fahrt-ermitteln'}),
+    ('FORK', '    // Ein manuell gesetzter Wert wird nie ueberschrieben.\n    const { data: vorhanden } = await db.from("immobilie_fahrt_cache").select("*").eq("immobilie_id", immobilieId).maybeSingle();', '    // Erst das Objekt, dann alles Weitere. Ohne es steht der Mandant nicht\n    // fest — und ohne den waere schon der Blick in den Zwischenspeicher eine\n    // Auskunft ueber ein fremdes Objekt: Entfernung, Fahrzeit, Koordinaten.\n    const { data: immo } = await db.from("immobilien")\n      .select("id, strasse, hausnummer, plz, ort, lage_koordinaten, mandant_id").eq("id", immobilieId).maybeSingle();\n    if (!immo) return antwort({ ok: false, fehler: "Objekt nicht gefunden." }, 404);\n    if (aufruferMandant && immo.mandant_id !== aufruferMandant) {\n      return antwort({ ok: false, fehler: "Objekt nicht gefunden." }, 404);\n    }\n\n    // Ein manuell gesetzter Wert wird nie ueberschrieben.\n    const { data: vorhanden } = await db.from("immobilie_fahrt_cache").select("*").eq("mandant_id", immo.mandant_id).eq("immobilie_id", immobilieId).maybeSingle();',
+     'Fahrtzeit: erst das Objekt und die Mandantenpruefung, dann der Zwischenspeicher.',
+     {'fahrt-ermitteln'}),
+    ('FORK', '    const satz = {\n      immobilie_id: immobilieId,', '    const satz = {\n      immobilie_id: immobilieId,\n      mandant_id: immo.mandant_id,',
+     'Fahrtzeit: der Zwischenspeicher wird mit Mandanten geschrieben.',
+     {'fahrt-ermitteln'}),
 ]
 
 

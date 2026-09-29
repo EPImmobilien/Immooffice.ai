@@ -110,6 +110,14 @@ ERWEITERT['signatur-token-validieren'] = (
 ERWEITERT['upload-benachrichtigung-versenden'] = (
     'Empfaenger je Mandant statt einmal fuer alle (Phase 2)')
 
+# fork_28: push_einstellungen, kosten_saetze, liquid_settings und
+# akq_einstellungen hatten EINE Zeile fuer die ganze Plattform. Die drei
+# Funktionen, die sie mit dem service_role lesen, brauchen jetzt den
+# Mandanten dazu — und pruefen bei der Gelegenheit, wem der Anlass gehoert.
+for _f in ('push-senden', 'fahrt-ermitteln'):
+    ERWEITERT[_f] = ('Einstellungen und Anlass aus dem eigenen Mandanten '
+                     '(Phase 2, fork_28)')
+
 BLOCKZEILEN = {
     'mpe-pdf-erzeugen': {
         'const pins: Array<[number, number, string, string, string]> = [',

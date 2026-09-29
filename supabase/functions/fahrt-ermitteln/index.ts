@@ -95,20 +95,34 @@ Deno.serve(async (req) => {
     new Response(JSON.stringify(o), { status, headers: { ...cors, "Content-Type": "application/json" } });
 
   try {
+    // Wer fragt. Beim Aufruf mit dem Dienstschluessel (Cron) bleibt es leer;
+    // dann entscheidet allein der Mandant des Objekts.
+    let aufruferMandant: string | null = null;
     const jwt = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
     if (jwt && jwt !== Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) {
       const { data: u } = await db.auth.getUser(jwt);
       if (!u?.user) return antwort({ ok: false, fehler: "Nicht angemeldet." }, 401);
-      const { data: p } = await db.from("profiles").select("role").eq("id", u.user.id).maybeSingle();
+      const { data: p } = await db.from("profiles").select("role, mandant_id").eq("id", u.user.id).maybeSingle();
       if (!p || !["chef", "mitarbeiter"].includes(p.role)) return antwort({ ok: false, fehler: "Keine Berechtigung." }, 403);
+      aufruferMandant = p.mandant_id || null;
     }
 
     const body = await req.json().catch(() => ({}));
     const immobilieId = String(body.immobilie_id || "").trim();
     if (!immobilieId) return antwort({ ok: false, fehler: "Feld „immobilie_id“ fehlt." }, 400);
 
+    // Erst das Objekt, dann alles Weitere. Ohne es steht der Mandant nicht
+    // fest — und ohne den waere schon der Blick in den Zwischenspeicher eine
+    // Auskunft ueber ein fremdes Objekt: Entfernung, Fahrzeit, Koordinaten.
+    const { data: immo } = await db.from("immobilien")
+      .select("id, strasse, hausnummer, plz, ort, lage_koordinaten, mandant_id").eq("id", immobilieId).maybeSingle();
+    if (!immo) return antwort({ ok: false, fehler: "Objekt nicht gefunden." }, 404);
+    if (aufruferMandant && immo.mandant_id !== aufruferMandant) {
+      return antwort({ ok: false, fehler: "Objekt nicht gefunden." }, 404);
+    }
+
     // Ein manuell gesetzter Wert wird nie ueberschrieben.
-    const { data: vorhanden } = await db.from("immobilie_fahrt_cache").select("*").eq("immobilie_id", immobilieId).maybeSingle();
+    const { data: vorhanden } = await db.from("immobilie_fahrt_cache").select("*").eq("mandant_id", immo.mandant_id).eq("immobilie_id", immobilieId).maybeSingle();
     if (vorhanden?.manuell) {
       return antwort({ ok: true, aus_cache: true, manuell: true, km_einfach: vorhanden.km_einfach,
                        minuten_einfach: vorhanden.minuten_einfach, koordinaten: vorhanden.koordinaten, quelle: vorhanden.quelle });
@@ -118,11 +132,9 @@ Deno.serve(async (req) => {
                        minuten_einfach: vorhanden.minuten_einfach, koordinaten: vorhanden.koordinaten, quelle: vorhanden.quelle });
     }
 
-    const { data: immo } = await db.from("immobilien")
-      .select("id, strasse, hausnummer, plz, ort, lage_koordinaten").eq("id", immobilieId).maybeSingle();
-    if (!immo) return antwort({ ok: false, fehler: "Objekt nicht gefunden." }, 404);
-
-    const { data: saetze } = await db.from("kosten_saetze").select("firmen_adresse, firmen_koordinaten").eq("id", 1).maybeSingle();
+    // Der Firmensitz, von dem aus gerechnet wird, gehoert dem Mandanten des
+    // Objekts. Bis fork_28 gab es ihn einmal fuer die ganze Plattform.
+    const { data: saetze } = await db.from("kosten_saetze").select("firmen_adresse, firmen_koordinaten").eq("mandant_id", immo.mandant_id).eq("id", 1).maybeSingle();
     const firmenAdresse = String(saetze?.firmen_adresse || "");
 
     // Firmensitz: erst die hinterlegten Koordinaten, sonst geocodieren
@@ -152,6 +164,7 @@ Deno.serve(async (req) => {
 
     const satz = {
       immobilie_id: immobilieId,
+      mandant_id: immo.mandant_id,
       km_einfach: r.km,
       minuten_einfach: r.min,
       koordinaten: { lat: pZiel.lat, lon: pZiel.lon },

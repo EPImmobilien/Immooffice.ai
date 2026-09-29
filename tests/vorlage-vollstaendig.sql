@@ -175,7 +175,11 @@ zuwachs(bereich, mehr, grund) as (values
   ,
   -- fork_27: der Wachposten aus fork_22 jetzt auch an aktivitaeten und
   -- immobilie_datei.
-  ('Trigger', 2, 'fork_27: mandant_aus_eltern an zwei weiteren Tabellen')
+  ('Trigger', 2, 'fork_27: mandant_aus_eltern an zwei weiteren Tabellen'),
+  -- fork_28: vier Einstellungstabellen gehoeren jetzt dem Mandanten. Die
+  -- Primaerschluessel werden nur umgebaut, nicht vermehrt — dazukommt eine
+  -- Funktion, die einem neuen Mandanten seine vier Zeilen anlegt.
+  ('Funktionen', 1, 'fork_28: mandant_grundeinstellungen()')
 ),
 soll(bereich, soll) as (
   select v.bereich,

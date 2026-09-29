@@ -267,7 +267,7 @@ Deno.serve(async (req) => {
       baujahr: baujahr ? Math.round(baujahr) : null,
       zustand: txt(body.zustand, 40), objektart: txt(body.objektart, 60),
     });
-    const { data: einst } = await db.from("akq_einstellungen").select("*").eq("id", true).maybeSingle();
+    const { data: einst } = await db.from("akq_einstellungen").select("*").eq("mandant_id", mandant).eq("id", true).maybeSingle();
     const spanne = Number(einst?.spanne_prozent ?? 10) / 100;
     const faktor = Number(einst?.startpreis_faktor ?? 0.85);
     const satz = Number(einst?.provision_satz ?? 3.57);

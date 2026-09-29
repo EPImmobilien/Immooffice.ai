@@ -721,3 +721,25 @@ Stelle, aus der sich beide bedienen.
 
 Nicht dringend, aber es wird nicht besser: jede neue Fundstelle vergrößert
 den Abstand.
+
+## Die 90 angemeldeten Funktionen sind noch nicht durchgesehen
+
+`tests/funktionen-oeffentlich.py` führt Buch über die 28 Edge Functions
+**ohne** JWT-Prüfung. Das ist die halbe Frage.
+
+Am 29.09.2026 ist bei `fahrt-ermitteln` aufgefallen, dass die andere Hälfte
+dieselbe Lücke haben kann: die Funktion prüft das JWT, arbeitet danach aber
+mit dem `service_role`, für den RLS nicht gilt, und nahm eine `immobilie_id`
+aus dem Anfragekörper, ohne zu fragen, wem das Objekt gehört. Ein
+angemeldeter Nutzer des einen Maklers hätte Entfernung, Fahrzeit und
+Koordinaten zu jedem Objekt jedes anderen abrufen können — und der
+Zwischenspeicher wurde dabei auch noch beschrieben.
+
+Das Muster ist immer dasselbe: **JWT geprüft, service_role benutzt, Kennung
+aus dem Körper geglaubt.** 90 der 118 Funktionen sind JWT-geprüft, und die
+meisten benutzen den `service_role`. Wie viele davon eine Kennung ungeprüft
+übernehmen, ist nicht gezählt.
+
+Der ehrliche Weg ist derselbe wie bei den öffentlichen: eine Liste, die nur
+kürzer werden darf. Nicht vor Gate 2 zu schaffen, aber vor einem echten
+zweiten Mandanten nötig.
