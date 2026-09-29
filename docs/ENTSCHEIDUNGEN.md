@@ -1456,10 +1456,10 @@ spätere Anweisung desselben Auftraggebers nicht überstimmen."
 - **Die 13 Tabellen.** Alle leer (geprüft), aber löschen wäre unumkehrbar, und
   „erstmal" heißt nicht „endgültig". Sie bleiben liegen wie der geparkte
   Greenfield-Stand.
-- **Rund 190 Fundstellen im Quelltext der Oberfläche.** Ohne Einstieg nicht
-  erreichbar. Sie einzeln herauszuschneiden wäre ein Eingriff in 190 Stellen
-  fremden Codes mit entsprechendem Risiko — für einen Gewinn, den niemand
-  sieht. Vermerkt in `docs/OFFEN.md`.
+- ~~**Rund 190 Fundstellen im Quelltext der Oberfläche.** Ohne Einstieg nicht
+  erreichbar.~~ **Diese Annahme war falsch** — siehe den Eintrag vom
+  29.09.2026 weiter unten. Der Auftraggeber hat die Marke in der laufenden
+  Oberfläche gesehen. Die sichtbaren Texte sind inzwischen neutralisiert.
 
 **Die richtige Endform** steht schon im Auftrag: Abschnitt 4b beschreibt für
 Postfächer eine Adapter-Schicht, bei der die Anwendung nur eine Schnittstelle
@@ -2893,3 +2893,76 @@ Der Rauchtest prüft jetzt alle drei Teile.
 lässt und nichts bewirkt, ist schlimmer als eine, die es nicht gibt — sie
 sieht aus wie eine Funktion. Beim nächsten Einstellungsfeld gehört die Probe
 dazu, ob der Wert am anderen Ende wirklich ankommt.
+
+---
+
+## Das Fremd-CRM verschwindet aus dem sichtbaren Text (29.09.2026)
+
+**Anlass:** „An vielen Ecken sind immer noch Verknüpfungen zu onOffice
+sichtbar. Das müssen wir natürlich rausnehmen."
+
+**Die Annahme vom 28.09.2026 war falsch.** Dort steht, die rund 190
+Fundstellen seien „ohne Einstieg nicht erreichbar" und das Herausschneiden
+bringe „einen Gewinn, den niemand sieht". Beides stimmte nicht. Entfernt
+waren die *Einstiege* — die Kachel, der Admin-Reiter, die Cron-Jobs. Die
+Marke stand aber weiter in Texten, die an ganz anderen Stellen erscheinen:
+im Kalender als Herkunfts-Kennzeichen am Termin, in den Rückfragen vor dem
+Portalexport, in der Urlaubs-Mail an den Mitarbeiter, in den Meldungen der
+Terminserie, im Hinweis beim Löschen eines Objekts, im Reiter über der
+Objektliste. Kurz: überall dort, wo eine Funktion, die bleibt, *nebenbei*
+das Fremdsystem erwähnt.
+
+Der Fehler im Denken war, „Modul abgeschaltet" mit „Text nicht mehr
+sichtbar" gleichzusetzen. Ein Text gehört nicht dem Modul, aus dem er
+stammt, sondern der Stelle, an der er gerendert wird.
+
+**Was jetzt gilt — drei Ebenen, sauber getrennt:**
+
+| Ebene | Behandlung | Grund |
+|---|---|---|
+| Sichtbarer Text | neutralisiert: „Fremdsystem", „Extern", oder die Erwähnung fällt ganz weg | Das Produkt ist neutral gebrandet |
+| Technische Bezeichner (`onoffice_id`, `onoffice-objekt-anlegen`, Schlüssel der Funktionsschalter) | bleiben unverändert | `CLAUDE.md`: „Bleibt im Code, hinter Funktionsschalter aus, bis Phase 2b: CRM-Sync". Die Spalten stehen so in der Datenbank; ein Umbenennen wäre eine Migration über 110 Tabellen für null Gewinn |
+| Kommentare, die diese Bezeichner erklären | bleiben unverändert | Sie beschreiben genau die Anbindung, die bleiben soll. Ohne den Namen wären sie unlesbar |
+
+Die Fremdmarke ist kein Kennzeichen des Referenzunternehmens; die Blockliste
+in `docs/NEUTRALITAET.md` führt sie deshalb zu Recht nicht. Es geht hier
+nicht um das Neutralitäts-Gate, sondern darum, dass ein Makler mit eigenem
+CRM in seiner Oberfläche nicht den Namen eines fremden Anbieters lesen soll.
+
+**Umfang:** 60 Textregeln aus dem ersten Durchgang (28./29.09.) und 34 aus
+dem zweiten, dazu sechs bauliche Regeln, die zwei Knöpfe am Objektkopf, eine
+Plakette und einen Admin-Reiter stilllegen. Danach: **keine einzige
+Zeichenkette in `src/app/anwendung.js` nennt die Marke mehr** — nur noch
+Kommentare und Bezeichner. In den Edge Functions ebenso: dort steht sie
+ausschließlich in Kommentaren.
+
+**Zwei Fehler auf dem Weg, beide selbst verursacht, beide gefunden:**
+
+1. *Teilzeichenketten statt ganzer Literale.* Eine Regel, die nur
+   `in onOffice` ersetzte, traf auch mitten in längeren Sätzen und machte
+   aus „Dieses Objekt jetzt in onOffice anlegen?" ein „Dieses Objekt jetzt
+   übernommen anlegen?". Alle 60 Regeln des ersten Durchgangs wurden
+   daraufhin auf vollständige Literale verankert (`"…"` von Anführungszeichen
+   zu Anführungszeichen).
+2. *Rückwärtsschrägstriche im Ersatztext.* `re.sub` macht aus `\n` im
+   Ersatztext einen echten Zeilenumbruch — mitten in einer
+   JavaScript-Zeichenkette ein Syntaxfehler. `node --check` hat ihn in
+   Zeile 32159 gefangen.
+
+Die Regeln des zweiten Durchgangs wurden deshalb nicht mehr von Hand
+geschrieben, sondern aus Klartext-Literalen über `re.escape` erzeugt. Damit
+ist beide Fehlerklassen ausgeschlossen.
+
+**Der Rauchtest hält den Stand fest.** Er sucht in der ausgelieferten Datei
+alle Zeichenketten — doppelte, einfache und Schablonen — und schlägt an,
+sobald eine davon die Marke in der Schreibweise mit großem O enthält.
+Technische Bezeichner sind durchgehend klein geschrieben und laufen damit
+nicht ins Netz. Die Prüfung läuft in `npm run check` mit; ein Rückfall kann
+nicht mehr unbemerkt eingecheckt werden.
+
+**Was offen bleibt:** Die Kommentare im Quelltext. Sie sind über die
+ausgelieferte Datei einsehbar, wenn jemand sie öffnet. Sie zu entfernen
+hieße, die Erklärung der Anbindung zu entfernen, die laut `CLAUDE.md`
+bestehen bleibt. Das lohnt sich erst, wenn der CRM-Anschluss in Phase 2b
+ohnehin zur Adapter-Schicht umgebaut wird — dann verschwindet der Name
+zusammen mit der eingebauten Annahme. Vermerkt in `docs/OFFEN.md`.

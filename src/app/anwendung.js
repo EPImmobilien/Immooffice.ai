@@ -1,4 +1,4 @@
-/* ImmoOffice – vorkompiliert 26.09.2026 (Exposé aus dem Objekt + Objektseiten-Vorschau; Exposé geladen = kein Hinweis; Newsletter-Schalter; Vorgaenge unter Weitere Aktionen; Einstellungen im Portal; Ehepaare und Erbengemeinschaften; Expose nur nach Auswahl; E-Mail-Knopf am Kontakt; Text am Griff drehen; Linien und schraege Schrift; Mitarbeiterkonten sofort nutzbar; Pfeile im Bild-Editor; Bildunterschrift als Dateiname; Checkliste fuer Eigentumswohnungen; Maklervertrag ohne doppelten Ort; Adressbuch: Vorgaenge, Expose, Zustaendig; Weiterleiten mit Anhaengen; Kalender: Termine ueber Fahrtzeiten; Energieausweis ohne Pflicht nach GEG; Bildunterschriften per KI; Einwertung: Finanzierungsannahmen aus dem Admin; Objekt-Landingpage für Interessenten; Kaufpreis auf Anfrage: interner Preis fürs Exposé; Termineinladungen im Posteingang annehmen und eintragen; Einwertung: Objektart frei eintragbar; Neubau-Nachrichten je Projekt mit Antwort und Zähler; Newsletter-Werkzeug mit Kampagnen und Immobilie des Monats; Newsletter-Anmeldungen mit Liste und Filtern; Eigentümer-Akte mit Besichtigungen; Posteingang-Spalten ziehbar; Eigentümer am Objekt: verknüpfen oder neu anlegen; API ohne Browser-Cache, Kalender-Ladefehler sichtbar; Besichtigungen für Eigentümer: Kontakt, Bestätigung, Portal-Zähler; Outlook-Ordner im Posteingang; ToDo-Kontakt; Stundenkonto klar; Kalender-Sicht; Urlaubszählung nach Teilnehmern; Mail-Übergabe ins Fenster; Unter-Verlauf; Kalenderfarben je Person; Exposé-Karte eingeklappt; Marketing-Objektquelle; Texte-Format; Marketing-Grundstück; Exposé-Direktlink; Exposé-nicht-abgerufen-Karte inkl. onOffice-Agreementlinks + Erinnerungsmail; Heute-Zone: nur eigene fällige ToDos; Neubauportal: Status/Bearbeiten/Adressbuch/Datei-Freigabe/Projekt-Vorlage; Kontakte-Ausbau; Akquise-Ausbau; Listen-Suche; Kalender-Karte; Löschschutz; Anruferkennung; Termineinladungen; Exposé-Freigabe robust; Widget-Daten; Offline-Mappe; Fehlerprotokoll; Einwertung ohne PPTX; Dashboard Heute nachrückend; Suchkriterien-Abgleich; Adressbuch-Werkzeuge; Mail-Anhang per Ablage; Termin-Hinweis im Adressbuch; Grundstücksdaten; Arbeitszeit h:mm; Termine ziehen; Posteingang im eigenen Fenster; Push-Mitteilungen; Zins & Preis; Warnzone mit Sprungzielen; Kostenrechner je Objekt; Telefonate per Klick; 360°-Rundgang-Modul; Hausgeld; HTML-Mailansicht v2.1; ComboFeld/ComboSelect; Termin-ICS; Kontaktwahl Vorlagen; Kachelpreis; Buchhaltungs-Kennzeichen; Vorlage extern) */
+/* ImmoOffice – vorkompiliert 26.09.2026 (Exposé aus dem Objekt + Objektseiten-Vorschau; Exposé geladen = kein Hinweis; Newsletter-Schalter; Vorgaenge unter Weitere Aktionen; Einstellungen im Portal; Ehepaare und Erbengemeinschaften; Expose nur nach Auswahl; E-Mail-Knopf am Kontakt; Text am Griff drehen; Linien und schraege Schrift; Mitarbeiterkonten sofort nutzbar; Pfeile im Bild-Editor; Bildunterschrift als Dateiname; Checkliste fuer Eigentumswohnungen; Maklervertrag ohne doppelten Ort; Adressbuch: Vorgaenge, Expose, Zustaendig; Weiterleiten mit Anhaengen; Kalender: Termine ueber Fahrtzeiten; Energieausweis ohne Pflicht nach GEG; Bildunterschriften per KI; Einwertung: Finanzierungsannahmen aus dem Admin; Objekt-Landingpage für Interessenten; Kaufpreis auf Anfrage: interner Preis fürs Exposé; Termineinladungen im Posteingang annehmen und eintragen; Einwertung: Objektart frei eintragbar; Neubau-Nachrichten je Projekt mit Antwort und Zähler; Newsletter-Werkzeug mit Kampagnen und Immobilie des Monats; Newsletter-Anmeldungen mit Liste und Filtern; Eigentümer-Akte mit Besichtigungen; Posteingang-Spalten ziehbar; Eigentümer am Objekt: verknüpfen oder neu anlegen; API ohne Browser-Cache, Kalender-Ladefehler sichtbar; Besichtigungen für Eigentümer: Kontakt, Bestätigung, Portal-Zähler; Outlook-Ordner im Posteingang; ToDo-Kontakt; Stundenkonto klar; Kalender-Sicht; Urlaubszählung nach Teilnehmern; Mail-Übergabe ins Fenster; Unter-Verlauf; Kalenderfarben je Person; Exposé-Karte eingeklappt; Marketing-Objektquelle; Texte-Format; Marketing-Grundstück; Exposé-Direktlink; Exposé-nicht-abgerufen-Karte inkl. Agreementlinks + Erinnerungsmail; Heute-Zone: nur eigene fällige ToDos; Neubauportal: Status/Bearbeiten/Adressbuch/Datei-Freigabe/Projekt-Vorlage; Kontakte-Ausbau; Akquise-Ausbau; Listen-Suche; Kalender-Karte; Löschschutz; Anruferkennung; Termineinladungen; Exposé-Freigabe robust; Widget-Daten; Offline-Mappe; Fehlerprotokoll; Einwertung ohne PPTX; Dashboard Heute nachrückend; Suchkriterien-Abgleich; Adressbuch-Werkzeuge; Mail-Anhang per Ablage; Termin-Hinweis im Adressbuch; Grundstücksdaten; Arbeitszeit h:mm; Termine ziehen; Posteingang im eigenen Fenster; Push-Mitteilungen; Zins & Preis; Warnzone mit Sprungzielen; Kostenrechner je Objekt; Telefonate per Klick; 360°-Rundgang-Modul; Hausgeld; HTML-Mailansicht v2.1; ComboFeld/ComboSelect; Termin-ICS; Kontaktwahl Vorlagen; Kachelpreis; Buchhaltungs-Kennzeichen; Vorlage extern) */
 /*
  * API ohne Browser-Zwischenspeicher, Ladefehler sichtbar (Stufe 43).
  *
@@ -12841,7 +12841,7 @@ function OnOfficeTest() {
       lineHeight: 1.6,
       marginBottom: 16
     }
-  }, "Prüft den onOffice-API-Zugang und liest testweise die ersten fünf Objekte. Es wird nichts verändert oder synchronisiert — nur gelesen."), React.createElement("button", {
+  }, "Prüft den API-Zugang des Fremdsystems und liest testweise die ersten fünf Objekte. Es wird nichts verändert oder synchronisiert — nur gelesen."), React.createElement("button", {
     onClick: async () => {
       t(!0), l(""), a(null);
       try {
@@ -13101,7 +13101,7 @@ function OnOfficeTest() {
       fontWeight: 600,
       marginBottom: 14
     }
-  }, "✓ Verbindung steht. ", null != n.gesamt ? `${n.gesamt} Objekte in onOffice` : `${n.anzahl} Objekte gelesen`, "."), React.createElement("div", {
+  }, "✓ Verbindung steht. ", null != n.gesamt ? `${n.gesamt} Objekte im Fremdsystem` : `${n.anzahl} Objekte gelesen`, "."), React.createElement("div", {
     style: {
       overflowX: "auto",
       border: `1px solid ${CI.border}`
@@ -19542,7 +19542,7 @@ function WerkzeugePage({
     titel: "Objektkosten",
     text: "Kosten je Objekt aus Terminen, Fahrten, Telefonaten und Pauschalen — mit erwarteter Provision und Deckungsbeitrag."
   });
-  // Die Kachel "onOffice-Verbindung" ist am 28.09.2026 entfallen: onOffice
+  // Die Kachel "Fremdsystem-Verbindung" ist am 28.09.2026 entfallen: onOffice
   // war in der Vorlage DIE Anbindung, nicht EINE, und welche Software ein
   // neuer Mandant benutzt, weiss niemand. Die Edge Functions sind
   // gestrichen, die Cron-Jobs abbestellt (fork_20).
@@ -21540,7 +21540,7 @@ function KiExposePrueferPage({
       marginBottom: 12,
       lineHeight: 1.5
     }
-  }, "Praktische Endkontrolle vor dem Versand: Kerndaten & Provision, Rechtschreibung, Grundriss, Lageplan, Energieskala und Foto-Galerie (keine Werbegrafiken, keine Hochkant-Fotos). Geprüft wird das zuletzt erstellte Exposé-PDF des gewählten Objekts — oder ein direkt hochgeladenes PDF (z. B. ein altes onOffice- oder ein externes Exposé); Bezug für Abgleich und Übernahmen ist dabei das gewählte Objekt oder eine eingetragene Objekt-Nr. Korrekturen (Textfelder und Bild-Titel) per Häkchen auswählen und gesammelt übernehmen — danach das Exposé neu erstellen."), a && React.createElement("div", {
+  }, "Praktische Endkontrolle vor dem Versand: Kerndaten & Provision, Rechtschreibung, Grundriss, Lageplan, Energieskala und Foto-Galerie (keine Werbegrafiken, keine Hochkant-Fotos). Geprüft wird das zuletzt erstellte Exposé-PDF des gewählten Objekts — oder ein direkt hochgeladenes PDF (zum Beispiel ein älteres oder ein extern gesetztes Exposé); Bezug für Abgleich und Übernahmen ist dabei das gewählte Objekt oder eine eingetragene Objekt-Nr. Korrekturen (Textfelder und Bild-Titel) per Häkchen auswählen und gesammelt übernehmen — danach das Exposé neu erstellen."), a && React.createElement("div", {
     style: {
       fontSize: 13,
       color: CI.muted
@@ -23462,7 +23462,7 @@ function OnofficeGrid({
       textAlign: "center",
       color: CI.muted
     }
-  }, "Lade onOffice-Objekte…") : e.length ? React.createElement("div", {
+  }, "Lade Objekte aus dem Fremdsystem…") : e.length ? React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fill, minmax(min(320px, 100%), 1fr))",
@@ -23566,7 +23566,7 @@ function OnofficeGrid({
       color: CI.muted,
       border: `1px dashed ${CI.border}`
     }
-  }, "Keine onOffice-Objekte gefunden. Ggf. erst unter Werkzeuge → onOffice synchronisieren.")
+  }, "Keine Fremdobjekte gefunden.")
 }
 
 function OnofficeDetailModal({
@@ -23655,7 +23655,7 @@ function OnofficeDetailModal({
       fontSize: 16,
       fontWeight: 600
     }
-  }, a.titel || "onOffice-Objekt"), React.createElement("button", {
+  }, a.titel || "Fremdobjekt"), React.createElement("button", {
     onClick: t,
     style: {
       background: "transparent",
@@ -23697,7 +23697,7 @@ function OnofficeDetailModal({
       letterSpacing: "0.15em",
       fontWeight: 700
     }
-  }, "AUS ONOFFICE"), !l && React.createElement("div", {
+  }, "ÜBERNOMMEN"), !l && React.createElement("div", {
     style: {
       display: "flex",
       alignItems: "center",
@@ -23734,7 +23734,7 @@ function OnofficeDetailModal({
       lineHeight: 1.5,
       marginBottom: 6
     }
-  }, "⚠ Titel und Preis werden beim Speichern ", React.createElement("strong", null, "direkt in onOffice"), " geändert — also auch in Portalen und auf der Webseite. Die interne Notiz bleibt nur hier in der ImmoOffice."), React.createElement("label", {
+  }, "⚠ Titel und Preis werden beim Speichern ", React.createElement("strong", null, "im führenden System"), " geändert — also auch in Portalen und auf der Webseite. Die interne Notiz bleibt nur hier in der ImmoOffice."), React.createElement("label", {
     style: R
   }, "Objekttitel"), React.createElement("input", {
     style: w,
@@ -23816,7 +23816,7 @@ function OnofficeDetailModal({
       const t = (h || "") !== (a.intern_notiz || ""),
         r = !!y != !!a.auf_webseite;
       if (0 !== Object.keys(e).length || t || r) {
-        if (!(Object.keys(e).length > 0) || confirm("Titel/Preis werden direkt in onOffice gespeichert und sind danach auch in den Portalen und auf der Webseite sichtbar. Fortfahren?")) {
+        if (!(Object.keys(e).length > 0) || confirm("Titel und Preis werden gespeichert und sind danach auch in den Portalen und auf der Webseite sichtbar. Fortfahren?")) {
           s(!0), d("");
           try {
             const {
@@ -23902,7 +23902,7 @@ function OnofficeDetailModal({
       color: CI.muted,
       fontSize: 12
     }
-  }, "Alle onOffice-Rohdaten anzeigen"), React.createElement("div", {
+  }, "Alle Rohdaten anzeigen"), React.createElement("div", {
     style: {
       marginTop: 8,
       maxHeight: 300,
@@ -28241,7 +28241,7 @@ function BestandsImmobilienPage({
         if (t) throw t;
         x(e || [])
       } catch (e) {
-        console.error("onOffice laden fehlgeschlagen:", e), x([])
+        console.error("Laden fehlgeschlagen:", e), x([])
       }
       z(!1)
     })()
@@ -28461,7 +28461,7 @@ function BestandsImmobilienPage({
       fontWeight: 600,
       cursor: "pointer"
     }
-  }, "onOffice (", R.length || "…", ")"), React.createElement("button", {
+  }, "Fremdsystem (", R.length || "…", ")"), React.createElement("button", {
     onClick: () => b("eigene"),
     style: {
       background: "eigene" === h ? CI.blau : "transparent",
@@ -28566,7 +28566,7 @@ function BestandsImmobilienPage({
     value: e
   }, t.label))), "eigene" === h && t.some(e => e.versteckt) && React.createElement("button", {
     onClick: () => A(e => !e),
-    title: "Ausgeblendete Objekte — Testobjekte und Altlasten, die aus onOffice kommen und dort nicht gelöscht sind",
+    title: "Ausgeblendete Objekte — Testobjekte und Altlasten, die nicht gelöscht werden sollen",
     style: {
       background: g ? CI.blau : "transparent",
       color: g ? "#fff" : CI.muted,
@@ -30887,7 +30887,7 @@ function ObjektKopierenDialog({
       lineHeight: 1.5,
       marginBottom: 10
     }
-  }, "Adresse, Objektart, alle Freitexte, Energieausweis, Ausstattung, Provisionen, Exposé-Angaben und die zuständige Person werden immer übernommen. ", "Objekt-Nr., onOffice-Verknüpfung, Status und Verkaufsdatum nicht — die Kopie startet in der Akquise."), React.createElement(KopieHaken, {
+  }, "Adresse, Objektart, alle Freitexte, Energieausweis, Ausstattung, Provisionen, Exposé-Angaben und die zuständige Person werden immer übernommen. ", "Objekt-Nr., Status und Verkaufsdatum nicht — die Kopie startet in der Akquise."), React.createElement(KopieHaken, {
     an: d,
     setAn: u,
     titel: "Flächen, Zimmer und Preise übernehmen",
@@ -31551,7 +31551,7 @@ function ImmobilieSeite({
   }, st = async (e, n) => {
     if (!t) return;
     const a = "immowelt" === n ? "Immowelt" : "kleinanzeigen" === n ? "Kleinanzeigen" : "Homepage";
-    if (("loeschen" !== e || confirm(`Lösch-Auftrag an ${a} senden? Das Objekt wird dort beim nächsten Import entfernt.`)) && ("uebertragen" !== e || !n || "homepage" === n || confirm(`Objekt jetzt per OpenImmo an ${a} übertragen?\n\nHinweis: Solange onOffice dasselbe Objekt an ${a} liefert, sollte es dort nur aus EINER Quelle gepflegt werden — sonst überschreiben sich die Stände gegenseitig.`))) {
+    if (("loeschen" !== e || confirm(`Lösch-Auftrag an ${a} senden? Das Objekt wird dort beim nächsten Import entfernt.`)) && ("uebertragen" !== e || !n || "homepage" === n || confirm(`Objekt jetzt per OpenImmo an ${a} übertragen?\n\nHinweis: Solange ein Fremdsystem dasselbe Objekt an ${a} liefert, sollte es dort nur aus EINER Quelle gepflegt werden — sonst überschreiben sich die Stände gegenseitig.`))) {
       Re(n || "homepage"), Se(null);
       try {
         if (p) throw new Error("Es gibt ungespeicherte Änderungen — bitte erst speichern, damit der aktuelle Stand übertragen wird.");
@@ -32033,14 +32033,14 @@ function ImmobilieSeite({
       color: CI.gold,
       fontWeight: 700
     }
-  }, "● Ungespeichert"), !s && t && "onoffice" !== t.quelle && !t.onoffice_id && React.createElement("button", {
+  }, "● Ungespeichert"), false && !s && t && "onoffice" !== t.quelle && !t.onoffice_id && React.createElement("button", {
     onClick: async () => {
       if (t)
         if (p) Be({
           typ: "fehler",
           text: "Es gibt ungespeicherte Änderungen — bitte erst speichern, dann übertragen."
         });
-        else if (confirm("Dieses Objekt jetzt in onOffice anlegen? Es wird dort als NEUES Objekt erstellt und danach mit dem Portal verknüpft. Der onOffice-Sync fasst es anschließend nicht mehr an.")) {
+        else if (confirm("Dieses Objekt jetzt im Fremdsystem anlegen? Es wird dort als NEUES Objekt erstellt und danach mit dem Portal verknüpft. Der Sync fasst es anschließend nicht mehr an.")) {
         Ce(!0), Be(null);
         try {
           const {
@@ -32056,7 +32056,7 @@ function ImmobilieSeite({
           const a = e.felder_fehler || [];
           Be({
             typ: "ok",
-            text: `In onOffice angelegt (Objekt-Nr. ${e.onoffice_id}) — ${e.felder_uebertragen} Feld(er) übertragen.` + (a.length ? ` Von onOffice abgelehnt: ${a.join(", ")}.` : "") + " Bilder bleiben im Portal."
+            text: `Im Fremdsystem angelegt (Objekt-Nr. ${e.onoffice_id}) — ${e.felder_uebertragen} Feld(er) übertragen.` + (a.length ? ` Vom Fremdsystem abgelehnt: ${a.join(", ")}.` : "") + " Bilder bleiben im Portal."
           }), r(t.id)
         } catch (e) {
           Be({
@@ -32068,7 +32068,7 @@ function ImmobilieSeite({
       }
     },
     disabled: ze,
-    title: "Dieses Portal-Objekt als neues Objekt in onOffice anlegen",
+    title: "Dieses Portal-Objekt als neues Objekt im Fremdsystem anlegen",
     style: {
       background: "transparent",
       border: "1px solid rgba(255,255,255,0.35)",
@@ -32080,7 +32080,7 @@ function ImmobilieSeite({
       fontWeight: 700,
       opacity: ze ? .6 : 1
     }
-  }, ze ? "Überträgt…" : "An onOffice übertragen"), !s && t && t.onoffice_id && React.createElement(React.Fragment, null, React.createElement("span", {
+  }, ze ? "Überträgt…" : "Ans Fremdsystem übertragen"), false && !s && t && t.onoffice_id && React.createElement(React.Fragment, null, React.createElement("span", {
     style: {
       background: "rgba(255,255,255,0.14)",
       color: "rgba(255,255,255,0.9)",
@@ -32090,15 +32090,15 @@ function ImmobilieSeite({
       textTransform: "uppercase",
       letterSpacing: "0.05em"
     },
-    title: "onOffice-Nr. " + t.onoffice_id
-  }, "in onOffice"), "onoffice" !== t.quelle && React.createElement("button", {
+    title: "Fremd-Nr. " + t.onoffice_id
+  }, "übernommen"), false && "onoffice" !== t.quelle && React.createElement("button", {
     onClick: async () => {
       if (t && t.onoffice_id)
         if (p) Be({
           typ: "fehler",
           text: "Es gibt ungespeicherte Änderungen — bitte erst speichern, dann aktualisieren."
         });
-        else if (confirm(`Die Objektdaten jetzt nach onOffice übertragen? Das verknüpfte onOffice-Objekt (Nr. ${t.onoffice_id}) wird mit dem aktuellen Portal-Stand überschrieben.`)) {
+        else if (confirm(`Die Objektdaten jetzt ans Fremdsystem übertragen? Das verknüpfte Objekt (Nr. ${t.onoffice_id}) wird mit dem aktuellen Portal-Stand überschrieben.`)) {
         Ce(!0), Be(null);
         try {
           const {
@@ -32115,7 +32115,7 @@ function ImmobilieSeite({
           const a = e.felder_fehler || [];
           Be({
             typ: "ok",
-            text: `onOffice aktualisiert (Objekt-Nr. ${e.onoffice_id}) — ${e.felder_uebertragen} Feld(er) übertragen.` + (a.length ? ` Von onOffice abgelehnt: ${a.join(", ")}.` : "") + " Bilder bleiben im Portal."
+            text: `Fremdsystem aktualisiert (Objekt-Nr. ${e.onoffice_id}) — ${e.felder_uebertragen} Feld(er) übertragen.` + (a.length ? ` Vom Fremdsystem abgelehnt: ${a.join(", ")}.` : "") + " Bilder bleiben im Portal."
           }), r(t.id)
         } catch (e) {
           Be({
@@ -32127,7 +32127,7 @@ function ImmobilieSeite({
       }
     },
     disabled: ze,
-    title: "Aktuellen Portal-Stand in das verknüpfte onOffice-Objekt (Nr. " + t.onoffice_id + ") schreiben — Bilder bleiben im Portal",
+    title: "Aktuellen Portal-Stand in das verknüpfte Objekt des Fremdsystems (Nr. " + t.onoffice_id + ") schreiben — Bilder bleiben im Portal",
     style: {
       background: "transparent",
       border: "1px solid rgba(255,255,255,0.35)",
@@ -32139,7 +32139,7 @@ function ImmobilieSeite({
       fontWeight: 700,
       opacity: ze ? .6 : 1
     }
-  }, ze ? "Überträgt…" : "↻ onOffice aktualisieren")), !s && React.createElement("button", {
+  }, ze ? "Überträgt…" : "↻ Fremdsystem aktualisieren")), !s && React.createElement("button", {
     onClick: () => {
       p && !confirm("Es gibt ungespeicherte Änderungen.\n\nDie Kopie übernimmt den zuletzt gespeicherten Stand. Trotzdem fortfahren?") || ee(!0)
     },
@@ -32156,7 +32156,7 @@ function ImmobilieSeite({
   }, "⧉ Kopieren"), !s && React.createElement("button", {
     onClick: async () => {
       const e = !t.versteckt;
-      if (!e || confirm("Objekt aus allen Listen ausblenden?\n\nEs bleibt erhalten und lässt sich über „Ausgeblendete“ in der Objektliste jederzeit zurückholen. Gedacht für Testobjekte aus onOffice, die dort nicht gelöscht werden.")) try {
+      if (!e || confirm("Objekt aus allen Listen ausblenden?\n\nEs bleibt erhalten und lässt sich über „Ausgeblendete“ in der Objektliste jederzeit zurückholen.")) try {
         const {
           error: n
         } = await window._sb.from("immobilien").update({
@@ -33596,7 +33596,7 @@ function ImmobilieSeite({
     }, "Eigene Internetseite"), React.createElement(e, {
       feld: "website_veroeffentlichen",
       label: "Auf der Website veröffentlichen",
-      hinweis: "Das Objekt erscheint auf der öffentlichen Objektseite (immobilien.html) — direkt aus dem eigenen Bestand, ohne onOffice."
+      hinweis: "Das Objekt erscheint auf der öffentlichen Objektseite (immobilien.html) — direkt aus dem eigenen Bestand."
     }), React.createElement(e, {
       feld: "website_top_angebot",
       label: "Als Top-Angebot hervorheben"
@@ -33849,7 +33849,7 @@ function ImmobilieSeite({
           border: `1px solid ${CI.border}`,
           padding: "1px 6px"
         }
-      }, "via onOffice")), React.createElement("span", {
+      }, "übernommen")), React.createElement("span", {
         style: {
           fontSize: 11,
           color: "fehler" === a?.status ? CI.danger || "#c83c3c" : CI.muted,
@@ -33924,7 +33924,7 @@ function ImmobilieSeite({
         marginTop: 10,
         fontStyle: "italic"
       }
-    }, "Homepage, Immowelt und Kleinanzeigen: erzeugt ein OpenImmo-1.27-ZIP (XML + externe Bilder, max. 20) und lädt es per FTP zum Portal. Der Inserat-Status (grün) kommt danach automatisch aus dem Importbericht des Portals; Objekte, die noch über onOffice laufen, werden über die Importberichte und Portalanfragen erkannt oder können manuell gesetzt werden.")))
+    }, "Homepage, Immowelt und Kleinanzeigen: erzeugt ein OpenImmo-1.27-ZIP (XML + externe Bilder, max. 20) und lädt es per FTP zum Portal. Der Inserat-Status (grün) kommt danach automatisch aus dem Importbericht des Portals; Er kann auch manuell gesetzt werden.")))
   })(), "expose" === d && !s && (() => {
     const n = nt.filter(e => e.oeffentlich && "Energieskala" !== e.doktyp),
       a = rt.filter(e => e.oeffentlich),
@@ -34151,7 +34151,7 @@ function ImmobilieSeite({
           color: CI.muted,
           marginBottom: 10
         }
-      }, "Fertiges Exposé-PDF (z. B. Miet-Exposé aus onOffice oder extern gesetztes Exposé) direkt am Objekt ablegen. Das als FINAL markierte PDF wird bei Exposé-Anfragen versendet bzw. über den Freigabelink ausgeliefert — auch ohne Erzeugung über die World."), 0 === n.length ? React.createElement("div", {
+      }, "Fertiges Exposé-PDF (zum Beispiel ein extern gesetztes Exposé) direkt am Objekt ablegen. Das als FINAL markierte PDF wird bei Exposé-Anfragen versendet bzw. über den Freigabelink ausgeliefert — auch ohne Erzeugung über die World."), 0 === n.length ? React.createElement("div", {
         style: {
           fontSize: 12,
           color: CI.danger || "#c83c3c"
@@ -38110,7 +38110,7 @@ function AufgabenKarte({
             }
           })
         } catch (e) {
-          console.warn("onOffice:", e)
+          console.warn("Fremdsystem:", e)
         }
         if (r.antragsteller_email) try {
           const {
@@ -38123,7 +38123,7 @@ function AufgabenKarte({
           if (t) {
             const l = r.datum_ende && r.datum_ende !== r.datum ? `${String(r.datum).split("-").reverse().join(".")} – ${String(r.datum_ende).split("-").reverse().join(".")}` : String(r.datum).split("-").reverse().join("."),
               i = String(r.antragsteller_name || "").split(" ")[0],
-              o = n ? `Hallo ${i},\n\ndein Urlaub vom ${l} (${r.arbeitstage} Arbeitstage) ist genehmigt. Der Termin steht im Kalender und in onOffice.\n\nSchöne Tage!\n\nMit freundlichen Grüßen\n${e.name}` : `Hallo ${i},\n\ndeinen Urlaubsantrag vom ${l} kann ich leider nicht genehmigen.${a?`\n\nGrund: ${a}`:""}\n\nLass uns gern kurz sprechen, dann finden wir einen anderen Zeitraum.\n\nMit freundlichen Grüßen\n${e.name}`;
+              o = n ? `Hallo ${i},\n\ndein Urlaub vom ${l} (${r.arbeitstage} Arbeitstage) ist genehmigt. Der Termin steht im Kalender.\n\nSchöne Tage!\n\nMit freundlichen Grüßen\n${e.name}` : `Hallo ${i},\n\ndeinen Urlaubsantrag vom ${l} kann ich leider nicht genehmigen.${a?`\n\nGrund: ${a}`:""}\n\nLass uns gern kurz sprechen, dann finden wir einen anderen Zeitraum.\n\nMit freundlichen Grüßen\n${e.name}`;
             await window._sb.functions.invoke("mail-senden", {
               body: {
                 postfach_id: t.id,
@@ -40185,7 +40185,7 @@ function KontaktKorrespondenz({
       color: CI.muted,
       marginBottom: 12
     }
-  }, o ? "Alle Mails von und an " + e.email + " — aus dem Posteingang, dem Portal-Versand und dem Gesendet-Ordner des Postfachs (Outlook, onOffice)." : "Keine E-Mail-Adresse hinterlegt — ohne Adresse lässt sich kein Verlauf zuordnen."), a && React.createElement("div", {
+  }, o ? "Alle Mails von und an " + e.email + " — aus dem Posteingang, dem Portal-Versand und dem Gesendet-Ordner des Postfachs." : "Keine E-Mail-Adresse hinterlegt — ohne Adresse lässt sich kein Verlauf zuordnen."), a && React.createElement("div", {
     style: {
       fontSize: 12,
       color: CI.muted
@@ -40447,14 +40447,14 @@ function AdminOnOffice({
       color: CI.blau,
       lineHeight: 1.6
     }
-  }, React.createElement("strong", null, "Reihenfolge einhalten."), " onOffice bricht eine Abfrage komplett ab, sobald ein Feldname unbekannt ist. Schritt 1 testet die Feldnamen deshalb einzeln — ohne ihn holt der Sync nur 18 Basisfelder und die ", React.createElement("strong", null, "Objektbeschreibung, Lage und Ausstattung bleiben leer"), ". Schritt 1 muss nur einmal laufen.")), React.createElement("div", {
+  }, React.createElement("strong", null, "Reihenfolge einhalten."), " Das Fremdsystem bricht eine Abfrage komplett ab, sobald ein Feldname unbekannt ist. Schritt 1 testet die Feldnamen deshalb einzeln — ohne ihn holt der Sync nur 18 Basisfelder und die ", React.createElement("strong", null, "Objektbeschreibung, Lage und Ausstattung bleiben leer"), ". Schritt 1 muss nur einmal laufen.")), React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fill, minmax(min(150px,100%), 1fr))",
       gap: 12,
       marginBottom: 24
     }
-  }, u(t.spiegel, "Im Spiegel", "roh aus onOffice geholt"), u(t.imCrm, "Im CRM", "als eigenes Objekt angelegt"), u(t.mitBildern, "Bilder geprüft", "Objekte, die Schritt 4 durchlaufen haben"), u(t.dateien, "Bilder geladen", "im Storage abgelegt"), u(t.felder, "Gültige Felder", "einzeln gegen die API getestet")), React.createElement("div", {
+  }, u(t.spiegel, "Im Spiegel", "unverändert übernommen"), u(t.imCrm, "Im CRM", "als eigenes Objekt angelegt"), u(t.mitBildern, "Bilder geprüft", "Objekte, die Schritt 4 durchlaufen haben"), u(t.dateien, "Bilder geladen", "im Storage abgelegt"), u(t.felder, "Gültige Felder", "einzeln gegen die API getestet")), React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fill, minmax(min(320px,100%), 1fr))",
@@ -40462,7 +40462,7 @@ function AdminOnOffice({
       marginBottom: 24
     }
   }, m("felder", "1", "Feldnamen prüfen", "Testet jeden Feldnamen einzeln gegen die API und merkt sich, welche es wirklich gibt. Dauert 1–2 Minuten. Nur einmal nötig.", async () => {
-    r("felder"), s("Prüfe Feldnamen einzeln gegen die onOffice-API — das dauert 1–2 Minuten …");
+    r("felder"), s("Prüfe Feldnamen einzeln gegen die API des Fremdsystems — das dauert 1–2 Minuten …");
     try {
       const e = await d("onoffice-sync", {
         modus: "felder-pruefen"
@@ -40472,12 +40472,12 @@ function AdminOnOffice({
       s("Fehler: " + e.message, "fehler")
     }
     r(null)
-  }), m("sync", "2", "Objektdaten holen", "Vollsync aller Objekte aus onOffice in den Spiegel — inklusive der in Schritt 1 bestätigten Felder.", async () => {
+  }), m("sync", "2", "Objektdaten holen", "Vollsync aller Objekte aus dem Fremdsystem in den Spiegel — inklusive der in Schritt 1 bestätigten Felder.", async () => {
     if (0 !== t.felder || window.confirm("Es wurden noch keine Feldnamen geprüft.\n\nDer Sync holt dann nur die 18 Basisfelder — OHNE Objektbeschreibung, Lage und Ausstattung.\n\nTrotzdem fortfahren?")) {
-      r("sync"), s("Hole Objektdaten aus onOffice …");
+      r("sync"), s("Hole Objektdaten …");
       try {
         const e = await d("onoffice-sync", {});
-        s(`${e.gelesen} Objekte gelesen mit ${e.felder} Feldern · ${e.neu} neu · ${e.aktualisiert} aktualisiert · ${e.deaktiviert} nicht mehr in onOffice`, "ok"), await c()
+        s(`${e.gelesen} Objekte gelesen mit ${e.felder} Feldern · ${e.neu} neu · ${e.aktualisiert} aktualisiert · ${e.deaktiviert} nicht mehr im Fremdsystem`, "ok"), await c()
       } catch (e) {
         s("Fehler: " + e.message, "fehler")
       }
@@ -40508,7 +40508,7 @@ function AdminOnOffice({
         });
         if (t += a.bilder_geladen || 0, n += a.ohne_bilder || 0, s(`Runde ${e}: ${a.verarbeitet} Objekte · ${a.bilder_geladen} Bilder geladen · ${a.ohne_bilder} ohne Bild · noch offen: ${a.rest}`), (a.fehler || []).length && a.fehler.forEach(e => s("Fehler: " + e, "fehler")), await c(), a.fertig || 0 === a.verarbeitet) break
       }
-      s(o.current ? `Abgebrochen. Bis hierher ${t} Bilder geladen.` : `Fertig: ${t} Bilder geladen, ${n} Objekte ohne Bild in onOffice.`, "ok"), 0 === t && n > 0 && s("Kein einziges Bild geladen — das ist der bekannte estatepictures-Fehler. Die Bild-Diagnose unten gibt die Rohantwort der API aus.", "fehler")
+      s(o.current ? `Abgebrochen. Bis hierher ${t} Bilder geladen.` : `Fertig: ${t} Bilder geladen, ${n} Objekte ohne Bild im Fremdsystem.`, "ok"), 0 === t && n > 0 && s("Kein einziges Bild geladen — das ist der bekannte estatepictures-Fehler. Die Bild-Diagnose unten gibt die Rohantwort der API aus.", "fehler")
     } catch (e) {
       s("Fehler: " + e.message, "fehler")
     }
@@ -40655,9 +40655,6 @@ function AdminPage({
     onClick: () => n("finanzierung"),
     style: a("finanzierung" === t)
   }, "Finanzierung"), React.createElement("button", {
-    onClick: () => n("onoffice"),
-    style: a("onoffice" === t)
-  }, "onOffice-Import"), React.createElement("button", {
     onClick: () => n("urlaub"),
     style: a("urlaub" === t)
   }, "Urlaub"), "chef" === e.role && React.createElement("button", {
@@ -73762,7 +73759,7 @@ function KalFahrzeitVorschau({
       marginTop: 8,
       lineHeight: 1.5
     }
-  }, "Startpunkt: ", a.basis, a.puffer_min ? ` · inkl. ${a.puffer_min} Min Puffer` : "", "schaetzung" === a.quelle ? " · geschätzt (Routendienst nicht erreichbar)" : "", React.createElement("br", null), "Wird beim Speichern am Termin hinterlegt, hier im Kalender als Schraffur vor und nach dem Termin gezeichnet und in onOffice in die Wegzeit-Felder (Hinweg / Rückweg) geschrieben.")) : React.createElement("div", {
+  }, "Startpunkt: ", a.basis, a.puffer_min ? ` · inkl. ${a.puffer_min} Min Puffer` : "", "schaetzung" === a.quelle ? " · geschätzt (Routendienst nicht erreichbar)" : "", React.createElement("br", null), "Wird beim Speichern am Termin hinterlegt, hier im Kalender als Schraffur vor und nach dem Termin gezeichnet.")) : React.createElement("div", {
     style: {
       fontSize: 11.5,
       color: CI.muted,
@@ -73893,7 +73890,7 @@ async function kalSerieAnlegen(e, t, n) {
   const l = a.anzahl;
   let i = 0;
   for (let e = 0; e < 40; e++) {
-    n && n(`Serie: ${i}/${l} nach onOffice übertragen …`);
+    n && n(`Serie: ${i}/${l} ins Fremdsystem übertragen …`);
     const {
       data: e
     } = await window._sb.functions.invoke("termin-serie", {
@@ -73946,7 +73943,7 @@ async function kalSerieAendern(e, t, n, a) {
   if (!r || !r.ok) throw new Error(r && r.fehler || "Die Serie konnte nicht geändert werden.");
   let i = 0;
   for (let n = 0; n < 40; n++) {
-    a && a(`Serie: ${i}/${r.geaendert} in onOffice aktualisiert …`);
+    a && a(`Serie: ${i}/${r.geaendert} im Fremdsystem aktualisiert …`);
     const {
       data: n
     } = await window._sb.functions.invoke("termin-serie", {
@@ -74186,7 +74183,7 @@ function KalSerieFeld({
       color: CI.muted,
       marginTop: 4
     }
-  }, i ? "Mehr als 200 Termine bzw. drei Jahre legen wir nicht auf einmal an. " : "", "Jeder Termin entsteht einzeln — mit eigener Fahrzeit und eigenem Eintrag in onOffice.")) : "Diese Einstellung ergibt keinen einzigen Termin." : "Zuerst ein Datum setzen — daraus ergibt sich die Serie.")) : null)
+  }, i ? "Mehr als 200 Termine bzw. drei Jahre legen wir nicht auf einmal an. " : "", "Jeder Termin entsteht einzeln — mit eigener Fahrzeit.")) : "Diese Einstellung ergibt keinen einzigen Termin." : "Zuerst ein Datum setzen — daraus ergibt sich die Serie.")) : null)
 }
 
 function KalSerieHinweis({
@@ -74919,7 +74916,7 @@ function KalenderPage({
           padding: "2px 6px",
           flexShrink: 0
         }
-      }, "onOffice")))))
+      }, "Extern")))))
     })),
     Y = kalWochenstart(s),
     J = Array.from({
@@ -75343,7 +75340,7 @@ function KalenderPage({
               nachfassen: n.nachfassen,
               erinnerung: n.erinnerung
             }, v);
-            return y(null), await x(), void alert(`${e} Termine der Serie geändert — in onOffice ebenfalls.`)
+            return y(null), await x(), void alert(`${e} Termine der Serie geändert — im Fremdsystem ebenfalls.`)
           } catch (e) {
             v(null), alert("Die Serie konnte nicht geändert werden: " + (e.message || e))
           }
@@ -75402,7 +75399,7 @@ function KalenderPage({
           if (t || !e || !e.ok) throw new Error(e && e.fehler || t && t.message || "Übertragung fehlgeschlagen");
           await x()
         } catch (e) {
-          alert(a ? "Die Änderung konnte nicht nach onOffice übertragen werden: " + e.message + "\nDer nächste Abgleich (alle 10 Min.) stellt im Portal dann wieder den onOffice-Stand her." : "Der Termin ist im Portal gespeichert und steht im Kalender — nur die Übertragung nach onOffice hat nicht geklappt: " + e.message + "\n\nBitte den Termin NICHT noch einmal anlegen. Einfach erneut öffnen und speichern, dann wird die Übertragung wiederholt.")
+          alert(a ? "Die Änderung konnte nicht gespeichert werden: " + e.message + "" : "Der Termin ist gespeichert und steht im Kalender." + e.message + "\n\nBitte den Termin NICHT noch einmal anlegen. Einfach erneut öffnen und speichern, dann wird die Übertragung wiederholt.")
         }
         if (i && t.bestaetigung_senden && !kalArtIntern(t.art) && t._kontakt && t._kontakt.email) try {
           await P({
@@ -75432,7 +75429,7 @@ function KalenderPage({
             ersteller_id: e.id,
             ersteller_name: e.name
           }, i, v);
-          await x(), await logAction("create", "termin", t.serie_id, `Serie ${n.titel}: ${t.anzahl} Termine ab ${n.datum}`), alert(`${t.anzahl} Termine angelegt, ${t.uebertragen} davon sind schon in onOffice.\n\nDie Fahrzeiten der nächsten drei Wochen sind gerechnet, die späteren trägt der Nachtlauf nach.`)
+          await x(), await logAction("create", "termin", t.serie_id, `Serie ${n.titel}: ${t.anzahl} Termine ab ${n.datum}`), alert(`${t.anzahl} Termine angelegt, ${t.uebertragen} davon sind schon im Fremdsystem.\n\nDie Fahrzeiten der nächsten drei Wochen sind gerechnet, die späteren trägt der Nachtlauf nach.`)
         } catch (e) {
           v(null), alert("Die Serie konnte nicht angelegt werden: " + (e.message || e))
         }
@@ -75443,7 +75440,7 @@ function KalenderPage({
       if (!t.id) return;
       const n = A.find(e => e.id === t.id);
       if (t.serie_id && confirm(`Dieser Termin gehört zu einer Serie (${kalSerieText(t.serie_regel)||"Wiederholung"}).\n\nOK — diesen und alle folgenden Termine der Serie löschen\nAbbrechen — nur diesen einen Termin löschen`)) {
-        if (!confirm("Alle folgenden Termine der Serie werden gelöscht und in onOffice abgesagt. Fortfahren?")) return;
+        if (!confirm("Alle folgenden Termine der Serie werden gelöscht. Fortfahren?")) return;
         y(null);
         try {
           const e = await kalSerieLoeschen(t.serie_id, t.datum, v);
@@ -75454,7 +75451,7 @@ function KalenderPage({
         return
       }
       if (!(canDelete(n) || n && (n.teilnehmer || []).includes(e.name))) return alert("Du darfst nur eigene Termine oder Termine, an denen du teilnimmst, löschen. Bitte den Chef fragen.");
-      if (!confirm(n && n.onoffice_id ? "Diesen Termin wirklich löschen? Er wird auch in onOffice abgesagt." : "Diesen Termin wirklich löschen?")) return;
+      if (!confirm(n && n.onoffice_id ? "Diesen Termin wirklich löschen?" : "Diesen Termin wirklich löschen?")) return;
       const a = n && n.kontakte || t.kontakte || t._kontakt || null,
         r = !!(n && n.bestaetigung_gesendet_am && a && a.email) && confirm(`Dem Kunden wurde eine Terminbestätigung mit Kalendereintrag geschickt.\n\nJetzt eine Absage-Mail an ${a.email} senden, die den Termin auch aus dem Kalender des Kunden entfernt?`),
         besEigInfo = await besEigAbsageFragen(n || t);
@@ -75469,7 +75466,7 @@ function KalenderPage({
               aktion: "absagen"
             }
           });
-          if (n || !e || !e.ok) return void alert("Der Termin konnte in onOffice nicht abgesagt werden: " + (e && e.fehler || n && n.message || "unbekannt") + "\nBitte erneut versuchen oder direkt in onOffice prüfen.")
+          if (n || !e || !e.ok) return void alert("Der Termin konnte nicht gelöscht werden: " + (e && e.fehler || n && n.message || "unbekannt") + "\nBitte erneut versuchen.")
         }
         try {
           const {
@@ -75616,7 +75613,7 @@ function UrlaubDialogInfo({
       color: "chef" === t.role ? "#1e7e34" : "#b45309",
       marginTop: 4
     }
-  }, "chef" === t.role ? "Als Geschäftsführer trägst du deinen Urlaub direkt genehmigt ein." : "Der Urlaub wird die Geschaeftsfuehrung im Dashboard zur Genehmigung vorgelegt und erst danach nach onOffice übertragen."))
+  }, "chef" === t.role ? "Als Geschäftsführer trägst du deinen Urlaub direkt genehmigt ein." : "Der Urlaub wird der Geschäftsführung im Dashboard zur Genehmigung vorgelegt."))
 }
 
 function KalTerminModal({
@@ -75734,7 +75731,7 @@ function KalTerminModal({
       textTransform: "uppercase",
       fontWeight: 600
     }
-  }, m ? "Termin aus onOffice" : "neu" === e.modus ? "Neuer Termin" : "Termin bearbeiten"), m && React.createElement("div", {
+  }, m ? "Übernommener Termin" : "neu" === e.modus ? "Neuer Termin" : "Termin bearbeiten"), m && React.createElement("div", {
     style: {
       fontSize: 17,
       fontWeight: 700,
@@ -75790,7 +75787,7 @@ function KalTerminModal({
       color: CI.blau,
       lineHeight: 1.5
     }
-  }, g ? "Serientermin aus onOffice – Serien können nur direkt in onOffice bearbeitet werden. Der Abgleich läuft alle 10 Minuten." : u.privat ? "Privater Termin aus onOffice – Details und Bearbeitung sind nur in onOffice möglich." : "Dieser Termin wird automatisch alle 10 Minuten aus onOffice übernommen."), !u.privat && !g && u.id && l && React.createElement("div", {
+  }, g ? "Serientermin – Serien werden an der Serie selbst bearbeitet." : u.privat ? "Privater Termin – Details sind nicht einsehbar." : "Dieser Termin stammt aus einem Abgleich und wird laufend aktualisiert."), !u.privat && !g && u.id && l && React.createElement("div", {
     style: {
       display: "flex",
       justifyContent: "flex-end",
@@ -75808,7 +75805,7 @@ function KalTerminModal({
       fontFamily: FONT,
       fontSize: 12
     }
-  }, "onoffice" === u.quelle ? "Termin absagen (auch in onOffice)" : "Termin löschen"))) : React.createElement("div", null, React.createElement("div", {
+  }, "onoffice" === u.quelle ? "Termin löschen" : "Termin löschen"))) : React.createElement("div", null, React.createElement("div", {
     style: {
       marginBottom: 14
     }
@@ -76248,7 +76245,7 @@ function KalTerminModal({
       color: CI.muted,
       marginBottom: 12
     }
-  }, "neu" === e.modus ? "Der Termin wird automatisch auch in onOffice eingetragen." : "onoffice" === u.quelle ? "onOffice-Termin – Änderungen werden direkt in onOffice übernommen." : u.onoffice_id ? "✓ In onOffice übertragen – Änderungen werden dort aktualisiert, Löschen sagt den Termin in onOffice ab." : "Beim Speichern wird der Termin auch in onOffice eingetragen."), React.createElement("div", {
+  }, "neu" === e.modus ? "Der Termin wird im Kalender eingetragen." : "Beim Speichern wird der Termin im Kalender eingetragen."), React.createElement("div", {
     style: {
       display: "flex",
       gap: 10
@@ -77684,14 +77681,14 @@ function MailEinstellungenModal({
         });
         if (t) throw t;
         if (!e || !e.ok) throw new Error(e && e.fehler || "Unbekannter Fehler");
-        await B(), T(`✓ onOffice: ${e.neu} neue Vorlage${1===e.neu?"":"n"} übernommen (${e.gefunden} gefunden, bereits vorhandene bleiben unverändert)`)
+        await B(), T(`✓ ${e.neu} neue Vorlage${1===e.neu?"":"n"} übernommen (${e.gefunden} gefunden, bereits vorhandene bleiben unverändert)`)
       } catch (e) {
-        T("Fehler beim onOffice-Import: " + (e.message || e))
+        T("Fehler beim Import: " + (e.message || e))
       }
       h(!1)
     },
     style: V
-  }, "⟳ Neue Vorlagen aus onOffice holen"), "Ordner „001 | Musterhaus Immobilien GmbH“ und „Musterprozessvorlagen“"), React.createElement("div", {
+  }, "⟳ Vorlagen neu einlesen"), "Ordner „001 | Musterhaus Immobilien GmbH“ und „Musterprozessvorlagen“"), React.createElement("div", {
     style: {
       ...L,
       background: "#fff",
@@ -78265,7 +78262,7 @@ function epSpellMerken(e) {
   try {
     localStorage.setItem("ep_rechtschreibung_eigene", JSON.stringify([...IMMO_SPELL.eigene].filter(e => !IMMO_SPELL_FACH.has(e))))
   } catch (e) {}
-} ["Exposé", "Exposés", "onOffice", "ImmoScout24", "ImmoScout", "Immowelt", "Kleinanzeigen", "Musterhaus", "ImmoOffice", "SCHUFA", "Schufa", "Courtage", "Bauträger", "Hebe-Schiebe-Tür", "Objektnachweis", "Reservierungsvereinbarung", "Marktpreiseinschätzung", "Selbstauskunft", "Mieterselbstauskunft", "Übergabeprotokoll", "Notarlaufzettel", "Dr", "Prof", "Nr", "Str", "Tel", "Fa", "Hr", "Fr", "ca", "bzw", "evtl", "ggf", "inkl", "exkl", "zzgl", "usw", "etc", "vgl", "bspw", "gem", "lt", "Mio", "Tsd", "MwSt", "Mwst", "USt", "Whg", "Zi", "OG", "EG", "DG", "UG", "KG", "Abs", "Art", "Az", "Pos", "St", "Std", "Min", "Sa", "So", "Mo", "Di", "Mi", "Do", "Jan", "Feb", "Mrz", "Apr", "Jun", "Jul", "Aug", "Sep", "Sept", "Okt", "Nov", "Dez", "Tsd", "qm", "m²", "PLZ", "WEG", "ETW", "EFH", "MFH", "DHH", "RH", "REH", "RMH", "Bj", "Wfl", "Nfl", "Gfl", "GmbH", "AG", "e", "V", "z", "B", "u", "a", "o", "ä", "s", "S", "d", "h", "i", "p"].forEach(e => IMMO_SPELL.eigene.add(e));
+} ["Exposé", "Exposés", "ImmoScout24", "ImmoScout", "Immowelt", "Kleinanzeigen", "Musterhaus", "ImmoOffice", "SCHUFA", "Schufa", "Courtage", "Bauträger", "Hebe-Schiebe-Tür", "Objektnachweis", "Reservierungsvereinbarung", "Marktpreiseinschätzung", "Selbstauskunft", "Mieterselbstauskunft", "Übergabeprotokoll", "Notarlaufzettel", "Dr", "Prof", "Nr", "Str", "Tel", "Fa", "Hr", "Fr", "ca", "bzw", "evtl", "ggf", "inkl", "exkl", "zzgl", "usw", "etc", "vgl", "bspw", "gem", "lt", "Mio", "Tsd", "MwSt", "Mwst", "USt", "Whg", "Zi", "OG", "EG", "DG", "UG", "KG", "Abs", "Art", "Az", "Pos", "St", "Std", "Min", "Sa", "So", "Mo", "Di", "Mi", "Do", "Jan", "Feb", "Mrz", "Apr", "Jun", "Jul", "Aug", "Sep", "Sept", "Okt", "Nov", "Dez", "Tsd", "qm", "m²", "PLZ", "WEG", "ETW", "EFH", "MFH", "DHH", "RH", "REH", "RMH", "Bj", "Wfl", "Nfl", "Gfl", "GmbH", "AG", "e", "V", "z", "B", "u", "a", "o", "ä", "s", "S", "d", "h", "i", "p"].forEach(e => IMMO_SPELL.eigene.add(e));
 const IMMO_SPELL_FACH = new Set(IMMO_SPELL.eigene),
   epSpellGross = e => e ? e[0].toUpperCase() + e.slice(1) : e;
 
@@ -85235,7 +85232,7 @@ function PosteingangPage({
                 }
               })
             } catch (e) {
-              console.warn("onOffice-Übertragung:", e)
+              console.warn("Übertragung:", e)
             }
           } else {
             const {
@@ -101990,7 +101987,7 @@ const TUTORIAL_SCHRITTE = [{
   target: '[data-tutorial="kachel-kalender"]',
   position: "bottom",
   title: "Termine",
-  text: "Wochen-, Monats- und Tagesansicht im onOffice-Stil, farbig nach Mitarbeiter. Termine gleichen sich in beide Richtungen mit onOffice ab. Enthalten sind außerdem Terminbestätigung per Mail mit Kalenderdatei, automatische Erinnerung sechs Stunden vorher, Fahrzeitberechnung und die Urlaubsplanung mit Antrag und Genehmigung."
+  text: "Wochen-, Monats- und Tagesansicht, farbig nach Mitarbeiter. Enthalten sind außerdem Terminbestätigung per Mail mit Kalenderdatei, automatische Erinnerung sechs Stunden vorher, Fahrzeitberechnung und die Urlaubsplanung mit Antrag und Genehmigung."
 }, {
   id: "todos",
   view: "home",
@@ -102118,7 +102115,7 @@ const TUTORIAL_SCHRITTE = [{
   target: '[data-tutorial="kachel-admin"]',
   position: "bottom",
   title: "Admin-Bereich",
-  text: "Mitarbeiter einladen, Stufen und Rechte je Modul setzen, Firmen-Stammdaten pflegen und den onOffice-Import steuern. Die Stufen sind nur Vorlagen — jedes Häkchen lässt sich einzeln überschreiben."
+  text: "Mitarbeiter einladen, Stufen und Rechte je Modul setzen und Firmen-Stammdaten pflegen. Die Stufen sind nur Vorlagen — jedes Recht lässt sich einzeln setzen."
 }, {
   id: "anpassen",
   view: "home",
@@ -119242,7 +119239,7 @@ function AkqAktivitaetModal({
       color: CI.muted,
       marginBottom: 14
     }
-  }, "Termine werden zusätzlich im Kalender angelegt — damit greift der bestehende onOffice-Sync."), React.createElement("div", {
+  }, "Termine werden zusätzlich im Kalender angelegt."), React.createElement("div", {
     style: {
       display: "flex",
       gap: 10,
@@ -126629,8 +126626,8 @@ async function kalTerminVerschieben(t, werte, user, einst, neuLaden) {
     if (error || !data || !data.ok) throw new Error((data && data.fehler) || (error && error.message) || "Übertragung fehlgeschlagen");
   } catch (e) {
     alert(t.quelle === "onoffice"
-      ? "Der Termin ist im Portal verschoben, aber die Änderung konnte nicht nach onOffice übertragen werden: " + (e.message || e) + "\nDer nächste Abgleich (alle 10 Min.) stellt im Portal dann wieder den onOffice-Stand her."
-      : "Der Termin ist im Portal verschoben — nur die Übertragung nach onOffice hat nicht geklappt: " + (e.message || e));
+      ? "Der Termin ist verschoben." + (e.message || e) + ""
+      : "Der Termin ist verschoben." + (e.message || e));
   }
   if (typeof neuLaden === "function") await neuLaden();
   return true;
@@ -126717,7 +126714,7 @@ function GrundstueckBlock({ daten, onAendern, quelle }) {
     React.createElement("div", { style: { fontSize: 14, fontWeight: 600, color: CI.blau, marginBottom: 4, marginTop: 6 } }, "Grundstück"),
     quelle === "onoffice"
       ? React.createElement("div", { style: { fontSize: 11, color: CI.muted, marginBottom: 10 } },
-          "Gepflegt in onOffice — dort eingetragene Werte kommen mit dem nächsten Abgleich hierher. Hier eingetragene Werte gelten nur, solange das Feld in onOffice leer ist.")
+          "Wird bei einem Abgleich aus dem führenden System übernommen. Hier eingetragene Werte gelten, solange dort nichts steht.")
       : null,
     React.createElement("div", { className: "mob-keep", style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: 10, marginBottom: 10 } },
       feld("GRZ", eingabe("grz", { placeholder: "z. B. 0,4", inputMode: "decimal" })),
@@ -127105,7 +127102,7 @@ function KwSuchkriterium({ kontakt, onClose, vorbelegung, index }) {
       idx < alle.length && React.createElement("button", { type: "button", onClick: () => wechseln(alle.length), style: { ...secondaryBtn, fontSize: 11 } }, "＋ weiteres Kriterium"),
       React.createElement("span", { style: { flex: 1 } }),
       idx < alle.length && alle.length > 0 && React.createElement("button", { type: "button", onClick: loeschen, disabled: busy, style: { background: "transparent", border: `1px solid ${CI.border}`, color: CI.danger, fontSize: 11, padding: "5px 9px", cursor: "pointer", fontFamily: FONT } }, "Kriterium löschen")),
-    React.createElement("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 12 } }, "Was sucht der Kontakt? Ein Kontakt kann mehrere Suchkriterien haben (z. B. Wohnung zum Kauf und Haus zur Miete); jedes wird einzeln abgeglichen." + (gespeichert.herkunft ? " Herkunft laut onOffice: " + String(gespeichert.herkunft).replace(/\|/g, "") + "." : "")),
+    React.createElement("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 12 } }, "Was sucht der Kontakt? Ein Kontakt kann mehrere Suchkriterien haben (z. B. Wohnung zum Kauf und Haus zur Miete); jedes wird einzeln abgeglichen." + (gespeichert.herkunft ? " Herkunft: " + String(gespeichert.herkunft).replace(/\|/g, "") + "." : "")),
     React.createElement("div", { className: "mob-keep", style: kwGrid("1fr 1fr") },
       React.createElement(ImmoFeld, { label: "Vermarktungsart" }, React.createElement("div", { style: { display: "flex", gap: 6, flexWrap: "wrap", paddingTop: 4 } },
         chip(f.vermarktungsart.includes("kauf"), () => toggle("vermarktungsart", "kauf"), "Kauf"), chip(f.vermarktungsart.includes("miete"), () => toggle("vermarktungsart", "miete"), "Miete"))),
@@ -127239,8 +127236,8 @@ function KwTermin({ user, kontakt, objekte, onClose }) {
       const { data, error } = await window._sb.from("termine").insert(satz).select().single();
       if (error) throw error;
       let uebertragen = "";
-      try { await window._sb.functions.invoke("onoffice-termin-schreiben", { body: { termin_id: data.id } }); uebertragen = " Übertragung nach onOffice angestoßen."; }
-      catch (e) { console.warn("onOffice-Übertragung:", e); uebertragen = " onOffice-Übertragung fehlgeschlagen — der Termin steht trotzdem im Kalender."; }
+      try { await window._sb.functions.invoke("onoffice-termin-schreiben", { body: { termin_id: data.id } }); uebertragen = ""; }
+      catch (e) { console.warn("Übertragung:", e); uebertragen = " Der Termin steht im Kalender."; }
       if (typeof logAction === "function") { try { logAction("termin_angelegt", "termin", data.id, titel); } catch (e) { /* ohne Folgen */ } }
       window.dispatchEvent(new CustomEvent("ep-termine-geaendert", { detail: { kontaktId: kontakt.id } }));
       setHinweis("Termin angelegt." + uebertragen);
@@ -127268,7 +127265,7 @@ function KwTermin({ user, kontakt, objekte, onClose }) {
       team.map((p) => { const an = f.teilnehmer.includes(p.name); return React.createElement("button", { key: p.id, type: "button", onClick: () => s("teilnehmer", an ? f.teilnehmer.filter((x) => x !== p.name) : [...f.teilnehmer, p.name]),
         style: { fontSize: 12, padding: "5px 10px", cursor: "pointer", fontFamily: FONT, border: `1px solid ${an ? CI.blau : CI.border}`, background: an ? CI.blau : "#fff", color: an ? "#fff" : CI.blau } }, p.name); }))),
     React.createElement(ImmoFeld, { label: "Notiz" }, React.createElement("textarea", { style: { ...inputStyle, minHeight: 60, resize: "vertical" }, value: f.notiz, onChange: (e) => s("notiz", e.target.value) })),
-    React.createElement("div", { style: { fontSize: 11.5, color: CI.muted, marginTop: 6 } }, "Der Termin erscheint im Kalender, beim Kontakt und wird wie gewohnt nach onOffice übertragen."),
+    React.createElement("div", { style: { fontSize: 11.5, color: CI.muted, marginTop: 6 } }, "Der Termin erscheint im Kalender und beim Kontakt."),
     React.createElement(KwFuss, { busy, fehler, hinweis, onAbbrechen: onClose, onOk: speichern, okText: "Termin anlegen" }));
 }
 
@@ -127442,7 +127439,7 @@ function KwLoeschen({ kontakt, onClose, onGespeichert }) {
   return React.createElement(KwDialog, { titel: "Adresse löschen", onClose },
     React.createElement("div", { style: { fontSize: 13, color: CI.blau, lineHeight: 1.6 } },
       React.createElement("strong", null, kwName(kontakt)), " wird aus dem Adressbuch entfernt. Termine, Vermerke und E-Mails bleiben erhalten, verweisen aber auf einen inaktiven Kontakt.",
-      kontakt.onoffice_id ? React.createElement("div", { style: { marginTop: 8, color: CI.danger } }, "Dieser Kontakt stammt aus onOffice. Dort bleibt er bestehen und kann beim nächsten Abgleich wieder erscheinen — zum endgültigen Löschen bitte auch in onOffice löschen.") : null),
+      kontakt.onoffice_id ? React.createElement("div", { style: { marginTop: 8, color: CI.danger } }, "Dieser Kontakt stammt aus einer Übernahme und kann bei einem erneuten Abgleich wieder erscheinen.") : null),
     React.createElement(KwFuss, { busy, fehler, onAbbrechen: onClose, onOk: loeschen, okText: "Endgültig entfernen", gefahr: true }));
 }
 
@@ -127530,7 +127527,7 @@ function KwDubletten({ kontakt, onClose }) {
     liste && !liste.length && React.createElement("div", { style: { fontSize: 13, color: CI.success } }, "✓ Keine Dubletten gefunden."),
     liste && liste.map((d) => React.createElement("div", { key: d.id, style: { display: "flex", gap: 12, alignItems: "center", padding: "10px 0", borderTop: `1px solid ${CI.border}` } },
       React.createElement("div", { style: { flex: 1, minWidth: 0 } },
-        React.createElement("div", { style: { fontSize: 13.5, fontWeight: 600, color: CI.blau } }, kwName(d), d.onoffice_id ? React.createElement("span", { style: { fontSize: 10, color: CI.muted, marginLeft: 8 } }, "onOffice") : null),
+        React.createElement("div", { style: { fontSize: 13.5, fontWeight: 600, color: CI.blau } }, kwName(d), d.onoffice_id ? React.createElement("span", { style: { fontSize: 10, color: CI.muted, marginLeft: 8 } }, "Extern") : null),
         React.createElement("div", { style: { fontSize: 12, color: CI.muted } }, [d.email, d.telefon, d.mobil, [d.plz, d.ort].filter(Boolean).join(" ")].filter(Boolean).join(" · ")),
         React.createElement("div", { style: { fontSize: 11, color: CI.gold, fontWeight: 600, marginTop: 2 } }, d.gruende.join(", "))),
       React.createElement("button", { type: "button", onClick: () => { window._epKontaktOeffnen = d.id; onClose(); if (window.setView) { window.setView("home"); setTimeout(() => window.setView("kontakte"), 30); } }, style: { ...secondaryBtn, fontSize: 11 } }, "Öffnen"),
@@ -127617,7 +127614,7 @@ function KontaktWerkzeuge({ user, kontakt, objekte, form, onFeld, onGespeichert 
     { id: "aktivitaet", icon: "📌", label: "Aktivität", hinweis: "Telefonat, Besuch, Notiz", onClick: () => setDialog("aktivitaet") },
     { id: "suchkriterium", icon: "🔍", label: "Suchkriterium", hinweis: "was der Kontakt sucht", onClick: () => { setDialogIndex(null); setDialog("suchkriterium"); } },
     { id: "aufgabe", icon: "✅", label: "Aufgabe", onClick: () => setDialog("aufgabe") },
-    { id: "termin", icon: "📅", label: "Termin", hinweis: "auch nach onOffice", onClick: () => setDialog("termin") },
+    { id: "termin", icon: "📅", label: "Termin", hinweis: "", onClick: () => setDialog("termin") },
     { id: "prozess", icon: "🔁", label: "Prozess", hinweis: "Aufgabenkette", onClick: () => setDialog("prozess") },
     { id: "wiedervorlage", icon: "⏰", label: "Wiedervorlage", onClick: () => setDialog("wiedervorlage") }
   ];
@@ -127950,7 +127947,7 @@ function AdminNachfrage({ user }) {
   return React.createElement("div", null,
     React.createElement("div", { style: { fontSize: 13, color: CI.muted, marginBottom: 16, lineHeight: 1.7 } },
       `Suchkriterien im Adressbuch: ${profile.length} (bei ${daten.kontakte.length} Kontakten), davon ${aktiv.length} aktiv. Mit Lage oder Budget (gehen in den Abgleich): ${mitInhalt.length}. `,
-      aktiv.length - mitInhalt.length > 0 ? React.createElement("span", { style: { color: CI.danger } }, `${aktiv.length - mitInhalt.length} Profile haben weder Ort noch Budget (meist nur Kauf/Miete aus onOffice) und werden nicht abgeglichen.`) : null),
+      aktiv.length - mitInhalt.length > 0 ? React.createElement("span", { style: { color: CI.danger } }, `${aktiv.length - mitInhalt.length} Profile haben weder Ort noch Budget (meist nur Kauf/Miete aus dem Import) und werden nicht abgeglichen.`) : null),
     tabelle("Kauf oder Miete", zeilenAus(vermN, vermA, ["kauf", "miete"]).map(([k, n, a]) => [k === "kauf" ? "Kauf" : "Miete", n, a])),
     tabelle("Objektarten", zeilenAus(artN, artA, ["Wohnung", "Haus", "Mehrfamilienhaus", "Grundstück", "Gewerbe", "Sonstiges"]), "Nachfrage nur aus Profilen mit Inhalt."),
     tabelle("Orte (Top 15 der Nachfrage)", zeilenAus(ortN, ortA, ortNamen), "Angebot = Objekte mit genau diesem Ort."),
@@ -129778,7 +129775,7 @@ async function epObjektLoeschenBestaetigen(objekt) {
   const wort = objekt.immo_nr ? String(objekt.immo_nr) : "LÖSCHEN";
   const antwort = await epBestaetigungsDialog({
     titel: "Objekt endgültig löschen?", gefahr: true,
-    text: `${name} wird mit allem, was daran hängt, gelöscht. Das lässt sich nicht rückgängig machen. Mails und Bewertungen bleiben erhalten, verlieren aber die Verknüpfung. In onOffice bleibt das Objekt bestehen.`,
+    text: `${name} wird mit allem, was daran hängt, gelöscht. Das lässt sich nicht rückgängig machen. Mails und Bewertungen bleiben erhalten, verlieren aber die Verknüpfung.`,
     zeilen, wort, knopf: "Endgültig löschen",
     alternative: objekt.status !== "archiviert" ? { label: "Stattdessen archivieren" } : null,
   });
@@ -130423,7 +130420,7 @@ function ExposeOffenKarte({ user: e, onOpen: t }) {
           const ooL = (oo || []).filter(f => "chef" === e.role || (f.immobilien && f.immobilien.zustaendig_id === e.id) || (e.name && f.benutzer && e.name.toLowerCase().startsWith(String(f.benutzer).toLowerCase())))
             .map(f => ({ ...f, quelle: "onoffice", created_at: f.gesendet_am, geoeffnet_am: null, token: null }));
           eig = [...eig, ...ooL].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-        } catch (x) { console.warn("onOffice-Versände:", x.message || x) }
+        } catch (x) { console.warn("Fremdversände:", x.message || x) }
         eig = await window.epExposeAbgerufenFiltern(eig);
         window._epExposeOffen = eig, setListe(eig)
       } catch (err) { console.warn("Exposé-offen-Karte:", err.message || err), setListe([]) }
@@ -130448,7 +130445,7 @@ function ExposeOffenKarte({ user: e, onOpen: t }) {
       if (offenId === f.id) return setOffenId(null);
       if ("onoffice" === f.quelle) {
         if (!f.email) return alert("Für diesen Interessenten ist keine E-Mail-Adresse im Adressbuch hinterlegt.");
-        if (!f.immobilie_id) return alert("Das onOffice-Objekt ist nicht in der ImmoOffice angelegt – Exposé-Link kann nicht erzeugt werden.");
+        if (!f.immobilie_id) return alert("Zu diesem Eintrag gibt es kein Objekt – Exposé-Link kann nicht erzeugt werden.");
         setBusy(!0);
         try {
           const { data: r, error } = await window._sb.functions.invoke("expose-freigabe-erstellen", { body: { immobilie_id: f.immobilie_id, email: f.email, name: f.name || null, kontakt_id: f.kontakt_id || null } });
@@ -130480,7 +130477,7 @@ function ExposeOffenKarte({ user: e, onOpen: t }) {
       setBusy(!1)
     },
     loeschen = async f => {
-      if (!confirm("onoffice" === f.quelle ? `Eintrag von ${f.name || f.email || "Interessent"} (${objTitel(f)}) aus der Karte entfernen?\n\nDer onOffice-Agreementlink bleibt bestehen; eine offene Nachfass-Aufgabe wird erledigt.` : `Exposé-Link von ${f.name || f.email} (${objTitel(f)}) löschen?\n\nDer Link wird ungültig, der Eintrag verschwindet aus der Karte und eine offene Nachfass-Aufgabe wird erledigt. Vermerke am Objekt/Kontakt bleiben erhalten.`)) return;
+      if (!confirm("onoffice" === f.quelle ? `Eintrag von ${f.name || f.email || "Interessent"} (${objTitel(f)}) aus der Karte entfernen?\n\nDer Agreementlink des Fremdsystems bleibt bestehen; eine offene Nachfass-Aufgabe wird erledigt.` : `Exposé-Link von ${f.name || f.email} (${objTitel(f)}) löschen?\n\nDer Link wird ungültig, der Eintrag verschwindet aus der Karte und eine offene Nachfass-Aufgabe wird erledigt. Vermerke am Objekt/Kontakt bleiben erhalten.`)) return;
       setBusy(!0);
       const { error } = "onoffice" === f.quelle ? await window._sb.from("onoffice_expose_versand").update({ ignoriert: !0 }).eq("id", f.id) : await window._sb.from("expose_freigaben").delete().eq("id", f.id);
       setBusy(!1), error ? alert("Löschen fehlgeschlagen: " + error.message) : (setMeldung(`Exposé-Link von ${f.name || f.email} gelöscht.`), offenId === f.id && setOffenId(null), setListe(l => (l || []).filter(x => x.id !== f.id)), window._epExposeOffen = (window._epExposeOffen || []).filter(x => x.id !== f.id))
@@ -130494,7 +130491,7 @@ function ExposeOffenKarte({ user: e, onOpen: t }) {
       React.createElement("span", { style: { background: "#b3261e", color: "#fff", fontSize: 11, fontWeight: 800, padding: "2px 8px", borderRadius: 10 } }, liste.length),
       React.createElement("span", { style: { flex: 1 } }),
       React.createElement("span", { style: { fontSize: 12, color: CI.muted } }, zu ? "▸" : "▾")),
-    !zu && React.createElement("div", { style: { fontSize: 11.5, color: CI.muted, marginTop: 4, lineHeight: 1.45 } }, "Interessenten, deren Exposé-Link (ImmoOffice oder onOffice-Agreementlink) noch nicht bestätigt/geladen wurde. Wer das Exposé bereits bestätigt oder geladen hat – auch über einen zweiten Link zum selben Objekt – erscheint hier nicht. Portal-Links: automatische Erinnerung nach 48 h. Alle: Nachfass-Aufgabe nach 2 Tagen. „Erinnern“ bei onOffice-Einträgen erzeugt einen ImmoOffice-Link."),
+    !zu && React.createElement("div", { style: { fontSize: 11.5, color: CI.muted, marginTop: 4, lineHeight: 1.45 } }, "Interessenten, deren Exposé-Link noch nicht bestätigt/geladen wurde. Wer das Exposé bereits bestätigt oder geladen hat – auch über einen zweiten Link zum selben Objekt – erscheint hier nicht. Portal-Links: automatische Erinnerung nach 48 h. Alle: Nachfass-Aufgabe nach 2 Tagen."),
     meldung && React.createElement("div", { style: { marginTop: 8, fontSize: 12, color: "#2f6b2f", fontWeight: 600 } }, "✓ ", meldung),
     !zu && React.createElement("div", { style: { marginTop: 8 } }, sicht.map(f => {
       const d = tage(f), geoeffnet = !!f.geoeffnet_am, offen = offenId === f.id;
@@ -130503,7 +130500,7 @@ function ExposeOffenKarte({ user: e, onOpen: t }) {
           React.createElement("span", { style: { fontSize: 11.5, fontWeight: 700, color: d >= 2 ? "#b3261e" : CI.gold, minWidth: 58, whiteSpace: "nowrap" } }, 0 === d ? "heute" : 1 === d ? "gestern" : `vor ${d} Tagen`),
           React.createElement("span", { onClick: () => { f.kontakt_id && (window._epKontaktOeffnen = f.kontakt_id, t("kontakte")) }, title: f.kontakt_id ? "Kontakt öffnen" : f.email, style: { fontSize: 12.5, fontWeight: 700, color: CI.blau, cursor: f.kontakt_id ? "pointer" : "default", textDecoration: f.kontakt_id ? "underline dotted" : "none" } }, f.name || f.email || "Interessent (ohne E-Mail)"),
           React.createElement("span", { onClick: () => { f.immobilie_id && (window._epObjektOeffnen = f.immobilie_id, t("immobilien")) }, title: "Objekt öffnen", style: { fontSize: 12, color: CI.blau, cursor: "pointer", flex: "1 1 140px", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, (f.immobilien && f.immobilien.immo_nr ? f.immobilien.immo_nr + " · " : "") + objTitel(f)),
-          React.createElement("span", { style: { fontSize: 10.5, fontWeight: 700, padding: "2px 7px", background: geoeffnet ? "#fff3e0" : "#f1f1ee", color: geoeffnet ? "#b35c00" : CI.muted, whiteSpace: "nowrap" } }, "onoffice" === f.quelle ? "onOffice · nicht bestätigt" : geoeffnet ? "geöffnet, nicht bestätigt" : "Link nicht geöffnet"),
+          React.createElement("span", { style: { fontSize: 10.5, fontWeight: 700, padding: "2px 7px", background: geoeffnet ? "#fff3e0" : "#f1f1ee", color: geoeffnet ? "#b35c00" : CI.muted, whiteSpace: "nowrap" } }, "onoffice" === f.quelle ? "Fremdsystem · nicht bestätigt" : geoeffnet ? "geöffnet, nicht bestätigt" : "Link nicht geöffnet"),
           f.erinnerung_am && React.createElement("span", { title: f.erinnerung_fehler || "", style: { fontSize: 10.5, color: f.erinnerung_fehler ? "#b3261e" : CI.muted, whiteSpace: "nowrap" } }, f.erinnerung_fehler ? "⚠ Erinnerung fehlgeschlagen" : `erinnert ${new Date(f.erinnerung_am).toLocaleDateString("de-DE")}`),
           knopf(offen ? "✕ Schließen" : f.erinnerung_am ? "✉ Erneut erinnern" : "✉ Erinnern", () => erinnernOeffnen(f), !offen, "Vorformulierte Erinnerungsmail öffnen – Text ist vor dem Senden anpassbar"),
           React.createElement("span", { onClick: () => loeschen(f), title: "Exposé-Link löschen (Link wird ungültig, Eintrag verschwindet, offene Nachfass-Aufgabe wird erledigt)", style: { cursor: "pointer", color: "#b3261e", fontWeight: 700, fontSize: 14, padding: "0 4px" } }, "🗑")),
@@ -132138,9 +132135,9 @@ function PreisAufAnfrageHinweis({ onofficeId, wert }) {
   if (!paaIstAufAnfrage(oo)) return null;
   const hatWert = Number(String(wert == null ? "" : wert).replace(/[^0-9.]/g, "")) > 0;
   return React.createElement("div", { "data-paa-hinweis": hatWert ? "intern" : "fehlt", style: { marginTop: 6, padding: "6px 9px", fontSize: 11.5, lineHeight: 1.45, background: hatWert ? "#eef7ee" : "#fff7d6", border: `1px solid ${hatWert ? "#b7e1c1" : "#ecd9a0"}`, color: hatWert ? "#1e7e34" : "#8a6a1f" } },
-    React.createElement("strong", null, "onOffice: Kaufpreis auf Anfrage. "),
-    hatWert ? "Dieser Angebotspreis ist der interne Kaufpreis: Er steht im Exposé und bleibt beim onOffice-Abgleich erhalten. Die Portale zeigen weiter „auf Anfrage“."
-      : "Bitte hier den Kaufpreis eintragen – er erscheint im Exposé und wird vom onOffice-Abgleich nicht überschrieben. Ohne Eintrag druckt das Exposé „Auf Anfrage“.");
+    React.createElement("strong", null, "Kaufpreis auf Anfrage. "),
+    hatWert ? "Dieser Angebotspreis ist der interne Kaufpreis: Er steht im Exposé. Die Portale zeigen weiter „auf Anfrage“."
+      : "Bitte hier den Kaufpreis eintragen – er erscheint im Exposé. Ohne Eintrag druckt das Exposé „Auf Anfrage“.");
 }
 window.PreisAufAnfrageHinweis = PreisAufAnfrageHinweis; window.paaIstAufAnfrage = paaIstAufAnfrage;
 // ============================================================================
@@ -132481,7 +132478,7 @@ function energieausweisOptionen(aktuell) {
 function EnergieausweisHinweis({ wert }) {
   if (!energieausweisKeinePflicht(wert)) return null;
   return React.createElement("div", { "data-energieausweis-hinweis": "keine-pflicht", style: { fontSize: 11, color: CI.muted, marginTop: 4, lineHeight: 1.4 } },
-    "Keine Ausweispflicht nach GEG – Kennwert, Klasse, Energieträger und Gültigkeit entfallen; der Grund wird im Exposé, auf der Objektseite und in onOffice („es besteht keine Pflicht!“) genannt. Ein geplanter Abriss ist keine Ausnahme.");
+    "Keine Ausweispflicht nach GEG – Kennwert, Klasse, Energieträger und Gültigkeit entfallen; der Grund wird im Exposé. Ein geplanter Abriss ist keine Ausnahme.");
 }
 
 // ---- Stufe 58: Anhänge beim Weiterleiten sichern (21.09.2026) ----
@@ -132545,7 +132542,7 @@ function KontaktZustaendig({ form, onFeld }) {
       React.createElement("option", { value: "" }, "— niemand zugeordnet —"),
       team.map((p) => React.createElement("option", { key: p.id, value: p.id }, p.name))),
     React.createElement("div", { style: { fontSize: 11.5, color: CI.muted, marginTop: 4 } },
-      "Wird beim Abgleich aus onOffice übernommen, solange hier nichts eingetragen ist."));
+      "Wird bei einem Abgleich aus dem führenden System übernommen, solange hier nichts eingetragen ist."));
 }
 // Exposé an den Kontakt senden – Objekt aus den verknüpften Objekten wählen
 function epExposeObjektText(o) {

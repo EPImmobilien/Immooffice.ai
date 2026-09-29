@@ -79,6 +79,19 @@ def pruefungen(html):
            'erwartet: Vorgabe und Zuweisung in immoCiAnwenden')
     pruefe('immoSchriftLaden(' in html,
            'Eine Schrift, die nicht auf dem Geraet liegt, wird nachgeladen')
+
+    # Kein Fremd-CRM im sichtbaren Text. Der CRM-Sync bleibt laut CLAUDE.md bis
+    # Phase 2b im Code, also bleiben Spaltennamen (onoffice_id), Funktionsnamen
+    # und Schluessel der Funktionsschalter stehen. Was der Nutzer liest, darf
+    # die Fremdmarke nicht nennen: geprueft werden Zeichenketten in einfachen
+    # und doppelten Anfuehrungszeichen sowie in Schablonen (Backticks), in
+    # denen die Marke in ihrer Schreibweise mit grossem O steht — technische
+    # Bezeichner sind durchgehend klein geschrieben.
+    sichtbar = [s for s in re.findall(r'"[^"\n]*"|\'[^\'\n]*\'|`[^`]*`', html)
+                if 'onOffice' in s]
+    pruefe(not sichtbar,
+           'Kein sichtbarer Text nennt das Fremd-CRM',
+           f'{len(sichtbar)} Fundstelle(n), z. B. {sichtbar[0][:80]!r}' if sichtbar else '')
     pruefe(html.count('function Registrieren(') == 1,
            'Das Registrierungsformular steht genau einmal',
            f"gefunden: {html.count('function Registrieren(')}")

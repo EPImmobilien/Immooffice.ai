@@ -595,15 +595,27 @@ Gebaut sind: der Nummernkreis, Zahlungsziele mit Skonto und die
 Rechnungsfreigabe — jeweils samt Maske unter *Einstellungen → Belegnummern*
 beziehungsweise *Einstellungen → Zahlung & Freigabe*.
 
-## onOffice: was noch im Quelltext steht
+## Das Fremd-CRM: was noch im Quelltext steht
 
 Ausgebaut sind die Wege hinein: Cron-Jobs abbestellt, 21 Edge Functions
-gestrichen, Kachel und Admin-Reiter entfernt.
+gestrichen, Kachel und Admin-Reiter entfernt. **Seit dem 29.09.2026 nennt
+auch kein sichtbarer Text die Marke mehr** — 94 Textregeln und sechs
+bauliche Regeln, der Rauchtest hält den Stand (siehe
+`docs/ENTSCHEIDUNGEN.md`).
 
-**Rund 190 Fundstellen bleiben im Quelltext der Oberfläche** und 13 leere
-Tabellen in der Datenbank. Beides ist ohne Einstieg nicht erreichbar. Das
-aufzuräumen lohnt erst, wenn die Adapter-Schicht aus Abschnitt 4b steht — dann
-wird daraus entweder ein Adapter unter mehreren oder es fällt ganz weg.
+**Was bleibt:**
+
+- **Technische Bezeichner** — Spalten wie `onoffice_id`, Namen von Edge
+  Functions, Schlüssel der Funktionsschalter. Sie bleiben absichtlich:
+  `CLAUDE.md` schreibt vor, dass der CRM-Sync bis Phase 2b im Code bleibt,
+  und die Spalten stehen so in der Datenbank.
+- **Kommentare**, die diese Bezeichner erklären. Ohne den Namen wären sie
+  unlesbar. Sie sind über die ausgelieferte Datei einsehbar, wenn jemand sie
+  öffnet — ein kosmetischer Rest, kein Funktionsproblem.
+- **13 leere Tabellen** in der Datenbank.
+
+Das aufzuräumen lohnt erst, wenn die Adapter-Schicht aus Abschnitt 4b steht —
+dann wird daraus entweder ein Adapter unter mehreren oder es fällt ganz weg.
 
 **Zu prüfen, bevor ein Mandant mit einem anderen CRM startet:** ob eine dieser
 Fundstellen beim Laden einer Ansicht eine der gestrichenen Funktionen ruft. Ein
