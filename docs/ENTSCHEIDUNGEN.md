@@ -2504,7 +2504,50 @@ Wächter, der eine Kennung prüft, greift dort ins Leere.
   damit die Terminserie eines fremden Maklers ändern und **Termin für
   Termin löschen**. Jede Abfrage hängt jetzt am Mandanten des Aufrufers.
 
-**Stand: 40 abgesichert, 0 offen.** Beide Blöcke sind damit durch: 28
-öffentliche Endpunkte und 40 angemeldete. `tests/funktionen-oeffentlich.py`
-und `tests/funktionen-angemeldet.py` melden jeden neuen Fall, der
-dazukommt.
+### Das Kriterium war zu eng — und was danach noch kam
+
+Die ersten vier Runden haben die Funktionen genommen, in denen eine Kennung
+als `body.irgendwas_id` im Quelltext steht. Das sind 40. **Aber das ist ein
+Muster, kein Kriterium:** `const { brief_id } = body` fällt durch, und ein
+`.from("x").select("*")` ohne jede Kennung liefert unter dem `service_role`
+gleich alle Mandanten.
+
+Geführt wird deshalb jede Funktion mit JWT-Prüfung, die den `service_role`
+benutzt — **63 statt 40**. Die 23 neu dazugekommenen haben drei weitere
+Formen derselben Lücke gezeigt:
+
+**Ein Pfad statt einer Kennung.** `energieausweis-auslesen` und
+`web-asset-kopieren` lasen mit dem `service_role` eine Datei, deren Pfad der
+Aufrufer benennt. Bei `web-asset-kopieren` hätte sogar der *gewollte*
+Rückfall der Storage-Hülle auf das Wurzelverzeichnis — er ist für die
+Schriften der Plattform da — einen fremden Mandantenpfad durchgelassen.
+
+**Ein Rundruf an „alle Chefs".** `makler-nachricht-senden` und
+`expose-rueckmeldung-melden` schickten die Nachricht eines Eigentümers an
+*seinen* Makler in jedes Büro der Plattform. Dieselbe Bauart wie bei
+`upload-benachrichtigung-versenden`, nur an anderer Stelle.
+
+**Eine Rückfallkette, die mit „irgendein Postfach" endet.**
+`projekt-datei-benachrichtigung`, `upload_benachrichtigung_planen` und
+`ea-mailtest` — letzteres nahm das erste aktive Postfach der Plattform und
+verschickte damit an eine Adresse aus dem Anfragekörper.
+
+Dazu drei Einzelfunde:
+
+- **`mail-senden` und `mail-postfach-speichern`**: dieselbe Konstruktion wie
+  bei `push-antworten` — die Rolle „chef" hebt die Eigentümerprüfung des
+  Postfachs auf, ohne dass ein Mandant dabei wäre. Damit ließ sich Post über
+  das Postfach eines fremden Maklers verschicken und dessen SMTP-Zugang
+  ändern.
+- **`eigentuemer-loeschen`**: der zweite Löschfall. Den Eigentümer eines
+  fremden Maklers entfernen, samt Konto und Dateien.
+- **`urlaub-hinweise`**: wertete die Profile und Urlaubstermine der ganzen
+  Plattform aus. Die angelegte Aufgabe nannte die Mitarbeiter fremder Büros
+  mit Namen und Resttagen, und die Antwort gab dem Aufrufer dieselbe Liste
+  samt E-Mail-Adressen zurück. Läuft jetzt je Mandant.
+
+**Stand: 62 abgesichert, 1 unbedenklich, 0 offen.**
+
+Damit sind beide Blöcke durch: **28 öffentliche Endpunkte und 63
+angemeldete**. `tests/funktionen-oeffentlich.py` und
+`tests/funktionen-angemeldet.py` melden jeden neuen Fall, der dazukommt.

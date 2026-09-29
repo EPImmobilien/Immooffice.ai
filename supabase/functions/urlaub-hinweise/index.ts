@@ -12,6 +12,49 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
+// Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
+// und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist
+// damit ungeprueft: sie kann auf einen Satz eines anderen Mandanten zeigen.
+//
+// public.mandant_sichern() aus fork_14 zieht genau diese Grenze. Sie muss
+// aber MIT DEM TOKEN DES AUFRUFERS gerufen werden — unter dem service_role
+// laesst sie jeden durch (mandant_grenze_gilt() ist dort false, mit Absicht:
+// Cron und Wartung haben keinen Mandanten). Deshalb ein zweiter Client, der
+// nur den mitgebrachten Kopf weiterreicht.
+//
+// Ohne Anmeldekopf oder mit dem Dienstschluessel passiert nichts — das sind
+// die internen Wege, und die sind nicht die Grenze, die hier gezogen wird.
+async function immoMandantSichern(req: Request, paare: Array<[string, unknown]>): Promise<void> {
+  const kopf = req.headers.get("Authorization") || "";
+  if (!/^Bearer\s+/i.test(kopf)) return;
+  const zuPruefen = paare.filter(([, id]) =>
+    typeof id === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));
+  if (!zuPruefen.length) return;
+  const nutzer = createClient(
+    Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: kopf } }, auth: { persistSession: false } });
+  for (const [tabelle, id] of zuPruefen) {
+    const { error } = await nutzer.rpc("mandant_sichern", { p_tabelle: tabelle, p_id: id });
+    if (error) throw new Error("Kein Zugriff auf Daten eines anderen Mandanten.");
+  }
+}
+
+// Wessen Mandant ist der Aufrufer? Fuer die Faelle, in denen nicht eine
+// Kennung, sondern ein PFAD aus dem Anfragekoerper kommt — das erste
+// Pfadsegment im Dateispeicher ist seit fork_09 die Mandantenkennung.
+async function immoMandantDesAufrufers(req: Request): Promise<string | null> {
+  const kopf = req.headers.get("Authorization") || "";
+  if (!/^Bearer\s+/i.test(kopf)) return null;
+  const nutzer = createClient(
+    Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: kopf } }, auth: { persistSession: false } });
+  const { data: u } = await nutzer.auth.getUser(kopf.replace(/^Bearer\s+/i, ""));
+  if (!u?.user) return null;
+  const { data: prof } = await nutzer.from("profiles").select("mandant_id").eq("id", u.user.id).maybeSingle();
+  return prof?.mandant_id ? String(prof.mandant_id) : null;
+}
+
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 
 // ===== Urlaub: Feiertage Mecklenburg-Vorpommern, Arbeitstage, Anspruch, Übertrag, Bilanz =====
@@ -127,21 +170,36 @@ Deno.serve(async (req) => {
   const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
   const antwort = (o: unknown) => new Response(JSON.stringify(o), { status: 200, headers: { ...cors, "Content-Type": "application/json" } });
   try {
+    let aufruferMandant: string | null = null;
     const jwt = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
     if (jwt && jwt !== Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) {
       const { data: u } = await db.auth.getUser(jwt);
-      if (u?.user) { const { data: p } = await db.from("profiles").select("role").eq("id", u.user.id).maybeSingle(); if (!p || !["chef", "mitarbeiter"].includes(p.role)) throw new Error("Keine Berechtigung."); }
+      if (u?.user) { const { data: p } = await db.from("profiles").select("role, mandant_id").eq("id", u.user.id).maybeSingle(); if (!p || !["chef", "mitarbeiter"].includes(p.role)) throw new Error("Keine Berechtigung."); aufruferMandant = p.mandant_id || null; if (!aufruferMandant) throw new Error("Konto ohne Mandanten."); }
     }
     const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
     const heute = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(new Date());
     const monat = parseInt(heute.slice(5, 7), 10);
     const modus = body.modus || (monat >= 9 ? "jahresende" : "uebertrag");
-    urlaubBundesland = (await db.from("firma_stammdaten").select("bundesland").not("bundesland", "is", null).order("sortierung").limit(1).maybeSingle()).data?.bundesland ?? null;
     const jahr = Number(body.jahr) || parseInt(heute.slice(0, 4), 10);
     const frist = modus === "jahresende" ? `${jahr}-12-31` : `${jahr}-03-31`;
 
-    const { data: profile } = await db.from("profiles").select("id, name, email, role, urlaubstage_jahr, urlaub_uebertrag, eintritt, urlaub_staffel").in("role", ["chef", "mitarbeiter"]);
-    const { data: termine } = await db.from("termine").select("id, art, datum, datum_ende, status, quelle, ersteller_id, ersteller_name, teilnehmer, urlaub_status, urlaub_arbeitstage").ilike("art", "%urlaub%").gte("datum", `${jahr - 1}-01-01`).lte("datum", `${jahr}-12-31`);
+    // Ein Lauf je Mandant. Vorher lief die Auswertung ueber ALLE Profile und
+    // ALLE Urlaubstermine der Plattform: die Aufgabe nannte die Mitarbeiter
+    // fremder Buerros mit Namen und Resttagen, und die Antwort gab dem
+    // Aufrufer dieselbe Liste samt E-Mail-Adressen zurueck.
+    let mandanten: string[] = [];
+    if (aufruferMandant) {
+      mandanten = [aufruferMandant];
+    } else {
+      const { data: alle } = await db.from("mandanten").select("id").order("erstellt_am");
+      mandanten = (alle || []).map((m: any) => String(m.id));
+    }
+    const ergebnisse: any[] = [];
+    for (const mandant of mandanten) {
+    urlaubBundesland = (await db.from("firma_stammdaten").select("bundesland").eq("mandant_id", mandant).not("bundesland", "is", null).order("sortierung").limit(1).maybeSingle()).data?.bundesland ?? null;
+
+    const { data: profile } = await db.from("profiles").select("id, name, email, role, urlaubstage_jahr, urlaub_uebertrag, eintritt, urlaub_staffel").eq("mandant_id", mandant).in("role", ["chef", "mitarbeiter"]);
+    const { data: termine } = await db.from("termine").select("id, art, datum, datum_ende, status, quelle, ersteller_id, ersteller_name, teilnehmer, urlaub_status, urlaub_arbeitstage").eq("mandant_id", mandant).ilike("art", "%urlaub%").gte("datum", `${jahr - 1}-01-01`).lte("datum", `${jahr}-12-31`);
     const chef = (profile || []).find((p: any) => p.role === "chef");
     const liste: any[] = [];
     for (const p of profile || []) {
@@ -154,16 +212,21 @@ Deno.serve(async (req) => {
     const beschreibung = liste.length ? `${liste.map((x) => `${x.name} ${x.resttage} Tag${x.resttage === 1 ? "" : "e"}`).join(" · ")}. Ohne schriftlichen, individuellen Hinweis auf Resttage und Frist verfällt Urlaub nicht (BAG 9 AZR 541/15).` : "Niemand hat offene Tage — nichts zu tun.";
     let aufgabeId: string | null = null;
     if (liste.length) {
-      const { data: vorhanden } = await db.from("aufgaben").select("id").eq("typ", "urlaub_hinweis").eq("status", "offen").contains("daten", { modus, jahr }).limit(1);
+      const { data: vorhanden } = await db.from("aufgaben").select("id").eq("mandant_id", mandant).eq("typ", "urlaub_hinweis").eq("status", "offen").contains("daten", { modus, jahr }).limit(1);
       if (vorhanden && vorhanden.length) {
         aufgabeId = vorhanden[0].id;
         await db.from("aufgaben").update({ titel, beschreibung, daten: { modus, jahr, frist, liste } }).eq("id", aufgabeId);
       } else {
-        const { data: neu, error } = await db.from("aufgaben").insert({ typ: "urlaub_hinweis", status: "offen", titel, beschreibung, zustaendig_id: chef ? chef.id : null, faellig_am: heute, daten: { modus, jahr, frist, liste } }).select("id").single();
+        const { data: neu, error } = await db.from("aufgaben").insert({ mandant_id: mandant, typ: "urlaub_hinweis", status: "offen", titel, beschreibung, zustaendig_id: chef ? chef.id : null, faellig_am: heute, daten: { modus, jahr, frist, liste } }).select("id").single();
         if (error) throw error; aufgabeId = neu?.id || null;
       }
     }
-    return antwort({ ok: true, modus, jahr, frist, betroffene: liste.length, aufgabe_id: aufgabeId, liste });
+    ergebnisse.push({ mandant, betroffene: liste.length, aufgabe_id: aufgabeId, liste });
+    }
+    const eigenes = ergebnisse[0] || { betroffene: 0, aufgabe_id: null, liste: [] };
+    return antwort({ ok: true, modus, jahr, frist, mandanten: ergebnisse.length,
+                     betroffene: eigenes.betroffene, aufgabe_id: eigenes.aufgabe_id,
+                     liste: aufruferMandant ? eigenes.liste : [] });
   } catch (e) {
     return antwort({ ok: false, fehler: e instanceof Error ? e.message : String(e) });
   }

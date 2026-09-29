@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
     const trocken = !!body.trocken;
     const jetzt = new Date();
 
-    const { data: postfaecher, error: pfErr } = await admin.from("mail_postfaecher").select("id, benutzer_id, absender_name, email_adresse, signatur, abwesend_aktiv, abwesend_von, abwesend_bis, abwesend_betreff, abwesend_text").eq("aktiv", true).eq("abwesend_aktiv", true);
+    const { data: postfaecher, error: pfErr } = await admin.from("mail_postfaecher").select("id, benutzer_id, absender_name, email_adresse, signatur, abwesend_aktiv, abwesend_von, abwesend_bis, abwesend_betreff, abwesend_text, mandant_id").eq("aktiv", true).eq("abwesend_aktiv", true);
     if (pfErr) throw pfErr;
     const aktive = (postfaecher || []).filter((pf) => pf.abwesend_text && pf.abwesend_text.trim() && !(pf.abwesend_von && new Date(pf.abwesend_von) > jetzt) && !(pf.abwesend_bis && new Date(pf.abwesend_bis) < jetzt));
 
@@ -56,9 +56,9 @@ Deno.serve(async (req) => {
         else if (m.anfrage_status === "verarbeitet" || m.rechnung_status === "weitergeleitet") grund = "Portalanfrage/Rechnung";
         if (!grund) {
           // Ist das ein Mensch?
-          const { data: k } = await admin.from("kontakte").select("id").ilike("email", abs).limit(1);
+          const { data: k } = await admin.from("kontakte").select("id").eq("mandant_id", pf.mandant_id).ilike("email", abs).limit(1);
           let mensch = !!(k && k.length);
-          if (!mensch) { const { data: v } = await admin.from("mail_versendet").select("id").ilike("empfaenger_email", `%${abs}%`).eq("status", "gesendet").limit(1); mensch = !!(v && v.length); }
+          if (!mensch) { const { data: v } = await admin.from("mail_versendet").select("id").eq("mandant_id", pf.mandant_id).ilike("empfaenger_email", `%${abs}%`).eq("status", "gesendet").limit(1); mensch = !!(v && v.length); }
           if (!mensch && PRIVAT.test(abs)) mensch = true;
           if (!mensch) { const t = (m.text && m.text.trim()) ? m.text : htmlZuText(m.html || ""); const kopf = t.slice(0, 400); mensch = ANREDE.test(kopf) && GRUSS.test(t) && t.length < 6000; }
           if (!mensch) grund = "kein persönlicher Absender";

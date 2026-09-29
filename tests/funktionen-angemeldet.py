@@ -162,23 +162,33 @@ ABGESICHERT = {
         'Der Rueckfall nahm das Standard-Postfach irgendeines Maklers.'),
     'web-asset-kopieren': ('eigenerMandant',
         'Eimer und Pfad kamen aus dem Anfragekoerper. Der Rueckfall der Storage-Huelle auf das Wurzelverzeichnis haette einen fremden Mandantenpfad durchgelassen.'),
+    'bewerbertest-einladen': ('profile.mandant_id',
+        'Die Einladung wurde ohne Mandanten geschrieben — unter dem service_role ist aktuelle_mandant_id() null, die Zeile waere fuer jeden unsichtbar gewesen.'),
+    'mail-abwesenheit-verarbeiten': ('pf.mandant_id',
+        'Cron ueber alle Postfaecher. Ob der Absender ein Mensch ist, entschied aber der Kontaktbestand und der Gesendet-Ordner ALLER Mandanten.'),
+    'mail-postfach-pull': ('immoMandantSichern',
+        'Ohne postfach_id der Cron ueber alle Postfaecher, der darf das. Mit einer Kennung aus dem Anfragekoerper war es ein IMAP-Abruf eines fremden Postfachs.'),
+    'mail-senden': ('immoMandantSichern',
+        'Die Rolle "chef" hob die Eigentuemerpruefung des Postfachs auf. Ohne Mandantengrenze davor haette ein Chef Post ueber das Postfach eines fremden Maklers verschickt — mit dessen Absenderadresse.'),
+    'urlaub-hinweise': ('aufruferMandant',
+        'Wertete die Profile und Urlaubstermine der ganzen Plattform aus. Die angelegte Aufgabe nannte die Mitarbeiter fremder Bueros mit Namen und Resttagen, und die Antwort gab dem Aufrufer dieselbe Liste samt E-Mail-Adressen zurueck.'),
     'fahrt-ermitteln': ('aufruferMandant',
         'Der erste Fund dieser Art (29.09.2026). Prueft jetzt erst das '
         'Objekt und den Mandanten, dann den Zwischenspeicher.'),
 }
 
 # --- Gelesen und fuer unbedenklich befunden ---------------------------------
-UNBEDENKLICH = {}
+UNBEDENKLICH = {
+    'akq-ki-vorlage':
+        'Erzeugt aus den Textbausteinen des Anfragekoerpers einen Vorschlag. '
+        'Liest aus der Datenbank nur die Rolle des Aufrufers und schreibt '
+        'nichts. Es gibt hier keine Kennung, die auf einen fremden Satz '
+        'zeigen koennte.',
+}
 
 # --- Gelesen oder erkannt, Befund offen ------------------------------------
 # Diese Liste darf kuerzer werden, nie laenger.
 NOCH_OFFEN = {
-    'akq-ki-vorlage': 'Textvorlage der Akquise',
-    'bewerbertest-einladen': 'Bewerbereinladung',
-    'mail-abwesenheit-verarbeiten': 'Abwesenheitsnotizen',
-    'mail-postfach-pull': 'IMAP-Abruf',
-    'mail-senden': 'Mailversand',
-    'urlaub-hinweise': 'Urlaubshinweise',
 }
 
 

@@ -180,7 +180,11 @@ for _f in ('credentials-anzeigen', 'mitarbeiter-loeschen',
            'reservierung-word-erzeugen', 'eigentuemer-link-erneut-senden',
            'eigentuemer-loeschen', 'web-asset-kopieren',
            'makler-nachricht-senden', 'expose-rueckmeldung-melden',
-           'expose-erinnerung', 'projekt-datei-benachrichtigung'):
+           'expose-erinnerung', 'projekt-datei-benachrichtigung',
+           # Runde 7: der Rest.
+           'mail-senden', 'mail-postfach-pull',
+           'mail-abwesenheit-verarbeiten', 'bewerbertest-einladen',
+           'urlaub-hinweise'):
     ERWEITERT[_f] = ('Prueft Kennungen aus dem Anfragekoerper gegen den '
                      'Mandanten des Aufrufers (Phase 2)')
 
