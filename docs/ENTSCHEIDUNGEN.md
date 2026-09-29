@@ -2583,3 +2583,50 @@ Das ist die Art Fehler, die eine Schema-Umstellung hinterlässt und die kein
 Neutralitäts- oder Mandantentest findet: das Schema ist richtig, die
 Berechtigungen sind richtig, und die Oberfläche redet trotzdem am Schema
 vorbei. Ein Schreibfehler im Spaltennamen fällt hier ab sofort ebenso auf.
+
+---
+
+## Selbstregistrierung — Phase 3, der Unterbau (29.09.2026)
+
+Bis hierher entstand ein Mandant nur von Hand. Der Auftrag verlangt, dass ein
+Makler sich selbst anmelden kann. Was dabei entstehen muss, ist mehr als eine
+Zeile:
+
+| Tabelle | wozu |
+|---|---|
+| `mandanten` | der Mandant selbst, mit eindeutigem Kürzel |
+| `profiles` | der Anmeldende als `chef` **dieses** Mandanten |
+| `firma_stammdaten` | ein Standort `standard` — sonst hätte das erste Exposé kein Impressum und der erste Vertrag keinen Briefkopf |
+| die vier Zeilen aus `fork_28` | sonst wären die Schalter stumm |
+
+**Warum eine Datenbankfunktion und keine Edge Function.** Alles davon muss
+entweder ganz oder gar nicht entstehen. Ein halb angelegter Mandant ist
+schlimmer als keiner — der Anmeldende käme in eine Oberfläche, die bei jedem
+zweiten Handgriff abbricht. In einer Funktion ist es **eine Transaktion**;
+über die Schnittstelle wären es vier Aufrufe und drei Stellen, an denen es
+zerreißen kann.
+
+**Warum kein Trigger auf `auth.users`.** Der liefe beim *Anlegen* des Kontos,
+also **vor** der Bestätigung der E-Mail-Adresse. Jede unbestätigte Anmeldung
+hätte einen Mandanten hinterlassen — und jede fremde Adresse, die jemand
+einträgt, wäre einer. Angelegt wird deshalb beim ersten Anmelden, und das
+setzt die Bestätigung voraus.
+
+**Was die Funktion nicht zulässt** (und was `tests/selbstregistrierung.sql`
+mit zehn Prüfungen festhält):
+
+- einen Aufruf ohne Anmeldung → `42501`
+- einen Aufruf ohne bestätigte E-Mail-Adresse → `42501`
+- einen **zweiten** Mandanten für dasselbe Konto: wer schon ein Profil hat,
+  bekommt dessen Mandanten zurück und nichts Neues
+- den **Beitritt** zu einem vorhandenen Mandanten: die Mandantenkennung kommt
+  nie von außen, der Mandant wird immer neu angelegt
+- dass ein eingeladener Mitarbeiter sich zum Chef eines eigenen Mandanten
+  macht — er behält Rolle und Mandant
+
+Zwei Firmen gleichen Namens bekommen verschiedene Kürzel
+(`testmakler-gmbh`, `testmakler-gmbh-2`); die Eindeutigkeit erzwingt am Ende
+der Schlüssel, nicht die Namensfunktion.
+
+**Was noch fehlt:** die Oberfläche dazu — ein Anmeldeformular und der
+Aufruf nach dem ersten Login. Der Unterbau steht und ist geprüft.

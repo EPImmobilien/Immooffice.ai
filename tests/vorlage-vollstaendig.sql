@@ -183,7 +183,10 @@ zuwachs(bereich, mehr, grund) as (values
   -- fork_29: projekte.slug ist wieder plattformweit eindeutig — der Index
   -- aus fork_17 weicht der Regel der Vorlage.
   ('Indizes ohne Constraint', -1, 'fork_29: projekte_mandant_slug_idx entfaellt'),
-  ('Primaer- und Eindeutigkeitsschluessel', 1, 'fork_29: projekte_slug_key kehrt zurueck')
+  ('Primaer- und Eindeutigkeitsschluessel', 1, 'fork_29: projekte_slug_key kehrt zurueck'),
+  -- fork_30: die Selbstregistrierung. Zwei Funktionen, kein neues Schema —
+  -- ein Mandant besteht aus Zeilen in Tabellen, die es alle schon gibt.
+  ('Funktionen', 2, 'fork_30: mandant_slug_vorschlag(), registrierung_abschliessen()')
 ),
 soll(bereich, soll) as (
   select v.bereich,

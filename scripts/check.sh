@@ -113,6 +113,13 @@ else
   fehler=1
 fi
 
+abschnitt "Selbstregistrierung"
+if scripts/lokale-db.sh psql -q -f tests/selbstregistrierung.sql; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Einstellungen je Mandant"
 if scripts/lokale-db.sh psql -q -f tests/einstellungen-je-mandant.sql; then
   :
