@@ -131945,7 +131945,7 @@ async function lpEinstellungLaden() {
 }
 async function lpEinstellungSetzen(wert) {
   const n = lpNutzer();
-  const { error } = await window._sb.from("portal_einstellungen").upsert({ schluessel: "landing_standard", wert: !!wert, updated_at: new Date().toISOString(), updated_by: n.id }, { onConflict: "schluessel" });
+  const { error } = await window._sb.from("portal_einstellungen").upsert({ mandant_id: window.IMMO_MANDANT_ID || null, schluessel: "landing_standard", wert: !!wert, updated_at: new Date().toISOString(), updated_by: n.id }, { onConflict: "mandant_id,schluessel" });
   if (error) throw error;
 }
 async function lpZugaengeLaden(immobilieId) {

@@ -2910,6 +2910,16 @@ ERSETZUNGEN = [
      'Schaltflaeche, die es auf beiden Selbstauskunft-Listen gibt.'),
     ('MARKE', 'const\\ t\\ =\\ prompt\\("Name\\ des\\ neuen\\ Ordners\\ \\(z\\.B\\.\\ „Mühlenblick\\ Teterow“\\):"\\);', 'const t = prompt("Name des neuen Ordners (z.B. „Wohnpark am See“):");',
      'Beispiel im Eingabefenster: ein Bauprojekt der Referenz.'),
+    # Dieselbe Stelle ein zweites Mal — der Schalter "Objektseite als
+    # Standard" speichert an einer eigenen Stelle. Aufgefallen ist sie
+    # erst, als jeder onConflict der Oberflaeche gegen die wirklich
+    # vorhandenen Eindeutigkeitsregeln gehalten wurde
+    # (tests/onconflict.py). Ohne die Grenze ging der Schalter seit
+    # fork_23 mit einem Fehler zurueck.
+    ('FORK',
+     '\\ \\ const\\ \\{\\ error\\ \\}\\ =\\ await\\ window\\._sb\\.from\\("portal_einstellungen"\\)\\.upsert\\(\\{\\ schluessel:\\ "landing_standard",\\ wert:\\ !!wert,\\ updated_at:\\ new\\ Date\\(\\)\\.toISOString\\(\\),\\ updated_by:\\ n\\.id\\ \\},\\ \\{\\ onConflict:\\ "schluessel"\\ \\}\\);',
+     '  const { error } = await window._sb.from("portal_einstellungen").upsert({ mandant_id: window.IMMO_MANDANT_ID || null, schluessel: "landing_standard", wert: !!wert, updated_at: new Date().toISOString(), updated_by: n.id }, { onConflict: "mandant_id,schluessel" });',
+     'Objektseite-Schalter: Konfliktschluessel je Mandant.'),
 ]
 
 

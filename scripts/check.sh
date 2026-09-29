@@ -99,6 +99,13 @@ else
   fehler=1
 fi
 
+abschnitt "Konfliktschluessel der Oberflaeche"
+if python3 tests/onconflict.py; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Angemeldete Endpunkte: Kennung aus dem Anfragekoerper"
 if python3 tests/funktionen-angemeldet.py; then
   :

@@ -2551,3 +2551,35 @@ Dazu drei Einzelfunde:
 Damit sind beide Blöcke durch: **28 öffentliche Endpunkte und 63
 angemeldete**. `tests/funktionen-oeffentlich.py` und
 `tests/funktionen-angemeldet.py` melden jeden neuen Fall, der dazukommt.
+
+---
+
+## Ein Knopf, den meine eigene Migration kaputtgemacht hatte (29.09.2026)
+
+`fork_17`, `fork_23` und `fork_28` haben Eindeutigkeitsregeln von „je
+Plattform" auf „je Mandant" umgestellt. Damit ändert sich der Schlüssel, auf
+den ein `upsert` sich beruft. Steht in der Oberfläche noch der alte,
+antwortet PostgREST mit
+
+```
+there is no unique or exclusion constraint matching the ON CONFLICT specification
+```
+
+— und der Knopf tut nichts.
+
+Genau das war bei `portal_einstellungen` der Fall, an **einer von zwei**
+Stellen. Die eine war bei `fork_23` mitumgestellt worden, die andere nicht:
+der Schalter „Objektseite als Standard" hätte seit dem Tag mit einem Fehler
+quittiert. Aufgefallen ist es nicht beim Ausprobieren, sondern erst, als ich
+**jeden** `onConflict` der Oberfläche gegen die wirklich vorhandenen
+Eindeutigkeitsregeln gehalten habe.
+
+Daraus ist `tests/onconflict.py` geworden, Teil von `npm run check`: es liest
+alle `upsert(…, { onConflict: "…" })` aus `src/`, sucht die zugehörige
+Tabelle davor und fragt die Datenbank, ob es dazu eine eindeutige Regel mit
+genau diesen Spalten gibt. **15 Konfliktschlüssel, jetzt alle gültig.**
+
+Das ist die Art Fehler, die eine Schema-Umstellung hinterlässt und die kein
+Neutralitäts- oder Mandantentest findet: das Schema ist richtig, die
+Berechtigungen sind richtig, und die Oberfläche redet trotzdem am Schema
+vorbei. Ein Schreibfehler im Spaltennamen fällt hier ab sofort ebenso auf.
