@@ -724,6 +724,9 @@ den Abstand.
 
 ## Die 90 angemeldeten Funktionen sind noch nicht durchgesehen
 
+*(Stand 29.09.2026: die 28 öffentlichen sind fertig — 24 abgesichert,
+4 unbedenklich, 0 offen. Das hier ist die andere Hälfte.)*
+
 `tests/funktionen-oeffentlich.py` führt Buch über die 28 Edge Functions
 **ohne** JWT-Prüfung. Das ist die halbe Frage.
 

@@ -399,6 +399,7 @@ async function bildUrlAuflösen(
   supabase: ReturnType<typeof createClient>,
   bild: BildEingabe,
   userId: string,
+  mandant: string,
   rolle: "input" | "maske",
 ): Promise<string> {
   // Primaerweg: URL ist direkt im Body
@@ -415,7 +416,7 @@ async function bildUrlAuflösen(
   const ext = mt === "image/jpeg" ? "jpg" : mt.split("/")[1];
 
   const binary = Uint8Array.from(atob(bild.data), c => c.charCodeAt(0));
-  const pfad = `_temp/${userId}/${Date.now()}_${crypto.randomUUID()}_${rolle}.${ext}`;
+  const pfad = `${mandant}/_temp/${userId}/${Date.now()}_${crypto.randomUUID()}_${rolle}.${ext}`;
 
   // Wir nutzen den schon vorhandenen 'ki-bilder'-Bucket, damit kein
   // zusaetzlicher Bucket gebraucht wird.
@@ -507,6 +508,7 @@ async function ladeNachStorage(
   bildUrl: string,
   funktion: Funktion,
   userId: string,
+  mandant: string,
   dateiname: string,
 ): Promise<{ path: string; publicUrl: string }> {
   // Download Replicate-Ergebnis
@@ -522,12 +524,12 @@ async function ladeNachStorage(
                   : contentType.includes("webp") ? "webp"
                   : "png";
 
-  // Pfad: ki-bilder/{userId}/{funktion}/{timestamp}_{slug}.ext
+  // Pfad: ki-bilder/{mandant}/{userId}/{funktion}/{timestamp}_{slug}.ext
   const slug = dateiname
     .replace(/\.[^.]+$/, "")
     .replace(/[^\w.\-äöüÄÖÜß]/g, "_")
     .substring(0, 60);
-  const path = `${userId}/${funktion}/${Date.now()}_${slug || "bild"}.${extension}`;
+  const path = `${mandant}/${userId}/${funktion}/${Date.now()}_${slug || "bild"}.${extension}`;
 
   // Upload via Service-Role-Client
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -591,12 +593,13 @@ async function buildInput(
   body: RequestBody,
   supabase: ReturnType<typeof createClient>,
   userId: string,
+  mandant: string,
 ): Promise<{ input: Record<string, unknown>; modellName: string; finalerPrompt: string }> {
   const modell = MODELLE[body.funktion];
   const modellName = `${modell.owner}/${modell.name}`;
 
   // Bild fuer alle Funktionen hochladen
-  const bildUrl = await bildUrlAuflösen(supabase, body.bild, userId, "input");
+  const bildUrl = await bildUrlAuflösen(supabase, body.bild, userId, mandant, "input");
 
   // -------- ATMOSPHAERE-STILE (V3.2) ---------------------------------------
   // Alle Single-Click-Buttons aus dem Frontend: Winterszene, Weihnachtsszene,
@@ -797,11 +800,24 @@ Deno.serve(async (req: Request) => {
 
     // Anzeigename aus profiles holen (optional, faellt auf E-Mail zurueck)
     let userName = userData.user.email || "";
+    let mandant = "";
     try {
       const { data: profil } = await userClient
-        .from("profiles").select("name").eq("id", userId).single();
+        .from("profiles").select("name, mandant_id").eq("id", userId).single();
       if (profil?.name) userName = profil.name;
+      if (profil?.mandant_id) mandant = String(profil.mandant_id);
     } catch (_) { /* egal */ }
+    // Ohne Mandanten wird nichts abgelegt. Der Eimer ki-bilder ist
+    // oeffentlich, die restriktive Richtlinie aus fork_09 prueft das erste
+    // Pfadsegment — eine Datei ausserhalb des Mandantenordners waere fuer
+    // die Anwendung unsichtbar und liesse sich von dort auch nicht mehr
+    // loeschen.
+    if (!mandant) {
+      return new Response(
+        JSON.stringify({ error: "Konto ohne Mandanten." }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     // ---- API-Token pruefen ----
     const replicateToken = Deno.env.get("REPLICATE_API_TOKEN");
@@ -875,7 +891,7 @@ Deno.serve(async (req: Request) => {
     let modellName: string;
     let finalerPrompt: string;
     try {
-      const built = await buildInput(body, supabaseAdmin, userId);
+      const built = await buildInput(body, supabaseAdmin, userId, mandant);
       input = built.input;
       modellName = built.modellName;
       finalerPrompt = built.finalerPrompt;
@@ -921,6 +937,7 @@ Deno.serve(async (req: Request) => {
       bildUrl,
       body.funktion,
       userId,
+      mandant,
       body.dateiname || "bild",
     );
 

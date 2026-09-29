@@ -1989,6 +1989,57 @@ NACHBESSERN = [
     ('MARKE', 'const PROJEKTE: Record<string, Projekt> = {\n  "muehlenblick-teterow": {\n    name: "Wohnquartier Mühlenblick",\n    strasse: "Mühlenblick",\n    ort: "Teterow",\n    haeuser: ["6-8", "10-12", "14-16"],\n  },\n};\n\n', '',
      'Fest eingebautes Kundenprojekt in projekt-wohnungen entfernt.',
      {'projekt-wohnungen'}),
+
+    # =====================================================================
+    # FORK — die KI-Bilder landeten ausserhalb des Mandantenordners
+    #
+    # ki-bildbearbeitung prueft das JWT selbst und arbeitet danach mit dem
+    # service_role, fuer den RLS nicht gilt. Die Pfade waren
+    # {userId}/… und _temp/{userId}/… — ohne Mandanten.
+    #
+    # Zu erraten ist da nichts, userId ist eine uuid. Aber die restriktive
+    # Richtlinie aus fork_09 prueft das ERSTE Pfadsegment: eine Datei
+    # ausserhalb des Mandantenordners ist fuer die Anwendung unsichtbar und
+    # von dort auch nicht mehr zu loeschen. Sie liegt im oeffentlichen Eimer
+    # und bleibt liegen — genau der Zustand, den storage_ohne_mandant()
+    # meldet.
+    #
+    # Der Mandant kommt aus dem Profil des Aufrufers und wird durchgereicht.
+    # Ohne Mandanten wird nichts abgelegt.
+    # =====================================================================
+    ('FORK', '      const { data: profil } = await userClient\n        .from("profiles").select("name").eq("id", userId).single();\n      if (profil?.name) userName = profil.name;\n    } catch (_) { /* egal */ }', '      const { data: profil } = await userClient\n        .from("profiles").select("name, mandant_id").eq("id", userId).single();\n      if (profil?.name) userName = profil.name;\n      if (profil?.mandant_id) mandant = String(profil.mandant_id);\n    } catch (_) { /* egal */ }\n    // Ohne Mandanten wird nichts abgelegt. Der Eimer ki-bilder ist\n    // oeffentlich, die restriktive Richtlinie aus fork_09 prueft das erste\n    // Pfadsegment — eine Datei ausserhalb des Mandantenordners waere fuer\n    // die Anwendung unsichtbar und liesse sich von dort auch nicht mehr\n    // loeschen.\n    if (!mandant) {\n      return new Response(\n        JSON.stringify({ error: "Konto ohne Mandanten." }),\n        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } },\n      );\n    }',
+     'KI-Bildbearbeitung: der Mandant kommt aus dem Profil des Aufrufers.',
+     {'ki-bildbearbeitung'}),
+    ('FORK', '    const userId = userData.user.id;\n\n    // Anzeigename aus profiles holen (optional, faellt auf E-Mail zurueck)\n    let userName = userData.user.email || "";', '    const userId = userData.user.id;\n\n    // Anzeigename aus profiles holen (optional, faellt auf E-Mail zurueck)\n    let userName = userData.user.email || "";\n    let mandant = "";',
+     'KI-Bildbearbeitung: Platz fuer den Mandanten.',
+     {'ki-bildbearbeitung'}),
+    ('FORK', 'async function bildUrlAuflösen(\n  supabase: ReturnType<typeof createClient>,\n  bild: BildEingabe,\n  userId: string,\n  rolle: "input" | "maske",\n): Promise<string> {', 'async function bildUrlAuflösen(\n  supabase: ReturnType<typeof createClient>,\n  bild: BildEingabe,\n  userId: string,\n  mandant: string,\n  rolle: "input" | "maske",\n): Promise<string> {',
+     'KI-Bildbearbeitung: der Zwischenpfad kennt den Mandanten.',
+     {'ki-bildbearbeitung'}),
+    ('FORK', '  const pfad = `_temp/${userId}/${Date.now()}_${crypto.randomUUID()}_${rolle}.${ext}`;', '  const pfad = `${mandant}/_temp/${userId}/${Date.now()}_${crypto.randomUUID()}_${rolle}.${ext}`;',
+     'KI-Bildbearbeitung: Zwischenablage im Mandantenordner.',
+     {'ki-bildbearbeitung'}),
+    ('FORK', 'async function ladeNachStorage(\n  bildUrl: string,\n  funktion: Funktion,\n  userId: string,\n  dateiname: string,\n): Promise<{ path: string; publicUrl: string }> {', 'async function ladeNachStorage(\n  bildUrl: string,\n  funktion: Funktion,\n  userId: string,\n  mandant: string,\n  dateiname: string,\n): Promise<{ path: string; publicUrl: string }> {',
+     'KI-Bildbearbeitung: auch das Ergebnis kennt den Mandanten.',
+     {'ki-bildbearbeitung'}),
+    ('FORK', '  // Pfad: ki-bilder/{userId}/{funktion}/{timestamp}_{slug}.ext', '  // Pfad: ki-bilder/{mandant}/{userId}/{funktion}/{timestamp}_{slug}.ext',
+     'KI-Bildbearbeitung: der Kommentar nennt den Mandanten mit.',
+     {'ki-bildbearbeitung'}),
+    ('FORK', '  const path = `${userId}/${funktion}/${Date.now()}_${slug || "bild"}.${extension}`;', '  const path = `${mandant}/${userId}/${funktion}/${Date.now()}_${slug || "bild"}.${extension}`;',
+     'KI-Bildbearbeitung: das Ergebnis liegt im Mandantenordner.',
+     {'ki-bildbearbeitung'}),
+    ('FORK', 'async function buildInput(\n  body: RequestBody,\n  supabase: ReturnType<typeof createClient>,\n  userId: string,\n): Promise', 'async function buildInput(\n  body: RequestBody,\n  supabase: ReturnType<typeof createClient>,\n  userId: string,\n  mandant: string,\n): Promise',
+     'KI-Bildbearbeitung: der Mandant wird durchgereicht.',
+     {'ki-bildbearbeitung'}),
+    ('FORK', '  const bildUrl = await bildUrlAuflösen(supabase, body.bild, userId, "input");', '  const bildUrl = await bildUrlAuflösen(supabase, body.bild, userId, mandant, "input");',
+     'KI-Bildbearbeitung: Aufruf mit Mandant.',
+     {'ki-bildbearbeitung'}),
+    ('FORK', '      const built = await buildInput(body, supabaseAdmin, userId);', '      const built = await buildInput(body, supabaseAdmin, userId, mandant);',
+     'KI-Bildbearbeitung: Aufruf mit Mandant (buildInput).',
+     {'ki-bildbearbeitung'}),
+    ('FORK', '    const { path, publicUrl } = await ladeNachStorage(\n      bildUrl,\n      body.funktion,\n      userId,\n      body.dateiname || "bild",\n    );', '    const { path, publicUrl } = await ladeNachStorage(\n      bildUrl,\n      body.funktion,\n      userId,\n      mandant,\n      body.dateiname || "bild",\n    );',
+     'KI-Bildbearbeitung: Aufruf mit Mandant (ladeNachStorage).',
+     {'ki-bildbearbeitung'}),
 ]
 
 

@@ -2353,3 +2353,37 @@ Projektname steht mehr im Produkt.
 
 **Abgesichert 22, unbedenklich 4, noch offen 2** — `bewerbertest-abgeben`
 und `ki-bildbearbeitung`.
+
+---
+
+## Die Liste der offenen öffentlichen Endpunkte ist leer (29.09.2026)
+
+Am 28.09. standen 19 darauf, heute keiner mehr. **24 abgesichert, 4
+unbedenklich, 0 offen** — `tests/funktionen-oeffentlich.py` führt darüber
+weiter Buch und meldet jeden neuen Endpunkt, der ohne JWT-Prüfung mit dem
+`service_role` arbeitet.
+
+Die letzten beiden:
+
+**`bewerbertest-abgeben`** ist gelesen und bleibt unverändert. Alles hängt am
+Token der Einladung, die Antworten werden mit deren Mandanten geschrieben,
+und die KI-Vorbewertung bekommt ausschließlich die Antworten des Bewerbers
+selbst — keine Objekt-, Kunden- oder Firmendaten, und nichts von anderen
+Bewerbern. Das war der Punkt, der als „ungelesen" offen stand.
+
+**`ki-bildbearbeitung`** prüft das JWT selbst und arbeitet danach mit dem
+`service_role`. Die Storage-Pfade waren `{userId}/…` und `_temp/{userId}/…`
+— ohne Mandanten. Zu erraten ist daran nichts, `userId` ist eine uuid. Aber
+die restriktive Richtlinie aus `fork_09` prüft das **erste** Pfadsegment:
+eine Datei außerhalb des Mandantenordners ist für die Anwendung unsichtbar
+und von dort auch nicht mehr zu löschen. Sie liegt im öffentlichen Eimer und
+bleibt liegen — genau der Zustand, den `storage_ohne_mandant()` meldet. Der
+Mandant kommt jetzt aus dem Profil des Aufrufers und wird durchgereicht; ohne
+ihn wird nichts abgelegt.
+
+**Was das für Gate 2 heißt.** Der Punkt „öffentliche Endpunkte lesen ohne
+Mandantengrenze" ist erledigt. Nicht erledigt ist die andere Hälfte: die 90
+Funktionen **mit** JWT-Prüfung, die danach ebenfalls den `service_role`
+benutzen und eine Kennung aus dem Anfragekörper glauben. `fahrt-ermitteln`
+war der erste Fund dieser Art (siehe oben); wie viele weitere es sind, ist
+nicht gezählt. Das steht in `docs/OFFEN.md` und ist der nächste Block.

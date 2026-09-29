@@ -135,6 +135,11 @@ ERWEITERT['portal-ftp-diagnose'] = (
 ERWEITERT['projekt-wohnungen'] = (
     'Projekt aus der Tabelle, Wohnungen aus dessen Mandanten (Phase 2)')
 
+# Die KI-Bilder lagen ausserhalb des Mandantenordners — im oeffentlichen
+# Eimer, fuer die Anwendung unsichtbar und nicht mehr loeschbar.
+ERWEITERT['ki-bildbearbeitung'] = (
+    'Storage-Pfade mit Mandanten davor (Phase 2)')
+
 BLOCKZEILEN = {
     'mpe-pdf-erzeugen': {
         'const pins: Array<[number, number, string, string, string]> = [',

@@ -111,6 +111,17 @@ ABGESICHERT = {
         'Wohnungen ueber Strasse und Ort — ohne Mandanten haetten zwei '
         'Makler mit Objekten in derselben Strasse sich vermischt. Projekt '
         'jetzt aus der Tabelle, Wohnungen aus dessen Mandanten.'),
+    'bewerbertest-abgeben': ('einladung.mandant_id',
+        'Gelesen. Alles haengt am Token der Einladung; die Antworten werden '
+        'mit deren Mandanten geschrieben. Die KI bekommt nur die Antworten '
+        'des Bewerbers selbst — keine Objekt-, Kunden- oder Firmendaten, und '
+        'nichts von anderen Bewerbern.'),
+    'ki-bildbearbeitung': ('mandant',
+        'Prueft das JWT selbst, arbeitet danach mit dem service_role. Die '
+        'Storage-Pfade waren {userId}/… und _temp/{userId}/… — ausserhalb '
+        'des Mandantenordners und damit fuer die Anwendung unsichtbar und '
+        'nicht mehr loeschbar. Jetzt mit Mandanten davor; ohne ihn wird '
+        'nichts abgelegt.'),
     'web-lead': ('immoMandantAusAnfrage',
         'Eingang fuer Bewertungsanfragen. Mandant aus der Anfrage, Chef und '
         'Empfaenger aus dem Mandanten; Kontaktsuche und beide inserts sind '
@@ -143,11 +154,6 @@ UNBEDENKLICH = {
 # Diese Liste darf kuerzer werden, nie laenger. Wer eine Funktion absichert,
 # traegt sie oben ein und streicht sie hier.
 NOCH_OFFEN = {
-    # Gelesen: laedt die Einladung ueber ihren Token, schreibt die Antworten
-    # mit deren Mandanten. Was noch fehlt, ist die Gegenprobe, dass die
-    # KI-Auswertung keine fremden Daten mitschickt.
-    'bewerbertest-abgeben': 'Token-gebunden; KI-Auswertung ungelesen.',
-    'ki-bildbearbeitung': 'Schreibt Bilder, 44 kB, ungelesen.',
 }
 
 
