@@ -155,7 +155,16 @@ for _f in ('credentials-anzeigen', 'mitarbeiter-loeschen',
            'expose-pdf-erzeugen', 'expose-pruefen', 'mietvertrag-pdf',
            'vertrag-pdf', 'mpe-pdf-erzeugen', 'eigentuemer-report-pdf',
            'portal-export', 'portal-export-homepage',
-           'signatur-vorgang-starten', 'signatur-vorgang-widerrufen'):
+           'signatur-vorgang-starten', 'signatur-vorgang-widerrufen',
+           # Runde 3: der Rest der geraden Faelle.
+           'akq-automation-lauf', 'akq-mail-leads', 'akq-wertindikation-pdf',
+           'bild-beschriften', 'bild-web-variante',
+           'eigentuemer-dokument-onedrive-push',
+           'eigentuemer-dokument-uebernehmen', 'eigentuemer-einladen',
+           'mail-anfrage-verarbeiten', 'mail-ki-vorschlag',
+           'mail-postfach-backfill', 'mail-rechnung-weiterleiten',
+           'mail-zu-todo', 'mitarbeiter-anlegen', 'newsletter-senden',
+           'projekt-nachricht-antwort', 'termin-fahrzeit'):
     ERWEITERT[_f] = ('Prueft Kennungen aus dem Anfragekoerper gegen den '
                      'Mandanten des Aufrufers (Phase 2)')
 

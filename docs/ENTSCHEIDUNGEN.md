@@ -2462,4 +2462,23 @@ Exposés, sondern jeder Eimer und jeder Pfad, den ein Angemeldeter benennen
 kann. Gemessen wird jetzt am ersten Pfadsegment; seit `fork_09` ist das die
 Mandantenkennung.
 
-**Stand: 19 abgesichert, 21 offen.**
+### Runde 3: der Rest der geraden Fälle
+
+Siebzehn weitere, jeweils nach demselben Muster — eine Kennung, eine
+Tabelle, eine Zeile davor. Darunter: die Akquise-Automation eines fremden
+Leads planen, eine fremde Mail als Anfrage verarbeiten (die Antwort enthält
+den ausgelesenen Inhalt), aus einer fremden Mail eine Aufgabe machen und sie
+einem Kollegen eines anderen Hauses zuweisen, einen Mitarbeiter an einem
+fremden Standort anlegen, die Newsletter-Kampagne eines fremden Maklers
+verschicken, im Kundenbereich eines fremden Bauträgers antworten.
+
+**Was übrig bleibt, sind vier Funktionen anderer Bauart:**
+`besichtigung-nachfassen`, `termin-erinnerung`, `termin-serie` und
+`eigentuemer-einladung-nachfassen`. Sie arbeiten entweder über ein
+**Zeitfenster** (alle Termine der nächsten Tage, über alle Mandanten) oder
+über eine Kennung, die gar keine Zeile benennt — `termin-serie` gruppiert
+über `termine.serie_id`, und dazu gibt es keine Tabelle. Ein Wächter, der
+eine Kennung prüft, greift dort ins Leere. Diese vier brauchen, was der
+Objekt-Newsletter schon bekommen hat: **einen Lauf je Mandant**.
+
+**Stand: 36 abgesichert, 4 offen.**
