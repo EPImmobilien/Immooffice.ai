@@ -722,10 +722,13 @@ Stelle, aus der sich beide bedienen.
 Nicht dringend, aber es wird nicht besser: jede neue Fundstelle vergrößert
 den Abstand.
 
-## Die 90 angemeldeten Funktionen sind noch nicht durchgesehen
+## Die angemeldeten Funktionen sind durchgesehen — **erledigt 29.09.2026**
 
-*(Stand 29.09.2026: die 28 öffentlichen sind fertig — 24 abgesichert,
-4 unbedenklich, 0 offen. Das hier ist die andere Hälfte.)*
+*Erledigt am selben Tag. 63 der 90 JWT-geprüften Funktionen benutzen den
+`service_role`; alle 63 sind durchgegangen — 62 abgesichert, 1 unbedenklich,
+0 offen. Was unten steht, ist der Befund, der zu der Arbeit geführt hat; er
+bleibt als Begründung stehen. Buch führt `tests/funktionen-angemeldet.py`,
+und die Liste darf nur kürzer werden.*
 
 `tests/funktionen-oeffentlich.py` führt Buch über die 28 Edge Functions
 **ohne** JWT-Prüfung. Das ist die halbe Frage.

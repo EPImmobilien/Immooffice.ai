@@ -440,3 +440,38 @@ danach `service_role`, und eine `immobilie_id` aus dem Anfragekörper
 geglaubt — Entfernung, Fahrzeit und Koordinaten zu jedem Objekt jedes
 Maklers. Wie viele weitere es sind, ist nicht gezählt. Steht in
 `docs/OFFEN.md`.
+
+## Nachtrag 29.09.2026, zweiter Teil — auch die angemeldeten Endpunkte sind durch
+
+Der Befund vom selben Tag („die 90 angemeldeten Funktionen sind noch nicht
+durchgesehen") ist abgearbeitet. 63 der 90 JWT-geprüften Edge Functions
+benutzen den `service_role`, für den RLS nicht gilt. Alle 63 sind
+durchgegangen: **62 abgesichert, 1 unbedenklich, 0 offen.**
+
+Das Muster war immer dasselbe — *JWT geprüft, `service_role` benutzt, eine
+Angabe aus dem Anfragekörper geglaubt* — in vier Verkleidungen:
+
+| Form | Beispiel | Was möglich war |
+|---|---|---|
+| Kennung aus dem Körper | `credentials-anzeigen` | Der FTP- oder Portalzugang eines fremden Maklers **im Klartext** |
+| Pfad aus dem Körper | `expose-pruefen` | **Jede Datei jedes Mandanten** lesen — nicht nur Exposés |
+| Rolle ohne Mandant | `mail-senden`, `push-antworten` | Post über das Postfach eines fremden Maklers verschicken |
+| Lauf ohne Grenze | `urlaub-hinweise` | Namen, Resttage und E-Mail-Adressen der Mitarbeiter fremder Büros |
+
+Zwei Funktionen erlaubten sogar **Löschen** über die Mandantengrenze:
+`termin-serie` (die Terminserie eines fremden Maklers, Termin für Termin)
+und `eigentuemer-loeschen` (ein fremder Eigentümer samt Konto und Dateien).
+
+**Der Weg war der von `fork_14`:** nicht die Körper neu schreiben, sondern
+eine Zeile vorne einziehen. Die Prüfung selbst steht seit `fork_14` in der
+Datenbank — `public.mandant_sichern(tabelle, id)`. Ein Haken war zu umgehen:
+sie lässt unter dem `service_role` mit Absicht jeden durch (Cron und Wartung
+haben keinen Mandanten), also baut der eingezogene Helfer
+`immoMandantSichern()` einen zweiten Client, der nur den Anmeldekopf des
+Aufrufers weiterreicht. `tests/funktionen-mandant.sql` prüft genau diesen
+Aufrufweg.
+
+Zwei Prüflisten führen darüber Buch und sind Teil von `npm run check`:
+`tests/funktionen-oeffentlich.py` (28 ohne JWT) und
+`tests/funktionen-angemeldet.py` (63 mit JWT). Beide melden jeden neuen
+Endpunkt, der dazukommt, und jede Absicherung, die wieder verschwindet.
