@@ -2844,3 +2844,52 @@ einer bereits vorhandenen Adresse.
 **Was ich daraus mitnehme:** „Es ist gebaut und die Tests sind grün" heißt
 nicht „es ist benutzbar". Bei jedem weiteren Bildschirm, den ich anfasse,
 gehört die Frage dazu, über welchen Knopf ein Mensch dort ankommt.
+
+---
+
+## Die Schrift des Mandanten wurde gesetzt und nie benutzt (29.09.2026)
+
+Gemeldet: „das mit den Schriftarten funktioniert immer noch nicht."
+
+Es hat nie funktioniert, und zwar an einer Stelle, die beim Schreiben
+plausibel aussah. `immoCiAnwenden()` hat die Schrift als **CSS-Variable**
+gesetzt:
+
+```js
+if (stamm && stamm.ci_font) s.setProperty("--immo-font", stamm.ci_font);
+```
+
+Diese Variable liest im ganzen Quelltext **niemand**. Die Oberfläche
+schreibt `fontFamily` **966-mal als Inline-Stil** — und inline schlägt jede
+Regel aus einem Stylesheet. Das Feld war da, das Speichern hat geklappt,
+der Wert stand in der Datenbank, und sichtbar wurde nichts.
+
+Die Farben gehen den richtigen Weg und waren deshalb nie auffällig: `CI` ist
+ein **Objekt**, das zur Laufzeit überschrieben wird, und die Inline-Stile
+lesen es bei jedem Rendern neu. `FONT` war dagegen eine feste Zeichenkette in
+derselben `const`-Kette.
+
+Jetzt ist `FONT` veränderlich und wird genauso ausgetauscht — von der
+Plattformschrift aus, damit beim Abmelden nicht die Schrift des vorigen
+Mandanten stehen bleibt. Dazu kommen die drei Stilobjekte auf Modulebene
+(`inputStyle`, `labelStyle`, `primaryBtn`), die `fontFamily` seit der
+Ladezeit in sich tragen und nicht bei jedem Rendern neu entstehen; für die
+Farben wurden sie längst so behandelt.
+
+**Zwei Kleinigkeiten, die den Unterschied zwischen „eingestellt" und
+„sichtbar" ausmachen:**
+
+- Im Feld stand `TimesNewRoman`. Ohne Leerzeichen löst das **kein Browser**
+  auf — das Feld ist ein freies Textfeld, und die Eingabe ist naheliegend.
+  Sie wird jetzt zu `Times New Roman` auseinandergezogen.
+- Eine Schrift, die nicht auf dem Gerät liegt, wird von Google Fonts
+  nachgeladen — derselbe Weg, den die Plattformschrift ohnehin nimmt. Für
+  die üblichen Systemschriften passiert nichts. Findet sich die Schrift dort
+  nicht, greift der Rückfall im Stapel und die Seite bleibt lesbar.
+
+Der Rauchtest prüft jetzt alle drei Teile.
+
+**Was das über die Arbeitsweise sagt:** Eine Einstellung, die sich speichern
+lässt und nichts bewirkt, ist schlimmer als eine, die es nicht gibt — sie
+sieht aus wie eine Funktion. Beim nächsten Einstellungsfeld gehört die Probe
+dazu, ob der Wert am anderen Ende wirklich ankommt.

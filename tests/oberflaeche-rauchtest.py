@@ -69,6 +69,16 @@ def pruefungen(html):
     # erst unter 768 Pixeln.
     pruefe('immoEinstellungenKachel' in html,
            'Die Einstellungen haben eine Kachel auf dem Dashboard')
+    # Die Schrift des Mandanten muss FONT wirklich austauschen. Eine
+    # CSS-Variable allein bewirkt nichts: fontFamily steht inline, und
+    # inline schlaegt jedes Stylesheet.
+    pruefe('let FONT = IMMO_FONT_PLATTFORM' in html,
+           'FONT ist austauschbar, nicht fest')
+    pruefe(html.count('FONT = IMMO_FONT_PLATTFORM;') >= 2,
+           'Die Schrift wird beim Anmelden gesetzt und beim Abmelden zurueckgesetzt',
+           'erwartet: Vorgabe und Zuweisung in immoCiAnwenden')
+    pruefe('immoSchriftLaden(' in html,
+           'Eine Schrift, die nicht auf dem Geraet liegt, wird nachgeladen')
     pruefe(html.count('function Registrieren(') == 1,
            'Das Registrierungsformular steht genau einmal',
            f"gefunden: {html.count('function Registrieren(')}")

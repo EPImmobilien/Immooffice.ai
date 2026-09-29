@@ -403,12 +403,70 @@ const PORTAL_VERSION = "5.34.0",
     shadow: "0 2px 12px rgba(27,42,71,0.06)",
     shadowHover: "0 12px 32px rgba(27,42,71,0.12)"
   },
-  FONT = "'Montserrat', system-ui, sans-serif",
   FONT_SERIF = "'Cormorant Garamond', 'Times New Roman', serif",
   fontLink = "https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap";
 if ("undefined" != typeof document && !document.querySelector(`link[href="${fontLink}"]`)) {
   const e = document.createElement("link");
   e.rel = "stylesheet", e.href = fontLink, document.head.appendChild(e)
+}
+
+// ---------------------------------------------------------------------------
+// Die Schrift des Mandanten.
+//
+// FONT steht an 966 Stellen als fontFamily in einem Inline-Stil. Inline
+// schlaegt jede Regel im Stylesheet — eine CSS-Variable zu setzen (so stand
+// es hier bis zum 29.09.2026) hat deshalb NICHTS bewirkt: niemand hat sie
+// gelesen. Gemeldet mit "das mit den Schriftarten funktioniert immer noch
+// nicht".
+//
+// Also derselbe Weg wie bei den Farben: der Wert wird zur Laufzeit
+// ausgetauscht. Die Inline-Stile werden bei jedem Rendern neu gebaut und
+// nehmen ihn dann mit. FONT ist dafuer veraenderlich statt fest.
+// ---------------------------------------------------------------------------
+const IMMO_FONT_PLATTFORM = "'Montserrat', system-ui, sans-serif";
+let FONT = IMMO_FONT_PLATTFORM;
+
+// Schriften, die auf den ueblichen Geraeten ohnehin liegen. Fuer sie wird
+// nichts nachgeladen.
+const IMMO_SCHRIFT_SYSTEM = ["times new roman", "georgia", "arial", "helvetica",
+  "helvetica neue", "verdana", "tahoma", "trebuchet ms", "courier new",
+  "garamond", "palatino", "cambria", "calibri", "system-ui", "serif",
+  "sans-serif", "monospace"];
+
+// Aus der Eingabe des Mandanten eine brauchbare Schriftangabe machen. Das
+// Feld in den Einstellungen ist ein freies Textfeld; dort steht
+// "TimesNewRoman" ebenso wie "Times New Roman" oder "Georgia, serif".
+function immoSchriftStapel(wert) {
+  let name = String(wert || "").replace(/["']/g, "").trim();
+  if (!name) return null;
+  if (name.includes(",")) return name;
+  // "TimesNewRoman" loest kein Browser auf. Ohne Leerzeichen, aber mit
+  // Grossbuchstaben im Wort: auseinanderziehen.
+  if (name.indexOf(" ") < 0 && /[a-z0-9][A-Z]/.test(name)) {
+    name = name.replace(/([a-z0-9])([A-Z])/g, "$1 $2");
+  }
+  const klein = name.toLowerCase();
+  const serif = /times|georgia|garamond|palatino|roman|book|serif|playfair|merriweather|lora/.test(klein);
+  // Der Rueckfall nennt die Familie nicht ein zweites Mal.
+  const rueckfall = (serif ? ["Georgia", "'Times New Roman'", "serif"] : ["system-ui", "sans-serif"])
+    .filter(f => f.replace(/['"]/g, "").toLowerCase() !== klein);
+  return "'" + name + "', " + rueckfall.join(", ");
+}
+
+// Eine Schrift, die nicht auf dem Geraet liegt, kommt von Google Fonts —
+// derselbe Weg, den die Plattformschrift oben schon nimmt. Liegt sie dort
+// nicht, greift der Rueckfall im Stapel; die Seite bleibt lesbar.
+function immoSchriftLaden(name) {
+  if (typeof document === "undefined" || !name) return;
+  if (IMMO_SCHRIFT_SYSTEM.indexOf(name.toLowerCase()) >= 0) return;
+  if (document.querySelector('link[data-immo-schrift="' + name + '"]')) return;
+  const l = document.createElement("link");
+  l.rel = "stylesheet";
+  l.href = "https://fonts.googleapis.com/css2?family=" +
+    encodeURIComponent(name).replace(/%20/g, "+") +
+    ":wght@300;400;500;600;700&display=swap";
+  l.setAttribute("data-immo-schrift", name);
+  document.head.appendChild(l);
 }
 const inputStyle = {
     width: "100%",
@@ -477,6 +535,14 @@ async function immoCiAnwenden(stamm) {
   // Immer von der Plattform-CI aus, nie vom zuletzt Gesetzten: sonst
   // bliebe beim Abmelden die Farbe des vorigen Mandanten stehen.
   Object.assign(CI, IMMO_CI_PLATTFORM);
+  // Wie bei den Farben: immer von der Plattform aus, sonst bliebe beim
+  // Abmelden die Schrift des vorigen Mandanten stehen.
+  FONT = IMMO_FONT_PLATTFORM;
+  const immoStapel = immoSchriftStapel(stamm && stamm.ci_font);
+  if (immoStapel) {
+    FONT = immoStapel;
+    immoSchriftLaden(immoStapel.split(",")[0].replace(/['"]/g, "").trim());
+  }
   if (primaer) { CI.blau = primaer; CI.ink = primaer; CI.blauDark = immoAbdunkeln(primaer, .25); }
   if (akzent) { CI.gold = akzent; CI.goldLight = immoAbdunkeln(akzent, -.3); }
   if (primaer) {
@@ -487,9 +553,11 @@ async function immoCiAnwenden(stamm) {
   // Die fuenf Stile auf Modulebene haben ihre Farben zur Ladezeit
   // eingebacken. Ueberschreiben statt neu bauen — jeder Aufrufer haelt
   // dieselbe Referenz.
-  Object.assign(inputStyle, { border: `1px solid ${CI.border}`, background: CI.card, color: CI.ink });
-  Object.assign(labelStyle, { color: CI.muted });
-  Object.assign(primaryBtn, { background: CI.blau, color: "#fff" });
+  // Diese drei tragen fontFamily seit der Ladezeit in sich — sie werden
+  // nicht bei jedem Rendern neu gebaut. Also mit austauschen.
+  Object.assign(inputStyle, { border: `1px solid ${CI.border}`, background: CI.card, color: CI.ink, fontFamily: FONT });
+  Object.assign(labelStyle, { color: CI.muted, fontFamily: FONT });
+  Object.assign(primaryBtn, { background: CI.blau, color: "#fff", fontFamily: FONT });
   Object.assign(secondaryBtn, { background: "transparent", color: CI.blau, border: `1px solid ${CI.border}` });
   Object.assign(cardStyle, { background: CI.card, border: `1px solid ${CI.border}`, boxShadow: CI.shadow });
   window.IMMO_LOGO_URL = null;
@@ -508,7 +576,9 @@ async function immoCiAnwenden(stamm) {
     const s = document.documentElement.style;
     s.setProperty("--immo-primaer", CI.blau);
     s.setProperty("--immo-akzent", CI.gold);
-    if (stamm && stamm.ci_font) s.setProperty("--immo-font", stamm.ci_font);
+    // Die Variable bleibt — fuer Stellen, die spaeter ueber CSS gestaltet
+    // werden. Sie traegt jetzt den fertigen Stapel statt der Roheingabe.
+    s.setProperty("--immo-font", FONT);
   }
 }
 // Hellt auf (negativer Anteil) oder dunkelt ab. Ohne Bibliothek, weil es

@@ -2981,6 +2981,46 @@ ERSETZUNGEN = [
      'e\\ \\&\\&\\ "chef"\\ ===\\ e\\.role\\ \\&\\&\\ c\\.push\\(s\\),\\ hatRecht\\(e,\\ "admin"\\)\\ \\&\\&\\ c\\.push\\(r\\);',
      'e && "chef" === e.role && c.push(s), hatRecht(e, "admin") && c.push(r), e && "chef" === e.role && c.push(immoEinstellungenKachel);',
      'Die Kachel erscheint fuer den Chef — dieselbe Bedingung wie die Seite.'),
+
+    # =====================================================================
+    # FORK — die Schrift des Mandanten wurde gesetzt und nie benutzt
+    #
+    # immoCiAnwenden hat --immo-font als CSS-Variable gesetzt. Gelesen hat
+    # sie niemand: die Oberflaeche schreibt fontFamily 966-mal als
+    # INLINE-Stil, und inline schlaegt jede Regel im Stylesheet. Die
+    # Einstellung war also da, das Feld war da, gespeichert wurde auch —
+    # sichtbar wurde nichts. Gemeldet am 29.09.2026.
+    #
+    # Die Farben gehen den richtigen Weg: CI ist ein Objekt, das zur
+    # Laufzeit ueberschrieben wird, und die Inline-Stile lesen es bei jedem
+    # Rendern neu. FONT war dagegen eine feste Zeichenkette.
+    #
+    # Jetzt ist FONT veraenderlich und wird genauso ausgetauscht. Dazu zwei
+    # Kleinigkeiten, die den Unterschied zwischen "eingestellt" und
+    # "sichtbar" ausmachen: "TimesNewRoman" wird zu "Times New Roman"
+    # auseinandergezogen (ohne Leerzeichen loest das kein Browser auf), und
+    # eine Schrift, die nicht auf dem Geraet liegt, wird nachgeladen.
+    # =====================================================================
+    ('FORK',
+     '\\ \\ FONT\\ =\\ "\'Montserrat\',\\ system\\-ui,\\ sans\\-serif",\\\n\\ \\ FONT_SERIF\\ =\\ "\'Cormorant\\ Garamond\',\\ \'Times\\ New\\ Roman\',\\ serif",',
+     '  FONT_SERIF = "\'Cormorant Garamond\', \'Times New Roman\', serif",',
+     'FONT aus der const-Kette geloest.'),
+    ('FORK',
+     'if\\ \\("undefined"\\ !=\\ typeof\\ document\\ \\&\\&\\ !document\\.querySelector\\(`link\\[href="\\$\\{fontLink\\}"\\]`\\)\\)\\ \\{\\\n\\ \\ const\\ e\\ =\\ document\\.createElement\\("link"\\);\\\n\\ \\ e\\.rel\\ =\\ "stylesheet",\\ e\\.href\\ =\\ fontLink,\\ document\\.head\\.appendChild\\(e\\)\\\n\\}',
+     'if ("undefined" != typeof document && !document.querySelector(`link[href="${fontLink}"]`)) {\n  const e = document.createElement("link");\n  e.rel = "stylesheet", e.href = fontLink, document.head.appendChild(e)\n}\n\n// ---------------------------------------------------------------------------\n// Die Schrift des Mandanten.\n//\n// FONT steht an 966 Stellen als fontFamily in einem Inline-Stil. Inline\n// schlaegt jede Regel im Stylesheet — eine CSS-Variable zu setzen (so stand\n// es hier bis zum 29.09.2026) hat deshalb NICHTS bewirkt: niemand hat sie\n// gelesen. Gemeldet mit "das mit den Schriftarten funktioniert immer noch\n// nicht".\n//\n// Also derselbe Weg wie bei den Farben: der Wert wird zur Laufzeit\n// ausgetauscht. Die Inline-Stile werden bei jedem Rendern neu gebaut und\n// nehmen ihn dann mit. FONT ist dafuer veraenderlich statt fest.\n// ---------------------------------------------------------------------------\nconst IMMO_FONT_PLATTFORM = "\'Montserrat\', system-ui, sans-serif";\nlet FONT = IMMO_FONT_PLATTFORM;\n\n// Schriften, die auf den ueblichen Geraeten ohnehin liegen. Fuer sie wird\n// nichts nachgeladen.\nconst IMMO_SCHRIFT_SYSTEM = ["times new roman", "georgia", "arial", "helvetica",\n  "helvetica neue", "verdana", "tahoma", "trebuchet ms", "courier new",\n  "garamond", "palatino", "cambria", "calibri", "system-ui", "serif",\n  "sans-serif", "monospace"];\n\n// Aus der Eingabe des Mandanten eine brauchbare Schriftangabe machen. Das\n// Feld in den Einstellungen ist ein freies Textfeld; dort steht\n// "TimesNewRoman" ebenso wie "Times New Roman" oder "Georgia, serif".\nfunction immoSchriftStapel(wert) {\n  let name = String(wert || "").replace(/["\']/g, "").trim();\n  if (!name) return null;\n  if (name.includes(",")) return name;\n  // "TimesNewRoman" loest kein Browser auf. Ohne Leerzeichen, aber mit\n  // Grossbuchstaben im Wort: auseinanderziehen.\n  if (name.indexOf(" ") < 0 && /[a-z0-9][A-Z]/.test(name)) {\n    name = name.replace(/([a-z0-9])([A-Z])/g, "$1 $2");\n  }\n  const klein = name.toLowerCase();\n  const serif = /times|georgia|garamond|palatino|roman|book|serif|playfair|merriweather|lora/.test(klein);\n  // Der Rueckfall nennt die Familie nicht ein zweites Mal.\n  const rueckfall = (serif ? ["Georgia", "\'Times New Roman\'", "serif"] : ["system-ui", "sans-serif"])\n    .filter(f => f.replace(/[\'"]/g, "").toLowerCase() !== klein);\n  return "\'" + name + "\', " + rueckfall.join(", ");\n}\n\n// Eine Schrift, die nicht auf dem Geraet liegt, kommt von Google Fonts —\n// derselbe Weg, den die Plattformschrift oben schon nimmt. Liegt sie dort\n// nicht, greift der Rueckfall im Stapel; die Seite bleibt lesbar.\nfunction immoSchriftLaden(name) {\n  if (typeof document === "undefined" || !name) return;\n  if (IMMO_SCHRIFT_SYSTEM.indexOf(name.toLowerCase()) >= 0) return;\n  if (document.querySelector(\'link[data-immo-schrift="\' + name + \'"]\')) return;\n  const l = document.createElement("link");\n  l.rel = "stylesheet";\n  l.href = "https://fonts.googleapis.com/css2?family=" +\n    encodeURIComponent(name).replace(/%20/g, "+") +\n    ":wght@300;400;500;600;700&display=swap";\n  l.setAttribute("data-immo-schrift", name);\n  document.head.appendChild(l);\n}',
+     'Die Schrift des Mandanten: Stapel bauen, bei Bedarf nachladen.'),
+    ('FORK',
+     '\\ \\ Object\\.assign\\(CI,\\ IMMO_CI_PLATTFORM\\);',
+     '  Object.assign(CI, IMMO_CI_PLATTFORM);\n  // Wie bei den Farben: immer von der Plattform aus, sonst bliebe beim\n  // Abmelden die Schrift des vorigen Mandanten stehen.\n  FONT = IMMO_FONT_PLATTFORM;\n  const immoStapel = immoSchriftStapel(stamm && stamm.ci_font);\n  if (immoStapel) {\n    FONT = immoStapel;\n    immoSchriftLaden(immoStapel.split(",")[0].replace(/[\'"]/g, "").trim());\n  }',
+     'Die Schrift des Mandanten wird gesetzt, nicht nur in eine Variable geschrieben.'),
+    ('FORK',
+     '\\ \\ Object\\.assign\\(inputStyle,\\ \\{\\ border:\\ `1px\\ solid\\ \\$\\{CI\\.border\\}`,\\ background:\\ CI\\.card,\\ color:\\ CI\\.ink\\ \\}\\);\\\n\\ \\ Object\\.assign\\(labelStyle,\\ \\{\\ color:\\ CI\\.muted\\ \\}\\);\\\n\\ \\ Object\\.assign\\(primaryBtn,\\ \\{\\ background:\\ CI\\.blau,\\ color:\\ "\\#fff"\\ \\}\\);',
+     '  // Diese drei tragen fontFamily seit der Ladezeit in sich — sie werden\n  // nicht bei jedem Rendern neu gebaut. Also mit austauschen.\n  Object.assign(inputStyle, { border: `1px solid ${CI.border}`, background: CI.card, color: CI.ink, fontFamily: FONT });\n  Object.assign(labelStyle, { color: CI.muted, fontFamily: FONT });\n  Object.assign(primaryBtn, { background: CI.blau, color: "#fff", fontFamily: FONT });',
+     'Auch die eingebackenen Stile bekommen die Schrift.'),
+    ('FORK',
+     '\\ \\ \\ \\ if\\ \\(stamm\\ \\&\\&\\ stamm\\.ci_font\\)\\ s\\.setProperty\\("\\-\\-immo\\-font",\\ stamm\\.ci_font\\);',
+     '    // Die Variable bleibt — fuer Stellen, die spaeter ueber CSS gestaltet\n    // werden. Sie traegt jetzt den fertigen Stapel statt der Roheingabe.\n    s.setProperty("--immo-font", FONT);',
+     'Die CSS-Variable traegt den fertigen Schriftstapel.'),
 ]
 
 
