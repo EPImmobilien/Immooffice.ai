@@ -2630,3 +2630,38 @@ der Schlüssel, nicht die Namensfunktion.
 
 **Was noch fehlt:** die Oberfläche dazu — ein Anmeldeformular und der
 Aufruf nach dem ersten Login. Der Unterbau steht und ist geprüft.
+
+---
+
+## Selbstregistrierung — die Oberfläche (29.09.2026)
+
+Drei Stellen, und jede einzelne macht die Sache für sich genommen
+wirkungslos: ohne Formular kommt niemand hinein, ohne den Umschalter findet
+es niemand, und ohne den Aufruf nach dem ersten Anmelden entsteht kein
+Mandant. Der Rauchtest prüft deshalb alle drei.
+
+**Das Konto entsteht über den normalen Weg von Supabase** — `auth.signUp()`.
+Bestätigungsmail und Passwortregeln sind damit die von Supabase und keine
+nachgebauten. Firmenname und Name reisen als Anmeldedaten des Kontos mit
+(`options.data`).
+
+**Der Mandant entsteht in `getProfile`**, beim ersten Anmelden. Das ist die
+einzige Stelle, an der das Profil des Angemeldeten geholt wird; fehlt es
+(`PGRST116`) und steht ein Firmenname in den Anmeldedaten, wird
+`registrierung_abschliessen()` gerufen und das Profil danach neu gelesen.
+Ohne Firmenname passiert nichts — dann ist es ein eingeladenes Konto, dessen
+Profil aus einem anderen Grund fehlt, und darüber entscheidet nicht diese
+Stelle.
+
+**Eine Falle bei der Umschaltung.** Der Zweig „Anmelden oder Registrieren"
+steht **im Rückgabewert** und nicht als vorgezogenes `return`. Ein Ausstieg
+vor den übrigen `useState`-Aufrufen würde sie überspringen, und React
+verlangt bei jedem Durchlauf dieselbe Reihenfolge der Hooks — der Fehler
+wäre erst beim Zurückschalten sichtbar geworden, als vertauschte
+Formularwerte.
+
+**Was der Betreiber noch tun muss**, damit es läuft: in Supabase unter
+*Authentication → Providers → Email* die Selbstregistrierung freigeben
+(„Enable email signups") und die Bestätigung eingeschaltet lassen. Ohne
+Bestätigung weist `registrierung_abschliessen()` ab — mit Absicht, denn
+sonst wäre jede fremde Adresse ein Mandant. Steht in `docs/OFFEN.md`.

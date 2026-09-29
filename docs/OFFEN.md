@@ -749,3 +749,20 @@ meisten benutzen den `service_role`. Wie viele davon eine Kennung ungeprüft
 Der ehrliche Weg ist derselbe wie bei den öffentlichen: eine Liste, die nur
 kürzer werden darf. Nicht vor Gate 2 zu schaffen, aber vor einem echten
 zweiten Mandanten nötig.
+
+## Selbstregistrierung: zwei Schalter in Supabase
+
+Der Unterbau (`fork_30`) und die Oberfläche stehen. Damit sich jemand
+wirklich anmelden kann, müssen im Supabase-Projekt zwei Dinge stimmen:
+
+1. **Authentication → Providers → Email → „Enable email signups"** muss an
+   sein. Ist es aus, antwortet `auth.signUp()` mit *Signups not allowed for
+   this instance* — das Formular meldet das, aber niemand kommt hinein.
+2. **Die Bestätigung der E-Mail-Adresse muss eingeschaltet bleiben.** Ohne
+   sie entsteht ein Konto ohne geprüfte Adresse; `registrierung_abschliessen()`
+   weist so eines ab, und der Anmeldende käme in eine leere Oberfläche.
+
+Dazu kommt die Mailzustellung: Supabase verschickt die Bestätigungsmails
+über seinen eingebauten Versand, der eng begrenzt ist (wenige Mails je
+Stunde). Für den echten Betrieb gehört dort ein eigener SMTP-Zugang
+hinterlegt — dieselbe Frage wie beim `RESEND_API_KEY`.

@@ -697,10 +697,34 @@ async function getSession() {
   return e.session
 }
 async function getProfile(e) {
-  const {
+  let {
     data: t,
     error: n
   } = await window._sb.from("profiles").select("*").eq("id", e).single();
+
+  // Erstanmeldung nach der Selbstregistrierung: das Konto gibt es, ein
+  // Profil noch nicht (PGRST116 = keine Zeile). Der Firmenname steht in den
+  // Anmeldedaten des Kontos, wo ihn das Registrierungsformular hinterlegt
+  // hat. registrierung_abschliessen() legt dann Mandant, Profil, Standort
+  // und Einstellungen in EINER Transaktion an — siehe fork_30.
+  //
+  // Ohne Firmennamen passiert nichts: dann ist es ein eingeladenes Konto,
+  // dessen Profil aus einem anderen Grund fehlt, und darueber entscheidet
+  // nicht diese Stelle.
+  if (n && n.code === "PGRST116") {
+    let firma = "", name = "";
+    try {
+      const { data: u } = await window._sb.auth.getUser();
+      firma = String(u?.user?.user_metadata?.firma || "").trim();
+      name = String(u?.user?.user_metadata?.name || "").trim();
+    } catch (f) { /* ohne Folgen */ }
+    if (firma) {
+      const { error: rFehler } = await window._sb.rpc("registrierung_abschliessen",
+        { p_firma: firma, p_name: name || null });
+      if (rFehler) throw rFehler;
+      ({ data: t, error: n } = await window._sb.from("profiles").select("*").eq("id", e).single());
+    }
+  }
   if (n) throw n;
 
   // Mandantenkontext einmal global ablegen.
@@ -76170,7 +76194,104 @@ function KalTerminModal({
   }, "onoffice" === u.quelle ? "Absagen" : "Löschen")))))
 }
 
+// ---------------------------------------------------------------------------
+// Selbstregistrierung (Phase 3)
+//
+// Angelegt wird hier nur das KONTO — ueber den normalen Weg von Supabase,
+// damit die Bestaetigungsmail und die Passwortregeln die von Supabase sind
+// und nicht nachgebaute. Firmenname und Name reisen als Anmeldedaten mit.
+//
+// Der Mandant entsteht erst beim ersten Anmelden, in getProfile: vorher ist
+// die Adresse nicht bestaetigt, und ein Mandant je unbestaetigter Anmeldung
+// waere eine Einladung an jeden.
+// ---------------------------------------------------------------------------
+function Registrieren({ onZurueck }) {
+  const [feld, setzeFeld] = useState({ firma: "", name: "", email: "", passwort: "", passwort2: "" });
+  const [fehler, setzeFehler] = useState("");
+  const [fertig, setzeFertig] = useState(false);
+  const [laeuft, setzeLaeuft] = useState(false);
+  const aendern = (k) => (ev) => setzeFeld({ ...feld, [k]: ev.target.value });
+
+  const absenden = async () => {
+    setzeFehler("");
+    if (feld.firma.trim().length < 2) return setzeFehler("Bitte geben Sie Ihren Firmennamen an.");
+    if (!/^[^@ ]+@[^@ ]+[.][^@ ]{2,}$/.test(feld.email.trim())) return setzeFehler("Bitte geben Sie eine gültige E-Mail-Adresse an.");
+    if (feld.passwort.length < 10) return setzeFehler("Das Passwort braucht mindestens 10 Zeichen.");
+    if (feld.passwort !== feld.passwort2) return setzeFehler("Die beiden Passwörter stimmen nicht überein.");
+    setzeLaeuft(true);
+    try {
+      const { error } = await window._sb.auth.signUp({
+        email: feld.email.trim().toLowerCase(),
+        password: feld.passwort,
+        options: { data: { firma: feld.firma.trim(), name: feld.name.trim() } }
+      });
+      if (error) throw error;
+      setzeFertig(true);
+    } catch (e) {
+      setzeFehler(e.message || "Die Registrierung ist fehlgeschlagen.");
+    }
+    setzeLaeuft(false);
+  };
+
+  const karte = (inhalt) => React.createElement("div", {
+    style: { minHeight: "100vh", background: `linear-gradient(135deg, ${CI.blau} 0%, ${CI.blauDark} 100%)`,
+             fontFamily: FONT, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }
+  }, React.createElement("div", {
+    style: { background: "#fff", padding: 48, borderRadius: 4, maxWidth: 440, width: "100%",
+             boxShadow: "0 20px 60px rgba(0,0,0,0.3)" }
+  }, React.createElement("div", { style: { display: "flex", justifyContent: "center", marginBottom: 32 } },
+      React.createElement(Logo, { height: 90, variant: "blau" })), inhalt));
+
+  if (fertig) return karte([
+    React.createElement("h1", { key: "h", style: { margin: 0, fontSize: 22, color: CI.blau, fontWeight: 600, textAlign: "center" } },
+      "Fast geschafft"),
+    React.createElement("p", { key: "p", style: { fontSize: 13, color: CI.muted, lineHeight: 1.7, marginTop: 16 } },
+      "Wir haben Ihnen eine E-Mail an ", React.createElement("b", null, feld.email.trim().toLowerCase()),
+      " geschickt. Bestätigen Sie darin Ihre Adresse — danach können Sie sich anmelden, und Ihr Zugang wird eingerichtet."),
+    React.createElement("button", { key: "b", onClick: onZurueck,
+      style: { ...primaryBtn, justifyContent: "center", marginTop: 8, width: "100%" } }, "Zur Anmeldung")
+  ]);
+
+  return karte([
+    React.createElement("div", { key: "k", style: { textAlign: "center", marginBottom: 28 } },
+      React.createElement("h1", { style: { margin: 0, fontSize: 22, color: CI.blau, fontWeight: 600 } }, "Konto anlegen"),
+      React.createElement("div", { style: { fontSize: 12, color: CI.muted, marginTop: 6 } },
+        "30 Tage testen, keine Zahlungsdaten nötig")),
+    React.createElement("div", { key: "f", style: { display: "flex", flexDirection: "column", gap: 16 } },
+      React.createElement("div", null,
+        React.createElement("label", { style: labelStyle }, "Firma"),
+        React.createElement("input", { value: feld.firma, onChange: aendern("firma"), style: inputStyle,
+          placeholder: "Name Ihres Unternehmens", autoComplete: "organization" })),
+      React.createElement("div", null,
+        React.createElement("label", { style: labelStyle }, "Ihr Name"),
+        React.createElement("input", { value: feld.name, onChange: aendern("name"), style: inputStyle,
+          placeholder: "Vor- und Nachname", autoComplete: "name" })),
+      React.createElement("div", null,
+        React.createElement("label", { style: labelStyle }, "E-Mail"),
+        React.createElement("input", { type: "email", value: feld.email, onChange: aendern("email"), style: inputStyle,
+          placeholder: "ihre.e-mail@example.de", autoComplete: "email" })),
+      React.createElement("div", null,
+        React.createElement("label", { style: labelStyle }, "Passwort"),
+        React.createElement("input", { type: "password", value: feld.passwort, onChange: aendern("passwort"), style: inputStyle,
+          placeholder: "mindestens 10 Zeichen", autoComplete: "new-password" })),
+      React.createElement("div", null,
+        React.createElement("label", { style: labelStyle }, "Passwort wiederholen"),
+        React.createElement("input", { type: "password", value: feld.passwort2, onChange: aendern("passwort2"), style: inputStyle,
+          placeholder: "••••••••", autoComplete: "new-password",
+          onKeyDown: (ev) => "Enter" === ev.key && absenden() })),
+      React.createElement(ErrorBox, null, fehler),
+      React.createElement("button", { onClick: absenden, disabled: laeuft,
+        style: { ...primaryBtn, justifyContent: "center", marginTop: 8, opacity: laeuft ? .6 : 1 } },
+        laeuft ? "Wird angelegt …" : "Konto anlegen"),
+      React.createElement("div", { style: { fontSize: 11, color: CI.muted, textAlign: "center", marginTop: 12, lineHeight: 1.6 } },
+        "Sie haben schon ein Konto? ",
+        React.createElement("a", { href: "#", onClick: (ev) => { ev.preventDefault(); onZurueck(); },
+          style: { color: CI.blau, fontWeight: 600 } }, "Anmelden")))
+  ]);
+}
+
 function Login() {
+  const [immoModus, immoSetzeModus] = useState("anmelden");
   const [e, t] = useState({
     email: "",
     password: ""
@@ -76184,7 +76305,12 @@ function Login() {
     }
     l(!1)
   };
-  return React.createElement("div", {
+  // Der Zweig steht IM Rueckgabewert und nicht davor: ein vorgezogenes
+  // return wuerde die uebrigen useState-Aufrufe ueberspringen, und React
+  // verlangt bei jedem Durchlauf dieselbe Reihenfolge.
+  return "registrieren" === immoModus ? React.createElement(Registrieren, {
+    onZurueck: () => immoSetzeModus("anmelden")
+  }) : React.createElement("div", {
     style: {
       minHeight: "100vh",
       background: `linear-gradient(135deg, ${CI.blau} 0%, ${CI.blauDark} 100%)`,
@@ -76301,7 +76427,13 @@ function Login() {
       marginTop: 12,
       lineHeight: 1.6
     }
-  }, React.createElement(ZugangLinkAnfordern, null), "Mitarbeiter: Passwort vergessen?", React.createElement("br", null), "Bitte wenden Sie sich an Ihren Ansprechpartner bei Musterhaus Immobilien."))))
+  }, React.createElement("div", {
+    style: { marginBottom: 10 }
+  }, "Noch kein Konto? ", React.createElement("a", {
+    href: "#",
+    onClick: ev => { ev.preventDefault(); immoSetzeModus("registrieren"); },
+    style: { color: CI.blau, fontWeight: 600 }
+  }, "Firma registrieren")), React.createElement(ZugangLinkAnfordern, null), "Mitarbeiter: Passwort vergessen?", React.createElement("br", null), "Bitte wenden Sie sich an Ihren Ansprechpartner."))))
 }
 
 function ConfigError() {

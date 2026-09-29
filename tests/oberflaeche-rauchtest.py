@@ -49,6 +49,20 @@ def pruefungen(html):
     pruefe(leere_anker <= 1,
            'Kein leergefallener Suchtext in einem split()',
            f'gefunden: {leere_anker} (erlaubt: 1, die Buchstabenhaeufigkeit)')
+    # Die Selbstregistrierung (fork_30) haengt an drei Stellen, und jede
+    # einzelne davon macht sie fuer sich genommen wirkungslos: ohne
+    # Formular kommt niemand hinein, ohne den Umschalter findet es niemand,
+    # und ohne den Aufruf nach dem ersten Anmelden entsteht kein Mandant.
+    pruefe('function Registrieren(' in html,
+           'Das Registrierungsformular ist da')
+    pruefe('registrierung_abschliessen' in html,
+           'Der Mandant wird beim ersten Anmelden angelegt')
+    pruefe('Firma registrieren' in html,
+           'Von der Anmeldung fuehrt ein Weg zur Registrierung')
+    pruefe(html.count('function Registrieren(') == 1,
+           'Das Registrierungsformular steht genau einmal',
+           f"gefunden: {html.count('function Registrieren(')}")
+
     pruefe(html.count('<div id="root">') == 1,
            'Genau ein Wurzelelement fuer React',
            f'gefunden: {html.count(chr(60) + "div id=" + chr(34) + "root" + chr(34) + chr(62))}')
