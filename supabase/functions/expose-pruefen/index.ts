@@ -12,6 +12,22 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+// Wessen Mandant ist der Aufrufer? Hier kommt keine Kennung aus dem
+// Anfragekoerper, sondern ein PFAD — und der wird mit dem service_role
+// gelesen, fuer den RLS nicht gilt. Das erste Pfadsegment ist seit fork_09
+// die Mandantenkennung; daran wird gemessen.
+async function immoMandantDesAufrufers(req: Request): Promise<string | null> {
+  const kopf = req.headers.get("Authorization") || "";
+  if (!/^Bearer\s+/i.test(kopf)) return null;
+  const nutzer = createClient(
+    Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: kopf } }, auth: { persistSession: false } });
+  const { data: u } = await nutzer.auth.getUser(kopf.replace(/^Bearer\s+/i, ""));
+  if (!u?.user) return null;
+  const { data: prof } = await nutzer.from("profiles").select("mandant_id").eq("id", u.user.id).maybeSingle();
+  return prof?.mandant_id ? String(prof.mandant_id) : null;
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -189,6 +205,14 @@ Deno.serve(async (req: Request) => {
     let pdfBase64 = (body.pdf_base64 || "").replace(/^data:application\/pdf;base64,/, "");
     let quelle = "upload";
     if (!pdfBase64 && body.bucket && body.pfad) {
+      // Eimer UND Pfad kommen aus dem Anfragekoerper, gelesen wird mit dem
+      // service_role. Ohne Grenze waere das ein Lesezugriff auf jede Datei
+      // jedes Mandanten — nicht nur Exposes: jeder Eimer, jeder Pfad.
+      const eigenerMandant = await immoMandantDesAufrufers(req);
+      if (!eigenerMandant || !String(body.pfad).startsWith(eigenerMandant + "/")) {
+        return new Response(JSON.stringify({ error: "Kein Zugriff auf diese Datei." }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
       const { data, error } = await admin.storage.from(body.bucket).download(body.pfad);
       if (error || !data) {
         return new Response(JSON.stringify({ error: `PDF nicht aus Storage ladbar (${body.bucket}/${body.pfad}): ${error?.message || "unbekannt"}` }),

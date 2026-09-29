@@ -2439,4 +2439,27 @@ nicht.
 `credentials-anzeigen` hat zusätzlich die Suche über den Dienstnamen an den
 Mandanten des Aufrufers gebunden.
 
-**Stand: 9 abgesichert, 31 offen.**
+### Runde 2: die Dokumente
+
+Ein PDF ist die vollständige Auskunft über einen Vorgang. Wer eine Kennung
+abschreiben kann, hält es in der Hand — Maklervertrag, Mietvertrag,
+Rechnung, Wertermittlung, Exposé, Eigentümerbericht. Dazu die beiden
+Portalexporte (ein fremdes Objekt veröffentlichen oder dort löschen) und die
+beiden Signaturfunktionen (einen Vorgang zu einem fremden Vertrag starten
+und damit Einladungen an dessen Beteiligte verschicken, oder einen fremden
+Vorgang widerrufen).
+
+**`expose-pruefen` war dabei kein „Kennung geglaubt", sondern mehr.** Die
+Funktion nimmt **Eimer und Pfad** aus dem Anfragekörper entgegen und lädt
+damit mit dem `service_role` aus dem Dateispeicher:
+
+```
+const { data, error } = await admin.storage.from(body.bucket).download(body.pfad);
+```
+
+Das ist ein Lesezugriff auf **jede Datei jedes Mandanten** — nicht nur
+Exposés, sondern jeder Eimer und jeder Pfad, den ein Angemeldeter benennen
+kann. Gemessen wird jetzt am ersten Pfadsegment; seit `fork_09` ist das die
+Mandantenkennung.
+
+**Stand: 19 abgesichert, 21 offen.**

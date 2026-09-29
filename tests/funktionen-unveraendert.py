@@ -148,7 +148,14 @@ ERWEITERT['ki-bildbearbeitung'] = (
 for _f in ('credentials-anzeigen', 'mitarbeiter-loeschen',
            'rechnung-pdf-erzeugen', 'mail-gelesen-setzen',
            'mail-anhaenge-extrahieren', 'eigentuemer-nachricht-senden',
-           'eigentuemer-person-hinzufuegen', 'expose-freigabe-erstellen'):
+           'eigentuemer-person-hinzufuegen', 'expose-freigabe-erstellen',
+           # Runde 2: die Dokumente. Ein PDF ist die vollstaendige Auskunft
+           # ueber einen Vorgang; expose-pruefen las sogar jeden Pfad in
+           # jedem Eimer.
+           'expose-pdf-erzeugen', 'expose-pruefen', 'mietvertrag-pdf',
+           'vertrag-pdf', 'mpe-pdf-erzeugen', 'eigentuemer-report-pdf',
+           'portal-export', 'portal-export-homepage',
+           'signatur-vorgang-starten', 'signatur-vorgang-widerrufen'):
     ERWEITERT[_f] = ('Prueft Kennungen aus dem Anfragekoerper gegen den '
                      'Mandanten des Aufrufers (Phase 2)')
 

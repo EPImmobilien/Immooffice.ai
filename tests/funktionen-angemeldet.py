@@ -52,6 +52,32 @@ ABGESICHERT = {
     'expose-freigabe-erstellen': ('immoMandantSichern',
         'Eine Expose-Freigabe zu einem fremden Objekt, auf einen fremden '
         'Kontakt ausgestellt.'),
+    'expose-pdf-erzeugen': ('immoMandantSichern',
+        'Das Expose eines fremden Objekts als PDF — mit Adresse, Preis und '
+        'allen Bildern.'),
+    'expose-pruefen': ('immoMandantDesAufrufers',
+        'Der schwerste Fall des zweiten Blocks: Eimer UND Pfad kamen aus dem '
+        'Anfragekoerper und wurden mit dem service_role gelesen. Das war ein '
+        'Lesezugriff auf JEDE Datei JEDES Mandanten — nicht nur Exposes. '
+        'Gemessen wird jetzt am ersten Pfadsegment (fork_09).'),
+    'mietvertrag-pdf': ('immoMandantSichern',
+        'Der Mietvertrag eines fremden Mandanten — mit Mieter, Miete und '
+        'Anschrift.'),
+    'vertrag-pdf': ('immoMandantSichern',
+        'Der Maklervertrag eines fremden Mandanten.'),
+    'mpe-pdf-erzeugen': ('immoMandantSichern',
+        'Die Wertermittlung eines fremden Mandanten.'),
+    'eigentuemer-report-pdf': ('immoMandantSichern',
+        'Der Eigentuemerbericht zu einem fremden Objekt.'),
+    'portal-export': ('immoMandantSichern',
+        'Ein fremdes Objekt an ein Portal uebertragen — oder dort loeschen.'),
+    'portal-export-homepage': ('immoMandantSichern',
+        'Dasselbe fuer die Homepage.'),
+    'signatur-vorgang-starten': ('immoMandantSichern',
+        'Einen Signaturvorgang zu einem fremden Vertrag starten und damit '
+        'Einladungen an dessen Beteiligte verschicken.'),
+    'signatur-vorgang-widerrufen': ('immoMandantSichern',
+        'Einen fremden Signaturvorgang widerrufen.'),
     'fahrt-ermitteln': ('aufruferMandant',
         'Der erste Fund dieser Art (29.09.2026). Prueft jetzt erst das '
         'Objekt und den Mandanten, dann den Zwischenspeicher.'),
@@ -73,27 +99,17 @@ NOCH_OFFEN = {
     'eigentuemer-dokument-uebernehmen': 'dokument_id, eigentuemer_id',
     'eigentuemer-einladen': 'ansprechpartner_id, maklervertrag_id',
     'eigentuemer-einladung-nachfassen': 'eigentuemer_id',
-    'eigentuemer-report-pdf': 'immobilie_id',
-    'expose-pdf-erzeugen': 'immobilie_id',
-    'expose-pruefen': 'immobilie_id',
     'mail-anfrage-verarbeiten': 'mail_eingang_id',
     'mail-ki-vorschlag': 'immobilie_id',
     'mail-postfach-backfill': 'postfach_id',
     'mail-rechnung-weiterleiten': 'mail_eingang_id',
     'mail-zu-todo': 'mail_id, zustaendig_id',
-    'mietvertrag-pdf': 'mietvertrag_id',
     'mitarbeiter-anlegen': 'firma_id',
-    'mpe-pdf-erzeugen': 'bewertung_id',
     'newsletter-senden': 'kampagne_id',
-    'portal-export': 'immobilie_id',
-    'portal-export-homepage': 'immobilie_id',
     'projekt-nachricht-antwort': 'zugang_id',
-    'signatur-vorgang-starten': 'vertrag_id',
-    'signatur-vorgang-widerrufen': 'vorgang_id',
     'termin-erinnerung': 'termin_id',
     'termin-fahrzeit': 'termin_id, immobilie_id',
     'termin-serie': 'serie_id',
-    'vertrag-pdf': 'vertrag_id',
 }
 
 # Kennung aus dem Anfragekoerper: body.x_id, body?.x_id, const xId = body...

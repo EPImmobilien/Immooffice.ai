@@ -42,6 +42,21 @@ async function immoMandantSichern(req: Request, paare: Array<[string, unknown]>)
   }
 }
 
+// Wessen Mandant ist der Aufrufer? Fuer die Faelle, in denen nicht eine
+// Kennung, sondern ein PFAD aus dem Anfragekoerper kommt — das erste
+// Pfadsegment im Dateispeicher ist seit fork_09 die Mandantenkennung.
+async function immoMandantDesAufrufers(req: Request): Promise<string | null> {
+  const kopf = req.headers.get("Authorization") || "";
+  if (!/^Bearer\s+/i.test(kopf)) return null;
+  const nutzer = createClient(
+    Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: kopf } }, auth: { persistSession: false } });
+  const { data: u } = await nutzer.auth.getUser(kopf.replace(/^Bearer\s+/i, ""));
+  if (!u?.user) return null;
+  const { data: prof } = await nutzer.from("profiles").select("mandant_id").eq("id", u.user.id).maybeSingle();
+  return prof?.mandant_id ? String(prof.mandant_id) : null;
+}
+
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const LINK_BASIS = (Deno.env.get("EXPOSE_FREIGABE_BASIS") || "https://immooffice.example/?expose=").replace(/\/\?expose=$/, "/freigabe.html?expose=");
 const OBJEKT_BASIS = LINK_BASIS.replace(/freigabe\.html\?expose=$/, "objekt.html?t=");

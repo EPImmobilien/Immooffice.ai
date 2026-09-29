@@ -2062,9 +2062,9 @@ NACHBESSERN = [
     # =====================================================================
     ('FORK',
      'import { createClient } from "jsr:@supabase/supabase-js@2";',
-     'import { createClient } from "jsr:@supabase/supabase-js@2";\n\n// --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------\n// Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —\n// und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist\n// damit ungeprueft: sie kann auf einen Satz eines anderen Mandanten zeigen.\n//\n// public.mandant_sichern() aus fork_14 zieht genau diese Grenze. Sie muss\n// aber MIT DEM TOKEN DES AUFRUFERS gerufen werden — unter dem service_role\n// laesst sie jeden durch (mandant_grenze_gilt() ist dort false, mit Absicht:\n// Cron und Wartung haben keinen Mandanten). Deshalb ein zweiter Client, der\n// nur den mitgebrachten Kopf weiterreicht.\n//\n// Ohne Anmeldekopf oder mit dem Dienstschluessel passiert nichts — das sind\n// die internen Wege, und die sind nicht die Grenze, die hier gezogen wird.\nasync function immoMandantSichern(req: Request, paare: Array<[string, unknown]>): Promise<void> {\n  const kopf = req.headers.get("Authorization") || "";\n  if (!/^Bearer\\s+/i.test(kopf)) return;\n  const zuPruefen = paare.filter(([, id]) =>\n    typeof id === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));\n  if (!zuPruefen.length) return;\n  const nutzer = createClient(\n    Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!,\n    { global: { headers: { Authorization: kopf } }, auth: { persistSession: false } });\n  for (const [tabelle, id] of zuPruefen) {\n    const { error } = await nutzer.rpc("mandant_sichern", { p_tabelle: tabelle, p_id: id });\n    if (error) throw new Error("Kein Zugriff auf Daten eines anderen Mandanten.");\n  }\n}',
+     'import { createClient } from "jsr:@supabase/supabase-js@2";\n\n// --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------\n// Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —\n// und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist\n// damit ungeprueft: sie kann auf einen Satz eines anderen Mandanten zeigen.\n//\n// public.mandant_sichern() aus fork_14 zieht genau diese Grenze. Sie muss\n// aber MIT DEM TOKEN DES AUFRUFERS gerufen werden — unter dem service_role\n// laesst sie jeden durch (mandant_grenze_gilt() ist dort false, mit Absicht:\n// Cron und Wartung haben keinen Mandanten). Deshalb ein zweiter Client, der\n// nur den mitgebrachten Kopf weiterreicht.\n//\n// Ohne Anmeldekopf oder mit dem Dienstschluessel passiert nichts — das sind\n// die internen Wege, und die sind nicht die Grenze, die hier gezogen wird.\nasync function immoMandantSichern(req: Request, paare: Array<[string, unknown]>): Promise<void> {\n  const kopf = req.headers.get("Authorization") || "";\n  if (!/^Bearer\\s+/i.test(kopf)) return;\n  const zuPruefen = paare.filter(([, id]) =>\n    typeof id === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));\n  if (!zuPruefen.length) return;\n  const nutzer = createClient(\n    Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!,\n    { global: { headers: { Authorization: kopf } }, auth: { persistSession: false } });\n  for (const [tabelle, id] of zuPruefen) {\n    const { error } = await nutzer.rpc("mandant_sichern", { p_tabelle: tabelle, p_id: id });\n    if (error) throw new Error("Kein Zugriff auf Daten eines anderen Mandanten.");\n  }\n}\n\n// Wessen Mandant ist der Aufrufer? Fuer die Faelle, in denen nicht eine\n// Kennung, sondern ein PFAD aus dem Anfragekoerper kommt — das erste\n// Pfadsegment im Dateispeicher ist seit fork_09 die Mandantenkennung.\nasync function immoMandantDesAufrufers(req: Request): Promise<string | null> {\n  const kopf = req.headers.get("Authorization") || "";\n  if (!/^Bearer\\s+/i.test(kopf)) return null;\n  const nutzer = createClient(\n    Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!,\n    { global: { headers: { Authorization: kopf } }, auth: { persistSession: false } });\n  const { data: u } = await nutzer.auth.getUser(kopf.replace(/^Bearer\\s+/i, ""));\n  if (!u?.user) return null;\n  const { data: prof } = await nutzer.from("profiles").select("mandant_id").eq("id", u.user.id).maybeSingle();\n  return prof?.mandant_id ? String(prof.mandant_id) : null;\n}',
      'Waechter fuer Kennungen aus dem Anfragekoerper eingezogen.',
-     {'mitarbeiter-loeschen', 'mail-anhaenge-extrahieren', 'credentials-anzeigen', 'mail-gelesen-setzen', 'eigentuemer-person-hinzufuegen', 'rechnung-pdf-erzeugen', 'eigentuemer-nachricht-senden', 'expose-freigabe-erstellen'}),
+     {'eigentuemer-nachricht-senden', 'mail-anhaenge-extrahieren', 'credentials-anzeigen', 'eigentuemer-person-hinzufuegen', 'mitarbeiter-loeschen', 'vertrag-pdf', 'eigentuemer-report-pdf', 'portal-export', 'expose-freigabe-erstellen', 'signatur-vorgang-widerrufen', 'signatur-vorgang-starten', 'expose-pdf-erzeugen', 'mietvertrag-pdf', 'rechnung-pdf-erzeugen', 'mail-gelesen-setzen', 'mpe-pdf-erzeugen', 'portal-export-homepage'}),
     ('FORK', '    const query = admin.from("external_credentials").select("*").eq("aktiv", true);', '    // Der schwerste Fall dieser Runde: die Antwort enthaelt das\n    // ENTSCHLUESSELTE Passwort. Mit einer credential_id aus dem Koerper waere\n    // das der FTP- oder Portalzugang eines fremden Maklers im Klartext.\n    await immoMandantSichern(req, [["external_credentials", credentialId]]);\n\n    const query = admin.from("external_credentials").select("*").eq("mandant_id", profil.mandant_id).eq("aktiv", true);',
      'Zugangsdaten: nur die des eigenen Mandanten.',
      {'credentials-anzeigen'}),
@@ -2092,6 +2092,57 @@ NACHBESSERN = [
     ('FORK', '    const immobilieId = String(body.immobilie_id || "").trim();', '    const immobilieId = String(body.immobilie_id || "").trim();\n    await immoMandantSichern(req, [["immobilien", immobilieId],\n                                   ["kontakte", String(body.kontakt_id || "")]]);',
      'Expose-Freigabe: nur zu eigenen Objekten und Kontakten.',
      {'expose-freigabe-erstellen'}),
+
+    # --- Runde 2: die Dokumente. Ein PDF ist die vollstaendige Auskunft ueber
+    # einen Vorgang — Vertrag, Rechnung, Bewertung, Expose. Wer eine Kennung
+    # raten oder abschreiben kann, haelt es in der Hand.
+    ('FORK', 'const immobilie_id = body.immobilie_id;', 'const immobilie_id = body.immobilie_id;\n    await immoMandantSichern(req, [["immobilien", immobilie_id]]);',
+     'Expose-PDF: nur zu eigenen Objekten.',
+     {'expose-pdf-erzeugen'}),
+    ('FORK', '    const mietvertragId = (body.mietvertrag_id || "").toString().trim();', '    const mietvertragId = (body.mietvertrag_id || "").toString().trim();\n    await immoMandantSichern(req, [["mietvertraege", mietvertragId]]);',
+     'Mietvertrags-PDF: nur eigene Vertraege.',
+     {'mietvertrag-pdf'}),
+    ('FORK', '    const vertragId = (body.vertrag_id || "").toString().trim();', '    const vertragId = (body.vertrag_id || "").toString().trim();\n    await immoMandantSichern(req, [["vertraege", vertragId]]);',
+     'Vertrags-PDF: nur eigene Vertraege.',
+     {'vertrag-pdf'}),
+    ('FORK', 'const bewertung_id = body.bewertung_id;', 'const bewertung_id = body.bewertung_id;\n    await immoMandantSichern(req, [["bewertungen", bewertung_id]]);',
+     'Bewertungs-PDF: nur eigene Bewertungen.',
+     {'mpe-pdf-erzeugen'}),
+    ('FORK', '    const immobilieId = String(body.immobilie_id || ""); if (!immobilieId) throw new Error("immobilie_id fehlt.");', '    const immobilieId = String(body.immobilie_id || ""); if (!immobilieId) throw new Error("immobilie_id fehlt.");\n    await immoMandantSichern(req, [["immobilien", immobilieId]]);',
+     'Eigentuemer-Bericht: nur zu eigenen Objekten.',
+     {'eigentuemer-report-pdf'}),
+    ('FORK', '    portal = String(body?.portal || "").trim().toLowerCase();', '    portal = String(body?.portal || "").trim().toLowerCase();\n    await immoMandantSichern(req, [["immobilien", immobilieId]]);',
+     'Portalexport: nur eigene Objekte uebertragen.',
+     {'portal-export'}),
+    ('FORK', '    immobilieId = body?.immobilie_id || null;\n    const aktion: string = body?.aktion === "loeschen" ? "loeschen" : "uebertragen";', '    immobilieId = body?.immobilie_id || null;\n    await immoMandantSichern(req, [["immobilien", immobilieId]]);\n    const aktion: string = body?.aktion === "loeschen" ? "loeschen" : "uebertragen";',
+     'Homepage-Export: nur eigene Objekte.',
+     {'portal-export-homepage'}),
+    ('FORK', '    const vertragId = (body.vertrag_id || "").toString().trim();', '    const vertragId = (body.vertrag_id || "").toString().trim();\n    await immoMandantSichern(req, [["vertraege", vertragId], ["objektnachweise", vertragId]]);',
+     'Signaturvorgang: nur zu eigenen Dokumenten.',
+     {'signatur-vorgang-starten'}),
+    ('FORK', '    const vorgangId = body.vorgang_id;', '    const vorgangId = body.vorgang_id;\n    await immoMandantSichern(req, [["signatur_vorgaenge", vorgangId]]);',
+     'Signatur widerrufen: nur eigene Vorgaenge.',
+     {'signatur-vorgang-widerrufen'}),
+
+    # =====================================================================
+    # FORK — expose-pruefen las jede Datei jedes Mandanten
+    #
+    # Die Funktion nimmt pdf_base64 ODER ein Paar aus Eimer und Pfad
+    # entgegen und laedt damit mit dem service_role aus dem Dateispeicher.
+    # Beides kommt aus dem Anfragekoerper. Das ist nicht "eine Kennung
+    # geglaubt", das ist ein Lesezugriff auf jede Datei jedes Mandanten —
+    # nicht nur Exposes, sondern jeder Eimer und jeder Pfad, den ein
+    # Angemeldeter benennen kann.
+    #
+    # Gemessen wird am ersten Pfadsegment: seit fork_09 ist das die
+    # Mandantenkennung.
+    # =====================================================================
+    ('FORK', 'import { createClient } from "https://esm.sh/@supabase/supabase-js@2";', 'import { createClient } from "https://esm.sh/@supabase/supabase-js@2";\n\n// Wessen Mandant ist der Aufrufer? Hier kommt keine Kennung aus dem\n// Anfragekoerper, sondern ein PFAD — und der wird mit dem service_role\n// gelesen, fuer den RLS nicht gilt. Das erste Pfadsegment ist seit fork_09\n// die Mandantenkennung; daran wird gemessen.\nasync function immoMandantDesAufrufers(req: Request): Promise<string | null> {\n  const kopf = req.headers.get("Authorization") || "";\n  if (!/^Bearer\\s+/i.test(kopf)) return null;\n  const nutzer = createClient(\n    Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!,\n    { global: { headers: { Authorization: kopf } }, auth: { persistSession: false } });\n  const { data: u } = await nutzer.auth.getUser(kopf.replace(/^Bearer\\s+/i, ""));\n  if (!u?.user) return null;\n  const { data: prof } = await nutzer.from("profiles").select("mandant_id").eq("id", u.user.id).maybeSingle();\n  return prof?.mandant_id ? String(prof.mandant_id) : null;\n}',
+     'Waechter fuer Pfade aus dem Anfragekoerper eingezogen.',
+     {'expose-pruefen'}),
+    ('FORK', '    if (!pdfBase64 && body.bucket && body.pfad) {\n      const { data, error } = await admin.storage.from(body.bucket).download(body.pfad);', '    if (!pdfBase64 && body.bucket && body.pfad) {\n      // Eimer UND Pfad kommen aus dem Anfragekoerper, gelesen wird mit dem\n      // service_role. Ohne Grenze waere das ein Lesezugriff auf jede Datei\n      // jedes Mandanten — nicht nur Exposes: jeder Eimer, jeder Pfad.\n      const eigenerMandant = await immoMandantDesAufrufers(req);\n      if (!eigenerMandant || !String(body.pfad).startsWith(eigenerMandant + "/")) {\n        return new Response(JSON.stringify({ error: "Kein Zugriff auf diese Datei." }),\n          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });\n      }\n      const { data, error } = await admin.storage.from(body.bucket).download(body.pfad);',
+     'Expose-Pruefung: nur Dateien des eigenen Mandanten.',
+     {'expose-pruefen'}),
 ]
 
 
