@@ -64,6 +64,11 @@ def pruefungen(html):
     # E-Mail geschickt", und es kommt nie eine.
     pruefe('identities.length === 0' in html,
            'Eine bereits vorhandene Adresse wird erkannt')
+    # Die Einstellungen waren am Schreibtisch nur ueber die Adresszeile
+    # erreichbar: einen Eintrag hatte nur das Burger-Menue, und das gibt es
+    # erst unter 768 Pixeln.
+    pruefe('immoEinstellungenKachel' in html,
+           'Die Einstellungen haben eine Kachel auf dem Dashboard')
     pruefe(html.count('function Registrieren(') == 1,
            'Das Registrierungsformular steht genau einmal',
            f"gefunden: {html.count('function Registrieren(')}")

@@ -2811,3 +2811,36 @@ Der Rauchtest prüft die Abfrage jetzt mit.
 Registrierung ist freigegeben und die Bestätigung verlangt. Beide
 Netlify-Adressen liefern dieselbe vollständige Oberfläche aus; die
 `netlify.toml`-Umstellung hat gewirkt.
+
+---
+
+## „Wo finde ich Einstellungen?" — eine Seite ohne Eingang (29.09.2026)
+
+Gefragt wurde, warum die Änderungen im Admin-Bereich nicht zu sehen sind.
+Nachgemessen an der laufenden Seite: sie **sind** ausgeliefert —
+`EinstZahlung`, `VorlagenMarkierung`, `laufzeit_monate`,
+`mindest_schriftgroesse`, alles vorhanden. Es lag nicht am Deploy.
+
+Es lag daran, dass **kein Weg dorthin führte.**
+
+Die Seite `EinstellungenPage` gibt es, die Rechteprüfung gibt es
+(`role === 'chef'`), und seit Phase 3 stehen dort zwei neue Reiter. Aber im
+ganzen Quelltext war die Ansicht `einstellungen` an **genau einer** Stelle
+verlinkt: im `MobileBurgerMenu`. Und das rendert `PageShell` erst, wenn das
+Fenster **768 Pixel oder schmaler** ist. Auf dem Dashboard fehlte die Kachel
+— `KACHEL_GRUPPEN` führte unter „Werkzeuge & Verwaltung" alles außer dieser
+einen.
+
+Am Schreibtisch war die Seite damit nur über `#einstellungen` in der
+Adresszeile erreichbar. Das ist kein Fehler, den ein Test findet: die Seite
+lädt, die Rechte stimmen, die Daten stimmen. Sie ist nur unsichtbar.
+
+Behoben mit einer Kachel in derselben Gruppe wie „Admin", mit derselben
+Bedingung wie die Seite selbst (`role === 'chef'`). Kein Redesign — ein
+fehlender Eingang. Der Rauchtest prüft sie jetzt mit; dasselbe gilt seit
+heute für das Registrierungsformular, den Weg dorthin und die Erkennung
+einer bereits vorhandenen Adresse.
+
+**Was ich daraus mitnehme:** „Es ist gebaut und die Tests sind grün" heißt
+nicht „es ist benutzbar". Bei jedem weiteren Bildschirm, den ich anfasse,
+gehört die Frage dazu, über welchen Knopf ein Mensch dort ankommt.

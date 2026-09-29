@@ -22423,7 +22423,7 @@ const KACHEL_GRUPPEN = [{
   }, {
     id: "verwaltung",
     titel: "Werkzeuge & Verwaltung",
-    tiles: ["werkzeuge", "onedrive", "rechnungen", "finanzen", "bewerber", "admin"]
+    tiles: ["werkzeuge", "onedrive", "rechnungen", "finanzen", "bewerber", "admin", "einstellungen"]
   }],
   KACHEL_GRUPPE_VON = (() => {
     const e = {};
@@ -22473,6 +22473,19 @@ function HomePage({
       title: "Bewerber",
       subtitle: "Einstellungstests verwalten",
       icon: Users,
+      num: "★",
+      isChef: !0
+    },
+    // Die Seite "Einstellungen" gab es, erreichbar war sie nicht: einen
+    // Eintrag hatte nur das Burger-Menue, und das erscheint erst unter
+    // 768 Pixeln Fensterbreite. Am Schreibtisch fuehrte kein Weg dorthin —
+    // ausser ueber "#einstellungen" in der Adresszeile. Gemeldet am
+    // 29.09.2026: "wo finde ich Einstellungen".
+    immoEinstellungenKachel = {
+      id: "einstellungen",
+      title: "Einstellungen",
+      subtitle: "Firma, Standorte, Vorlagen",
+      icon: Wrench,
       num: "★",
       isChef: !0
     };
@@ -22567,7 +22580,7 @@ function HomePage({
     icon: Search,
     num: "14"
   }].filter(t => hatRecht(e, t.id));
-  hatRecht(e, "posteingang") && c.push(o), hatRecht(e, "rechnungen") && !hatRecht(e, "finanzen") && c.push(i), hatRecht(e, "finanzen") && c.push(l), e && "chef" === e.role && c.push(s), hatRecht(e, "admin") && c.push(r);
+  hatRecht(e, "posteingang") && c.push(o), hatRecht(e, "rechnungen") && !hatRecht(e, "finanzen") && c.push(i), hatRecht(e, "finanzen") && c.push(l), e && "chef" === e.role && c.push(s), hatRecht(e, "admin") && c.push(r), e && "chef" === e.role && c.push(immoEinstellungenKachel);
   const d = Object.fromEntries(c.map(e => [e.id, e])),
     u = c.map(e => e.id),
     [m, g] = useState(u),

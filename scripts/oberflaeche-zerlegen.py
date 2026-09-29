@@ -2952,6 +2952,35 @@ ERSETZUNGEN = [
      '\\ \\ \\ \\ \\ \\ const\\ \\{\\ error\\ \\}\\ =\\ await\\ window\\._sb\\.auth\\.signUp\\(\\{\\\n\\ \\ \\ \\ \\ \\ \\ \\ email:\\ feld\\.email\\.trim\\(\\)\\.toLowerCase\\(\\),\\\n\\ \\ \\ \\ \\ \\ \\ \\ password:\\ feld\\.passwort,\\\n\\ \\ \\ \\ \\ \\ \\ \\ options:\\ \\{\\ data:\\ \\{\\ firma:\\ feld\\.firma\\.trim\\(\\),\\ name:\\ feld\\.name\\.trim\\(\\)\\ \\}\\ \\}\\\n\\ \\ \\ \\ \\ \\ \\}\\);\\\n\\ \\ \\ \\ \\ \\ if\\ \\(error\\)\\ throw\\ error;\\\n\\ \\ \\ \\ \\ \\ setzeFertig\\(true\\);',
      '      const { data, error } = await window._sb.auth.signUp({\n        email: feld.email.trim().toLowerCase(),\n        password: feld.passwort,\n        options: { data: { firma: feld.firma.trim(), name: feld.name.trim() } }\n      });\n      if (error) throw error;\n      // Eine Anmeldung mit einer BEREITS VORHANDENEN Adresse meldet Supabase\n      // nicht als Fehler — das wuerde verraten, welche Adressen es gibt. Es\n      // legt dann aber auch nichts an und verschickt nichts. Erkennbar ist\n      // der Fall allein an der leeren Liste der Identitaeten.\n      //\n      // Ohne diese Abfrage stand hier "Wir haben Ihnen eine E-Mail\n      // geschickt", und der Anmeldende wartete auf Post, die nie kommen\n      // konnte. Am 29.09.2026 genau so passiert.\n      //\n      // Ja, das verraet jetzt, dass es die Adresse gibt. Das ist die\n      // Abwaegung: eine Sackgasse ohne jede Rueckmeldung ist schlechter als\n      // die Auskunft, dass hier schon jemand ist — zumal die Anmeldemaske\n      // daneben dieselbe Auskunft ohnehin gibt.\n      if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {\n        setzeLaeuft(false);\n        return setzeFehler("Zu dieser E-Mail-Adresse gibt es bereits ein Konto. Bitte melden Sie sich an — oder nehmen Sie eine andere Adresse, wenn Sie ein weiteres Unternehmen anlegen möchten.");\n      }\n      setzeFertig(true);',
      'Registrierung: eine vorhandene Adresse wird als solche gemeldet.'),
+
+    # =====================================================================
+    # FORK — die Einstellungen waren am Schreibtisch nicht zu finden
+    #
+    # Die Seite gibt es, die Rechtepruefung gibt es ("chef"), und seit
+    # Phase 3 stehen dort zwei neue Reiter: "Zahlung & Freigabe" und
+    # "Vertragsvorlagen". Einen WEG dorthin gab es nur an einer Stelle: im
+    # Burger-Menue, und das rendert PageShell erst unter 768 Pixeln
+    # Fensterbreite. Auf dem Dashboard fehlte die Kachel.
+    #
+    # Damit war eine Seite, an der wir gearbeitet haben, am Schreibtisch nur
+    # ueber "#einstellungen" in der Adresszeile erreichbar. Gemeldet am
+    # 29.09.2026 mit der Frage "wo finde ich Einstellungen".
+    #
+    # Eine Kachel, dieselbe Bedingung wie die Seite, in derselben Gruppe wie
+    # "Admin". Kein Redesign, ein fehlender Eingang.
+    # =====================================================================
+    ('FORK',
+     '\\ \\ \\ \\ id:\\ "verwaltung",\\\n\\ \\ \\ \\ titel:\\ "Werkzeuge\\ \\&\\ Verwaltung",\\\n\\ \\ \\ \\ tiles:\\ \\["werkzeuge",\\ "onedrive",\\ "rechnungen",\\ "finanzen",\\ "bewerber",\\ "admin"\\]',
+     '    id: "verwaltung",\n    titel: "Werkzeuge & Verwaltung",\n    tiles: ["werkzeuge", "onedrive", "rechnungen", "finanzen", "bewerber", "admin", "einstellungen"]',
+     'Kachelgruppe: die Einstellungen gehoeren zur Verwaltung.'),
+    ('FORK',
+     '\\ \\ \\ \\ s\\ =\\ \\{\\\n\\ \\ \\ \\ \\ \\ id:\\ "bewerber",\\\n\\ \\ \\ \\ \\ \\ title:\\ "Bewerber",\\\n\\ \\ \\ \\ \\ \\ subtitle:\\ "Einstellungstests\\ verwalten",\\\n\\ \\ \\ \\ \\ \\ icon:\\ Users,\\\n\\ \\ \\ \\ \\ \\ num:\\ "★",\\\n\\ \\ \\ \\ \\ \\ isChef:\\ !0\\\n\\ \\ \\ \\ \\};',
+     '    s = {\n      id: "bewerber",\n      title: "Bewerber",\n      subtitle: "Einstellungstests verwalten",\n      icon: Users,\n      num: "★",\n      isChef: !0\n    },\n    // Die Seite "Einstellungen" gab es, erreichbar war sie nicht: einen\n    // Eintrag hatte nur das Burger-Menue, und das erscheint erst unter\n    // 768 Pixeln Fensterbreite. Am Schreibtisch fuehrte kein Weg dorthin —\n    // ausser ueber "#einstellungen" in der Adresszeile. Gemeldet am\n    // 29.09.2026: "wo finde ich Einstellungen".\n    immoEinstellungenKachel = {\n      id: "einstellungen",\n      title: "Einstellungen",\n      subtitle: "Firma, Standorte, Vorlagen",\n      icon: Wrench,\n      num: "★",\n      isChef: !0\n    };',
+     'Kachel fuer die Einstellungen angelegt.'),
+    ('FORK',
+     'e\\ \\&\\&\\ "chef"\\ ===\\ e\\.role\\ \\&\\&\\ c\\.push\\(s\\),\\ hatRecht\\(e,\\ "admin"\\)\\ \\&\\&\\ c\\.push\\(r\\);',
+     'e && "chef" === e.role && c.push(s), hatRecht(e, "admin") && c.push(r), e && "chef" === e.role && c.push(immoEinstellungenKachel);',
+     'Die Kachel erscheint fuer den Chef — dieselbe Bedingung wie die Seite.'),
 ]
 
 
