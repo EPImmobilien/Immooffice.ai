@@ -33,8 +33,11 @@ Deno.serve(async (req) => {
       const { data: abgerufen } = await db.rpc("expose_abgerufen", { p_email: f.email, p_kontakt_id: f.kontakt_id, p_immobilie_id: f.immobilie_id });
       if (abgerufen) { erg.push({ id: f.id, an: f.email, uebersprungen: "über anderen Link abgerufen" }); continue; }
       try {
-        const { data: im } = await db.from("immobilien").select("immo_nr, objekttitel, bezeichnung, plz, ort, zustaendig_id").eq("id", f.immobilie_id).maybeSingle();
-        const { data: firma } = await db.from("firma_stammdaten").select("firma_name, email, strasse, plz, ort").eq("slug", f.firma_slug || "standard").maybeSingle();
+        const { data: im } = await db.from("immobilien").select("immo_nr, objekttitel, bezeichnung, plz, ort, zustaendig_id, mandant_id").eq("id", f.immobilie_id).maybeSingle();
+        // Wie in expose-freigabe: der Slug "standard" ist seit fork_17 nur
+        // noch je Mandant eindeutig. Ohne Grenze stuende ein fremder
+        // Firmenname unter der Erinnerung.
+        const { data: firma } = await db.from("firma_stammdaten").select("firma_name, email, strasse, plz, ort").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").eq("slug", f.firma_slug || "standard").maybeSingle();
         const maklerId = im?.zustaendig_id || f.erstellt_von;
         const { data: makler } = maklerId ? await db.from("profiles").select("name, email, telefon").eq("id", maklerId).maybeSingle() : { data: null };
         const titel = im?.objekttitel || im?.bezeichnung || "die angefragte Immobilie";

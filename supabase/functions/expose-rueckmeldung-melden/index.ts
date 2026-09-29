@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
     if (dok.eigentuemer_id !== eigentuemerId) throw new Error("Keine Berechtigung für dieses Dokument.");
 
     const { data: eigDaten } = await supabase
-      .from("eigentuemer").select("vorname, nachname, firma").eq("id", eigentuemerId).maybeSingle();
+      .from("eigentuemer").select("vorname, nachname, firma, mandant_id").eq("id", eigentuemerId).maybeSingle();
     const eigName = eigDaten
       ? (eigDaten.firma || [eigDaten.vorname, eigDaten.nachname].filter(Boolean).join(" ") || "Eigentümer")
       : "Eigentümer";
@@ -80,7 +80,7 @@ Deno.serve(async (req) => {
       const { data: aps } = await supabase.from("profiles").select("name, email").in("id", apIds);
       for (const p of aps || []) if (p.email) empfaengerMap.set(p.email.toLowerCase(), p.name || "");
     }
-    const { data: chefs } = await supabase.from("profiles").select("name, email").eq("role", "chef");
+    const { data: chefs } = await supabase.from("profiles").select("name, email").eq("mandant_id", eigDaten?.mandant_id ?? "00000000-0000-0000-0000-000000000000").eq("role", "chef");
     for (const c of chefs || []) if (c.email) empfaengerMap.set(c.email.toLowerCase(), c.name || "");
     if (empfaengerMap.size === 0) throw new Error("Keine internen Empfaenger gefunden.");
 

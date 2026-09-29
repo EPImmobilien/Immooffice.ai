@@ -168,7 +168,19 @@ for _f in ('credentials-anzeigen', 'mitarbeiter-loeschen',
            # Runde 4: die vier anderer Bauart — Zeitfenster statt Kennung,
            # und termin-serie konnte sogar fremde Termine loeschen.
            'termin-erinnerung', 'besichtigung-nachfassen', 'termin-serie',
-           'eigentuemer-einladung-nachfassen'):
+           'eigentuemer-einladung-nachfassen',
+           # Runde 5 und 6: die Faelle, die das erste, zu enge Kriterium
+           # nicht gesehen hat — ein Pfad statt einer Kennung, eine
+           # destrukturierte Kennung, ein Rundruf an "alle Chefs" oder eine
+           # Rueckfallkette, die mit "irgendein Postfach" endet.
+           'objekt-wissen-auslesen', 'mail-zu-mietanfrage',
+           'mail-postfach-speichern', 'credentials-speichern', 'ea-mailtest',
+           'energieausweis-auslesen', 'upload_benachrichtigung_planen',
+           'brief-pdf-erzeugen', 'reservierung-pdf-erzeugen',
+           'reservierung-word-erzeugen', 'eigentuemer-link-erneut-senden',
+           'eigentuemer-loeschen', 'web-asset-kopieren',
+           'makler-nachricht-senden', 'expose-rueckmeldung-melden',
+           'expose-erinnerung', 'projekt-datei-benachrichtigung'):
     ERWEITERT[_f] = ('Prueft Kennungen aus dem Anfragekoerper gegen den '
                      'Mandanten des Aufrufers (Phase 2)')
 

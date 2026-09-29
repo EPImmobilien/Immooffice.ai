@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
     }
     if (!eigentuemerId) throw new Error("Kein verkn\u00fcpfter Eigent\u00fcmer-Zugang gefunden.");
 
-    const { data: eigDaten } = await supabase.from("eigentuemer").select("vorname, nachname, firma").eq("id", eigentuemerId).maybeSingle();
+    const { data: eigDaten } = await supabase.from("eigentuemer").select("vorname, nachname, firma, mandant_id").eq("id", eigentuemerId).maybeSingle();
     const eigName = eigDaten ? (eigDaten.firma || [eigDaten.vorname, eigDaten.nachname].filter(Boolean).join(" ") || absenderName || "Eigent\u00fcmer") : (absenderName || "Eigent\u00fcmer");
 
     const body = await req.json();
@@ -49,7 +49,9 @@ Deno.serve(async (req) => {
       const { data: aps } = await supabase.from("profiles").select("id, name, email").in("id", apIds);
       for (const p of aps || []) { if (p.email) empfaengerMap.set(p.email.toLowerCase(), p.name || ""); if (p.id) apUserIds.add(p.id); }
     }
-    const { data: chefs } = await supabase.from("profiles").select("id, name, email").eq("role", "chef");
+    // Der Rundruf an "alle Chefs" traf die ganze Plattform: die Nachricht
+    // eines Eigentuemers an SEINEN Makler landete in jedem Buero.
+    const { data: chefs } = await supabase.from("profiles").select("id, name, email").eq("mandant_id", eigDaten?.mandant_id ?? "00000000-0000-0000-0000-000000000000").eq("role", "chef");
     for (const c of chefs || []) if (c.email) empfaengerMap.set(c.email.toLowerCase(), c.name || "");
     if (empfaengerMap.size === 0) throw new Error("Keine internen Empfaenger gefunden.");
 

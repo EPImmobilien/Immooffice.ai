@@ -122,7 +122,7 @@ Deno.serve(async (req) => {
     if (dateien.length === 0 && updates.length === 0) return jsonResponse({ ok: true, versendet: 0 });
 
     const projektIds = [...new Set([...dateien.map((d: any) => d.projekt_id), ...updates.map((u: any) => u.projekt_id)])];
-    const { data: projekte } = await admin.from("projekte").select("id, name, oeffentliche_url").in("id", projektIds);
+    const { data: projekte } = await admin.from("projekte").select("id, name, oeffentliche_url, mandant_id").in("id", projektIds);
     const projektMap = new Map((projekte || []).map((p: any) => [p.id, p]));
 
     const { data: zugaenge } = await admin.from("projekt_zugaenge")
@@ -133,13 +133,21 @@ Deno.serve(async (req) => {
       .select("*").eq("aktiv", true)
       .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false });
 
-    const postfachFuerEmpfaenger = (ansprechpartnerId: string | null, uploaderId: string | null) =>
-      (postfaecher || []).find((p: any) => ansprechpartnerId && p.benutzer_id === ansprechpartnerId && p.standard_zum_senden)
-      || (postfaecher || []).find((p: any) => ansprechpartnerId && p.benutzer_id === ansprechpartnerId)
-      || (postfaecher || []).find((p: any) => (p.email_adresse || "").toLowerCase() === STANDARD_MAIL)
-      || (postfaecher || []).find((p: any) => uploaderId && p.benutzer_id === uploaderId && p.standard_zum_senden)
-      || (postfaecher || []).find((p: any) => uploaderId && p.benutzer_id === uploaderId)
-      || (postfaecher || [])[0] || null;
+    // Die Rueckfallkette endete mit "irgendein Postfach". Ueber mehrere
+    // Mandanten hinweg heisst das: die Meldung des einen Bautraegers geht
+    // ueber den SMTP-Zugang des anderen hinaus. Gewaehlt wird deshalb nur
+    // aus den Postfaechern des Mandanten, dem das Projekt gehoert — und
+    // ohne Mandanten gar keines.
+    const postfachFuerEmpfaenger = (ansprechpartnerId: string | null, uploaderId: string | null, mandant: string | null) => {
+      if (!mandant) return null;
+      const eigene = (postfaecher || []).filter((p: any) => p.mandant_id === mandant);
+      return eigene.find((p: any) => ansprechpartnerId && p.benutzer_id === ansprechpartnerId && p.standard_zum_senden)
+        || eigene.find((p: any) => ansprechpartnerId && p.benutzer_id === ansprechpartnerId)
+        || eigene.find((p: any) => (p.email_adresse || "").toLowerCase() === STANDARD_MAIL)
+        || eigene.find((p: any) => uploaderId && p.benutzer_id === uploaderId && p.standard_zum_senden)
+        || eigene.find((p: any) => uploaderId && p.benutzer_id === uploaderId)
+        || eigene[0] || null;
+    };
 
     const proEmpfaenger = new Map<string, { zugang: any; projekt: any; dateien: any[]; updates: any[]; uploader: string | null }>();
     const hole = (z: any, projekt: any, uploader: string | null) => {
@@ -180,7 +188,7 @@ Deno.serve(async (req) => {
 
     let versendet = 0;
     for (const { zugang, projekt, dateien: dz, updates: uz, uploader } of proEmpfaenger.values()) {
-      const postfach = postfachFuerEmpfaenger(zugang.ansprechpartner_id || null, uploader);
+      const postfach = postfachFuerEmpfaenger(zugang.ansprechpartner_id || null, uploader, projekt?.mandant_id ?? null);
       const loginUrl = (projekt.oeffentliche_url || "").replace(/\/+$/, "");
 
       const persoenliche = dz.filter((d: any) => d.zugang_id);
