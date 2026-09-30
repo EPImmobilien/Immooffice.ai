@@ -99,7 +99,7 @@ function textAusMail(text: string | null, html: string | null): string {
   return s.replace(/\n{3,}/g, "\n\n").trim().slice(0, 12000);
 }
 
-const SYSTEM = `Du liest E-Mails eines Immobilienmaklerbüros (Musterhaus Immobilien)
+const SYSTEM = `Du liest E-Mails eines Immobilienmaklerbüros
 und entscheidest, ob darin ein VERKÄUFER-LEAD steckt: eine Person, die ihre eigene Immobilie
 bewerten lassen oder verkaufen möchte, oder ein Portal, das genau so einen Kontakt weiterleitet.
 

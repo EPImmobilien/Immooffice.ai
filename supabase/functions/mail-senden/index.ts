@@ -25,7 +25,7 @@
 // NEU v20 (26.09.2026): Signatur genau einmal.
 //   Befund: Automatische Texte (Termine, Besichtigungen, Exposé-Links, Urlaub, Landingpage, Vorgänge)
 //   enden mit "Mit freundlichen Grüßen" + Name; die Postfach-Signatur kam trotzdem noch einmal
-//   darunter, weil nur die ersten 40 Zeichen der Signatur gesucht wurden. Texte mit "Musterhaus Immobilien
+//   darunter, weil nur die ersten 40 Zeichen der Signatur gesucht wurden. Texte mit dem Firmennamen im
 //   Immobilien" bekamen dagegen gar keine Signatur. Jetzt gilt eine Regel (mail-signatur.ts):
 //   Grußformel am Textende abschneiden und die Postfach-Signatur genau einmal anhängen; steckt die
 //   Signatur schon im Text (sichtbare Signatur, signatur_auto === false), bleibt alles; ohne

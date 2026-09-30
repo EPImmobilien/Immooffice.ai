@@ -47,7 +47,7 @@ interface RequestBody {
 const PORTALFELDER = ["objekttitel", "beschreibung_objekt", "beschreibung_lage", "beschreibung_ausstattung", "beschreibung_sonstiges"];
 
 const SYSTEM_PROMPT = `# Rolle
-Du bist der interne Exposé-Prüfer von Musterhaus Immobilien GmbH . Du machst eine schnelle, praktische Endkontrolle vor der Veröffentlichung — keine juristische Tiefenprüfung. Du prüfst genau die sieben Punkte unten und sonst nichts.
+Du bist ein interner Exposé-Prüfer. Du machst eine schnelle, praktische Endkontrolle vor der Veröffentlichung — keine juristische Tiefenprüfung. Du prüfst genau die sieben Punkte unten und sonst nichts.
 
 # Was du prüfst
 

@@ -83,7 +83,7 @@ function jsonReparieren(t: string): any | null {
   return null;
 }
 
-const SYSTEM = `Du liest Unterlagen zu einer Immobilie für ein Maklerbüro (Musterhaus Immobilien GmbH) aus.
+const SYSTEM = `Du liest Unterlagen zu einer Immobilie für ein Maklerbüro aus.
 Ziel: eine Faktenbasis, mit der später Kundenfragen per E-Mail korrekt beantwortet werden können.
 
 Regeln:

@@ -72,7 +72,7 @@ const norm = (s: unknown) => String(s || "").toLowerCase().replace(/ä/g, "ae").
 async function kiExtrahieren(text: string, betreff: string, absender: string, weitergeleitet: boolean) {
   const key = Deno.env.get("ANTHROPIC_API_KEY");
   if (!key) throw new Error("ANTHROPIC_API_KEY fehlt");
-  const prompt = `Du bekommst eine E-Mail an einen Immobilienmakler (Musterhaus Immobilien GmbH). Extrahiere die Daten als JSON. Antworte NUR mit dem JSON-Objekt, ohne Erklärung, ohne Markdown.
+  const prompt = `Du bekommst eine E-Mail an einen Immobilienmakler. Extrahiere die Daten als JSON. Antworte NUR mit dem JSON-Objekt, ohne Erklärung, ohne Markdown.
 ${weitergeleitet ? "\nWICHTIG: Diese Mail wurde von einem KOLLEGEN intern weitergeleitet (Absender @immooffice.example). Der Kollege ist NIEMALS der Kontakt. Der Kontakt ist der ursprüngliche Anfragesteller – er steht im weitergeleiteten Teil (z. B. hinter \"Von:\" / \"From:\", in einem Portal-Block \"Interessent\" oder im Formulartext \"Frau/Herr X wünscht Kontakt\" mit E-Mail und Telefon).\n" : ""}
 Schema:
 {

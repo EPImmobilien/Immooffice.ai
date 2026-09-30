@@ -20,8 +20,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const BASIS_SYSTEM_PROMPT = `Du bist der KI-Assistent fuer das interne Tool von Musterhaus Immobilien GmbH
-Du hilfst den Mitarbeitern (Lasse Musterhaus und Team) bei taeglichen
+// Der Assistent gehoert dem Haus, das ihn benutzt. Der Firmenname kommt
+// beim Aufruf dazu; der erfundene Geschaeftsfuehrer ist ersatzlos weg.
+const BASIS_SYSTEM_PROMPT = `Du bist der KI-Assistent fuer das interne Tool eines Immobilienbueros.
+Du hilfst den Mitarbeitern bei taeglichen
 Aufgaben rund um Immobilienmakler-Geschaeft.
 
 Du kannst helfen bei:

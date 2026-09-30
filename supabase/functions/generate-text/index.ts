@@ -1,5 +1,5 @@
 // Supabase Edge Function: generate-text
-// Erzeugt Exposé-Texte mit Claude (Anthropic) im Stil von Musterhaus Immobilien.
+// Erzeugt Exposé-Texte mit Claude (Anthropic) nach den Stilregeln des Hauses.
 //
 // v5.12.0: Captions: korrekte Telefonnummer (vorher stand eine falsche
 //          Nummer fest im Prompt); Verbot, Kontaktdaten zu erfinden; fester KI-Hinweis
@@ -130,7 +130,7 @@ function beispieleFuer(kategorie: string | undefined, art: "objekt" | "lage"): s
   return [...eigene, ...haus];
 }
 
-const STIL_REGELN = `Musterhaus-Stilrichtlinien (immer einhalten):
+const STIL_REGELN = `Stilrichtlinien (immer einhalten):
 - Sachlich-warm, nie marktschreierisch. Keine Werbe-Floskeln.
 - Fakten zuerst, Atmosphäre danach. Konkrete Zahlen statt vager Aussagen.
 - Jahreszahlen konkret nennen.
@@ -201,7 +201,7 @@ function buildPrompt(body: RequestBody): { system: string; user: string } {
     const titel = (daten.headline || "").toString().trim();
     const inhalt = (daten.besonderheiten || "").toString().trim();
     return {
-      system: `Du bist Redakteur für Musterhaus Immobilien GmbH. Aus einer Branchen-Nachricht destillierst du die wichtigsten KERNAUSSAGEN fuer eine Social-Media-Kachel.
+      system: `Du bist Redakteur für ein Immobilienbüro. Aus einer Branchen-Nachricht destillierst du die wichtigsten KERNAUSSAGEN fuer eine Social-Media-Kachel.
 
 REGELN:
 - Genau 3 Kernaussagen.
@@ -233,11 +233,11 @@ Antworte AUSSCHLIESSLICH mit einem JSON-Array aus genau 3 Strings, ohne Markdown
       : `\n\nKEINE Hashtags am Ende – lass den Hashtag-Block komplett weg.`;
 
     return {
-      system: `Du bist Social-Media-Texter für Musterhaus Immobilien GmbH. Du schreibst eine AUSFÜHRLICHE, gut erklärende Instagram-Caption zu einer BRANCHEN-NACHRICHT (kein Objekt-Inserat).
+      system: `Du bist Social-Media-Texter für ein Immobilienbüro. Du schreibst eine AUSFÜHRLICHE, gut erklärende Instagram-Caption zu einer BRANCHEN-NACHRICHT (kein Objekt-Inserat).
 
 KONTEXT: Auf der zugehörigen Bild-Kachel stehen nur 3 kurze Kernaussagen plus der Hinweis "Mehr dazu in der Caption". Die Caption ist also der Ort, an dem das Thema WIRKLICH erklärt und eingeordnet wird – sie muss die Stichpunkte mit Substanz füllen, nicht nur wiederholen.
 
-ZIEL: Die Nachricht verständlich erklären und konkret einordnen – als hilfreicher, fundierter Hinweis für Eigentümer, Verkäufer und Interessenten. Musterhaus Immobilien positioniert sich als kompetenter, zugänglicher Ansprechpartner.
+ZIEL: Die Nachricht verständlich erklären und konkret einordnen – als hilfreicher, fundierter Hinweis für Eigentümer, Verkäufer und Interessenten. Das Büro positioniert sich als kompetenter, zugänglicher Ansprechpartner.
 
 WICHTIG:
 - KEINE Immobilie bewerben, KEIN "Neu im Angebot".
@@ -294,7 +294,7 @@ Antworte AUSSCHLIESSLICH mit der fertigen Caption – kein Vorwort, kein Markdow
       : `\n\nKein Foto beigefügt - das ist okay.`;
 
     return {
-      system: `Du bist Social-Media-Texter für Musterhaus Immobilien GmbH. Du schreibst eine Instagram-Caption für eine VERKAUFTE Immobilie.
+      system: `Du bist Social-Media-Texter für ein Immobilienbüro. Du schreibst eine Instagram-Caption für eine VERKAUFTE Immobilie.
 
 WICHTIG - KEINE Verkaufsanzeige:
 - Immobilie ist VERKAUFT
@@ -351,7 +351,7 @@ Antworte AUSSCHLIESSLICH mit der fertigen Caption.`,
       : `\n\nKein Foto. Highlights aus Eckdaten ableiten.`;
 
     return {
-      system: `Du bist Social-Media-Texter für Musterhaus Immobilien GmbH. Instagram-Captions im lockeren Stil mit Emojis.
+      system: `Du bist Social-Media-Texter für ein Immobilienbüro. Instagram-Captions im lockeren Stil mit Emojis.
 
 REGELN:
 - Deutsch, neutral. Emojis am Zeilenanfang (🏡 ✨ 📍 📐 🛏️ 📩). 600–900 Zeichen ohne Hashtags.
@@ -409,10 +409,10 @@ Antworte AUSSCHLIESSLICH mit der fertigen Caption.`,
     if (daten.ort)       eckdatenKurz.push(`Ort: ${daten.ort}`);
     const eckdatenZeile = eckdatenKurz.length > 0 ? `\nZusaetzlicher Kontext: ${eckdatenKurz.join(", ")}\n` : "";
     const userMsg = hatBasis
-      ? `Erstelle EINEN Objekttitel im Musterhaus-Stil.\n\nZiehe die ansprechendsten 2-3 Merkmale heraus. Erfinde nichts dazu.\n\nObjektbeschreibung:\n${daten.titel_basis}\n${eckdatenZeile}\nFormat: Nur der Titel, eine Zeile.`
-      : `Erstelle EINEN Objekttitel im Musterhaus-Stil.\n\nEckdaten:\n${datenAufzaehlen(daten)}\n\nFormat: Nur der Titel, eine Zeile.`;
+      ? `Erstelle EINEN Objekttitel im Hausstil.\n\nZiehe die ansprechendsten 2-3 Merkmale heraus. Erfinde nichts dazu.\n\nObjektbeschreibung:\n${daten.titel_basis}\n${eckdatenZeile}\nFormat: Nur der Titel, eine Zeile.`
+      : `Erstelle EINEN Objekttitel im Hausstil.\n\nEckdaten:\n${datenAufzaehlen(daten)}\n\nFormat: Nur der Titel, eine Zeile.`;
     return {
-      system: `Du bist Texter für Musterhaus Immobilien in Mecklenburg-Vorpommern.\n\n${STIL_REGELN}\n\nObjekttitel im Musterhaus-Stil: energisch, konkret. Adjektiv-Hook am Anfang, Phrasen mit Gedankenstrich/Ausrufezeichen, konkrete Vorzüge, Lage als Verkaufsargument. 60-110 Zeichen. Kein Punkt am Ende.`,
+      system: `Du bist Texter für ein Immobilienbüro.\n\n${STIL_REGELN}\n\nObjekttitel im Hausstil: energisch, konkret. Adjektiv-Hook am Anfang, Phrasen mit Gedankenstrich/Ausrufezeichen, konkrete Vorzüge, Lage als Verkaufsargument. 60-110 Zeichen. Kein Punkt am Ende.`,
       user: userMsg
     };
   }
@@ -422,7 +422,7 @@ Antworte AUSSCHLIESSLICH mit der fertigen Caption.`,
   // -------------------------------------------------------------
   if (textart === "headline") {
     return {
-      system: `Du bist Texter für Musterhaus Immobilien. Kurze, einprägsame Schlagzeilen. ${STIL_REGELN}`,
+      system: `Du bist Texter für ein Immobilienbüro. Kurze, einprägsame Schlagzeilen. ${STIL_REGELN}`,
       user: `Erstelle 5 Vorschläge für eine Schlagzeile (max. 10 Wörter) für folgendes Objekt:\n\n${datenAufzaehlen(daten)}\n\nFormat: nummerierte Liste 1. bis 5.`
     };
   }
@@ -435,7 +435,7 @@ Antworte AUSSCHLIESSLICH mit der fertigen Caption.`,
     const klickChips = (daten.ausstattungsliste && daten.ausstattungsliste.length > 0) ? daten.ausstattungsliste.join("\n- ") : "";
     const pflichtBlockBullets = klickChips ? `\n\nFOLGENDE MERKMALE MUESSEN ALLE vorkommen:\n- ${klickChips}` : "";
     return {
-      system: `Du bist Texter für Musterhaus Immobilien. Kompakte Ausstattungs-Bulletpoints. Knapp, klar. Jeder Punkt 2–6 Wörter.\n\n${STIL_REGELN}\n\nBeispiele:\n\n${beispieleText}`,
+      system: `Du bist Texter für ein Immobilienbüro. Kompakte Ausstattungs-Bulletpoints. Knapp, klar. Jeder Punkt 2–6 Wörter.\n\n${STIL_REGELN}\n\nBeispiele:\n\n${beispieleText}`,
       user: `Erstelle eine Bulletpoint-Liste der Ausstattung.\n\nEckdaten:\n${datenAufzaehlen(daten)}\n\nFreitext: ${daten.ausstattung_freitext || "(keine Angabe)"}${pflichtBlockBullets}\n\nFormat: jeder Bulletpoint beginnt mit \"- \".`
     };
   }
@@ -510,7 +510,7 @@ Verkaufswirkung (wichtig):
     : "Ziel-Länge: 1.700–1.950 Zeichen — nutze diesen Rahmen wirklich aus, deutlich unter 1.500 Zeichen ist zu knapp. Harte Obergrenze: 2.000 Zeichen (Portal-Limit).";
 
   return {
-    system: `Du bist Texter für Musterhaus Immobilien in Mecklenburg-Vorpommern.\n\n${STIL_REGELN}${verkaufsBlock}\n\nZusätzlich:\n- Deutsch, vollständige Sätze, in 3–5 Sinnabsätze gegliedert (Absätze durch Leerzeile trennen, keine Überschriften).\n- Erfinde keine Fakten.\n- ${laengeHinweis}\n- Kein Markdown.${beispieleBlock}${bilderBlock}\n\nHinweis zu den Stilvorbildern: Sie zeigen TONALITÄT, nicht Länge — dein Text soll deutlich ausführlicher sein als die Beispiele.`,
+    system: `Du bist Texter für ein Immobilienbüro.\n\n${STIL_REGELN}${verkaufsBlock}\n\nZusätzlich:\n- Deutsch, vollständige Sätze, in 3–5 Sinnabsätze gegliedert (Absätze durch Leerzeile trennen, keine Überschriften).\n- Erfinde keine Fakten.\n- ${laengeHinweis}\n- Kein Markdown.${beispieleBlock}${bilderBlock}\n\nHinweis zu den Stilvorbildern: Sie zeigen TONALITÄT, nicht Länge — dein Text soll deutlich ausführlicher sein als die Beispiele.`,
     user: `Erstelle eine ${textartLabel[textart]}.\n\n${fokus[textart]}\n\nEckdaten:\n${datenAufzaehlen(daten)}${pflichtBlock}\n\nSchreibe einen flüssigen, verkaufsstarken Text – keine Bildbeschreibung – und nutze die Ziel-Länge wirklich aus.`
   };
 }

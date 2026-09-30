@@ -192,7 +192,7 @@ Deno.serve(async (req) => {
     };
     if (!auswahl.length || probe) return await antwortOhneKi();
 
-    const system = `Du beschriftest Fotos und Grundrisse für ein Immobilien-Exposé von Musterhaus Immobilien GmbH. Je Bild EINE Bildunterschrift auf Deutsch: 2–6 Wörter, sachlich, ohne Bewertung, ohne Satzzeichen am Ende.
+    const system = `Du beschriftest Fotos und Grundrisse für ein Immobilien-Exposé. Je Bild EINE Bildunterschrift auf Deutsch: 2–6 Wörter, sachlich, ohne Bewertung, ohne Satzzeichen am Ende.
 Benenne, was zu sehen ist: Raum oder Ansicht, gern mit prägnantem Merkmal – z. B. „Wohnzimmer mit Kamin“, „Außenansicht Straßenseite“, „Küche mit Einbauküche“, „Badezimmer mit Dusche“, „Garten mit Terrasse“, „Grundriss Erdgeschoss“, „Luftbild mit Grundstück“, „Blick auf den See“, „Carport und Nebengebäude“.
 Stockwerk oder Himmelsrichtung nur nennen, wenn es eindeutig erkennbar ist (z. B. Beschriftung im Grundriss). Keine Vermutungen, keine Personen beschreiben, keine Marken.
 Ordne jedes Bild außerdem einer Gruppe zu: aussen_haus (Hausansicht von außen, Fassade, Straßen-/Gartenseite), eingang (Hauseingang, Diele, Windfang, Flur im Erdgeschoss), wohnen (Wohn-/Esszimmer, Kamin, Wintergarten), kueche, bad (Bad, Duschbad, WC), schlafen (Schlaf-, Kinder-, Gästezimmer), weitere (Flur OG, Treppe, Keller, Dachboden, Technik, Arbeitszimmer, sonstige Innenräume, Grundrisse), aussen_garten (Garten, Terrasse, Balkon, Carport, Garage, Nebengebäude, Einfahrt), luftbild (Luftbild, Umgebung, See, Ortsansicht).

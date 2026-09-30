@@ -177,7 +177,10 @@ async function mailSenden(db: any, p: {
   if (!pf) return { ok: false, fehler: "Kein aktives Postfach hinterlegt." };
 
   const sig = (pf.signatur || "").trim();
-  const hatSig = sig && (p.text.includes(sig.slice(0, 40).trim()) || p.text.includes("Musterhaus Immobilien GmbH"));
+  // Die zweite Bedingung suchte einen festen Firmennamen im Text — bei
+  // jedem Mandanten ausser einem den falschen. Die Signatur des eigenen
+  // Postfachs reicht; sie steht in sig.
+  const hatSig = sig && p.text.includes(sig.slice(0, 40).trim());
   const voll = !sig || hatSig ? p.text : `${p.text}\n\n--\n${sig}`;
   const clean = voll.split("\n").map((z: string) => z.replace(/[ \t]+$/, "")).join("\n");
 
@@ -329,7 +332,7 @@ async function ausfuehren(db: any, grenze: number, trocken: boolean) {
         spanne: lead.wert_min && lead.wert_max ? `${eur(lead.wert_min)} – ${eur(lead.wert_max)}` : "—",
         startpreis: eur(lead.startpreis),
         provision: eur(lead.provision_erwartet),
-        makler_name: makler?.name || "Ihr Musterhaus Immobilien Team",
+        makler_name: makler?.name || "Ihr Maklerteam",
         makler_telefon: makler?.telefon || "",
         makler_mail: makler?.email || "",
       };

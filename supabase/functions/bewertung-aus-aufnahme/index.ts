@@ -42,7 +42,7 @@ function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status, headers: JSON_HEADERS });
 }
 
-const SYSTEM_PROMPT = `Du bist Spezialist fuer Immobilien-Bewertungen bei Musterhaus Immobilien.
+const SYSTEM_PROMPT = `Du bist Spezialist fuer Immobilien-Bewertungen.
 Aus einer Objektaufnahme (Daten vom Vor-Ort-Termin) sollst du Vorschlaege
 generieren fuer die spaetere Bewertungs-Praesentation an den Eigentuemer.
 

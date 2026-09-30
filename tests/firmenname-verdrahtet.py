@@ -56,39 +56,23 @@ NAME = re.compile(r'Musterhaus')
 # AUSGABE     Steht in etwas, das ein Kunde liest — Mail, PDF, Portal,
 #             Webseite. Das ist die Klasse, die weg muss.
 #
-# Stand 30.09.2026, nach zwei Durchgaengen: von 107 Vorkommen sind 32 uebrig,
-# und die Klasse AUSGABE — alles, was ein Kunde liest — steht auf NULL.
-# Behoben unter anderem: das OpenImmo-Feld <firma>, die Widerrufsbelehrung
-# des Energieausweis-Fragebogens, der Maklervertrag samt zeichnendem
-# Vertreter, die neun Ueberschriften der Akquise-Praesentation und saemtliche
-# Grussformeln. Der Weg dorthin ist der Helfer immoFirmenName(db, mandant),
-# der ohne Eintrag einen LEEREN Text liefert — nie einen Beispielnamen.
-BUCH = {
-    # --- KI: wirkt ueber den erzeugten Text -------------------------------
-    # Eine Systemvorgabe nennt das Haus, fuer das die KI schreibt. Mit einem
-    # verdrahteten Namen schreibt sie fuer jeden Mandanten im Namen eines
-    # fremden — und der Name kann in den erzeugten Text geraten.
-    #
-    # Der Umbau ist ein anderer als bei den Ausgaben: die Vorgabe muss den
-    # Namen des Mandanten als Baustein bekommen, und dafuer braucht jede
-    # dieser Funktionen den Mandanten an der Stelle, an der sie die Vorgabe
-    # zusammensetzt. Das ist der naechste Block von Phase 2.4.
-    'generate-text':           (14, 'KI', 'Systemvorgaben fuer Exposetexte und Beitraege'),
-    'mail-ki-vorschlag':       (5, 'KI', 'Systemvorgabe nennt zusaetzlich einen erfundenen Geschaeftsfuehrer'),
-    'claude-chat':             (2, 'KI', 'Systemvorgabe des Assistenten'),
-    'akq-ki-vorlage':          (1, 'KI', 'Systemvorgabe fuer Akquisevorlagen'),
-    'akq-mail-leads':          (1, 'KI', 'Systemvorgabe der Lead-Erkennung'),
-    'bewerbertest-abgeben':    (1, 'KI', 'Systemvorgabe der Testbewertung'),
-    'bewertung-aus-aufnahme':  (1, 'KI', 'Systemvorgabe der Bewertung'),
-    'bild-beschriften':        (1, 'KI', 'Systemvorgabe der Bildunterschriften'),
-    'expose-pruefen':          (1, 'KI', 'Systemvorgabe der Endkontrolle'),
-    'mail-anfrage-verarbeiten': (1, 'KI', 'Systemvorgabe der Anfrage-Auslese'),
-    'objekt-wissen-auslesen':  (1, 'KI', 'Systemvorgabe der Unterlagen-Auslese'),
-
-    # --- HEURISTIK und KOMMENTAR ------------------------------------------
-    'akq-automation-lauf':     (2, 'HEURISTIK', 'Signaturerkennung im Mailtext, dazu ein Team-Name'),
-    'mail-senden':             (1, 'KOMMENTAR', 'Vermerk zur Signaturerkennung'),
-}
+# Stand 30.09.2026: **leer**. Von 107 Vorkommen ist keines uebrig; das Buch
+# ist damit vom Verzeichnis offener Stellen zur Schranke geworden. Kommt ein
+# verdrahteter Firmenname zurueck, schlaegt die Pruefung an, und wer ihn
+# braucht, muss ihn hier mit Grund eintragen.
+#
+# Behoben wurden unter anderem: das OpenImmo-Feld <firma>, das jedes Portal
+# anzeigt; die Widerrufsbelehrung des Energieausweis-Fragebogens; der
+# Maklervertrag samt zeichnendem Vertreter; neun Ueberschriften der
+# Akquise-Praesentation; saemtliche Grussformeln; und die Systemvorgaben der
+# KI — darunter eine, die die KI als erfundenen Geschaeftsfuehrer schreiben
+# und unter dessen Namen unterzeichnen liess.
+#
+# Der Weg dorthin ist der Helfer immoFirmenName(db, mandant). Er liefert
+# ohne Eintrag einen LEEREN Text — nie einen Beispielnamen. Wo der Name die
+# Aufgabe gar nicht formt (JSON aus einer Mail ziehen, einen Test bewerten),
+# ist er ersatzlos entfallen.
+BUCH: dict[str, tuple[int, str, str]] = {}
 
 
 def finde():

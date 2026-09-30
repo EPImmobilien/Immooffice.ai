@@ -110,6 +110,13 @@ ERWEITERT['signatur-token-validieren'] = (
 ERWEITERT['upload-benachrichtigung-versenden'] = (
     'Empfaenger je Mandant statt einmal fuer alle (Phase 2)')
 
+# Phase 2.4 (30.09.2026): die Systemvorgabe fuer Akquisevorlagen nannte einen
+# festen Firmennamen. Damit sie den des Mandanten nennen kann, muss das
+# Profil seine mandant_id mitgeben — eine Zeile ohne Kennzeichen, deshalb
+# hier.
+ERWEITERT['akq-ki-vorlage'] = (
+    'Firmenname des Mandanten statt eines festen in der KI-Vorgabe (Phase 2.4)')
+
 # fork_28: push_einstellungen, kosten_saetze, liquid_settings und
 # akq_einstellungen hatten EINE Zeile fuer die ganze Plattform. Die drei
 # Funktionen, die sie mit dem service_role lesen, brauchen jetzt den

@@ -15,6 +15,25 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// --- Firmenname des Mandanten (Phase 2.4) ---------------------------------
+// Die Neutralisierung hat den Namen der Referenz ueberall durch den des
+// Demo-Mandanten ersetzt. Fuer das Neutralitaets-Gate war das richtig; fuer
+// ein mandantenfaehiges Produkt ist ein verdrahteter Firmenname bei jedem
+// Mandanten ausser einem falsch — und er stand in Grussformeln, Briefkoepfen
+// und im OpenImmo-Feld <firma>, das jedes Portal anzeigt.
+//
+// Ohne Eintrag liefert diese Funktion einen LEEREN Text, keinen Beispielnamen.
+// Die aufrufende Stelle laesst die Zeile dann weg. Eine fehlende Grussformel
+// faellt auf; eine falsche nicht.
+async function immoFirmenName(db: any, mandant: unknown): Promise<string> {
+  if (typeof mandant !== "string" || !mandant) return "";
+  const { data } = await db.from("firma_stammdaten")
+    .select("firma_name, marken_name")
+    .eq("mandant_id", mandant).eq("aktiv", true)
+    .order("sortierung", { ascending: true }).limit(1).maybeSingle();
+  return String(data?.marken_name || data?.firma_name || "").trim();
+}
+
 // --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
 // Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
 // und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist
@@ -60,9 +79,13 @@ async function immoMandantDesAufrufers(req: Request): Promise<string | null> {
 
 const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type" };
 
-const STIL_PROFIL_LASSE = `
-Du bist Lasse Musterhaus, Geschäftsführer von Musterhaus Immobilien GmbH,
-Sachverständiger für Immobilienbewertung (Bewertungsdienst) und Makler.
+// Die Vorgabe liess die KI als erfundener Geschaeftsfuehrer schreiben und
+// unter dessen Namen unterzeichnen — in einem Antwortentwurf, der an einen
+// Kunden geht. Wer schreibt, ist jetzt der angemeldete Nutzer; die Firma
+// kommt aus seinen Stammdaten. Beides wird beim Aufruf eingesetzt.
+const stilProfil = (wer: string, firma: string) => `
+Du bist ${wer}${firma ? `, tätig für ${firma}` : ""},
+Immobilienmakler.
 Deine Aufgabe: einen Antwort-Entwurf auf eine eingegangene E-Mail formulieren —
 EXAKT in deinem eigenen Schreibstil, basierend auf 100+ Beispielen deiner echten Mails.
 
@@ -80,7 +103,7 @@ Endet IMMER mit:
 \`\`\`
 Mit freundlichen Grüßen
 
-Lasse Musterhaus
+${wer}
 \`\`\`
 
 Davor (60% der Mails, weglassen bei sehr kurzen Replies):
@@ -183,7 +206,7 @@ VERWENDE NIE Formulierungen wie "an einem späteren Termin", "zu einem geeignete
 Gib NUR den reinen Mail-Text aus. Keine Erklärungen davor oder danach.
 Keine Markdown-Formatierung. Kein "Hier ist Ihr Entwurf:" oder ähnliches.
 Direkt mit der Anrede (oder bei Folge-Mails direkt mit dem Inhalt) starten,
-mit "Lasse Musterhaus" enden.
+mit "${wer}" enden.
 `;
 
 const HTML_ENTITIES: Record<string, string> = { nbsp: " ", amp: "&", lt: "<", gt: ">", quot: "\"", apos: "'", auml: "ä", ouml: "ö", uuml: "ü", Auml: "Ä", Ouml: "Ö", Uuml: "Ü", szlig: "ß", euro: "€", hellip: "…", ndash: "–", mdash: "—", minus: "−", deg: "°", laquo: "«", raquo: "»", bdquo: "„", ldquo: "“", rdquo: "”", sbquo: "‚", lsquo: "‘", rsquo: "’", middot: "·", bull: "•", copy: "©", reg: "®", trade: "™", eacute: "é", egrave: "è", agrave: "à", uacute: "ú" };
@@ -266,7 +289,7 @@ Deno.serve(async (req) => {
     const { data: userData, error: userErr } = await userClient.auth.getUser();
     if (userErr || !userData?.user) return jsonErr(401, "Nicht authentifiziert");
     const userId = userData.user.id;
-    const { data: profile } = await admin.from("profiles").select("role, email").eq("id", userId).maybeSingle();
+    const { data: profile } = await admin.from("profiles").select("role, email, name, mandant_id").eq("id", userId).maybeSingle();
     if (profile?.role !== "chef") return jsonErr(403, "KI-Vorschläge sind aktuell nur für die Chef-Rolle verfügbar (Test-Phase).");
     const { data: mail, error: mailErr } = await admin.from("mail_eingang").select("*").eq("id", mail_eingang_id).maybeSingle();
     if (mailErr || !mail) return jsonErr(404, "Mail nicht gefunden");
@@ -292,6 +315,8 @@ Deno.serve(async (req) => {
     const interessentName = mail.kontakt_name || (kont ? [kont.anrede, kont.vorname, kont.nachname].filter(Boolean).join(" ") : "");
     const interessentMail = mail.kontakt_email || (kont && kont.email) || "";
     const istAnfrage = !!(interessentName || interessentMail);
+    const wer = String(profile?.name || "").trim() || "der Makler";
+    const firmaDesNutzers = await immoFirmenName(admin, profile?.mandant_id);
     const absender = mail.absender_name ? `${mail.absender_name} <${mail.absender_email}>` : (mail.absender_email || "unbekannt");
     const interessentTeil = istAnfrage ? `\n\nINTERESSENT (Empfänger deiner Antwort)\nName: ${interessentName || "unbekannt"}\nE-Mail: ${interessentMail || "unbekannt"}${kont && kont.telefon ? `\nTelefon: ${kont.telefon}` : ""}${ad && ad.portal ? `\nQuelle: ${ad.portal}` : ""}${ad && Array.isArray(ad.wuensche) && ad.wuensche.length ? `\nWünsche: ${ad.wuensche.join(", ")}` : ""}${ad && ad.nachricht ? `\nNachricht des Interessenten: ${String(ad.nachricht).slice(0, 1500)}` : ""}\nHinweis: Die Mail wurde von ${absender} übermittelt (Portal bzw. Kollege) — antworte dem Interessenten, nicht dem Übermittler.${objekt && /miet/i.test(String(objekt.vertragsart || "")) ? "\nDas Objekt ist ein MIETOBJEKT: provisionsfrei, Exposé als Anhang, kein Freigabelink." : objekt ? "\nDas Objekt ist ein KAUFOBJEKT: Exposé über den persönlichen Link {expose_link}." : ""}` : "";
     const unterlagenTeil = unterlagen.length ? `\n\nVERFÜGBARE UNTERLAGEN ZUM OBJEKT (id · Name · Typ · Freigabe)\n${unterlagen.map((u) => `- ${u.id} · ${u.name} · ${u.typ} · ${u.freigegeben ? "für Kunden freigegeben" : "intern (nur nach Rücksprache)"}`).join("\n")}\nBeantworte zuerst alle Fragen vollständig im Text aus dem Objektwissen. Unterlagen, die dazu passen (Exposé, Grundriss, Energieausweis, Wirtschaftsplan, Teilungserklärung, Protokolle), kannst du ZUSÄTZLICH mitschicken: dann ein kurzer Satz am Ende ("Die Unterlagen dazu füge ich Ihnen bei.") und als ALLERLETZTE Zeile: [[ANHAENGE: id, id]] — nur ids aus dieser Liste, bevorzugt freigegebene; interne nur, wenn sie eine konkrete Frage betreffen. Der Anhang ersetzt NIE die Antwort im Text. Passt nichts: keine Marker-Zeile.` : "";
@@ -313,14 +338,14 @@ Antworte nur mit dem reinen Mail-Text (kein "Hier ist ihr Entwurf:", keine Erkl�
 Wenn dir Informationen fehlen, nutze Platzhalter wie [ZU PRÜFEN: ...].
 `.trim();
 
-    const anthropicResponse = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 6000, system: STIL_PROFIL_LASSE, messages: [{ role: "user", content: userPrompt }] }) });
+    const anthropicResponse = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 6000, system: stilProfil(wer, firmaDesNutzers), messages: [{ role: "user", content: userPrompt }] }) });
     if (!anthropicResponse.ok) { const errText = await anthropicResponse.text(); console.error("Anthropic API Fehler:", anthropicResponse.status, errText); return jsonErr(500, `KI-Anfrage fehlgeschlagen (${anthropicResponse.status}): ${errText.slice(0, 300)}`); }
     const anthropicData = await anthropicResponse.json();
     let antwortText = anthropicData?.content?.[0]?.text || "";
     if (!antwortText) return jsonErr(500, "KI hat leere Antwort geliefert");
     if (anthropicData?.stop_reason === "max_tokens") {
       try {
-        const r2 = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 4000, system: STIL_PROFIL_LASSE, messages: [{ role: "user", content: userPrompt }, { role: "assistant", content: antwortText }, { role: "user", content: "Deine Antwort wurde am Ausgabelimit abgeschnitten. Setze exakt an der Abbruchstelle fort — ohne Wiederholung, ohne Anrede, ohne Einleitung — bis alle Fragen beantwortet sind und die Mail regulär mit \"Mit freundlichen Grüßen\" und \"Lasse Musterhaus\" endet." }] }) });
+        const r2 = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 4000, system: stilProfil(wer, firmaDesNutzers), messages: [{ role: "user", content: userPrompt }, { role: "assistant", content: antwortText }, { role: "user", content: "Deine Antwort wurde am Ausgabelimit abgeschnitten. Setze exakt an der Abbruchstelle fort — ohne Wiederholung, ohne Anrede, ohne Einleitung — bis alle Fragen beantwortet sind und die Mail regulär mit \"Mit freundlichen Grüßen\" und dem Namen des Absenders endet." }] }) });
         if (r2.ok) { const d2 = await r2.json(); const t2 = d2?.content?.[0]?.text || ""; if (t2) antwortText = antwortText.replace(/\s+$/, "") + (antwortText.endsWith("\n") || /^\s/.test(t2) ? "" : " ") + t2.replace(/^\s+/, ""); }
       } catch (e) { console.warn("Fortsetzung:", e); }
     }

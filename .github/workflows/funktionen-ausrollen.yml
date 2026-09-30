@@ -132,17 +132,48 @@ jobs:
 
           # Jede Funktion einzeln: so nennt das Protokoll bei einem Fehler den
           # Namen, und die uebrigen laufen weiter. Am Ende wird gezaehlt.
-          gut=0; schlecht=0; fehlerhafte=""
+          #
+          # Bis zu drei Versuche je Funktion. Grund: am 30.09.2026 ist
+          # mail-anhaenge-diagnose zweimal hintereinander mit
+          #   unexpected deploy status 500: Function deploy failed due to an
+          #   internal error
+          # stehengeblieben — waehrend dieselbe Datei kurz davor und kurz
+          # danach durchging. Die Funktion bindet imagescript und pdfjs-dist
+          # ein; das Buendeln geschieht bei --use-api auf der Gegenseite, und
+          # dort scheitert es gelegentlich. Ein einzelner Fehlversuch hat
+          # damit den ganzen Lauf rot gemacht, obwohl nichts kaputt war.
+          #
+          # Drei Versuche mit Pause davor, nicht mehr: eine wirklich kaputte
+          # Funktion faellt dreimal durch und wird weiter gemeldet. Die
+          # Wiederholung verdeckt also keinen echten Fehler, sie ueberbrueckt
+          # nur einen fremden.
+          gut=0; schlecht=0; fehlerhafte=""; wiederholt=""
           for d in supabase/functions/*/; do
             name="$(basename "$d")"
             echo "::group::$name"
-            if supabase functions deploy "$name" $gemeinsam; then
+            erfolg=0
+            for versuch in 1 2 3; do
+              if [ "$versuch" -gt 1 ]; then
+                echo "Versuch $versuch fuer $name nach kurzer Pause …"
+                sleep $((versuch * 10))
+              fi
+              if supabase functions deploy "$name" $gemeinsam; then
+                erfolg=1
+                [ "$versuch" -gt 1 ] && wiederholt="$wiederholt $name($versuch)"
+                break
+              fi
+            done
+            if [ "$erfolg" -eq 1 ]; then
               gut=$((gut + 1))
             else
               schlecht=$((schlecht + 1)); fehlerhafte="$fehlerhafte $name"
             fi
             echo "::endgroup::"
           done
+
+          if [ -n "$wiederholt" ]; then
+            echo "::warning::Erst nach Wiederholung ausgerollt:$wiederholt"
+          fi
 
           echo "Ausgerollt: $gut, fehlgeschlagen: $schlecht"
           if [ "$schlecht" -gt 0 ]; then

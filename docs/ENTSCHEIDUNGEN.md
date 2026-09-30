@@ -3410,3 +3410,66 @@ genau dort, wo sie ihre Vorgabe zusammensetzt. Das ist der nächste Block.
   und damit genau getan, wozu sie da ist. Die Zahl war gewollt, also steigt
   die Grenze — nicht die Toleranz.
 
+---
+
+## Der verdrahtete Firmenname: null von 107 (30.09.2026)
+
+Die 29 Systemvorgaben der KI sind erledigt, und damit steht
+`tests/firmenname-verdrahtet.py` auf **null**. Das Buch ist vom Verzeichnis
+offener Stellen zur Schranke geworden: kommt ein verdrahteter Firmenname
+zurück, schlägt die Prüfung an.
+
+### Zwei Arten von Systemvorgabe, zwei Antworten
+
+**Wo der Name die Aufgabe nicht formt, fällt er ersatzlos weg.** Die KI
+braucht keinen Firmennamen, um JSON aus einer Mail zu ziehen, einen
+Einstellungstest zu bewerten, Unterlagen auszulesen oder eine
+Bildunterschrift zu schreiben. Sieben Vorgaben sind so bereinigt. Ein Name,
+der nichts bewirkt, ist nur eine Stelle, an der der falsche stehen kann.
+
+**Wo er die Ausgabe formt, kommt der des Mandanten hinein** — `claude-chat`,
+`akq-ki-vorlage` und `mail-ki-vorschlag`.
+
+### Die KI unterschrieb als erfundener Geschäftsführer
+
+`mail-ki-vorschlag` erzeugt Antwortentwürfe auf eingegangene Kundenmails. Die
+Systemvorgabe begann mit „Du bist **[erfundener Name]**, Geschäftsführer von
+[Firma], Sachverständiger für Immobilienbewertung und Makler" und schrieb
+vor, die Mail **mit diesem Namen zu unterzeichnen** — an drei Stellen der
+Vorgabe, einschließlich der Anweisung an das Fortsetzungs-Prompt.
+
+Das ist derselbe Befund wie im Maklervertrag, nur in der täglichen Post:
+Korrespondenz an Kunden, gezeichnet von einer Person, die es nicht gibt. Wer
+schreibt, ist jetzt der **angemeldete Nutzer** (`profiles.name`), die Firma
+kommt aus seinen Stammdaten.
+
+`claude-chat` nannte denselben erfundenen Namen als Ansprechpartner der
+Mitarbeiter. Ersatzlos weg.
+
+### Nebenbefund: eine fremde Region im Exposé-Text
+
+`generate-text` schrieb der KI zweimal vor: „Du bist Texter für [Firma] **in
+Mecklenburg-Vorpommern**". Das ist die Region des Referenzunternehmens, und
+sie hätte jedem Makler — egal wo er sitzt — diese Landschaft in den
+Exposé-Text geschrieben. Die Stilregeln bleiben unverändert; sie sind
+allgemein und tragen den Text. Der Firmenname und die Region sind weg.
+
+Ebenfalls weg: die Signaturerkennung in `akq-automation-lauf` prüfte, ob im
+Mailtext ein **fester Firmenname** steht, um zu erkennen, ob schon geantwortet
+wurde. Bei jedem Mandanten außer einem hätte sie damit nie angeschlagen. Die
+Signatur des eigenen Postfachs, die daneben schon geprüft wurde, reicht.
+
+### Was die Bilanz sagt
+
+| | Anfang | Ende |
+|---|---|---|
+| Vorkommen | 107 in 41 Funktionen | **0** |
+| davon in Kundenausgabe | 64 | 0 |
+| davon in KI-Vorgaben | 29 | 0 |
+
+Und ein Nachtrag zur Arbeitsweise: dass es **107** waren und nicht drei, hat
+die Prüfung gezeigt, nicht das Lesen. Der Name war mir in
+`portal-export` aufgefallen — ein Vorkommen. Erst die Frage „wie oft
+eigentlich?" hat die Größenordnung sichtbar gemacht. Bei einem Fund, der wie
+ein Einzelfall aussieht, lohnt sich diese Frage immer.
+

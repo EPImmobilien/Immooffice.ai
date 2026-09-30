@@ -10,6 +10,25 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// --- Firmenname des Mandanten (Phase 2.4) ---------------------------------
+// Die Neutralisierung hat den Namen der Referenz ueberall durch den des
+// Demo-Mandanten ersetzt. Fuer das Neutralitaets-Gate war das richtig; fuer
+// ein mandantenfaehiges Produkt ist ein verdrahteter Firmenname bei jedem
+// Mandanten ausser einem falsch — und er stand in Grussformeln, Briefkoepfen
+// und im OpenImmo-Feld <firma>, das jedes Portal anzeigt.
+//
+// Ohne Eintrag liefert diese Funktion einen LEEREN Text, keinen Beispielnamen.
+// Die aufrufende Stelle laesst die Zeile dann weg. Eine fehlende Grussformel
+// faellt auf; eine falsche nicht.
+async function immoFirmenName(db: any, mandant: unknown): Promise<string> {
+  if (typeof mandant !== "string" || !mandant) return "";
+  const { data } = await db.from("firma_stammdaten")
+    .select("firma_name, marken_name")
+    .eq("mandant_id", mandant).eq("aktiv", true)
+    .order("sortierung", { ascending: true }).limit(1).maybeSingle();
+  return String(data?.marken_name || data?.firma_name || "").trim();
+}
+
 const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
 const MODEL = "claude-sonnet-4-6";
 
@@ -36,18 +55,22 @@ Deno.serve(async (req) => {
 
     const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
     const jwt = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+    // firmaDesNutzers steht ausserhalb des Blocks: die Systemvorgabe weiter
+    // unten braucht sie, und p lebt nur hier drin.
+    let firmaDesNutzers = "";
     if (jwt) {
       const { data: u } = await db.auth.getUser(jwt);
       if (u?.user) {
-        const { data: p } = await db.from("profiles").select("role").eq("id", u.user.id).maybeSingle();
+        const { data: p } = await db.from("profiles").select("role, mandant_id").eq("id", u.user.id).maybeSingle();
         if (!p || !["chef", "mitarbeiter"].includes(p.role)) return antwort({ ok: false, fehler: "Keine Berechtigung." }, 403);
+        firmaDesNutzers = await immoFirmenName(db, p.mandant_id);
       }
     }
 
     const body = await req.json().catch(() => ({}));
     const kanal = String(body.kanal || "mail");
 
-    const system = `Du schreibst Vorlagen fuer die Verkaeufer-Akquise von Musterhaus Immobilien GmbH .
+    const system = `Du schreibst Vorlagen fuer die Verkaeufer-Akquise${firmaDesNutzers ? ` von ${firmaDesNutzers}` : ""}.
 Stil wie in der Exposé-Schmiede des Hauses: deutsch, Sie-Form, sachlich-freundlich, kurze Saetze, keine Superlative,
 keine Wortspiele, keine erfundenen Fakten (keine Preise, Fristen, Mitbewerber, kein Druck).
 
