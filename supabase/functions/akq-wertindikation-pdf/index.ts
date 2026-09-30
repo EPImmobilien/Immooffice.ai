@@ -216,7 +216,7 @@ Deno.serve(async (req) => {
     seite.drawRectangle({ x: M, y: y - 4, width: B - 2 * M, height: 1, color: LINIE });
     y -= 24;
     const hinweis = [
-      "Grundlage dieser Indikation sind Vergleichswerte aus dem eigenen Objektbestand von Musterhaus &",
+      "Grundlage dieser Indikation sind Vergleichswerte aus dem eigenen Objektbestand von",
       "Partner in vergleichbarer Lage sowie die von Ihnen gemachten Angaben zu Fläche, Baujahr und",
       "Zustand. Es handelt sich um eine erste Einschätzung, nicht um ein Wertgutachten nach ImmoWertV.",
       "Eine belastbare Marktpreiseinschätzung erstellen wir nach einem Vor-Ort-Termin — kostenfrei und",
@@ -239,7 +239,7 @@ Deno.serve(async (req) => {
     const fussY = 52;
     seite.drawRectangle({ x: M, y: fussY + 22, width: B - 2 * M, height: 1, color: LINIE });
     const fuss = [
-      stamm?.firma_name || "Musterhaus Immobilien GmbH",
+      stamm?.firma_name || "",
       [stamm?.strasse, [stamm?.plz, stamm?.ort].filter(Boolean).join(" ")].filter(Boolean).join(", "),
       [stamm?.telefon, stamm?.email].filter(Boolean).join(" · "),
     ].filter(Boolean).join("  |  ");

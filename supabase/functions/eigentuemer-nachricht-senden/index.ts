@@ -7,6 +7,25 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// --- Firmenname des Mandanten (Phase 2.4) ---------------------------------
+// Die Neutralisierung hat den Namen der Referenz ueberall durch den des
+// Demo-Mandanten ersetzt. Fuer das Neutralitaets-Gate war das richtig; fuer
+// ein mandantenfaehiges Produkt ist ein verdrahteter Firmenname bei jedem
+// Mandanten ausser einem falsch — und er stand in Grussformeln, Briefkoepfen
+// und im OpenImmo-Feld <firma>, das jedes Portal anzeigt.
+//
+// Ohne Eintrag liefert diese Funktion einen LEEREN Text, keinen Beispielnamen.
+// Die aufrufende Stelle laesst die Zeile dann weg. Eine fehlende Grussformel
+// faellt auf; eine falsche nicht.
+async function immoFirmenName(db: any, mandant: unknown): Promise<string> {
+  if (typeof mandant !== "string" || !mandant) return "";
+  const { data } = await db.from("firma_stammdaten")
+    .select("firma_name, marken_name")
+    .eq("mandant_id", mandant).eq("aktiv", true)
+    .order("sortierung", { ascending: true }).limit(1).maybeSingle();
+  return String(data?.marken_name || data?.firma_name || "").trim();
+}
+
 // --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
 // Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
 // und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist
@@ -80,7 +99,7 @@ Deno.serve(async (req) => {
     const jwt = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
     const { data: userData, error: userErr } = await supabase.auth.getUser(jwt);
     if (userErr || !userData?.user) throw new Error("Nicht angemeldet.");
-    const { data: profil } = await supabase.from("profiles").select("role, name").eq("id", userData.user.id).maybeSingle();
+    const { data: profil } = await supabase.from("profiles").select("role, name, mandant_id").eq("id", userData.user.id).maybeSingle();
     if (!profil || !["chef", "mitarbeiter"].includes(profil.role)) throw new Error("Keine Berechtigung.");
 
     const body = await req.json();
@@ -102,7 +121,8 @@ Deno.serve(async (req) => {
     }
     if (empfaenger.length === 0) throw new Error("Kein Empfaenger mit E-Mail-Adresse gefunden.");
 
-    const absender = profil.name || "Musterhaus Immobilien GmbH";
+    const firmaName = await immoFirmenName(supabase, profil.mandant_id);
+    const absender = profil.name || firmaName;
 
     // ---- Absender-Identitaet: persoenliches Postfach des Maklers bevorzugt ----
     const { data: postfaecher } = await supabase.from("mail_postfaecher")
@@ -115,7 +135,7 @@ Deno.serve(async (req) => {
       || null;
 
     const fromEmail = gewaehlt?.email_adresse || Deno.env.get("SMTP_FROM_EMAIL") || "info@immooffice.example";
-    const fromName = gewaehlt?.absender_name || absender || Deno.env.get("SMTP_FROM_NAME") || "Musterhaus Immobilien GmbH";
+    const fromName = gewaehlt?.absender_name || absender || firmaName || Deno.env.get("SMTP_FROM_NAME") || "";
 
     // ---- Versandweg: Resend bevorzugt, sonst SMTP wie bisher ----
     const resendKey = Deno.env.get("RESEND_API_KEY");
@@ -162,9 +182,9 @@ Deno.serve(async (req) => {
     for (const e of empfaenger) {
       const name = [e.vorname, e.nachname].filter(Boolean).join(" ");
       const begruessung = e.anrede ? `${e.anrede} ${e.nachname || name}` : (name || "Sehr geehrte Damen und Herren");
-      const { htmlBody, textBody } = buildMail({ begruessung, text, absender, portalUrl, anhaenge });
+      const { htmlBody, textBody } = buildMail({ begruessung, text, absender, firmaName, portalUrl, anhaenge });
       try {
-        await sende(e.email, "Eine Nachricht von Musterhaus Immobilien", textBody, htmlBody);
+        await sende(e.email, firmaName ? `Eine Nachricht von ${firmaName}` : "Eine Nachricht von Ihrem Makler", textBody, htmlBody);
         gesendet++;
       } catch (err) {
         const m = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
@@ -189,7 +209,7 @@ Deno.serve(async (req) => {
   }
 });
 
-function buildMail(opts: { begruessung: string; text: string; absender: string; portalUrl: string; anhaenge: Array<{ name: string }> }) {
+function buildMail(opts: { begruessung: string; text: string; absender: string; firmaName: string; portalUrl: string; anhaenge: Array<{ name: string }> }) {
   const anhHtml = opts.anhaenge.length
     ? `<p style="margin:14px 0 0;font-size:13px;color:#5a5440;">\ud83d\udcce ${opts.anhaenge.length} Datei(en) im Portal: ${opts.anhaenge.map(a => escapeHtml(a.name)).join(", ")}</p>` : "";
   const textTeil = opts.text ? `<div style="margin:18px 0;padding:14px 18px;background:#f3edde;border-left:3px solid #c7a455;font-size:14px;line-height:1.7;white-space:pre-wrap;">${escapeHtml(opts.text)}</div>` : "";
@@ -199,11 +219,11 @@ function buildMail(opts: { begruessung: string; text: string; absender: string; 
     <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background:#ffffff;border:1px solid #e5e0d6;">
       <tr><td style="background:#263159;padding:32px 36px;border-bottom:3px solid #c7a455;"><div style="font-size:22px;font-weight:300;letter-spacing:0.25em;color:#ffffff;">MUSTERHAUS</div><div style="font-size:10px;color:#c7a455;letter-spacing:0.2em;margin-top:4px;font-weight:600;">EIGENT\u00dcMER-PORTAL</div></td></tr>
       <tr><td style="padding:40px 36px 30px;"><p style="margin:0 0 14px;font-size:14px;line-height:1.7;">Guten Tag ${escapeHtml(opts.begruessung)},</p>${textTeil}${anhHtml}
-        <p style="margin:18px 0 0;font-size:13px;line-height:1.7;color:#5a5440;">\u2014 ${escapeHtml(opts.absender)}, Musterhaus Immobilien GmbH</p>
+        <p style="margin:18px 0 0;font-size:13px;line-height:1.7;color:#5a5440;">\u2014 ${escapeHtml(opts.absender)}${opts.firmaName ? ", " + escapeHtml(opts.firmaName) : ""}</p>
         <p style="margin:28px 0 0;text-align:center;"><a href="${opts.portalUrl}" style="display:inline-block;background:#263159;color:#ffffff;text-decoration:none;padding:13px 30px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">Zum Eigent\u00fcmer-Portal</a></p></td></tr>
       <tr><td style="padding:24px 36px 30px;border-top:1px solid #e5e0d6;background:#faf8f3;"><p style="margin:0;font-size:11px;line-height:1.6;color:#8a8470;">Antworten Sie einfach auf diese E-Mail oder nutzen Sie die Nachrichten-Funktion in Ihrem Portal.</p></td></tr>
     </table></td></tr></table></body></html>`;
-  const textBody = `Guten Tag ${opts.begruessung},\n\n${opts.text || "(Dateianhang)"}` + (opts.anhaenge.length ? `\n\n\ud83d\udcce ${opts.anhaenge.length} Datei(en): ${opts.anhaenge.map(a => a.name).join(", ")}` : "") + `\n\n\u2014 ${opts.absender}, Musterhaus Immobilien GmbH\n\nIhr Portal: ${opts.portalUrl}\n`;
+  const textBody = `Guten Tag ${opts.begruessung},\n\n${opts.text || "(Dateianhang)"}` + (opts.anhaenge.length ? `\n\n\ud83d\udcce ${opts.anhaenge.length} Datei(en): ${opts.anhaenge.map(a => a.name).join(", ")}` : "") + `\n\n\u2014 ${opts.absender}${opts.firmaName ? ", " + opts.firmaName : ""}\n\nIhr Portal: ${opts.portalUrl}\n`;
   return { htmlBody, textBody };
 }
 function escapeHtml(s: string): string { return (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#39;"); }

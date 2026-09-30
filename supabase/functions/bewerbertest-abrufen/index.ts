@@ -115,10 +115,10 @@ Deno.serve(async (req) => {
       .from("bewerber_einladungen").select("*").eq("token", token).maybeSingle();
     if (error || !einladung) return jsonErr(404, "Dieser Link ist ungültig.");
 
-    if (einladung.status === "widerrufen") return jsonErr(410, "Dieser Link wurde zurückgezogen. Bitte wenden Sie sich an Musterhaus Immobilien.");
+    if (einladung.status === "widerrufen") return jsonErr(410, "Dieser Link wurde zurückgezogen. Bitte wenden Sie sich an Ihren Ansprechpartner.");
     if (einladung.status === "abgeschlossen") return jsonErr(410, "Der Test wurde bereits abgeschlossen. Vielen Dank!");
     if (einladung.gueltig_bis && new Date(einladung.gueltig_bis) < new Date()) {
-      return jsonErr(410, "Dieser Link ist abgelaufen. Bitte wenden Sie sich an Musterhaus Immobilien.");
+      return jsonErr(410, "Dieser Link ist abgelaufen. Bitte wenden Sie sich an Ihren Ansprechpartner.");
     }
 
     if (einladung.status === "offen") {

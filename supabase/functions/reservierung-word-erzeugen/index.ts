@@ -329,7 +329,7 @@ Deno.serve(async (req) => {
     for (const p of sigLine(`${firma.geschaeftsfuehrer || ""}, ${firma.firma_name}`)) children.push(p);
 
     const doc = new Document({
-      creator: firma.firma_name || "Musterhaus Immobilien",
+      creator: firma.firma_name || "",
       title: "Reservierungsvereinbarung",
       sections: [{
         properties: { page: { margin: { top: 1000, bottom: 1000, left: 1000, right: 1000 } } },

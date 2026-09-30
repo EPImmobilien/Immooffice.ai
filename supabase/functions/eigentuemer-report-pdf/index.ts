@@ -253,7 +253,7 @@ Deno.serve(async (req) => {
     absatz([firma?.firma_name, makler?.telefon ? "Telefon " + makler.telefon : "", makler?.email || ""].filter(Boolean).join("  ·  "), 9, fR, GRAU);
 
     // Fußzeilen
-    seiten.forEach((p, i) => { p.drawLine({ start: { x: RAND, y: 38 }, end: { x: A4.w - RAND, y: 38 }, thickness: 0.6, color: GOLD }); p.drawText(`${firma?.firma_name || "Musterhaus Immobilien GmbH"}${firma ? ` · ${firma.strasse}, ${firma.plz} ${firma.ort}` : ""}${firma?.web ? " · " + firma.web : ""}`, { x: RAND, y: 26, size: 7.5, font: fR, color: GRAU }); p.drawText(`Seite ${i + 1} von ${seiten.length}`, { x: A4.w - RAND - 60, y: 26, size: 7.5, font: fR, color: GRAU }); });
+    seiten.forEach((p, i) => { p.drawLine({ start: { x: RAND, y: 38 }, end: { x: A4.w - RAND, y: 38 }, thickness: 0.6, color: GOLD }); p.drawText(`${firma?.firma_name || "Ihr Makler"}${firma ? ` · ${firma.strasse}, ${firma.plz} ${firma.ort}` : ""}${firma?.web ? " · " + firma.web : ""}`, { x: RAND, y: 26, size: 7.5, font: fR, color: GRAU }); p.drawText(`Seite ${i + 1} von ${seiten.length}`, { x: A4.w - RAND - 60, y: 26, size: 7.5, font: fR, color: GRAU }); });
     const bytes = await pdf.save();
 
     // Ablage
@@ -270,7 +270,7 @@ Deno.serve(async (req) => {
     const empfaenger: string[] = Array.isArray(body.empfaenger) && body.empfaenger.length ? body.empfaenger : eigentuemer.map((e: any) => e.email).filter(Boolean);
     if (body.senden && empfaenger.length) {
       const key = Deno.env.get("RESEND_API_KEY"); if (!key) throw new Error("RESEND_API_KEY fehlt");
-      const absender = makler?.email && /@immooffice.example\.de$/i.test(makler.email) ? `${makler.name} <${makler.email}>` : `${firma?.firma_name || "Musterhaus Immobilien GmbH"} <${firma?.email || "info@immooffice.example"}>`;
+      const absender = makler?.email && /@immooffice.example\.de$/i.test(makler.email) ? `${makler.name} <${makler.email}>` : `${firma?.firma_name || "Ihr Makler"} <${firma?.email || "info@immooffice.example"}>`;
       const text = `${eigNamen.length ? eigNamen.join(", ") : "Sehr geehrte Eigentümer"},\n\nanbei erhalten Sie den Vermarktungsbericht für Ihre Immobilie „${im.objekttitel || im.bezeichnung || adr}“ für den Zeitraum ${dDE(von)} bis ${dDE(bis)}.\n\nKurz zusammengefasst: ${kurz}.\n\n${body.kommentar ? String(body.kommentar).trim() + "\n\n" : ""}Bei Fragen erreichen Sie mich jederzeit.\n\nMit freundlichen Grüßen\n${makler?.name || prof.name || ""}\n${firma?.firma_name || ""}${makler?.telefon ? "\nTelefon " + makler.telefon : ""}`;
       let b64 = ""; for (let i = 0; i < bytes.length; i += 32768) b64 += String.fromCharCode.apply(null, Array.from(bytes.subarray(i, Math.min(i + 32768, bytes.length))) as any); b64 = btoa(b64);
       const r = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" }, body: JSON.stringify({ from: absender, to: empfaenger, reply_to: makler?.email || firma?.email, subject: `Vermarktungsbericht ${dDE(von)} – ${dDE(bis)}: ${im.objekttitel || im.bezeichnung || adr}`, text, attachments: [{ filename: dateiName, content: b64, content_type: "application/pdf" }] }) });

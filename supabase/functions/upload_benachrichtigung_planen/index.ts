@@ -9,6 +9,25 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// --- Firmenname des Mandanten (Phase 2.4) ---------------------------------
+// Die Neutralisierung hat den Namen der Referenz ueberall durch den des
+// Demo-Mandanten ersetzt. Fuer das Neutralitaets-Gate war das richtig; fuer
+// ein mandantenfaehiges Produkt ist ein verdrahteter Firmenname bei jedem
+// Mandanten ausser einem falsch — und er stand in Grussformeln, Briefkoepfen
+// und im OpenImmo-Feld <firma>, das jedes Portal anzeigt.
+//
+// Ohne Eintrag liefert diese Funktion einen LEEREN Text, keinen Beispielnamen.
+// Die aufrufende Stelle laesst die Zeile dann weg. Eine fehlende Grussformel
+// faellt auf; eine falsche nicht.
+async function immoFirmenName(db: any, mandant: unknown): Promise<string> {
+  if (typeof mandant !== "string" || !mandant) return "";
+  const { data } = await db.from("firma_stammdaten")
+    .select("firma_name, marken_name")
+    .eq("mandant_id", mandant).eq("aktiv", true)
+    .order("sortierung", { ascending: true }).limit(1).maybeSingle();
+  return String(data?.marken_name || data?.firma_name || "").trim();
+}
+
 // --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
 // Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
 // und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist
@@ -100,6 +119,7 @@ Deno.serve(async (req) => {
 
     for (const ben of offene) {
       try {
+        const firmaName = await immoFirmenName(admin, ben.mandant_id);
         // Eigentuemer-Daten
         const { data: eigentuemer } = await admin
           .from("eigentuemer")
@@ -171,7 +191,7 @@ ${eigentuemerName} hat ${dateienText} ins Eigentuemerportal hochgeladen.
 Bitte im Tool unter "Eigentuemer" anschauen.
 
 Viele Gruesse
-Musterhaus Immobilien Tool`;
+${firmaName || "Ihr Maklerbuero"}`;
 
         // SMTP-Versand (gleich wie mail-senden)
         const passwort = await entschluessele(postfach.smtp_passwort_verschluesselt);

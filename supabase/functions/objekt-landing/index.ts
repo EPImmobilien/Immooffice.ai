@@ -52,6 +52,25 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// --- Firmenname des Mandanten (Phase 2.4) ---------------------------------
+// Die Neutralisierung hat den Namen der Referenz ueberall durch den des
+// Demo-Mandanten ersetzt. Fuer das Neutralitaets-Gate war das richtig; fuer
+// ein mandantenfaehiges Produkt ist ein verdrahteter Firmenname bei jedem
+// Mandanten ausser einem falsch — und er stand in Grussformeln, Briefkoepfen
+// und im OpenImmo-Feld <firma>, das jedes Portal anzeigt.
+//
+// Ohne Eintrag liefert diese Funktion einen LEEREN Text, keinen Beispielnamen.
+// Die aufrufende Stelle laesst die Zeile dann weg. Eine fehlende Grussformel
+// faellt auf; eine falsche nicht.
+async function immoFirmenName(db: any, mandant: unknown): Promise<string> {
+  if (typeof mandant !== "string" || !mandant) return "";
+  const { data } = await db.from("firma_stammdaten")
+    .select("firma_name, marken_name")
+    .eq("mandant_id", mandant).eq("aktiv", true)
+    .order("sortierung", { ascending: true }).limit(1).maybeSingle();
+  return String(data?.marken_name || data?.firma_name || "").trim();
+}
+
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-diagnose-secret", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const AGB_URL = "https://immooffice.example/agb";
 const DATENSCHUTZ_URL = "https://immooffice.example/datenschutz";
@@ -102,7 +121,10 @@ async function kontext(db: any, t: string) {
   const { data: im } = await db.from("immobilien").select(IM_FELDER).eq("id", f.immobilie_id).maybeSingle();
   if (!im) return null;
   const firmaRow = await immoStandortDesObjekts(db, im.mandant_id, f.firma_slug || null);
-  const firma = firmaRow || { firma_name: "Musterhaus Immobilien GmbH", strasse: "", plz: "", ort: "", email: "info@immooffice.example" };
+  // Ohne Stammdaten bleiben die Felder leer. Der Rueckfall trug bisher den
+  // Namen und die Platzhalteradresse des Demo-Mandanten — auf der
+  // oeffentlichen Objektseite eines fremden Maklers.
+  const firma = firmaRow || { firma_name: "", strasse: "", plz: "", ort: "", email: "" };
   const { data: makler } = im.zustaendig_id ? await db.from("profiles").select("id, name, email, telefon, funktion, foto_url").eq("id", im.zustaendig_id).maybeSingle() : { data: null as any };
   return { f, im, firma, makler };
 }
@@ -177,7 +199,8 @@ async function kiAntwort(db: any, im: any, faq: any[], frage: string, maklerName
   const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
   if (!apiKey) return { antwort: "", sicher: false, quellen: [] as string[] };
   const quellen = await quellenPaket(db, im, faq);
-  const system = `Du bist der Objekt-Assistent von Musterhaus Immobilien GmbH auf der persönlichen Objektseite eines Interessenten. Du antwortest auf Deutsch, freundlich, sachlich, in 1–4 Sätzen, Sie-Anrede.
+  const firmaName = await immoFirmenName(db, im.mandant_id);
+  const system = `Du bist der Objekt-Assistent von ${firmaName || "einem Immobilienmakler"} auf der persönlichen Objektseite eines Interessenten. Du antwortest auf Deutsch, freundlich, sachlich, in 1–4 Sätzen, Sie-Anrede.
 STRIKTE REGELN:
 - Antworte AUSSCHLIESSLICH aus den unten stehenden Quellen (Eckdaten, Exposé-Texte, FAQ, freigegebene Unterlagen). Erfinde nichts, schätze nichts, rechne keine Werte hoch.
 - Keine Aussagen zu Preisverhandlung, Zusagen, Reservierung, Rechts- oder Steuerfragen, Finanzierung – das übernimmt ${maklerName}. Dann "sicher": false.
@@ -252,8 +275,9 @@ async function faqErzeugen(db: any, immobilieId: string, nutzerId: string | null
   const offen = katalog.filter((k) => !geprueft.has(k.schluessel));
   if (!offen.length) return { ok: true, beantwortet: 0, offen: 0, uebersprungen: geprueft.size, entfernt, objektart: art };
   const quellen = await quellenPaket(db, im, teamFaq || []);
+  const firmaName = await immoFirmenName(db, im.mandant_id);
   const artText = [im.objektart, im.objekttyp].filter(Boolean).join(" / ") || "Immobilie";
-  const system = `Du beantwortest für die persönliche Objektseite eines Interessenten Standardfragen zu einer Immobilie von Musterhaus Immobilien GmbH (${artText}, ${istMiete ? "Vermietung" : "Verkauf"}). Deutsch, sachlich, freundlich, Sie-Anrede, je Antwort 1–3 Sätze.
+  const system = `Du beantwortest für die persönliche Objektseite eines Interessenten Standardfragen zu einer Immobilie von ${firmaName || "einem Immobilienmakler"} (${artText}, ${istMiete ? "Vermietung" : "Verkauf"}). Deutsch, sachlich, freundlich, Sie-Anrede, je Antwort 1–3 Sätze.
 STRIKTE REGELN:
 - Antworte AUSSCHLIESSLICH aus den Quellen (Eckdaten, Texte, FAQ, freigegebene Unterlagen). Erfinde nichts, schätze nichts, rechne nichts hoch, kein Allgemeinwissen zu Steuersätzen, Gebühren oder Rechtslage.
 - Steht die Antwort ganz oder teilweise nicht in den Quellen: "sicher": false und als Antwort kurz „Dazu liegen in den Unterlagen keine Angaben vor.“ (ggf. mit dem Teil, der belegt ist).
@@ -347,7 +371,10 @@ async function kontextVorschau(db: any, immobilieId: string, nutzer: { id: strin
   const { data: im } = await db.from("immobilien").select(IM_FELDER).eq("id", immobilieId).maybeSingle();
   if (!im) return null;
   const firmaRow = await immoStandortDesObjekts(db, im.mandant_id, null);
-  const firma = firmaRow || { firma_name: "Musterhaus Immobilien GmbH", strasse: "", plz: "", ort: "", email: "info@immooffice.example" };
+  // Ohne Stammdaten bleiben die Felder leer. Der Rueckfall trug bisher den
+  // Namen und die Platzhalteradresse des Demo-Mandanten — auf der
+  // oeffentlichen Objektseite eines fremden Maklers.
+  const firma = firmaRow || { firma_name: "", strasse: "", plz: "", ort: "", email: "" };
   const { data: makler } = im.zustaendig_id ? await db.from("profiles").select("id, name, email, telefon, funktion, foto_url").eq("id", im.zustaendig_id).maybeSingle() : { data: null as any };
   const jetzt = new Date().toISOString();
   const f = { id: null, token: null, immobilie_id: im.id, email: nutzer.email || "", name: "Vorschau", kontakt_id: null, created_at: jetzt, geoeffnet_am: jetzt, bestaetigt_am: jetzt,

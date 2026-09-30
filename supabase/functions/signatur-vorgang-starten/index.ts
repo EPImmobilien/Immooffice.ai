@@ -81,7 +81,6 @@ const FONT_MARCELLUS          = "fonts/Marcellus-Regular.ttf";
 const FONT_SCHREIBSCHRIFT     = "fonts/GreatVibes-Regular.ttf";
 const LOGO_PFAD               = "logo.png";
 const MAKLER_SIGNATUR_PFADE   = ["unterschrift-lasse.png", "unterschrift.png"];
-const MAKLER_NAME             = "Lasse Musterhaus";
 
 const CI = {
   // Hier standen bis zum 28.09.2026 rgb(0.149, 0.192, 0.349) und
@@ -125,8 +124,32 @@ function objektAdresseVon(vertrag: any): string {
   return [vertrag.objekt_strasse, plzOrt].filter(Boolean).join(", ");
 }
 
-const STANDORTE: Record<string, { name: string; firma: string; strasse: string; plzOrt: string; stadt: string }> = {
-  standard: { name: "", firma: "", strasse: "", plzOrt: "", stadt: "" },
+// Wie in vertrag-pdf: der Briefkopf kommt aus firma_stammdaten des
+// Mandanten, und vertreter ist der wirkliche Geschaeftsfuehrer statt eines
+// erfundenen Namens. Hier wiegt es doppelt: diese Funktion startet den
+// SIGNATURVORGANG — was hier steht, unterschreibt der Kunde.
+type ImmoStandort = { name: string; firma: string; strasse: string; plzOrt: string; stadt: string; vertreter: string; email: string };
+const STANDORT_LEER: ImmoStandort = { name: "", firma: "", strasse: "", plzOrt: "", stadt: "", vertreter: "", email: "" };
+async function immoStandort(db: any, mandant: unknown, slug: unknown): Promise<ImmoStandort> {
+  if (typeof mandant !== "string" || !mandant) return STANDORT_LEER;
+  let frage = db.from("firma_stammdaten")
+    .select("firma_name, marken_name, strasse, plz, ort, email, geschaeftsfuehrer, slug")
+    .eq("mandant_id", mandant).eq("aktiv", true);
+  if (typeof slug === "string" && slug && slug !== "standard") frage = frage.eq("slug", slug);
+  const { data } = await frage.order("sortierung", { ascending: true }).limit(1).maybeSingle();
+  if (!data) return STANDORT_LEER;
+  return {
+    name: String(data.marken_name || data.firma_name || "").trim(),
+    firma: String(data.firma_name || "").trim(),
+    strasse: String(data.strasse || "").trim(),
+    plzOrt: `${data.plz || ""} ${data.ort || ""}`.trim(),
+    stadt: String(data.ort || "").trim(),
+    vertreter: String(data.geschaeftsfuehrer || "").trim(),
+    email: String(data.email || "").trim(),
+  };
+}
+const STANDORTE: Record<string, ImmoStandort> = {
+  standard: STANDORT_LEER,
 };
 
 async function sha256Hex(bytes: Uint8Array): Promise<string> {
@@ -193,7 +216,7 @@ function verkaeuferZeilen(vertrag: any): { titel: string; zeilen: string[] } {
 type Absatz = { text: string; bold?: boolean; heading?: boolean; size?: number; spaceAfter?: number; indent?: number; pageBreakBefore?: boolean };
 
 // Statische AGB \u2014 identisch fuer Maklervertrag und Objektnachweis.
-function buildAgbAbsaetze(standort: typeof STANDORTE["standard"], mitSalvatorischerKlausel: boolean): Absatz[] {
+function buildAgbAbsaetze(standort: ImmoStandort, mitSalvatorischerKlausel: boolean): Absatz[] {
   const a: Absatz[] = [];
   a.push({ text: "Allgemeine Gesch\u00e4ftsbedingungen", heading: true, size: 16 });
   a.push({ text: "1. Geltungsbereich", bold: true });
@@ -245,7 +268,7 @@ function buildAgbAbsaetze(standort: typeof STANDORTE["standard"], mitSalvatorisc
   return a;
 }
 
-function buildMaklervertragAbsaetze(vertrag: any, standort: typeof STANDORTE["standard"]): Absatz[] {
+function buildMaklervertragAbsaetze(vertrag: any, standort: ImmoStandort): Absatz[] {
   const { titel: verkTitel, zeilen: verkZeilen } = verkaeuferZeilen(vertrag);
   const preis = vertrag.angebotspreis ? formatMoneyDE(vertrag.angebotspreis) : "____________________________";
   const laufzeit = vertrag.laufzeit_monate || "6";
@@ -343,12 +366,12 @@ function buildMaklervertragAbsaetze(vertrag: any, standort: typeof STANDORTE["st
   a.push({ text: "Haben Sie verlangt, dass die Dienstleistung w\u00e4hrend der Widerrufsfrist beginnen soll, so haben Sie uns einen angemessenen Betrag zu zahlen, der dem Anteil der bis zu dem Zeitpunkt, zu dem Sie uns von der Aus\u00fcbung des Widerrufsrechts hinsichtlich dieses Vertrages unterrichten, bereits erbrachten Dienstleistungen im Vergleich zum Gesamtumfang der im Vertrag vorgesehenen Dienstleistungen entspricht." });
   a.push({ text: "Indem Sie diese Vereinbarung unterschreiben, best\u00e4tigen Sie, dass Sie die oben genannte Widerrufsbelehrung gelesen und verstanden haben." });
   a.push({ text: "Bitte beachten Sie, dass Ihr Widerrufsrecht erlischt, wenn wir auf Ihren ausdr\u00fccklichen Wunsch hin unsere Maklert\u00e4tigkeit vollst\u00e4ndig erbracht haben, bevor Sie von Ihrem Widerrufsrecht Gebrauch gemacht haben. Wir bitten Sie daher, Ihren Wunsch diesbez\u00fcglich unten zum Ausdruck zu bringen." });
-  a.push({ text: `[ ] Ich stimme ausdr\u00fccklich zu, dass ${standort.name}; ${standort.firma}, vertreten durch Lasse Musterhaus, ${standort.strasse}, ${standort.plzOrt}, mit der Maklert\u00e4tigkeit beginnt, bevor die oben genannte Frist f\u00fcr die Aus\u00fcbung meines Widerrufsrechts abgelaufen ist, und bin mir bewusst, dass mein Widerrufsrecht vorzeitig erlischt. (Diese Zustimmung wird gesondert im Rahmen der elektronischen Unterschrift eingeholt.)` });
+  a.push({ text: `[ ] Ich stimme ausdr\u00fccklich zu, dass ${standort.name}; ${standort.firma}, vertreten durch ${standort.vertreter}, ${standort.strasse}, ${standort.plzOrt}, mit der Maklert\u00e4tigkeit beginnt, bevor die oben genannte Frist f\u00fcr die Aus\u00fcbung meines Widerrufsrechts abgelaufen ist, und bin mir bewusst, dass mein Widerrufsrecht vorzeitig erlischt. (Diese Zustimmung wird gesondert im Rahmen der elektronischen Unterschrift eingeholt.)` });
   a.push({ text: "Wir hoffen, Ihnen bald einen geeigneten K\u00e4ufer pr\u00e4sentieren zu k\u00f6nnen, und verbleiben" });
   a.push({ text: "mit freundlichen Gr\u00fc\u00dfen" });
   a.push({ text: standort.name });
   a.push({ text: standort.firma });
-  a.push({ text: "Lasse Musterhaus", spaceAfter: 10 });
+  a.push({ text: standort.vertreter, spaceAfter: 10 });
   a.push({ text: "Hiermit best\u00e4tigt der Verk\u00e4ufer, die Widerrufsbelehrung, das Muster-Widerrufsformular und die AGB erhalten zu haben." });
   a.push({ text: "Wir ben\u00f6tigen eine unterzeichnete Kopie dieses Schreibens und m\u00f6chten Sie h\u00f6flich bitten, uns dieses unverz\u00fcglich zur\u00fcckzusenden.", spaceAfter: 20 });
 
@@ -356,7 +379,7 @@ function buildMaklervertragAbsaetze(vertrag: any, standort: typeof STANDORTE["st
   a.push({ text: "(Wenn Sie den Vertrag widerrufen wollen, dann f\u00fcllen Sie bitte dieses Formular aus und senden es an uns zur\u00fcck.)" });
   a.push({ text: standort.name });
   a.push({ text: standort.firma });
-  a.push({ text: "Lasse Musterhaus" });
+  a.push({ text: standort.vertreter });
   a.push({ text: standort.strasse });
   a.push({ text: standort.plzOrt });
   a.push({ text: "info@immooffice.example" });
@@ -372,7 +395,7 @@ function buildMaklervertragAbsaetze(vertrag: any, standort: typeof STANDORTE["st
   return a;
 }
 
-function buildVollmachtAbsaetze(vertrag: any, standort: typeof STANDORTE["standard"]): Absatz[] {
+function buildVollmachtAbsaetze(vertrag: any, standort: ImmoStandort): Absatz[] {
   const { titel: verkTitel, zeilen: verkZeilen } = verkaeuferZeilen(vertrag);
   const objektZeilen: string[] = [];
   if (vertrag.objekt_bezeichnung) objektZeilen.push(vertrag.objekt_bezeichnung);
@@ -390,7 +413,7 @@ function buildVollmachtAbsaetze(vertrag: any, standort: typeof STANDORTE["standa
   a.push({ text: "erteilt", bold: true, spaceAfter: 6 });
   a.push({ text: standort.name });
   a.push({ text: standort.firma });
-  a.push({ text: "Lasse Musterhaus" });
+  a.push({ text: standort.vertreter });
   a.push({ text: standort.strasse });
   a.push({ text: standort.plzOrt, spaceAfter: 6 });
   a.push({ text: "zu der Immobilie:", bold: true });
@@ -521,7 +544,7 @@ function kaeuferListe(objektnachweis: any): any[] {
 
 // ---- Objektnachweis, Teil 1: Nachweis + Reservierung. Direkt darunter kommen
 //      die Unterschriften. Widerruf und AGB folgen als Anlagen.
-function buildObjektnachweisHauptteil(objektnachweis: any, standort: typeof STANDORTE["standard"], verkaeuferNamen: string[]): Absatz[] {
+function buildObjektnachweisHauptteil(objektnachweis: any, standort: ImmoStandort, verkaeuferNamen: string[]): Absatz[] {
   const kaeufer = kaeuferListe(objektnachweis);
   const heute = new Date().toLocaleDateString("de-DE");
   const angebotsdatum = objektnachweis.angebotsdatum ? formatGermanDate(objektnachweis.angebotsdatum) : heute;
@@ -590,7 +613,7 @@ function buildObjektnachweisHauptteil(objektnachweis: any, standort: typeof STAN
 }
 
 // ---- Objektnachweis, Anlage 1: Widerrufsbelehrung + Muster-Widerrufsformular
-function buildObjektnachweisWiderruf(standort: typeof STANDORTE["standard"]): Absatz[] {
+function buildObjektnachweisWiderruf(standort: ImmoStandort): Absatz[] {
   const a: Absatz[] = [];
   a.push({ text: "Anlage 1 \u2013 Widerrufsbelehrung", heading: true, size: 13, pageBreakBefore: true });
   a.push({ text: "Widerrufsrecht", bold: true });
@@ -608,14 +631,14 @@ function buildObjektnachweisWiderruf(standort: typeof STANDORTE["standard"]): Ab
   a.push({ text: "Haben Sie verlangt, dass die Dienstleistung w\u00e4hrend der Widerrufsfrist beginnen soll, so haben Sie uns einen angemessenen Betrag zu zahlen, der dem Anteil der bis zu dem Zeitpunkt, zu dem Sie uns von der Aus\u00fcbung des Widerrufsrechts hinsichtlich dieses Vertrages unterrichten, bereits erbrachten Dienstleistungen im Vergleich zum Gesamtumfang der im Vertrag vorgesehenen Dienstleistungen entspricht." });
   a.push({ text: "Indem Sie diese Vereinbarung unterschreiben, best\u00e4tigen Sie, dass Sie die oben genannte Widerrufsbelehrung gelesen und verstanden haben." });
   a.push({ text: "Bitte beachten Sie, dass Ihr Widerrufsrecht erlischt, wenn wir auf Ihren ausdr\u00fccklichen Wunsch hin unsere Maklert\u00e4tigkeit vollst\u00e4ndig erbracht haben, bevor Sie von Ihrem Widerrufsrecht Gebrauch gemacht haben." });
-  a.push({ text: `[ ] Ich stimme ausdr\u00fccklich zu, dass ${standort.name}; ${standort.firma}, vertreten durch ${MAKLER_NAME}, ${standort.strasse}, ${standort.plzOrt}, mit der Maklert\u00e4tigkeit beginnt, bevor die oben genannte Frist f\u00fcr die Aus\u00fcbung meines Widerrufsrechts abgelaufen ist, und bin mir bewusst, dass mein Widerrufsrecht vorzeitig erlischt. (Diese Zustimmung wird gesondert im Rahmen der elektronischen Unterschrift eingeholt.)`, spaceAfter: 10 });
+  a.push({ text: `[ ] Ich stimme ausdr\u00fccklich zu, dass ${standort.name}; ${standort.firma}, vertreten durch ${standort.vertreter}, ${standort.strasse}, ${standort.plzOrt}, mit der Maklert\u00e4tigkeit beginnt, bevor die oben genannte Frist f\u00fcr die Aus\u00fcbung meines Widerrufsrechts abgelaufen ist, und bin mir bewusst, dass mein Widerrufsrecht vorzeitig erlischt. (Diese Zustimmung wird gesondert im Rahmen der elektronischen Unterschrift eingeholt.)`, spaceAfter: 10 });
   a.push({ text: "Hiermit best\u00e4tigt der K\u00e4ufer, die Widerrufsbelehrung, das Muster-Widerrufsformular und die AGB erhalten zu haben.", spaceAfter: 12 });
 
   a.push({ text: "Anlage 2 \u2013 Muster-Widerrufsformular", heading: true, size: 13, pageBreakBefore: true });
   a.push({ text: "(Wenn Sie den Vertrag widerrufen wollen, dann f\u00fcllen Sie bitte dieses Formular aus und senden es an uns zur\u00fcck.)" });
   a.push({ text: standort.name });
   a.push({ text: standort.firma });
-  a.push({ text: MAKLER_NAME });
+  a.push({ text: standort.vertreter });
   a.push({ text: standort.strasse });
   a.push({ text: standort.plzOrt });
   a.push({ text: "info@immooffice.example" });
@@ -629,7 +652,7 @@ function buildObjektnachweisWiderruf(standort: typeof STANDORTE["standard"]): Ab
   return a;
 }
 
-function buildObjektnachweisAgb(standort: typeof STANDORTE["standard"]): Absatz[] {
+function buildObjektnachweisAgb(standort: ImmoStandort): Absatz[] {
   const agb = buildAgbAbsaetze(standort, true);
   agb[0] = { text: "Anlage 3 \u2013 Allgemeine Gesch\u00e4ftsbedingungen", heading: true, size: 13, pageBreakBefore: true };
   return agb;
@@ -880,7 +903,12 @@ Deno.serve(async (req) => {
     }
     if (!maklerSignatur) console.warn("Kein Makler-Signaturbild gefunden \u2014 verwende Schreibschrift-Fallback.");
 
-    const standort = STANDORTE[vertrag.standort || "standard"] || STANDORTE.standard;
+    const standort = await immoStandort(admin, vertrag.mandant_id, vertrag.standort);
+    // Ein Dokument, das unterschrieben werden soll, braucht einen
+    // Aussteller. Fehlt er, entsteht kein Vorgang.
+    if (!standort.firma || !standort.vertreter) {
+      return antwort({ ok: false, fehler: "Fuer diesen Mandanten fehlen Firmenname oder Geschaeftsfuehrer in den Stammdaten. Ohne beides wird kein Signaturvorgang gestartet." }, 400);
+    }
     const titel = dokumentTyp === "maklervertrag"
       ? (inklVollmacht ? "Maklervertrag & Vollmacht" : "Maklervertrag")
       : dokumentTyp === "objektnachweis"
@@ -1113,14 +1141,14 @@ Deno.serve(async (req) => {
         // Fallback: Name in Schreibschrift auf die Linie setzen.
         const sigFont = fontSchreibschrift || fontHeadline || fontBold;
         let sigSize = 30;
-        while (sigSize > 14 && sicherBreite(sigFont, MAKLER_NAME, sigSize) > feldBreite - 16) sigSize -= 1;
-        drawSicher(MAKLER_NAME, {
+        while (sigSize > 14 && sicherBreite(sigFont, standort.vertreter, sigSize) > feldBreite - 16) sigSize -= 1;
+        drawSicher(standort.vertreter, {
           x: margin + 8, y: boxBottom + 10, size: sigSize, font: sigFont, color: ciBlau,
         });
       }
 
       const heute = new Date().toLocaleDateString("de-DE");
-      drawSicher(fix(`${MAKLER_NAME} (Makler)`), {
+      drawSicher(fix(`${standort.vertreter} (Makler)`), {
         x: margin, y: boxBottom - 13, size: 9, font: fontRegular, color: CI.dunkelGrau,
       });
       drawSicher(fix(`${standort.name} \u00b7 ${standort.firma} \u2014 vorunterzeichnet am ${heute}`), {

@@ -14,6 +14,25 @@
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+
+// --- Firmenname des Mandanten (Phase 2.4) ---------------------------------
+// Die Neutralisierung hat den Namen der Referenz ueberall durch den des
+// Demo-Mandanten ersetzt. Fuer das Neutralitaets-Gate war das richtig; fuer
+// ein mandantenfaehiges Produkt ist ein verdrahteter Firmenname bei jedem
+// Mandanten ausser einem falsch — und er stand in Grussformeln, Briefkoepfen
+// und im OpenImmo-Feld <firma>, das jedes Portal anzeigt.
+//
+// Ohne Eintrag liefert diese Funktion einen LEEREN Text, keinen Beispielnamen.
+// Die aufrufende Stelle laesst die Zeile dann weg. Eine fehlende Grussformel
+// faellt auf; eine falsche nicht.
+async function immoFirmenName(db: any, mandant: unknown): Promise<string> {
+  if (typeof mandant !== "string" || !mandant) return "";
+  const { data } = await db.from("firma_stammdaten")
+    .select("firma_name, marken_name")
+    .eq("mandant_id", mandant).eq("aktiv", true)
+    .order("sortierung", { ascending: true }).limit(1).maybeSingle();
+  return String(data?.marken_name || data?.firma_name || "").trim();
+}
 import { PDFDocument, rgb, StandardFonts } from "npm:pdf-lib@1.17.1";
 import nodemailer from "npm:nodemailer@6.9.16";
 
@@ -234,6 +253,7 @@ Deno.serve(async (req) => {
     const { data: vorgang, error: vgErr } = await admin.from("signatur_vorgaenge").select("*").eq("id", empfaenger.vorgang_id).maybeSingle(); immoSetzeMandant(vorgang?.mandant_id);
     if (vgErr) throw vgErr;
     if (!vorgang) throw new Error("Signatur-Vorgang nicht gefunden.");
+    const firmaName = await immoFirmenName(admin, vorgang.mandant_id);
     if (vorgang.ablauf_am && new Date(vorgang.ablauf_am).getTime() < Date.now()) throw new Error("Dieser Link ist abgelaufen.");
 
     if (vorgang.dokument_typ === "maklervertrag" && empfaenger.rolle !== "makler" && !bestaetigungWiderruf) {
@@ -312,7 +332,7 @@ Deno.serve(async (req) => {
               + `Als Verk\u00e4uferseite bitten wir Sie nun um Ihre Gegenzeichnung. Damit best\u00e4tigen Sie, dass Ihnen die im Dokument genannten Kaufinteressenten durch uns nachgewiesen wurden.\n\n`
               + `Bitte lesen Sie das Dokument vollst\u00e4ndig und unterschreiben Sie \u00fcber folgenden Link:\n\n${link}\n\n`
               + `Sobald alle Beteiligten unterschrieben haben, erhalten Sie das fertige Dokument automatisch als PDF per E-Mail.\n\n`
-              + `Mit freundlichen Gr\u00fc\u00dfen\nMusterhaus Immobilien GmbH`
+              + `Mit freundlichen Gr\u00fc\u00dfen\n${firmaName || ""}`
             : `Guten Tag ${e.anzeigename},\n\n`
               + `alle Auftraggeber haben den ${titel} f\u00fcr ${objektText} elektronisch unterschrieben.\n\n`
               + `Bitte zeichnen Sie das Dokument nun \u00fcber folgenden Link gegen:\n\n${link}\n\n`
@@ -485,7 +505,7 @@ Deno.serve(async (req) => {
             + `${anhangSatz}\n\n`
             + `Bitte bewahren Sie diese E-Mail und den Anhang gut auf.\n\n`
             + `F\u00fcr R\u00fcckfragen stehen wir Ihnen selbstverst\u00e4ndlich gerne zur Verf\u00fcgung.\n\n`
-            + `Mit freundlichen Gr\u00fc\u00dfen\nMusterhaus Immobilien GmbH`,
+            + `Mit freundlichen Gr\u00fc\u00dfen\n${firmaName || ""}`,
             [{ filename: `${titel.replace(/\s+/g, "_")}_unterschrieben.pdf`, content: finalBytes, contentType: "application/pdf" }]
           );
           await admin.from("signatur_events").insert({ mandant_id: vorgang.mandant_id, vorgang_id: vorgang.id, empfaenger_id: e.id, event_typ: "mail_gesendet", details: { email: e.email, anlass: "abschluss", rolle: e.rolle } });

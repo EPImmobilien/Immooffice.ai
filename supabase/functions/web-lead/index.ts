@@ -12,7 +12,9 @@ const json = (b: unknown, s = 200) =>
 // Quelltext. Sie kommt jetzt je Anfrage aus dem Mandanten.
 // Dasselbe gilt fuer die Empfaengerliste: sie steht am Standort.
 // EMPFAENGER entfaellt: die Adressen kommen aus firma_stammdaten.
-const ABSENDER = "Musterhaus Immobilien Website <info@immooffice.example>";
+// Der Absendername des Webformulars: der Mandant, dem das Formular
+// gehoert, plus die Absenderadresse der Plattform (SPF/DKIM).
+const ABSENDER_ADRESSE = (Deno.env.get("SMTP_FROM_EMAIL") || "").trim();
 const MAIL_VERZOEGERUNG_MS = 75_000; // Zeit für Schritt 2, danach geht die Mail mit allem raus, was da ist
 
 const clean = (v: unknown, max = 300) => String(v ?? "").replace(/\s+/g, " ").trim().slice(0, max);
@@ -86,7 +88,7 @@ async function mailSenden(leadId: string) {
   try {
     const r = await fetch("https://api.resend.com/emails", {
       method: "POST", headers: { Authorization: `Bearer ${key}`, "content-type": "application/json" },
-      body: JSON.stringify({ from: ABSENDER, to: empfaenger, reply_to: l.email || undefined,
+      body: JSON.stringify({ from: `${(await immoFirmenName(db, l.mandant_id)) || "Website"} <${ABSENDER_ADRESSE}>`, to: empfaenger, reply_to: l.email || undefined,
         subject: `${flag} Lead: ${l.objektart || "Immobilie"} in ${l.adresse}${l.verkaufszeitpunkt ? " – " + l.verkaufszeitpunkt : ""} – ${l.name || l.telefon}`, html }),
     });
     if (!r.ok) { console.error("resend", r.status, await r.text()); return; }

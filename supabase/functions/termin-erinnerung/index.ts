@@ -188,7 +188,7 @@ Deno.serve(async (req) => {
         const objektZeile = objekt ? ` (${[objekt.immo_nr, objekt.bezeichnung || objekt.objekttitel].filter(Boolean).join(" · ")})` : "";
         const wann = t.ganztags ? `am ${datumLang(t.datum)}` : `am ${datumLang(t.datum)} um ${String(t.uhrzeit).slice(0, 5)} Uhr`;
         const heuteOderMorgen = t.datum === heute ? "heute" : "morgen";
-        const text = `${anrede(k)}\n\nich möchte Sie freundlich an unseren Termin ${heuteOderMorgen} erinnern:\n\n${art}${objektZeile}\n${wann}${ort ? `\nOrt: ${ort}` : ""}\n\nSollte Ihnen etwas dazwischengekommen sein, geben Sie mir bitte kurz Bescheid. Ansonsten freue ich mich auf Sie!\n\nMit freundlichen Grüßen\n${(makler && makler.name) || postfach.absender_name || "Ihr Musterhaus Immobilien Team"}`;
+        const text = `${anrede(k)}\n\nich möchte Sie freundlich an unseren Termin ${heuteOderMorgen} erinnern:\n\n${art}${objektZeile}\n${wann}${ort ? `\nOrt: ${ort}` : ""}\n\nSollte Ihnen etwas dazwischengekommen sein, geben Sie mir bitte kurz Bescheid. Ansonsten freue ich mich auf Sie!\n\nMit freundlichen Grüßen\n${(makler && makler.name) || postfach.absender_name || "Ihr Maklerteam"}`;
         // v3: Grußformel des Textes durch die Postfach-Signatur ersetzen (genau einmal)
         const finalText = mitSignatur(text, postfach.signatur);
         const betreff = `Erinnerung: ${art} ${heuteOderMorgen}${t.ganztags ? "" : ` um ${String(t.uhrzeit).slice(0, 5)} Uhr`}`;

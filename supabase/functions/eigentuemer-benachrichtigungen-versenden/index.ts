@@ -11,6 +11,25 @@
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+
+// --- Firmenname des Mandanten (Phase 2.4) ---------------------------------
+// Die Neutralisierung hat den Namen der Referenz ueberall durch den des
+// Demo-Mandanten ersetzt. Fuer das Neutralitaets-Gate war das richtig; fuer
+// ein mandantenfaehiges Produkt ist ein verdrahteter Firmenname bei jedem
+// Mandanten ausser einem falsch — und er stand in Grussformeln, Briefkoepfen
+// und im OpenImmo-Feld <firma>, das jedes Portal anzeigt.
+//
+// Ohne Eintrag liefert diese Funktion einen LEEREN Text, keinen Beispielnamen.
+// Die aufrufende Stelle laesst die Zeile dann weg. Eine fehlende Grussformel
+// faellt auf; eine falsche nicht.
+async function immoFirmenName(db: any, mandant: unknown): Promise<string> {
+  if (typeof mandant !== "string" || !mandant) return "";
+  const { data } = await db.from("firma_stammdaten")
+    .select("firma_name, marken_name")
+    .eq("mandant_id", mandant).eq("aktiv", true)
+    .order("sortierung", { ascending: true }).limit(1).maybeSingle();
+  return String(data?.marken_name || data?.firma_name || "").trim();
+}
 import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const corsHeaders = {
@@ -153,6 +172,10 @@ Deno.serve(async (req) => {
           .order("created_at", { ascending: false })
           .limit(20);
 
+        // Die Warteschlange traegt keinen Mandanten; er haengt am
+        // Eigentuemer, fuer den die Sammelmail entsteht.
+        const mandantDesEintrags = (await supabase.from("eigentuemer")
+          .select("mandant_id").eq("id", eintrag.eigentuemer_id).maybeSingle()).data?.mandant_id ?? null;
         const anzahl = dokumente?.length ?? eintrag.anzahl_dokumente;
 
         for (const e of empfaenger) {
@@ -163,6 +186,7 @@ Deno.serve(async (req) => {
             anzahl,
             dokumente: dokumente || [],
             portalUrl,
+            firmaName: await immoFirmenName(supabase, mandantDesEintrags),
           });
           await sende(e.email, betreff, textBody, htmlBody);
           console.log(`Mail an ${e.email} verschickt (${anzahl} Dokument${anzahl === 1 ? "" : "e"}, ${resendKey ? "resend" : "smtp"}).`);
@@ -229,6 +253,7 @@ function buildMail(opts: {
   anzahl: number;
   dokumente: Array<{ name: string; kategorie: string; nachricht?: string | null }>;
   portalUrl: string;
+  firmaName: string;
 }): { betreff: string; htmlBody: string; textBody: string } {
   const name = [opts.vorname, opts.nachname].filter(Boolean).join(" ");
   const begruessung = opts.anrede
@@ -330,7 +355,7 @@ wir haben ${istEines ? "ein neues Dokument" : `${opts.anzahl} neue Dokumente`} i
 Sie erreichen Ihr Portal hier:
 ${opts.portalUrl}
 
-Mit freundlichen Gr\u00fc\u00dfen\nMusterhaus Immobilien GmbH
+Mit freundlichen Gr\u00fc\u00dfen\n${opts.firmaName || ""}
 `;
 
   return { betreff, htmlBody, textBody };

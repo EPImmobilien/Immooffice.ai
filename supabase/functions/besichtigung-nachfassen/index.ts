@@ -16,6 +16,25 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// --- Firmenname des Mandanten (Phase 2.4) ---------------------------------
+// Die Neutralisierung hat den Namen der Referenz ueberall durch den des
+// Demo-Mandanten ersetzt. Fuer das Neutralitaets-Gate war das richtig; fuer
+// ein mandantenfaehiges Produkt ist ein verdrahteter Firmenname bei jedem
+// Mandanten ausser einem falsch — und er stand in Grussformeln, Briefkoepfen
+// und im OpenImmo-Feld <firma>, das jedes Portal anzeigt.
+//
+// Ohne Eintrag liefert diese Funktion einen LEEREN Text, keinen Beispielnamen.
+// Die aufrufende Stelle laesst die Zeile dann weg. Eine fehlende Grussformel
+// faellt auf; eine falsche nicht.
+async function immoFirmenName(db: any, mandant: unknown): Promise<string> {
+  if (typeof mandant !== "string" || !mandant) return "";
+  const { data } = await db.from("firma_stammdaten")
+    .select("firma_name, marken_name")
+    .eq("mandant_id", mandant).eq("aktiv", true)
+    .order("sortierung", { ascending: true }).limit(1).maybeSingle();
+  return String(data?.marken_name || data?.firma_name || "").trim();
+}
+
 // --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
 // Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
 // und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist
@@ -85,7 +104,7 @@ function anredeZeile(k: any): string {
   return `Guten Tag ${[k.vorname, name].filter(Boolean).join(" ")},`;
 }
 
-async function entwurfSchreiben(p: { anrede: string; kunde: string; objekt: string; adresse: string; vermarktung: string; besichtigung: string; makler: string }): Promise<{ betreff: string; text: string }> {
+async function entwurfSchreiben(p: { anrede: string; kunde: string; objekt: string; adresse: string; vermarktung: string; besichtigung: string; makler: string; firmaName: string }): Promise<{ betreff: string; text: string }> {
   const fallbackText = `${p.anrede}
 
 vielen Dank noch einmal für Ihren Besuch am ${p.besichtigung} in ${p.objekt}${p.adresse ? ` (${p.adresse})` : ""}.
@@ -96,7 +115,7 @@ Mit freundlichen Grüßen
 ${p.makler}`;
   const fallback = { betreff: `Ihre Besichtigung ${p.objekt} – noch Interesse?`, text: fallbackText };
   if (!ANTHROPIC_API_KEY) return fallback;
-  const system = `Du schreibst für ${p.makler} von Musterhaus Immobilien GmbH  eine kurze persönliche Nachfass-E-Mail an einen Interessenten, der vor drei Tagen ein Objekt besichtigt hat und sich seitdem nicht gemeldet hat.
+  const system = `Du schreibst für ${p.makler}${p.firmaName ? ` von ${p.firmaName}` : ""} eine kurze persönliche Nachfass-E-Mail an einen Interessenten, der vor drei Tagen ein Objekt besichtigt hat und sich seitdem nicht gemeldet hat.
 Regeln:
 - Deutsch, Sie-Form, warm und unaufdringlich, 70–120 Wörter im Fließtext; sachlich-freundlich wie ein guter Makler, keine Wortspiele, keine gewollt originellen Formulierungen.
 - Beginne exakt mit dieser Anrede: "${p.anrede}" — danach ein kurzer Dank für den Besichtigungstermin.
@@ -225,7 +244,7 @@ Deno.serve(async (req) => {
         const entwurf = await entwurfSchreiben({
           anrede: anredeZeile(k), kunde: kundenName, objekt: objektName, adresse,
           vermarktung: immo ? (immo.vertragsart === "miete" ? "Vermietung" : immo.vertragsart === "kauf" ? "Verkauf" : "") : "",
-          besichtigung: `${wt}, ${deDatum(t.datum)}${t.uhrzeit ? ` um ${String(t.uhrzeit).slice(0, 5)} Uhr` : ""}`, makler: makler.name || "Ihr Musterhaus Immobilien Team",
+          besichtigung: `${wt}, ${deDatum(t.datum)}${t.uhrzeit ? ` um ${String(t.uhrzeit).slice(0, 5)} Uhr` : ""}`, makler: makler.name || "Ihr Maklerteam", firmaName: await immoFirmenName(db, t.mandant_id),
         });
         eintrag.entwurf = entwurf; eintrag.makler = makler.name; eintrag.ergebnis = "vorschlag";
         vorschlaege++;

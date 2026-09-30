@@ -766,7 +766,7 @@ text(metaTeile.join("   ·   "), 70, 84, fL, 10, rgb(0.910, 0.918, 0.949), 0.3);
 neueSeite();
 kopf("Ihre Unterlage im Überblick", "Inhalt.");
 const toc: Array<[string, string, string]> = [];
-toc.push(["01", "Musterhaus Immobilien GmbH", "Daten & Fakten  ·  Vertriebsgebiet" + (hatKZ ? "  ·  Warum mit uns" : "")]);
+toc.push(["01", firma.firma_name, "Daten & Fakten  ·  Vertriebsgebiet" + (hatKZ ? "  ·  Warum mit uns" : "")]);
 toc.push(["02", "Fundierte Preisermittlung", ["Eckdaten", vos.length ? "Vergleichsobjekte" : "", hatHerleitung ? "Preisherleitung" : "", "Kaufpreisempfehlung"].filter(Boolean).join("  ·  ")]);
 if (marktwert || einwandAntwort.length) toc.push(["03", "Preisstrategie", ["Warum der Startpreis entscheidet", einwandAntwort.length ? "Verteidigung Ihres Preises" : "", num(d.fin_kaufpreis) ? "Finanzierung" : ""].filter(Boolean).join("  ·  ")]);
 toc.push(["04", "Professionelle Vermarktung", "Objektaufbereitung  ·  Exklusivmandat  ·  Vermarktungsfahrplan"]);
@@ -853,9 +853,9 @@ x += breite(it, fL, 10, 0.2) + 8;
 }
 footer(true);
 }
-await divider("01", "Musterhaus Immobilien", "Immobilien.", ["Daten & Fakten", "Vertriebsgebiet"]);
+await divider("01", firma.firma_name, "Immobilien.", ["Daten & Fakten", "Vertriebsgebiet"]);
 neueSeite();
-kopf("Musterhaus Immobilien GmbH", "Unser Immobilienbüro.");
+kopf(firma.firma_name, "Unser Immobilienbüro.");
 const fakten: string[] = (kz && Array.isArray(kz.fakten) && kz.fakten.length) ? kz.fakten.map((f: any) => String(f)) : [
 "Inhabergäführtes Familienunternehmen".replace("gäf", "gef"),
 "Spezialisten für außergewöhnliche Immobilien & Neubauprojekte",
@@ -900,7 +900,7 @@ for (const z of wrapT([so.strasse, (so.plz || "") + " " + (so.ort || "")].filter
 hline(70, 118, 510);
 footer();
 neueSeite(true);
-kopf("Musterhaus Immobilien GmbH", "Unser Vertriebsgebiet.", true);
+kopf(firma.firma_name, "Unser Vertriebsgebiet.", true);
 const geo = await geoLaden(admin);
 if (geo && geo.features) {
 const lat0 = 47.20, lat1 = 55.15, lonMid = 10.45;
@@ -975,7 +975,7 @@ para("Mecklenburg-Vorpommern · Schleswig-Holstein · Hamburg · Niedersachsen u
 footer(true);
 if (hatKZ) {
 neueSeite(true);
-kopf("Musterhaus Immobilien GmbH", "Warum der Verkauf mit uns den Unterschied macht.", true);
+kopf(firma.firma_name, "Warum der Verkauf mit uns den Unterschied macht.", true);
 const kpis: Array<[string, string]> = [];
 if (kz.objekte_vermittelt) kpis.push([String(kz.objekte_vermittelt), "vermittelte Immobilien " + kz.jahr]);
 if (kz.erzielungsquote) kpis.push([fmtProz(kz.erzielungsquote), "des Angebotspreises im Schnitt erzielt"]);
@@ -1398,7 +1398,7 @@ neueSeite();
 kopf("Professionelle Vermarktung", "Wir bereiten Ihre Immobilie optimal auf.");
 const bloecke: Array<[string, string]> = [
 ["Exposé", "Erstellung eines aussagekräftigen, detailreichen und maßgeschneiderten Exposés Ihrer Immobilie."],
-["Fotografien", "Professionelle & hochwertige Fotografien nach Musterhaus Immobilien Richtlinien."],
+["Fotografien", "Professionelle & hochwertige Fotografien nach unseren Richtlinien."],
 ["Grundrisse", "Professionelle Grundrissbearbeitung und -gestaltung für einen klaren ersten Eindruck."],
 ["Objektbeschreibung", "Detaillierte Beschreibung samt Ausstattung, Besonderheiten und Lage – bezogen auf die Zielgruppen."],
 ];
@@ -1523,7 +1523,7 @@ text("inkl. gesetzl. MwSt.", mid, midy - 30, fL, 8.5, GRAU, 0.2, "c");
 page.drawRectangle({ x: 70, y: 84, width: W - 140, height: 118, borderColor: HAIR, borderWidth: 0.9, opacity: 0 });
 page.drawRectangle({ x: 70, y: 84, width: 6, height: 118, color: NAVY });
 text("COURTAGE-ANSPRUCH NUR BEI ERFOLG", 100, 170, fSB, 7.8, GOLD, 1.6);
-para("Eigentümern entstehen während der gesamten Vermarktung durch Musterhaus Immobilien keinerlei Kosten – außer bei gesondert beauftragten Marketingmaßnahmen.", 100, 148, W - 200, fL, 9.5, 14, NAVY);
+para("Eigentümern entstehen während der gesamten Vermarktung durch " + firma.firma_name + " keinerlei Kosten – außer bei gesondert beauftragten Marketingmaßnahmen.", 100, 148, W - 200, fL, 9.5, 14, NAVY);
 text(String(d.courtage_hinweis || "Maklervertrag mit einer Laufzeit von 6 Monaten, danach monatlich kündbar."), 100, 106, fSB, 9.5, NAVY, 0.1);
 footer();
 }
@@ -1606,7 +1606,7 @@ let zz = ns - 15;
 for (const z of wrapT(String(s.text || ""), fL, 8.2, 220)) { text(z, 577, zz, fL, 8.2, GRAU, 0.1); zz -= 11.5; }
 ns = zz - 22;
 });
-para("Bitte beachten Sie, dass die vorliegende Auswertung unserer Einschätzung der aktuellen Marktsituation entspricht und keine offizielle Bewertung darstellt. Die Unterlage wurde von Musterhaus Immobilien GmbH sorgfältig erstellt und dient ausschließlich Informationszwecken. Die Angaben gelten zum Zeitpunkt der Erstellung und können sich je nach Marktentwicklung ändern. Für Daten aus Drittanbieterquellen übernimmt Musterhaus Immobilien GmbH keine Haftung. Diese Unterlage begründet weder gegenseitige Rechte und Pflichten noch bildet sie eine Grundlage für etwaige Geschäftsbeziehungen.", 70, 96, W - 140, fL, 6.4, 9, GRAUH);
+para("Bitte beachten Sie, dass die vorliegende Auswertung unserer Einschätzung der aktuellen Marktsituation entspricht und keine offizielle Bewertung darstellt. Die Unterlage wurde von " + firma.firma_name + " sorgfältig erstellt und dient ausschließlich Informationszwecken. Die Angaben gelten zum Zeitpunkt der Erstellung und können sich je nach Marktentwicklung ändern. Für Daten aus Drittanbieterquellen übernimmt " + firma.firma_name + " keine Haftung. Diese Unterlage begründet weder gegenseitige Rechte und Pflichten noch bildet sie eine Grundlage für etwaige Geschäftsbeziehungen.", 70, 96, W - 140, fL, 6.4, 9, GRAUH);
 footer();
 neueSeite(true);
 if (logoWeiss) {

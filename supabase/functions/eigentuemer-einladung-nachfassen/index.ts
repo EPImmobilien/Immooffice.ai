@@ -96,7 +96,7 @@ Deno.serve(async (req) => {
     for (const einl of jeEig.values()) {
       const info: any = { eigentuemer_id: einl.eigentuemer_id, email: einl.email };
       const firmaRow = await firmaFuer(einl.mandant_id || null);
-      const firma = firmaRow?.firma_name || "Musterhaus Immobilien GmbH";
+      const firma = firmaRow?.firma_name || "";
       const fromEmail = Deno.env.get("SMTP_FROM_EMAIL") || firmaRow?.email || "info@immooffice.example";
       try {
         const { data: eig } = await admin.from("eigentuemer").select("id, anrede, titel, vorname, nachname, email, user_id, aktiv").eq("id", einl.eigentuemer_id).maybeSingle();

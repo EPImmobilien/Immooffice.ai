@@ -3316,3 +3316,97 @@ fiel nicht in die Liste „ohne Treffer", weil die andere den Zähler schon
 gefüllt hatte. Der Erzeuger hätte eine wirkungslose Regel nicht gemeldet. Der
 Schlüssel trägt jetzt die Bemerkung mit.
 
+---
+
+## Der verdrahtete Firmenname, zweiter Durchgang: die Ausgabe steht auf null (30.09.2026)
+
+Von 107 Vorkommen sind 32 übrig, und **die Klasse AUSGABE — alles, was ein
+Kunde liest — steht auf null**. Übrig sind 29 Systemvorgaben der KI, zwei
+Erkennungsmuster und ein Kommentar.
+
+### Der Maklervertrag hatte einen erfundenen Unterzeichner
+
+Das ist der schwerste Einzelbefund dieses Durchgangs. `vertrag-pdf` und
+`signatur-vorgang-starten` trugen einen **erfundenen Geschäftsführer** — an
+drei Stellen je Dokument:
+
+- in der Zustimmungsklausel („… vertreten durch …"),
+- unter der Unterschrift,
+- im Muster-Widerrufsformular.
+
+`signatur-vorgang-starten` setzt diesen Namen zusätzlich **in
+Schreibschrift auf die Unterschriftenlinie**, wenn keine Bilddatei hinterlegt
+ist — eine vorgesetzte Unterschrift mit einem Namen, den es nicht gibt.
+
+`CLAUDE.md` verbietet erfundene Daten. In einem Vertrag ist das nicht bloß ein
+Neutralitätsproblem: ein Dokument, dessen Aussteller nicht existiert, ist im
+Streitfall wertlos. Beide Funktionen brechen jetzt mit einer klaren Meldung
+ab, wenn Firmenname oder Geschäftsführer in den Stammdaten fehlen. Kein
+Dokument ist besser als eines mit erfundenem Aussteller.
+
+**Damit ist zugleich Punkt 3 aus `docs/OFFEN.md` erledigt:** „`vertrag-pdf`
+erzeugt Verträge ohne Firmenkopf." Die Standorttabelle, die beim
+Neutralisieren geleert worden war, ist durch eine Abfrage auf
+`firma_stammdaten` ersetzt — Firmenname, Anschrift, E-Mail und
+Geschäftsführer, gefiltert auf den Mandanten des Vertrags.
+
+### Die Rechnung nannte die eigene Firma überhaupt nicht
+
+`rechnung-pdf-erzeugen` baute die Schlussformel so:
+
+```js
+const firmenZeile = firma.firma_name === "<fester Name> Berlin GmbH"
+  ? "<fester Name> Berlin GmbH"
+  : "<fester Name>";
+```
+
+Drei Zeilen, die den Firmennamen aus den Stammdaten mit einem festen Wert
+vergleichen — und danach **so oder so** einen festen Namen schreiben. Die
+Firma des Mandanten kam in der Schlussformel der Rechnung nie vor. Jetzt steht
+dort `firma.firma_name`.
+
+### Die übrigen Klassen
+
+**Neun Überschriften** der Akquise-Präsentation, darunter der Haftungshinweis
+und die Kostenzusage — also die Sätze, auf die sich ein Eigentümer berufen
+würde. Der Briefkopf stand als `firma` längst bereit; die Überschriften kannten
+ihn nur nicht.
+
+**Sämtliche Grußformeln** unter Mails an Kunden, Eigentümer und
+Bauträger-Käufer. Fast alle hatten schon eine richtige Quelle (Makler,
+Postfach, `firma`) und fielen nur am Ende der Kette auf den verdrahteten Namen
+zurück. Dort steht jetzt der Wert aus den Stammdaten oder eine neutrale
+Wendung — „Ihr Maklerteam" ist bei jedem Mandanten richtig.
+
+**Der Weg dorthin** ist ein Helfer, kein Sammelersetzen:
+
+```ts
+async function immoFirmenName(db: any, mandant: unknown): Promise<string>
+```
+
+Er liefert ohne Eintrag einen **leeren** Text. Die aufrufende Stelle lässt die
+Zeile dann weg. Das ist dieselbe Regel wie beim Briefkopf und beim Rückfall auf
+fremde Mandanten: **eine fehlende Angabe fällt auf, eine falsche nicht.**
+
+### Was bleibt: 29 Systemvorgaben der KI
+
+Sie nennen das Haus, für das die KI schreibt. Mit einem verdrahteten Namen
+schreibt sie für jeden Mandanten im Namen eines fremden — und der Name kann in
+den erzeugten Exposé-Text geraten. In `mail-ki-vorschlag` steht zusätzlich ein
+erfundener Geschäftsführer in der Vorgabe.
+
+Der Umbau ist ein anderer als bei den Ausgaben: die Vorgabe muss den Namen als
+Baustein bekommen, und dafür braucht jede dieser Funktionen den Mandanten
+genau dort, wo sie ihre Vorgabe zusammensetzt. Das ist der nächste Block.
+`tests/firmenname-verdrahtet.py` führt sie einzeln auf.
+
+### Zwei kleinere Aufräumarbeiten am Erzeuger
+
+- Zwei Regeln zur Standorttabelle in `vertrag-pdf` waren **seit Wochen ohne
+  Treffer** — eine Regex-Regel weiter oben erledigt dasselbe. Aufgefallen ist
+  es erst, seit der Trefferzähler je Bemerkung schlüsselt. Sie sind entfernt.
+- Die Grenze für zulässiges Zeilenwachstum je Funktion ist von 140 auf 170
+  gestiegen. Die Bremse hat bei `rechnung-pdf-erzeugen` mit +144 angehalten
+  und damit genau getan, wozu sie da ist. Die Zahl war gewollt, also steigt
+  die Grenze — nicht die Toleranz.
+

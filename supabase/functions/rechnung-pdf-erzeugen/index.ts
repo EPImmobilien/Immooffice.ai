@@ -490,9 +490,10 @@ Deno.serve(async (req) => {
       einleitung = "Sehr geehrte Damen und Herren,\n\nhiermit stellen wir Ihnen folgende Leistungen in Rechnung:";
     }
     if (schluss.includes("fuer") || schluss.includes("Gruessen") || !schluss) {
-      const firmenZeile = firma.firma_name === "Musterhaus Immobilien GmbH Berlin GmbH"
-        ? "Musterhaus Immobilien GmbH Berlin GmbH"
-        : "Musterhaus Immobilien GmbH";
+      // Diese drei Zeilen verglichen den Firmennamen mit einem festen Wert
+      // und schrieben danach SO ODER SO einen festen Namen — die Firma aus
+      // den Stammdaten kam in der Schlussformel der Rechnung nie vor.
+      const firmenZeile = firma.firma_name || "";
       schluss = `Vielen Dank für Ihr Vertrauen!\n\nMit freundlichen Grüßen\n${firmenZeile}`;
     }
 

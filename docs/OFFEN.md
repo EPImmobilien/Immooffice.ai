@@ -57,12 +57,14 @@ Hinzukommen, kein Beweis der Richtigkeit.
    Das ist Absicht: ein Platzhalter, der auffällt, ist besser als eine
    erfundene Domain, die zufällig jemandem gehört.
 
-3. **`vertrag-pdf` erzeugt Verträge ohne Firmenkopf.** Die Funktion trug die
-   drei Standorte der Referenz als Tabelle im Quelltext. An ihre Stelle ist
-   ein leerer Eintrag `standard` getreten. Bis die Werte aus
-   `firma_stammdaten` (`typ = 'standort'`) kommen, bleiben Firmenname,
-   Anschrift und Ort im erzeugten Maklervertrag leer. Ein Vertrag ohne
-   Firmenkopf darf nicht an einen Kunden gehen.
+3. ~~**`vertrag-pdf` erzeugt Verträge ohne Firmenkopf.**~~ **Erledigt am
+   30.09.2026.** Die Standorttabelle ist durch eine Abfrage auf
+   `firma_stammdaten` ersetzt, gefiltert auf den Mandanten des Vertrags.
+   Dabei kam heraus, dass der Vertrag zusätzlich einen **erfundenen
+   Geschäftsführer** als Unterzeichner trug — in der Zustimmungsklausel,
+   unter der Unterschrift und im Widerrufsformular; `signatur-vorgang-starten`
+   setzte ihn sogar in Schreibschrift auf die Unterschriftenlinie. Beide
+   Funktionen brechen jetzt ab, wenn Firmenname oder Geschäftsführer fehlen.
 
 ## ~~Der Quelltext der Oberflaeche~~ — geklärt am 28.09.2026, anders als gedacht
 

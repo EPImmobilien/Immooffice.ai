@@ -56,37 +56,25 @@ NAME = re.compile(r'Musterhaus')
 # AUSGABE     Steht in etwas, das ein Kunde liest — Mail, PDF, Portal,
 #             Webseite. Das ist die Klasse, die weg muss.
 #
-# Stand 30.09.2026. Behoben: portal-export, portal-export-homepage
-# (OpenImmo-Anbieter), energieausweis-anfrage (Widerrufsbelehrung, Briefkopf,
-# erfundener Ansprechpartner) und die vier Funktionen des Neubauportals
-# (Absendername und Grussformel) ueber den Helfer immoFirmenName.
+# Stand 30.09.2026, nach zwei Durchgaengen: von 107 Vorkommen sind 32 uebrig,
+# und die Klasse AUSGABE — alles, was ein Kunde liest — steht auf NULL.
+# Behoben unter anderem: das OpenImmo-Feld <firma>, die Widerrufsbelehrung
+# des Energieausweis-Fragebogens, der Maklervertrag samt zeichnendem
+# Vertreter, die neun Ueberschriften der Akquise-Praesentation und saemtliche
+# Grussformeln. Der Weg dorthin ist der Helfer immoFirmenName(db, mandant),
+# der ohne Eintrag einen LEEREN Text liefert — nie einen Beispielnamen.
 BUCH = {
-    # --- AUSGABE: erreicht einen Kunden -----------------------------------
-    'mpe-pdf-erzeugen':        (9, 'AUSGABE', 'Ueberschriften der Akquise-Praesentation'),
-    'vertrag-pdf':             (5, 'AUSGABE', 'Maklervertrag'),
-    'signatur-vorgang-starten': (5, 'AUSGABE', 'Mails und Huelle des Signaturvorgangs'),
-    'eigentuemer-nachricht-senden': (5, 'AUSGABE', 'Absender, Betreff und Fuss der Nachricht'),
-    'objekt-landing':          (4, 'AUSGABE', 'Rueckfall-Firma der oeffentlichen Objektseite'),
-    'expose-erinnerung':       (3, 'AUSGABE', 'Absender und Text der Erinnerungsmail'),
-    'rechnung-pdf-erzeugen':   (3, 'AUSGABE', 'Firmenzeile auf der Rechnung'),
-    'akq-wertindikation-pdf':  (2, 'AUSGABE', 'Briefkopf-Rueckfall'),
-    'besichtigung-nachfassen': (2, 'AUSGABE', 'Systemvorgabe und Team-Name in der Nachfassmail'),
-    'bewerbertest-abrufen':    (2, 'AUSGABE', 'Fehlermeldungen an den Bewerber'),
-    'eigentuemer-report-pdf':  (2, 'AUSGABE', 'Absender des Berichts'),
-    'expose-freigabe':         (2, 'AUSGABE', 'Rueckfall-Firma der Freigabeseite'),
-    'signatur-unterschreiben':  (2, 'AUSGABE', 'Grussformel der Bestaetigungsmails'),
-    'eigentuemer-benachrichtigungen-versenden': (1, 'AUSGABE', 'Grussformel'),
-    'eigentuemer-einladung-nachfassen': (1, 'AUSGABE', 'Briefkopf-Rueckfall'),
-    'newsletter-senden':       (1, 'AUSGABE', 'Absendername-Rueckfall'),
-    'reservierung-word-erzeugen': (1, 'AUSGABE', 'Dokument-Urheber'),
-    'suchkriterien-newsletter': (1, 'AUSGABE', 'Grussformel'),
-    'termin-erinnerung':       (1, 'AUSGABE', 'Grussformel'),
-    'upload_benachrichtigung_planen': (1, 'AUSGABE', 'Fuss der Meldung'),
-    'web-lead':                (1, 'AUSGABE', 'Absendername des Webformulars'),
-
     # --- KI: wirkt ueber den erzeugten Text -------------------------------
+    # Eine Systemvorgabe nennt das Haus, fuer das die KI schreibt. Mit einem
+    # verdrahteten Namen schreibt sie fuer jeden Mandanten im Namen eines
+    # fremden — und der Name kann in den erzeugten Text geraten.
+    #
+    # Der Umbau ist ein anderer als bei den Ausgaben: die Vorgabe muss den
+    # Namen des Mandanten als Baustein bekommen, und dafuer braucht jede
+    # dieser Funktionen den Mandanten an der Stelle, an der sie die Vorgabe
+    # zusammensetzt. Das ist der naechste Block von Phase 2.4.
     'generate-text':           (14, 'KI', 'Systemvorgaben fuer Exposetexte und Beitraege'),
-    'mail-ki-vorschlag':       (5, 'KI', 'Systemvorgabe nennt einen erfundenen Geschaeftsfuehrer'),
+    'mail-ki-vorschlag':       (5, 'KI', 'Systemvorgabe nennt zusaetzlich einen erfundenen Geschaeftsfuehrer'),
     'claude-chat':             (2, 'KI', 'Systemvorgabe des Assistenten'),
     'akq-ki-vorlage':          (1, 'KI', 'Systemvorgabe fuer Akquisevorlagen'),
     'akq-mail-leads':          (1, 'KI', 'Systemvorgabe der Lead-Erkennung'),

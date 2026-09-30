@@ -49,7 +49,7 @@ async function lade(db: any, t: string) {
   const { data: im } = await db.from("immobilien").select("id, immo_nr, objekttitel, bezeichnung, strasse, hausnummer, plz, ort, vertragsart, angebotspreis, kaltmiete, wohnflaeche, zimmer, hauptbild_url, adresse_freigeben, zustaendig_id, mandant_id").eq("id", f.immobilie_id).maybeSingle();
   const { data: firma } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").eq("slug", f.firma_slug || "standard").maybeSingle();
   const { data: maklerRoh } = im?.zustaendig_id ? await db.from("profiles").select("id, name, email, telefon, titel").eq("id", im.zustaendig_id).maybeSingle() : { data: null };
-  const firmaFertig = firma || { firma_name: "Musterhaus Immobilien GmbH", strasse: "", plz: "", ort: "", email: "info@immooffice.example", telefon: null };
+  const firmaFertig = firma || { firma_name: "", strasse: "", plz: "", ort: "", email: "", telefon: null };
   // v16: Kunden bekommen die Büronummer, nie die Mobilnummer des Maklers
   const bueroTel = firmaFertig.telefon || "";
   const makler = maklerRoh ? { ...maklerRoh, telefon: bueroTel } : null;
@@ -135,7 +135,7 @@ Deno.serve(async (req) => {
       let firmaSlug = "standard";
       if (makler?.firma_id) { const { data: fs } = await db.from("firma_stammdaten").select("slug").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").eq("id", makler.firma_id).maybeSingle(); if (fs?.slug) firmaSlug = fs.slug; }
       const { data: firmaRow } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").eq("slug", firmaSlug).maybeSingle();
-      const firma = firmaRow || { firma_name: "Musterhaus Immobilien GmbH", strasse: "", plz: "", ort: "", email: "info@immooffice.example", telefon: null };
+      const firma = firmaRow || { firma_name: "", strasse: "", plz: "", ort: "", email: "", telefon: null };
       if (!prov || !expose) return json({ ok: false, fehler: `Für dieses Objekt ist der sofortige Exposé-Download derzeit nicht möglich. Bitte fordern Sie das Exposé per E-Mail an: ${makler?.email || firma.email}` }, 409);
 
       if (body.aktion === "objekt_laden") {
