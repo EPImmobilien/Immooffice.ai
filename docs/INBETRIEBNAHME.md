@@ -171,17 +171,60 @@ recovery* oder direkt ein neues Passwort setzen.
 
 ---
 
+## Schritt 9 — Firmenstammdaten vollständig füllen (5 Minuten)
+
+**Seit dem 30.09.2026 ist das nicht mehr Kosmetik, sondern Voraussetzung.**
+Bis dahin standen Firmenname, Briefkopf und Absender fest im Quelltext; jetzt
+kommen sie aus `firma_stammdaten` des Mandanten. Was dort fehlt, fehlt im
+Dokument — und an zwei Stellen entsteht gar kein Dokument mehr:
+
+| Feld | Wird gebraucht für | Ohne Eintrag |
+|---|---|---|
+| `firma_name` | Briefkopf, Grußformel, OpenImmo-Anbieter | Portalexport **bricht ab**; Mails ohne Grußformel |
+| `geschaeftsfuehrer` | Zeichnender Vertreter im Maklervertrag | Maklervertrag und Signaturvorgang **brechen ab** |
+| `email` | Antwortadresse, Kontakt im Portal-Inserat, Widerrufsbelehrung | Antworten gehen an die Plattform statt an den Makler |
+| `strasse`, `plz`, `ort` | Briefkopf, Fahrzeit-Startpunkt | Leere Zeilen im Dokument |
+| `telefon` | Kontakt im Inserat, Hinweiskasten | Zeile entfällt |
+
+**Das ist so gewollt:** vorher standen an diesen Stellen entweder ein fest
+verdrahteter Name oder — schlimmer — die Daten eines *anderen* Mandanten. Ein
+Dokument ohne Briefkopf fällt auf, eines mit dem falschen nicht. Und ein
+Maklervertrag, dessen Unterzeichner nicht existiert, ist im Streitfall
+wertlos.
+
+**Stand am 30.09.2026 im Projekt:** `geschaeftsfuehrer` ist leer. Solange das
+so ist, erzeugt `vertrag-pdf` keinen Maklervertrag mehr und
+`signatur-vorgang-starten` keinen Signaturvorgang — beide mit einer Meldung,
+die den Grund nennt.
+
+**Ebenfalls prüfen:** unter `email` steht die Adresse des
+Referenzunternehmens. Bis zum 30.09.2026 wurde das Feld gar nicht benutzt,
+weshalb es nicht auffiel. Jetzt geht diese Adresse als Antwortadresse in
+Mails und als Kontakt in das OpenImmo-Inserat. Das ist eingegebene
+**Mandantendaten**, kein Quelltext — das Neutralitäts-Gate prüft das
+Repository und kann sie nicht sehen. Bitte auf die eigene Adresse ändern.
+
+Zu finden unter *Einstellungen → Firmendaten*.
+
+---
+
 ## Was danach noch offen ist
 
 Kein Handgriff des Betreibers, sondern Entwicklungsarbeit — steht in
 `docs/OFFEN.md`:
 
-- Der **Absender** ist noch plattformweit. Die Edge Functions lesen
-  Firmenname und Absenderadresse aus Umgebungsvariablen statt aus
-  `firma_stammdaten` des Mandanten (Phase 2.4).
-- `vertrag-pdf` erzeugt Verträge **ohne Firmenkopf**, bis die Standortdaten
-  aus `firma_stammdaten` kommen. Ein Vertrag ohne Firmenkopf darf nicht an
-  einen Kunden gehen.
+- ~~Der **Absender** ist noch plattformweit.~~ Erledigt: Anzeigename und
+  Antwortadresse kommen je Mandant aus `firma_stammdaten`. Die
+  **Absenderadresse** bleibt bewusst die der Plattform — ein Mailanbieter
+  verschickt nur von einer nachgewiesenen Domain (SPF/DKIM). Eigene
+  Absenderdomains je Mandant sind Phase 6.
+- ~~`vertrag-pdf` erzeugt Verträge **ohne Firmenkopf**.~~ Erledigt, siehe
+  Schritt 9.
+- Die **Platzhalter-Adresse `immooffice.example`** steht noch an 83 Stellen
+  in 45 Funktionen — überall dort, wo die Vorlage ihre eigene Domain
+  verdrahtet hatte. Die Endung ist nach RFC 2606 reserviert und existiert
+  nicht; diese Links führen nirgendwohin. Das ist Absicht: ein Platzhalter,
+  der auffällt, ist besser als eine erfundene Domain.
 - Die Fremdanbindungen (CRM, Microsoft 365, Immowelt, Kleinanzeigen) liegen
   hinter Funktionsschaltern und sind aus (Phase 2b).
 - Stripe und damit die Abrechnung ist Gate 3.
