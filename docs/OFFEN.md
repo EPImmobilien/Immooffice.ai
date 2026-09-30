@@ -25,41 +25,21 @@ holbar.~~ Der Betreiber hat sie mit dem Supabase-CLI geholt: 143 Funktionen,
 2,8 MB. 139 davon sind neutralisiert übernommen, vier entfallen nach Phase 1.4.
 Einzelheiten in `docs/EDGE_FUNCTIONS.md`.
 
-## Der Dienstschlüssel liest an 26 Stellen über die Mandantengrenze
+## ~~Der Dienstschlüssel liest über die Mandantengrenze~~ — erledigt am 30.09.2026
 
-Gefunden am 30.09.2026 mit `tests/dienstschluessel-mandant.py`, das seitdem
-Teil von `npm run check` ist. Die Prüfung nennt jede Stelle bei jedem Lauf,
-mit Einstufung und Wirkung — dort steht der aktuelle Stand, nicht hier.
+62 Fundstellen in 51 Funktion/Tabelle-Paaren, gefunden mit
+`tests/dienstschluessel-mandant.py`. **Alle behoben.** Die Prüfung läuft in
+`npm run check` mit und meldet noch 21 Abfragen, die aus einem genannten
+Grund über alle Mandanten gehen: Cron-Läufe, Missbrauchssperren, Kontosuche.
+Keine davon gibt Inhalte eines fremden Mandanten heraus.
 
-**Warum es diese Klasse gibt:** Edge Functions arbeiten mit dem
-Dienstschlüssel, und für den gilt RLS nicht. Wo die Vorlage „die erste aktive
-Zeile" nahm, war das bei einem Mandanten die richtige. Bei mehreren ist es die
-eines fremden Maklers.
+Einzelheiten in `docs/ENTSCHEIDUNGEN.md` — die beiden Einträge vom
+30.09.2026. Das Buch in der Prüfung selbst ist der aktuelle Stand.
 
-**Behoben sind** die schwersten drei Klassen: fremdes Postfach (samt
-SMTP-Passwort), fremde FTP-Zugangsdaten, fremder Briefkopf auf Dokumenten.
-Einzelheiten in `docs/ENTSCHEIDUNGEN.md`.
-
-**Offen sind 26 Fundstellen in 20 Funktionen,** in drei Gruppen:
-
-1. **Zuordnung über die E-Mail-Adresse** (7 Stellen, `kontakte`,
-   `eigentuemer`, `eigentuemer_personen`, `profiles`). Zwei Makler können
-   denselben Interessenten haben; die Zuordnung findet den des anderen.
-2. **Zuordnung über den Bestand** (`immobilien` in `akq-lead-eingang`,
-   `mail-postfach-pull`, `mail-anfrage-verarbeiten`). Am schwersten wiegt die
-   Wertindikation: sie zieht **Vergleichsobjekte aus den Beständen aller
-   Makler**. Das ist Geschäftsdaten des einen in der Rechnung des anderen.
-3. **Einstellungen und Regeln** (`akq_mail_regeln`, `mail_rechnung_ziele`,
-   `landing_faq`, `portal_einstellungen`, `onoffice_feld_werte`). Regeln eines
-   Hauses greifen auf die Mails eines anderen.
-
-Dazu ein Funktionsfehler, kein Leck: `news-briefing-erstellen` fragt
-plattformweit, ob es für heute schon ein Briefing gibt. Mit zwei Mandanten
-bekommt der zweite keines.
-
-**Vor dem ersten zweiten Mandanten im Echtbetrieb** muss Gruppe 2 weg — sie
-gibt Bestandsdaten heraus. Gruppe 1 und 3 führen zu falschen Zuordnungen und
-falschen Regeln, aber nicht zur Herausgabe fremder Bestände.
+**Was die Prüfung nicht leistet:** sie liest Abfragen, nicht Wirkung. Eine
+Abfrage mit `mandant_id` gilt ihr als eingeschränkt, auch wenn der Wert
+daneben aus der falschen Quelle kommt. Sie ist ein Netz gegen unbemerktes
+Hinzukommen, kein Beweis der Richtigkeit.
 
 **Was dabei offen bleibt — drei Punkte, alle Phase 2.4:**
 

@@ -364,6 +364,7 @@ async function ausfuehren(db: any, grenze: number, trocken: boolean) {
         const mail = String(kontakt?.email || "").trim();
         if (mail) {
           const { data: antwortV } = await db.from("mail_eingang").select("id")
+            .eq("mandant_id", lead.mandant_id)
             .ilike("absender_email", mail).neq("ordner", "gesendet")
             .gt("gesendet_am", lead.created_at).limit(1);
           if (antwortV && antwortV.length) {
@@ -411,6 +412,7 @@ async function ausfuehren(db: any, grenze: number, trocken: boolean) {
 
       // Eigentuemer hat geantwortet? -> alle offenen Laeufe dieses Leads stoppen
       const { data: antwort } = await db.from("mail_eingang").select("id, betreff, gesendet_am")
+        .eq("mandant_id", lead.mandant_id)
         .ilike("absender_email", an).neq("ordner", "gesendet")
         .gt("gesendet_am", lead.created_at).limit(1);
       if (antwort && antwort.length) {

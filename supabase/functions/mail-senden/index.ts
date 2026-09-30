@@ -307,7 +307,7 @@ Deno.serve(async (req) => {
       .from("mail_postfaecher").select("*").eq("id", postfach_id).maybeSingle();
     if (pfErr || !postfach) return antwort({ ok: false, error: "Postfach nicht gefunden" }, 404);
 
-    const { data: profile } = await admin.from("profiles").select("role").eq("id", userId).maybeSingle();
+    const { data: profile } = await admin.from("profiles").select("role, mandant_id").eq("id", userId).maybeSingle();
     const istChef = profile?.role === "chef";
     if (postfach.benutzer_id !== userId && !istChef) return antwort({ ok: false, error: "Keine Berechtigung fuer dieses Postfach" }, 403);
     if (!postfach.aktiv) return antwort({ ok: false, error: "Postfach ist deaktiviert" }, 400);
@@ -487,8 +487,13 @@ Deno.serve(async (req) => {
     try {
       const ziele = anListe.map(reineAdresse).filter(Boolean);
       if (ziele.length) {
+        // Diese ToDos werden gleich auf "erledigt" gesetzt. Ohne
+        // Mandantenfilter haette eine Mail an eine Adresse, die in zwei
+        // Haeusern als Empfaenger steht, das ToDo des fremden Hauses
+        // mit abgehakt — ein Schreibzugriff ueber die Mandantengrenze.
         const { data: mitEmpf } = await admin.from("todos")
           .select("id, titel, empfaenger_email")
+          .eq("mandant_id", profile?.mandant_id ?? "00000000-0000-0000-0000-000000000000")
           .eq("status", "offen").not("empfaenger_email", "is", null);
         const direkt = (mitEmpf || []).filter((t: any) =>
           ziele.includes(String(t.empfaenger_email || "").trim().toLowerCase()));
@@ -506,7 +511,7 @@ Deno.serve(async (req) => {
         // v19: nur Kontakte mit genau diesen Adressen (Gross-/Kleinschreibung egal) statt der ganzen Tabelle
         const sicher = ziele.filter((z) => /^[a-z0-9._%+@-]+$/i.test(z));
         const { data: kontakte } = sicher.length
-          ? await admin.from("kontakte").select("id, email").or(sicher.map((z) => `email.ilike.${z}`).join(",")).limit(200)
+          ? await admin.from("kontakte").select("id, email").eq("mandant_id", profile?.mandant_id ?? "00000000-0000-0000-0000-000000000000").or(sicher.map((z) => `email.ilike.${z}`).join(",")).limit(200)
           : { data: [] as any[] };
         const kIds = (kontakte || []).filter((k: any) => ziele.includes(String(k.email || "").trim().toLowerCase())).map((k: any) => k.id);
         if (kIds.length) {

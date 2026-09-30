@@ -534,7 +534,15 @@ Deno.serve(async (req) => {
 
     let objektIndex: any[] = [];
     try {
-      const { data: oi } = await admin.from("immobilien").select("id, immo_nr, strasse, hausnummer, plz, ort, status").range(0, 1999);
+      // Der Index, gegen den eingehende Mails einem Objekt zugeordnet werden.
+      // Ohne Mandantenfilter standen darin die Objekte aller Makler; die
+      // Zuordnung unten prueft ihn deshalb zusaetzlich je Postfach.
+      const mandantenDerPostfaecher = [...new Set((postfaecher || [])
+        .map((p: any) => p.mandant_id).filter(Boolean))];
+      const { data: oi } = mandantenDerPostfaecher.length
+        ? await admin.from("immobilien").select("id, mandant_id, immo_nr, strasse, hausnummer, plz, ort, status")
+            .in("mandant_id", mandantenDerPostfaecher).range(0, 1999)
+        : { data: [] as any[] };
       objektIndex = oi || [];
     } catch (e) { console.warn("Objektindex:", e); }
 

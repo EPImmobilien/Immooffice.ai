@@ -135,7 +135,11 @@ async function verarbeiten(db: any, mail: any, userId: string | null, erzwingen:
   let immobilieId: string | null = mail.immobilie_id || null;
   let objektGrund = mail.immobilie_id ? "bereits zugeordnet" : "";
   if (!immobilieId && !istEigentuemer) {
-    const { data: objekte } = await db.from("immobilien").select("id, immo_nr, objekttitel, bezeichnung, plz, ort, status, stammobjekt_id").neq("versteckt", true).limit(2000);
+    // Der Objektindex, gegen den die Anfrage zugeordnet wird. Ohne
+    // Mandantenfilter standen darin die Objekte aller Makler: die Anfrage
+    // des einen konnte am Objekt des anderen landen, samt Objektnummer und
+    // Titel in der Antwort.
+    const { data: objekte } = await db.from("immobilien").select("id, immo_nr, objekttitel, bezeichnung, plz, ort, status, stammobjekt_id").eq("mandant_id", mail.mandant_id).neq("versteckt", true).limit(2000);
     const liste = objekte || [];
     const aktiv = (o: any) => o.status === "vermarktung" || o.status === "reserviert" ? 2 : o.status === "verkauft" || o.status === "vermietet" || o.status === "archiv" ? -5 : 0;
     const nrRoh = d.objekt_nr ? String(d.objekt_nr).replace(/^\s*(ref\.?-?\s*nr\.?|objekt-?nr\.?)\s*:?\s*/i, "").trim().toLowerCase() : "";
@@ -166,11 +170,11 @@ async function verarbeiten(db: any, mail: any, userId: string | null, erzwingen:
   const vor = String(k.vorname || "").trim(), nach = String(k.nachname || "").trim();
   let kontakt: any = null, kontaktGrund = "";
   if (email && !PORTAL_RE.test(email)) {
-    const { data } = await db.from("kontakte").select("id, anrede, vorname, nachname, email, telefon, plz, rollen, notiz, aktiv").ilike("email", email).order("aktiv", { ascending: false }).limit(1).maybeSingle();
+    const { data } = await db.from("kontakte").select("id, anrede, vorname, nachname, email, telefon, plz, rollen, notiz, aktiv").eq("mandant_id", mail.mandant_id).ilike("email", email).order("aktiv", { ascending: false }).limit(1).maybeSingle();
     if (data) { kontakt = data; kontaktGrund = "E-Mail"; }
   }
   if (!kontakt && nach) {
-    let q = db.from("kontakte").select("id, anrede, vorname, nachname, email, telefon, plz, rollen, notiz, aktiv").ilike("nachname", nach).eq("aktiv", true).limit(20);
+    let q = db.from("kontakte").select("id, anrede, vorname, nachname, email, telefon, plz, rollen, notiz, aktiv").eq("mandant_id", mail.mandant_id).ilike("nachname", nach).eq("aktiv", true).limit(20);
     if (vor) q = q.ilike("vorname", vor);
     const { data } = await q;
     const kand = (data || []).filter((x: any) => (!vor || norm(x.vorname) === norm(vor)) && !EIGENE_RE.test(String(x.email || "")));
@@ -233,7 +237,7 @@ Deno.serve(async (req) => {
         userId = u.user.id;
       }
     }
-    const felder = "id, absender_email, absender_name, betreff, text, html, gesendet_am, immobilie_id, postfach_id";
+    const felder = "id, absender_email, absender_name, betreff, text, html, gesendet_am, immobilie_id, postfach_id, mandant_id";
     if (body.modus === "batch") {
       const seit = new Date(Date.now() - 7 * 86400000).toISOString();
       const { data: mails } = await db.from("mail_eingang").select(felder).is("anfrage_status", null).eq("ordner", "posteingang").gte("gesendet_am", seit).order("gesendet_am", { ascending: false }).limit(Number(body.limit) || 8);

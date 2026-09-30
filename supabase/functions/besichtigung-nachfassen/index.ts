@@ -208,11 +208,15 @@ Deno.serve(async (req) => {
         if (!makler) {
           const namen = [...(Array.isArray(t.teilnehmer) ? t.teilnehmer : []), t.ersteller_name].filter(Boolean);
           for (const n of namen) {
-            const { data } = await db.from("profiles").select("id, name").in("role", ["chef", "mitarbeiter"]).ilike("name", String(n).trim()).limit(1);
+            const { data } = await db.from("profiles").select("id, name").eq("mandant_id", t.mandant_id).in("role", ["chef", "mitarbeiter"]).ilike("name", String(n).trim()).limit(1);
             if (data && data.length) { makler = data[0]; break; }
           }
         }
-        if (!makler) { const { data } = await db.from("profiles").select("id, name").eq("role", "chef").limit(1); makler = (data && data[0]) || { id: null, name: "Ihr Musterhaus Immobilien Team" }; }
+        // Letzter Rueckfall: der Chef DIESES Hauses. Ohne Mandantenfilter war
+        // es der erstbeste Chef der Plattform — und sein Name stand dann
+        // unter der Nachfass-Mail eines fremden Maklers. Der Name-Rueckfall
+        // nannte den Demo-Mandanten; jetzt steht dort eine neutrale Anrede.
+        if (!makler) { const { data } = await db.from("profiles").select("id, name").eq("mandant_id", t.mandant_id).eq("role", "chef").limit(1); makler = (data && data[0]) || { id: null, name: "Ihr Team" }; }
 
         const objektName = immo ? (immo.bezeichnung || immo.objekttitel || [immo.strasse, immo.hausnummer].filter(Boolean).join(" ") || "unserem Objekt") : (t.titel || "unserem Objekt");
         const adresse = immo ? [[immo.strasse, immo.hausnummer].filter(Boolean).join(" "), [immo.plz, immo.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ") : "";

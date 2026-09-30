@@ -108,12 +108,12 @@ Deno.serve(async (req) => {
     const zust = im.zustaendig_id || u.user.id;
     const { data: zp } = await db.from("profiles").select("firma_id").eq("id", zust).maybeSingle();
     const firmaId = zp?.firma_id || p.firma_id;
-    if (firmaId) { const { data: f } = await db.from("firma_stammdaten").select("slug").eq("id", firmaId).maybeSingle(); firmaSlug = f?.slug || null; }
+    if (firmaId) { const { data: f } = await db.from("firma_stammdaten").select("slug").eq("id", firmaId).eq("mandant_id", im.mandant_id).maybeSingle(); firmaSlug = f?.slug || null; }
 
     // v10: Objektseite oder Download-Seite
     let landing: boolean;
     if (typeof body.landing === "boolean") landing = body.landing;
-    else { const { data: e } = await db.from("portal_einstellungen").select("wert").eq("schluessel", "landing_standard").maybeSingle(); landing = e ? e.wert === true : true; }
+    else { const { data: e } = await db.from("portal_einstellungen").select("wert").eq("mandant_id", im.mandant_id).eq("schluessel", "landing_standard").maybeSingle(); landing = e ? e.wert === true : true; }
 
     const t = token();
     const { data: row, error } = await db.from("expose_freigaben").insert({

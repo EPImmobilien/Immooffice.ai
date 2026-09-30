@@ -3091,3 +3091,102 @@ Anwendung ist das gleichgültig. In einer mandantenfähigen ist jeder solche
 Rückfall eine offene Tür, und er steht genau dort, wo man am wenigsten
 hinsieht: im Zweig, der „normalerweise nicht vorkommt".
 
+---
+
+## Der Dienstschlüssel, zweiter Durchgang: alle 26 Reststellen (30.09.2026)
+
+Im ersten Durchgang waren die drei schwersten Klassen dran — fremdes
+Postfach, fremde FTP-Zugangsdaten, fremder Briefkopf. Übrig blieben 26
+Fundstellen, alle benannt. **Sie sind jetzt ebenfalls erledigt.** Die Prüfung
+meldet: keine offene Stelle mehr, nur noch 21 Abfragen, die aus einem
+genannten Grund über alle Mandanten gehen.
+
+### Die schwerste der Reststellen: die Wertindikation
+
+`akq-lead-eingang` berechnet aus dem eigenen Bestand eine Preisschätzung für
+einen eingehenden Lead. Sie sucht Vergleichsobjekte nach PLZ, dann nach Ort,
+dann — als letzter Rückfall — im *„gesamtbestand"*. Der Kommentar über der
+Funktion sagt seit jeher: *„Wertindikation aus dem, was das Portal selbst
+hat: erzielte bzw. angebotene Quadratmeterpreise vergleichbarer **eigener**
+Objekte."*
+
+Bei einem Mandanten stimmte das Wort „eigener". Bei mehreren hieß
+„Gesamtbestand" die Bestände **aller Makler der Plattform** — und erzielte
+Verkaufspreise sind Geschäftsdaten. Die Schätzung des einen stützte sich auf
+die Zahlen seiner Mitbewerber.
+
+Alle drei Stufen sind jetzt auf den eigenen Mandanten eingeschränkt. Reicht
+der eigene Bestand nicht für einen Median, liefert die Funktion
+`keine_vergleichsdaten` statt einer Zahl. Das ist die Regel aus `CLAUDE.md`,
+angewandt: keine erfundenen Objektdaten, und lieber keine Zahl als eine aus
+fremden Büchern.
+
+### Die drei übrigen Gruppen
+
+**Zuordnung über die E-Mail-Adresse** (`kontakte`, `eigentuemer`,
+`eigentuemer_personen`, `profiles`). Eine Adresse sieht aus wie ein
+Schlüssel, ist aber keiner: zwei Makler können denselben Interessenten haben.
+Jede Suche „Kontakt mit dieser Adresse" fand deshalb auch den des anderen
+Hauses — und hängte den neuen Lead, das neue ToDo oder die Einladung an
+dessen Datensatz. Bei `eigentuemer-person-hinzufuegen` kam etwas hinzu: die
+Prüfung suchte ausdrücklich „irgendwo", und die Fehlermeldung darunter hätte
+verraten, dass diese Adresse beim Mitbewerber als Eigentümer geführt wird.
+
+**Zuordnung über den Bestand** (`immobilien` in `mail-postfach-pull` und
+`mail-anfrage-verarbeiten`). Der Index, gegen den eingehende Mails einem
+Objekt zugeordnet werden, umfasste alle Makler. Die Anfrage des einen konnte
+am Objekt des anderen landen, mit dessen Objektnummer und Titel in der
+Antwort.
+
+**Regeln und Einstellungen** (`akq_mail_regeln`, `mail_rechnung_ziele`,
+`landing_faq`, `portal_einstellungen`, `onoffice_feld_werte`). Am deutlichsten
+bei den Rechnungsmails: die Weiterleitungsregel des einen Hauses galt für die
+Rechnungsmail des anderen — und die Rechnung ginge an dessen Buchhaltung.
+
+Ein Sonderfall: `mail-senden` setzt ToDos automatisch auf „erledigt", wenn
+eine Mail an deren Empfängeradresse rausgeht. Das ist ein **Schreibzugriff**,
+und er lief über die Mandantengrenze: eine Adresse, die in zwei Häusern als
+Empfänger steht, hätte das ToDo des fremden Hauses mit abgehakt.
+
+### Zwei Stellen waren schon richtig — und ich hatte sie falsch verbucht
+
+Beim Aufstellen des Buchs habe ich zwei Abfragen als „offen" eingetragen, die
+seit Phase 2 mit Bedacht so gebaut sind. Beim Nachlesen des Quelltexts stand
+die Begründung jeweils als Kommentar darüber:
+
+- **`eigentuemer-zugang-anfordern`** sucht das Profil über Adresse und Rolle,
+  bevor ein Mandant feststeht. Das ist Absicht: ein *Konto* gibt es je Adresse
+  genau einmal, plattformweit. Gesucht wird deshalb zuerst das Konto, und aus
+  ihm folgt der Mandant. Alles Weitere bleibt darin.
+- **`news-briefing-erstellen`** fragt plattformweit „wie viele Briefings gibt
+  es heute?" und vergleicht mit der Zahl der Mandanten. Auch das ist Absicht
+  und sogar die Behebung eines früheren Fehlers — eine einzelne Zeile hieße
+  „für alle erledigt".
+
+Beide sind jetzt als `KONTO` verbucht, mit dem Grund. **Die Lehre ist nicht,
+dass die Prüfung zu streng ist**, sondern dass eine Prüfung, die eine Liste
+ausgibt, keine Liste von Fehlern ausgibt: sie gibt eine Liste von Stellen aus,
+die jemand ansehen muss. Wer die Einstufung aus dem Suchtreffer ableitet statt
+aus dem Quelltext, baut funktionierenden Code kaputt.
+
+### Der Stand
+
+| | erster Durchgang | jetzt |
+|---|---|---|
+| Fundstellen | 62 in 51 Paaren | 21 in 19 Paaren |
+| davon offen | 26 | **0** |
+| Einstufungen | BEABSICHTIGT, TOKEN, OFFEN | BEABSICHTIGT 15 · MISSBRAUCH 4 · KONTO 2 |
+
+Die verbleibenden 21 gehen aus einem genannten Grund über alle Mandanten:
+Cron-Läufe, die danach je Zeile im richtigen Mandanten weiterarbeiten;
+Missbrauchssperren, die plattformweit zählen müssen, sonst wären sie keine;
+und die Kontosuche über die Adresse. Keine davon gibt Inhalte eines fremden
+Mandanten heraus.
+
+**Was der Prüfung weiterhin entgeht:** sie liest Abfragen, nicht Wirkung. Eine
+Abfrage, die `mandant_id` enthält, gilt ihr als eingeschränkt — auch wenn der
+Wert daneben aus der falschen Quelle kommt. Und eine Einschränkung, die erst
+in JavaScript nach der Abfrage greift, sieht sie als Fundstelle, obwohl sie
+richtig ist. Beide Fälle sind im Buch vermerkt, wo sie vorkommen. Sie ist ein
+Netz gegen das unbemerkte Hinzukommen, kein Beweis der Richtigkeit.
+

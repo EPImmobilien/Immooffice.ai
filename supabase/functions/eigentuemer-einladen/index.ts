@@ -119,9 +119,16 @@ Deno.serve(async (req) => {
     });
 
     // 1) Bestehenden Eigentuemer ueber E-Mail finden
+    const mandantDesAufrufers = await immoMandantDesAufrufers(req);
+    if (!mandantDesAufrufers) throw new Error("Kein Mandant am Konto — ohne den keine Einladung.");
+
+    // Ueber die Adresse allein faellt die Suche ueber die Mandantengrenze:
+    // derselbe Eigentuemer kann bei zwei Maklern liegen, und die Einladung
+    // haette sich an den Datensatz des anderen gehaengt.
     const { data: bestehend } = await adminClient
       .from("eigentuemer")
       .select("id, user_id, anrede, titel, vorname, nachname")
+      .eq("mandant_id", mandantDesAufrufers)
       .ilike("email", email)
       .maybeSingle();
 

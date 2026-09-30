@@ -196,8 +196,8 @@ Antworte NUR mit JSON: {"antwort": "...", "sicher": true|false, "quellen": ["...
 
 // ---- v9: Standard-FAQ je Objekt per KI ----
 type Katalogfrage = { schluessel: string; kategorie: string; frage: string; objektarten: string[] | null; vermarktung: string | null };
-async function faqKatalog(db: any): Promise<Katalogfrage[]> {
-  const { data } = await db.from("portal_einstellungen").select("wert").eq("schluessel", "landing_faq_katalog").maybeSingle();
+async function faqKatalog(db: any, mandant: string | null): Promise<Katalogfrage[]> {
+  const { data } = await db.from("portal_einstellungen").select("wert").eq("mandant_id", mandant).eq("schluessel", "landing_faq_katalog").maybeSingle();
   const k = Array.isArray(data?.wert) ? data.wert : [];
   return k.filter((x: any) => x && x.schluessel && x.frage).map((x: any) => ({
     schluessel: String(x.schluessel).slice(0, 40), kategorie: String(x.kategorie || "Allgemein").slice(0, 60), frage: String(x.frage).slice(0, 300),
@@ -233,7 +233,7 @@ async function faqErzeugen(db: any, immobilieId: string, nutzerId: string | null
   if (!apiKey) return { ok: false, fehler: "Kein KI-Schlüssel hinterlegt." };
   const { data: im } = await db.from("immobilien").select(IM_FELDER).eq("id", immobilieId).maybeSingle();
   if (!im) return { ok: false, fehler: "Objekt nicht gefunden." };
-  const katalogAlle = await faqKatalog(db);
+  const katalogAlle = await faqKatalog(db, im.mandant_id);
   if (!katalogAlle.length) return { ok: false, fehler: "Kein Fragenkatalog hinterlegt (portal_einstellungen.landing_faq_katalog)." };
   const istMiete = /miet/i.test(String(im.vertragsart || ""));
   // v10: nur Fragen, die zur Gebäudeart und zur Vermarktung passen
@@ -320,7 +320,10 @@ async function ladeAntwort(db: any, ctx: any, vorschau: boolean): Promise<{ stat
   const basis: any = { ok: true, vorschau, f: fPub, im: imPub, fotos, lage, firma: { ...firma, telefon: bueroTel }, makler: makler ? { name: makler.name, email: makler.email, telefon: bueroTel, funktion: makler.funktion, foto: await maklerFoto(db, makler.foto_url) } : null,
     texte: { widerrufsbelehrung: widerrufsbelehrung(firma), beginn_text: BEGINN_TEXT, agb_url: AGB_URL, datenschutz_url: DATENSCHUTZ_URL } };
   if (!bestaetigt) return { status: 200, body: basis };
-  const { data: faq } = await db.from("landing_faq").select("id, frage, antwort, sortierung, kategorie, quelle, quellen, geprueft_am").eq("aktiv", true).or(`immobilie_id.eq.${im.id},immobilie_id.is.null`).order("sortierung", { ascending: true }).limit(60);
+  // Der Zweig immobilie_id.is.null holt die allgemeinen Fragen. Ohne
+  // Mandantenfilter waren das die allgemeinen Fragen ALLER Makler — auf der
+  // oeffentlichen Objektseite eines einzelnen.
+  const { data: faq } = await db.from("landing_faq").select("id, frage, antwort, sortierung, kategorie, quelle, quellen, geprueft_am").eq("mandant_id", im.mandant_id).eq("aktiv", true).or(`immobilie_id.eq.${im.id},immobilie_id.is.null`).order("sortierung", { ascending: true }).limit(60);
   let wuensche: any[] = [], fragen: any[] = [];
   if (!vorschau) {
     const [{ data: w }, { data: q }] = await Promise.all([
@@ -528,7 +531,7 @@ Deno.serve(async (req) => {
       const seit = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
       const { count } = await db.from("landing_fragen").select("id", { count: "exact", head: true }).eq("freigabe_id", f.id).gte("created_at", seit);
       if ((count || 0) >= FRAGEN_TAG) return json({ ok: false, fehler: "Sie haben heute schon viele Fragen gestellt – bitte rufen Sie uns an oder schreiben Sie eine E-Mail." }, 429);
-      const { data: faq } = await db.from("landing_faq").select("frage, antwort").eq("aktiv", true).or(`immobilie_id.eq.${im.id},immobilie_id.is.null`).limit(30);
+      const { data: faq } = await db.from("landing_faq").select("frage, antwort").eq("mandant_id", im.mandant_id).eq("aktiv", true).or(`immobilie_id.eq.${im.id},immobilie_id.is.null`).limit(30);
       const ki = await kiAntwort(db, im, faq || [], frage, makler?.name || "Ihr Ansprechpartner");
       const kontaktId = await kontaktSichern(db, f, im);
       const weiter = !ki.sicher || !ki.antwort;

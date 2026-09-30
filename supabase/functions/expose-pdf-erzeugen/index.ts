@@ -571,7 +571,7 @@ obstpflanzung: "Obstpflanzung", camping: "Camping", bootsstaende: "Bootsstände"
 };
 const gsWerte: Record<string, Record<string, string>> = {};
 try {
-const { data: fw } = await admin.from("onoffice_feld_werte").select("feld, oo_key, label").in("feld", ["erschliessung", "bebaubar_nach", "bebaubar_mit"]);
+const { data: fw } = await admin.from("onoffice_feld_werte").select("feld, oo_key, label").eq("mandant_id", immoMandant).in("feld", ["erschliessung", "bebaubar_nach", "bebaubar_mit"]);
 for (const r of (fw || [])) { (gsWerte[r.feld] = gsWerte[r.feld] || {})[String(r.oo_key)] = String(r.label || "").replace(/_/g, " "); }
 } catch (_e) {}
 const gsText = (feld: string, key: any): string => {

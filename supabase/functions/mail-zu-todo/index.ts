@@ -196,7 +196,8 @@ Deno.serve(async (req) => {
     const gegenueber = String(mail.gegenueber_email || "").split(/[;,]/)[0].replace(/^.*<([^>]+)>.*$/, "$1").trim();
     if (gegenueber && gegenueber.includes("@")) {
       const { data: k } = await db.from("kontakte")
-        .select("id, vorname, nachname, firma, email").ilike("email", gegenueber).limit(1);
+        .select("id, vorname, nachname, firma, email")
+        .eq("mandant_id", mail.mandant_id).ilike("email", gegenueber).limit(1);
       kontakt = k && k[0] ? k[0] : null;
     }
 

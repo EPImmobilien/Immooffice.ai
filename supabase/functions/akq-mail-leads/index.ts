@@ -198,6 +198,11 @@ Deno.serve(async (req) => {
     const grenze = Math.min(Math.max(Number(body.limit) || 25, 1), 60);
     const neuBewerten = body.neu_bewerten === true;
 
+    // Die Regeln gehoeren je einem Mandanten. Ohne mandant_id im Ergebnis
+    // wurden die Erkennungsregeln JEDES Hauses auf JEDE Mail angewandt —
+    // der Lead des einen entstand nach der Regel des anderen. Gelesen
+    // werden sie weiter in einem Zug (ein Cron hat keinen Mandanten),
+    // zugeordnet wird unten je Mail.
     const { data: regeln } = await db.from("akq_mail_regeln").select("*").eq("aktiv", true).order("sortierung");
     if (!regeln || !regeln.length) return antwort({ ok: true, hinweis: "Keine aktiven Erkennungsregeln.", geprueft: 0, vorschlaege: 0 });
 
@@ -210,7 +215,7 @@ Deno.serve(async (req) => {
     } else {
       const ab = new Date(Date.now() - tage * 86400000).toISOString();
       const { data } = await db.from("mail_eingang")
-        .select("id, absender_email, absender_name, betreff, gesendet_am")
+        .select("id, absender_email, absender_name, betreff, gesendet_am, mandant_id")
         .neq("ordner", "gesendet").gte("gesendet_am", ab)
         .order("gesendet_am", { ascending: false }).limit(1500);
       kandidaten = data || [];
@@ -225,6 +230,7 @@ Deno.serve(async (req) => {
       const absender = String(m.absender_email || "").toLowerCase();
       const domain = absender.split("@")[1] || "";
       const regel = regeln.find((r: any) =>
+        r.mandant_id === m.mandant_id &&
         (r.absender_muster || r.betreff_muster) &&
         passt(r.absender_muster, absender) && passt(r.betreff_muster, String(m.betreff || "")));
       if (!regel) continue;
@@ -266,7 +272,9 @@ Deno.serve(async (req) => {
         // Dublettenpruefung ueber die Mailadresse
         let dubletteKontakt: string | null = null, dubletteLead: string | null = null;
         if (daten.email) {
-          const { data: k } = await db.from("kontakte").select("id").ilike("email", daten.email).limit(1);
+          // Die Dublettenpruefung ueber die Adresse fand auch den Kontakt eines
+          // fremden Maklers — und haengte den neuen Lead an dessen Datensatz.
+          const { data: k } = await db.from("kontakte").select("id").eq("mandant_id", t.mail.mandant_id).ilike("email", daten.email).limit(1);
           if (k && k.length) {
             dubletteKontakt = k[0].id;
             const { data: l } = await db.from("akq_leads").select("id").eq("kontakt_id", k[0].id).eq("status", "offen").limit(1);

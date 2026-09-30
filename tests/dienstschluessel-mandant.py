@@ -164,13 +164,14 @@ BUCH = {
     # --- BEABSICHTIGT: Cron-Laeufe und Warteschlangen ---------------------
     # Ein Cron hat keinen Mandanten. Er liest die Warteschlange ueber alle
     # Mandanten und arbeitet danach je Zeile im Mandanten DIESER Zeile
-    # weiter — das ist die Bauform aus Phase 2 ("ein Lauf je Mandant").
+    # weiter — die Bauform aus Phase 2 ("ein Lauf je Mandant").
     ('akq-automation-lauf', 'akq_automation_lauf'):
         (1, 'BEABSICHTIGT', 'faellige Schritte aller Mandanten, danach je Lead weiter'),
-    ('akq-mail-leads', 'mail_eingang'):
-        (1, 'BEABSICHTIGT', 'neue Mails aller Postfaecher; das Postfach traegt den Mandanten'),
     ('akq-mail-leads', 'akq_mail_leads'):
         (1, 'BEABSICHTIGT', 'Liste der schon verarbeiteten Mails, nur zum Ausschliessen'),
+    ('akq-mail-leads', 'akq_mail_regeln'):
+        (1, 'BEABSICHTIGT', 'in einem Zug gelesen, aber je Mail auf r.mandant_id === m.mandant_id '
+                            'eingeschraenkt — nachgezogen am 30.09.2026'),
     ('bild-web-variante', 'immobilien'):
         (1, 'BEABSICHTIGT', 'Nachtlauf: Web-Varianten fuer die Bilder aller Mandanten'),
     ('bild-web-variante', 'immobilie_datei'):
@@ -178,7 +179,7 @@ BUCH = {
     ('expose-erinnerung', 'expose_freigaben'):
         (1, 'BEABSICHTIGT', 'faellige Erinnerungen aller Mandanten'),
     ('mail-anfrage-verarbeiten', 'mail_eingang'):
-        (1, 'BEABSICHTIGT', 'unbearbeitete Mails aller Postfaecher'),
+        (1, 'BEABSICHTIGT', 'unbearbeitete Mails aller Postfaecher; die Mail traegt ihren Mandanten'),
     ('mail-postfach-pull', 'mail_postfaecher'):
         (1, 'BEABSICHTIGT', 'holt je Postfach ab; die Liste MUSS alle umfassen'),
     ('mail-rechnung-weiterleiten', 'mail_eingang'):
@@ -195,9 +196,9 @@ BUCH = {
         (1, 'BEABSICHTIGT', 'wie oben'),
 
     # --- MISSBRAUCH: die Sperre muss ueber alle Mandanten gelten ----------
-    # Eine Sperre je Mandant waere keine Sperre: wer sie umgehen will,
-    # nimmt den naechsten Mandanten. Diese Abfragen zaehlen deshalb
-    # absichtlich plattformweit — und lesen nur eine Anzahl, keine Inhalte.
+    # Eine Sperre je Mandant waere keine: wer sie umgehen will, nimmt den
+    # naechsten Mandanten. Diese Abfragen zaehlen deshalb absichtlich
+    # plattformweit — und lesen nur eine Anzahl, keine Inhalte.
     ('akq-lead-eingang', 'akq_eingang_log'):
         (2, 'MISSBRAUCH', 'Drosselung nach IP und Adresse, plattformweit gezaehlt'),
     ('energieausweis-anfrage', 'energieausweis_anfragen'):
@@ -205,49 +206,15 @@ BUCH = {
     ('eigentuemer-zugang-anfordern', 'mail_versendet'):
         (1, 'MISSBRAUCH', 'verhindert, dieselbe Mail mehrfach anzufordern'),
 
-    # --- OFFEN: echte Fundstellen, noch nicht behoben ---------------------
-    # Nach Schwere geordnet. Jede mit der Wirkung, die sie hat.
-    ('akq-lead-eingang', 'immobilien'):
-        (3, 'OFFEN', 'Vergleichsobjekte fuer die Wertindikation aus den Bestaenden ALLER Makler'),
-    ('akq-automation-lauf', 'mail_eingang'):
-        (2, 'OFFEN', 'Antwortsuche ueber die Absenderadresse liest fremde Postfaecher'),
-    ('mail-postfach-pull', 'immobilien'):
-        (1, 'OFFEN', 'Objektzuordnung eingehender Mails ueber alle Bestaende'),
-    ('mail-anfrage-verarbeiten', 'immobilien'):
-        (1, 'OFFEN', 'wie oben, fuer Anfragen'),
-    ('mail-anfrage-verarbeiten', 'kontakte'):
-        (2, 'OFFEN', 'Kontaktzuordnung ueber die E-Mail-Adresse faellt ueber die Mandantengrenze'),
-    ('akq-mail-leads', 'kontakte'):
-        (1, 'OFFEN', 'wie oben'),
-    ('mail-zu-todo', 'kontakte'):
-        (1, 'OFFEN', 'wie oben'),
-    ('mail-senden', 'kontakte'):
-        (1, 'OFFEN', 'wie oben, beim Zuordnen versendeter Mails'),
-    ('mail-senden', 'todos'):
-        (1, 'OFFEN', 'offene ToDos aller Mandanten werden nach Empfaengeradresse gesucht'),
-    ('eigentuemer-einladen', 'eigentuemer'):
-        (1, 'OFFEN', 'Eigentuemer wird ueber die Adresse gefunden, auch der eines fremden Maklers'),
-    ('eigentuemer-person-hinzufuegen', 'eigentuemer_personen'):
-        (1, 'OFFEN', 'wie oben, fuer Personen eines Eigentuemers'),
+    # --- KONTO: die Adresse fuehrt zum Konto, das Konto zum Mandanten -----
     ('eigentuemer-zugang-anfordern', 'profiles'):
-        (1, 'OFFEN', 'oeffentlicher Endpunkt sucht das Profil nur ueber Adresse und Rolle'),
-    ('besichtigung-nachfassen', 'profiles'):
-        (2, 'OFFEN', '"erster Chef" und Namenssuche greifen ueber Mandanten hinweg'),
-    ('akq-mail-leads', 'akq_mail_regeln'):
-        (1, 'OFFEN', 'Mailregeln aller Mandanten werden auf jede Mail angewandt'),
-    ('mail-rechnung-weiterleiten', 'mail_rechnung_ziele'):
-        (1, 'OFFEN', 'Weiterleitungsziele aller Mandanten'),
-    ('objekt-landing', 'landing_faq'):
-        (2, 'OFFEN', 'FAQ eines fremden Mandanten auf der eigenen Objektseite'),
-    ('objekt-landing', 'portal_einstellungen'):
-        (1, 'OFFEN', 'FAQ-Katalog eines fremden Mandanten'),
-    ('expose-freigabe-erstellen', 'portal_einstellungen'):
-        (1, 'OFFEN', 'Landing-Vorgabe eines fremden Mandanten'),
+        (1, 'KONTO', 'oeffentlicher Endpunkt: ein Konto gibt es je Adresse genau einmal. '
+                     'Gesucht wird deshalb erst das KONTO, und aus ihm folgt der Mandant — '
+                     'so steht es seit Phase 2 im Quelltext, und so ist es richtig'),
     ('news-briefing-erstellen', 'news_briefings'):
-        (1, 'OFFEN', 'die Tagesfrage "gibt es schon eines?" gilt plattformweit — der '
-                     'zweite Mandant bekommt keines'),
-    ('expose-pdf-erzeugen', 'onoffice_feld_werte'):
-        (1, 'OFFEN', 'Feldbezeichnungen aus der Zuordnungstabelle eines fremden Mandanten'),
+        (1, 'KONTO', 'zaehlt die Briefings des Tages und vergleicht mit der Zahl der '
+                     'Mandanten. Der Vergleich MUSS plattformweit sein, sonst laeuft '
+                     'der Cron je Mandant erneut durch'),
 }
 
 
@@ -274,7 +241,7 @@ def main():
     nach_art = Counter(BUCH[s][1] for s in gezaehlt if s in BUCH)
     print(f'  {len(treffer)} Leseabfragen auf Mandantentabellen ohne Mandantenbezug, '
           f'in {len(gezaehlt)} Funktion/Tabelle-Paaren:')
-    for art in ('BEABSICHTIGT', 'TOKEN', 'OFFEN'):
+    for art in sorted({BUCH[s][1] for s in gezaehlt if s in BUCH}):
         anzahl = sum(n for s, n in gezaehlt.items()
                      if s in BUCH and BUCH[s][1] == art)
         print(f'    {art:13s} {anzahl:3d}')
@@ -307,7 +274,11 @@ def main():
         for (f, tab), (n, _, grund) in offen:
             print(f'    {f} / {tab}: {grund}')
 
-    if not fehler:
+    if not fehler and not offen:
+        print('\n  [ok] Keine unverbuchte und keine offene Stelle. Jede Abfrage '
+              'ohne Mandantenbezug\n       ist benannt und begruendet: Cron-Laeufe, '
+              'Missbrauchssperren, Kontosuche.')
+    elif not fehler:
         print('\n  [ok] Keine unverbuchte Stelle. Jede Abfrage ohne '
               'Mandantenbezug ist benannt und begruendet.')
     return 1 if fehler else 0

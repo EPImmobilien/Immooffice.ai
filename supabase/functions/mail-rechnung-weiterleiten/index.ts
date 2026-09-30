@@ -68,9 +68,12 @@ function htmlZuText(html: string) {
 
 // ---------- Zieladresse je Absender ----------
 interface Ziel { an: string[]; regel: string | null }
-async function zielFuer(db: any, absender: string, absenderName: string): Promise<Ziel> {
+async function zielFuer(db: any, mandant: string | null, absender: string, absenderName: string): Promise<Ziel> {
   try {
-    const { data } = await db.from("mail_rechnung_ziele").select("absender_muster, name_muster, ziel_email, bezeichnung").eq("aktiv", true).order("reihenfolge").order("created_at");
+    // Die Weiterleitungsregeln gehoeren je einem Haus. Ohne Mandantenfilter
+    // galt die Regel des einen fuer die Rechnungsmail des anderen — und die
+    // Rechnung ginge an dessen Buchhaltung.
+    const { data } = await db.from("mail_rechnung_ziele").select("absender_muster, name_muster, ziel_email, bezeichnung").eq("mandant_id", mandant).eq("aktiv", true).order("reihenfolge").order("created_at");
     const name = String(absenderName || "").toLowerCase();
     for (const z of data || []) {
       const am = String(z.absender_muster || "").trim().toLowerCase();
@@ -181,7 +184,7 @@ async function verarbeiten(db: any, mail: any, erzwingen: boolean) {
   const absender = String(mail.absender_email || "").toLowerCase();
   const empf = String(mail.empfaenger_email || "").toLowerCase();
   const anhangNamen = Array.isArray(mail.anhaenge) ? mail.anhaenge.map((a: any) => a.name || a.filename || "").filter(Boolean) : [];
-  const ziel = await zielFuer(db, absender, mail.absender_name || "");
+  const ziel = await zielFuer(db, mail.mandant_id || null, absender, mail.absender_name || "");
   // Schleifenschutz: Mails von oder an eine Buchhaltungsadresse und unsere eigenen Automatik-Weiterleitungen nie erneut weiterleiten.
   const buchhaltung = /(^|\.)buchhaltung@/.test(absender) || ziel.an.includes(absender);
   const anBuchhaltung = /buchhaltung@immooffice.example\.de/.test(empf) || empf.includes(ZIEL_STANDARD) || ziel.an.some((z) => empf.includes(z));
@@ -227,7 +230,7 @@ Deno.serve(async (req) => {
     let userId: string | null = null;
     const jwt = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
     if (jwt && jwt !== Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) { const { data: u } = await db.auth.getUser(jwt); if (u?.user) { const { data: p } = await db.from("profiles").select("role").eq("id", u.user.id).maybeSingle(); if (!p || !["chef", "mitarbeiter"].includes(p.role)) return antwort({ ok: false, fehler: "Keine Berechtigung." }); userId = u.user.id; } }
-    const felder = "id, postfach_id, absender_email, absender_name, empfaenger_email, betreff, text, html, anhaenge, gesendet_am, imap_uid, imap_folder";
+    const felder = "id, postfach_id, absender_email, absender_name, empfaenger_email, betreff, text, html, anhaenge, gesendet_am, imap_uid, imap_folder, mandant_id";
     if (body.modus === "batch") {
       const seit = new Date(Date.now() - 3 * 86400000).toISOString();
       const { data: mails } = await db.from("mail_eingang").select(felder).is("rechnung_status", null).eq("ordner", "posteingang").gte("gesendet_am", seit).order("gesendet_am", { ascending: false }).limit(Number(body.limit) || 15);

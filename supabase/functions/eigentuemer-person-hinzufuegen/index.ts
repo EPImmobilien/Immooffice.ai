@@ -116,13 +116,17 @@ Deno.serve(async (req) => {
     const adminClient = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } });
 
     const { data: eig, error: eigErr } = await adminClient
-      .from("eigentuemer").select("id, firma").eq("id", eigentuemerId).maybeSingle();
+      .from("eigentuemer").select("id, firma, mandant_id").eq("id", eigentuemerId).maybeSingle();
     if (eigErr || !eig) throw new Error("Eigentuemer-Datensatz nicht gefunden.");
 
     // ---- Pruefen ob diese Email schon Person ist (irgendwo) ----
+    // "irgendwo" hiess bis zum 30.09.2026 auch "bei einem anderen Makler".
+    // Die Fehlermeldung darunter haette damit verraten, dass diese Adresse
+    // beim Mitbewerber als Eigentuemer gefuehrt wird.
     const { data: existsPerson } = await adminClient
       .from("eigentuemer_personen")
       .select("id, eigentuemer_id")
+      .eq("mandant_id", eig.mandant_id)
       .ilike("email", email)
       .maybeSingle();
     if (existsPerson) {

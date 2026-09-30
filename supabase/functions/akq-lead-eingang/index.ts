@@ -51,7 +51,7 @@ function median(werte: number[]): number | null {
 
 // Wertindikation aus dem, was das Portal selbst hat: erzielte bzw. angebotene
 // Quadratmeterpreise vergleichbarer eigener Objekte. Kein Fremddatenanbieter.
-async function schaetzeWert(db: any, p: { plz: string; ort: string; wohnflaeche: number | null; grundstueck: number | null; baujahr: number | null; zustand: string; objektart: string }) {
+async function schaetzeWert(db: any, mandant: string, p: { plz: string; ort: string; wohnflaeche: number | null; grundstueck: number | null; baujahr: number | null; zustand: string; objektart: string }) {
   if (!p.wohnflaeche) return { wert: null as number | null, qm: null as number | null, basis: "keine_flaeche", anzahl: 0 };
 
   const spalten = "wohnflaeche, angebotspreis, verkaufspreis, marktwert, plz, ort, objektart";
@@ -66,21 +66,30 @@ async function schaetzeWert(db: any, p: { plz: string; ort: string; wohnflaeche:
 
   let basis = "plz", zeilen: any[] = [];
   if (p.plz) {
-    const { data } = await db.from("immobilien").select(spalten).eq("plz", p.plz).gt("wohnflaeche", 15).limit(400);
+    const { data } = await db.from("immobilien").select(spalten).eq("mandant_id", mandant).eq("plz", p.plz).gt("wohnflaeche", 15).limit(400);
     zeilen = data || [];
   }
   let qm = median(auswerten(zeilen));
   if (!qm || auswerten(zeilen).length < 4) {
     if (p.ort) {
-      const { data } = await db.from("immobilien").select(spalten).ilike("ort", p.ort).gt("wohnflaeche", 15).limit(600);
+      const { data } = await db.from("immobilien").select(spalten).eq("mandant_id", mandant).ilike("ort", p.ort).gt("wohnflaeche", 15).limit(600);
       const q2 = median(auswerten(data || []));
       if (q2) { qm = q2; basis = "ort"; }
     }
   }
   if (!qm) {
-    const { data } = await db.from("immobilien").select(spalten).gt("wohnflaeche", 15).limit(1000);
+    // "gesamtbestand" hiess bis zum 30.09.2026 der Bestand ALLER Makler auf
+    // der Plattform. Der Kommentar oben sagt "vergleichbarer eigener
+    // Objekte" — bei einem Mandanten stimmte das. Die Schaetzung eines
+    // Maklers stuetzte sich damit auf die erzielten Preise seiner
+    // Mitbewerber, und das sind deren Geschaeftsdaten.
+    //
+    // Hat der eigene Bestand zu wenige Vergleichsobjekte, liefert die
+    // Funktion jetzt "keine_vergleichsdaten". Keine Zahl ist besser als
+    // eine aus fremden Buechern — CLAUDE.md: keine erfundenen Objektdaten.
+    const { data } = await db.from("immobilien").select(spalten).eq("mandant_id", mandant).gt("wohnflaeche", 15).limit(1000);
     qm = median(auswerten(data || []));
-    basis = "gesamtbestand";
+    basis = "eigener_gesamtbestand";
   }
   if (!qm) return { wert: null, qm: null, basis: "keine_vergleichsdaten", anzahl: 0 };
 
@@ -262,7 +271,7 @@ Deno.serve(async (req) => {
     const wohnflaeche = zahl(body.wohnflaeche);
     const grundstueck = zahl(body.grundstueck);
     const baujahr = zahl(body.baujahr);
-    const schaetzung = await schaetzeWert(db, {
+    const schaetzung = await schaetzeWert(db, mandant, {
       plz: txt(body.plz, 10), ort: txt(body.ort, 80), wohnflaeche, grundstueck,
       baujahr: baujahr ? Math.round(baujahr) : null,
       zustand: txt(body.zustand, 40), objektart: txt(body.objektart, 60),
