@@ -43,12 +43,24 @@ Hinzukommen, kein Beweis der Richtigkeit.
 
 **Was dabei offen bleibt — drei Punkte, alle Phase 2.4:**
 
-1. **Die Funktionen sind einmandantig.** Sie lesen Firmenname, Absender und
-   Anschrift aus Umgebungsvariablen und festen Vorgabewerten, nicht aus
-   `firma_stammdaten` des Mandanten, dem der Datensatz gehört. Mit mehreren
-   Mandanten verschickt jede Mail denselben Absender.
+1. ~~**Die Funktionen sind einmandantig.**~~ **Erledigt am 30.09.2026.**
+   Firmenname, Briefkopf und Anschrift kommen aus `firma_stammdaten` des
+   Mandanten; `tests/firmenname-verdrahtet.py` hält den Stand (0 von
+   ursprünglich 107 Vorkommen).
 
-2. **Die Platzhalter-Adresse `immooffice.example` muss ersetzt werden.** Sie
+   **Was am Absender bewusst bleibt:** die **Absenderadresse** ist weiter die
+   der Plattform. Ein Mailanbieter verschickt nur von einer Domain, die ihm
+   nachgewiesen ist (SPF/DKIM); eine fremde Adresse als `From` wird
+   abgewiesen oder landet im Spam. Je Mandant wechseln **Anzeigename** und
+   **Antwortadresse** — der Empfänger sieht den richtigen Namen, und seine
+   Antwort erreicht den richtigen Makler. Eigene Absenderdomains je Mandant
+   gehören zur Anbieter-Schicht in Phase 6.
+
+   Funktionen, die über `mail_postfaecher` versenden, nutzen ohnehin den
+   SMTP-Zugang des Mandanten und sind davon nicht betroffen.
+
+2. **Die Platzhalter-Adresse `immooffice.example` muss ersetzt werden**
+   (Stand 30.09.2026: 83 Fundstellen in 45 Funktionen). Sie
    steht überall dort, wo die Vorlage ihre eigene Domain verdrahtet hatte:
    als Rückfall hinter `PORTAL_URL` und `EXPOSE_FREIGABE_BASIS`, in
    Absenderadressen und in den Empfängerlisten von `web-lead`. Die Endung
