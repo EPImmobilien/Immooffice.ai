@@ -55,9 +55,24 @@ Deno.serve(async (req) => {
   const ordner = url.searchParams.get("ordner") || "";
   const datei = url.searchParams.get("datei") || "";
 
+  // Die Diagnose zeigt Server, Benutzer und Ordner eines Portalzugangs.
+  // Der Mandant war ein WUNSCH aus der Abfrage: ohne ihn nahm sie den
+  // erstbesten Zugang, mit ihm jeden beliebigen. Jetzt gilt der Mandant
+  // des Aufrufers; ein Wunsch darf ihn nur bestaetigen, nicht ersetzen.
   const mandantWunsch = url.searchParams.get("mandant") || "";
-  let zFrage = db.from("portal_zugaenge").select("*").eq("portal", portal);
-  if (/^[0-9a-f-]{36}$/i.test(mandantWunsch)) zFrage = zFrage.eq("mandant_id", mandantWunsch);
+  const mandantDesAufrufers = await immoMandantDesAufrufers(req);
+  if (!mandantDesAufrufers) {
+    return new Response(JSON.stringify({ ok: false, fehler: "kein Mandant" }), {
+      status: 403, headers: { ...cors, "Content-Type": "application/json" },
+    });
+  }
+  if (/^[0-9a-f-]{36}$/i.test(mandantWunsch) && mandantWunsch !== mandantDesAufrufers) {
+    return new Response(JSON.stringify({ ok: false, fehler: "fremder Mandant" }), {
+      status: 403, headers: { ...cors, "Content-Type": "application/json" },
+    });
+  }
+  const zFrage = db.from("portal_zugaenge").select("*")
+    .eq("mandant_id", mandantDesAufrufers).eq("portal", portal);
   const { data: zZeilen } = await zFrage.limit(2);
   const z = (zZeilen || [])[0];
   if (!z) {

@@ -135,11 +135,15 @@ Deno.serve(async (req) => {
           postfach = pf;
         }
 
-        // Fallback: erstes aktives Standard-Postfach irgendeines Maklers
-        if (!postfach) {
+        // Rueckfall: Standard-Postfach DIESES Mandanten. Vorher stand hier
+        // "irgendeines Maklers" — im Quelltext genau so benannt. Mit einem
+        // Mandanten war das harmlos, mit mehreren geht die Meldung des einen
+        // Maklers ueber den Zugang des anderen hinaus.
+        if (!postfach && ben.mandant_id) {
           const { data: pf } = await admin
             .from("mail_postfaecher")
             .select("*")
+            .eq("mandant_id", ben.mandant_id)
             .eq("ist_standard", true)
             .eq("aktiv", true)
             .limit(1)

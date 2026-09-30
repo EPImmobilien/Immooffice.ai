@@ -2966,3 +2966,128 @@ hieße, die Erklärung der Anbindung zu entfernen, die laut `CLAUDE.md`
 bestehen bleibt. Das lohnt sich erst, wenn der CRM-Anschluss in Phase 2b
 ohnehin zur Adapter-Schicht umgebaut wird — dann verschwindet der Name
 zusammen mit der eingebauten Annahme. Vermerkt in `docs/OFFEN.md`.
+
+---
+
+## Der Dienstschlüssel kennt keine Mandantengrenze (30.09.2026)
+
+**Der Befund, in einem Satz:** `tests/mandant-rundumschlag.sql` hat am
+28.09. bewiesen, dass über 159 Tabellen kein fremder Satz sichtbar ist — und
+dieser Beweis gilt nur für RLS. Die Edge Functions laufen nicht unter RLS. Sie
+arbeiten mit `SUPABASE_SERVICE_ROLE_KEY`, und für den ist RLS ausgeschaltet.
+**Jede Abfrage einer Edge Function sieht jede Tabelle vollständig, über alle
+Mandanten hinweg.**
+
+Was den Mandanten dort zieht, ist keine Richtlinie, sondern die Bedingung in
+der Abfrage. Steht keine dort, liefert `.limit(1)` die erste Zeile, die die
+Datenbank findet.
+
+In der Vorlage war das *richtig*. Es gab einen Mandanten; „das erste aktive
+Postfach" **war** das Postfach. Derselbe Satz Quelltext ist im Fork ein
+Mandantenwechsel — und einer, der nichts kaputt macht. Die Mail geht raus.
+Nur eben über das Postfach eines fremden Maklers.
+
+### Was gefunden wurde
+
+`tests/dienstschluessel-mandant.py` (neu, Teil von `npm run check`) hat
+**62 Leseabfragen in 51 Funktion/Tabelle-Paaren** gefunden, die eine
+mandantenpflichtige Tabelle ohne Mandantenbezug lesen. Nicht alle sind
+Fehler — ein Cron hat keinen Mandanten, und ein öffentlicher Endpunkt mit
+unerratbarem Token identifiziert seine Zeile über genau dieses Token. Die
+Prüfung ist deshalb eine **Buchführung**: jede Stelle steht namentlich im
+Buch, mit Einstufung und Grund. Kommt eine hinzu, die dort nicht steht,
+schlägt sie an.
+
+### Was in diesem Durchgang behoben ist
+
+**1. Das fremde Postfach — die schwerste Klasse.** Fünf Rückfälle auf „das
+erste aktive Postfach". Eine davon nennt sich im Quelltext der Vorlage selbst
+so: `// Fallback: erstes aktives Standard-Postfach irgendeines Maklers`. Was
+dabei mitgeht, ist nicht nur der Absender: es ist das **entschlüsselte
+SMTP-Passwort** des fremden Maklers, sein Gesendet-Ordner und sein Ruf beim
+Empfänger. Betroffen: `akq-automation-lauf`, `energieausweis-anfrage`,
+`projekt-nachricht-antwort`, `upload_benachrichtigung_planen`. In
+`projekt-datei-benachrichtigung` war die Auswahl in JavaScript schon richtig
+gefiltert — die **Abfrage** holte trotzdem die Postfächer aller Mandanten
+samt verschlüsselter Passwörter in den Speicher; jetzt holt sie nur die der
+beteiligten Mandanten. Was nicht geholt wird, kann kein späterer Umbau
+versehentlich verwenden.
+
+**2. Die fremden FTP-Zugangsdaten.** `portal_zugaenge` trägt Server, Benutzer
+und Passwort des Portalzugangs. Drei Stellen lasen ihn ohne Mandanten:
+`portal-export`, `portal-export-homepage`, `portal-ftp-diagnose`. Das Objekt
+des einen Maklers wäre im Portalkonto des anderen gelandet. Bei der Diagnose
+war der Mandant sogar ein **Wunsch aus der Abfrage** — ohne ihn nahm sie den
+erstbesten Zugang, mit ihm jeden beliebigen. Jetzt gilt der Mandant des
+Aufrufers; ein Wunsch darf ihn bestätigen, nicht ersetzen.
+
+**3. Der fremde Briefkopf.** Exposé, Präsentation, Rechnung und
+Wertindikation holen Briefkopf, Standortliste, Finanzierungsannahmen,
+Kennzahlen und Textbausteine. Jede dieser Ketten endete auf einem Rückfall
+ohne Mandantenbezug — und zwar **ausgerechnet dann, wenn der eigene Mandant
+nichts hinterlegt hat**. Aus „das Dokument bleibt leer" wurde so „das
+Dokument trägt Anschrift, Steuernummer und Bankverbindung eines fremden
+Maklers".
+
+Zwei Stellen waren schlimmer als ein Rückfall:
+
+- `expose-pdf-erzeugen` und `mpe-pdf-erzeugen` lasen die **Standortliste ohne
+  `.limit(1)`** — im Fuß des Exposés stand damit die Liste *aller* Standorte
+  *aller* Makler der Plattform.
+- `rechnung-pdf-erzeugen` hatte die Reihenfolge auf dem Kopf: erst den
+  Briefkopf holen, **dann** den Mandanten aus dem Briefkopf setzen. Der
+  Briefkopf bestimmte den Mandanten statt umgekehrt. Jetzt setzt die Rechnung
+  ihren Mandanten, und der Briefkopf muss dazu passen.
+
+**Die Rückfälle sind gestrichen, nicht umgebogen.** Ohne Stammdaten entsteht
+kein Dokument, und die Meldung sagt warum. Ein Dokument ohne Briefkopf fällt
+auf; eines mit dem falschen nicht.
+
+### Was dabei nebenbei auffiel: `EP-` im OpenImmo-Export
+
+Der Portalexport bildete die OpenImmo-**Objektnummer** als `"EP-" + id` und
+die **OBID** als `"ep-" + id` — an sieben Stellen. Das ist die Abkürzung des
+Referenzunternehmens, in genau dem Feld, das ImmoScout24, Immowelt,
+Kleinanzeigen und die Homepage zu sehen bekommen. `CLAUDE.md` nennt beides
+ausdrücklich: „Abkürzung" und „API-Payload".
+
+Das Neutralitäts-Gate hatte einen Test für `EP_` (mit Unterstrich, als
+Bezeichner-Vorsatz) — und sah deshalb an `EP-` vorbei. Jetzt prüft es
+`"[Ee][Pp]-"`. Ein bloßes `EP` wäre unbrauchbar: es steckt in „September",
+„Rezeption", „Konzept". Neu ist `OBJ-` beziehungsweise `obj-`.
+
+**Der richtige Zeitpunkt, und warum es nur jetzt einer ist:** die OBID ist die
+Identität des Inserats beim Portal. Wer sie ändert, während Objekte dort
+stehen, erzeugt Doubletten — das Portal sieht ein neues Objekt. Der
+Portalexport läuft in diesem Fork noch für keinen Mandanten. Nach dem ersten
+Livegang wäre dieselbe Änderung ein Datenschaden.
+
+### Was offen bleibt — 26 Fundstellen, alle benannt
+
+Die Prüfung nennt sie bei jedem Lauf. Drei Gruppen:
+
+| Gruppe | Beispiele | Wirkung |
+|---|---|---|
+| Zuordnung über die E-Mail-Adresse | `kontakte`, `eigentuemer`, `eigentuemer_personen` (7 Stellen) | Zwei Makler können denselben Interessenten haben. Die Zuordnung findet den des anderen |
+| Zuordnung über den Bestand | `immobilien` in `akq-lead-eingang`, `mail-postfach-pull`, `mail-anfrage-verarbeiten` | Die Wertindikation zieht **Vergleichsobjekte aus den Beständen aller Makler** |
+| Einstellungen und Regeln | `akq_mail_regeln`, `mail_rechnung_ziele`, `landing_faq`, `portal_einstellungen` | Regeln eines Hauses greifen auf die Mails eines anderen |
+
+Eine davon ist kein Leck, sondern ein Funktionsfehler:
+`news-briefing-erstellen` fragt „gibt es für heute schon ein Briefing?"
+plattformweit. Mit zwei Mandanten bekommt der zweite keines.
+
+### Was das über die Arbeitsweise sagt
+
+Ein Nachweis gilt genau für den Weg, den er geht. `mandant-rundumschlag.sql`
+ist ein guter Test — für RLS. Er sagt über den Dienstschlüssel nichts, und ich
+habe ihn zwei Tage lang gelesen, als sagte er etwas über die Trennung
+überhaupt. Der Unterschied steht ab jetzt im Kopf der neuen Prüfung, damit er
+beim nächsten Lesen nicht wieder verschwimmt.
+
+Das Zweite: **ein Rückfall ist eine Entscheidung.** `if (!firma) { nimm
+irgendeine }` liest sich wie Sorgfalt und ist das Gegenteil — es ersetzt einen
+sichtbaren Mangel durch einen unsichtbaren Fehler. In einer einmandantigen
+Anwendung ist das gleichgültig. In einer mandantenfähigen ist jeder solche
+Rückfall eine offene Tür, und er steht genau dort, wo man am wenigsten
+hinsieht: im Zweig, der „normalerweise nicht vorkommt".
+

@@ -2375,6 +2375,191 @@ NACHBESSERN = [
     ('FORK', '        const { data: neu, error } = await db.from("aufgaben").insert({ typ: "urlaub_hinweis", status: "offen", titel, beschreibung, zustaendig_id: chef ? chef.id : null, faellig_am: heute, daten: { modus, jahr, frist, liste } }).select("id").single();\n        if (error) throw error; aufgabeId = neu?.id || null;\n      }\n    }\n    return antwort({ ok: true, modus, jahr, frist, betroffene: liste.length, aufgabe_id: aufgabeId, liste });', '        const { data: neu, error } = await db.from("aufgaben").insert({ mandant_id: mandant, typ: "urlaub_hinweis", status: "offen", titel, beschreibung, zustaendig_id: chef ? chef.id : null, faellig_am: heute, daten: { modus, jahr, frist, liste } }).select("id").single();\n        if (error) throw error; aufgabeId = neu?.id || null;\n      }\n    }\n    ergebnisse.push({ mandant, betroffene: liste.length, aufgabe_id: aufgabeId, liste });\n    }\n    const eigenes = ergebnisse[0] || { betroffene: 0, aufgabe_id: null, liste: [] };\n    return antwort({ ok: true, modus, jahr, frist, mandanten: ergebnisse.length,\n                     betroffene: eigenes.betroffene, aufgabe_id: eigenes.aufgabe_id,\n                     liste: aufruferMandant ? eigenes.liste : [] });',
      'Urlaubshinweise: die Aufgabe traegt den Mandanten, die Antwort nur die eigene Liste.',
      {'urlaub-hinweise'}),
+
+    # ======================================================================
+    # Phase 2.4, erster Block (30.09.2026): das fremde Postfach
+    # ======================================================================
+    # Gefunden mit tests/dienstschluessel-mandant.py. Die Edge Functions
+    # arbeiten mit dem Dienstschluessel, und fuer den gilt RLS nicht — jede
+    # Abfrage sieht die Tabelle ueber alle Mandanten. Wo die Vorlage "das
+    # erste aktive Postfach" nahm, war das bei einem Mandanten DAS Postfach.
+    # Bei mehreren ist es das eines fremden Maklers: mit dessen Absender,
+    # dessen entschluesseltem SMTP-Passwort und dessen Gesendet-Ordner.
+    #
+    # Nichts davon schlaegt fehl, wenn es passiert. Deshalb war es nicht zu
+    # sehen, und deshalb haelt die Pruefung den Stand jetzt fest.
+    ('FORK',
+     'async function postfachFuer(db: any, userId: string | null) {\n  if (userId) {\n    const { data } = await db.from("mail_postfaecher").select("*").eq("benutzer_id", userId).eq("aktiv", true)\n      .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false }).limit(1);\n    if (data && data.length) return data[0];\n  }\n  const { data } = await db.from("mail_postfaecher").select("*").eq("aktiv", true)\n    .order("ist_standard", { ascending: false }).limit(1);\n  return (data && data[0]) || null;\n}',
+     'async function postfachFuer(db: any, userId: string | null, mandant: string | null) {\n  if (userId) {\n    const { data } = await db.from("mail_postfaecher").select("*").eq("benutzer_id", userId).eq("aktiv", true)\n      .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false }).limit(1);\n    if (data && data.length) return data[0];\n  }\n  // Der Rueckfall hiess "irgendein aktives Postfach". Mit einem Mandanten\n  // war das DAS Postfach; mit mehreren ist es der SMTP-Zugang eines fremden\n  // Maklers — die Mail ginge unter dessen Absender hinaus und laege in\n  // dessen Gesendet-Ordner. Ohne Mandanten deshalb gar keines: kein Versand\n  // ist besser als der falsche.\n  if (!mandant) return null;\n  const { data } = await db.from("mail_postfaecher").select("*")\n    .eq("mandant_id", mandant).eq("aktiv", true)\n    .order("ist_standard", { ascending: false }).limit(1);\n  return (data && data[0]) || null;\n}',
+     'Postfach-Rueckfall bleibt im Mandanten des Leads.',
+     {'akq-automation-lauf'}),
+    ('FORK',
+     'await postfachFuer(db, lead.zustaendig_id);',
+     'await postfachFuer(db, lead.zustaendig_id, lead.mandant_id || null);',
+     'Der Mandant des Leads wird durchgereicht.',
+     {'akq-automation-lauf'}),
+    ('FORK',
+     'async function postfach(db: any) {\n  const { data: genau } = await db.from("mail_postfaecher").select("*").eq("email_adresse", ABSENDER).limit(1);\n  if (genau && genau[0]) return genau[0];\n  const { data: rest } = await db.from("mail_postfaecher").select("*").eq("aktiv", true)\n    .order("ist_standard", { ascending: false }).limit(1);\n  return rest && rest[0];\n}',
+     '// Das Postfach gehoert dem Mandanten, dem das Formular zugeordnet ist. Die\n// Vorlage nahm "das Postfach mit DIESER Adresse, sonst irgendeines" — die\n// Adresse war die des einen Hauses, und "irgendeines" ist mit mehreren\n// Mandanten das eines fremden Maklers.\nasync function postfach(db: any, mandant: string | null) {\n  if (!mandant) return null;\n  const { data: genau } = await db.from("mail_postfaecher").select("*")\n    .eq("mandant_id", mandant).eq("email_adresse", ABSENDER).limit(1);\n  if (genau && genau[0]) return genau[0];\n  const { data: rest } = await db.from("mail_postfaecher").select("*")\n    .eq("mandant_id", mandant).eq("aktiv", true)\n    .order("ist_standard", { ascending: false }).limit(1);\n  return rest && rest[0];\n}',
+     'Energieausweis: Postfach nur aus dem eigenen Mandanten.',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     'async function sendeMail(db: any, opt: { an: string;',
+     'async function sendeMail(db: any, mandant: string | null, opt: { an: string;',
+     'Energieausweis: sendeMail bekommt den Mandanten.',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     '  const pf = await postfach(db);',
+     '  const pf = await postfach(db, mandant);',
+     'Energieausweis: das Postfach wird je Mandant geholt.',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     'await sendeMail(db, {',
+     'await sendeMail(db, mandant, {',
+     'Energieausweis: beide Aufrufe reichen den Mandanten durch (2x).',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     '    const { data: z } = await admin.from("projekt_zugaenge")\n      .select("id, projekt_id, anzeigename, email, aktiv, ansprechpartner_id")\n      .eq("id", zugangId).maybeSingle();',
+     '    const { data: z } = await admin.from("projekt_zugaenge")\n      .select("id, projekt_id, anzeigename, email, aktiv, ansprechpartner_id, mandant_id")\n      .eq("id", zugangId).maybeSingle();',
+     'Projekt-Antwort: der Zugang gibt seinen Mandanten mit.',
+     {'projekt-nachricht-antwort'}),
+    ('FORK',
+     '      const { data: postfaecher } = await admin.from("mail_postfaecher")\n        .select("*").eq("aktiv", true)\n        .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false });\n      const postfach = (postfaecher || []).find((p: any) => p.benutzer_id === user.id && p.standard_zum_senden)\n        || (postfaecher || []).find((p: any) => p.benutzer_id === user.id)\n        || (postfaecher || []).find((p: any) => z.ansprechpartner_id && p.benutzer_id === z.ansprechpartner_id)\n        || (postfaecher || []).find((p: any) => (p.email_adresse || "").toLowerCase() === STANDARD_MAIL)\n        || (postfaecher || [])[0] || null;',
+     '      const { data: postfaecher } = await admin.from("mail_postfaecher")\n        .select("*").eq("mandant_id", z.mandant_id).eq("aktiv", true)\n        .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false });\n      // Die Kette endete auf (postfaecher || [])[0] — "irgendeines". Mit der\n      // Einschraenkung oben ist "irgendeines" jetzt wenigstens eines des\n      // eigenen Mandanten. Der Griff nach STANDARD_MAIL entfaellt: das war\n      // die feste Adresse des einen Hauses und gehoert keinem Mandanten.\n      const postfach = (postfaecher || []).find((p: any) => p.benutzer_id === user.id && p.standard_zum_senden)\n        || (postfaecher || []).find((p: any) => p.benutzer_id === user.id)\n        || (postfaecher || []).find((p: any) => z.ansprechpartner_id && p.benutzer_id === z.ansprechpartner_id)\n        || (postfaecher || []).find((p: any) => p.standard_zum_senden)\n        || (postfaecher || [])[0] || null;',
+     'Projekt-Antwort: Postfach nur aus dem eigenen Mandanten.',
+     {'projekt-nachricht-antwort'}),
+    ('FORK',
+     '        // Fallback: erstes aktives Standard-Postfach irgendeines Maklers\n        if (!postfach) {\n          const { data: pf } = await admin\n            .from("mail_postfaecher")\n            .select("*")\n            .eq("ist_standard", true)\n            .eq("aktiv", true)\n            .limit(1)\n            .maybeSingle();',
+     '        // Rueckfall: Standard-Postfach DIESES Mandanten. Vorher stand hier\n        // "irgendeines Maklers" — im Quelltext genau so benannt. Mit einem\n        // Mandanten war das harmlos, mit mehreren geht die Meldung des einen\n        // Maklers ueber den Zugang des anderen hinaus.\n        if (!postfach && ben.mandant_id) {\n          const { data: pf } = await admin\n            .from("mail_postfaecher")\n            .select("*")\n            .eq("mandant_id", ben.mandant_id)\n            .eq("ist_standard", true)\n            .eq("aktiv", true)\n            .limit(1)\n            .maybeSingle();',
+     'Upload-Planer: Postfach-Rueckfall bleibt im Mandanten.',
+     {'upload_benachrichtigung_planen'}),
+    ('FORK',
+     '    const { data: postfaecher } = await admin.from("mail_postfaecher")\n      .select("*").eq("aktiv", true)\n      .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false });',
+     '    // Die Auswahl darunter filtert schon auf den Mandanten des Projekts. Die\n    // ABFRAGE tat es nicht: sie holte die Postfaecher aller Mandanten samt\n    // verschluesselter SMTP-Passwoerter in den Speicher. Was nicht geholt\n    // wird, kann auch kein spaeterer Umbau versehentlich verwenden.\n    const mandantenDerProjekte = [...new Set((projekte || [])\n      .map((p: any) => p.mandant_id).filter(Boolean))];\n    const { data: postfaecher } = mandantenDerProjekte.length\n      ? await admin.from("mail_postfaecher")\n          .select("*").in("mandant_id", mandantenDerProjekte).eq("aktiv", true)\n          .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false })\n      : { data: [] as any[] };',
+     'Projekt-Dateimeldung: nur die Postfaecher der beteiligten Mandanten.',
+     {'projekt-datei-benachrichtigung'}),
+
+    # --- Phase 2.4, zweiter Block: fremde Zugangsdaten und fremder Briefkopf
+    # portal_zugaenge traegt FTP-Server, Benutzer und Passwort. firma_stammdaten
+    # traegt Briefkopf, Kontaktadresse und Rufnummer. Beide wurden ohne
+    # Mandantenbezug gelesen — das Ergebnis geht in ein Portal-Inserat oder auf
+    # ein Dokument, das ein Kunde bekommt.
+    ('FORK',
+     'const { data: profile } = await admin.from("profiles").select("id, role").eq("id", userData.user.id).maybeSingle();\n    if (!profile || !["chef", "mitarbeiter"].includes(profile.role)) return jsonErr(403, "Kein Teamzugang");\n\n    const { data: zugang } = await admin.from("portal_zugaenge").select("*").eq("portal", portal).eq("aktiv", true).maybeSingle();',
+     'const { data: profile } = await admin.from("profiles").select("id, role, mandant_id").eq("id", userData.user.id).maybeSingle();\n    if (!profile || !["chef", "mitarbeiter"].includes(profile.role)) return jsonErr(403, "Kein Teamzugang");\n    if (!profile.mandant_id) return jsonErr(403, "Kein Mandant am Profil — ohne den keine Portaluebertragung.");\n\n    // Der Zugang traegt FTP-Server, Benutzer und Passwort des Maklers. Ohne\n    // Mandantenfilter liefert .maybeSingle() den erstbesten aktiven Zugang\n    // fuer dieses Portal — unter mehreren Mandanten also die Zugangsdaten\n    // eines fremden Maklers, und das Objekt landete in dessen Portalkonto.\n    const { data: zugang } = await admin.from("portal_zugaenge").select("*")\n      .eq("mandant_id", profile.mandant_id).eq("portal", portal).eq("aktiv", true).maybeSingle();',
+     'Portalexport: der FTP-Zugang gehoert dem Mandanten des Aufrufers.',
+     {'portal-export'}),
+    ('FORK',
+     'const { data: profile } = await admin.from("profiles").select("*").eq("id", userData.user.id).maybeSingle();\n    if (!profile) return jsonErr(403, "Kein Teamzugang");\n\n    const { data: zugang } = await admin.from("portal_zugaenge")\n      .select("*").eq("portal", "homepage").eq("aktiv", true).maybeSingle();',
+     'const { data: profile } = await admin.from("profiles").select("*").eq("id", userData.user.id).maybeSingle();\n    if (!profile) return jsonErr(403, "Kein Teamzugang");\n    if (!profile.mandant_id) return jsonErr(403, "Kein Mandant am Profil — ohne den kein Homepage-Export.");\n\n    // Wie im Portalexport: der Zugang traegt fremde FTP-Zugangsdaten,\n    // wenn niemand sagt, wessen Zugang gemeint ist.\n    const { data: zugang } = await admin.from("portal_zugaenge")\n      .select("*").eq("mandant_id", profile.mandant_id).eq("portal", "homepage").eq("aktiv", true).maybeSingle();',
+     'Homepage-Export: der FTP-Zugang gehoert dem Mandanten des Aufrufers.',
+     {'portal-export-homepage'}),
+    ('FORK',
+     '  const mandantWunsch = url.searchParams.get("mandant") || "";\n  let zFrage = db.from("portal_zugaenge").select("*").eq("portal", portal);\n  if (/^[0-9a-f-]{36}$/i.test(mandantWunsch)) zFrage = zFrage.eq("mandant_id", mandantWunsch);\n  const { data: zZeilen } = await zFrage.limit(2);',
+     '  // Die Diagnose zeigt Server, Benutzer und Ordner eines Portalzugangs.\n  // Der Mandant war ein WUNSCH aus der Abfrage: ohne ihn nahm sie den\n  // erstbesten Zugang, mit ihm jeden beliebigen. Jetzt gilt der Mandant\n  // des Aufrufers; ein Wunsch darf ihn nur bestaetigen, nicht ersetzen.\n  const mandantWunsch = url.searchParams.get("mandant") || "";\n  const mandantDesAufrufers = await immoMandantDesAufrufers(req);\n  if (!mandantDesAufrufers) {\n    return new Response(JSON.stringify({ ok: false, fehler: "kein Mandant" }), {\n      status: 403, headers: { ...cors, "Content-Type": "application/json" },\n    });\n  }\n  if (/^[0-9a-f-]{36}$/i.test(mandantWunsch) && mandantWunsch !== mandantDesAufrufers) {\n    return new Response(JSON.stringify({ ok: false, fehler: "fremder Mandant" }), {\n      status: 403, headers: { ...cors, "Content-Type": "application/json" },\n    });\n  }\n  const zFrage = db.from("portal_zugaenge").select("*")\n    .eq("mandant_id", mandantDesAufrufers).eq("portal", portal);\n  const { data: zZeilen } = await zFrage.limit(2);',
+     'FTP-Diagnose: nur der Portalzugang des eigenen Mandanten.',
+     {'portal-ftp-diagnose'}),
+    ('FORK',
+     'const { data: firma } = await admin.from("firma_stammdaten").select("email, telefon").not("email", "is", null).limit(1).maybeSingle();',
+     '// Diese Adresse und Rufnummer gehen als Kontakt in das OpenImmo-ZIP und\n    // damit in das Portal-Inserat. Ohne Mandantenfilter war es die des\n    // erstbesten Maklers mit einer Adresse — im Inserat eines anderen.\n    const { data: firma } = await admin.from("firma_stammdaten").select("email, telefon")\n      .eq("mandant_id", profile.mandant_id).not("email", "is", null).limit(1).maybeSingle();',
+     'Portalexport: Kontaktdaten aus dem eigenen Mandanten.',
+     {'portal-export'}),
+    ('FORK',
+     'const { data: firma } = await admin.from("firma_stammdaten")\n      .select("email, telefon").not("email", "is", null).limit(1).maybeSingle();',
+     '// Wie im Portalexport: der Kontakt im Inserat war der des erstbesten\n    // Maklers, nicht der des eigenen.\n    const { data: firma } = await admin.from("firma_stammdaten")\n      .select("email, telefon").eq("mandant_id", profile.mandant_id)\n      .not("email", "is", null).limit(1).maybeSingle();',
+     'Homepage-Export: Kontaktdaten aus dem eigenen Mandanten.',
+     {'portal-export-homepage'}),
+    ('FORK',
+     '    const { data: firmen } = await db.from("firma_stammdaten").select("*")\n      .eq("typ", "standort").eq("aktiv", true).order("sortierung").limit(1);\n    const stamm = (firmen && firmen[0]) || (await db.from("firma_stammdaten").select("*").order("sortierung").limit(1).maybeSingle()).data;',
+     '    // Briefkopf der Wertindikation. Der zweite Griff war ein Rueckfall ohne\n    // jede Bedingung — der erste Satz der ganzen Tabelle, also unter mehreren\n    // Mandanten der Briefkopf eines fremden Maklers auf dem eigenen\n    // Dokument. Er entfaellt: ohne Stammdaten kein Dokument.\n    const { data: firmen } = await db.from("firma_stammdaten").select("*")\n      .eq("mandant_id", lead.mandant_id).eq("typ", "standort").eq("aktiv", true)\n      .order("sortierung").limit(1);\n    const stamm = (firmen && firmen[0]) || null;\n    if (!stamm) return antwort({ ok: false, fehler: "Fuer diesen Mandanten sind keine Firmenstammdaten hinterlegt — ohne Briefkopf wird kein Dokument erzeugt." }, 400);',
+     'Wertindikation: Briefkopf nur aus dem eigenen Mandanten, kein blinder Rueckfall.',
+     {'akq-wertindikation-pdf'}),
+    ('FORK',
+     '      const { data: firmen } = await db.from("firma_stammdaten").select("strasse, plz, ort")\n        .eq("typ", "standort").eq("aktiv", true).order("sortierung").limit(1);',
+     '      // Startadresse fuer die Fahrzeit, wenn der Mitarbeiter keine eigene hat:\n      // der Standort SEINES Hauses, nicht der erstbeste in der Tabelle.\n      const { data: firmen } = await db.from("firma_stammdaten").select("strasse, plz, ort")\n        .eq("mandant_id", profil?.mandant_id ?? "00000000-0000-0000-0000-000000000000")\n        .eq("typ", "standort").eq("aktiv", true).order("sortierung").limit(1);',
+     'Fahrzeit: der Standort des eigenen Mandanten als Startpunkt.',
+     {'termin-fahrzeit'}),
+    ('FORK',
+     'const { data } = await db.from("profiles").select("id, name, start_adresse, fahrzeit_aktiv, fahrzeit_puffer_min").eq("id", userId).maybeSingle();',
+     'const { data } = await db.from("profiles").select("id, name, start_adresse, fahrzeit_aktiv, fahrzeit_puffer_min, mandant_id").eq("id", userId).maybeSingle();',
+     'Fahrzeit: das Profil gibt seinen Mandanten mit.',
+     {'termin-fahrzeit'}),
+
+    # --- Phase 2.4, dritter Block: der Briefkopf auf Dokumenten -----------
+    # Expose, Praesentation und Rechnung holen Briefkopf, Standortliste,
+    # Finanzierungsannahmen, Kennzahlen und Textbausteine. Jede dieser
+    # Ketten endete auf einem Rueckfall ohne Mandantenbezug — und zwar genau
+    # dann, wenn der eigene Mandant nichts hinterlegt hat. Aus "das Dokument
+    # bleibt leer" wurde so "das Dokument traegt die Angaben eines fremden
+    # Maklers": Anschrift, Steuernummer, Bankverbindung, Umsatzzahlen.
+    #
+    # Der Rueckfall ist gestrichen, nicht umgebogen. Ein Dokument ohne
+    # Briefkopf faellt auf; eines mit dem falschen nicht.
+    ('FORK',
+     '{ const { data } = await admin.from("firma_stammdaten").select("firma_name,strasse,plz,ort,sortierung").eq("aktiv", true).order("sortierung"); standorte = data || []; }',
+     '// Die Standortliste steht im Fuss des Exposes. Ohne Mandantenfilter war\n// das die Liste ALLER Standorte ALLER Makler auf der Plattform — im\n// Expose eines einzelnen.\n{ const { data } = await admin.from("firma_stammdaten").select("firma_name,strasse,plz,ort,sortierung").eq("mandant_id", immoMandant).eq("aktiv", true).order("sortierung"); standorte = data || []; }',
+     'Expose: die Standortliste im Fuss nur aus dem eigenen Mandanten.',
+     {'expose-pdf-erzeugen'}),
+    ('FORK',
+     '{ const { data } = await admin.from("finanzierungs_annahmen").select("*").eq("aktiv", true).limit(1).maybeSingle(); finAnn = data; }',
+     '// Zins und Tilgung fuer die Finanzierungsrechnung im Expose. Die Annahmen\n// eines fremden Maklers sind hier keine Annaeherung, sondern eine falsche\n// Zahl in einem Dokument, das ein Kaufinteressent bekommt.\n{ const { data } = await admin.from("finanzierungs_annahmen").select("*").eq("mandant_id", immoMandant).eq("aktiv", true).limit(1).maybeSingle(); finAnn = data; }',
+     'Expose: Finanzierungsannahmen nur aus dem eigenen Mandanten.',
+     {'expose-pdf-erzeugen'}),
+    ('FORK',
+     'if (ap.firma_id) { const { data } = await admin.from("firma_stammdaten").select("*").eq("id", ap.firma_id).maybeSingle(); if (data && data.aktiv !== false) firma = data; }\nif (!firma) { const { data } = await admin.from("firma_stammdaten").select("*").eq("mandant_id", immoMandant).order("sortierung").limit(1).maybeSingle(); firma = data; }\nif (!firma) { const { data } = await admin.from("firma_stammdaten").select("*").eq("aktiv", true).order("sortierung").limit(1).maybeSingle(); firma = data; }',
+     '// Briefkopf: erst der Standort des Ansprechpartners, dann ein Standort des\n// Mandanten. Der dritte Griff war "der erste aktive Standort ueberhaupt" —\n// ein Rueckfall ueber die Mandantengrenze, und zwar ausgerechnet dann,\n// wenn der eigene Mandant keine Stammdaten hat. Er ist gestrichen; auch\n// der erste Griff bleibt jetzt im Mandanten, damit eine geerbte oder\n// falsch gesetzte firma_id keinen fremden Briefkopf holt.\nif (ap.firma_id) { const { data } = await admin.from("firma_stammdaten").select("*").eq("id", ap.firma_id).eq("mandant_id", immoMandant).maybeSingle(); if (data && data.aktiv !== false) firma = data; }\nif (!firma) { const { data } = await admin.from("firma_stammdaten").select("*").eq("mandant_id", immoMandant).order("sortierung").limit(1).maybeSingle(); firma = data; }',
+     'Expose: der Briefkopf-Rueckfall ueber die Mandantengrenze ist gestrichen.',
+     {'expose-pdf-erzeugen'}),
+    ('FORK',
+     'if (!pid) { const { data: chef } = await admin.from("profiles").select("id").eq("role", "chef").limit(1).maybeSingle(); pid = chef?.id || null; }',
+     'if (!pid) { const { data: chef } = await admin.from("profiles").select("id").eq("mandant_id", immoMandant).eq("role", "chef").limit(1).maybeSingle(); pid = chef?.id || null; }',
+     'Expose: "der Chef" ist der des eigenen Mandanten.',
+     {'expose-pdf-erzeugen'}),
+    ('FORK',
+     'if (ap.firma_id) { const { data } = await admin.from("firma_stammdaten").select("*").eq("id", ap.firma_id).eq("aktiv", true).maybeSingle(); firma = data; }\nif (!firma) { const { data } = await admin.from("firma_stammdaten").select("*").eq("aktiv", true).order("sortierung").limit(1).maybeSingle(); firma = data; }',
+     '// Wie im Expose: Briefkopf nur aus dem eigenen Mandanten, und der\n// Rueckfall "erster aktiver Standort ueberhaupt" faellt weg.\nif (ap.firma_id) { const { data } = await admin.from("firma_stammdaten").select("*").eq("id", ap.firma_id).eq("mandant_id", immoMandant).eq("aktiv", true).maybeSingle(); firma = data; }\nif (!firma) { const { data } = await admin.from("firma_stammdaten").select("*").eq("mandant_id", immoMandant).eq("aktiv", true).order("sortierung").limit(1).maybeSingle(); firma = data; }',
+     'Praesentation: Briefkopf nur aus dem eigenen Mandanten.',
+     {'mpe-pdf-erzeugen'}),
+    ('FORK',
+     '{ const { data } = await admin.from("firma_stammdaten").select("firma_name,strasse,plz,ort,sortierung").eq("aktiv", true).order("sortierung"); standorte = data || []; }',
+     '{ const { data } = await admin.from("firma_stammdaten").select("firma_name,strasse,plz,ort,sortierung").eq("mandant_id", immoMandant).eq("aktiv", true).order("sortierung"); standorte = data || []; }',
+     'Praesentation: die Standortliste nur aus dem eigenen Mandanten.',
+     {'mpe-pdf-erzeugen'}),
+    ('FORK',
+     '{ const { data } = await admin.from("firma_kennzahlen").select("*").eq("aktiv", true).order("jahr", { ascending: false }).limit(1).maybeSingle(); kz = data; }',
+     '// Umsatz, Objektzahl, Mitarbeiter — die Zahlen, mit denen sich der Makler\n// beim Eigentuemer vorstellt. Die eines fremden Hauses waeren hier eine\n// falsche Angabe im Akquisegespraech.\n{ const { data } = await admin.from("firma_kennzahlen").select("*").eq("mandant_id", immoMandant).eq("aktiv", true).order("jahr", { ascending: false }).limit(1).maybeSingle(); kz = data; }',
+     'Praesentation: Kennzahlen nur aus dem eigenen Mandanten.',
+     {'mpe-pdf-erzeugen'}),
+    ('FORK',
+     '{ const { data } = await admin.from("mpe_bausteine").select("*").eq("aktiv", true).order("sortierung"); ',
+     '{ const { data } = await admin.from("mpe_bausteine").select("*").eq("mandant_id", immoMandant).eq("aktiv", true).order("sortierung"); ',
+     'Praesentation: Textbausteine nur aus dem eigenen Mandanten.',
+     {'mpe-pdf-erzeugen'}),
+    ('FORK',
+     '    let firma: any = null;\n    if (rechnung.absender_firma_id) {\n      const { data } = await admin.from("firma_stammdaten").select("*").eq("id", rechnung.absender_firma_id).maybeSingle();\n      firma = data;\n    }\n    if (!firma) {\n      // Fallback: Musterhaus Immobilien GmbH oder erste aktive Firma\n      const { data } = await admin.from("firma_stammdaten").select("*")\n        .eq("aktiv", true).order("sortierung", { ascending: true }).limit(1).maybeSingle();\n      firma = data;\n    }\n    if (!firma) throw new Error("Firmen-Stammdaten nicht gefunden.");\n    immoSetzeMandant(firma.mandant_id);',
+     '    // Die Reihenfolge stand auf dem Kopf: erst wurde der Briefkopf geholt,\n    // DANN der Mandant aus dem Briefkopf gesetzt. Damit bestimmte der\n    // Briefkopf den Mandanten statt umgekehrt — und der Rueckfall "erste\n    // aktive Firma" konnte eine fremde sein, auf einer Rechnung mit\n    // fremdem Absender, fremder Steuernummer und fremder Bankverbindung.\n    immoSetzeMandant(rechnung.mandant_id);\n    if (!immoMandant) throw new Error("Die Rechnung hat keinen Mandanten.");\n    let firma: any = null;\n    if (rechnung.absender_firma_id) {\n      const { data } = await admin.from("firma_stammdaten").select("*")\n        .eq("id", rechnung.absender_firma_id).eq("mandant_id", immoMandant).maybeSingle();\n      firma = data;\n    }\n    if (!firma) {\n      const { data } = await admin.from("firma_stammdaten").select("*")\n        .eq("mandant_id", immoMandant)\n        .eq("aktiv", true).order("sortierung", { ascending: true }).limit(1).maybeSingle();\n      firma = data;\n    }\n    if (!firma) throw new Error("Fuer diesen Mandanten sind keine Firmen-Stammdaten hinterlegt.");',
+     'Rechnung: der Mandant der Rechnung bestimmt den Briefkopf, nicht umgekehrt.',
+     {'rechnung-pdf-erzeugen'}),
+    ('FORK',
+     '"ep-" + i.id',
+     '"obj-" + i.id',
+     'OpenImmo-OBID: neutrale Vorsilbe statt der Abkuerzung der Referenz (2x).',
+     {'portal-export-homepage', 'portal-export'}),
+    ('FORK',
+     '("EP-" + String(i.id).slice(0, 8))',
+     '("OBJ-" + String(i.id).slice(0, 8))',
+     'OpenImmo-Objektnummer: neutrale Vorsilbe (2x).',
+     {'portal-export-homepage', 'portal-export'}),
+    ('FORK',
+     '("EP-" + String(immo.id).slice(0, 8))',
+     '("OBJ-" + String(immo.id).slice(0, 8))',
+     'OpenImmo-Objektnummer in der Antwort: neutrale Vorsilbe (2x).',
+     {'portal-export-homepage', 'portal-export'}),
+    ('FORK',
+     'immo.onoffice_id ? String(immo.onoffice_id) : "ep-" + immo.id',
+     'immo.onoffice_id ? String(immo.onoffice_id) : "obj-" + immo.id',
+     'OpenImmo-OBID in der Antwort: neutrale Vorsilbe.',
+     {'portal-export'}),
 ]
 
 
@@ -2456,8 +2641,13 @@ def main():
             # jetzt auch das Lesen und bringt die Liste der Plattform-
             # Schriften mit. Sie allein sind 75 Zeilen. Die Grenze soll
             # unbemerktes Wachstum melden, nicht bewusstes verhindern.
+            #
+            # 30.09.2026 von 140 auf 170: Phase 2.4 zieht in rechnung-pdf-
+            # erzeugen den Mandanten VOR den Briefkopf. Die Bremse hat bei
+            # +144 angehalten und damit genau getan, wozu sie da ist — die
+            # Zahl war gewollt, also steigt die Grenze, nicht die Toleranz.
             zeilen_delta = inhalt.count('\n') - zeilen_vorher
-            unten, oben = (-2, 140) if erweitert else (-2, 0)
+            unten, oben = (-2, 170) if erweitert else (-2, 0)
             if not unten <= zeilen_delta <= oben:
                 sys.exit(f'ABBRUCH: {datei} hat {zeilen_delta:+d} Zeilen '
                          f'(erlaubt: {unten} bis {oben}). '

@@ -137,7 +137,7 @@ Deno.serve(async (req) => {
     if (!zugangId || !text) throw new Error("zugang_id und text sind Pflicht.");
 
     const { data: z } = await admin.from("projekt_zugaenge")
-      .select("id, projekt_id, anzeigename, email, aktiv, ansprechpartner_id")
+      .select("id, projekt_id, anzeigename, email, aktiv, ansprechpartner_id, mandant_id")
       .eq("id", zugangId).maybeSingle();
     if (!z) throw new Error("Kunden-Zugang nicht gefunden.");
 
@@ -156,12 +156,16 @@ Deno.serve(async (req) => {
     try {
       const { data: projekt } = await admin.from("projekte").select("name, oeffentliche_url").eq("id", z.projekt_id).maybeSingle();
       const { data: postfaecher } = await admin.from("mail_postfaecher")
-        .select("*").eq("aktiv", true)
+        .select("*").eq("mandant_id", z.mandant_id).eq("aktiv", true)
         .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false });
+      // Die Kette endete auf (postfaecher || [])[0] — "irgendeines". Mit der
+      // Einschraenkung oben ist "irgendeines" jetzt wenigstens eines des
+      // eigenen Mandanten. Der Griff nach STANDARD_MAIL entfaellt: das war
+      // die feste Adresse des einen Hauses und gehoert keinem Mandanten.
       const postfach = (postfaecher || []).find((p: any) => p.benutzer_id === user.id && p.standard_zum_senden)
         || (postfaecher || []).find((p: any) => p.benutzer_id === user.id)
         || (postfaecher || []).find((p: any) => z.ansprechpartner_id && p.benutzer_id === z.ansprechpartner_id)
-        || (postfaecher || []).find((p: any) => (p.email_adresse || "").toLowerCase() === STANDARD_MAIL)
+        || (postfaecher || []).find((p: any) => p.standard_zum_senden)
         || (postfaecher || [])[0] || null;
       if (z.aktiv && z.email) {
         const loginUrl = (projekt?.oeffentliche_url || "").replace(/\/+$/, "");

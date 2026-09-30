@@ -59,16 +59,23 @@ type Anhang = { filename: string; bytes: Uint8Array; typ?: string };
 type Zeile = [string, unknown];
 
 // ---------------------------------------------------------------- Mailversand
-async function postfach(db: any) {
-  const { data: genau } = await db.from("mail_postfaecher").select("*").eq("email_adresse", ABSENDER).limit(1);
+// Das Postfach gehoert dem Mandanten, dem das Formular zugeordnet ist. Die
+// Vorlage nahm "das Postfach mit DIESER Adresse, sonst irgendeines" — die
+// Adresse war die des einen Hauses, und "irgendeines" ist mit mehreren
+// Mandanten das eines fremden Maklers.
+async function postfach(db: any, mandant: string | null) {
+  if (!mandant) return null;
+  const { data: genau } = await db.from("mail_postfaecher").select("*")
+    .eq("mandant_id", mandant).eq("email_adresse", ABSENDER).limit(1);
   if (genau && genau[0]) return genau[0];
-  const { data: rest } = await db.from("mail_postfaecher").select("*").eq("aktiv", true)
+  const { data: rest } = await db.from("mail_postfaecher").select("*")
+    .eq("mandant_id", mandant).eq("aktiv", true)
     .order("ist_standard", { ascending: false }).limit(1);
   return rest && rest[0];
 }
 
-async function sendeMail(db: any, opt: { an: string; kopie?: string; antwortAn?: string; betreff: string; text: string; html: string; anhaenge?: Anhang[] }) {
-  const pf = await postfach(db);
+async function sendeMail(db: any, mandant: string | null, opt: { an: string; kopie?: string; antwortAn?: string; betreff: string; text: string; html: string; anhaenge?: Anhang[] }) {
+  const pf = await postfach(db, mandant);
   const resendKey = Deno.env.get("RESEND_API_KEY");
   const protokoll: Record<string, unknown> = { anhaenge: (opt.anhaenge || []).map((a) => a.filename) };
 
@@ -468,7 +475,7 @@ Deno.serve(async (req) => {
       ? "DATEIEN (60 Tage abrufbar)\n" + dateiInfos.map((x) => `  ${x.name}: ${x.link || "\u2014"}`).join("\n")
       : "Keine Dateien hochgeladen.";
 
-    const anBeratung = await sendeMail(db, {
+    const anBeratung = await sendeMail(db, mandant, {
       an: BERATUNG,
       kopie: KOPIE,
       antwortAn: email,
@@ -488,7 +495,7 @@ Deno.serve(async (req) => {
       anhaenge,
     });
 
-    const kunde = await sendeMail(db, {
+    const kunde = await sendeMail(db, mandant, {
       an: email,
       antwortAn: BERATUNG,
       betreff: "Ihre Anfrage zum Energieausweis \u2013 Eingangsbest\u00e4tigung",

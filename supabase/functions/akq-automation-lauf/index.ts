@@ -152,13 +152,20 @@ async function entschluessele(verschluesselt: string): Promise<string> {
   return new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ct));
 }
 
-async function postfachFuer(db: any, userId: string | null) {
+async function postfachFuer(db: any, userId: string | null, mandant: string | null) {
   if (userId) {
     const { data } = await db.from("mail_postfaecher").select("*").eq("benutzer_id", userId).eq("aktiv", true)
       .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false }).limit(1);
     if (data && data.length) return data[0];
   }
-  const { data } = await db.from("mail_postfaecher").select("*").eq("aktiv", true)
+  // Der Rueckfall hiess "irgendein aktives Postfach". Mit einem Mandanten
+  // war das DAS Postfach; mit mehreren ist es der SMTP-Zugang eines fremden
+  // Maklers — die Mail ginge unter dessen Absender hinaus und laege in
+  // dessen Gesendet-Ordner. Ohne Mandanten deshalb gar keines: kein Versand
+  // ist besser als der falsche.
+  if (!mandant) return null;
+  const { data } = await db.from("mail_postfaecher").select("*")
+    .eq("mandant_id", mandant).eq("aktiv", true)
     .order("ist_standard", { ascending: false }).limit(1);
   return (data && data[0]) || null;
 }
@@ -432,7 +439,7 @@ async function ausfuehren(db: any, grenze: number, trocken: boolean) {
       e.betreff = betreff; e.an = an;
       if (trocken) { e.ergebnis = "trocken"; log.push(e); continue; }
 
-      const pf = await postfachFuer(db, lead.zustaendig_id);
+      const pf = await postfachFuer(db, lead.zustaendig_id, lead.mandant_id || null);
       const res = await mailSenden(db, { postfach: pf, an, anName: kontaktName(kontakt), betreff, text, userId: lead.zustaendig_id });
       if (!res.ok) {
         e.ergebnis = "fehler"; e.grund = res.fehler;

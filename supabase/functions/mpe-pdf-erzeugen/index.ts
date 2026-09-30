@@ -362,13 +362,18 @@ const { data } = await admin.from("profiles").select("id,name,funktion,telefon,e
 if (data) ap = data;
 }
 let firma: any = null;
-if (ap.firma_id) { const { data } = await admin.from("firma_stammdaten").select("*").eq("id", ap.firma_id).eq("aktiv", true).maybeSingle(); firma = data; }
-if (!firma) { const { data } = await admin.from("firma_stammdaten").select("*").eq("aktiv", true).order("sortierung").limit(1).maybeSingle(); firma = data; }
+// Wie im Expose: Briefkopf nur aus dem eigenen Mandanten, und der
+// Rueckfall "erster aktiver Standort ueberhaupt" faellt weg.
+if (ap.firma_id) { const { data } = await admin.from("firma_stammdaten").select("*").eq("id", ap.firma_id).eq("mandant_id", immoMandant).eq("aktiv", true).maybeSingle(); firma = data; }
+if (!firma) { const { data } = await admin.from("firma_stammdaten").select("*").eq("mandant_id", immoMandant).eq("aktiv", true).order("sortierung").limit(1).maybeSingle(); firma = data; }
 if (!firma) return jsonErr(500, "Firma-Stammdaten fehlen");
 let standorte: any[] = [];
-{ const { data } = await admin.from("firma_stammdaten").select("firma_name,strasse,plz,ort,sortierung").eq("aktiv", true).order("sortierung"); standorte = data || []; }
+{ const { data } = await admin.from("firma_stammdaten").select("firma_name,strasse,plz,ort,sortierung").eq("mandant_id", immoMandant).eq("aktiv", true).order("sortierung"); standorte = data || []; }
 let kz: any = null;
-{ const { data } = await admin.from("firma_kennzahlen").select("*").eq("aktiv", true).order("jahr", { ascending: false }).limit(1).maybeSingle(); kz = data; }
+// Umsatz, Objektzahl, Mitarbeiter — die Zahlen, mit denen sich der Makler
+// beim Eigentuemer vorstellt. Die eines fremden Hauses waeren hier eine
+// falsche Angabe im Akquisegespraech.
+{ const { data } = await admin.from("firma_kennzahlen").select("*").eq("mandant_id", immoMandant).eq("aktiv", true).order("jahr", { ascending: false }).limit(1).maybeSingle(); kz = data; }
 const pdf = await PDFDocument.create();
 if (fontkit) { try { pdf.registerFontkit(fontkit); } catch (_e) {} }
 pdf.setTitle("Marktpreiseinschaetzung " + (bew.titel || ""));
@@ -641,7 +646,7 @@ const gelesen: any[] = Array.isArray(d.herleitung) ? d.herleitung.filter((p: any
 const hatHerleitung = gelesen.length > 0 || hatSachwert || (qmSchnitt != null && marktwert != null);
 // ---- Freie Seiten (Baukasten): aus daten.seiten[] + Standard-Bausteinen ----
 let bausteine: any[] = [];
-{ const { data } = await admin.from("mpe_bausteine").select("*").eq("aktiv", true).order("sortierung"); bausteine = data || []; }
+{ const { data } = await admin.from("mpe_bausteine").select("*").eq("mandant_id", immoMandant).eq("aktiv", true).order("sortierung"); bausteine = data || []; }
 const bausteineAus: string[] = Array.isArray(d.bausteine_aus) ? d.bausteine_aus.map(String) : [];
 const eigene: any[] = Array.isArray(d.seiten) ? d.seiten.filter((p: any) => p && (p.titel || p.bild_data || p.inhalt)) : [];
 const gewaehlt: string[] = Array.isArray(d.bausteine) ? d.bausteine.map(String) : [];

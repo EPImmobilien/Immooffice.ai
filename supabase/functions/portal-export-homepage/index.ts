@@ -141,8 +141,8 @@ function openImmoXml(
   const istMiete = i.vertragsart === "vermietung";
   const istKauf = i.vertragsart !== "vermietung";
   const nutz = String(i.nutzungsart || "Wohnen");
-  const obid = "ep-" + i.id;
-  const objektnr = String(i.immo_nr || "").trim() || ("EP-" + String(i.id).slice(0, 8));
+  const obid = "obj-" + i.id;
+  const objektnr = String(i.immo_nr || "").trim() || ("OBJ-" + String(i.id).slice(0, 8));
 
   const epartMap: Record<string, string> = { Bedarfsausweis: "BEDARF", Verbrauchsausweis: "VERBRAUCH" };
   const epart = epartMap[String(i.energieausweis_typ)] || "";
@@ -293,9 +293,12 @@ Deno.serve(async (req) => {
     if (userErr || !userData?.user) return jsonErr(401, "Nicht authentifiziert");
     const { data: profile } = await admin.from("profiles").select("*").eq("id", userData.user.id).maybeSingle();
     if (!profile) return jsonErr(403, "Kein Teamzugang");
+    if (!profile.mandant_id) return jsonErr(403, "Kein Mandant am Profil — ohne den kein Homepage-Export.");
 
+    // Wie im Portalexport: der Zugang traegt fremde FTP-Zugangsdaten,
+    // wenn niemand sagt, wessen Zugang gemeint ist.
     const { data: zugang } = await admin.from("portal_zugaenge")
-      .select("*").eq("portal", "homepage").eq("aktiv", true).maybeSingle();
+      .select("*").eq("mandant_id", profile.mandant_id).eq("portal", "homepage").eq("aktiv", true).maybeSingle();
     if (!zugang) return jsonErr(500, "Kein aktiver Homepage-Zugang in portal_zugaenge hinterlegt");
 
     const { data: immo, error: immoErr } = await admin.from("immobilien").select("*").eq("id", immobilieId).maybeSingle();
@@ -317,15 +320,18 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Wie im Portalexport: der Kontakt im Inserat war der des erstbesten
+    // Maklers, nicht der des eigenen.
     const { data: firma } = await admin.from("firma_stammdaten")
-      .select("email, telefon").not("email", "is", null).limit(1).maybeSingle();
+      .select("email, telefon").eq("mandant_id", profile.mandant_id)
+      .not("email", "is", null).limit(1).maybeSingle();
     if (!kontaktEmail && firma?.email) kontaktEmail = firma.email;
     if (!kontaktTelefon && firma?.telefon) kontaktTelefon = firma.telefon;
 
     if (!kontaktEmail) return jsonErr(500, "Keine Kontakt-E-Mail gefunden (weder im Makler-Profil noch in den Firmenstammdaten) — OpenImmo verlangt eine.");
 
     const zeit = Date.now();
-    const objektnr = String(immo.immo_nr || "").trim() || ("EP-" + String(immo.id).slice(0, 8));
+    const objektnr = String(immo.immo_nr || "").trim() || ("OBJ-" + String(immo.id).slice(0, 8));
     const zipName = `ep_${objektnr.replace(/[^a-zA-Z0-9_-]/g, "_")}_${zeit}.zip`;
     const zip = new JSZip();
 

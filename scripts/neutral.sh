@@ -111,6 +111,15 @@ pruefe "Keine Kennzeichen des Referenzunternehmens" "$MARKEN"
 pruefe "Keine Stammdaten des Referenzunternehmens"  "$STAMM"
 pruefe "Kein Verweis auf das fremde Supabase-Projekt" "$FREMD"
 pruefe_genau "Kein Vorsatz EP_ in Bezeichnern" '\bEP_[A-Z]'
+# 30.09.2026: dieselbe Abkuerzung mit Bindestrich, als Zeichenkette. Sie stand
+# an sieben Stellen im Portalexport und bildete dort die OpenImmo-Objektnummer
+# und die OBID — also genau das Feld, das ImmoScout24, Immowelt, Kleinanzeigen
+# und die Homepage zu sehen bekommen. "Abkuerzung" und "API-Payload" stehen
+# beide in CLAUDE.md; das Muster fuer EP_ hat sie trotzdem nicht gefunden,
+# weil es auf den Unterstrich sah. Ein bloses EP waere unbrauchbar (es steckt
+# in September, Rezeption, Konzept), deshalb nur die beiden Vorsilben in
+# Anfuehrungszeichen — so, wie eine Kennung im Quelltext entsteht.
+pruefe_genau "Kein Vorsatz EP- in Kennungen" '"[Ee][Pp]-"'
 # Fest eingebaute Benutzerkennungen der Referenz. web-lead trug die des
 # Chefs im Quelltext; eine UUID enthaelt keinen Markennamen, deshalb ist
 # sie durch alle bisherigen Muster gefallen. Base64 wie die uebrigen:

@@ -308,12 +308,15 @@ Deno.serve(async (req) => {
 
     let profil: any = null;
     if (userId) {
-      const { data } = await db.from("profiles").select("id, name, start_adresse, fahrzeit_aktiv, fahrzeit_puffer_min").eq("id", userId).maybeSingle();
+      const { data } = await db.from("profiles").select("id, name, start_adresse, fahrzeit_aktiv, fahrzeit_puffer_min, mandant_id").eq("id", userId).maybeSingle();
       profil = data;
     }
     let basisAdresse = String(profil?.start_adresse || "").trim();
     if (!basisAdresse) {
+      // Startadresse fuer die Fahrzeit, wenn der Mitarbeiter keine eigene hat:
+      // der Standort SEINES Hauses, nicht der erstbeste in der Tabelle.
       const { data: firmen } = await db.from("firma_stammdaten").select("strasse, plz, ort")
+        .eq("mandant_id", profil?.mandant_id ?? "00000000-0000-0000-0000-000000000000")
         .eq("typ", "standort").eq("aktiv", true).order("sortierung").limit(1);
       const f = firmen && firmen[0];
       basisAdresse = f ? [f.strasse, [f.plz, f.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ") : "";

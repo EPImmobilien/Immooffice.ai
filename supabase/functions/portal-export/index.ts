@@ -116,8 +116,8 @@ function openImmoXml(i: Record<string, unknown>, anbieterNr: string, aktion: "AD
   const istMiete = i.vertragsart === "vermietung";
   const istKauf = i.vertragsart !== "vermietung";
   const nutz = String(i.nutzungsart || "Wohnen");
-  const obid = i.onoffice_id ? String(i.onoffice_id) : "ep-" + i.id;
-  const objektnr = String(i.immo_nr || "").trim() || ("EP-" + String(i.id).slice(0, 8));
+  const obid = i.onoffice_id ? String(i.onoffice_id) : "obj-" + i.id;
+  const objektnr = String(i.immo_nr || "").trim() || ("OBJ-" + String(i.id).slice(0, 8));
   const epartMap: Record<string, string> = { Bedarfsausweis: "BEDARF", Verbrauchsausweis: "VERBRAUCH" };
   const epart = epartMap[String(i.energieausweis_typ)] || "";
   const keinePflicht = /^nicht erforderlich|keine pflicht|^ohne energieausweis/i.test(String(i.energieausweis_typ || "").trim());
@@ -230,10 +230,16 @@ Deno.serve(async (req) => {
     const userClient = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: authHeader } } });
     const { data: userData, error: userErr } = await userClient.auth.getUser();
     if (userErr || !userData?.user) return jsonErr(401, "Nicht authentifiziert");
-    const { data: profile } = await admin.from("profiles").select("id, role").eq("id", userData.user.id).maybeSingle();
+    const { data: profile } = await admin.from("profiles").select("id, role, mandant_id").eq("id", userData.user.id).maybeSingle();
     if (!profile || !["chef", "mitarbeiter"].includes(profile.role)) return jsonErr(403, "Kein Teamzugang");
+    if (!profile.mandant_id) return jsonErr(403, "Kein Mandant am Profil — ohne den keine Portaluebertragung.");
 
-    const { data: zugang } = await admin.from("portal_zugaenge").select("*").eq("portal", portal).eq("aktiv", true).maybeSingle();
+    // Der Zugang traegt FTP-Server, Benutzer und Passwort des Maklers. Ohne
+    // Mandantenfilter liefert .maybeSingle() den erstbesten aktiven Zugang
+    // fuer dieses Portal — unter mehreren Mandanten also die Zugangsdaten
+    // eines fremden Maklers, und das Objekt landete in dessen Portalkonto.
+    const { data: zugang } = await admin.from("portal_zugaenge").select("*")
+      .eq("mandant_id", profile.mandant_id).eq("portal", portal).eq("aktiv", true).maybeSingle();
     if (!zugang) return jsonErr(500, `Kein aktiver Zugang für Portal „${portal}" in portal_zugaenge hinterlegt`);
     const { data: immo, error: immoErr } = await admin.from("immobilien").select("*").eq("id", immobilieId).maybeSingle();
     if (immoErr || !immo) return jsonErr(404, "Objekt nicht gefunden");
@@ -242,12 +248,16 @@ Deno.serve(async (req) => {
     let kontaktName = "Musterhaus Immobilien GmbH"; let kontaktEmail: string | null = null; let kontaktTelefon: string | null = null;
     const apId = immo.zustaendig_id || immo.ersteller_id || null;
     if (apId) { const { data: p } = await admin.from("profiles").select("name, email, telefon").eq("id", apId).maybeSingle(); if (p) { if (p.name) kontaktName = p.name; if (p.email) kontaktEmail = p.email; if (p.telefon && String(p.telefon).trim()) kontaktTelefon = String(p.telefon).trim(); } }
-    const { data: firma } = await admin.from("firma_stammdaten").select("email, telefon").not("email", "is", null).limit(1).maybeSingle();
+    // Diese Adresse und Rufnummer gehen als Kontakt in das OpenImmo-ZIP und
+    // damit in das Portal-Inserat. Ohne Mandantenfilter war es die des
+    // erstbesten Maklers mit einer Adresse — im Inserat eines anderen.
+    const { data: firma } = await admin.from("firma_stammdaten").select("email, telefon")
+      .eq("mandant_id", profile.mandant_id).not("email", "is", null).limit(1).maybeSingle();
     if (!kontaktEmail && firma?.email) kontaktEmail = firma.email;
     if (!kontaktTelefon && firma?.telefon) kontaktTelefon = firma.telefon;
     if (!kontaktEmail) return jsonErr(500, "Keine Kontakt-E-Mail gefunden — OpenImmo verlangt eine.");
 
-    const objektnr = String(immo.immo_nr || "").trim() || ("EP-" + String(immo.id).slice(0, 8));
+    const objektnr = String(immo.immo_nr || "").trim() || ("OBJ-" + String(immo.id).slice(0, 8));
     const zipName = `ep_${portal}_${objektnr.replace(/[^a-zA-Z0-9_-]/g, "_")}_${Date.now()}.zip`;
     const zip = new JSZip();
     const anhaenge: { dateiname: string; titel: string; gruppe: string; format: string }[] = [];
@@ -296,7 +306,7 @@ Deno.serve(async (req) => {
     const status = aktion === "loeschen" ? "geloescht" : "uebertragen";
     const meldung = aktion === "loeschen" ? `Lösch-Auftrag per ${protokoll} übertragen (${zipName})` : `Per ${protokoll} übertragen (${zipName}, ${Math.round(zipBytes.length / 1024)} KB, ${bilderInfo}, Kontakt: ${kontaktName}) — Bestätigung folgt per Importbericht`;
     await admin.from("immobilie_portal_status").upsert({ immobilie_id: immo.id, portal, status, meldung, uebertragen_am: new Date().toISOString(), quelle: "world", manuell: false }, { onConflict: "immobilie_id,portal" });
-    return new Response(JSON.stringify({ ok: true, meldung, kontakt: kontaktName, obid: immo.onoffice_id ? String(immo.onoffice_id) : "ep-" + immo.id }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ ok: true, meldung, kontakt: kontaktName, obid: immo.onoffice_id ? String(immo.onoffice_id) : "obj-" + immo.id }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
     const fehlerText = e instanceof Error ? e.message : String(e);
     console.error("portal-export Fehler:", fehlerText);

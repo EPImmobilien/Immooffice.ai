@@ -113,6 +113,13 @@ else
   fehler=1
 fi
 
+abschnitt "Dienstschluessel: liest eine Funktion ueber die Mandantengrenze?"
+if python3 tests/dienstschluessel-mandant.py; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Mandantentrennung: Rundumschlag ueber alle Tabellen"
 if scripts/lokale-db.sh psql -q -f tests/mandant-rundumschlag.sql; then
   :

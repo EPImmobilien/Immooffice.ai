@@ -113,9 +113,15 @@ Deno.serve(async (req) => {
     const kontakt = lead.kontakt_id ? (await db.from("kontakte").select("*").eq("id", lead.kontakt_id).maybeSingle()).data : null;
     const immo = lead.immobilie_id ? (await db.from("immobilien").select("*").eq("id", lead.immobilie_id).maybeSingle()).data : null;
     const makler = lead.zustaendig_id ? (await db.from("profiles").select("name, email, telefon, funktion").eq("id", lead.zustaendig_id).maybeSingle()).data : null;
+    // Briefkopf der Wertindikation. Der zweite Griff war ein Rueckfall ohne
+    // jede Bedingung — der erste Satz der ganzen Tabelle, also unter mehreren
+    // Mandanten der Briefkopf eines fremden Maklers auf dem eigenen
+    // Dokument. Er entfaellt: ohne Stammdaten kein Dokument.
     const { data: firmen } = await db.from("firma_stammdaten").select("*")
-      .eq("typ", "standort").eq("aktiv", true).order("sortierung").limit(1);
-    const stamm = (firmen && firmen[0]) || (await db.from("firma_stammdaten").select("*").order("sortierung").limit(1).maybeSingle()).data;
+      .eq("mandant_id", lead.mandant_id).eq("typ", "standort").eq("aktiv", true)
+      .order("sortierung").limit(1);
+    const stamm = (firmen && firmen[0]) || null;
+    if (!stamm) return antwort({ ok: false, fehler: "Fuer diesen Mandanten sind keine Firmenstammdaten hinterlegt — ohne Briefkopf wird kein Dokument erzeugt." }, 400);
 
     // ---- Dokument ----
     const pdf = await PDFDocument.create();

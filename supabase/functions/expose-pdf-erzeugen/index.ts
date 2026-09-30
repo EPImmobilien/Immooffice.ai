@@ -541,7 +541,7 @@ const { data: okSecret } = await admin.rpc("diagnose_secret_pruefen", { p: diagn
 if (!okSecret) return jsonErr(401, "Nicht erlaubt.");
 const { data: immoZ } = await admin.from("immobilien").select("zustaendig_id").eq("id", immobilie_id).maybeSingle();
 let pid: string | null = immoZ?.zustaendig_id || null;
-if (!pid) { const { data: chef } = await admin.from("profiles").select("id").eq("role", "chef").limit(1).maybeSingle(); pid = chef?.id || null; }
+if (!pid) { const { data: chef } = await admin.from("profiles").select("id").eq("mandant_id", immoMandant).eq("role", "chef").limit(1).maybeSingle(); pid = chef?.id || null; }
 if (!pid) return jsonErr(403, "Kein Ansprechpartner ableitbar");
 userData = { user: { id: pid } };
 } else {
@@ -677,9 +677,15 @@ if (neu) lageplaene = [neu];
 if (autoJobs.length) { await Promise.all(autoJobs); await schritt("auto-befuellung-ok", "jobs=" + autoJobs.length); }
 await schritt("vorbereitung-ok", "fotos=" + fotos.length + " grundrisse=" + grundrisse.length + " lageplan=" + lageplaene.length);
 let standorte: any[] = [];
-{ const { data } = await admin.from("firma_stammdaten").select("firma_name,strasse,plz,ort,sortierung").eq("aktiv", true).order("sortierung"); standorte = data || []; }
+// Die Standortliste steht im Fuss des Exposes. Ohne Mandantenfilter war
+// das die Liste ALLER Standorte ALLER Makler auf der Plattform — im
+// Expose eines einzelnen.
+{ const { data } = await admin.from("firma_stammdaten").select("firma_name,strasse,plz,ort,sortierung").eq("mandant_id", immoMandant).eq("aktiv", true).order("sortierung"); standorte = data || []; }
 let finAnn: any = null;
-{ const { data } = await admin.from("finanzierungs_annahmen").select("*").eq("aktiv", true).limit(1).maybeSingle(); finAnn = data; }
+// Zins und Tilgung fuer die Finanzierungsrechnung im Expose. Die Annahmen
+// eines fremden Maklers sind hier keine Annaeherung, sondern eine falsche
+// Zahl in einem Dokument, das ein Kaufinteressent bekommt.
+{ const { data } = await admin.from("finanzierungs_annahmen").select("*").eq("mandant_id", immoMandant).eq("aktiv", true).limit(1).maybeSingle(); finAnn = data; }
 let ap: any = profil;
 if (immo.zustaendig_id && immo.zustaendig_id !== profil.id) {
 const { data } = await admin.from("profiles").select("id,name,titel,firma_id,funktion,telefon,email,foto_url").eq("id", immo.zustaendig_id).maybeSingle();
@@ -687,9 +693,14 @@ if (data) ap = data;
 }
 const apName = [ap.titel, ap.name].map((x: any) => (x || "").trim()).filter(Boolean).join(" ");
 let firma: any = null;
-if (ap.firma_id) { const { data } = await admin.from("firma_stammdaten").select("*").eq("id", ap.firma_id).maybeSingle(); if (data && data.aktiv !== false) firma = data; }
+// Briefkopf: erst der Standort des Ansprechpartners, dann ein Standort des
+// Mandanten. Der dritte Griff war "der erste aktive Standort ueberhaupt" —
+// ein Rueckfall ueber die Mandantengrenze, und zwar ausgerechnet dann,
+// wenn der eigene Mandant keine Stammdaten hat. Er ist gestrichen; auch
+// der erste Griff bleibt jetzt im Mandanten, damit eine geerbte oder
+// falsch gesetzte firma_id keinen fremden Briefkopf holt.
+if (ap.firma_id) { const { data } = await admin.from("firma_stammdaten").select("*").eq("id", ap.firma_id).eq("mandant_id", immoMandant).maybeSingle(); if (data && data.aktiv !== false) firma = data; }
 if (!firma) { const { data } = await admin.from("firma_stammdaten").select("*").eq("mandant_id", immoMandant).order("sortierung").limit(1).maybeSingle(); firma = data; }
-if (!firma) { const { data } = await admin.from("firma_stammdaten").select("*").eq("aktiv", true).order("sortierung").limit(1).maybeSingle(); firma = data; }
 if (!firma) return jsonErr(500, "Firma-Stammdaten fehlen");
 const pdf = await PDFDocument.create();
 if (fontkit) { try { pdf.registerFontkit(fontkit); } catch (_e) {} }

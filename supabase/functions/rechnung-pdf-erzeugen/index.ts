@@ -262,19 +262,26 @@ Deno.serve(async (req) => {
       .order("reihenfolge", { ascending: true });
 
     // Firma: erst aus rechnung.absender_firma_id, sonst Default
+    // Die Reihenfolge stand auf dem Kopf: erst wurde der Briefkopf geholt,
+    // DANN der Mandant aus dem Briefkopf gesetzt. Damit bestimmte der
+    // Briefkopf den Mandanten statt umgekehrt — und der Rueckfall "erste
+    // aktive Firma" konnte eine fremde sein, auf einer Rechnung mit
+    // fremdem Absender, fremder Steuernummer und fremder Bankverbindung.
+    immoSetzeMandant(rechnung.mandant_id);
+    if (!immoMandant) throw new Error("Die Rechnung hat keinen Mandanten.");
     let firma: any = null;
     if (rechnung.absender_firma_id) {
-      const { data } = await admin.from("firma_stammdaten").select("*").eq("id", rechnung.absender_firma_id).maybeSingle();
+      const { data } = await admin.from("firma_stammdaten").select("*")
+        .eq("id", rechnung.absender_firma_id).eq("mandant_id", immoMandant).maybeSingle();
       firma = data;
     }
     if (!firma) {
-      // Fallback: Musterhaus Immobilien GmbH oder erste aktive Firma
       const { data } = await admin.from("firma_stammdaten").select("*")
+        .eq("mandant_id", immoMandant)
         .eq("aktiv", true).order("sortierung", { ascending: true }).limit(1).maybeSingle();
       firma = data;
     }
-    if (!firma) throw new Error("Firmen-Stammdaten nicht gefunden.");
-    immoSetzeMandant(firma.mandant_id);
+    if (!firma) throw new Error("Fuer diesen Mandanten sind keine Firmen-Stammdaten hinterlegt.");
 
     // Die CI des Mandanten, sonst die der Plattform.
     const ciBlau = immoCiFarbe(firma.ci_primaer, CI.blau);

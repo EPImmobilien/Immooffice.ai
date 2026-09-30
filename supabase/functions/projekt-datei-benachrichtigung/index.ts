@@ -129,9 +129,17 @@ Deno.serve(async (req) => {
       .select("id, projekt_id, einheit_id, email, anzeigename, rolle, passwort_gesetzt_am, aktiv, ansprechpartner_id")
       .in("projekt_id", projektIds).eq("aktiv", true);
 
-    const { data: postfaecher } = await admin.from("mail_postfaecher")
-      .select("*").eq("aktiv", true)
-      .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false });
+    // Die Auswahl darunter filtert schon auf den Mandanten des Projekts. Die
+    // ABFRAGE tat es nicht: sie holte die Postfaecher aller Mandanten samt
+    // verschluesselter SMTP-Passwoerter in den Speicher. Was nicht geholt
+    // wird, kann auch kein spaeterer Umbau versehentlich verwenden.
+    const mandantenDerProjekte = [...new Set((projekte || [])
+      .map((p: any) => p.mandant_id).filter(Boolean))];
+    const { data: postfaecher } = mandantenDerProjekte.length
+      ? await admin.from("mail_postfaecher")
+          .select("*").in("mandant_id", mandantenDerProjekte).eq("aktiv", true)
+          .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false })
+      : { data: [] as any[] };
 
     // Die Rueckfallkette endete mit "irgendein Postfach". Ueber mehrere
     // Mandanten hinweg heisst das: die Meldung des einen Bautraegers geht
