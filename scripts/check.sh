@@ -120,6 +120,13 @@ else
   fehler=1
 fi
 
+abschnitt "Verdrahtete Firmennamen"
+if python3 tests/firmenname-verdrahtet.py; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Mandantentrennung: Rundumschlag ueber alle Tabellen"
 if scripts/lokale-db.sh psql -q -f tests/mandant-rundumschlag.sql; then
   :

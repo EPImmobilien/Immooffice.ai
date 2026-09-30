@@ -11,6 +11,25 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// --- Firmenname des Mandanten (Phase 2.4) ---------------------------------
+// Die Neutralisierung hat den Namen der Referenz ueberall durch den des
+// Demo-Mandanten ersetzt. Fuer das Neutralitaets-Gate war das richtig; fuer
+// ein mandantenfaehiges Produkt ist ein verdrahteter Firmenname bei jedem
+// Mandanten ausser einem falsch — und er stand in Grussformeln, Briefkoepfen
+// und im OpenImmo-Feld <firma>, das jedes Portal anzeigt.
+//
+// Ohne Eintrag liefert diese Funktion einen LEEREN Text, keinen Beispielnamen.
+// Die aufrufende Stelle laesst die Zeile dann weg. Eine fehlende Grussformel
+// faellt auf; eine falsche nicht.
+async function immoFirmenName(db: any, mandant: unknown): Promise<string> {
+  if (typeof mandant !== "string" || !mandant) return "";
+  const { data } = await db.from("firma_stammdaten")
+    .select("firma_name, marken_name")
+    .eq("mandant_id", mandant).eq("aktiv", true)
+    .order("sortierung", { ascending: true }).limit(1).maybeSingle();
+  return String(data?.marken_name || data?.firma_name || "").trim();
+}
+
 // --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
 // Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
 // und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist
@@ -83,7 +102,10 @@ async function entschluessele(verschluesseltesBase64: string): Promise<string> {
 // Versand: Resend (HTTPS, feste Infrastruktur) bevorzugt, sonst All-Inkl-SMTP
 async function sendeMail(postfach: any, an: string, anName: string, betreff: string, text: string) {
   const resendKey = Deno.env.get("RESEND_API_KEY");
-  const absName = postfach?.absender_name || "Musterhaus Immobilien GmbH";
+  // Der Anzeigename im Absender: erst der des Postfachs, dann der
+  // Firmenname des Mandanten. Ein verdrahteter Name waere bei jedem
+  // Mandanten ausser einem falsch.
+  const absName = postfach?.absender_name || postfach?.firma_name || "";
   const absMail = postfach?.email_adresse || STANDARD_MAIL;
   const finalText = mitSignatur(text, postfach?.signatur);
   if (resendKey) {
@@ -142,7 +164,8 @@ Deno.serve(async (req) => {
     if (!z) throw new Error("Kunden-Zugang nicht gefunden.");
 
     const { data: profil } = await admin.from("profiles").select("name").eq("id", user.id).maybeSingle();
-    const absenderName = (body.absender_name || "").toString().trim().slice(0, 120) || profil?.name || "Musterhaus Immobilien";
+    const firmaName = await immoFirmenName(admin, z.mandant_id);
+    const absenderName = (body.absender_name || "").toString().trim().slice(0, 120) || profil?.name || firmaName;
 
     const { data: n, error: insErr } = await admin.from("projekt_nachrichten").insert({
       projekt_id: z.projekt_id, zugang_id: z.id, richtung: "makler", text,
@@ -162,18 +185,19 @@ Deno.serve(async (req) => {
       // Einschraenkung oben ist "irgendeines" jetzt wenigstens eines des
       // eigenen Mandanten. Der Griff nach STANDARD_MAIL entfaellt: das war
       // die feste Adresse des einen Hauses und gehoert keinem Mandanten.
-      const postfach = (postfaecher || []).find((p: any) => p.benutzer_id === user.id && p.standard_zum_senden)
+      const postfachRoh = (postfaecher || []).find((p: any) => p.benutzer_id === user.id && p.standard_zum_senden)
         || (postfaecher || []).find((p: any) => p.benutzer_id === user.id)
         || (postfaecher || []).find((p: any) => z.ansprechpartner_id && p.benutzer_id === z.ansprechpartner_id)
         || (postfaecher || []).find((p: any) => p.standard_zum_senden)
         || (postfaecher || [])[0] || null;
+      const postfach = postfachRoh ? { ...postfachRoh, firma_name: firmaName } : null;
       if (z.aktiv && z.email) {
         const loginUrl = (projekt?.oeffentliche_url || "").replace(/\/+$/, "");
         await sendeMail(postfach, z.email, z.anzeigename || "",
           `Neue Nachricht in Ihrem Kundenbereich – ${projekt?.name || "Ihr Projekt"}`,
           `Guten Tag ${z.anzeigename || ""},\n\n${absenderName} hat Ihnen in Ihrem Kundenbereich geantwortet:\n\n„${text}“\n\n`
           + (loginUrl ? `Zum Antworten melden Sie sich einfach an:\n${loginUrl}\n\n` : "")
-          + `Für Rückfragen stehen wir Ihnen gerne zur Verfügung.\n\nMit freundlichen Grüßen\n${absenderName}\nMusterhaus Immobilien GmbH`);
+          + `Für Rückfragen stehen wir Ihnen gerne zur Verfügung.\n\nMit freundlichen Grüßen\n${absenderName}${firmaName ? "\n" + firmaName : ""}`);
       }
     } catch (_mailErr) { /* Mail darf die Antwort nicht blockieren */ }
 

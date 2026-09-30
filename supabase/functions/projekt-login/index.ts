@@ -29,6 +29,25 @@
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+
+// --- Firmenname des Mandanten (Phase 2.4) ---------------------------------
+// Die Neutralisierung hat den Namen der Referenz ueberall durch den des
+// Demo-Mandanten ersetzt. Fuer das Neutralitaets-Gate war das richtig; fuer
+// ein mandantenfaehiges Produkt ist ein verdrahteter Firmenname bei jedem
+// Mandanten ausser einem falsch — und er stand in Grussformeln, Briefkoepfen
+// und im OpenImmo-Feld <firma>, das jedes Portal anzeigt.
+//
+// Ohne Eintrag liefert diese Funktion einen LEEREN Text, keinen Beispielnamen.
+// Die aufrufende Stelle laesst die Zeile dann weg. Eine fehlende Grussformel
+// faellt auf; eine falsche nicht.
+async function immoFirmenName(db: any, mandant: unknown): Promise<string> {
+  if (typeof mandant !== "string" || !mandant) return "";
+  const { data } = await db.from("firma_stammdaten")
+    .select("firma_name, marken_name")
+    .eq("mandant_id", mandant).eq("aktiv", true)
+    .order("sortierung", { ascending: true }).limit(1).maybeSingle();
+  return String(data?.marken_name || data?.firma_name || "").trim();
+}
 import nodemailer from "npm:nodemailer@6.9.16";
 
 const corsHeaders = {
@@ -95,17 +114,21 @@ async function holePostfach(admin: ReturnType<typeof createClient>, mandant: str
   if (!mandant) { console.warn("Postfach: kein Mandant angegeben, kein Versand."); return null; }
   const { data: pf } = await admin.from("mail_postfaecher")
     .select("*").eq("mandant_id", mandant).eq("email_adresse", STANDARD_MAIL).eq("aktiv", true).limit(1).maybeSingle();
-  if (pf) return pf;
+  if (pf) return { ...pf, firma_name: await immoFirmenName(admin, mandant) };
   const { data: alle } = await admin.from("mail_postfaecher")
     .select("*").eq("mandant_id", mandant).eq("aktiv", true)
     .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false }).limit(1);
-  return (alle || [])[0] || null;
+  const gewaehlt = (alle || [])[0] || null;
+  return gewaehlt ? { ...gewaehlt, firma_name: await immoFirmenName(admin, mandant) } : null;
 }
 
 // Versand: Resend (HTTPS, feste Infrastruktur) bevorzugt, sonst All-Inkl-SMTP
 async function sendeMail(postfach: any, an: string, anName: string, betreff: string, text: string) {
   const resendKey = Deno.env.get("RESEND_API_KEY");
-  const absName = postfach?.absender_name || "Musterhaus Immobilien GmbH";
+  // Der Anzeigename im Absender: erst der des Postfachs, dann der
+  // Firmenname des Mandanten. Ein verdrahteter Name waere bei jedem
+  // Mandanten ausser einem falsch.
+  const absName = postfach?.absender_name || postfach?.firma_name || "";
   const absMail = postfach?.email_adresse || STANDARD_MAIL;
   const finalText = postfach?.signatur ? `${text}\n\n--\n${postfach.signatur}` : text;
   if (resendKey) {
@@ -242,7 +265,7 @@ Deno.serve(async (req) => {
           + `Sie haben ein neues Passwort für Ihren Kundenbereich zum Projekt „${projekt.name}“ angefordert.\n\n`
           + `Über folgenden Link legen Sie Ihr neues Passwort fest (48 Stunden gültig):\n\n${link}\n\n`
           + `Falls Sie das nicht waren, können Sie diese E-Mail einfach ignorieren – Ihr bisheriges Passwort bleibt gültig.\n\n`
-          + `Für Rückfragen stehen wir Ihnen gerne zur Verfügung!\n\nMit freundlichen Grüßen\nMusterhaus Immobilien GmbH`);
+          + `Für Rückfragen stehen wir Ihnen gerne zur Verfügung!\n\nMit freundlichen Grüßen\n${postfach?.firma_name || ""}`);
       } catch (_mailErr) { /* generische Antwort bleibt */ }
 
       return jsonResponse({ ok: true });

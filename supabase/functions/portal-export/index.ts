@@ -112,7 +112,7 @@ function objektartXml(i: Record<string, unknown>): string {
   }
 }
 
-function openImmoXml(i: Record<string, unknown>, anbieterNr: string, aktion: "ADD" | "CHANGE" | "DELETE", anhaenge: { dateiname: string; titel: string; gruppe: string; format: string }[], kontakt: { name: string; email: string; telefon: string | null }): string {
+function openImmoXml(i: Record<string, unknown>, anbieterNr: string, aktion: "ADD" | "CHANGE" | "DELETE", anhaenge: { dateiname: string; titel: string; gruppe: string; format: string }[], kontakt: { name: string; email: string; telefon: string | null; firma: string }): string {
   const istMiete = i.vertragsart === "vermietung";
   const istKauf = i.vertragsart !== "vermietung";
   const nutz = String(i.nutzungsart || "Wohnen");
@@ -132,7 +132,7 @@ function openImmoXml(i: Record<string, unknown>, anbieterNr: string, aktion: "AD
   <uebertragung art="ONLINE" umfang="TEIL" modus="NEW" version="1.2.7" sendersoftware="ImmoOffice" senderversion="1.0"/>
   <anbieter>
     <anbieternr>${esc(anbieterNr)}</anbieternr>
-    <firma>Musterhaus Immobilien GmbH</firma>
+    <firma>${esc(kontakt.firma)}</firma>
     <openimmo_anid>${esc(anbieterNr)}</openimmo_anid>
     <immobilie>
       <objektkategorie>
@@ -245,14 +245,17 @@ Deno.serve(async (req) => {
     if (immoErr || !immo) return jsonErr(404, "Objekt nicht gefunden");
     if (aktion === "uebertragen" && !(immo.objekttitel || immo.bezeichnung)) return jsonErr(400, "Objekttitel fehlt — Portale verlangen einen Titel.");
 
-    let kontaktName = "Musterhaus Immobilien GmbH"; let kontaktEmail: string | null = null; let kontaktTelefon: string | null = null;
+    let kontaktName = ""; let kontaktEmail: string | null = null; let kontaktTelefon: string | null = null;
     const apId = immo.zustaendig_id || immo.ersteller_id || null;
     if (apId) { const { data: p } = await admin.from("profiles").select("name, email, telefon").eq("id", apId).maybeSingle(); if (p) { if (p.name) kontaktName = p.name; if (p.email) kontaktEmail = p.email; if (p.telefon && String(p.telefon).trim()) kontaktTelefon = String(p.telefon).trim(); } }
     // Diese Adresse und Rufnummer gehen als Kontakt in das OpenImmo-ZIP und
     // damit in das Portal-Inserat. Ohne Mandantenfilter war es die des
     // erstbesten Maklers mit einer Adresse — im Inserat eines anderen.
-    const { data: firma } = await admin.from("firma_stammdaten").select("email, telefon")
+    const { data: firma } = await admin.from("firma_stammdaten").select("firma_name, email, telefon")
       .eq("mandant_id", profile.mandant_id).not("email", "is", null).limit(1).maybeSingle();
+    const firmaName = String(firma?.firma_name || "").trim();
+    if (!firmaName) return jsonErr(500, "Fuer diesen Mandanten ist kein Firmenname hinterlegt — OpenImmo verlangt einen Anbieter.");
+    if (!kontaktName) kontaktName = firmaName;
     if (!kontaktEmail && firma?.email) kontaktEmail = firma.email;
     if (!kontaktTelefon && firma?.telefon) kontaktTelefon = firma.telefon;
     if (!kontaktEmail) return jsonErr(500, "Keine Kontakt-E-Mail gefunden — OpenImmo verlangt eine.");
@@ -298,7 +301,7 @@ Deno.serve(async (req) => {
         bilderInfo += ", 360°-Rundgang verlinkt";
       }
     }
-    const xml = openImmoXml(immo, zugang.anbieter_nr || "1001", aktion === "loeschen" ? "DELETE" : "CHANGE", anhaenge, { name: kontaktName, email: kontaktEmail, telefon: kontaktTelefon });
+    const xml = openImmoXml(immo, zugang.anbieter_nr || "1001", aktion === "loeschen" ? "DELETE" : "CHANGE", anhaenge, { name: kontaktName, email: kontaktEmail, telefon: kontaktTelefon, firma: firmaName });
     zip.file("openimmo.xml", xml);
     const zipBytes: Uint8Array = await zip.generateAsync({ type: "uint8array", compression: "DEFLATE", compressionOptions: { level: 6 } });
     const protokoll = await ftpUpload(zugang as Record<string, string>, zipName, zipBytes);

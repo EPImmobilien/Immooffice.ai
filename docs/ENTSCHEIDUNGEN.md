@@ -3235,3 +3235,84 @@ wie der geprüfte Code gebaut ist. Diese Annahme gehört mitgeprüft — hier ha
 sie vier Dateien versteckt, und zwar ausgerechnet die, in denen der Fehler
 stand.
 
+---
+
+## Die Neutralisierung hat einen Firmennamen gegen einen anderen getauscht (30.09.2026)
+
+Beim Aufräumen der Mandantengrenze fiel auf, wie oft ein **fest verdrahteter
+Firmenname** im Quelltext steht: **107 Vorkommen in 41 Edge Functions.**
+
+Es ist der Name des Demo-Mandanten. Die Neutralisierung hat nicht nur
+entfernt, sie hat auch **ersetzt**: überall, wo die Vorlage ihren eigenen
+Firmennamen verdrahtet hatte, steht jetzt der des Demo-Mandanten. Für
+`scripts/neutral.sh` ist das richtig — die Referenz ist weg, und der neue Name
+steht zu Recht auf der Erlaubnisliste. Für ein mandantenfähiges Produkt ist es
+**derselbe Fehler in neuer Farbe**: ein verdrahteter Firmenname ist bei jedem
+Mandanten außer einem falsch.
+
+Und er ist nicht harmlos. Er stand unter anderem:
+
+| Stelle | Wirkung |
+|---|---|
+| `<anbieter><firma>` im OpenImmo-ZIP | **Jedes Inserat jedes Mandanten** trug den Namen des Demo-Mandanten — sichtbar bei ImmoScout24, Immowelt, Kleinanzeigen und auf der Homepage |
+| Muster-Widerrufsformular der Widerrufsbelehrung | Die Belehrung nennt den Unternehmer, gegenüber dem widerrufen wird. Mit dem falschen Namen ist sie **unrichtig — und eine unrichtige Belehrung setzt die Frist nicht in Lauf** |
+| Grußformel unter Mails an Kunden und Eigentümer | Der Kunde des einen Bauträgers liest den Namen eines anderen |
+| Überschriften der Akquise-Präsentation | 9 Seiten mit fremdem Firmennamen im Eigentümergespräch |
+| Systemvorgaben der KI | Der erzeugte Exposé-Text kann den Namen übernehmen |
+
+### In diesem Durchgang behoben
+
+**Der OpenImmo-Anbieter.** `<firma>` kommt jetzt aus `firma_stammdaten` des
+Mandanten. Fehlt der Name, bricht der Export mit einer klaren Meldung ab —
+OpenImmo verlangt einen Anbieter, und ein falscher ist schlimmer als keiner.
+
+**Der Energieausweis-Fragebogen**, vollständig. Das ist die Funktion mit der
+gesetzlichen Belehrung, und dort steckte mehr als ein Name:
+
+- Die Widerrufsbelehrung ist von einer Konstante zu einer Funktion des
+  Mandanten geworden — beide Stellen, die den Unternehmer nennen (der
+  Belehrungstext und das Muster-Widerrufsformular).
+- Der Mailfuß trug Firmenname, E-Mail-Adresse und Webadresse fest verdrahtet.
+- Im Hinweiskasten stand ein **erfundener Ansprechpartner mit erfundener
+  Rufnummer**. `CLAUDE.md` verbietet erfundene Daten; beides ist weg. Genannt
+  wird, was in den Stammdaten steht, und sonst nichts.
+- Der Alternativtext des Logos.
+
+**Das Neubauportal**, vier Funktionen. Absendername und Grußformel kommen
+jetzt aus dem Mandanten. Der Weg dorthin ist ein neuer Helfer
+`immoFirmenName(db, mandant)`, und `holePostfach()` hängt den Namen gleich an
+das Postfach — damit war eine Änderung an einer Stelle statt an acht nötig.
+
+**Wichtig am Helfer:** ohne Eintrag liefert er einen **leeren** Text, keinen
+Beispielnamen. Die aufrufende Stelle lässt die Zeile dann weg. Eine fehlende
+Grußformel fällt auf; eine falsche nicht. Das ist dieselbe Regel wie beim
+Briefkopf: der Rückfall ist gestrichen, nicht umgebogen.
+
+### Was offen bleibt — 86 Vorkommen, gebucht
+
+`tests/firmenname-verdrahtet.py` (neu, Teil von `npm run check`) führt Buch,
+in vier Klassen:
+
+| Klasse | Anzahl | Bedeutung |
+|---|---|---|
+| **AUSGABE** | 54 | Etwas, das ein Kunde liest. Muss weg |
+| **KI** | 29 | Systemvorgaben. Wirkt indirekt über den erzeugten Text |
+| **HEURISTIK** | 2 | Der Name dient der *Erkennung* („steht meine Signatur schon in diesem Text?"). Falsch, aber ohne Wirkung nach draußen: die Erkennung greift nur nicht |
+| **KOMMENTAR** | 1 | Kein Fehler |
+
+Die größten Posten unter AUSGABE: `mpe-pdf-erzeugen` (9),
+`signatur-vorgang-starten` (5), `vertrag-pdf` (5),
+`eigentuemer-nachricht-senden` (5), `objekt-landing` (4).
+
+### Ein Nebenbefund am Erzeuger selbst
+
+Der Zähler, der ausgibt, wie oft jede Regel gegriffen hat, schlüsselte auf
+`(Grund, Muster)`. Zwei Regeln mit **demselben Muster** — etwa zwei Helfer,
+die beide hinter die `supabase-js`-Zeile gespleißt werden — teilten sich damit
+einen Zähler. Sichtbar wurde das als „59x" statt „4x".
+
+Schlimmer als die falsche Zahl ist die Folge: eine Regel, die **nie** greift,
+fiel nicht in die Liste „ohne Treffer", weil die andere den Zähler schon
+gefüllt hatte. Der Erzeuger hätte eine wirkungslose Regel nicht gemeldet. Der
+Schlüssel trägt jetzt die Bemerkung mit.
+

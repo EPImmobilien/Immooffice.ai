@@ -2792,6 +2792,228 @@ NACHBESSERN = [
      '      const erg = await einladungVersenden(admin, mandant, { email, userId, vorname, nachname, anrede, titel, redirectTo: portalUrl, makler, erneut: true })',
      'Zugang anfordern: der Mandant des Kontos geht mit.',
      {'eigentuemer-zugang-anfordern'}),
+
+    # ======================================================================
+    # Phase 2.4, siebter Block: der Name des Demo-Mandanten im Quelltext
+    # ======================================================================
+    # Die Neutralisierung hat den Namen des Referenzunternehmens ueberall
+    # durch den des Demo-Mandanten ersetzt. Fuer das Neutralitaets-Gate war
+    # das richtig — die Referenz ist weg. Fuer ein mandantenfaehiges Produkt
+    # ist es derselbe Fehler in neuer Farbe: ein fest verdrahteter
+    # Firmenname ist bei jedem Mandanten ausser einem falsch.
+    #
+    # 107 Vorkommen in 41 Funktionen. Dieser Block nimmt die schwersten:
+    # das Feld <firma> im OpenImmo-ZIP, das jedes Portal anzeigt.
+    ('FORK',
+     '  kontakt: { name: string; email: string; telefon: string | null },\n): string {',
+     '  // firma: der Name, der als <anbieter><firma> im OpenImmo-ZIP steht. Er\n  // war fest verdrahtet — jedes Inserat JEDES Mandanten trug damit den\n  // Namen des Demo-Mandanten, und zwar sichtbar im Portal.\n  kontakt: { name: string; email: string; telefon: string | null; firma: string },\n): string {',
+     'OpenImmo: der Anbietername kommt aus den Stammdaten (Homepage).',
+     {'portal-export-homepage'}),
+    ('FORK',
+     'kontakt: { name: string; email: string; telefon: string | null }): string {',
+     'kontakt: { name: string; email: string; telefon: string | null; firma: string }): string {',
+     'OpenImmo: der Anbietername kommt aus den Stammdaten (Portalexport).',
+     {'portal-export'}),
+    ('FORK',
+     '    <firma>Musterhaus Immobilien GmbH</firma>',
+     '    <firma>${esc(kontakt.firma)}</firma>',
+     'OpenImmo: <firma> traegt den Namen des eigenen Mandanten (2x).',
+     {'portal-export', 'portal-export-homepage'}),
+    ('FORK',
+     '    let kontaktName = "Musterhaus Immobilien GmbH"; let kontaktEmail: string | null = null; let kontaktTelefon: string | null = null;',
+     '    let kontaktName = ""; let kontaktEmail: string | null = null; let kontaktTelefon: string | null = null;',
+     'Portalexport: kein verdrahteter Kontaktname mehr.',
+     {'portal-export'}),
+    ('FORK',
+     '    const { data: firma } = await admin.from("firma_stammdaten").select("email, telefon")\n      .eq("mandant_id", profile.mandant_id).not("email", "is", null).limit(1).maybeSingle();',
+     '    const { data: firma } = await admin.from("firma_stammdaten").select("firma_name, email, telefon")\n      .eq("mandant_id", profile.mandant_id).not("email", "is", null).limit(1).maybeSingle();\n    const firmaName = String(firma?.firma_name || "").trim();\n    if (!firmaName) return jsonErr(500, "Fuer diesen Mandanten ist kein Firmenname hinterlegt — OpenImmo verlangt einen Anbieter.");\n    if (!kontaktName) kontaktName = firmaName;',
+     'Portalexport: Name und Kontakt aus den eigenen Stammdaten.',
+     {'portal-export'}),
+    ('FORK',
+     'aktion === "loeschen" ? "DELETE" : "CHANGE", anhaenge, { name: kontaktName, email: kontaktEmail, telefon: kontaktTelefon })',
+     'aktion === "loeschen" ? "DELETE" : "CHANGE", anhaenge, { name: kontaktName, email: kontaktEmail, telefon: kontaktTelefon, firma: firmaName })',
+     'Portalexport: der Firmenname geht in den XML-Bau.',
+     {'portal-export'}),
+    ('FORK',
+     '    let kontaktName = "Musterhaus Immobilien GmbH";\n    let kontaktEmail: string | null = null;',
+     '    let kontaktName = "";\n    let kontaktEmail: string | null = null;',
+     'Homepage-Export: kein verdrahteter Kontaktname mehr.',
+     {'portal-export-homepage'}),
+    ('FORK',
+     '    const { data: firma } = await admin.from("firma_stammdaten")\n      .select("email, telefon").eq("mandant_id", profile.mandant_id)\n      .not("email", "is", null).limit(1).maybeSingle();',
+     '    const { data: firma } = await admin.from("firma_stammdaten")\n      .select("firma_name, email, telefon").eq("mandant_id", profile.mandant_id)\n      .not("email", "is", null).limit(1).maybeSingle();\n    const firmaName = String(firma?.firma_name || "").trim();\n    if (!firmaName) return jsonErr(500, "Fuer diesen Mandanten ist kein Firmenname hinterlegt — OpenImmo verlangt einen Anbieter.");\n    if (!kontaktName) kontaktName = firmaName;',
+     'Homepage-Export: Name und Kontakt aus den eigenen Stammdaten.',
+     {'portal-export-homepage'}),
+    ('FORK',
+     '      { name: kontaktName, email: kontaktEmail, telefon: kontaktTelefon },\n    );',
+     '      { name: kontaktName, email: kontaktEmail, telefon: kontaktTelefon, firma: firmaName },\n    );',
+     'Homepage-Export: der Firmenname geht in den XML-Bau.',
+     {'portal-export-homepage'}),
+
+    # --- Der Energieausweis-Fragebogen: Briefkopf und Widerrufsbelehrung --
+    # Ein oeffentliches Formular, dessen Bestaetigungsmail eine gesetzliche
+    # Widerrufsbelehrung traegt. Das Muster-Widerrufsformular darin nennt den
+    # Unternehmer, gegenueber dem widerrufen wird — mit einem verdrahteten
+    # Namen ist die Belehrung fuer jeden Mandanten ausser einem unrichtig,
+    # und eine unrichtige Belehrung setzt die Frist nicht in Lauf.
+    #
+    # Dazu stand im Hinweiskasten ein erfundener Ansprechpartner mit
+    # erfundener Rufnummer. CLAUDE.md: keine erfundenen Daten.
+    ('FORK',
+     'const ABSENDER = "info@immooffice.example";\nconst ABSENDER_NAME = "Musterhaus Immobilien GmbH";',
+     '// Absender und Briefkopf gehoeren dem Mandanten, dem das Formular zugeordnet\n// ist — nicht dem Demo-Mandanten, dessen Name hier verdrahtet stand. Die\n// ABSENDERADRESSE bleibt die der Plattform (SPF/DKIM), Anzeigename und\n// Antwortadresse wechseln je Mandant.\nconst ABSENDER = (Deno.env.get("SMTP_FROM_EMAIL") || "").trim();\ntype ImmoFirma = { name: string; email: string; telefon: string; web: string };\nconst IMMO_FIRMA_LEER: ImmoFirma = { name: "", email: "", telefon: "", web: "" };\nasync function immoFirma(db: any, mandant: string | null): Promise<ImmoFirma> {\n  if (!mandant) return IMMO_FIRMA_LEER;\n  const { data } = await db.from("firma_stammdaten").select("firma_name, marken_name, email, telefon, web")\n    .eq("mandant_id", mandant).eq("aktiv", true).order("sortierung").limit(1).maybeSingle();\n  if (!data) return IMMO_FIRMA_LEER;\n  return {\n    name: String(data.marken_name || data.firma_name || "").trim(),\n    email: String(data.email || "").trim(),\n    telefon: String(data.telefon || "").trim(),\n    web: String(data.web || "").trim(),\n  };\n}',
+     'Energieausweis: Firmendaten des Mandanten statt verdrahteter Werte.',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     '  const pf = await postfach(db, mandant);',
+     '  const pf = await postfach(db, mandant);\n  const firma = await immoFirma(db, mandant);\n  const absenderName = firma.name || Deno.env.get("SMTP_FROM_NAME") || "ImmoOffice";',
+     'Energieausweis: der Anzeigename kommt aus den Stammdaten.',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     '        from: `${ABSENDER_NAME} <${ABSENDER}>`,',
+     '        from: `${absenderName} <${ABSENDER}>`,',
+     'Energieausweis: Resend-Absender mit dem Namen des Mandanten.',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     '      from: `"${ABSENDER_NAME}" <${pf.email_adresse}>`,',
+     '      from: `"${absenderName}" <${pf.email_adresse}>`,',
+     'Energieausweis: SMTP-Absender mit dem Namen des Mandanten.',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     'function rahmen(opt: { kopfzeile: string; anrede: string; einleitung: string; d: any; fuss: string; hinweisKasten?: string }): string {',
+     'function rahmen(opt: { kopfzeile: string; anrede: string; einleitung: string; d: any; fuss: string; hinweisKasten?: string; firma: ImmoFirma }): string {',
+     'Energieausweis: der Mailrahmen bekommt die Firmendaten uebergeben.',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     '      Musterhaus Immobilien GmbH <br>\n      <a href="mailto:info@immooffice.example" style="color:${GOLD};text-decoration:none">info@immooffice.example</a> &nbsp;\\u00b7&nbsp; <a href="https://immooffice.example" style="color:${GOLD};text-decoration:none">immooffice.example</a>',
+     '      ${esc(opt.firma.name)}${opt.firma.name ? "<br>" : ""}\n      ${opt.firma.email ? `<a href="mailto:${esc(opt.firma.email)}" style="color:${GOLD};text-decoration:none">${esc(opt.firma.email)}</a>` : ""}${opt.firma.email && opt.firma.web ? " &nbsp;\\u00b7&nbsp; " : ""}${opt.firma.web ? `<a href="${esc(opt.firma.web)}" style="color:${GOLD};text-decoration:none">${esc(opt.firma.web.replace(/^https?:\\/\\//, ""))}</a>` : ""}',
+     'Energieausweis: der Mailfuss traegt die Daten des Mandanten.',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     '  "An Musterhaus Immobilien GmbH, E-Mail: info@immooffice.example:",',
+     '  `An ${firma.name || "den Anbieter"}${firma.email ? `, E-Mail: ${firma.email}` : ""}:`,',
+     'Energieausweis: das Widerrufsformular nennt den richtigen Empfaenger.',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     'const WIDERRUF_TEXT = [',
+     '// Die Belehrung nennt den Unternehmer, gegenueber dem widerrufen wird. Mit\n// einem verdrahteten Namen war sie fuer jeden Mandanten ausser einem\n// unrichtig — und eine unrichtige Belehrung setzt die Frist nicht in Lauf.\n// Deshalb eine Funktion, nicht mehr eine Konstante.\n// HINWEIS: Der Text ist das gesetzliche Muster. Er ersetzt keine\n// anwaltliche Pruefung des konkreten Vertrags (siehe docs/OFFEN.md).\nconst widerrufText = (firma: ImmoFirma) => [',
+     'Energieausweis: die Widerrufsbelehrung wird je Mandant gebaut.',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     '].join("\\n");\n\nconst WIDERRUF_HTML = WIDERRUF_TEXT.split("\\n").map((z) => {',
+     '].join("\\n");\n\nconst widerrufHtml = (firma: ImmoFirma) => widerrufText(firma).split("\\n").map((z) => {',
+     'Energieausweis: auch die HTML-Fassung je Mandant.',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     '    immoSetzeMandant(mandant);',
+     '    immoSetzeMandant(mandant);\n    const firma = await immoFirma(db, mandant);',
+     'Energieausweis: die Firmendaten stehen im Handler bereit.',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     '        hinweisKasten: dateiListeHtml,',
+     '        firma,\n        hinweisKasten: dateiListeHtml,',
+     'Energieausweis: die interne Mail bekommt die Firmendaten.',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     '        hinweisKasten: `Ihr Ansprechpartner: <b style="color:${NAVY}">J\\u00f6rn Musterhaus</b>, Energieberatung \\u00b7 <a href="tel:01639774328" style="color:${NAVY}">0163 9774328</a>`,\n        fuss: WIDERRUF_HTML,',
+     '        firma,\n        // Hier stand ein erfundener Ansprechpartner mit erfundener\n        // Rufnummer. Beides ist weg: genannt wird, was in den Stammdaten\n        // des Mandanten steht, und sonst nichts.\n        hinweisKasten: firma.telefon\n          ? `Ihr Ansprechpartner: <b style="color:${NAVY}">${esc(firma.name)}</b> \\u00b7 <a href="tel:${esc(firma.telefon.replace(/[^+0-9]/g, ""))}" style="color:${NAVY}">${esc(firma.telefon)}</a>`\n          : undefined,\n        fuss: widerrufHtml(firma),',
+     'Energieausweis: kein erfundener Ansprechpartner mehr.',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     '        alsText(d, ""), "", WIDERRUF_TEXT, "",\n        "Mit freundlichen Gr\\u00fc\\u00dfen", "Musterhaus Immobilien GmbH",',
+     '        alsText(d, ""), "", widerrufText(firma), "",\n        "Mit freundlichen Gr\\u00fc\\u00dfen", firma.name,',
+     'Energieausweis: Grussformel mit dem Namen des Mandanten.',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     'm\\u00fcssen Sie uns (Musterhaus Immobilien GmbH, E-Mail: info@immooffice.example) mittels',
+     'm\\u00fcssen Sie uns (${firma.name || "dem Anbieter"}${firma.email ? `, E-Mail: ${firma.email}` : ""}${firma.telefon ? `, Tel.: ${firma.telefon}` : ""}) mittels',
+     'Energieausweis: auch der Belehrungstext nennt den richtigen Unternehmer.',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     '"Sie haben das Recht, binnen 14 Tagen',
+     '`Sie haben das Recht, binnen 14 Tagen',
+     'Energieausweis: die Belehrungszeile wird zur Schablone (Anfang).',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     'Widerrufsrechts vor Ablauf der Widerrufsfrist absenden.",',
+     'Widerrufsrechts vor Ablauf der Widerrufsfrist absenden.`,',
+     'Energieausweis: die Belehrungszeile wird zur Schablone (Ende).',
+     {'energieausweis-anfrage'}),
+    ('FORK',
+     'alt="Musterhaus Immobilien GmbH"',
+     'alt="${esc(opt.firma.name)}"',
+     'Energieausweis: das Logo tragt den Namen des Mandanten als Alternativtext.',
+     {'energieausweis-anfrage'}),
+
+    # --- Das Neubauportal: Absendername und Grussformeln ------------------
+    # Vier Funktionen schicken Mail an Kunden eines Bautraegers. Der
+    # Absendername fiel auf den Namen des Demo-Mandanten zurueck, und unter
+    # jeder Mail stand er als Grussformel.
+    ('FORK',
+     'import { createClient } from "jsr:@supabase/supabase-js@2";',
+     'import { createClient } from "jsr:@supabase/supabase-js@2";\n\n// --- Firmenname des Mandanten (Phase 2.4) ---------------------------------\n// Die Neutralisierung hat den Namen der Referenz ueberall durch den des\n// Demo-Mandanten ersetzt. Fuer das Neutralitaets-Gate war das richtig; fuer\n// ein mandantenfaehiges Produkt ist ein verdrahteter Firmenname bei jedem\n// Mandanten ausser einem falsch — und er stand in Grussformeln, Briefkoepfen\n// und im OpenImmo-Feld <firma>, das jedes Portal anzeigt.\n//\n// Ohne Eintrag liefert diese Funktion einen LEEREN Text, keinen Beispielnamen.\n// Die aufrufende Stelle laesst die Zeile dann weg. Eine fehlende Grussformel\n// faellt auf; eine falsche nicht.\nasync function immoFirmenName(db: any, mandant: unknown): Promise<string> {\n  if (typeof mandant !== "string" || !mandant) return "";\n  const { data } = await db.from("firma_stammdaten")\n    .select("firma_name, marken_name")\n    .eq("mandant_id", mandant).eq("aktiv", true)\n    .order("sortierung", { ascending: true }).limit(1).maybeSingle();\n  return String(data?.marken_name || data?.firma_name || "").trim();\n}',
+     'Helfer immoFirmenName eingezogen (Firmenname je Mandant).',
+     {'projekt-interaktion', 'projekt-datei-benachrichtigung', 'projekt-login', 'projekt-nachricht-antwort'}),
+    ('FORK',
+     '  const { data: alle } = await admin.from("mail_postfaecher")\n    .select("*").eq("mandant_id", mandant).eq("aktiv", true)\n    .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false }).limit(1);\n  return (alle || [])[0] || null;\n}',
+     '  const { data: alle } = await admin.from("mail_postfaecher")\n    .select("*").eq("mandant_id", mandant).eq("aktiv", true)\n    .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false }).limit(1);\n  const gewaehlt = (alle || [])[0] || null;\n  return gewaehlt ? { ...gewaehlt, firma_name: await immoFirmenName(admin, mandant) } : null;\n}',
+     'Neubauportal: das Postfach bringt den Firmennamen seines Mandanten mit.',
+     {'projekt-interaktion', 'projekt-login'}),
+    ('FORK',
+     '  if (pf) return pf;',
+     '  if (pf) return { ...pf, firma_name: await immoFirmenName(admin, mandant) };',
+     'Neubauportal: auch das genannte Postfach bringt den Firmennamen mit.',
+     {'projekt-interaktion', 'projekt-login'}),
+    ('FORK',
+     '  const absName = postfach?.absender_name || "Musterhaus Immobilien GmbH";',
+     '  // Der Anzeigename im Absender: erst der des Postfachs, dann der\n  // Firmenname des Mandanten. Ein verdrahteter Name waere bei jedem\n  // Mandanten ausser einem falsch.\n  const absName = postfach?.absender_name || postfach?.firma_name || "";',
+     'Neubauportal: der Absendername kommt aus dem Mandanten (4x).',
+     {'projekt-interaktion', 'projekt-datei-benachrichtigung', 'projekt-login', 'projekt-nachricht-antwort'}),
+    ('FORK',
+     '          + `Für Rückfragen stehen wir Ihnen gerne zur Verfügung!\\n\\nMit freundlichen Grüßen\\nMusterhaus Immobilien GmbH`);',
+     '          + `Für Rückfragen stehen wir Ihnen gerne zur Verfügung!\\n\\nMit freundlichen Grüßen\\n${postfach?.firma_name || ""}`);',
+     'Neubauportal: Grussformel mit dem Namen des Mandanten (Anmeldung).',
+     {'projekt-login'}),
+    ('FORK',
+     '    + `F\\u00fcr R\\u00fcckfragen stehen wir Ihnen gerne zur Verf\\u00fcgung!\\n\\nMit freundlichen Gr\\u00fc\\u00dfen\\nMusterhaus Immobilien GmbH`;',
+     '    + `F\\u00fcr R\\u00fcckfragen stehen wir Ihnen gerne zur Verf\\u00fcgung!\\n\\nMit freundlichen Gr\\u00fc\\u00dfen\\n${postfach?.firma_name || ""}`;',
+     'Neubauportal: Grussformel mit dem Namen des Mandanten (Interaktion).',
+     {'projekt-interaktion'}),
+    ('FORK',
+     '        + `Für Rückfragen stehen wir Ihnen gerne zur Verfügung.\\n\\nMit freundlichen Grüßen\\nMusterhaus Immobilien GmbH`;',
+     '        + `Für Rückfragen stehen wir Ihnen gerne zur Verfügung.\\n\\nMit freundlichen Grüßen\\n${postfach?.firma_name || ""}`;',
+     'Neubauportal: Grussformel mit dem Namen des Mandanten (Dateimeldung).',
+     {'projekt-datei-benachrichtigung'}),
+    ('FORK',
+     '          + `Für Rückfragen stehen wir Ihnen gerne zur Verfügung.\\n\\nMit freundlichen Grüßen\\n${absenderName}\\nMusterhaus Immobilien GmbH`);',
+     '          + `Für Rückfragen stehen wir Ihnen gerne zur Verfügung.\\n\\nMit freundlichen Grüßen\\n${absenderName}${firmaName ? "\\n" + firmaName : ""}`);',
+     'Neubauportal: Grussformel mit dem Namen des Mandanten (Antwort).',
+     {'projekt-nachricht-antwort'}),
+    ('FORK',
+     '    const absenderName = (body.absender_name || "").toString().trim().slice(0, 120) || profil?.name || "Musterhaus Immobilien";',
+     '    const firmaName = await immoFirmenName(admin, z.mandant_id);\n    const absenderName = (body.absender_name || "").toString().trim().slice(0, 120) || profil?.name || firmaName;',
+     'Neubauportal: der Absendername faellt auf den Firmennamen zurueck.',
+     {'projekt-nachricht-antwort'}),
+    ('FORK',
+     '      const postfach = (postfaecher || []).find((p: any) => p.benutzer_id === user.id && p.standard_zum_senden)',
+     '      const postfachRoh = (postfaecher || []).find((p: any) => p.benutzer_id === user.id && p.standard_zum_senden)',
+     'Neubauportal: das Rohpostfach bekommt den Firmennamen angehaengt (1).',
+     {'projekt-nachricht-antwort'}),
+    ('FORK',
+     '        || (postfaecher || [])[0] || null;\n      if (z.aktiv && z.email) {',
+     '        || (postfaecher || [])[0] || null;\n      const postfach = postfachRoh ? { ...postfachRoh, firma_name: firmaName } : null;\n      if (z.aktiv && z.email) {',
+     'Neubauportal: das Rohpostfach bekommt den Firmennamen angehaengt (2).',
+     {'projekt-nachricht-antwort'}),
+    ('FORK',
+     '      const postfach = postfachFuerEmpfaenger(zugang.ansprechpartner_id || null, uploader, projekt?.mandant_id ?? null);',
+     '      const postfachRoh = postfachFuerEmpfaenger(zugang.ansprechpartner_id || null, uploader, projekt?.mandant_id ?? null);\n      const postfach = postfachRoh\n        ? { ...postfachRoh, firma_name: await immoFirmenName(admin, projekt?.mandant_id ?? null) }\n        : null;',
+     'Neubauportal: das Postfach der Dateimeldung bekommt den Firmennamen.',
+     {'projekt-datei-benachrichtigung'}),
+    ('FORK',
+     'im Login-Fenster.\\n\\nMit freundlichen Gr\\u00fc\\u00dfen\\nMusterhaus Immobilien GmbH`);',
+     'im Login-Fenster.\\n\\nMit freundlichen Gr\\u00fc\\u00dfen\\n${postfach?.firma_name || ""}`);',
+     'Neubauportal: Grussformel der Hinweismail mit dem Namen des Mandanten.',
+     {'projekt-interaktion'}),
 ]
 
 
@@ -2845,7 +3067,8 @@ def main():
                 inhalt, n = re.subn(muster, ersatz, inhalt)
                 pruefe_haeufigkeit(n, bemerkung, datei)
                 if n:
-                    zaehler[(grund, muster)] = zaehler.get((grund, muster), 0) + n
+                    schluessel = (grund, muster, bemerkung)
+                    zaehler[schluessel] = zaehler.get(schluessel, 0) + n
                     if grund == 'FORK':
                         erweitert = True
             for regel in NACHBESSERN:
@@ -2856,7 +3079,8 @@ def main():
                 pruefe_haeufigkeit(n, bemerkung, datei)
                 if n:
                     inhalt = inhalt.replace(muster, ersatz)
-                    zaehler[(grund, muster)] = zaehler.get((grund, muster), 0) + n
+                    schluessel = (grund, muster, bemerkung)
+                    zaehler[schluessel] = zaehler.get(schluessel, 0) + n
                     # Auch eine NACHBESSERN-Regel darf die Vorlage erweitern.
                     # Das stand bisher nur an der Schleife darueber — solange
                     # jede betroffene Funktion ohnehin eine FORK-Regel aus
@@ -2897,11 +3121,17 @@ def main():
     # Regel auf bestimmte Funktionen ein. Fuer den Bericht zaehlt nur, was in
     # den ersten vier steht.
     alle_regeln = [r[:4] for r in ERSETZUNGEN + NACHBESSERN]
+    # 30.09.2026: der Schluessel traegt die Bemerkung mit. Vorher stand nur
+    # (grund, muster) darin — und zwei Regeln mit demselben Muster (etwa zwei
+    # Helfer, die beide hinter die supabase-js-Zeile gespleisst werden)
+    # teilten sich einen Zaehler. Die Ausgabe zeigte dann 59x statt 4x, und
+    # schlimmer: eine Regel, die NIE greift, fiel nicht in die Liste
+    # "ohne Treffer", weil die andere den Zaehler schon gefuellt hatte.
     for grund, muster, _, bemerkung in alle_regeln:
-        n = zaehler.get((grund, muster), 0)
+        n = zaehler.get((grund, muster, bemerkung), 0)
         if n:
             print(f'  [{grund:7s}] {n:4d}x  {bemerkung}')
-    nie = [b for g, m, _, b in alle_regeln if not zaehler.get((g, m))]
+    nie = [b for g, m, _, b in alle_regeln if not zaehler.get((g, m, b))]
     if nie:
         print(f'\n  {len(nie)} Regel(n) ohne Treffer — Vorlage hat sich geaendert '
               f'oder die Regel ist ueberholt:')

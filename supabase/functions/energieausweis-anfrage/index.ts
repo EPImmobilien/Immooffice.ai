@@ -18,8 +18,25 @@ const cors = {
 
 const BERATUNG = "energie@immooffice.example";
 const KOPIE = "info@immooffice.example";
-const ABSENDER = "info@immooffice.example";
-const ABSENDER_NAME = "Musterhaus Immobilien GmbH";
+// Absender und Briefkopf gehoeren dem Mandanten, dem das Formular zugeordnet
+// ist — nicht dem Demo-Mandanten, dessen Name hier verdrahtet stand. Die
+// ABSENDERADRESSE bleibt die der Plattform (SPF/DKIM), Anzeigename und
+// Antwortadresse wechseln je Mandant.
+const ABSENDER = (Deno.env.get("SMTP_FROM_EMAIL") || "").trim();
+type ImmoFirma = { name: string; email: string; telefon: string; web: string };
+const IMMO_FIRMA_LEER: ImmoFirma = { name: "", email: "", telefon: "", web: "" };
+async function immoFirma(db: any, mandant: string | null): Promise<ImmoFirma> {
+  if (!mandant) return IMMO_FIRMA_LEER;
+  const { data } = await db.from("firma_stammdaten").select("firma_name, marken_name, email, telefon, web")
+    .eq("mandant_id", mandant).eq("aktiv", true).order("sortierung").limit(1).maybeSingle();
+  if (!data) return IMMO_FIRMA_LEER;
+  return {
+    name: String(data.marken_name || data.firma_name || "").trim(),
+    email: String(data.email || "").trim(),
+    telefon: String(data.telefon || "").trim(),
+    web: String(data.web || "").trim(),
+  };
+}
 const LOGO = "https://usguiggfciavwzkdfjgt.supabase.co/storage/v1/object/public/web-assets/logo-weiss.png";
 const MAX_ANHANG_GESAMT = 14 * 1024 * 1024;
 
@@ -76,13 +93,15 @@ async function postfach(db: any, mandant: string | null) {
 
 async function sendeMail(db: any, mandant: string | null, opt: { an: string; kopie?: string; antwortAn?: string; betreff: string; text: string; html: string; anhaenge?: Anhang[] }) {
   const pf = await postfach(db, mandant);
+  const firma = await immoFirma(db, mandant);
+  const absenderName = firma.name || Deno.env.get("SMTP_FROM_NAME") || "ImmoOffice";
   const resendKey = Deno.env.get("RESEND_API_KEY");
   const protokoll: Record<string, unknown> = { anhaenge: (opt.anhaenge || []).map((a) => a.filename) };
 
   if (resendKey) {
     try {
       const body: Record<string, unknown> = {
-        from: `${ABSENDER_NAME} <${ABSENDER}>`,
+        from: `${absenderName} <${ABSENDER}>`,
         to: [opt.an],
         subject: opt.betreff,
         text: opt.text,
@@ -121,7 +140,7 @@ async function sendeMail(db: any, mandant: string | null, opt: { an: string; kop
       connectionTimeout: 15000, greetingTimeout: 15000, socketTimeout: 45000,
     });
     await tr.sendMail({
-      from: `"${ABSENDER_NAME}" <${pf.email_adresse}>`,
+      from: `"${absenderName}" <${pf.email_adresse}>`,
       to: opt.an, cc: opt.kopie && opt.kopie !== opt.an ? opt.kopie : undefined, replyTo: opt.antwortAn,
       subject: opt.betreff, text: opt.text, html: opt.html,
       attachments: (opt.anhaenge || []).map((a) => ({ filename: a.filename, content: a.bytes, contentType: a.typ })),
@@ -215,7 +234,7 @@ function tabelle(d: any): string {
   }).join("");
 }
 
-function rahmen(opt: { kopfzeile: string; anrede: string; einleitung: string; d: any; fuss: string; hinweisKasten?: string }): string {
+function rahmen(opt: { kopfzeile: string; anrede: string; einleitung: string; d: any; fuss: string; hinweisKasten?: string; firma: ImmoFirma }): string {
   return `<!DOCTYPE html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(opt.kopfzeile)}</title></head>
 <body style="margin:0;padding:0;background:#f6f6f3">
@@ -225,7 +244,7 @@ function rahmen(opt: { kopfzeile: string; anrede: string; einleitung: string; d:
 
     <tr><td style="background:${NAVY};padding:24px">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-        <td style="vertical-align:middle"><img src="${LOGO}" alt="Musterhaus Immobilien GmbH" width="150" style="display:block;width:150px;height:auto;border:0"></td>
+        <td style="vertical-align:middle"><img src="${LOGO}" alt="${esc(opt.firma.name)}" width="150" style="display:block;width:150px;height:auto;border:0"></td>
         <td align="right" style="vertical-align:middle;font:400 12px/1.5 Arial,Helvetica,sans-serif;color:#c9cde0">${esc(opt.kopfzeile)}</td>
       </tr></table>
     </td></tr>
@@ -248,25 +267,31 @@ function rahmen(opt: { kopfzeile: string; anrede: string; einleitung: string; d:
     </td></tr>
 
     <tr><td style="background:${NAVY};padding:18px 24px;font:400 12px/1.7 Arial,Helvetica,sans-serif;color:#c9cde0">
-      Musterhaus Immobilien GmbH <br>
-      <a href="mailto:info@immooffice.example" style="color:${GOLD};text-decoration:none">info@immooffice.example</a> &nbsp;\u00b7&nbsp; <a href="https://immooffice.example" style="color:${GOLD};text-decoration:none">immooffice.example</a>
+      ${esc(opt.firma.name)}${opt.firma.name ? "<br>" : ""}
+      ${opt.firma.email ? `<a href="mailto:${esc(opt.firma.email)}" style="color:${GOLD};text-decoration:none">${esc(opt.firma.email)}</a>` : ""}${opt.firma.email && opt.firma.web ? " &nbsp;\u00b7&nbsp; " : ""}${opt.firma.web ? `<a href="${esc(opt.firma.web)}" style="color:${GOLD};text-decoration:none">${esc(opt.firma.web.replace(/^https?:\/\//, ""))}</a>` : ""}
     </td></tr>
   </table>
 </td></tr></table>
 </body></html>`;
 }
 
-const WIDERRUF_TEXT = [
+// Die Belehrung nennt den Unternehmer, gegenueber dem widerrufen wird. Mit
+// einem verdrahteten Namen war sie fuer jeden Mandanten ausser einem
+// unrichtig — und eine unrichtige Belehrung setzt die Frist nicht in Lauf.
+// Deshalb eine Funktion, nicht mehr eine Konstante.
+// HINWEIS: Der Text ist das gesetzliche Muster. Er ersetzt keine
+// anwaltliche Pruefung des konkreten Vertrags (siehe docs/OFFEN.md).
+const widerrufText = (firma: ImmoFirma) => [
   "WIDERRUFSBELEHRUNG",
   "",
   "Widerrufsrecht",
-  "Sie haben das Recht, binnen 14 Tagen ohne Angabe von Gr\u00fcnden diesen Vertrag zu widerrufen. Die Widerrufsfrist betr\u00e4gt 14 Tage ab dem Tag des Vertragsabschlusses. Um Ihr Widerrufsrecht auszu\u00fcben, m\u00fcssen Sie uns (Musterhaus Immobilien GmbH, E-Mail: info@immooffice.example) mittels einer eindeutigen Erkl\u00e4rung (z. B. ein mit der Post versandter Brief oder eine E-Mail) \u00fcber Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie k\u00f6nnen das Muster-Widerrufsformular oder eine andere eindeutige Erkl\u00e4rung auch auf unserer Webseite www.immooffice.example elektronisch ausf\u00fcllen und \u00fcbermitteln. Machen Sie von dieser M\u00f6glichkeit Gebrauch, so werden wir Ihnen unverz\u00fcglich (z. B. per E-Mail) eine Best\u00e4tigung \u00fcber den Eingang eines solchen Widerrufs \u00fcbermitteln. Zur Wahrung der Widerrufsfrist reicht es aus, dass Sie die Mitteilung \u00fcber die Aus\u00fcbung des Widerrufsrechts vor Ablauf der Widerrufsfrist absenden.",
+  `Sie haben das Recht, binnen 14 Tagen ohne Angabe von Gr\u00fcnden diesen Vertrag zu widerrufen. Die Widerrufsfrist betr\u00e4gt 14 Tage ab dem Tag des Vertragsabschlusses. Um Ihr Widerrufsrecht auszu\u00fcben, m\u00fcssen Sie uns (${firma.name || "dem Anbieter"}${firma.email ? `, E-Mail: ${firma.email}` : ""}${firma.telefon ? `, Tel.: ${firma.telefon}` : ""}) mittels einer eindeutigen Erkl\u00e4rung (z. B. ein mit der Post versandter Brief oder eine E-Mail) \u00fcber Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie k\u00f6nnen das Muster-Widerrufsformular oder eine andere eindeutige Erkl\u00e4rung auch auf unserer Webseite www.immooffice.example elektronisch ausf\u00fcllen und \u00fcbermitteln. Machen Sie von dieser M\u00f6glichkeit Gebrauch, so werden wir Ihnen unverz\u00fcglich (z. B. per E-Mail) eine Best\u00e4tigung \u00fcber den Eingang eines solchen Widerrufs \u00fcbermitteln. Zur Wahrung der Widerrufsfrist reicht es aus, dass Sie die Mitteilung \u00fcber die Aus\u00fcbung des Widerrufsrechts vor Ablauf der Widerrufsfrist absenden.`,
   "",
   "Folgen des Widerrufs",
   "Wenn Sie diesen Vertrag widerrufen, haben wir Ihnen alle Zahlungen, die wir von Ihnen erhalten haben, unverz\u00fcglich und sp\u00e4testens binnen vierzehn Tagen ab dem Tag zur\u00fcckzuzahlen, an dem die Mitteilung \u00fcber Ihren Widerruf dieses Vertrags bei uns eingegangen ist. F\u00fcr diese R\u00fcckzahlung verwenden wir dasselbe Zahlungsmittel, das Sie bei der urspr\u00fcnglichen Transaktion eingesetzt haben, es sei denn, mit Ihnen wurde ausdr\u00fccklich etwas anderes vereinbart; in keinem Fall werden Ihnen wegen dieser R\u00fcckzahlung Entgelte berechnet. Haben Sie verlangt, dass die Dienstleistungen w\u00e4hrend der Widerrufsfrist beginnen sollen, so haben Sie uns einen angemessenen Betrag zu zahlen, der dem Anteil der bis zu dem Zeitpunkt, zu dem Sie uns von der Aus\u00fcbung des Widerrufsrechts hinsichtlich dieses Vertrags unterrichten, bereits erbrachten Dienstleistungen im Vergleich zum Gesamtumfang der im Vertrag vorgesehenen Dienstleistungen entspricht.",
   "",
   "Muster-Widerrufsformular",
-  "An Musterhaus Immobilien GmbH, E-Mail: info@immooffice.example:",
+  `An ${firma.name || "den Anbieter"}${firma.email ? `, E-Mail: ${firma.email}` : ""}:`,
   "Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag \u00fcber die Erbringung der folgenden Dienstleistung: Erstellung eines Energieausweises auf Verbrauchsbasis.",
   "Bestellt am (*) / erhalten am (*): __________",
   "Name des/der Verbraucher(s): __________",
@@ -276,7 +301,7 @@ const WIDERRUF_TEXT = [
   "(*) Unzutreffendes streichen.",
 ].join("\n");
 
-const WIDERRUF_HTML = WIDERRUF_TEXT.split("\n").map((z) => {
+const widerrufHtml = (firma: ImmoFirma) => widerrufText(firma).split("\n").map((z) => {
   if (!z.trim()) return "";
   if (/^(WIDERRUFSBELEHRUNG|Widerrufsrecht|Folgen des Widerrufs|Muster-Widerrufsformular)$/.test(z)) {
     return `<div style="font:400 14px/1.4 Georgia,'Times New Roman',serif;color:${NAVY};margin:14px 0 6px">${esc(z === "WIDERRUFSBELEHRUNG" ? "Widerrufsbelehrung" : z)}</div>`;
@@ -408,6 +433,7 @@ Deno.serve(async (req) => {
     }
     if (!mandant) return antwort({ ok: false, fehler: "Das Formular ist keinem Anbieter zugeordnet. Bitte wenden Sie sich direkt an Ihren Ansprechpartner." }, 400);
     immoSetzeMandant(mandant);
+    const firma = await immoFirma(db, mandant);
     const { count } = await db.from("energieausweis_anfragen").select("id", { count: "exact", head: true })
       .eq("ip_hash", ipHash).gte("created_at", vorEinerStunde);
     if ((count || 0) >= 5) return antwort({ ok: false, fehler: "Zu viele Anfragen. Bitte melden Sie sich telefonisch bei uns." }, 429);
@@ -485,6 +511,7 @@ Deno.serve(async (req) => {
         anrede: "Neue Anfrage \u00fcber den Fragebogen",
         einleitung: `${esc(txt(d?.kontakt?.name, 120))} m\u00f6chte einen Energieausweis auf Verbrauchsbasis f\u00fcr <b>${esc(txt(d?.objekt?.anschrift, 120))}</b>. Antworten geht direkt an den Absender.`,
         d,
+        firma,
         hinweisKasten: dateiListeHtml,
         fuss: `Vorgang ${esc(vorgang)} \u00b7 eingegangen am ${new Date().toLocaleString("de-DE", { timeZone: "Europe/Berlin" })}`,
       }),
@@ -504,14 +531,20 @@ Deno.serve(async (req) => {
         anrede: `Guten Tag ${esc(txt(d?.kontakt?.name, 120))},`,
         einleitung: "vielen Dank f\u00fcr Ihre Anfrage. Wir haben Ihre Angaben erhalten und pr\u00fcfen sie. Bei R\u00fcckfragen melden wir uns telefonisch, in der Regel innerhalb von zwei Werktagen.",
         d,
-        hinweisKasten: `Ihr Ansprechpartner: <b style="color:${NAVY}">J\u00f6rn Musterhaus</b>, Energieberatung \u00b7 <a href="tel:01639774328" style="color:${NAVY}">0163 9774328</a>`,
-        fuss: WIDERRUF_HTML,
+        firma,
+        // Hier stand ein erfundener Ansprechpartner mit erfundener
+        // Rufnummer. Beides ist weg: genannt wird, was in den Stammdaten
+        // des Mandanten steht, und sonst nichts.
+        hinweisKasten: firma.telefon
+          ? `Ihr Ansprechpartner: <b style="color:${NAVY}">${esc(firma.name)}</b> \u00b7 <a href="tel:${esc(firma.telefon.replace(/[^+0-9]/g, ""))}" style="color:${NAVY}">${esc(firma.telefon)}</a>`
+          : undefined,
+        fuss: widerrufHtml(firma),
       }),
       text: [
         `Guten Tag ${txt(d?.kontakt?.name, 120)},`, "",
         "vielen Dank f\u00fcr Ihre Anfrage. Wir haben Ihre Angaben erhalten und pr\u00fcfen sie. Bei R\u00fcckfragen melden wir uns telefonisch, in der Regel innerhalb von zwei Werktagen.", "",
-        alsText(d, ""), "", WIDERRUF_TEXT, "",
-        "Mit freundlichen Gr\u00fc\u00dfen", "Musterhaus Immobilien GmbH",
+        alsText(d, ""), "", widerrufText(firma), "",
+        "Mit freundlichen Gr\u00fc\u00dfen", firma.name,
       ].join("\n"),
       anhaenge,
     });

@@ -136,7 +136,10 @@ function openImmoXml(
   anbieterNr: string,
   aktion: "ADD" | "CHANGE" | "DELETE",
   anhaenge: { dateiname: string; titel: string; gruppe: string; format: string }[],
-  kontakt: { name: string; email: string; telefon: string | null },
+  // firma: der Name, der als <anbieter><firma> im OpenImmo-ZIP steht. Er
+  // war fest verdrahtet — jedes Inserat JEDES Mandanten trug damit den
+  // Namen des Demo-Mandanten, und zwar sichtbar im Portal.
+  kontakt: { name: string; email: string; telefon: string | null; firma: string },
 ): string {
   const istMiete = i.vertragsart === "vermietung";
   const istKauf = i.vertragsart !== "vermietung";
@@ -179,7 +182,7 @@ function openImmoXml(
   <uebertragung art="ONLINE" umfang="TEIL" modus="NEW" version="1.2.7" sendersoftware="ImmoOffice" senderversion="1.0"/>
   <anbieter>
     <anbieternr>${esc(anbieterNr)}</anbieternr>
-    <firma>Musterhaus Immobilien GmbH</firma>
+    <firma>${esc(kontakt.firma)}</firma>
     <openimmo_anid>${esc(anbieterNr)}</openimmo_anid>
     <immobilie>
       <objektkategorie>
@@ -305,7 +308,7 @@ Deno.serve(async (req) => {
     if (immoErr || !immo) return jsonErr(404, "Objekt nicht gefunden");
 
     // ---- Kontaktperson: zustaendiger Makler > Ersteller > Firmenstammdaten ----
-    let kontaktName = "Musterhaus Immobilien GmbH";
+    let kontaktName = "";
     let kontaktEmail: string | null = null;
     let kontaktTelefon: string | null = null;
 
@@ -323,8 +326,11 @@ Deno.serve(async (req) => {
     // Wie im Portalexport: der Kontakt im Inserat war der des erstbesten
     // Maklers, nicht der des eigenen.
     const { data: firma } = await admin.from("firma_stammdaten")
-      .select("email, telefon").eq("mandant_id", profile.mandant_id)
+      .select("firma_name, email, telefon").eq("mandant_id", profile.mandant_id)
       .not("email", "is", null).limit(1).maybeSingle();
+    const firmaName = String(firma?.firma_name || "").trim();
+    if (!firmaName) return jsonErr(500, "Fuer diesen Mandanten ist kein Firmenname hinterlegt — OpenImmo verlangt einen Anbieter.");
+    if (!kontaktName) kontaktName = firmaName;
     if (!kontaktEmail && firma?.email) kontaktEmail = firma.email;
     if (!kontaktTelefon && firma?.telefon) kontaktTelefon = firma.telefon;
 
@@ -382,7 +388,7 @@ Deno.serve(async (req) => {
       zugang.anbieter_nr || "1001",
       aktion === "loeschen" ? "DELETE" : "CHANGE",
       anhaenge,
-      { name: kontaktName, email: kontaktEmail, telefon: kontaktTelefon },
+      { name: kontaktName, email: kontaktEmail, telefon: kontaktTelefon, firma: firmaName },
     );
     zip.file("openimmo.xml", xml);
 
