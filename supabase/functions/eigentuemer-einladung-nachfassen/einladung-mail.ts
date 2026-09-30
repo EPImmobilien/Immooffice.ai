@@ -49,7 +49,7 @@ export function baueEinladungsMail(o: { anrede: string; link: string; makler: st
 export type VersandErgebnis = { versandweg: "resend" | "supabase-auth"; userId: string | null; resendId: string | null; methode: "invite" | "magiclink" | "otp" };
 
 /** Schickt eine Einladungs- bzw. Anmeldelink-Mail. Wirft bei Fehlern (Beleg mit status fehler wird vorher geschrieben). */
-export async function einladungVersenden(admin: SupabaseClient, o: {
+export async function einladungVersenden(admin: SupabaseClient, mandant: string, o: {
   email: string; userId: string | null; vorname: string; nachname: string; anrede: string; titel: string;
   redirectTo: string; makler: { id?: string | null; name?: string | null; email?: string | null; telefon?: string | null } | null;
   erneut: boolean;
@@ -57,9 +57,18 @@ export async function einladungVersenden(admin: SupabaseClient, o: {
   const url = Deno.env.get("SUPABASE_URL")!;
   const resendKey = (Deno.env.get("RESEND_API_KEY") || "").trim();
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
-  const { data: firmaRow } = await admin.from("firma_stammdaten").select("firma_name, email, web").eq("aktiv", true).order("sortierung").limit(1).maybeSingle();
-  const firma = firmaRow?.firma_name || "Musterhaus Immobilien GmbH";
-  const fromEmail = (Deno.env.get("SMTP_FROM_EMAIL") || firmaRow?.email || "info@immooffice.example").trim();
+  // Diese Zeile bestimmt, welcher Firmenname unter der Einladung steht und
+  // an wen der Eigentuemer antwortet. Ohne Mandantenfilter war es der
+  // erstbeste aktive Standort der ganzen Plattform — die Einladung des
+  // einen Maklers trug Namen, Adresse und Netzauftritt des anderen.
+  //
+  // Die Pruefung hat diese vier Kopien lange nicht gesehen: sie nennen
+  // SERVICE_ROLE nirgends, sondern bekommen den fertigen Client als
+  // Parameter. Seit dem 30.09.2026 sucht sie auch danach.
+  const { data: firmaRow } = await admin.from("firma_stammdaten").select("firma_name, email, web")
+    .eq("mandant_id", mandant).eq("aktiv", true).order("sortierung").limit(1).maybeSingle();
+  const firma = firmaRow?.firma_name || (Deno.env.get("SMTP_FROM_NAME") || "ImmoOffice");
+  const fromEmail = (Deno.env.get("SMTP_FROM_EMAIL") || "").trim();
   const email = o.email.trim().toLowerCase();
   const maklerName = o.makler?.name || firma;
   const empfaengerName = [o.vorname, o.nachname].filter(Boolean).join(" ");
@@ -95,7 +104,13 @@ export async function einladungVersenden(admin: SupabaseClient, o: {
     }
     if (!link) throw new Error("Kein Anmeldelink erzeugt.");
     Object.assign(mail, baueEinladungsMail({ anrede, link, makler: maklerName, telefon: o.makler?.telefon || "", firma, web: firmaRow?.web || "", erneut: o.erneut, zugangUrl: zugangUrlAus(o.redirectTo) }));
-    const replyTo = o.makler?.email && /@immooffice.example\.de$/i.test(o.makler.email) ? o.makler.email : fromEmail;
+    // Die Absenderadresse bleibt die der Plattform: ein Mailanbieter
+    // verschickt nur von einer Domain, die ihm nachgewiesen ist (SPF/DKIM).
+    // Die ANTWORT soll aber beim Makler landen, nicht bei der Plattform.
+    // Die alte Bedingung prüfte auf die Platzhalterdomain und traf deshalb
+    // nie zu — jede Antwort ging ins Leere. Jetzt: der Makler, sonst die
+    // Adresse seines Hauses, sonst die Plattform.
+    const replyTo = (o.makler?.email || firmaRow?.email || fromEmail || "").trim();
     const r = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({ from: `${firma} <${fromEmail}>`, to: [email], reply_to: replyTo, subject: mail.betreff, text: mail.text, html: mail.html }) });
     const rTxt = await r.text();

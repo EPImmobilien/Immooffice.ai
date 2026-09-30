@@ -165,7 +165,7 @@ Deno.serve(async (req) => {
     // 4) Einladung verschicken (Resend mit eigenem Absender, sonst Supabase-Auth)
     let versandweg = "resend"; let mailFehler: string | null = null;
     try {
-      const erg = await einladungVersenden(adminClient, {
+      const erg = await einladungVersenden(adminClient, mandantDesAufrufers, {
         email, userId: authUserId,
         vorname: vorname || bestehend?.vorname || "", nachname: nachname || bestehend?.nachname || "",
         anrede: anrede || bestehend?.anrede || "", titel: titel || bestehend?.titel || "",

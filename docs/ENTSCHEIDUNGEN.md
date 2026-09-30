@@ -3190,3 +3190,48 @@ in JavaScript nach der Abfrage greift, sieht sie als Fundstelle, obwohl sie
 richtig ist. Beide Fälle sind im Buch vermerkt, wo sie vorkommen. Sie ist ein
 Netz gegen das unbemerkte Hinzukommen, kein Beweis der Richtigkeit.
 
+---
+
+## Vier Dateien, die die Prüfung nicht sah (30.09.2026)
+
+Nachdem das Buch auf null offene Stellen stand, fiel beim Weiterarbeiten auf,
+dass `einladung-mail.ts` nicht darin vorkam — obwohl die Datei
+`firma_stammdaten` ohne Mandantenfilter liest.
+
+**Der Grund war die Prüfung selbst.** Sie überging jede Datei, in der
+`SERVICE_ROLE` nicht vorkommt — in der Annahme, dass dann kein
+Dienstschlüssel im Spiel ist. Die vier Kopien von `einladung-mail.ts` nennen
+`SERVICE_ROLE` nirgends: sie bekommen den fertigen Client als Parameter
+`admin: SupabaseClient` herein. Eine Prüfung, die nach dem **Schlüssel**
+sucht statt nach seiner **Wirkung**, sieht daran vorbei.
+
+Sie sucht jetzt auch nach `admin`/`db`/`supabase` mit dem Typ `any` oder
+`SupabaseClient`. Damit kamen genau die vier fehlenden Fundstellen zutage —
+und keine weitere.
+
+**Was dort stand:** die Einladungsmail an einen Eigentümer holte Firmenname,
+E-Mail und Netzauftritt aus dem erstbesten aktiven Standort der Plattform.
+Der Eigentümer des einen Maklers hätte Namen, Adresse und Webseite des
+anderen gelesen — im Absender, in der Grußformel und im Fuß.
+
+Zwei Kleinigkeiten kamen dabei mit heraus:
+
+- Der Rückfall für den Firmennamen war `"Musterhaus Immobilien GmbH"`, der
+  Name des Demo-Mandanten. Jetzt der Plattformname.
+- Die Antwortadresse prüfte `/@immooffice.example\.de$/` — die
+  Platzhalterdomain. Diese Bedingung konnte **nie** zutreffen, also ging jede
+  Antwort eines Eigentümers an die Plattform statt an seinen Makler. Jetzt:
+  der Makler, sonst die Adresse seines Hauses, sonst die Plattform.
+
+Zur Absenderadresse selbst: sie bleibt die der Plattform. Ein Mailanbieter
+verschickt nur von einer Domain, die ihm nachgewiesen ist (SPF/DKIM); eine
+fremde Adresse als `From` wird abgewiesen oder landet im Spam. Was je Mandant
+wechselt, sind **Anzeigename** und **Antwortadresse**. Eigene Absenderdomains
+je Mandant gehören zur Anbieter-Schicht in Phase 6.
+
+**Die Lehre:** Ein Gate ist so gut wie sein Auswahlkriterium, und das
+Auswahlkriterium steht meistens nicht im Test, sondern in der Annahme darüber,
+wie der geprüfte Code gebaut ist. Diese Annahme gehört mitgeprüft — hier hat
+sie vier Dateien versteckt, und zwar ausgerechnet die, in denen der Fehler
+stand.
+

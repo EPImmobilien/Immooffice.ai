@@ -91,7 +91,7 @@ Deno.serve(async (req) => {
     if (!makler) { const { data: chef } = await admin.from("profiles").select("id, name, email, telefon").eq("mandant_id", mandant).eq("role", "chef").limit(1).maybeSingle(); makler = chef || null; }
 
     try {
-      const erg = await einladungVersenden(admin, { email, userId, vorname, nachname, anrede, titel, redirectTo: portalUrl, makler, erneut: true });
+      const erg = await einladungVersenden(admin, mandant, { email, userId, vorname, nachname, anrede, titel, redirectTo: portalUrl, makler, erneut: true });
       if (eigentuemerId) {
         await admin.from("aktivitaeten").insert({ zielgruppe: "makler", eigentuemer_id: eigentuemerId, typ: "einladung_nachgefasst", titel: `Anmeldelink selbst angefordert: ${email}`, text: `Der Eigentümer hat auf der Anmeldeseite einen neuen Anmeldelink angefordert (Versandweg ${erg.versandweg}).`, ref_tabelle: "eigentuemer", ref_id: eigentuemerId }).then(() => {}, () => {});
         await admin.from("eigentuemer_einladungen").update({ erinnert_am: new Date().toISOString(), versandweg: erg.versandweg, letzter_fehler: null }).eq("mandant_id", mandant).eq("eigentuemer_id", eigentuemerId).eq("status", "offen").then(() => {}, () => {});

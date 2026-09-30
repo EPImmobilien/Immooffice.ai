@@ -2756,6 +2756,42 @@ NACHBESSERN = [
      '          ? await admin.from("kontakte").select("id, email").eq("mandant_id", profile?.mandant_id ?? "00000000-0000-0000-0000-000000000000").or(sicher.map((z) => `email.ilike.${z}`).join(",")).limit(200)',
      'Mail senden: die Kontaktzuordnung bleibt im eigenen Mandanten.',
      {'mail-senden'}),
+
+    # --- Phase 2.4, sechster Block: die vier Kopien von einladung-mail.ts -
+    # Vier Dateien mit demselben Inhalt, und in allen vieren derselbe Fehler:
+    # der Briefkopf der Einladungsmail kam aus dem erstbesten aktiven Standort
+    # der Plattform. Der Eigentuemer des einen Maklers las Namen, Adresse und
+    # Netzauftritt des anderen.
+    ('FORK',
+     'export async function einladungVersenden(admin: SupabaseClient, o: {',
+     'export async function einladungVersenden(admin: SupabaseClient, mandant: string, o: {',
+     'Einladungsmail: die Versandfunktion bekommt den Mandanten (4 Kopien).',
+     {'eigentuemer-einladung-nachfassen', 'eigentuemer-zugang-anfordern', 'eigentuemer-link-erneut-senden', 'eigentuemer-einladen'}),
+    ('FORK',
+     '  const { data: firmaRow } = await admin.from("firma_stammdaten").select("firma_name, email, web").eq("aktiv", true).order("sortierung").limit(1).maybeSingle();\n  const firma = firmaRow?.firma_name || "Musterhaus Immobilien GmbH";\n  const fromEmail = (Deno.env.get("SMTP_FROM_EMAIL") || firmaRow?.email || "info@immooffice.example").trim();',
+     '  // Diese Zeile bestimmt, welcher Firmenname unter der Einladung steht und\n  // an wen der Eigentuemer antwortet. Ohne Mandantenfilter war es der\n  // erstbeste aktive Standort der ganzen Plattform — die Einladung des\n  // einen Maklers trug Namen, Adresse und Netzauftritt des anderen.\n  //\n  // Die Pruefung hat diese vier Kopien lange nicht gesehen: sie nennen\n  // SERVICE_ROLE nirgends, sondern bekommen den fertigen Client als\n  // Parameter. Seit dem 30.09.2026 sucht sie auch danach.\n  const { data: firmaRow } = await admin.from("firma_stammdaten").select("firma_name, email, web")\n    .eq("mandant_id", mandant).eq("aktiv", true).order("sortierung").limit(1).maybeSingle();\n  const firma = firmaRow?.firma_name || (Deno.env.get("SMTP_FROM_NAME") || "ImmoOffice");\n  const fromEmail = (Deno.env.get("SMTP_FROM_EMAIL") || "").trim();',
+     'Einladungsmail: Briefkopf und Absender aus dem eigenen Mandanten (4 Kopien).',
+     {'eigentuemer-einladung-nachfassen', 'eigentuemer-zugang-anfordern', 'eigentuemer-link-erneut-senden', 'eigentuemer-einladen'}),
+    ('FORK',
+     '    const replyTo = o.makler?.email && /@immooffice.example\\.de$/i.test(o.makler.email) ? o.makler.email : fromEmail;',
+     '    // Die Absenderadresse bleibt die der Plattform: ein Mailanbieter\n    // verschickt nur von einer Domain, die ihm nachgewiesen ist (SPF/DKIM).\n    // Die ANTWORT soll aber beim Makler landen, nicht bei der Plattform.\n    // Die alte Bedingung prüfte auf die Platzhalterdomain und traf deshalb\n    // nie zu — jede Antwort ging ins Leere. Jetzt: der Makler, sonst die\n    // Adresse seines Hauses, sonst die Plattform.\n    const replyTo = (o.makler?.email || firmaRow?.email || fromEmail || "").trim();',
+     'Einladungsmail: die Antwort geht an den Makler, nicht an die Plattform (4 Kopien).',
+     {'eigentuemer-einladung-nachfassen', 'eigentuemer-zugang-anfordern', 'eigentuemer-link-erneut-senden', 'eigentuemer-einladen'}),
+    ('FORK',
+     '      const erg = await einladungVersenden(adminClient, {\n        email, userId: authUserId,',
+     '      const erg = await einladungVersenden(adminClient, mandantDesAufrufers, {\n        email, userId: authUserId,',
+     'Eigentuemer einladen: der Mandant wird an die Versandfunktion gereicht.',
+     {'eigentuemer-einladen'}),
+    ('FORK',
+     '      const erg = await einladungVersenden(adminClient, {\n        email, userId: userIdGefunden, vorname, nachname, anrede, titel, redirectTo: redirect, makler, erneut: !!userIdGefunden,\n      });',
+     '      const mandantDesAufrufers = await immoMandantDesAufrufers(req);\n      if (!mandantDesAufrufers) throw new Error("Kein Mandant am Konto — ohne den kein Anmeldelink.");\n      const erg = await einladungVersenden(adminClient, mandantDesAufrufers, {\n        email, userId: userIdGefunden, vorname, nachname, anrede, titel, redirectTo: redirect, makler, erneut: !!userIdGefunden,\n      });',
+     'Anmeldelink erneut: der Mandant des Aufrufers geht mit.',
+     {'eigentuemer-link-erneut-senden'}),
+    ('FORK',
+     '      const erg = await einladungVersenden(admin, { email, userId, vorname, nachname, anrede, titel, redirectTo: portalUrl, makler, erneut: true })',
+     '      const erg = await einladungVersenden(admin, mandant, { email, userId, vorname, nachname, anrede, titel, redirectTo: portalUrl, makler, erneut: true })',
+     'Zugang anfordern: der Mandant des Kontos geht mit.',
+     {'eigentuemer-zugang-anfordern'}),
 ]
 
 

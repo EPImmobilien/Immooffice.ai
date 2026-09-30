@@ -116,8 +116,17 @@ def finde(tabellen):
     treffer = []
     for p in sorted(FUNKTIONEN.rglob('*.ts')):
         t = p.read_text(encoding='utf-8')
-        # Nur Funktionen, die ueberhaupt mit dem Dienstschluessel arbeiten.
-        if 'SERVICE_ROLE' not in t:
+        # Nur Dateien, in denen ein Dienstschluessel-Client vorkommt — direkt
+        # ueber die Umgebungsvariable oder als uebergebener Parameter.
+        #
+        # Der Parameterfall hat am 30.09.2026 vier Fundstellen verdeckt: die
+        # vier Kopien von einladung-mail.ts nennen SERVICE_ROLE nirgends, sie
+        # bekommen den fertigen Client als `admin` herein. Eine Pruefung, die
+        # nach dem Schluessel sucht statt nach seiner Wirkung, sieht daran
+        # vorbei — und ausgerechnet dort stand der Briefkopf eines fremden
+        # Maklers in der Einladungsmail.
+        if 'SERVICE_ROLE' not in t and not re.search(
+                r'\b(admin|db|supabase)\s*:\s*(any|SupabaseClient)\b', t):
             continue
         for m in re.finditer(r'\.from\("([a-z_]+)"\)', t):
             tab = m.group(1)

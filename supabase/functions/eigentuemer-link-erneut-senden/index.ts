@@ -159,7 +159,9 @@ Deno.serve(async (req) => {
 
     let methode = "resend"; let neuerUserId: string | null = null;
     try {
-      const erg = await einladungVersenden(adminClient, {
+      const mandantDesAufrufers = await immoMandantDesAufrufers(req);
+      if (!mandantDesAufrufers) throw new Error("Kein Mandant am Konto — ohne den kein Anmeldelink.");
+      const erg = await einladungVersenden(adminClient, mandantDesAufrufers, {
         email, userId: userIdGefunden, vorname, nachname, anrede, titel, redirectTo: redirect, makler, erneut: !!userIdGefunden,
       });
       methode = erg.versandweg === "resend" ? "resend" : erg.methode;
