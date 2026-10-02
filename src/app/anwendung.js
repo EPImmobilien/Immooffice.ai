@@ -1,4 +1,4 @@
-/* ImmoOffice – vorkompiliert 26.09.2026 (Exposé aus dem Objekt + Objektseiten-Vorschau; Exposé geladen = kein Hinweis; Newsletter-Schalter; Vorgaenge unter Weitere Aktionen; Einstellungen im Portal; Ehepaare und Erbengemeinschaften; Expose nur nach Auswahl; E-Mail-Knopf am Kontakt; Text am Griff drehen; Linien und schraege Schrift; Mitarbeiterkonten sofort nutzbar; Pfeile im Bild-Editor; Bildunterschrift als Dateiname; Checkliste fuer Eigentumswohnungen; Maklervertrag ohne doppelten Ort; Adressbuch: Vorgaenge, Expose, Zustaendig; Weiterleiten mit Anhaengen; Kalender: Termine ueber Fahrtzeiten; Energieausweis ohne Pflicht nach GEG; Bildunterschriften per KI; Einwertung: Finanzierungsannahmen aus dem Admin; Objekt-Landingpage für Interessenten; Kaufpreis auf Anfrage: interner Preis fürs Exposé; Termineinladungen im Posteingang annehmen und eintragen; Einwertung: Objektart frei eintragbar; Neubau-Nachrichten je Projekt mit Antwort und Zähler; Newsletter-Werkzeug mit Kampagnen und Immobilie des Monats; Newsletter-Anmeldungen mit Liste und Filtern; Eigentümer-Akte mit Besichtigungen; Posteingang-Spalten ziehbar; Eigentümer am Objekt: verknüpfen oder neu anlegen; API ohne Browser-Cache, Kalender-Ladefehler sichtbar; Besichtigungen für Eigentümer: Kontakt, Bestätigung, Portal-Zähler; Outlook-Ordner im Posteingang; ToDo-Kontakt; Stundenkonto klar; Kalender-Sicht; Urlaubszählung nach Teilnehmern; Mail-Übergabe ins Fenster; Unter-Verlauf; Kalenderfarben je Person; Exposé-Karte eingeklappt; Marketing-Objektquelle; Texte-Format; Marketing-Grundstück; Exposé-Direktlink; Exposé-nicht-abgerufen-Karte inkl. Agreementlinks + Erinnerungsmail; Heute-Zone: nur eigene fällige ToDos; Neubauportal: Status/Bearbeiten/Adressbuch/Datei-Freigabe/Projekt-Vorlage; Kontakte-Ausbau; Akquise-Ausbau; Listen-Suche; Kalender-Karte; Löschschutz; Anruferkennung; Termineinladungen; Exposé-Freigabe robust; Widget-Daten; Offline-Mappe; Fehlerprotokoll; Einwertung ohne PPTX; Dashboard Heute nachrückend; Suchkriterien-Abgleich; Adressbuch-Werkzeuge; Mail-Anhang per Ablage; Termin-Hinweis im Adressbuch; Grundstücksdaten; Arbeitszeit h:mm; Termine ziehen; Posteingang im eigenen Fenster; Push-Mitteilungen; Zins & Preis; Warnzone mit Sprungzielen; Kostenrechner je Objekt; Telefonate per Klick; 360°-Rundgang-Modul; Hausgeld; HTML-Mailansicht v2.1; ComboFeld/ComboSelect; Termin-ICS; Kontaktwahl Vorlagen; Kachelpreis; Buchhaltungs-Kennzeichen; Vorlage extern) */
+/* ImmoOffice – vorkompiliert 02.10.2026 (Exposé aus dem Objekt + Objektseiten-Vorschau; Exposé geladen = kein Hinweis; Newsletter-Schalter; Vorgaenge unter Weitere Aktionen; Einstellungen im Portal; Ehepaare und Erbengemeinschaften; Expose nur nach Auswahl; E-Mail-Knopf am Kontakt; Text am Griff drehen; Linien und schraege Schrift; Mitarbeiterkonten sofort nutzbar; Pfeile im Bild-Editor; Bildunterschrift als Dateiname; Checkliste fuer Eigentumswohnungen; Maklervertrag ohne doppelten Ort; Adressbuch: Vorgaenge, Expose, Zustaendig; Weiterleiten mit Anhaengen; Kalender: Termine ueber Fahrtzeiten; Energieausweis ohne Pflicht nach GEG; Bildunterschriften per KI; Einwertung: Finanzierungsannahmen aus dem Admin; Objekt-Landingpage für Interessenten; Kaufpreis auf Anfrage: interner Preis fürs Exposé; Termineinladungen im Posteingang annehmen und eintragen; Einwertung: Objektart frei eintragbar; Neubau-Nachrichten je Projekt mit Antwort und Zähler; Newsletter-Werkzeug mit Kampagnen und Immobilie des Monats; Newsletter-Anmeldungen mit Liste und Filtern; Eigentümer-Akte mit Besichtigungen; Posteingang-Spalten ziehbar; Eigentümer am Objekt: verknüpfen oder neu anlegen; API ohne Browser-Cache, Kalender-Ladefehler sichtbar; Besichtigungen für Eigentümer: Kontakt, Bestätigung, Portal-Zähler; Outlook-Ordner im Posteingang; ToDo-Kontakt; Stundenkonto klar; Kalender-Sicht; Urlaubszählung nach Teilnehmern; Mail-Übergabe ins Fenster; Unter-Verlauf; Kalenderfarben je Person; Exposé-Karte eingeklappt; Marketing-Objektquelle; Texte-Format; Marketing-Grundstück; Exposé-Direktlink; Exposé-nicht-abgerufen-Karte inkl. Agreementlinks + Erinnerungsmail; Heute-Zone: nur eigene fällige ToDos; Neubauportal: Status/Bearbeiten/Adressbuch/Datei-Freigabe/Projekt-Vorlage; Kontakte-Ausbau; Akquise-Ausbau; Listen-Suche; Kalender-Karte; Löschschutz; Anruferkennung; Termineinladungen; Exposé-Freigabe robust; Widget-Daten; Offline-Mappe; Fehlerprotokoll; Einwertung ohne PPTX; Dashboard Heute nachrückend; Suchkriterien-Abgleich; Adressbuch-Werkzeuge; Mail-Anhang per Ablage; Termin-Hinweis im Adressbuch; Grundstücksdaten; Arbeitszeit h:mm; Termine ziehen; Posteingang im eigenen Fenster; Push-Mitteilungen; Zins & Preis; Warnzone mit Sprungzielen; Kostenrechner je Objekt; Telefonate per Klick; 360°-Rundgang-Modul; Hausgeld; HTML-Mailansicht v2.1; ComboFeld/ComboSelect; Termin-ICS; Kontaktwahl Vorlagen; Kachelpreis; Buchhaltungs-Kennzeichen; Vorlage extern) */
 /*
  * API ohne Browser-Zwischenspeicher, Ladefehler sichtbar (Stufe 43).
  *
@@ -2562,6 +2562,7 @@ function PageShell({
   onSuche: l,
   onNavigate: i,
   breit: o,
+  ohneTitel: epOhneTitel,
   children: s
 }) {
   const [c, d] = React.useState(() => "undefined" != typeof window && window.matchMedia("(max-width: 768px)").matches);
@@ -2736,9 +2737,10 @@ function PageShell({
     style: {
       maxWidth: o ? "none" : 1200,
       margin: "0 auto",
-      padding: c ? "20px 14px" : o ? "36px 28px" : "48px 24px"
-    }
-  }, React.createElement("div", {
+      padding: epOhneTitel ? (c ? "10px 14px" : "16px 28px") : c ? "20px 14px" : o ? "36px 28px" : "48px 24px"
+    },
+    "data-ep-seite-ohne-titel": epOhneTitel ? "1" : void 0
+  }, epOhneTitel ? null : React.createElement("div", {
     style: {
       marginBottom: c ? 24 : 40,
       borderLeft: `3px solid ${CI.gold}`,
@@ -14825,7 +14827,13 @@ function WohnflaechenRechner({
           fontFamily: FONT,
           color: CI.blau
         }
-      }, "+ Abzug"), t("button", {
+      }, "+ Abzug"), t(EpWfDachschraegeKnopf, {
+        raum: a,
+        onUebernehmen: (z, sch) => A(e => {
+          e.geschosse[n].raeume[r].teile = z;
+          e.geschosse[n].raeume[r].schraege = sch
+        })
+      }), t("button", {
         onClick: () => A(e => {
           e.geschosse[n].raeume.splice(r, 1)
         }),
@@ -15860,16 +15868,32 @@ function(e) {
             aussen: s,
             quelle: [e]
           })
-        } else p.push({
-          p1: r,
-          p2: o,
-          d: e.d,
-          n: e.n,
-          dicke: 2 === t ? 12 : 24,
-          art: "frei",
-          aussen: null,
-          quelle: [e]
-        })
+        } else {
+          var sf = 0 === t && "function" == typeof n.seiteFuer ? n.seiteFuer(e) || 0 : 0;
+          if (1 === sf || -1 === sf) {
+            var s2 = i(e.n, -sf),
+              c2 = i(s2, (n.aussenDicke || 30) / 200);
+            p.push({
+              p1: l(r, c2),
+              p2: l(o, c2),
+              d: e.d,
+              n: e.n,
+              dicke: n.aussenDicke || 30,
+              art: "aussen",
+              aussen: s2,
+              quelle: [e]
+            })
+          } else p.push({
+            p1: r,
+            p2: o,
+            d: e.d,
+            n: e.n,
+            dicke: 2 === t ? 12 : 24,
+            art: "frei",
+            aussen: null,
+            quelle: [e]
+          })
+        }
       })
     });
     var j = [];
@@ -19208,10 +19232,11 @@ async function epPdfAufPersonendatenPruefen(e, t) {
     beispiele: i.filter(e => e.sicher).slice(0, 5).map(e => e.text)
   }
 }
-const GE_EDITOR_HTML = "<!doctype html>\n<html lang=\"de\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>Grundriss-Editor – ImmoOffice</title>\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link href=\"https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js\"><\/script>\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js\"><\/script>\n<script>if (window.self !== window.top) document.documentElement.classList.add(\"eingebettet\");<\/script>\n<style>\n  :root { --navy: #263159; --navy-dark: #1a2342; --gold: #D4A567; --gold-dunkel: #a87b2e; --ink: #1f2433; --muted: #6b7280; --line: #e1e4ec; --bg: #eef0f5; --rot: #d2232a; --gruen: #2f8f5b; --amber: #c98a12; }\n  * { box-sizing: border-box; }\n  html, body { height: 100%; margin: 0; }\n  body { font-family: 'Montserrat', system-ui, sans-serif; font-size: 13px; color: var(--ink); background: var(--bg); overflow: hidden; }\n  button, input, select, textarea { font: inherit; color: inherit; }\n  #app { display: grid; grid-template-columns: 64px 1fr 276px; grid-template-rows: 56px 1fr; height: 100vh; position: relative; }\n  #app.drop::after { content: 'Loslassen zum Laden'; position: absolute; inset: 0; background: rgba(38,49,89,.55); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 600; z-index: 50; pointer-events: none; }\n\n  /* Kopf */\n  header { grid-column: 1 / -1; background: var(--navy-dark); color: #fff; display: flex; align-items: center; gap: 14px; padding: 0 16px 0 14px; }\n  .marke { display: flex; flex-direction: column; line-height: 1.15; min-width: 150px; }\n  .marke .eyebrow { font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); font-weight: 600; }\n  .marke .titel { font-size: 15px; font-weight: 600; }\n  html.eingebettet .marke { display: none; }\n  .datei { display: flex; align-items: center; gap: 8px; padding-left: 14px; border-left: 1px solid rgba(255,255,255,.15); min-width: 0; }\n  #dateiName { color: rgba(255,255,255,.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; font-weight: 500; }\n  .kopfrest { margin-left: auto; display: flex; align-items: center; gap: 10px; }\n  .kbtn { background: transparent; border: 1px solid rgba(255,255,255,.22); color: #fff; border-radius: 6px; padding: 6px 10px; cursor: pointer; font-weight: 500; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }\n  .kbtn:hover { background: rgba(255,255,255,.08); }\n  .kbtn:disabled { opacity: .35; cursor: default; }\n  .kbtn.gold { background: var(--gold); border-color: var(--gold); color: var(--navy-dark); font-weight: 600; }\n  .kbtn.gold:hover { background: #e0b77b; }\n  .gruppe { display: inline-flex; border: 1px solid rgba(255,255,255,.22); border-radius: 6px; overflow: hidden; }\n  .gruppe .kbtn { border: 0; border-radius: 0; padding: 6px 9px; }\n  .gruppe .kbtn + .kbtn { border-left: 1px solid rgba(255,255,255,.18); }\n  #zoomWert { min-width: 52px; text-align: center; font-variant-numeric: tabular-nums; }\n  select.kopf { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.22); border-radius: 6px; padding: 5px 8px; font-size: 12px; }\n  select.kopf option { color: var(--ink); }\n\n  /* Maßstab-Chip: das Schriftfeld des Blattes */\n  .chip { display: inline-flex; align-items: center; gap: 10px; border-radius: 6px; padding: 5px 10px 5px 8px; cursor: pointer; border: 1px solid transparent; }\n  .chip svg { width: 18px; height: 18px; flex: none; }\n  .chip .chip-wert { font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .02em; }\n  .chip .chip-info { font-size: 11px; opacity: .85; }\n  .chip-amber { background: rgba(201,138,18,.18); border-color: rgba(201,138,18,.6); color: #ffd47a; }\n  .chip-gruen { background: rgba(47,143,91,.2); border-color: rgba(47,143,91,.7); color: #8be0ad; }\n  .chip:hover { filter: brightness(1.12); }\n\n  /* Werkzeugleiste */\n  nav { background: var(--navy); display: flex; flex-direction: column; padding: 10px 0; gap: 2px; }\n  .tool { background: transparent; border: 0; color: rgba(255,255,255,.72); width: 100%; padding: 8px 0 7px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 9.5px; letter-spacing: .04em; text-transform: uppercase; border-left: 3px solid transparent; }\n  .tool svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }\n  .tool:hover { color: #fff; background: rgba(255,255,255,.06); }\n  .tool.aktiv { color: #fff; border-left-color: var(--gold); background: rgba(255,255,255,.1); }\n  .tool.aktiv svg { stroke: var(--gold); }\n  nav .trenner { height: 1px; background: rgba(255,255,255,.12); margin: 6px 12px; }\n\n  /* Werkstatt */\n  #werkstatt { position: relative; overflow: auto; background-color: var(--bg); background-image: radial-gradient(rgba(38,49,89,.13) 1px, transparent 1px); background-size: 18px 18px; cursor: crosshair; }\n  #werkstatt.hand { cursor: grab; } #werkstatt.greift { cursor: grabbing; }\n  #blatt { position: relative; margin: 24px; background: #fff; box-shadow: 0 1px 2px rgba(26,35,66,.12), 0 10px 30px rgba(26,35,66,.16); }\n  #seite { position: absolute; left: 0; top: 0; display: block; }\n  #overlay { position: absolute; left: 0; top: 0; overflow: visible; touch-action: none; }\n  #overlay[data-werkzeug=\"auswahl\"] { cursor: default; }\n  #overlay:not([data-werkzeug=\"auswahl\"]) .el, #overlay:not([data-werkzeug=\"auswahl\"]) .el * { pointer-events: none !important; }\n  #overlay .el:hover .hit { cursor: move; }\n  #overlay .griff { cursor: move; }\n  #leer { position: absolute; left: 64px; top: 56px; right: 276px; bottom: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }\n  #leer .box { pointer-events: auto; border: 1.5px dashed var(--gold); border-radius: 10px; background: rgba(255,255,255,.9); padding: 34px 40px; text-align: center; max-width: 440px; }\n  #leer h2 { margin: 0 0 6px; font-size: 17px; font-weight: 600; color: var(--navy); }\n  #leer p { margin: 0 0 16px; color: var(--muted); line-height: 1.5; }\n  .aus { display: none !important; }\n  #laden { position: absolute; left: 64px; top: 56px; right: 276px; bottom: 0; background: rgba(238,240,245,.7); display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--navy); font-weight: 600; z-index: 30; }\n  #laden i { width: 18px; height: 18px; border: 2.5px solid rgba(38,49,89,.25); border-top-color: var(--navy); border-radius: 50%; animation: dreh .8s linear infinite; }\n  @keyframes dreh { to { transform: rotate(360deg); } }\n  @media (prefers-reduced-motion: reduce) { #laden i { animation: none; } }\n  #neuPop { position: absolute; z-index: 41; left: 50%; top: 40%; transform: translate(-50%, -50%); background: #fff; border: 1px solid var(--line); border-top: 3px solid var(--gold); border-radius: 8px; box-shadow: 0 10px 30px rgba(26,35,66,.18); padding: 14px 16px; width: 340px; }\n  #neuPop .t { font-weight: 600; color: var(--navy); margin-bottom: 4px; }\n  #neuPop .s { color: var(--muted); font-size: 11.5px; margin-bottom: 10px; }\n  #neuPop .feld { display: block; margin-bottom: 8px; }\n  #neuPop .feld span { display: block; font-size: 11px; color: var(--muted); margin-bottom: 3px; }\n  #neuPop select, #neuPop input { width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; font: inherit; }\n  #neuPop .knopfzeile { display: flex; gap: 8px; margin-top: 10px; }\n  #kalibPop { position: absolute; z-index: 40; background: #fff; border: 1px solid var(--line); border-top: 3px solid var(--gold); border-radius: 8px; box-shadow: 0 10px 30px rgba(26,35,66,.18); padding: 12px 14px; width: 280px; }\n  #kalibPop .t { font-weight: 600; color: var(--navy); margin-bottom: 4px; }\n  #kalibPop .s { color: var(--muted); font-size: 11.5px; margin-bottom: 8px; }\n  #kalibPop .zeile { display: flex; gap: 6px; align-items: center; }\n  #kalibPop input { flex: 1; }\n\n  /* Eigenschaften */\n  aside { background: #fff; border-left: 1px solid var(--line); overflow: auto; padding: 4px 0 20px; }\n  .abschnitt { padding: 14px 16px 16px; border-bottom: 1px solid var(--line); }\n  .abschnitt-titel { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-dunkel); font-weight: 700; margin-bottom: 10px; }\n  .feld { display: block; margin-bottom: 10px; }\n  .feld > span { display: block; font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 500; }\n  .feld input[type=\"text\"], .feld input[type=\"number\"], .feld select, .feld textarea, #kalibPop input { width: 100%; border: 1px solid #cfd4e0; border-radius: 6px; padding: 7px 9px; background: #fff; font-size: 13px; }\n  .feld input:focus, .feld select:focus, .feld textarea:focus, #kalibPop input:focus { outline: 2px solid rgba(212,165,103,.55); outline-offset: 0; border-color: var(--gold); }\n  .feld textarea { resize: vertical; min-height: 54px; }\n  .zeile { display: flex; gap: 6px; }\n  .zeile input { flex: 1; }\n  .swatches { display: flex; gap: 8px; }\n  .swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #cfd4e0; cursor: pointer; padding: 0; }\n  .swatch.aktiv { box-shadow: 0 0 0 2px var(--gold); }\n  .farbwahl { position: relative; width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #cfd4e0; cursor: pointer; background: conic-gradient(#e2412f, #f0b400, #45b356, #2f80d6, #8e44ad, #e2412f); display: flex; align-items: center; justify-content: center; overflow: hidden; }\n  .farbwahl.aktiv { box-shadow: 0 0 0 2px var(--gold); background: var(--farbe, #263159); }\n  .farbwahl span { color: #fff; font-weight: 700; font-size: 15px; line-height: 1; text-shadow: 0 0 2px rgba(0,0,0,.5); pointer-events: none; }\n  .farbwahl.aktiv span { display: none; }\n  .zeile2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }\n  .griff.dreh { cursor: grab; }\n  .farbwahl input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; padding: 0; border: 0; }\n  .check { display: flex; gap: 8px; align-items: flex-start; margin: 8px 0; line-height: 1.35; cursor: pointer; }\n  .check input { margin: 2px 0 0; accent-color: var(--navy); }\n  .check em { font-style: normal; color: var(--muted); font-size: 11px; }\n  .hinweis { color: var(--muted); line-height: 1.5; margin: 6px 0 0; }\n  .hinweis.klein { font-size: 11px; }\n  .elinfo { font-weight: 600; color: var(--navy); margin: 6px 0 12px; font-variant-numeric: tabular-nums; }\n  .knopfzeile { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }\n  .btn { border: 1px solid #cfd4e0; background: #fff; border-radius: 6px; padding: 7px 11px; cursor: pointer; font-weight: 500; font-size: 12px; color: var(--navy); }\n  .btn:hover { background: #f3f4f8; border-color: #b9c0d1; }\n  .btn-rot { color: var(--rot); border-color: rgba(210,35,42,.4); }\n  .btn-rot:hover { background: rgba(210,35,42,.06); }\n  .btn.gold { background: var(--gold); border-color: var(--gold); color: var(--navy-dark); font-weight: 600; }\n  .kv { display: grid; grid-template-columns: 70px 1fr; gap: 5px 8px; margin-bottom: 12px; line-height: 1.4; }\n  .kv span { color: var(--muted); font-size: 11px; padding-top: 1px; }\n  .kv b { font-weight: 500; word-break: break-word; }\n  :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }\n  @media (max-width: 900px) { #app { grid-template-columns: 64px 1fr; } #leer, #laden { right: 0; } aside { position: absolute; right: 0; top: 56px; bottom: 0; width: 276px; box-shadow: -6px 0 20px rgba(26,35,66,.12); } }\n</style>\n</head>\n<body>\n<div id=\"app\">\n  <header>\n    <div class=\"marke\"><span class=\"eyebrow\">ImmoOffice · Werkzeuge</span><span class=\"titel\">Grundriss-Editor</span></div>\n    <div class=\"datei\">\n      <button type=\"button\" class=\"kbtn\" id=\"btnNeu\" title=\"Neues leeres Zeichenblatt anlegen\">Neu</button>\n      <button type=\"button\" class=\"kbtn\" id=\"btnOeffnen\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M4 4h7l2 2h7v13H4z\"/></svg>Plan öffnen</button>\n      <span id=\"dateiName\">Kein Plan geladen</span>\n      <select class=\"kopf\" id=\"seitenWahl\" style=\"display:none\"></select>\n    </div>\n    <div class=\"chip chip-amber\" id=\"kalibChip\" title=\"Maßstab prüfen oder kalibrieren (K)\">\n      <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"><rect x=\"2.5\" y=\"8\" width=\"19\" height=\"8\" rx=\"1\"/><path d=\"M6.5 8v3M10 8v4.5M13.5 8v3M17 8v4.5\"/></svg>\n      <span><span class=\"chip-wert\">1 : 100</span><br><span class=\"chip-info\">angenommen · bitte prüfen</span></span>\n    </div>\n    <div class=\"kopfrest\">\n      <div class=\"gruppe\">\n        <button type=\"button\" class=\"kbtn\" id=\"btnUndo\" title=\"Rückgängig (Strg+Z)\">↶</button>\n        <button type=\"button\" class=\"kbtn\" id=\"btnRedo\" title=\"Wiederholen (Strg+Y)\">↷</button>\n      </div>\n      <div class=\"gruppe\">\n        <button type=\"button\" class=\"kbtn\" id=\"btnZoomMinus\" title=\"Verkleinern (−)\">−</button>\n        <button type=\"button\" class=\"kbtn\" id=\"btnZoomFit\" title=\"Zeichnung einpassen (0) · mit Shift: ganzes Blatt\"><span id=\"zoomWert\">100 %</span></button>\n        <button type=\"button\" class=\"kbtn\" id=\"btnZoomPlus\" title=\"Vergrößern (+)\">+</button>\n      </div>\n      <button type=\"button\" class=\"kbtn\" id=\"btnLeeren\" title=\"Alle Einträge dieser Seite löschen\">Leeren</button>\n      <button type=\"button\" class=\"kbtn\" id=\"btnVollbild\" title=\"Editor bildschirmfüllend anzeigen\">Vollbild</button>\n      <div class=\"gruppe\">\n        <button type=\"button\" class=\"kbtn\" id=\"btnJsonLaden\" title=\"Gespeicherten Bearbeitungsstand (.json) laden\">Stand laden</button>\n        <button type=\"button\" class=\"kbtn\" id=\"btnJson\" title=\"Bearbeitungsstand als .json sichern (Strg+S)\">Stand sichern</button>\n      </div>\n      <select class=\"kopf\" id=\"exportGroesse\" title=\"Auflösung des PNG (längste Kante)\">\n        <option value=\"2500\">PNG 2500 px</option>\n        <option value=\"4000\" selected>PNG 4000 px</option>\n        <option value=\"6000\">PNG 6000 px</option>\n      </select>\n      <button type=\"button\" class=\"kbtn\" id=\"btnPng\">PNG exportieren</button>\n      <button type=\"button\" class=\"kbtn gold\" id=\"btnPdf\">PDF exportieren</button>\n    </div>\n  </header>\n\n  <nav>\n    <button type=\"button\" class=\"tool aktiv\" data-tool=\"auswahl\"><svg viewBox=\"0 0 24 24\"><path d=\"M5 3l14 8-6.5 1.5L9 19z\"/></svg>Auswahl</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"hand\"><svg viewBox=\"0 0 24 24\"><path d=\"M12 2v20M2 12h20M12 2l-3 3M12 2l3 3M12 22l-3-3M12 22l3-3M2 12l3-3M2 12l3 3M22 12l-3-3M22 12l-3 3\"/></svg>Bewegen</button>\n    <div class=\"trenner\"></div>\n    <button type=\"button\" class=\"tool\" data-tool=\"wand\"><svg viewBox=\"0 0 24 24\"><path d=\"M3 12h18\" stroke-width=\"5\"/></svg>Wand</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"tuer\"><svg viewBox=\"0 0 24 24\"><path d=\"M4 20V5M4 5c8 0 15 7 15 15M4 20h16\"/></svg>Tür</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"fenster\"><svg viewBox=\"0 0 24 24\"><path d=\"M3 9h18v6H3z\"/><path d=\"M3 12h18M12 9v6\"/></svg>Fenster</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"mass\"><svg viewBox=\"0 0 24 24\"><path d=\"M3 14h18M3 10v8M21 10v8M6 17l3-6M15 17l3-6\"/></svg>Maß</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"text\"><svg viewBox=\"0 0 24 24\"><path d=\"M5 5h14M12 5v15M9 20h6\"/></svg>Text</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"moebel\"><svg viewBox=\"0 0 24 24\"><path d=\"M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3\"/><path d=\"M3 11h18v6H3z\"/><path d=\"M5 17v2M19 17v2\"/></svg>Möbel</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"abdecken\"><svg viewBox=\"0 0 24 24\"><path d=\"M4 4h16v16H4z\"/><path d=\"M8 8l8 8M16 8l-8 8\" stroke-width=\"1.2\"/></svg>Abdecken</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"flaeche\"><svg viewBox=\"0 0 24 24\"><path d=\"M4 8l8-4 8 5v8l-8 4-8-5z\"/><path d=\"M8 11h8M8 14h5\" stroke-width=\"1.2\"/></svg>Fläche</button>\n    <div class=\"trenner\"></div>\n    <button type=\"button\" class=\"tool\" data-tool=\"kalib\"><svg viewBox=\"0 0 24 24\"><path d=\"M3 15l12-12 6 6-12 12z\"/><path d=\"M8 10l2 2M11 7l2 2M14 4l2 2\"/></svg>Maßstab</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"ausschnitt\"><svg viewBox=\"0 0 24 24\"><path d=\"M7 3v14h14M3 7h14v14\"/></svg>Ausschnitt</button>\n  </nav>\n\n  <main id=\"werkstatt\">\n    <div id=\"blatt\"><canvas id=\"seite\"></canvas><svg id=\"overlay\" xmlns=\"http://www.w3.org/2000/svg\" data-werkzeug=\"auswahl\"></svg></div>\n  </main>\n\n  <aside id=\"eigenschaften\"></aside>\n  <div id=\"leer\"><div class=\"box\"><h2>Grundriss hierher ziehen – oder neu zeichnen</h2><p>PDF aus der Architektur-Software (Wände rasten exakt ein), aber auch Scans, Fotos, JPG oder PNG alter Grundrisse – dort werden Kanten im Bild erkannt; der Maßstab wird über eine bekannte Strecke kalibriert.<br>Ein gesicherter Bearbeitungsstand (.json) lässt sich zusätzlich laden.</p><button type=\"button\" class=\"btn gold\" id=\"btnOeffnen2\">Datei auswählen</button> <button type=\"button\" class=\"btn\" id=\"btnNeu2\">Neuen Grundriss zeichnen</button></div></div>\n  <div id=\"laden\" class=\"aus\"><i></i><span>Plan wird geladen …</span></div>\n  <div id=\"neuPop\" class=\"aus\">\n    <div class=\"t\">Neues Zeichenblatt</div>\n    <div class=\"s\">Leeres Blatt in Papiergröße – Wände, Türen, Fenster, Möbel und Maße wie gewohnt, mit Meterraster.</div>\n    <label class=\"feld\"><span>Blatt</span><select id=\"neuFormat\"></select></label>\n    <label class=\"feld\"><span>Maßstab 1 : …</span><select id=\"neuMassstab\"><option value=\"50\">50 (Wohnung, Detail)</option><option value=\"100\" selected>100 (Haus, Geschoss)</option><option value=\"200\">200 (große Anlage)</option></select></label>\n    <label class=\"feld\"><span>Titel (optional, z. B. Erdgeschoss · Musterstraße 1)</span><input type=\"text\" id=\"neuTitel\"></label>\n    <div class=\"knopfzeile\"><button type=\"button\" class=\"btn gold\" id=\"neuOk\">Blatt anlegen</button><button type=\"button\" class=\"btn\" id=\"neuAbbruch\">Abbrechen</button></div>\n  </div>\n  <div id=\"kalibPop\" class=\"aus\">\n    <div class=\"t\">Maßstab kalibrieren</div>\n    <div class=\"s\">Gemessene Strecke im Plan: <b id=\"kalibPt\">0 pt</b></div>\n      <label class=\"feld\"><span>Tatsächliche Länge (m)</span><div class=\"zeile\"><input type=\"text\" id=\"kalibMeter\" inputmode=\"decimal\"><button type=\"button\" class=\"btn gold\" id=\"kalibOk\">Übernehmen</button><button type=\"button\" class=\"btn\" id=\"kalibAbbruch\">✕</button></div></label>\n    </div>\n  <input type=\"file\" id=\"dateiInput\" accept=\".pdf,.png,.jpg,.jpeg,.webp,.json,application/pdf,image/*\" class=\"aus\">\n</div>\n<script>\n  if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';\n// ===== Grundriss-Editor · Kern (renderer-neutral, ohne DOM) =====\n// Koordinaten: Seiten-Einheiten (pt) im pdf.js-Viewport bei scale 1, y nach unten.\nconst GE = (() => {\n  const PT_PRO_MM = 72 / 25.4;\n  const ptProMausMassstab = (m) => 1000 * PT_PRO_MM / m;   // 1:100 → 28,346 pt je Meter\n  const massstabAusPtProM = (p) => 1000 * PT_PRO_MM / p;\n\n  const V = {\n    sub: (a, b) => ({ x: a.x - b.x, y: a.y - b.y }),\n    add: (a, b) => ({ x: a.x + b.x, y: a.y + b.y }),\n    mul: (a, s) => ({ x: a.x * s, y: a.y * s }),\n    len: (a) => Math.hypot(a.x, a.y),\n    dist: (a, b) => Math.hypot(a.x - b.x, a.y - b.y),\n    norm: (a) => { const l = Math.hypot(a.x, a.y) || 1; return { x: a.x / l, y: a.y / l }; },\n    perp: (a) => ({ x: -a.y, y: a.x }),\n    dot: (a, b) => a.x * b.x + a.y * b.y,\n    mid: (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }),\n    rot: (a, deg) => { const r = deg * Math.PI / 180, c = Math.cos(r), s = Math.sin(r); return { x: a.x * c - a.y * s, y: a.x * s + a.y * c }; },\n    // Lotfußpunkt von p auf die Strecke ab (geklemmt)\n    fuss: (p, a, b) => {\n      const ab = V.sub(b, a); const l2 = ab.x * ab.x + ab.y * ab.y;\n      if (l2 < 1e-9) return { p: a, t: 0 };\n      let t = ((p.x - a.x) * ab.x + (p.y - a.y) * ab.y) / l2; t = Math.max(0, Math.min(1, t));\n      return { p: { x: a.x + ab.x * t, y: a.y + ab.y * t }, t };\n    },\n  };\n\n  const FARBEN = [\n    { hex: '#d2232a', name: 'Rot – Neubau' },\n    { hex: '#e0b400', name: 'Gelb – Abbruch' },\n    { hex: '#263159', name: 'Navy – ImmoOffice' },\n    { hex: '#1f2433', name: 'Schwarz' },\n  ];\n  const STILE = [\n    { key: 'massiv', name: 'Massiv (gefüllt)' },\n    { key: 'schraffur', name: 'Mauerwerk (schraffiert)' },\n    { key: 'hohl', name: 'Trockenbau (Umriss)' },\n    { key: 'glas', name: 'Glaswand (Doppellinie)' },\n    { key: 'abbruch', name: 'Abbruch (gelb hinterlegt)' },\n  ];\n  const NEU = {\n    wand: () => ({ typ: 'wand', dicke: 12.5, stil: 'massiv', farbe: '#d2232a' }),\n    tuer: () => ({ typ: 'tuer', variante: 'dreh', farbe: '#d2232a', spiegeln: false, durchbruch: null }),   // durchbruch: { tiefe (cm), richtung ±1 } = Öffnung in einer PLAN-Wand (weiß + Laibungen)\n    fenster: () => ({ typ: 'fenster', variante: 'einfach', farbe: '#d2232a', spiegeln: false, durchbruch: null }),\n    mass: () => ({ typ: 'mass', farbe: '#d2232a', versatz: 14, groesse: 7, text: '' }),\n    text: () => ({ typ: 'text', farbe: '#d2232a', groesse: 8, winkel: 0, text: 'Text', halo: true }),\n    flaeche: () => ({ typ: 'flaeche', farbe: '#263159', groesse: 8, text: '', fuellen: true }),\n    abdecken: () => ({ typ: 'abdecken' }),\n    moebel: () => ({ typ: 'moebel', art: 'schreibtisch', breite: 160, tiefe: 80, winkel: 0, farbe: '#263159', fuellen: true, text: '' }),\n  };\n  // Blattformate (mm) für leere Zeichenblätter\n  const BLAETTER = [['a4q', 'A4 quer', 297, 210], ['a4h', 'A4 hoch', 210, 297], ['a3q', 'A3 quer', 420, 297], ['a3h', 'A3 hoch', 297, 420], ['a2q', 'A2 quer', 594, 420], ['a1q', 'A1 quer', 841, 594]];\n  const K = { dimLinie: 0.5, dimTick: 2.2, dimUeberstand: 2, dimGap: 1.5, textGap: 1.4, tuerLinie: 0.6, glasLinie: 0.7, umriss: 0.8, moebel: 0.5, duenn: 0.35 };\n  const TUEREN = [['dreh', 'Drehtür, einflügelig'], ['doppel', 'Doppeltür, zweiflügelig'], ['schiebe', 'Schiebetür'], ['pendel', 'Pendeltür'], ['oeffnung', 'Durchgang ohne Tür']];\n  const FENSTER = [['einfach', 'Fenster, einflügelig'], ['zweifluegelig', 'Fenster, zweiflügelig'], ['dreifluegelig', 'Fenster, dreiflügelig'], ['bodentief', 'Bodentiefes Fenster / Fenstertür'], ['schiebe', 'Hebe-Schiebe-Tür']];\n  // Linienstärken sind in pt gedacht; bei Pixelquellen (Scans) skaliert der Faktor mit der Auflösung (1 m = 28,35 px entspräche 72 dpi bei 1:100)\n  const linienSkala = (kalib) => (kalib && kalib.einheit === 'px') ? Math.max(1, kalib.ptProM / 28.35) : 1;\n\n  // ---------- Formatierung ----------\n  // Meter → Bauzeichnungs-Schreibweise wie im Plan: 2.26 · 24 (cm) · 1.13⁵ (halber Zentimeter hochgestellt)\n  const formatMass = (m) => {\n    const halbe = Math.round(Math.abs(m) * 200);\n    const ganzCm = Math.floor(halbe / 2), hoch = halbe % 2 ? '5' : null;\n    if (ganzCm < 100) return { haupt: String(ganzCm), hoch };\n    return { haupt: Math.floor(ganzCm / 100) + '.' + String(ganzCm % 100).padStart(2, '0'), hoch };\n  };\n  const formatMeter = (m) => m.toFixed(2).replace('.', ',') + ' m';\n  const formatFlaeche = (m2) => m2.toFixed(2).replace('.', ',') + ' m²';\n\n  // ---------- Element-Geometrie ----------\n  const massGeometrie = (el) => {\n    const d0 = V.sub(el.p2, el.p1); const L = V.len(d0); if (L < 1e-6) return null;\n    const d = V.mul(d0, 1 / L); const n = V.perp(d); const v = (el.versatz == null ? 14 : el.versatz);\n    const D1 = V.add(el.p1, V.mul(n, v)), D2 = V.add(el.p2, V.mul(n, v));\n    let r = d; if (r.x < -1e-9 || (Math.abs(r.x) < 1e-9 && r.y > 0)) r = V.mul(r, -1);   // Leserichtung: von links / von rechts lesbar\n    const up = { x: r.y, y: -r.x };                                                      // \"oben\" des gedrehten Textes\n    return { d, n, L, D1, D2, r, up, winkel: Math.atan2(r.y, r.x) * 180 / Math.PI, v, s: v < 0 ? -1 : 1 };\n  };\n  const flaecheInhalt = (pts) => { let a = 0; for (let i = 0; i < pts.length; i++) { const p = pts[i], q = pts[(i + 1) % pts.length]; a += p.x * q.y - q.x * p.y; } return Math.abs(a) / 2; };\n  const schwerpunkt = (pts) => {\n    let a = 0, cx = 0, cy = 0;\n    for (let i = 0; i < pts.length; i++) { const p = pts[i], q = pts[(i + 1) % pts.length]; const f = p.x * q.y - q.x * p.y; a += f; cx += (p.x + q.x) * f; cy += (p.y + q.y) * f; }\n    if (Math.abs(a) < 1e-9) { const s = pts.reduce((o, p) => ({ x: o.x + p.x, y: o.y + p.y }), { x: 0, y: 0 }); return { x: s.x / pts.length, y: s.y / pts.length }; }\n    return { x: cx / (3 * a), y: cy / (3 * a) };\n  };\n  const rechteck = (p1, p2, dickePt) => { const n = V.mul(V.perp(V.norm(V.sub(p2, p1))), dickePt / 2); return [V.add(p1, n), V.add(p2, n), V.sub(p2, n), V.sub(p1, n)]; };\n  const tuerGeometrie = (el) => {\n    const w = V.dist(el.p1, el.p2); if (w < 1e-6) return null;\n    const d = V.norm(V.sub(el.p2, el.p1)); const q = V.rot(d, el.spiegeln ? 90 : -90);\n    const E = V.add(el.p1, V.mul(q, w));                               // Blattende\n    const k = 0.5523 * w;                                              // Viertelkreis E → p2 um p1 als Bézier\n    return { w, d, E, c1: V.add(E, V.mul(d, k)), c2: V.add(el.p2, V.mul(q, k)) };\n  };\n  const dickePt = (el, kalib) => (el.dicke || 12.5) / 100 * kalib.ptProM;\n\n\n  // ---------- Einrichtung (Möbelsymbole in Draufsicht) ----------\n  // Bauteile in Einheitskoordinaten: u 0..1 = Breite, v 0..1 = Tiefe, v = 0 ist die Rück-/Wandseite.\n  const MOEBEL = (() => {\n    const kb = 0.5523;\n    const rect = (u0, v0, u1, v1) => ({ art: 'polygon', punkte: [{ x: u0, y: v0 }, { x: u1, y: v0 }, { x: u1, y: v1 }, { x: u0, y: v1 }] });\n    const line = (u0, v0, u1, v1) => ({ art: 'linie', p1: { x: u0, y: v0 }, p2: { x: u1, y: v1 } });\n    const kreis = (cu, cv, ru, rv) => ({ art: 'pfad', d: [['M', { x: cu + ru, y: cv }],\n      ['C', { x: cu + ru, y: cv + rv * kb }, { x: cu + ru * kb, y: cv + rv }, { x: cu, y: cv + rv }],\n      ['C', { x: cu - ru * kb, y: cv + rv }, { x: cu - ru, y: cv + rv * kb }, { x: cu - ru, y: cv }],\n      ['C', { x: cu - ru, y: cv - rv * kb }, { x: cu - ru * kb, y: cv - rv }, { x: cu, y: cv - rv }],\n      ['C', { x: cu + ru * kb, y: cv - rv }, { x: cu + ru, y: cv - rv * kb }, { x: cu + ru, y: cv }], ['Z']] });\n    const rrect = (u0, v0, u1, v1, ru, rv) => ({ art: 'pfad', d: [['M', { x: u0 + ru, y: v0 }], ['L', { x: u1 - ru, y: v0 }],\n      ['C', { x: u1 - ru + ru * kb, y: v0 }, { x: u1, y: v0 + rv - rv * kb }, { x: u1, y: v0 + rv }], ['L', { x: u1, y: v1 - rv }],\n      ['C', { x: u1, y: v1 - rv + rv * kb }, { x: u1 - ru + ru * kb, y: v1 }, { x: u1 - ru, y: v1 }], ['L', { x: u0 + ru, y: v1 }],\n      ['C', { x: u0 + ru - ru * kb, y: v1 }, { x: u0, y: v1 - rv + rv * kb }, { x: u0, y: v1 - rv }], ['L', { x: u0, y: v0 + rv }],\n      ['C', { x: u0, y: v0 + rv - rv * kb }, { x: u0 + ru - ru * kb, y: v0 }, { x: u0 + ru, y: v0 }], ['Z']] });\n    // Stuhl: Sitz + Rückenlehne an der angegebenen Seite (Mitte cu/cv, Größe wu/hv in Einheitskoordinaten)\n    const stuhl = (cu, cv, wu, hv, seite) => {\n      const u0 = cu - wu / 2, u1 = cu + wu / 2, v0 = cv - hv / 2, v1 = cv + hv / 2, d = 0.18;\n      const out = [rrect(u0, v0, u1, v1, wu * 0.12, hv * 0.12)];\n      if (seite === 'oben') out.push(rect(u0, v0, u1, v0 + hv * d)); else if (seite === 'unten') out.push(rect(u0, v1 - hv * d, u1, v1));\n      else if (seite === 'links') out.push(rect(u0, v0, u0 + wu * d, v1)); else out.push(rect(u1 - wu * d, v0, u1, v1));\n      return out;\n    };\n    const buerostuhl = (cu, cv, wu, hv) => [kreis(cu, cv + hv * 0.06, wu * 0.36, hv * 0.36), rrect(cu - wu * 0.4, cv - hv * 0.5, cu + wu * 0.4, cv - hv * 0.3, wu * 0.08, hv * 0.08), line(cu - wu * 0.5, cv + hv * 0.06, cu - wu * 0.36, cv + hv * 0.06), line(cu + wu * 0.36, cv + hv * 0.06, cu + wu * 0.5, cv + hv * 0.06)];\n    const sofa = (n) => { const out = [rect(0, 0, 1, 1), rect(0, 0, 1, 0.2), rect(0, 0.2, 0.12, 1), rect(0.88, 0.2, 1, 1)]; for (let i = 1; i < n; i++) { const u = 0.12 + 0.76 * i / n; out.push(line(u, 0.2, u, 1)); } return out; };\n    // Tischgruppe: Box B×T cm, Tisch tb×tt cm mittig, n Stühle je Längsseite, optional Kopfstühle\n    const tischGruppe = (B, T, tb, tt, n, kopf) => {\n      const su = 45 / B, sv = 45 / T, u0 = 0.5 - tb / 2 / B, u1 = 0.5 + tb / 2 / B, v0 = 0.5 - tt / 2 / T, v1 = 0.5 + tt / 2 / T;\n      const out = [rect(u0, v0, u1, v1)];\n      for (let i = 0; i < n; i++) { const cu = u0 + (u1 - u0) * (i + 0.5) / n; out.push(...stuhl(cu, v0 - sv / 2 - 0.01, su, sv, 'oben'), ...stuhl(cu, v1 + sv / 2 + 0.01, su, sv, 'unten')); }\n      if (kopf) out.push(...stuhl(u0 - su / 2 - 0.01, 0.5, su, sv, 'links'), ...stuhl(u1 + su / 2 + 0.01, 0.5, su, sv, 'rechts'));\n      return out;\n    };\n    const kueche = () => [rect(0, 0, 1, 1), rrect(0.07, 0.2, 0.25, 0.8, 0.02, 0.1), kreis(0.16, 0.11, 0.012, 0.06), kreis(0.62, 0.35, 0.03, 0.15), kreis(0.72, 0.35, 0.03, 0.15), kreis(0.62, 0.65, 0.03, 0.15), kreis(0.72, 0.65, 0.03, 0.15), line(0.42, 0, 0.42, 1), line(0.86, 0, 0.86, 1)];\n    const KATALOG = [\n      { key: 'rechteck', name: 'Freies Rechteck mit Beschriftung', gruppe: 'Allgemein', b: 100, t: 60, teile: () => [rect(0, 0, 1, 1)] },\n      { key: 'pflanze', name: 'Pflanze Ø 60', gruppe: 'Allgemein', b: 60, t: 60, teile: () => [kreis(0.5, 0.5, 0.5, 0.5), kreis(0.5, 0.5, 0.28, 0.28), line(0.5, 0, 0.5, 1), line(0, 0.5, 1, 0.5)] },\n      { key: 'sofa-2', name: 'Sofa 2-Sitzer 160 × 90', gruppe: 'Wohnen', b: 160, t: 90, teile: () => sofa(2) },\n      { key: 'sofa-3', name: 'Sofa 3-Sitzer 220 × 90', gruppe: 'Wohnen', b: 220, t: 90, teile: () => sofa(3) },\n      { key: 'sessel', name: 'Sessel 80 × 85', gruppe: 'Wohnen', b: 80, t: 85, teile: () => sofa(1) },\n      { key: 'couchtisch', name: 'Couchtisch 100 × 60', gruppe: 'Wohnen', b: 100, t: 60, teile: () => [rrect(0, 0, 1, 1, 0.08, 0.13)] },\n      { key: 'tv', name: 'TV-Board 160 × 45', gruppe: 'Wohnen', b: 160, t: 45, teile: () => [rect(0, 0, 1, 1), rect(0.2, 0.06, 0.8, 0.18)] },\n      { key: 'regal', name: 'Regal / Sideboard 120 × 40', gruppe: 'Wohnen', b: 120, t: 40, teile: () => [rect(0, 0, 1, 1), line(0, 0.5, 1, 0.5)] },\n      { key: 'esstisch-4', name: 'Esstisch 120 × 80 mit 4 Stühlen', gruppe: 'Essen', b: 220, t: 180, teile: () => tischGruppe(220, 180, 120, 80, 2, false) },\n      { key: 'esstisch-6', name: 'Esstisch 180 × 90 mit 6 Stühlen', gruppe: 'Essen', b: 280, t: 190, teile: () => tischGruppe(280, 190, 180, 90, 3, false) },\n      { key: 'bett-einzel', name: 'Bett 90 × 200', gruppe: 'Schlafen', b: 90, t: 200, teile: () => [rect(0, 0, 1, 1), rrect(0.12, 0.05, 0.88, 0.22, 0.04, 0.02), line(0, 0.32, 1, 0.32)] },\n      { key: 'bett-doppel', name: 'Doppelbett 180 × 200', gruppe: 'Schlafen', b: 180, t: 200, teile: () => [rect(0, 0, 1, 1), rrect(0.06, 0.05, 0.47, 0.22, 0.03, 0.02), rrect(0.53, 0.05, 0.94, 0.22, 0.03, 0.02), line(0, 0.32, 1, 0.32), line(0.5, 0.32, 0.5, 1)] },\n      { key: 'nachttisch', name: 'Nachttisch 45 × 40', gruppe: 'Schlafen', b: 45, t: 40, teile: () => [rect(0, 0, 1, 1), kreis(0.5, 0.5, 0.14, 0.14)] },\n      { key: 'schrank', name: 'Kleiderschrank 100 × 60', gruppe: 'Schlafen', b: 100, t: 60, teile: () => [rect(0, 0, 1, 1), line(0.5, 0, 0.5, 1), line(0, 0.5, 1, 0.5)] },\n      { key: 'schreibtisch', name: 'Schreibtisch 160 × 80', gruppe: 'Arbeiten', b: 160, t: 80, teile: () => [rect(0, 0, 1, 1), rect(0.36, 0.08, 0.64, 0.16)] },\n      { key: 'arbeitsplatz', name: 'Arbeitsplatz Tisch + Stuhl 160 × 150', gruppe: 'Arbeiten', b: 160, t: 150, teile: () => [rect(0, 0, 1, 0.53), rect(0.36, 0.05, 0.64, 0.1), ...buerostuhl(0.5, 0.78, 60 / 160, 60 / 150)] },\n      { key: 'buerostuhl', name: 'Bürostuhl 60 × 60', gruppe: 'Arbeiten', b: 60, t: 60, teile: () => buerostuhl(0.5, 0.5, 1, 1) },\n      { key: 'besprechung-6', name: 'Besprechungstisch 200 × 100 mit 6 Stühlen', gruppe: 'Arbeiten', b: 300, t: 200, teile: () => tischGruppe(300, 200, 200, 100, 3, false) },\n      { key: 'besprechung-8', name: 'Besprechungstisch 240 × 100 mit 8 Stühlen', gruppe: 'Arbeiten', b: 340, t: 200, teile: () => tischGruppe(340, 200, 240, 100, 3, true) },\n      { key: 'aktenschrank', name: 'Aktenschrank 80 × 42', gruppe: 'Arbeiten', b: 80, t: 42, teile: () => [rect(0, 0, 1, 1), line(0.5, 0, 0.5, 1)] },\n      { key: 'kueche', name: 'Küchenzeile 300 × 60', gruppe: 'Küche', b: 300, t: 60, teile: () => kueche() },\n      { key: 'kuehlschrank', name: 'Kühlschrank 60 × 60', gruppe: 'Küche', b: 60, t: 60, teile: () => [rect(0, 0, 1, 1), line(0, 0, 1, 1), line(0, 1, 1, 0)] },\n      { key: 'wc', name: 'WC 40 × 65', gruppe: 'Bad', b: 40, t: 65, teile: () => [rect(0.05, 0, 0.95, 0.3), kreis(0.5, 0.65, 0.42, 0.33)] },\n      { key: 'waschbecken', name: 'Waschbecken 60 × 45', gruppe: 'Bad', b: 60, t: 45, teile: () => [rect(0, 0, 1, 1), kreis(0.5, 0.58, 0.36, 0.32), kreis(0.5, 0.16, 0.05, 0.06)] },\n      { key: 'dusche', name: 'Dusche 90 × 90', gruppe: 'Bad', b: 90, t: 90, teile: () => [rect(0, 0, 1, 1), rect(0.08, 0.08, 0.92, 0.92), line(0.08, 0.08, 0.92, 0.92), line(0.92, 0.08, 0.08, 0.92), kreis(0.5, 0.5, 0.06, 0.06)] },\n      { key: 'badewanne', name: 'Badewanne 170 × 75', gruppe: 'Bad', b: 170, t: 75, teile: () => [rect(0, 0, 1, 1), rrect(0.06, 0.12, 0.94, 0.88, 0.08, 0.3), kreis(0.16, 0.5, 0.03, 0.07)] },\n      { key: 'waschmaschine', name: 'Waschmaschine 60 × 60', gruppe: 'Bad', b: 60, t: 60, teile: () => [rect(0, 0, 1, 1), rect(0, 0, 1, 0.15), kreis(0.5, 0.58, 0.3, 0.3)] },\n    ];\n    const byKey = Object.fromEntries(KATALOG.map(k => [k.key, k]));\n    return { KATALOG, byKey };\n  })();\n\n  // Element → Primitive (linie / polygon / kurve / pfad / text). ctx.oeffnungen: Intervalle [a, b] in pt entlang der Wandachse, die frei bleiben (Türen)\n  function prims(el, kalib, ctx) {\n    const out = []; const f = el.farbe || '#d2232a'; const sk = linienSkala(kalib);\n    const linie = (p1, p2, breite, farbe, cap, dash) => ({ art: 'linie', p1, p2, breite, farbe, cap: cap || 'butt', dash: dash || null });\n    switch (el.typ) {\n      case 'wand': {\n        const t = dickePt(el, kalib), L0 = V.dist(el.p1, el.p2); if (L0 < 1e-6) break;\n        const d = V.mul(V.sub(el.p2, el.p1), 1 / L0);\n        // Anschlüsse: an Ecken und T-Stößen wird das Wandende um die halbe Dicke der Nachbarwand verlängert (ctx.enden = [Anfang, Ende] in pt)\n        const e1 = (ctx && ctx.enden ? ctx.enden[0] : 0) || 0, e2 = (ctx && ctx.enden ? ctx.enden[1] : 0) || 0;\n        const P1 = V.sub(el.p1, V.mul(d, e1)), L = L0 + e1 + e2;\n        // Wandstücke = Achse ohne die Öffnungen (Öffnungen sind relativ zu el.p1 → um e1 verschieben)\n        const stuecke = []; let a = 0;\n        for (const [o0, o1] of (ctx && ctx.oeffnungen ? ctx.oeffnungen : []).map(o => [o[0] + e1, o[1] + e1]).sort((x, y) => x[0] - y[0])) { const s0 = Math.max(a, Math.min(L, o0)), s1 = Math.max(a, Math.min(L, o1)); if (s0 > a + 0.1) stuecke.push([a, s0]); a = Math.max(a, s1); }\n        if (L > a + 0.1) stuecke.push([a, L]);\n        for (const [s0, s1] of stuecke) {\n          const p1 = V.add(P1, V.mul(d, s0)), p2 = V.add(P1, V.mul(d, s1));\n          if (el.stil === 'glas') {\n            const n = V.mul(V.perp(d), t / 2);\n            out.push(linie(V.add(p1, n), V.add(p2, n), K.glasLinie * sk, f));\n            out.push(linie(V.sub(p1, n), V.sub(p2, n), K.glasLinie * sk, f));\n            out.push(linie(p1, p2, K.glasLinie * 0.6 * sk, f, 'butt', [3 * sk, 2 * sk]));\n          } else if (el.stil === 'hohl') {\n            out.push({ art: 'polygon', punkte: rechteck(p1, p2, t), fuellung: '#ffffff', deckkraft: 1, rand: f, randBreite: K.umriss * sk });\n          } else if (el.stil === 'abbruch') {\n            out.push({ art: 'polygon', punkte: rechteck(p1, p2, t), fuellung: '#f2c200', deckkraft: 0.45, rand: f, randBreite: K.umriss * sk, dash: [3 * sk, 2 * sk] });\n          } else if (el.stil === 'schraffur') {\n            out.push({ art: 'polygon', punkte: rechteck(p1, p2, t), fuellung: '#ffffff', deckkraft: 1, rand: f, randBreite: K.umriss * sk });\n            // 45°-Schraffur im lokalen System (u entlang, v quer), auf das Rechteck geschnitten\n            const n = V.perp(d), Ls = s1 - s0, ab = Math.max(2 * sk, Math.min(6 * sk, t / 3)) * Math.SQRT2;\n            for (let c = -t / 2; c < Ls + t / 2; c += ab) {\n              const u0 = Math.max(0, c - t / 2), u1 = Math.min(Ls, c + t / 2); if (u1 - u0 < 0.05) continue;\n              out.push(linie(V.add(V.add(p1, V.mul(d, u0)), V.mul(n, u0 - c)), V.add(V.add(p1, V.mul(d, u1)), V.mul(n, u1 - c)), K.duenn * sk, f));\n            }\n          } else {\n            out.push(linie(p1, p2, t, f));\n          }\n        }\n        break;\n      }\n      case 'tuer': case 'fenster': {\n        const w = V.dist(el.p1, el.p2); if (w < 1e-6) break;\n        const d = V.mul(V.sub(el.p2, el.p1), 1 / w), n = V.perp(d), q = V.rot(d, el.spiegeln ? 90 : -90);\n        const db = el.durchbruch, tW = ctx && ctx.wandDicke;\n        // Querausdehnung der Öffnung entlang n: gezeichnete Wand → mittig um die Achse; Plan-Wand → von der Linie bis zur Gegenkante\n        let a0 = 0, a1 = 0;\n        if (tW) { a0 = -tW / 2; a1 = tW / 2; }\n        else if (db && db.tiefe > 0) {\n          const tp = db.tiefe / 100 * kalib.ptProM * (db.richtung || 1); a0 = Math.min(0, tp); a1 = Math.max(0, tp);\n          const ue = 0.35 * sk;   // weiß abdecken + Laibungen in Elementfarbe\n          out.push({ art: 'polygon', punkte: [V.add(el.p1, V.mul(n, a0 - ue)), V.add(el.p2, V.mul(n, a0 - ue)), V.add(el.p2, V.mul(n, a1 + ue)), V.add(el.p1, V.mul(n, a1 + ue))], fuellung: '#ffffff', deckkraft: 1, rand: null, randBreite: 0 });\n          out.push(linie(V.add(el.p1, V.mul(n, a0)), V.add(el.p1, V.mul(n, a1)), K.umriss * sk, f));\n          out.push(linie(V.add(el.p2, V.mul(n, a0)), V.add(el.p2, V.mul(n, a1)), K.umriss * sk, f));\n        } else { const t0 = 0.125 * kalib.ptProM; a0 = -t0 / 2; a1 = t0 / 2; }\n        const am = (a0 + a1) / 2, at = (u) => V.mul(n, a0 + (a1 - a0) * u);   // Punkt in Querrichtung als Anteil 0..1 der Wanddicke\n        const ql = (u, dash) => out.push(linie(V.add(el.p1, at(u)), V.add(el.p2, at(u)), (u === 0 || u === 1 ? K.duenn : K.glasLinie) * sk, f, 'butt', dash));   // Linie über die ganze Breite\n        // Türflügel: Angel H, Anschlagpunkt T auf der Öffnungslinie, Radius r, Aufschlagseite qv, gestrichelt optional\n        const fluegel = (H, T, r, qv, dash) => {\n          const dir = V.norm(V.sub(T, H)), E = V.add(H, V.mul(qv, r)), k = 0.5523 * r;\n          out.push(linie(H, E, K.tuerLinie * sk, f, 'butt', dash));\n          out.push({ art: 'kurve', punkte: [E, V.add(E, V.mul(dir, k)), V.add(T, V.mul(qv, k)), T], breite: K.tuerLinie * sk, farbe: f, dash: dash || null });\n        };\n        // Schiebeflügel: dünnes Rechteck parallel zur Öffnung auf der Aufschlagseite + Pfeil\n        const schiebeFluegel = (u0, u1, off, links) => {\n          const A = V.add(el.p1, V.mul(d, w * u0)), B = V.add(el.p1, V.mul(d, w * u1)), o = V.mul(n, off), dk = 1.1 * sk, nn = V.mul(n, dk / 2);\n          out.push({ art: 'polygon', punkte: [V.add(V.add(A, o), nn), V.add(V.add(B, o), nn), V.sub(V.add(B, o), nn), V.sub(V.add(A, o), nn)], fuellung: '#ffffff', deckkraft: 1, rand: f, randBreite: K.duenn * sk });\n          const L = V.dist(A, B), pa = V.add(V.add(A, o), V.mul(d, L * (links ? 0.62 : 0.38))), pb = V.add(V.add(A, o), V.mul(d, L * (links ? 0.2 : 0.8))), sp = V.mul(d, (links ? 1 : -1) * 2.2 * sk);\n          out.push(linie(pa, pb, K.duenn * sk, f));\n          out.push(linie(pb, V.add(V.add(pb, sp), V.mul(n, 1.6 * sk)), K.duenn * sk, f)); out.push(linie(pb, V.add(V.add(pb, sp), V.mul(n, -1.6 * sk)), K.duenn * sk, f));\n        };\n        const dashK = [3 * sk, 2 * sk], m = V.mid(el.p1, el.p2);\n        if (el.typ === 'tuer') {\n          const v = el.variante || 'dreh';\n          if (v === 'dreh') fluegel(el.p1, el.p2, w, q);\n          else if (v === 'doppel') { fluegel(el.p1, m, w / 2, q); fluegel(el.p2, m, w / 2, q); }\n          else if (v === 'pendel') { fluegel(el.p1, el.p2, w, q); fluegel(el.p1, el.p2, w, V.mul(q, -1), dashK); }\n          else if (v === 'schiebe') { const sq = V.dot(q, n) > 0 ? 1 : -1; schiebeFluegel(0, 1, (sq > 0 ? a1 : a0) + sq * 1.4 * sk, el.spiegeln); }\n          else if (v === 'oeffnung') out.push(linie(el.p1, el.p2, K.duenn * sk, f, 'butt', dashK));   // Sturz\n        } else {\n          const v = el.variante || 'einfach';\n          ql(0); ql(1);                                                                  // Wandflächen / Brüstung (dünn)\n          if (v === 'schiebe') {\n            // Hebe-Schiebe: zwei Glasebenen, überlappend; Pfeil am beweglichen Flügel\n            ql(0.4); ql(0.6);\n            const sq = V.dot(q, n) > 0 ? 1 : -1;\n            schiebeFluegel(el.spiegeln ? 0.48 : 0, el.spiegeln ? 1 : 0.52, a0 + (a1 - a0) * (sq > 0 ? 0.72 : 0.28), !el.spiegeln);\n          } else {\n            ql(0.4); ql(0.6);                                                            // Rahmen/Glas\n            const teile = v === 'zweifluegelig' ? 2 : v === 'dreifluegelig' ? 3 : 1;\n            for (let i = 1; i < teile; i++) { const P = V.add(el.p1, V.mul(d, w * i / teile)); out.push(linie(V.add(P, at(0.3)), V.add(P, at(0.7)), K.glasLinie * sk, f)); }\n            if (v === 'bodentief') {   // Fenstertür: Aufschlag gestrichelt, ab 1,30 m zweiflügelig\n              if (w / kalib.ptProM > 1.3) { fluegel(el.p1, m, w / 2, q, dashK); fluegel(el.p2, m, w / 2, q, dashK); } else fluegel(el.p1, el.p2, w, q, dashK);\n            }\n          }\n        }\n        break;\n      }\n      case 'mass': {\n        const g = massGeometrie(el); if (!g) break;\n        const nn = V.mul(g.n, g.s);\n        out.push(linie(V.add(el.p1, V.mul(nn, K.dimGap)), V.add(g.D1, V.mul(nn, K.dimUeberstand)), K.dimLinie * sk, f));\n        out.push(linie(V.add(el.p2, V.mul(nn, K.dimGap)), V.add(g.D2, V.mul(nn, K.dimUeberstand)), K.dimLinie * sk, f));\n        out.push(linie(g.D1, g.D2, K.dimLinie * sk, f));\n        const tk = V.mul(V.norm(V.add(g.r, g.up)), K.dimTick * sk);\n        out.push(linie(V.sub(g.D1, tk), V.add(g.D1, tk), K.dimLinie * sk * 1.6, f));\n        out.push(linie(V.sub(g.D2, tk), V.add(g.D2, tk), K.dimLinie * sk * 1.6, f));\n        const M = V.add(V.mid(g.D1, g.D2), V.mul(g.up, K.textGap));\n        const fm = formatMass(g.L / kalib.ptProM);\n        const eigen = (el.text || '').trim();\n        out.push({ art: 'text', x: M.x, y: M.y, winkel: g.winkel, groesse: el.groesse || 7, farbe: f, text: eigen || fm.haupt, hoch: eigen ? null : fm.hoch, anker: 'mitte', halo: el.halo !== false });\n        break;\n      }\n      case 'text': {\n        out.push({ art: 'text', x: el.p.x, y: el.p.y, winkel: el.winkel || 0, groesse: el.groesse || 8, farbe: f, text: el.text || '', hoch: null, anker: 'start', halo: el.halo !== false });\n        break;\n      }\n      case 'abdecken': {\n        const x1 = Math.min(el.p1.x, el.p2.x), x2 = Math.max(el.p1.x, el.p2.x), y1 = Math.min(el.p1.y, el.p2.y), y2 = Math.max(el.p1.y, el.p2.y);\n        out.push({ art: 'polygon', punkte: [{ x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 }], fuellung: '#ffffff', deckkraft: 1, rand: null, randBreite: 0 });\n        break;\n      }\n      case 'moebel': {\n        const kat = MOEBEL.byKey[el.art] || MOEBEL.byKey.rechteck;\n        const B = (el.breite || kat.b) / 100 * kalib.ptProM, T = (el.tiefe || kat.t) / 100 * kalib.ptProM;\n        const rad = (el.winkel || 0) * Math.PI / 180, c = Math.cos(rad), si = Math.sin(rad);\n        const map = (q) => { const x = (q.x - 0.5) * B, y = (q.y - 0.5) * T; return { x: el.p.x + x * c - y * si, y: el.p.y + x * si + y * c }; };\n        const fuell = el.fuellen !== false ? '#ffffff' : null, br = K.moebel * sk;\n        for (const t of kat.teile()) {\n          if (t.art === 'polygon') out.push({ art: 'polygon', punkte: t.punkte.map(map), fuellung: fuell, deckkraft: 1, rand: f, randBreite: br });\n          else if (t.art === 'linie') out.push(linie(map(t.p1), map(t.p2), br, f));\n          else if (t.art === 'pfad') out.push({ art: 'pfad', d: t.d.map(seg => [seg[0], ...seg.slice(1).map(map)]), fuellung: fuell, deckkraft: 1, rand: f, randBreite: br });\n        }\n        if (el.text) { let w = (el.winkel || 0) % 360; if (w < 0) w += 360; if (w > 90 && w <= 270) w -= 180; out.push({ art: 'text', x: el.p.x, y: el.p.y + (el.groesse || 7) * 0.35, winkel: w, groesse: el.groesse || 7, farbe: f, text: el.text, hoch: null, anker: 'mitte', halo: false }); }\n        break;\n      }\n      case 'flaeche': {\n        if (!el.punkte || el.punkte.length < 3) break;\n        if (el.fuellen !== false) out.push({ art: 'polygon', punkte: el.punkte, fuellung: f, deckkraft: 0.1, rand: f, randBreite: 0.6 * sk });\n        const c = schwerpunkt(el.punkte); const eigen = (el.text || '').trim();\n        const qm = formatFlaeche(flaecheInhalt(el.punkte) / (kalib.ptProM * kalib.ptProM)), g = el.groesse || 8;\n        if (eigen && !/m²|m2|qm/i.test(eigen)) {   // Raumname + Fläche in zwei Zeilen\n          out.push({ art: 'text', x: c.x, y: c.y - g * 0.25, winkel: 0, groesse: g, farbe: f, text: eigen, hoch: null, anker: 'mitte', halo: el.halo !== false });\n          out.push({ art: 'text', x: c.x, y: c.y + g * 1.05, winkel: 0, groesse: g * 0.9, farbe: f, text: qm, hoch: null, anker: 'mitte', halo: el.halo !== false });\n        } else out.push({ art: 'text', x: c.x, y: c.y + g * 0.35, winkel: 0, groesse: g, farbe: f, text: eigen || qm, hoch: null, anker: 'mitte', halo: el.halo !== false });\n        break;\n      }\n    }\n    return out;\n  }\n\n  // ---------- SVG ----------\n  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');\n  const n2 = (v) => String(Math.round(v * 100) / 100);\n  function svgPrim(p) {\n    switch (p.art) {\n      case 'linie':\n        return `<line x1=\"${n2(p.p1.x)}\" y1=\"${n2(p.p1.y)}\" x2=\"${n2(p.p2.x)}\" y2=\"${n2(p.p2.y)}\" stroke=\"${p.farbe}\" stroke-width=\"${n2(p.breite)}\" stroke-linecap=\"${p.cap}\"${p.dash ? ` stroke-dasharray=\"${p.dash.join(' ')}\"` : ''}/>`;\n      case 'polygon':\n        return `<polygon points=\"${p.punkte.map(q => n2(q.x) + ',' + n2(q.y)).join(' ')}\" fill=\"${p.fuellung || 'none'}\" fill-opacity=\"${p.deckkraft == null ? 1 : p.deckkraft}\" stroke=\"${p.rand || 'none'}\" stroke-width=\"${n2(p.randBreite || 0)}\" stroke-linejoin=\"round\"${p.dash ? ` stroke-dasharray=\"${p.dash.join(' ')}\"` : ''}/>`;\n      case 'kurve': {\n        const [a, c1, c2, b] = p.punkte;\n        return `<path d=\"M${n2(a.x)} ${n2(a.y)} C${n2(c1.x)} ${n2(c1.y)} ${n2(c2.x)} ${n2(c2.y)} ${n2(b.x)} ${n2(b.y)}\" fill=\"none\" stroke=\"${p.farbe}\" stroke-width=\"${n2(p.breite)}\"${p.dash ? ` stroke-dasharray=\"${p.dash.join(' ')}\"` : ''}/>`;\n      }\n      case 'pfad': {\n        const d = p.d.map(seg => seg[0] === 'Z' ? 'Z' : seg[0] + seg.slice(1).map(q => n2(q.x) + ' ' + n2(q.y)).join(' ')).join(' ');\n        return `<path d=\"${d}\" fill=\"${p.fuellung || 'none'}\" fill-opacity=\"${p.deckkraft == null ? 1 : p.deckkraft}\" stroke=\"${p.rand || 'none'}\" stroke-width=\"${n2(p.randBreite || 0)}\" stroke-linejoin=\"round\"/>`;\n      }\n      case 'text': {\n        const halo = p.halo ? ` paint-order=\"stroke\" stroke=\"#ffffff\" stroke-width=\"${n2(p.groesse * 0.4)}\" stroke-linejoin=\"round\"` : '';\n        const hoch = p.hoch ? `<tspan font-size=\"${n2(p.groesse * 0.65)}\" dy=\"${n2(-p.groesse * 0.35)}\">${esc(p.hoch)}</tspan>` : '';\n        const tr = p.winkel ? ` transform=\"rotate(${n2(p.winkel)} ${n2(p.x)} ${n2(p.y)})\"` : '';\n        return `<text x=\"${n2(p.x)}\" y=\"${n2(p.y)}\"${tr} font-family=\"Helvetica, Arial, sans-serif\" font-size=\"${n2(p.groesse)}\" fill=\"${p.farbe}\" text-anchor=\"${p.anker === 'mitte' ? 'middle' : 'start'}\"${halo}>${esc(p.text)}${hoch}</text>`;\n      }\n    }\n    return '';\n  }\n  const svgAus = (ps) => ps.map(svgPrim).join('');\n\n  // ---------- PDF (pdf-lib) ----------\n  // toPdf(p) → [x, y] im PDF-Nutzerraum der Seite\n  function pdfZeichnen(ps, page, font, toPdf, PDFLib) {\n    const { rgb, degrees, LineCapStyle } = PDFLib;\n    const farbe = (hex) => { const n = parseInt(hex.slice(1), 16); return rgb(((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255); };\n    const pfad = (pts, schliessen) => pts.map((q, i) => { const u = toPdf(q); return (i ? 'L' : 'M') + n2(u[0]) + ' ' + n2(-u[1]); }).join(' ') + (schliessen ? ' Z' : '');\n    const winkelPdf = (p, d) => { const a = toPdf(p), b = toPdf(V.add(p, d)); return Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI; };\n    for (const p of ps) {\n      if (p.art === 'linie') {\n        const a = toPdf(p.p1), b = toPdf(p.p2);\n        page.drawLine({ start: { x: a[0], y: a[1] }, end: { x: b[0], y: b[1] }, thickness: p.breite, color: farbe(p.farbe), lineCap: p.cap === 'round' ? LineCapStyle.Round : LineCapStyle.Butt, dashArray: p.dash || undefined });\n      } else if (p.art === 'polygon') {\n        page.drawSvgPath(pfad(p.punkte, true), { x: 0, y: 0, color: p.fuellung ? farbe(p.fuellung) : undefined, opacity: p.deckkraft == null ? 1 : p.deckkraft, borderColor: p.rand ? farbe(p.rand) : undefined, borderWidth: p.rand ? (p.randBreite || 0) : 0, borderDashArray: p.dash || undefined });\n      } else if (p.art === 'pfad') {\n        const d = p.d.map(seg => seg[0] === 'Z' ? 'Z' : seg[0] + seg.slice(1).map(q => { const u = toPdf(q); return n2(u[0]) + ' ' + n2(-u[1]); }).join(' ')).join(' ');\n        page.drawSvgPath(d, { x: 0, y: 0, color: p.fuellung ? farbe(p.fuellung) : undefined, opacity: p.deckkraft == null ? 1 : p.deckkraft, borderColor: p.rand ? farbe(p.rand) : undefined, borderWidth: p.rand ? (p.randBreite || 0) : 0 });\n      } else if (p.art === 'kurve') {\n        const [a, c1, c2, b] = p.punkte.map(toPdf);\n        page.drawSvgPath(`M${n2(a[0])} ${n2(-a[1])} C${n2(c1[0])} ${n2(-c1[1])} ${n2(c2[0])} ${n2(-c2[1])} ${n2(b[0])} ${n2(-b[1])}`, { x: 0, y: 0, color: undefined, borderColor: farbe(p.farbe), borderWidth: p.breite, borderDashArray: p.dash || undefined });\n      } else if (p.art === 'text') {\n        if (!p.text && !p.hoch) continue;\n        const g = p.groesse, gh = g * 0.65;\n        const w = font.widthOfTextAtSize(p.text || '', g), wh = p.hoch ? font.widthOfTextAtSize(p.hoch, gh) : 0;\n        const rad = (p.winkel || 0) * Math.PI / 180; const d = { x: Math.cos(rad), y: Math.sin(rad) }; const up = { x: d.y, y: -d.x };\n        const start = p.anker === 'mitte' ? V.sub({ x: p.x, y: p.y }, V.mul(d, (w + wh) / 2)) : { x: p.x, y: p.y };\n        if (p.halo) {\n          const pad = g * 0.18, oben = g * 0.78 + pad, unten = g * 0.22 + pad;\n          const a0 = V.sub(start, V.mul(d, pad)), a1 = V.add(start, V.mul(d, w + wh + pad));\n          page.drawSvgPath(pfad([V.add(a0, V.mul(up, oben)), V.add(a1, V.mul(up, oben)), V.sub(a1, V.mul(up, unten)), V.sub(a0, V.mul(up, unten))], true), { x: 0, y: 0, color: rgb(1, 1, 1), borderColor: undefined, borderWidth: 0 });\n        }\n        const u = toPdf(start); const rot = degrees(winkelPdf(start, d)); const col = farbe(p.farbe);\n        if (p.text) page.drawText(p.text, { x: u[0], y: u[1], size: g, font, color: col, rotate: rot });\n        if (p.hoch) { const s2 = V.add(V.add(start, V.mul(d, w)), V.mul(up, g * 0.35)); const u2 = toPdf(s2); page.drawText(p.hoch, { x: u2[0], y: u2[1], size: gh, font, color: col, rotate: rot }); }\n      }\n    }\n  }\n\n  // ---------- Fang ----------\n  // quellen: Array von { punkte: [{x,y}], segmente: [[x1,y1,x2,y2]] }\n  function fangFrei(p, r, quellen) {\n    let best = null, bd = r;\n    for (const q of quellen) for (const e of q.punkte) { const d = V.dist(p, e); if (d < bd) { bd = d; best = { p: { x: e.x, y: e.y }, art: 'Endpunkt' }; } }\n    if (best) return best;\n    bd = r; const nah = [];\n    for (const q of quellen) for (const s of q.segmente) {\n      if (Math.min(s[0], s[2]) > p.x + r || Math.max(s[0], s[2]) < p.x - r || Math.min(s[1], s[3]) > p.y + r || Math.max(s[1], s[3]) < p.y - r) continue;\n      const f = V.fuss(p, { x: s[0], y: s[1] }, { x: s[2], y: s[3] }); const d = V.dist(p, f.p);\n      if (d < r) nah.push({ s, d, f: f.p });\n      if (d < bd) { bd = d; best = { p: f.p, art: 'Linie' }; }\n    }\n    // Zwei nahe, nicht parallele Linien → Schnittpunkt (Innenecken von Räumen, Kreuzungen)\n    if (nah.length >= 2) {\n      nah.sort((a, b) => a.d - b.d);\n      for (let i = 0; i < Math.min(nah.length, 4); i++) for (let j = i + 1; j < Math.min(nah.length, 4); j++) {\n        const A = nah[i].s, B = nah[j].s, ax = A[2] - A[0], ay = A[3] - A[1], bx = B[2] - B[0], by = B[3] - B[1], det = ax * by - ay * bx;\n        if (Math.abs(det) < 1e-6 * Math.hypot(ax, ay) * Math.hypot(bx, by)) continue;\n        const t = ((B[0] - A[0]) * by - (B[1] - A[1]) * bx) / det, ip = { x: A[0] + ax * t, y: A[1] + ay * t };\n        if (V.dist(p, ip) <= r * 1.2) return { p: ip, art: 'Schnittpunkt' };\n      }\n    }\n    return best;\n  }\n  // Rechtwinklig zu S: Punkt auf die nähere Achse legen, dann entlang der Achse an Endpunkte / Schnittpunkte fangen\n  function fangAchse(S, p, r, quellen) {\n    const horiz = Math.abs(p.x - S.x) >= Math.abs(p.y - S.y);\n    const pa = horiz ? { x: p.x, y: S.y } : { x: S.x, y: p.y };\n    let best = null, bd = r;\n    for (const q of quellen) for (const e of q.punkte) {\n      if ((horiz ? Math.abs(e.y - S.y) : Math.abs(e.x - S.x)) > 0.6) continue;\n      const d = V.dist(pa, e); if (d < bd) { bd = d; best = { p: horiz ? { x: e.x, y: S.y } : { x: S.x, y: e.y }, art: 'Endpunkt' }; }\n    }\n    if (best) return { p: best.p, fang: best };\n    bd = r;\n    for (const q of quellen) for (const s of q.segmente) {\n      let ip = null;\n      if (horiz) { const y = S.y; if ((s[1] - y) * (s[3] - y) > 0 || Math.abs(s[3] - s[1]) < 1e-9) continue; const t = (y - s[1]) / (s[3] - s[1]); ip = { x: s[0] + (s[2] - s[0]) * t, y }; }\n      else { const x = S.x; if ((s[0] - x) * (s[2] - x) > 0 || Math.abs(s[2] - s[0]) < 1e-9) continue; const t = (x - s[0]) / (s[2] - s[0]); ip = { x, y: s[1] + (s[3] - s[1]) * t }; }\n      const d = V.dist(pa, ip); if (d < bd) { bd = d; best = { p: ip, art: 'Schnittpunkt' }; }\n    }\n    return best ? { p: best.p, fang: best } : { p: pa, fang: null };\n  }\n\n  // ---------- Plan-Linien aus einer pdf.js-Seite (für Fang) ----------\n  async function planSegmente(page, viewport, pdfjs) {\n    const OPS = pdfjs.OPS; const ol = await page.getOperatorList();\n    const segs = []; let ctm = [1, 0, 0, 1, 0, 0]; const stack = [];\n    const mul = (m1, m2) => [m1[0] * m2[0] + m1[2] * m2[1], m1[1] * m2[0] + m1[3] * m2[1], m1[0] * m2[2] + m1[2] * m2[3], m1[1] * m2[2] + m1[3] * m2[3], m1[0] * m2[4] + m1[2] * m2[5] + m1[4], m1[1] * m2[4] + m1[3] * m2[5] + m1[5]];\n    const ap = (m, x, y) => [m[0] * x + m[2] * y + m[4], m[1] * x + m[3] * y + m[5]];\n    const push = (x1, y1, x2, y2) => {\n      const p = ap(ctm, x1, y1), q = ap(ctm, x2, y2);\n      const P = viewport.convertToViewportPoint(p[0], p[1]), Q = viewport.convertToViewportPoint(q[0], q[1]);\n      const dx = Math.abs(Q[0] - P[0]), dy = Math.abs(Q[1] - P[1]); const L = Math.hypot(dx, dy);\n      if (L >= 3 && (dx < 0.05 * L || dy < 0.05 * L)) segs.push([P[0], P[1], Q[0], Q[1]]);   // nur waagerecht/senkrecht, ≥ 3 pt (Schraffuren fallen raus)\n    };\n    for (let i = 0; i < ol.fnArray.length; i++) {\n      const fn = ol.fnArray[i], a = ol.argsArray[i];\n      if (fn === OPS.save) stack.push(ctm);\n      else if (fn === OPS.restore) ctm = stack.pop() || [1, 0, 0, 1, 0, 0];\n      else if (fn === OPS.transform) ctm = mul(ctm, a);\n      else if (fn === OPS.constructPath) {\n        const ops = a[0], args = a[1]; let k = 0, cur = null, start = null;\n        for (const op of ops) {\n          switch (op) {\n            case OPS.moveTo: cur = [args[k], args[k + 1]]; start = cur; k += 2; break;\n            case OPS.lineTo: { const n = [args[k], args[k + 1]]; if (cur) push(cur[0], cur[1], n[0], n[1]); cur = n; k += 2; break; }\n            case OPS.curveTo: { const n = [args[k + 4], args[k + 5]]; if (cur) push(cur[0], cur[1], n[0], n[1]); cur = n; k += 6; break; }\n            case OPS.curveTo2: case OPS.curveTo3: { const n = [args[k + 2], args[k + 3]]; if (cur) push(cur[0], cur[1], n[0], n[1]); cur = n; k += 4; break; }\n            case OPS.closePath: if (cur && start) push(cur[0], cur[1], start[0], start[1]); cur = start; break;\n            case OPS.rectangle: { const x = args[k], y = args[k + 1], w = args[k + 2], h = args[k + 3]; push(x, y, x + w, y); push(x + w, y, x + w, y + h); push(x + w, y + h, x, y + h); push(x, y + h, x, y); cur = [x, y]; start = cur; k += 4; break; }\n            default: break;\n          }\n        }\n      }\n    }\n    // Endpunkte (dedupliziert auf 0,1 pt)\n    const seen = new Set(), punkte = [];\n    for (const s of segs) for (const [x, y] of [[s[0], s[1]], [s[2], s[3]]]) { const key = Math.round(x * 10) + ':' + Math.round(y * 10); if (!seen.has(key)) { seen.add(key); punkte.push({ x, y }); } }\n    return { segmente: segs, punkte };\n  }\n\n\n\n  // Öffnungen einer gezeichneten Wand durch Türen, die auf ihrer Achse liegen → Intervalle [a, b] in pt entlang der Achse\n  function wandOeffnungen(wand, elemente, kalib) {\n    const L = V.dist(wand.p1, wand.p2); if (L < 1e-6) return [];\n    const d = V.mul(V.sub(wand.p2, wand.p1), 1 / L), n = V.perp(d), tol = dickePt(wand, kalib) / 2 + 3;\n    const out = [];\n    for (const el of elemente) {\n      if ((el.typ !== 'tuer' && el.typ !== 'fenster') || el.id === wand.id) continue;\n      const a = V.sub(el.p1, wand.p1), b = V.sub(el.p2, wand.p1);\n      if (Math.abs(V.dot(a, n)) > tol || Math.abs(V.dot(b, n)) > tol) continue;\n      const u1 = V.dot(a, d), u2 = V.dot(b, d), lo = Math.min(u1, u2), hi = Math.max(u1, u2);\n      if (hi < -1 || lo > L + 1) continue;\n      out.push([Math.max(0, lo), Math.min(L, hi)]);\n    }\n    return out;\n  }\n  // Verlängerung der beiden Wandenden an Anschlüssen: halbe Dicke der Nachbarwand, wenn das Ende auf deren Achse liegt (Ecke / T-Stoß)\n  function wandEnden(wand, elemente, kalib) {\n    const out = [0, 0]; const t = dickePt(wand, kalib);\n    [wand.p1, wand.p2].forEach((P, i) => {\n      for (const w of elemente) {\n        if (w.typ !== 'wand' || w.id === wand.id) continue;\n        const tw = dickePt(w, kalib); const L = V.dist(w.p1, w.p2); if (L < 1e-6) continue;\n        const f = V.fuss(P, w.p1, w.p2); if (V.dist(P, f.p) > Math.max(1.5, t * 0.15)) continue;   // Ende liegt auf der Nachbarachse\n        const u = V.dot(V.sub(P, w.p1), V.mul(V.sub(w.p2, w.p1), 1 / L)); if (u < -tw / 2 - 1 || u > L + tw / 2 + 1) continue;\n        // Nur verlängern, wenn die Wände nicht in der gleichen Richtung weiterlaufen (gerade Fortsetzung braucht keine Verlängerung)\n        const dA = V.norm(V.sub(wand.p2, wand.p1)), dB = V.norm(V.sub(w.p2, w.p1)); if (Math.abs(V.dot(dA, dB)) > 0.98) continue;\n        out[i] = Math.max(out[i], tw / 2);\n      }\n    });\n    return out;\n  }\n  // Umriss einer gezeichneten Wand (mit Anschluss-Verlängerungen): 4 Ecken + 4 Kanten – Fangziele für Flächen, Maße, Möbel\n  function wandUmriss(wand, elemente, kalib) {\n    const t = dickePt(wand, kalib), e = wandEnden(wand, elemente, kalib), L = V.dist(wand.p1, wand.p2); if (L < 1e-6) return null;\n    const d = V.mul(V.sub(wand.p2, wand.p1), 1 / L);\n    return rechteck(V.sub(wand.p1, V.mul(d, e[0])), V.add(wand.p2, V.mul(d, e[1])), t);\n  }\n  // Liegt die Tür auf der Achse einer gezeichneten Wand? → dann öffnet sich die Wand selbst\n  const tuerAufWand = (tuer, elemente, kalib) => elemente.some(w => w.typ === 'wand' && wandOeffnungen(w, [tuer], kalib).length > 0);\n  // Dicke (pt) der gezeichneten Wand, auf der eine Tür/ein Fenster liegt – sonst null\n  const wandDickeAuf = (el, elemente, kalib) => { const w = elemente.find(x => x.typ === 'wand' && wandOeffnungen(x, [el], kalib).length > 0); return w ? dickePt(w, kalib) : null; };\n  // Durchbruch für eine Tür auf einer PLAN-Wand: gegenüberliegende parallele Plan-Linie (5–80 cm) suchen → { tiefe cm, richtung ±1 } oder null\n  function tuerDurchbruchErkennen(tuer, segmente, kalib) {\n    const w = V.dist(tuer.p1, tuer.p2); if (w < 1e-6 || !segmente || !segmente.length) return null;\n    const d = V.mul(V.sub(tuer.p2, tuer.p1), 1 / w), n = V.perp(d);\n    const min = 0.04 * kalib.ptProM, max = 0.5 * kalib.ptProM;   // Wanddicken 4–50 cm (Putz-, Dämm- und Mauerwerkslinien liegen dazwischen)\n    const kand = [];\n    for (const s of segmente) {\n      const sd = { x: s[2] - s[0], y: s[3] - s[1] }, sl = Math.hypot(sd.x, sd.y); if (sl < 1e-6) continue;\n      if (Math.abs(V.dot(V.mul(sd, 1 / sl), d)) < 0.985) continue;                    // nicht parallel\n      const a = V.dot(V.sub({ x: s[0], y: s[1] }, tuer.p1), d), b = V.dot(V.sub({ x: s[2], y: s[3] }, tuer.p1), d);\n      const ueberlappung = Math.min(Math.max(a, b), w) - Math.max(Math.min(a, b), 0);\n      if (ueberlappung < 0.6 * w) continue;                                           // muss die Türbreite überdecken\n      const dist = V.dot(V.sub({ x: (s[0] + s[2]) / 2, y: (s[1] + s[3]) / 2 }, tuer.p1), n), ad = Math.abs(dist);\n      if (ad < min || ad > max) continue;\n      kand.push({ ad, richtung: dist > 0 ? 1 : -1 });\n    }\n    if (!kand.length) return null;\n    // Wandseite = Seite der nächstgelegenen Parallelen; Gegenkante = die ENTFERNTESTE Parallele auf dieser Seite (Putz-/Schichtlinien liegen dazwischen)\n    kand.sort((x, y) => x.ad - y.ad); const seite = kand[0].richtung;\n    const best = kand.filter(k => k.richtung === seite).reduce((m, k) => k.ad > m.ad ? k : m);\n    return { tiefe: Math.round(best.ad / kalib.ptProM * 1000) / 10, richtung: seite };\n  }\n\n  // ---------- Rasterquellen (Scans, Fotos, JPG/PNG, gescannte PDFs) ----------\n  // Aufhellen wie im Grundriss-Aufbereiter, aber mit LOKALEM Weißpunkt: je Block (≈ 1/60 der Bildkante) das 95. Perzentil\n  // der Helligkeit als Papierweiß, über die Nachbarblöcke dilatiert und bilinear interpoliert → Schatten, Falten und\n  // Grauschleier fallen weg, graue Füllungen bleiben grau, Linien bleiben. Danach Papierton neutralisieren und Schwarzpunkt setzen.\n  function bildAufhellen(img) {\n    const w = img.width, h = img.height, d = img.data, n = w * h;\n    const g = new Uint8Array(n);\n    for (let i = 0, j = 0; i < n; i++, j += 4) g[i] = (d[j] * 77 + d[j + 1] * 151 + d[j + 2] * 28) >> 8;\n    const B = Math.max(24, Math.round(Math.max(w, h) / 60)), gw = Math.ceil(w / B), gh = Math.ceil(h / B);\n    const bg = new Float32Array(gw * gh), hist = new Uint32Array(256);\n    for (let by = 0; by < gh; by++) for (let bx = 0; bx < gw; bx++) {\n      hist.fill(0); let cnt = 0;\n      for (let y = by * B, ye = Math.min(h, y + B); y < ye; y++) for (let x = bx * B, xe = Math.min(w, x + B); x < xe; x++) { hist[g[y * w + x]]++; cnt++; }\n      let acc = 0, v = 255; const ziel = cnt * 0.95; for (v = 0; v < 256; v++) { acc += hist[v]; if (acc >= ziel) break; }\n      bg[by * gw + bx] = Math.min(255, v);\n    }\n    // Weites Nachbarschafts-Maximum (Radius ≈ 1/5 der Bildkante, mind. 300 px): dunkle Blöcke (Wandbalken, Schrift) und auch\n    // größere graue Füllungen erben das Papierweiß der Umgebung – nur eine Schattierung über das ganze Blatt bleibt zum Teil erhalten.\n    const Rb = Math.ceil(Math.max(300, Math.max(w, h) / 5) / B), dil = new Float32Array(gw * gh);\n    for (let by = 0; by < gh; by++) for (let bx = 0; bx < gw; bx++) { let m = 0; for (let yy = Math.max(0, by - Rb); yy <= Math.min(gh - 1, by + Rb); yy++) for (let xx = Math.max(0, bx - Rb); xx <= Math.min(gw - 1, bx + Rb); xx++) m = Math.max(m, bg[yy * gw + xx]); dil[by * gw + bx] = Math.max(40, m); }\n    // glätten (Kastenfilter, halber Radius), damit aus dem Fensterrand kein Helligkeitssprung wird\n    const Rs = Math.max(1, Math.round(Rb / 2)), gl = new Float32Array(gw * gh);\n    for (let by = 0; by < gh; by++) for (let bx = 0; bx < gw; bx++) { let sum = 0, cnt = 0; for (let yy = Math.max(0, by - Rs); yy <= Math.min(gh - 1, by + Rs); yy++) for (let xx = Math.max(0, bx - Rs); xx <= Math.min(gw - 1, bx + Rs); xx++) { sum += dil[yy * gw + xx]; cnt++; } gl[by * gw + bx] = sum / cnt; }\n    const at = (bx, by) => gl[Math.min(gh - 1, Math.max(0, by)) * gw + Math.min(gw - 1, Math.max(0, bx))];\n    for (let y = 0; y < h; y++) {\n      const fy = y / B - 0.5, by = Math.floor(fy), ty = fy - by;\n      for (let x = 0; x < w; x++) {\n        const fx = x / B - 0.5, bx = Math.floor(fx), tx = fx - bx;\n        const L = (at(bx, by) * (1 - tx) + at(bx + 1, by) * tx) * (1 - ty) + (at(bx, by + 1) * (1 - tx) + at(bx + 1, by + 1) * tx) * ty;\n        const s = 255 / L, j = (y * w + x) * 4;\n        d[j] = Math.min(255, d[j] * s); d[j + 1] = Math.min(255, d[j + 1] * s); d[j + 2] = Math.min(255, d[j + 2] * s);\n      }\n    }\n    // Papierton neutralisieren (je Kanal 95. Perzentil → Weiß) und Schwarzpunkt (1,5. Perzentil der Helligkeit, max. 120)\n    const hk = [new Uint32Array(256), new Uint32Array(256), new Uint32Array(256)];\n    for (let j = 0; j < d.length; j += 4) { hk[0][d[j]]++; hk[1][d[j + 1]]++; hk[2][d[j + 2]]++; }\n    const perz = (hh, p) => { let acc = 0; const ziel = n * p; for (let v = 0; v < 256; v++) { acc += hh[v]; if (acc >= ziel) return v; } return 255; };\n    const wpK = hk.map(hh => Math.max(120, perz(hh, 0.95)));\n    hist.fill(0);\n    for (let j = 0; j < d.length; j += 4) hist[Math.min(255, ((d[j] * 77 + d[j + 1] * 151 + d[j + 2] * 28) >> 8))]++;\n    const bp = Math.min(120, perz(hist, 0.015));\n    const luts = wpK.map(wp => { const lut = new Uint8ClampedArray(256); for (let v = 0; v < 256; v++) lut[v] = Math.round(Math.max(0, Math.min(1, (v - bp) / (wp - bp))) * 255); return lut; });\n    for (let j = 0; j < d.length; j += 4) { d[j] = luts[0][d[j]]; d[j + 1] = luts[1][d[j + 1]]; d[j + 2] = luts[2][d[j + 2]]; }\n    return { wp: wpK, bp, block: B };\n  }\n  // Fanglinien aus einem Rasterbild: waagerechte/senkrechte Kanten (Hell→Dunkel-Übergänge) – Wandbalken liefern ihre Außenkanten,\n  // dünne Linien ihre beiden Ränder. Gradient quer zur Kante mit Non-Maximum-Unterdrückung, ±1 px Toleranz gegen Zittern,\n  // kleine Lücken (Rauschen, Schraffurkreuzungen) werden überbrückt. img = ImageData in Arbeitsauflösung, faktor = Seiteneinheiten je Pixel.\n  function bildSegmente(img, faktor) {\n    const w = img.width, h = img.height, d = img.data, n = w * h, f = faktor || 1;\n    const g = new Uint8Array(n);\n    for (let i = 0, j = 0; i < n; i++, j += 4) g[i] = (d[j] * 77 + d[j + 1] * 151 + d[j + 2] * 28) >> 8;\n    // lokale Helligkeit (Integralbild) → Schwelle relativ zum Papierweiß der Umgebung\n    const R = Math.max(10, Math.round(Math.max(w, h) / 50)), W = w + 1, I = new Float64Array(W * (h + 1));\n    for (let y = 1; y <= h; y++) { let z = 0; const o = (y - 1) * w, r = y * W, ro = (y - 1) * W; for (let x = 1; x <= w; x++) { z += g[o + x - 1]; I[r + x] = I[ro + x] + z; } }\n    const schwelle = (x, y) => { const x0 = Math.max(0, x - R), x1 = Math.min(w, x + R + 1), y0 = Math.max(0, y - R), y1 = Math.min(h, y + R + 1); const m = (I[y1 * W + x1] - I[y0 * W + x1] - I[y1 * W + x0] + I[y0 * W + x0]) / ((x1 - x0) * (y1 - y0)); return Math.max(22, 0.16 * m); };\n    const minLen = Math.max(10, Math.round(Math.max(w, h) / 90)), luecke = 3, segs = [];\n    // Kantenkarte: +1 = Übergang hell→dunkel in Laufrichtung, −1 = dunkel→hell (Vorzeichen getrennt, damit Ober- und Unterkante nicht verschmelzen)\n    const kanten = (senkrecht) => {\n      const L1 = senkrecht ? w : h, L2 = senkrecht ? h : w;           // L1: Achse quer zur Kante, L2: Achse entlang der Kante\n      const gv = (a, b) => senkrecht ? g[b * w + a] : g[a * w + b];    // (quer, entlang)\n      const grad = new Int16Array(L1 * L2);\n      for (let a = 1; a < L1 - 1; a++) for (let b = 0; b < L2; b++) grad[a * L2 + b] = gv(a - 1, b) - gv(a + 1, b);\n      const E = new Int8Array(L1 * L2);\n      for (let a = 1; a < L1 - 1; a++) for (let b = 0; b < L2; b++) {\n        const v = grad[a * L2 + b], av = Math.abs(v); if (av < 22) continue;\n        const T = senkrecht ? schwelle(a, b) : schwelle(b, a); if (av < T) continue;\n        const o = Math.abs(grad[(a - 1) * L2 + b]), u = Math.abs(grad[(a + 1) * L2 + b]);\n        if (av >= o && av >= u) E[a * L2 + b] = v > 0 ? 1 : -1;      // Non-Maximum-Unterdrückung quer zur Kante\n      }\n      for (const vz of [1, -1]) for (let a = 1; a < L1 - 1; a++) {\n        let start = -1, letzte = -1;\n        for (let b = 0; b <= L2; b++) {\n          const k = b < L2 && (E[a * L2 + b] === vz || E[(a - 1) * L2 + b] === vz || E[(a + 1) * L2 + b] === vz);   // ±1 px Zittern\n          if (k) { if (start < 0) start = b; letzte = b; }\n          else if (start >= 0 && b - letzte > luecke) { if (letzte + 1 - start >= minLen) { const q = (a + 0.5) * f; segs.push(senkrecht ? [q, start * f, q, (letzte + 1) * f] : [start * f, q, (letzte + 1) * f, q]); } start = -1; }\n        }\n      }\n    };\n    kanten(false); kanten(true);\n    // Fast gleiche Parallelen (Zitter-Duplikate innerhalb 1 px) auf die längere reduzieren\n    const key = (s0) => (Math.abs(s0[3] - s0[1]) < 1e-9 ? 'h' : 'v') + ':' + Math.round((Math.abs(s0[3] - s0[1]) < 1e-9 ? s0[1] : s0[0]) / f);\n    segs.sort((a, b) => (Math.abs(b[2] - b[0]) + Math.abs(b[3] - b[1])) - (Math.abs(a[2] - a[0]) + Math.abs(a[3] - a[1])));\n    const behalten = [], lagen = new Map();\n    for (const s0 of segs) {\n      const waag = Math.abs(s0[3] - s0[1]) < 1e-9, lage = Math.round((waag ? s0[1] : s0[0]) / f), a0 = waag ? s0[0] : s0[1], a1 = waag ? s0[2] : s0[3];\n      let doppelt = false;\n      for (const dl of [-1, 0, 1]) { const liste = lagen.get((waag ? 'h' : 'v') + ':' + (lage + dl)); if (!liste) continue; for (const [b0, b1] of liste) if (a0 >= b0 - 1 && a1 <= b1 + 1) { doppelt = true; break; } if (doppelt) break; }\n      if (doppelt) continue;\n      behalten.push(s0); const k = key(s0); if (!lagen.has(k)) lagen.set(k, []); lagen.get(k).push([a0, a1]);\n      if (behalten.length >= 8000) break;\n    }\n    const seen = new Set(), punkte = [];\n    for (const s0 of behalten) for (const [x, y] of [[s0[0], s0[1]], [s0[2], s0[3]]]) { const kk = Math.round(x / f) + ':' + Math.round(y / f); if (!seen.has(kk)) { seen.add(kk); punkte.push({ x, y }); } }\n    return { segmente: behalten, punkte };\n  }\n\n  return { PT_PRO_MM, ptProMausMassstab, massstabAusPtProM, V, FARBEN, STILE, NEU, K, formatMass, formatMeter, formatFlaeche, massGeometrie, tuerGeometrie, dickePt, flaecheInhalt, schwerpunkt, rechteck, prims, svgAus, svgPrim, pdfZeichnen, fangFrei, fangAchse, planSegmente, bildAufhellen, bildSegmente, MOEBEL, TUEREN, FENSTER, BLAETTER, wandEnden, wandUmriss, wandOeffnungen, tuerAufWand, wandDickeAuf, tuerDurchbruchErkennen, linienSkala, esc, n2 };\n})();\n\n// ===== Grundriss-Editor · Oberfläche =====\n(() => {\n  const $ = (s) => document.querySelector(s);\n  const V = GE.V;\n  const WERKZEUGE = {\n    auswahl: { name: 'Auswahl', taste: 'V', hinweis: 'Element anklicken, um es zu bearbeiten oder zu verschieben. Griffe ziehen ändert Endpunkte. Entf löscht.' },\n    hand: { name: 'Verschieben', taste: 'H', hinweis: 'Ziehen verschiebt den Ausschnitt. Alternativ Leertaste halten oder mittlere Maustaste. Strg + Mausrad zoomt.' },\n    wand: { name: 'Wand', taste: 'W', hinweis: 'Klick setzt den Anfang, Klick das Ende – die nächste Wand beginnt dort. Wände verbinden sich an Ecken und T-Stößen von selbst. Esc oder Rechtsklick beendet den Wandzug. Shift hebt den rechten Winkel auf.' },\n    tuer: { name: 'Tür', taste: 'T', hinweis: 'Klick auf den Anschlag (Band), Klick auf die Gegenseite – die Breite ergibt sich aus der Strecke. Aufschlagseite später in den Eigenschaften spiegeln.' },\n    fenster: { name: 'Fenster', taste: 'N', hinweis: 'Klick auf die eine Laibung, Klick auf die andere – die Breite ergibt sich aus der Strecke. Fensterart rechts wählen. Auf gezeichneten Wänden öffnet sich die Wand automatisch, in Plan-Wänden wird die Gegenkante gesucht.' },\n    mass: { name: 'Maß', taste: 'M', hinweis: 'Zwei Punkte anklicken. Die Maßzahl rechnet sich aus der Kalibrierung; der Abstand der Maßlinie lässt sich am Griff ziehen. Eigener Text ist möglich.' },\n    text: { name: 'Text', taste: 'X', hinweis: 'Klick setzt die Beschriftung. Text, Größe und Drehung rechts anpassen.' },\n    flaeche: { name: 'Fläche', taste: 'F', hinweis: 'Ecken nacheinander anklicken. Doppelklick, Enter oder Klick auf den ersten Punkt schließt die Fläche – die Quadratmeter erscheinen automatisch.' },\n    kalib: { name: 'Kalibrieren', taste: 'K', hinweis: 'Zwei Punkte einer bekannten Strecke anklicken (z. B. die Enden einer Maßkette im Plan) und die Länge in Metern eingeben. Alternativ unten den Zeichnungsmaßstab setzen.' },\n    moebel: { name: 'Einrichtung', taste: 'E', hinweis: 'Möbelstück rechts wählen, Maße und Drehung anpassen, dann per Klick platzieren. Danach mit der Auswahl verschieben, am runden Griff oder mit R drehen.' },\n    abdecken: { name: 'Abdecken', taste: 'D', hinweis: 'Rechteck über den Bereich ziehen, der weiß abgedeckt werden soll – z. B. eine entfallende Wand oder alte Maßzahlen. Danach darüber neu zeichnen.' },\n    ausschnitt: { name: 'Ausschnitt', taste: 'A', hinweis: 'Rechteck aufziehen – der PNG-Export enthält nur diesen Bereich. Ohne Ausschnitt wird das ganze Blatt exportiert.' },\n  };\n  const NAME = { wand: 'Wand', tuer: 'Tür', fenster: 'Fenster', mass: 'Maß', text: 'Text', flaeche: 'Fläche', abdecken: 'Abdeckung', moebel: 'Möbel' };\n  const PLURAL = { wand: ['Wand', 'Wände'], tuer: ['Tür', 'Türen'], fenster: ['Fenster', 'Fenster'], mass: ['Maß', 'Maße'], text: ['Text', 'Texte'], flaeche: ['Fläche', 'Flächen'], abdecken: ['Abdeckung', 'Abdeckungen'], moebel: ['Möbelstück', 'Möbelstücke'] };\n\n  const st = {\n    pdf: null, pdfBytes: null, seite: null, seiteNr: 1, seitenAnzahl: 0, viewport: null, renderTask: null,\n    bild: null, bildBytes: null, dateiName: '', breite: 0, hoehe: 0, zoom: 1, inhalt: null,\n    werkzeug: 'auswahl', elemente: [], proSeite: {}, naechsteId: 1, auswahl: null,\n    kalib: { ptProM: GE.ptProMausMassstab(100), quelle: 'angenommen', massstab: 100 },\n    ortho: true, fangAn: true, segmente: [], punkte: [], fangIndex: [], fangArt: '', aufhellen: true, blank: null, rasterCm: 0, rasterZeigen: false,\n    zeichnung: null, maus: null, fang: null, drag: null, pan: null, leertaste: false, shift: false,\n    verlauf: [], verlaufPos: -1, ausschnitt: null,\n    einstellungen: { wand: GE.NEU.wand(), tuer: GE.NEU.tuer(), fenster: GE.NEU.fenster(), mass: GE.NEU.mass(), text: GE.NEU.text(), flaeche: GE.NEU.flaeche(), abdecken: GE.NEU.abdecken(), moebel: GE.NEU.moebel() },\n  };\n  const werkstatt = $('#werkstatt'), blatt = $('#blatt'), seiteCanvas = $('#seite'), overlay = $('#overlay'), panel = $('#eigenschaften');\n  const klon = (o) => JSON.parse(JSON.stringify(o));\n  const elById = (id) => st.elemente.find(e => e.id === id);\n  const zahl = (v, alt) => { const n = parseFloat(String(v).replace(',', '.')); return isNaN(n) ? alt : n; };\n\n  // ---------- Datei laden ----------\n  async function ladeDatei(file) {\n    if (!file) return;\n    zeigeLaden(true, 'Plan wird geladen …');\n    try {\n      st.dateiName = file.name.replace(/\\.[^.]+$/, ''); st.blank = null; st.rasterCm = 0; st.rasterZeigen = false;\n      st.elemente = []; st.proSeite = {}; st.auswahl = null; st.zeichnung = null; st.ausschnitt = null; st.verlauf = []; st.verlaufPos = -1;\n      st.segmente = []; st.punkte = [];\n      const buf = await file.arrayBuffer();\n      if (/\\.pdf$/i.test(file.name) || file.type === 'application/pdf') {\n        st.pdfBytes = new Uint8Array(buf.slice(0)); st.bild = null; st.bildBytes = null;\n        st.pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;\n        st.seitenAnzahl = st.pdf.numPages;\n        await zeigeSeite(1);\n      } else {\n        st.pdf = null; st.pdfBytes = null; st.seite = null; st.viewport = null; st.seitenAnzahl = 1; st.seiteNr = 1;\n        st.bildBytes = new Uint8Array(buf);\n        st.bild = await new Promise((ok, err) => { const im = new Image(); im.onload = () => ok(im); im.onerror = () => err(new Error('Bild konnte nicht gelesen werden.')); im.src = URL.createObjectURL(file); });\n        st.breite = st.bild.naturalWidth; st.hoehe = st.bild.naturalHeight;\n        st.kalib = { ptProM: 50, quelle: 'angenommen', massstab: null, einheit: 'px' };   // Pixelquelle: Maßstab unbekannt → kalibrieren\n        bildAufbereiten();\n        nachSeite();\n      }\n      $('#leer').classList.add('aus');\n      commit();\n    } catch (e) {\n      alert('Die Datei konnte nicht geladen werden: ' + (e && e.message ? e.message : e));\n    } finally { zeigeLaden(false); }\n  }\n\n  async function zeigeSeite(n) {\n    if (st.seite && st.seiteNr) st.proSeite[st.seiteNr] = st.elemente;\n    st.seiteNr = n; st.elemente = st.proSeite[n] || []; st.auswahl = null; st.zeichnung = null;\n    st.seite = await st.pdf.getPage(n);\n    st.viewport = st.seite.getViewport({ scale: 1 });\n    st.breite = st.viewport.width; st.hoehe = st.viewport.height;\n    const R = Math.max(1, Math.min(2 * (window.devicePixelRatio || 1), 5000 / Math.max(st.breite, st.hoehe)));\n    seiteCanvas.width = Math.ceil(st.breite * R); seiteCanvas.height = Math.ceil(st.hoehe * R);\n    const ctx = seiteCanvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, seiteCanvas.width, seiteCanvas.height);\n    if (st.renderTask) { try { st.renderTask.cancel(); } catch (e) { /* egal */ } }\n    st.renderTask = st.seite.render({ canvasContext: ctx, viewport: st.seite.getViewport({ scale: R }) });\n    nachSeite();\n    try { await st.renderTask.promise; } catch (e) { /* abgebrochen */ }\n    st.renderTask = null;\n    inhaltErmitteln(); zoomAnpassen();\n    // Fanglinien im Hintergrund holen\n    st.segmente = []; st.punkte = []; st.fangArt = '';\n    try { const q = await GE.planSegmente(st.seite, st.viewport, pdfjsLib); if (st.seite && q) { st.segmente = q.segmente; st.punkte = q.punkte; st.fangArt = 'vektor'; } } catch (e) { console.warn('Fanglinien', e); }\n    if (st.seite && st.segmente.length < 30) rasterFang(seiteCanvas);   // gescanntes PDF: Kanten aus dem Bild\n    renderPanel();\n  }\n\n  // Leeres Zeichenblatt: Format (mm) + Maßstab → weißes Blatt, Raster, schwarze Bauteile\n  function neuesBlatt(format, massstab, titel) {\n    const bl = GE.BLAETTER.find(b => b[0] === format) || GE.BLAETTER[0];\n    if (st.renderTask) { try { st.renderTask.cancel(); } catch (e) { /* egal */ } st.renderTask = null; }\n    st.pdf = null; st.pdfBytes = null; st.seite = null; st.viewport = null; st.bild = null; st.bildBytes = null; st.seitenAnzahl = 1; st.seiteNr = 1;\n    st.blank = { format: bl[0], name: bl[1], mm: [bl[2], bl[3]], massstab, titel: titel || '' };\n    st.breite = Math.round(bl[2] * GE.PT_PRO_MM * 100) / 100; st.hoehe = Math.round(bl[3] * GE.PT_PRO_MM * 100) / 100;\n    st.dateiName = (titel || 'Grundriss').replace(/[\\\\/:*?\"<>|]+/g, '-').trim() || 'Grundriss';\n    st.kalib = { ptProM: GE.ptProMausMassstab(massstab), quelle: 'massstab', massstab, einheit: 'pt' };\n    st.elemente = []; st.proSeite = {}; st.auswahl = null; st.zeichnung = null; st.ausschnitt = null; st.verlauf = []; st.verlaufPos = -1; st.naechsteId = 1;\n    st.segmente = []; st.punkte = []; st.fangArt = 'leer'; st.inhalt = null; st.rasterCm = 10; st.rasterZeigen = true;\n    seiteCanvas.width = Math.ceil(st.breite * 2); seiteCanvas.height = Math.ceil(st.hoehe * 2);\n    const ctx = seiteCanvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, seiteCanvas.width, seiteCanvas.height);\n    // Neuzeichnung: Bauteile schwarz, Wände gemauert 24 cm\n    st.einstellungen.wand = { ...GE.NEU.wand(), dicke: 24, stil: 'schraffur', farbe: '#000000' };\n    for (const k of ['tuer', 'fenster', 'mass', 'text', 'flaeche']) st.einstellungen[k] = { ...GE.NEU[k](), farbe: k === 'flaeche' ? '#263159' : '#000000' };\n    if (titel) { const g = 10; st.elemente.push({ ...GE.NEU.text(), text: titel + ' · M 1:' + massstab, farbe: '#000000', groesse: g, halo: false, p: { x: 12 * GE.PT_PRO_MM, y: 12 * GE.PT_PRO_MM }, id: st.naechsteId++ }); }\n    nachSeite(); $('#leer').classList.add('aus'); commit(); setzeWerkzeug('wand');\n  }\n  function neuPop(zeigen) {\n    const pop = $('#neuPop'); pop.classList.toggle('aus', !zeigen);\n    if (zeigen) { const sel = $('#neuFormat'); if (!sel.options.length) for (const b of GE.BLAETTER) { const o = document.createElement('option'); o.value = b[0]; o.textContent = `${b[1]} (${b[2]} × ${b[3]} mm)`; sel.appendChild(o); } $('#neuTitel').focus(); }\n  }\n  // Rasterquelle: Rohbild → Blatt-Canvas (optional aufgehellt) → Fanglinien aus dem Bild\n  function bildAufbereiten() {\n    seiteCanvas.width = st.breite; seiteCanvas.height = st.hoehe;\n    const ctx = seiteCanvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, st.breite, st.hoehe); ctx.drawImage(st.bild, 0, 0);\n    if (st.aufhellen) { try { const id = ctx.getImageData(0, 0, st.breite, st.hoehe); GE.bildAufhellen(id); ctx.putImageData(id, 0, 0); } catch (e) { console.warn('Aufhellen', e); } }\n    inhaltErmitteln();\n    rasterFang(seiteCanvas);\n  }\n  function rasterFang(quelle) {\n    st.segmente = []; st.punkte = []; st.fangArt = 'raster';\n    try {\n      const w = Math.max(200, Math.round(Math.min(2600, quelle.width))), h = Math.max(1, Math.round(w * st.hoehe / st.breite)), f = st.breite / w;\n      const c = document.createElement('canvas'); c.width = w; c.height = h;\n      const cx = c.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, w, h); cx.drawImage(quelle, 0, 0, w, h);\n      const q = GE.bildSegmente(cx.getImageData(0, 0, w, h), f);\n      st.segmente = q.segmente; st.punkte = q.punkte;\n    } catch (e) { console.warn('Rasterfang', e); }\n  }\n\n  function nachSeite() {\n    const sel = $('#seitenWahl'); sel.innerHTML = '';\n    for (let i = 1; i <= st.seitenAnzahl; i++) { const o = document.createElement('option'); o.value = i; o.textContent = 'Seite ' + i + ' / ' + st.seitenAnzahl; sel.appendChild(o); }\n    sel.value = st.seiteNr; sel.style.display = st.seitenAnzahl > 1 ? '' : 'none';\n    $('#dateiName').textContent = st.dateiName || 'Kein Plan geladen';\n    zoomAnpassen(); renderPanel(); kalibChip(); render();\n  }\n\n  // ---------- Zoom / Pan ----------\n  function setzeZoom(z, ankerClient) {\n    z = Math.max(0.05, Math.min(12, z));\n    const wr = werkstatt.getBoundingClientRect();\n    let pp = null;\n    if (ankerClient) pp = seitenPunktAus(ankerClient.x, ankerClient.y);\n    st.zoom = z;\n    const w = st.breite * z, h = st.hoehe * z;\n    blatt.style.width = w + 'px'; blatt.style.height = h + 'px';\n    seiteCanvas.style.width = w + 'px'; seiteCanvas.style.height = h + 'px';\n    overlay.setAttribute('width', w); overlay.setAttribute('height', h); overlay.setAttribute('viewBox', `0 0 ${st.breite} ${st.hoehe}`);\n    if (pp) { werkstatt.scrollLeft = pp.x * z + 24 - (ankerClient.x - wr.left); werkstatt.scrollTop = pp.y * z + 24 - (ankerClient.y - wr.top); }\n    $('#zoomWert').textContent = Math.round(z * 100) + ' %';\n    render();\n  }\n  // Einpassen: auf die Zeichnung (Tinte ohne leeren Blattrand) oder auf das ganze Blatt\n  function zoomAnpassen(ganzesBlatt) {\n    if (!st.breite) return;\n    const r = (!ganzesBlatt && st.inhalt) ? st.inhalt : { x: 0, y: 0, w: st.breite, h: st.hoehe };\n    const z = Math.min((werkstatt.clientWidth - 48) / r.w, (werkstatt.clientHeight - 48) / r.h);\n    setzeZoom(z);\n    werkstatt.scrollLeft = Math.max(0, (r.x + r.w / 2) * st.zoom + 24 - werkstatt.clientWidth / 2);\n    werkstatt.scrollTop = Math.max(0, (r.y + r.h / 2) * st.zoom + 24 - werkstatt.clientHeight / 2);\n  }\n  // Tinten-Rechteck des Blatts aus dem gerenderten Canvas (Abtastung, Helligkeit < 235); mit 2 % Rand\n  function inhaltErmitteln() {\n    st.inhalt = null;\n    try {\n      const cw = seiteCanvas.width, ch = seiteCanvas.height; if (!cw || !ch) return;\n      const schritt = Math.max(1, Math.floor(Math.max(cw, ch) / 900));\n      const id = seiteCanvas.getContext('2d').getImageData(0, 0, cw, ch).data;\n      let x0 = cw, y0 = ch, x1 = -1, y1 = -1;\n      for (let y = 0; y < ch; y += schritt) for (let x = 0; x < cw; x += schritt) {\n        const j = (y * cw + x) * 4; if (id[j + 3] < 40) continue;\n        if (((id[j] * 77 + id[j + 1] * 151 + id[j + 2] * 28) >> 8) < 235) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }\n      }\n      if (x1 < 0) return;\n      const f = st.breite / cw, rand = 0.02 * Math.max(x1 - x0, y1 - y0) * f;\n      const X0 = Math.max(0, x0 * f - rand), Y0 = Math.max(0, y0 * f - rand), X1 = Math.min(st.breite, (x1 + schritt) * f + rand), Y1 = Math.min(st.hoehe, (y1 + schritt) * f + rand);\n      if ((X1 - X0) * (Y1 - Y0) < 0.9 * st.breite * st.hoehe) st.inhalt = { x: X0, y: Y0, w: X1 - X0, h: Y1 - Y0 };   // nur wenn es sich lohnt\n    } catch (e) { console.warn('Inhalt', e); }\n  }\n  const seitenPunktAus = (cx, cy) => { const r = overlay.getBoundingClientRect(); return { x: (cx - r.left) / st.zoom, y: (cy - r.top) / st.zoom }; };\n  const seitenPunkt = (e) => seitenPunktAus(e.clientX, e.clientY);\n\n  // ---------- Verlauf ----------\n  function commit() {\n    st.proSeite[st.seiteNr] = st.elemente;\n    const snap = JSON.stringify({ proSeite: st.proSeite, ausschnitt: st.ausschnitt, seiteNr: st.seiteNr });\n    st.verlauf = st.verlauf.slice(0, st.verlaufPos + 1); st.verlauf.push(snap); if (st.verlauf.length > 60) st.verlauf.shift();\n    st.verlaufPos = st.verlauf.length - 1; verlaufKnoepfe();\n  }\n  function verlaufAnwenden(pos) {\n    const s = JSON.parse(st.verlauf[pos]); st.verlaufPos = pos;\n    st.proSeite = s.proSeite; st.elemente = st.proSeite[st.seiteNr] || []; st.ausschnitt = s.ausschnitt;\n    st.auswahl = null; st.zeichnung = null; verlaufKnoepfe(); renderPanel(); render();\n  }\n  const rueckgaengig = () => { if (st.verlaufPos > 0) verlaufAnwenden(st.verlaufPos - 1); };\n  const wiederholen = () => { if (st.verlaufPos < st.verlauf.length - 1) verlaufAnwenden(st.verlaufPos + 1); };\n  function verlaufKnoepfe() { $('#btnUndo').disabled = st.verlaufPos <= 0; $('#btnRedo').disabled = st.verlaufPos >= st.verlauf.length - 1; }\n\n  // ---------- Fang ----------\n  function fangQuellen(ausserId) {\n    const punkte = [], segmente = [], flaechenFang = ['flaeche', 'mass', 'text', 'moebel', 'auswahl', 'abdecken'].includes(st.werkzeug);   // Wandflächen nur dort fangen, wo man an Wände anlegt\n    for (const el of st.elemente) {\n      if (el.id === ausserId) continue;\n      if (el.typ === 'wand' || el.typ === 'tuer' || el.typ === 'fenster' || el.typ === 'mass') { punkte.push(el.p1, el.p2); if (el.typ === 'wand') segmente.push([el.p1.x, el.p1.y, el.p2.x, el.p2.y]); }\n      if (el.typ === 'wand' && flaechenFang) { const u = GE.wandUmriss(el, st.elemente, st.kalib); if (u) { punkte.push(...u); for (let i = 0; i < 4; i++) { const a = u[i], b = u[(i + 1) % 4]; segmente.push([a.x, a.y, b.x, b.y]); } } }\n      else if (el.typ === 'flaeche') punkte.push(...el.punkte);\n      else if (el.typ === 'text') punkte.push(el.p);\n    }\n    const q = [{ punkte, segmente }];\n    if (st.fangAn) q.push({ punkte: st.punkte, segmente: st.segmente });\n    return q;\n  }\n  const fangRadius = () => 9 / st.zoom;\n  const rasterPt = () => st.rasterCm > 0 ? st.rasterCm / 100 * st.kalib.ptProM : 0;\n  const aufRaster = (p) => { const r = rasterPt(); return r ? { x: Math.round(p.x / r) * r, y: Math.round(p.y / r) * r } : p; };\n  function punktFrei(p, ausserId) {\n    if (!st.fangAn && !st.elemente.length) { st.fang = null; return aufRaster(p); }\n    const f = GE.fangFrei(p, fangRadius(), fangQuellen(ausserId)); st.fang = f; return f ? f.p : aufRaster(p);\n  }\n  function punktZuStart(S, p, ausserId) {\n    if (st.ortho && !st.shift) { const r = GE.fangAchse(S, p, fangRadius(), fangQuellen(ausserId)); st.fang = r.fang; if (r.fang) return r.p; const g = aufRaster(p); return Math.abs(p.x - S.x) >= Math.abs(p.y - S.y) ? { x: g.x, y: S.y } : { x: S.x, y: g.y }; }\n    return punktFrei(p, ausserId);\n  }\n\n  // ---------- Zeichnen (SVG-Overlay) ----------\n  function hitSvg(el) {\n    const z = st.zoom, b = GE.n2(8 / z), attr = `stroke=\"transparent\" fill=\"none\" stroke-width=\"${b}\" pointer-events=\"stroke\" class=\"hit\"`;\n    switch (el.typ) {\n      case 'wand': return `<line x1=\"${el.p1.x}\" y1=\"${el.p1.y}\" x2=\"${el.p2.x}\" y2=\"${el.p2.y}\" stroke=\"transparent\" fill=\"none\" stroke-width=\"${Math.max(GE.dickePt(el, st.kalib), 8 / z)}\" pointer-events=\"stroke\" class=\"hit\"/>`;\n      case 'tuer': { const g = GE.tuerGeometrie(el); if (!g) return ''; const t = GE.wandDickeAuf(el, st.elemente, st.kalib) || (el.durchbruch ? el.durchbruch.tiefe / 100 * st.kalib.ptProM : 0); return `<polyline points=\"${el.p1.x},${el.p1.y} ${g.E.x},${g.E.y} ${el.p2.x},${el.p2.y} ${el.p1.x},${el.p1.y}\" ${attr}/><line x1=\"${el.p1.x}\" y1=\"${el.p1.y}\" x2=\"${el.p2.x}\" y2=\"${el.p2.y}\" stroke=\"transparent\" fill=\"none\" stroke-width=\"${Math.max(t * 2, 10 / z)}\" pointer-events=\"stroke\" class=\"hit\"/>`; }\n      case 'fenster': { const t = GE.wandDickeAuf(el, st.elemente, st.kalib) || (el.durchbruch ? el.durchbruch.tiefe / 100 * st.kalib.ptProM : 0); return `<line x1=\"${el.p1.x}\" y1=\"${el.p1.y}\" x2=\"${el.p2.x}\" y2=\"${el.p2.y}\" stroke=\"transparent\" fill=\"none\" stroke-width=\"${Math.max(t * 2, 10 / z)}\" pointer-events=\"stroke\" class=\"hit\"/>`; }\n      case 'mass': { const g = GE.massGeometrie(el); if (!g) return ''; return `<polyline points=\"${el.p1.x},${el.p1.y} ${g.D1.x},${g.D1.y} ${g.D2.x},${g.D2.y} ${el.p2.x},${el.p2.y}\" ${attr}/>`; }\n      case 'text': { const g = el.groesse || 8, w = Math.max(10, (el.text || '').length * g * 0.56); return `<rect x=\"${el.p.x - 2}\" y=\"${el.p.y - g}\" width=\"${w + 4}\" height=\"${g * 1.35}\" transform=\"rotate(${el.winkel || 0} ${el.p.x} ${el.p.y})\" fill=\"transparent\" pointer-events=\"fill\" class=\"hit\"/>`; }\n      case 'flaeche': return `<polygon points=\"${el.punkte.map(q => q.x + ',' + q.y).join(' ')}\" fill=\"transparent\" pointer-events=\"fill\" class=\"hit\"/>`;\n      case 'moebel': return `<polygon points=\"${moebelEcken(el).map(q => GE.n2(q.x) + ',' + GE.n2(q.y)).join(' ')}\" fill=\"transparent\" pointer-events=\"fill\" class=\"hit\"/>`;\n      case 'abdecken': return `<rect x=\"${Math.min(el.p1.x, el.p2.x)}\" y=\"${Math.min(el.p1.y, el.p2.y)}\" width=\"${Math.abs(el.p2.x - el.p1.x)}\" height=\"${Math.abs(el.p2.y - el.p1.y)}\" fill=\"transparent\" stroke=\"#D4A567\" stroke-opacity=\".5\" stroke-width=\"${b}\" stroke-dasharray=\"${GE.n2(4 / z)} ${GE.n2(3 / z)}\" pointer-events=\"fill\" class=\"hit\"/>`;\n    }\n    return '';\n  }\n  function griffe(el) {\n    const z = st.zoom, r = GE.n2(5 / z), sw = GE.n2(1.5 / z);\n    const g = (name, p) => `<circle data-handle=\"${name}\" cx=\"${GE.n2(p.x)}\" cy=\"${GE.n2(p.y)}\" r=\"${r}\" fill=\"#fff\" stroke=\"#D4A567\" stroke-width=\"${sw}\" class=\"griff\"/>`;\n    let s = '';\n    if (el.typ === 'wand' || el.typ === 'tuer' || el.typ === 'fenster' || el.typ === 'mass' || el.typ === 'abdecken') s += g('p1', el.p1) + g('p2', el.p2);\n    if (el.typ === 'mass') { const m = GE.massGeometrie(el); if (m) s += `<rect data-handle=\"v\" x=\"${GE.n2(V.mid(m.D1, m.D2).x - 4 / z)}\" y=\"${GE.n2(V.mid(m.D1, m.D2).y - 4 / z)}\" width=\"${GE.n2(8 / z)}\" height=\"${GE.n2(8 / z)}\" fill=\"#D4A567\" stroke=\"#fff\" stroke-width=\"${sw}\" class=\"griff\"/>`; }\n    if (el.typ === 'text') s += g('p', el.p);\n    if (el.typ === 'flaeche') el.punkte.forEach((p, i) => { s += g('v' + i, p); });\n    if (el.typ === 'moebel') { const e = moebelEcken(el), o = V.mid(e[0], e[1]), c = el.p, dir = V.norm(V.sub(o, c)), rp = V.add(o, V.mul(dir, 16 / z)); s += `<line x1=\"${GE.n2(o.x)}\" y1=\"${GE.n2(o.y)}\" x2=\"${GE.n2(rp.x)}\" y2=\"${GE.n2(rp.y)}\" stroke=\"#D4A567\" stroke-width=\"${sw}\"/>` + g('rot', rp).replace('class=\"griff\"', 'class=\"griff dreh\"'); }\n    return s;\n  }\n  // Ecken des Möbel-Rechtecks (gedreht): [hinten-links, hinten-rechts, vorne-rechts, vorne-links]\n  function moebelEcken(el) {\n    const kat = GE.MOEBEL.byKey[el.art] || GE.MOEBEL.byKey.rechteck;\n    const B = (el.breite || kat.b) / 100 * st.kalib.ptProM, T = (el.tiefe || kat.t) / 100 * st.kalib.ptProM, rad = (el.winkel || 0) * Math.PI / 180, c = Math.cos(rad), si = Math.sin(rad);\n    const m = (x, y) => ({ x: el.p.x + x * c - y * si, y: el.p.y + x * si + y * c });\n    return [m(-B / 2, -T / 2), m(B / 2, -T / 2), m(B / 2, T / 2), m(-B / 2, T / 2)];\n  }\n  function elementSvg(el, sel) {\n    const ps = primsFuer(el);\n    let glanz = '';\n    if (sel) {\n      const z = st.zoom;\n      if (el.typ === 'wand' || el.typ === 'mass' || el.typ === 'tuer' || el.typ === 'fenster') glanz = `<line x1=\"${el.p1.x}\" y1=\"${el.p1.y}\" x2=\"${el.p2.x}\" y2=\"${el.p2.y}\" stroke=\"#D4A567\" stroke-opacity=\".35\" stroke-width=\"${GE.n2(Math.max(el.typ === 'wand' ? GE.dickePt(el, st.kalib) + 6 / z : 10 / z, 6 / z))}\" stroke-linecap=\"round\"/>`;\n      if (el.typ === 'flaeche') glanz = `<polygon points=\"${el.punkte.map(q => q.x + ',' + q.y).join(' ')}\" fill=\"none\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(3 / z)}\" stroke-opacity=\".6\"/>`;\n      if (el.typ === 'text') { const g = el.groesse || 8, w = Math.max(10, (el.text || '').length * g * 0.56); glanz = `<rect x=\"${el.p.x - 2}\" y=\"${el.p.y - g}\" width=\"${w + 4}\" height=\"${g * 1.35}\" transform=\"rotate(${el.winkel || 0} ${el.p.x} ${el.p.y})\" fill=\"none\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(1.5 / z)}\" stroke-dasharray=\"${GE.n2(4 / z)} ${GE.n2(3 / z)}\"/>`; }\n      if (el.typ === 'abdecken') glanz = `<rect x=\"${Math.min(el.p1.x, el.p2.x)}\" y=\"${Math.min(el.p1.y, el.p2.y)}\" width=\"${Math.abs(el.p2.x - el.p1.x)}\" height=\"${Math.abs(el.p2.y - el.p1.y)}\" fill=\"none\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(2 / z)}\"/>`;\n      if (el.typ === 'moebel') glanz = `<polygon points=\"${moebelEcken(el).map(q => GE.n2(q.x) + ',' + GE.n2(q.y)).join(' ')}\" fill=\"none\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(1.5 / z)}\" stroke-dasharray=\"${GE.n2(4 / z)} ${GE.n2(3 / z)}\"/>`;\n    }\n    return `<g data-id=\"${el.id}\" class=\"el${sel ? ' sel' : ''}\">${glanz}${GE.svgAus(ps)}${hitSvg(el)}</g>`;\n  }\n  function beschriftung(p, text, z) {\n    return `<text x=\"${GE.n2(p.x + 12 / z)}\" y=\"${GE.n2(p.y - 10 / z)}\" font-family=\"Montserrat, sans-serif\" font-weight=\"600\" font-size=\"${GE.n2(12 / z)}\" fill=\"#263159\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"${GE.n2(4 / z)}\" stroke-linejoin=\"round\" pointer-events=\"none\">${GE.esc(text)}</text>`;\n  }\n  function vorschauSvg() {\n    const m0 = st.maus;\n    if (!st.zeichnung && st.werkzeug === 'moebel' && m0 && !st.drag) return `<g class=\"vorschau\" opacity=\".6\">${GE.svgAus(GE.prims({ ...st.einstellungen.moebel, p: m0 }, st.kalib))}</g>`;\n    const zn = st.zeichnung, m = st.maus, z = st.zoom; if (!zn || !m) return '';\n    const cur = zn.cursor || m;\n    if (zn.art === 'wand' || zn.art === 'tuer' || zn.art === 'fenster' || zn.art === 'mass') {\n      const tmp = { ...st.einstellungen[zn.art], p1: zn.start, p2: cur };\n      const L = V.dist(zn.start, cur) / st.kalib.ptProM;\n      return `<g class=\"vorschau\" opacity=\".85\">${GE.svgAus(primsFuer(tmp))}</g>` + beschriftung(cur, GE.formatMeter(L), z);\n    }\n    if (zn.art === 'flaeche') {\n      const pts = [...zn.punkte, cur];\n      let s = `<polyline points=\"${pts.map(q => GE.n2(q.x) + ',' + GE.n2(q.y)).join(' ')}\" fill=\"${st.einstellungen.flaeche.farbe}\" fill-opacity=\".12\" stroke=\"${st.einstellungen.flaeche.farbe}\" stroke-width=\"${GE.n2(1 / z)}\" stroke-dasharray=\"${GE.n2(4 / z)} ${GE.n2(3 / z)}\"/>`;\n      s += zn.punkte.map((q, i) => `<circle cx=\"${q.x}\" cy=\"${q.y}\" r=\"${GE.n2((i ? 3 : 5) / z)}\" fill=\"${i ? st.einstellungen.flaeche.farbe : '#D4A567'}\"/>`).join('');\n      if (pts.length >= 3) s += beschriftung(cur, GE.formatFlaeche(GE.flaecheInhalt(pts) / (st.kalib.ptProM * st.kalib.ptProM)), z);\n      return s;\n    }\n    if (zn.art === 'kalib') {\n      return `<line x1=\"${zn.start.x}\" y1=\"${zn.start.y}\" x2=\"${cur.x}\" y2=\"${cur.y}\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(2 / z)}\" stroke-dasharray=\"${GE.n2(6 / z)} ${GE.n2(4 / z)}\"/><circle cx=\"${zn.start.x}\" cy=\"${zn.start.y}\" r=\"${GE.n2(4 / z)}\" fill=\"#D4A567\"/>` + beschriftung(cur, 'Strecke: ' + GE.formatMeter(V.dist(zn.start, cur) / st.kalib.ptProM) + ' (bisherige Kalibrierung)', z);\n    }\n    if (zn.art === 'abdecken') {\n      const x = Math.min(zn.start.x, m.x), y = Math.min(zn.start.y, m.y), w = Math.abs(m.x - zn.start.x), h = Math.abs(m.y - zn.start.y);\n      return `<rect x=\"${x}\" y=\"${y}\" width=\"${w}\" height=\"${h}\" fill=\"#fff\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(1.5 / z)}\" stroke-dasharray=\"${GE.n2(4 / z)} ${GE.n2(3 / z)}\"/>`;\n    }\n    if (zn.art === 'ausschnitt') {\n      const x = Math.min(zn.start.x, m.x), y = Math.min(zn.start.y, m.y), w = Math.abs(m.x - zn.start.x), h = Math.abs(m.y - zn.start.y);\n      return `<rect x=\"${x}\" y=\"${y}\" width=\"${w}\" height=\"${h}\" fill=\"#D4A567\" fill-opacity=\".12\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(1.5 / z)}\" stroke-dasharray=\"${GE.n2(6 / z)} ${GE.n2(4 / z)}\"/>`;\n    }\n    return '';\n  }\n  function render() {\n    if (!st.breite) { overlay.innerHTML = ''; return; }\n    const z = st.zoom, W = st.breite, H = st.hoehe, teile = [];\n    if (st.rasterZeigen && st.kalib.ptProM > 0) {   // Meterraster mit 10-cm-Unterteilung (nur Anzeige, nicht im Export)\n      const m = st.kalib.ptProM, k = m / 10; let d = '';\n      for (let i = 1; i < 10; i++) d += `M${GE.n2(i * k)} 0V${GE.n2(m)}M0 ${GE.n2(i * k)}H${GE.n2(m)}`;\n      teile.push(`<defs><pattern id=\"raster\" width=\"${GE.n2(m)}\" height=\"${GE.n2(m)}\" patternUnits=\"userSpaceOnUse\"><path d=\"${d}\" stroke=\"#eef0f4\" stroke-width=\"${GE.n2(0.6 / z)}\"/><path d=\"M0 0H${GE.n2(m)}V${GE.n2(m)}\" fill=\"none\" stroke=\"#d9dde6\" stroke-width=\"${GE.n2(0.8 / z)}\"/></pattern></defs><rect width=\"${W}\" height=\"${H}\" fill=\"url(#raster)\" pointer-events=\"none\"/>`);\n    }\n    if (st.ausschnitt) { const a = st.ausschnitt; teile.push(`<path d=\"M0 0H${W}V${H}H0Z M${a.x} ${a.y}H${a.x + a.w}V${a.y + a.h}H${a.x}Z\" fill=\"#263159\" fill-opacity=\".14\" fill-rule=\"evenodd\" pointer-events=\"none\"/><rect x=\"${a.x}\" y=\"${a.y}\" width=\"${a.w}\" height=\"${a.h}\" fill=\"none\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(1.5 / z)}\" stroke-dasharray=\"${GE.n2(6 / z)} ${GE.n2(4 / z)}\" pointer-events=\"none\"/>`); }\n    for (const el of st.elemente) teile.push(elementSvg(el, el.id === st.auswahl));\n    if (st.zeichnung && st.maus) teile.push(vorschauSvg());\n    if (st.fang && st.werkzeug !== 'auswahl' && st.werkzeug !== 'hand') {\n      const f = st.fang; teile.push(`<g pointer-events=\"none\"><circle cx=\"${GE.n2(f.p.x)}\" cy=\"${GE.n2(f.p.y)}\" r=\"${GE.n2(5 / z)}\" fill=\"none\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(1.5 / z)}\"/><text x=\"${GE.n2(f.p.x + 8 / z)}\" y=\"${GE.n2(f.p.y + 14 / z)}\" font-family=\"Montserrat, sans-serif\" font-size=\"${GE.n2(10 / z)}\" fill=\"#a87b2e\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"${GE.n2(3 / z)}\">${f.art}</text></g>`);\n    } else if (st.fang && st.drag) {\n      const f = st.fang; teile.push(`<circle cx=\"${GE.n2(f.p.x)}\" cy=\"${GE.n2(f.p.y)}\" r=\"${GE.n2(5 / z)}\" fill=\"none\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(1.5 / z)}\" pointer-events=\"none\"/>`);\n    }\n    const sel = st.auswahl && elById(st.auswahl); if (sel && st.werkzeug === 'auswahl') teile.push(griffe(sel));\n    overlay.innerHTML = teile.join('');\n  }\n\n  // ---------- Werkzeuge ----------\n  function setzeWerkzeug(w) {\n    st.werkzeug = w; st.zeichnung = null; st.fang = null; kalibPop(false);\n    document.querySelectorAll('.tool').forEach(b => b.classList.toggle('aktiv', b.dataset.tool === w));\n    overlay.dataset.werkzeug = w;\n    werkstatt.classList.toggle('hand', w === 'hand');\n    renderPanel(); render();\n  }\n  function abbrechen() {\n    if (st.zeichnung) { st.zeichnung = null; st.fang = null; kalibPop(false); render(); return; }\n    if (st.auswahl) { st.auswahl = null; renderPanel(); render(); return; }\n    setzeWerkzeug('auswahl');\n  }\n  function neuesElement(basis, extra) {\n    const el = { ...klon(basis), ...extra, id: st.naechsteId++ };\n    const sk = GE.linienSkala(st.kalib);   // Pixelquellen: Schrift und Abstände mit der Auflösung skalieren\n    if (sk > 1 && !extra.groesse) { if (el.groesse) el.groesse = Math.round(el.groesse * sk * 10) / 10; if (el.versatz) el.versatz = Math.round(el.versatz * sk); }\n    st.elemente.push(el); commit(); return el;\n  }\n  // Primitive eines Elements – Wände bekommen ihre Türöffnungen mit\n  const primsFuer = (el, elemente) => {\n    const alle = elemente || st.elemente;\n    if (el.typ === 'wand') return GE.prims(el, st.kalib, { oeffnungen: GE.wandOeffnungen(el, alle, st.kalib), enden: GE.wandEnden(el, alle, st.kalib) });\n    if (el.typ === 'tuer' || el.typ === 'fenster') return GE.prims(el, st.kalib, { wandDicke: GE.wandDickeAuf(el, alle, st.kalib) });\n    return GE.prims(el, st.kalib);\n  };\n  // Tür: liegt sie auf einer Plan-Wand, Durchbruch (Gegenkante) automatisch bestimmen; auf gezeichneter Wand öffnet die Wand selbst\n  function tuerDurchbruch(el) {\n    if (el.durchbruchAuto === false) return;\n    el.durchbruch = GE.tuerAufWand(el, st.elemente, st.kalib) ? null : GE.tuerDurchbruchErkennen(el, st.fangAn ? st.segmente : [], st.kalib);\n  }\n  function loescheAuswahl() {\n    if (!st.auswahl) return;\n    st.elemente = st.elemente.filter(e => e.id !== st.auswahl); st.auswahl = null; commit(); renderPanel(); render();\n  }\n  function flaecheSchliessen() {\n    const zn = st.zeichnung; if (!zn || zn.art !== 'flaeche') return;\n    if (zn.punkte.length >= 3) { const el = neuesElement(st.einstellungen.flaeche, { punkte: zn.punkte }); st.auswahl = el.id; }\n    st.zeichnung = null; st.fang = null; renderPanel(); render();\n  }\n\n  function onDown(e) {\n    if (!st.breite) return;\n    if (e.target.closest('#kalibPop')) return;\n    const p = seitenPunkt(e);\n    if (e.button === 1 || st.leertaste || st.werkzeug === 'hand') { st.pan = { x: e.clientX, y: e.clientY, sl: werkstatt.scrollLeft, stp: werkstatt.scrollTop }; werkstatt.classList.add('greift'); e.preventDefault(); return; }\n    if (e.button === 2) { if (st.zeichnung) { if (st.zeichnung.art === 'flaeche') flaecheSchliessen(); else { st.zeichnung = null; st.fang = null; render(); } } return; }\n    if (e.button !== 0) return;\n    overlay.setPointerCapture(e.pointerId);\n    const w = st.werkzeug;\n    if (w === 'auswahl') {\n      const h = e.target.closest('[data-handle]');\n      if (h && st.auswahl) { st.drag = { id: st.auswahl, handle: h.dataset.handle, start: p, vorher: klon(elById(st.auswahl)), bewegt: false }; return; }\n      const g = e.target.closest('[data-id]');\n      if (g) { const id = +g.dataset.id; st.auswahl = id; st.drag = { id, handle: 'body', start: p, vorher: klon(elById(id)), bewegt: false }; renderPanel(); render(); return; }\n      if (st.auswahl) { st.auswahl = null; renderPanel(); render(); }\n      return;\n    }\n    if (w === 'wand' || w === 'tuer' || w === 'fenster' || w === 'mass') {\n      if (!st.zeichnung) { st.zeichnung = { art: w, start: punktFrei(p) }; render(); return; }\n      const ende = punktZuStart(st.zeichnung.start, p);\n      if (V.dist(ende, st.zeichnung.start) < 0.5) return;\n      const el = neuesElement(st.einstellungen[w], { p1: st.zeichnung.start, p2: ende });\n      if (w === 'tuer' || w === 'fenster') tuerDurchbruch(el);\n      if (w === 'wand') st.zeichnung = { art: 'wand', start: ende };          // Wandzug fortsetzen\n      else { st.zeichnung = null; st.auswahl = el.id; setzeWerkzeug('auswahl'); }\n      renderPanel(); render(); return;\n    }\n    if (w === 'flaeche') {\n      if (st.zeichnung && st.zeichnung.punkte.length >= 3 && V.dist(p, st.zeichnung.punkte[0]) < fangRadius() * 1.5) { flaecheSchliessen(); return; }\n      const q = punktFrei(p);\n      if (!st.zeichnung) { st.zeichnung = { art: 'flaeche', punkte: [q] }; render(); return; }\n      st.zeichnung.punkte.push(q); render(); return;\n    }\n    if (w === 'text') {\n      const el = neuesElement(st.einstellungen.text, { p }); st.auswahl = el.id; st.fang = null; setzeWerkzeug('auswahl');\n      const ta = panel.querySelector('[data-prop=\"text\"]'); if (ta) { ta.focus(); ta.select(); }\n      return;\n    }\n    if (w === 'kalib') {\n      if (!st.zeichnung) { st.zeichnung = { art: 'kalib', start: punktFrei(p) }; render(); return; }\n      const ende = punktZuStart(st.zeichnung.start, p);\n      st.zeichnung.ende = ende; st.zeichnung.cursor = ende; render();\n      kalibPop(true, e.clientX, e.clientY, V.dist(st.zeichnung.start, ende)); return;\n    }\n    if (w === 'ausschnitt' || w === 'abdecken') { st.zeichnung = { art: w, start: p }; st.fang = null; render(); return; }\n    if (w === 'moebel') {\n      const el = neuesElement(st.einstellungen.moebel, { p }); st.auswahl = el.id; st.fang = null; setzeWerkzeug('auswahl');\n      renderPanel(); render(); return;\n    }\n  }\n  function onMove(e) {\n    if (!st.breite) return;\n    if (e._p) { const zn = st.zeichnung; if (!st.maus || !zn) return; if (zn.art !== 'flaeche' && zn.art !== 'ausschnitt' && zn.art !== 'abdecken' && !(zn.art === 'kalib' && zn.ende)) { zn.cursor = punktZuStart(zn.start, st.maus); render(); } return; }\n    if (st.pan) { werkstatt.scrollLeft = st.pan.sl - (e.clientX - st.pan.x); werkstatt.scrollTop = st.pan.stp - (e.clientY - st.pan.y); return; }\n    const p = seitenPunkt(e); st.maus = p;\n    if (st.drag) {\n      const el = elById(st.drag.id); if (!el) return; const vh = st.drag.vorher; const d = V.sub(p, st.drag.start); const h = st.drag.handle;\n      st.drag.bewegt = true; st.fang = null;\n      if (h === 'body') {\n        if (el.typ === 'text' || el.typ === 'moebel') el.p = V.add(vh.p, d);\n        else if (el.typ === 'flaeche') el.punkte = vh.punkte.map(q => V.add(q, d));\n        else { el.p1 = V.add(vh.p1, d); el.p2 = V.add(vh.p2, d); }\n      } else if (h === 'v') {\n        const g = GE.massGeometrie({ ...el, versatz: 0 }); if (g) el.versatz = Math.round(V.dot(V.sub(p, V.mid(el.p1, el.p2)), g.n) * 10) / 10;\n      } else if (h === 'p') { el.p = el.typ === 'moebel' ? p : punktFrei(p, el.id); }\n      else if (h === 'rot') { let w = Math.atan2(p.y - el.p.y, p.x - el.p.x) * 180 / Math.PI + 90; if (!st.shift) w = Math.round(w / 15) * 15; el.winkel = ((w % 360) + 360) % 360; }\n      else if (h[0] === 'v') { el.punkte[+h.slice(1)] = punktFrei(p, el.id); }\n      else if (h === 'p1' || h === 'p2') { const andere = h === 'p1' ? el.p2 : el.p1; el[h] = el.typ === 'abdecken' ? p : punktZuStart(andere, p, el.id); }\n      infoAktualisieren(el); render(); return;\n    }\n    if (st.zeichnung && st.zeichnung.art !== 'ausschnitt' && st.zeichnung.art !== 'abdecken' && !(st.zeichnung.art === 'kalib' && st.zeichnung.ende)) {\n      const zn = st.zeichnung;\n      if (zn.art === 'flaeche') zn.cursor = punktFrei(p);\n      else zn.cursor = punktZuStart(zn.start, p);\n      render(); return;\n    }\n    if (st.zeichnung && (st.zeichnung.art === 'ausschnitt' || st.zeichnung.art === 'abdecken')) { render(); return; }\n    if (st.werkzeug === 'moebel') { render(); return; }\n    if (!['auswahl', 'hand', 'text', 'ausschnitt', 'abdecken'].includes(st.werkzeug) && !(st.zeichnung && st.zeichnung.art === 'kalib' && st.zeichnung.ende)) { punktFrei(p); render(); }\n  }\n  function onUp(e) {\n    if (st.pan) { st.pan = null; werkstatt.classList.remove('greift'); return; }\n    if (st.drag) { const bewegt = st.drag.bewegt, el = elById(st.drag.id); st.drag = null; st.fang = null; if (bewegt && el && (el.typ === 'tuer' || el.typ === 'fenster')) tuerDurchbruch(el); if (bewegt) commit(); renderPanel(); render(); return; }\n    if (st.zeichnung && st.zeichnung.art === 'abdecken') {\n      const p = seitenPunkt(e), s = st.zeichnung.start; st.zeichnung = null;\n      if (Math.abs(p.x - s.x) > 2 && Math.abs(p.y - s.y) > 2) { const el = neuesElement(st.einstellungen.abdecken, { p1: s, p2: p }); st.auswahl = el.id; setzeWerkzeug('auswahl'); }\n      render(); return;\n    }\n    if (st.zeichnung && st.zeichnung.art === 'ausschnitt') {\n      const p = seitenPunkt(e), s = st.zeichnung.start; st.zeichnung = null;\n      const w = Math.abs(p.x - s.x), h = Math.abs(p.y - s.y);\n      st.ausschnitt = (w > 5 && h > 5) ? { x: Math.min(s.x, p.x), y: Math.min(s.y, p.y), w, h } : null;\n      commit(); renderPanel(); render();\n    }\n  }\n  function onDblClick(e) {\n    if (st.zeichnung && st.zeichnung.art === 'flaeche') { flaecheSchliessen(); return; }\n    if (st.zeichnung && st.zeichnung.art === 'wand') { st.zeichnung = null; st.fang = null; render(); return; }\n    if (st.werkzeug === 'auswahl' && st.auswahl) { const el = elById(st.auswahl); if (el && el.typ === 'text') { const ta = panel.querySelector('[data-prop=\"text\"]'); if (ta) { ta.focus(); ta.select(); } } }\n  }\n\n  // ---------- Kalibrier-Dialog ----------\n  function kalibPop(zeigen, cx, cy, strecke) {\n    const pop = $('#kalibPop');\n    if (!zeigen) { pop.classList.add('aus'); return; }\n    const app = $('#app').getBoundingClientRect();\n    pop.style.left = Math.max(70, Math.min(cx - app.left + 14, app.width - 300)) + 'px'; pop.style.top = Math.max(60, Math.min(cy - app.top + 14, app.height - 150)) + 'px';\n    pop.dataset.strecke = strecke;\n    $('#kalibPt').textContent = strecke.toFixed(1) + ' pt';\n    const inp = $('#kalibMeter'); inp.value = (strecke / st.kalib.ptProM).toFixed(2).replace('.', ','); pop.classList.remove('aus'); inp.focus(); inp.select();\n  }\n  function kalibUebernehmen() {\n    const strecke = parseFloat($('#kalibPop').dataset.strecke); const m = zahl($('#kalibMeter').value, 0);\n    if (!(m > 0) || !(strecke > 0)) return;\n    st.kalib = { ptProM: strecke / m, quelle: 'zweipunkt', massstab: st.pdf ? GE.massstabAusPtProM(strecke / m) : null, einheit: st.pdf ? 'pt' : 'px' };\n    st.zeichnung = null; st.fang = null; kalibPop(false); kalibChip(); renderPanel(); render(); setzeWerkzeug('auswahl');\n  }\n  function kalibChip() {\n    const c = $('#kalibChip'); const k = st.kalib;\n    const ms = k.massstab ? '1 : ' + (Math.abs(k.massstab - Math.round(k.massstab)) < 0.05 ? Math.round(k.massstab) : k.massstab.toFixed(1).replace('.', ',')) : '1 m = ' + k.ptProM.toFixed(1).replace('.', ',') + ' px';\n    c.className = 'chip ' + (k.quelle === 'angenommen' ? 'chip-amber' : 'chip-gruen');\n    c.querySelector('.chip-wert').textContent = ms;\n    c.querySelector('.chip-info').textContent = k.quelle === 'angenommen' ? 'angenommen · bitte prüfen' : (k.quelle === 'zweipunkt' ? 'kalibriert (2 Punkte)' : 'gesetzt');\n  }\n\n  // ---------- Eigenschaften-Panel ----------\n  const swatches = (aktiv) => `<div class=\"swatches\">${GE.FARBEN.map(f => `<button type=\"button\" class=\"swatch${aktiv === f.hex ? ' aktiv' : ''}\" data-prop=\"farbe\" data-wert=\"${f.hex}\" title=\"${f.name}\" style=\"background:${f.hex}\"></button>`).join('')}<label class=\"farbwahl${GE.FARBEN.some(f => f.hex === aktiv) ? '' : ' aktiv'}\" title=\"Eigene Farbe wählen\" style=\"--farbe:${aktiv}\"><input type=\"color\" data-prop=\"farbe\" value=\"${/^#[0-9a-f]{6}$/i.test(aktiv || '') ? aktiv : '#263159'}\"><span>+</span></label></div>`;\n  const feld = (label, inner) => `<label class=\"feld\"><span>${label}</span>${inner}</label>`;\n  function felder(z, istElement) {\n    let h = '';\n    if (z.typ === 'wand') {\n      h += feld('Wanddicke (cm)', `<input type=\"number\" step=\"0.5\" min=\"1\" data-prop=\"dicke\" value=\"${z.dicke}\">`);\n      h += feld('Darstellung', `<select data-prop=\"stil\">${GE.STILE.map(s => `<option value=\"${s.key}\"${z.stil === s.key ? ' selected' : ''}>${s.name}</option>`).join('')}</select>`);\n      h += feld('Farbe', swatches(z.farbe));\n      if (istElement) h += `<div class=\"knopfzeile\"><button type=\"button\" class=\"btn\" data-aktion=\"wandmass\">Maß an dieser Wand anlegen</button></div>`;\n    } else if (z.typ === 'abdecken') {\n      h += `<p class=\"hinweis\">Deckt den Bereich im Export weiß ab. Ecken an den Griffen ziehen.</p>`;\n    } else if (z.typ === 'tuer' || z.typ === 'fenster') {\n      const arten = z.typ === 'tuer' ? GE.TUEREN : GE.FENSTER;\n      h += feld(z.typ === 'tuer' ? 'Türart' : 'Fensterart', `<select data-prop=\"variante\">${arten.map(([k, n]) => `<option value=\"${k}\"${(z.variante || arten[0][0]) === k ? ' selected' : ''}>${n}</option>`).join('')}</select>`);\n      h += feld('Farbe', swatches(z.farbe));\n      h += `<div class=\"knopfzeile\"><button type=\"button\" class=\"btn\" data-aktion=\"spiegeln\">${z.typ === 'tuer' ? 'Aufschlag spiegeln' : 'Seite spiegeln'}</button>${istElement ? '<button type=\"button\" class=\"btn\" data-aktion=\"anschlag\">Anschlag wechseln</button>' : ''}</div>`;\n      if (istElement) {\n        if (GE.tuerAufWand(z, st.elemente, st.kalib)) h += `<p class=\"hinweis klein\">Liegt auf einer gezeichneten Wand – die Wand öffnet sich in ${z.typ === 'tuer' ? 'Türbreite' : 'Fensterbreite'} automatisch.</p>`;\n        else {\n          h += feld('Wandöffnung in der Plan-Wand (cm, 0 = keine)', `<input type=\"number\" step=\"0.5\" min=\"0\" data-prop=\"durchbruchTiefe\" value=\"${z.durchbruch ? z.durchbruch.tiefe : 0}\">`);\n          h += `<div class=\"knopfzeile\"><button type=\"button\" class=\"btn\" data-aktion=\"durchbruchSeite\">Öffnung: andere Seite</button></div>`;\n          h += `<p class=\"hinweis klein\">${z.durchbruch ? 'Gegenkante der Wand automatisch erkannt – die Wand wird in Elementbreite weiß geöffnet, Laibungen in Elementfarbe.' : 'Keine Gegenkante gefunden. Wanddicke eintragen, um die Plan-Wand hier zu öffnen.'}</p>`;\n        }\n      }\n    } else if (z.typ === 'mass') {\n      h += feld('Maßtext (leer = automatisch)', `<input type=\"text\" data-prop=\"text\" value=\"${GE.esc(z.text || '')}\" placeholder=\"automatisch\">`);\n      h += feld('Schriftgröße (pt)', `<input type=\"number\" step=\"0.5\" min=\"3\" data-prop=\"groesse\" value=\"${z.groesse}\">`);\n      h += feld('Abstand Maßlinie (pt)', `<input type=\"number\" step=\"1\" data-prop=\"versatz\" value=\"${z.versatz}\">`);\n      h += feld('Farbe', swatches(z.farbe));\n    } else if (z.typ === 'text') {\n      h += feld('Text', `<textarea rows=\"2\" data-prop=\"text\">${GE.esc(z.text || '')}</textarea>`);\n      h += feld('Schriftgröße (pt)', `<input type=\"number\" step=\"0.5\" min=\"3\" data-prop=\"groesse\" value=\"${z.groesse}\">`);\n      h += feld('Drehung', `<select data-prop=\"winkel\">${[[0, 'waagerecht'], [-90, 'senkrecht (von unten lesbar)'], [90, 'senkrecht (von oben lesbar)'], [-45, '45° steigend'], [45, '45° fallend']].map(([w, n]) => `<option value=\"${w}\"${(z.winkel || 0) === w ? ' selected' : ''}>${n}</option>`).join('')}</select>`);\n      h += `<label class=\"check\"><input type=\"checkbox\" data-prop=\"halo\"${z.halo !== false ? ' checked' : ''}> Weißer Hintergrund hinter der Schrift</label>`;\n      h += feld('Farbe', swatches(z.farbe));\n    } else if (z.typ === 'moebel') {\n      const gruppen = [...new Set(GE.MOEBEL.KATALOG.map(k => k.gruppe))];\n      h += feld('Möbelstück', `<select data-prop=\"art\">${gruppen.map(g => `<optgroup label=\"${g}\">${GE.MOEBEL.KATALOG.filter(k => k.gruppe === g).map(k => `<option value=\"${k.key}\"${z.art === k.key ? ' selected' : ''}>${k.name}</option>`).join('')}</optgroup>`).join('')}</select>`);\n      h += `<div class=\"zeile2\">${feld('Breite (cm)', `<input type=\"number\" step=\"1\" min=\"5\" data-prop=\"breite\" value=\"${z.breite}\">`)}${feld('Tiefe (cm)', `<input type=\"number\" step=\"1\" min=\"5\" data-prop=\"tiefe\" value=\"${z.tiefe}\">`)}</div>`;\n      h += feld('Drehung (°)', `<div class=\"zeile\"><input type=\"number\" step=\"15\" data-prop=\"winkel\" value=\"${z.winkel || 0}\"><button type=\"button\" class=\"btn\" data-aktion=\"drehen\" title=\"90° drehen (R)\">↻ 90°</button></div>`);\n      h += feld('Beschriftung (optional)', `<input type=\"text\" data-prop=\"text\" value=\"${GE.esc(z.text || '')}\" placeholder=\"z. B. Sideboard\">`);\n      h += `<label class=\"check\"><input type=\"checkbox\" data-prop=\"fuellen\"${z.fuellen !== false ? ' checked' : ''}> Weiß hinterlegen (verdeckt den Plan darunter)</label>`;\n      h += feld('Farbe', swatches(z.farbe));\n    } else if (z.typ === 'flaeche') {\n      h += feld('Raumname (m² werden ergänzt)', `<input type=\"text\" data-prop=\"text\" value=\"${GE.esc(z.text || '')}\" placeholder=\"z. B. Wohnen\">`);\n      h += `<label class=\"check\"><input type=\"checkbox\" data-prop=\"fuellen\"${z.fuellen !== false ? ' checked' : ''}> Fläche leicht einfärben</label>`;\n      h += feld('Schriftgröße (pt)', `<input type=\"number\" step=\"0.5\" min=\"3\" data-prop=\"groesse\" value=\"${z.groesse}\">`);\n      h += feld('Farbe', swatches(z.farbe));\n    }\n    return h;\n  }\n  // Seite der Wand relativ zu perp(p1→p2): entgegen der Aufschlagseite\n  const tuerWandSeite = (el) => { const g = GE.tuerGeometrie(el); if (!g) return 1; const q = V.rot(g.d, el.spiegeln ? 90 : -90); return V.dot(q, V.perp(g.d)) > 0 ? -1 : 1; };\n  function infoText(el) {\n    const k = st.kalib.ptProM;\n    if (el.typ === 'moebel') { const kat = GE.MOEBEL.byKey[el.art]; return (kat ? kat.name.replace(/ \\d.*$/, '') : 'Möbel') + ' · ' + el.breite + ' × ' + el.tiefe + ' cm'; }\n    if (el.typ === 'wand' || el.typ === 'tuer' || el.typ === 'fenster') return (el.typ === 'wand' ? 'Länge ' : 'Breite ') + GE.formatMeter(V.dist(el.p1, el.p2) / k);\n    if (el.typ === 'mass') return 'gemessen ' + GE.formatMeter(V.dist(el.p1, el.p2) / k);\n    if (el.typ === 'flaeche') return 'Fläche ' + GE.formatFlaeche(GE.flaecheInhalt(el.punkte) / (k * k));\n    return '';\n  }\n  function infoAktualisieren(el) { const s = $('#elInfo'); if (s && el) s.textContent = infoText(el); }\n  function renderPanel() {\n    const el = st.auswahl ? elById(st.auswahl) : null;\n    const wz = WERKZEUGE[st.werkzeug];\n    const ziel = el || (st.einstellungen[st.werkzeug] || null);\n    let h = `<div class=\"abschnitt\"><div class=\"abschnitt-titel\">${el ? 'Auswahl · ' + NAME[el.typ] : 'Werkzeug · ' + wz.name}</div>`;\n    if (ziel) h += `<div class=\"felder\" data-ziel=\"${el ? 'element' : 'werkzeug'}\">${felder(ziel, !!el)}</div>`;\n    if (el) h += `<div class=\"elinfo\" id=\"elInfo\">${infoText(el)}</div><button type=\"button\" class=\"btn btn-rot\" data-aktion=\"loeschen\">Löschen (Entf)</button>`;\n    else {\n      h += `<p class=\"hinweis\">${wz.hinweis}</p>`;\n      if (st.werkzeug === 'kalib') h += `<div class=\"felder\"><label class=\"feld\"><span>Zeichnungsmaßstab 1 : …</span><div class=\"zeile\"><input type=\"number\" id=\"kalibMassstab\" value=\"${st.kalib.massstab ? Math.round(st.kalib.massstab) : 100}\" min=\"1\"><button type=\"button\" class=\"btn\" data-aktion=\"massstab\">Setzen</button></div></label><p class=\"hinweis klein\">Gilt für PDFs, die maßstäblich exportiert wurden (Blatt = Papierformat). Bei Scans oder Fotos immer über zwei Punkte kalibrieren.</p></div>`;\n      if (st.werkzeug === 'ausschnitt' && st.ausschnitt) h += `<button type=\"button\" class=\"btn\" data-aktion=\"ausschnittWeg\">Ausschnitt entfernen</button>`;\n    }\n    h += '</div>';\n    h += `<div class=\"abschnitt\"><div class=\"abschnitt-titel\">Zeichnen</div><label class=\"check\"><input type=\"checkbox\" data-opt=\"ortho\"${st.ortho ? ' checked' : ''}> Rechtwinklig zeichnen (Shift hebt auf)</label><label class=\"check\"><input type=\"checkbox\" data-opt=\"fangAn\"${st.fangAn ? ' checked' : ''}> An Plan-Linien fangen${st.breite && !st.blank ? ` <em>${st.segmente.length ? st.segmente.length.toLocaleString('de-DE') + (st.fangArt === 'raster' ? ' Kanten im Bild erkannt' : ' Linien erkannt') : (st.fangArt ? 'keine Linien erkannt' : 'werden gelesen …')}</em>` : ''}</label><label class=\"feld\"><span>Raster (fängt, wenn sonst nichts fängt)</span><div class=\"zeile\"><select data-opt-zahl=\"rasterCm\">${[[0, 'aus'], [1, '1 cm'], [5, '5 cm'], [10, '10 cm'], [25, '25 cm'], [50, '50 cm'], [100, '1 m']].map(([v, n]) => `<option value=\"${v}\"${st.rasterCm === v ? ' selected' : ''}>${n}</option>`).join('')}</select><label class=\"check\" style=\"margin:0\"><input type=\"checkbox\" data-opt=\"rasterZeigen\"${st.rasterZeigen ? ' checked' : ''}> anzeigen</label></div></label></div>`;\n    const anz = {}; for (const e of st.elemente) anz[e.typ] = (anz[e.typ] || 0) + 1;\n    const mm = st.blank ? `${st.blank.name}, leer` : st.pdf ? `${(st.breite / GE.PT_PRO_MM).toFixed(0)} × ${(st.hoehe / GE.PT_PRO_MM).toFixed(0)} mm` : `${st.breite} × ${st.hoehe} px`;\n    h += `<div class=\"abschnitt\"><div class=\"abschnitt-titel\">Plan</div><div class=\"kv\"><span>Datei</span><b>${GE.esc(st.dateiName || '–')}</b><span>Blatt</span><b>${st.breite ? mm : '–'}</b><span>Maßstab</span><b>1 m = ${st.kalib.ptProM.toFixed(2).replace('.', ',')} ${st.pdf ? 'pt' : 'px'}</b><span>Elemente</span><b>${Object.keys(anz).length ? Object.entries(anz).map(([t, n]) => n + ' ' + PLURAL[t][n > 1 ? 1 : 0]).join(', ') : 'noch keine'}</b></div>${st.bild ? `<label class=\"check\"><input type=\"checkbox\" data-opt=\"aufhellen\"${st.aufhellen ? ' checked' : ''}> Scan aufhellen (Papiergrau → Weiß)</label>` : ''}<button type=\"button\" class=\"btn\" data-aktion=\"kalibrieren\">Maßstab kalibrieren</button></div>`;\n    panel.innerHTML = h;\n  }\n  function panelZiel() { const f = panel.querySelector('.felder'); if (!f) return null; return f.dataset.ziel === 'element' ? elById(st.auswahl) : st.einstellungen[st.werkzeug]; }\n  function panelInput(e) {\n    const t = e.target; const prop = t.dataset.prop; if (!prop) return;\n    const ziel = panelZiel(); if (!ziel) return;\n    if (t.type === 'checkbox') ziel[prop] = t.checked;\n    else if (prop === 'durchbruchTiefe') { const tiefe = zahl(t.value, 0); ziel.durchbruchAuto = false; ziel.durchbruch = tiefe > 0 ? { tiefe, richtung: (ziel.durchbruch && ziel.durchbruch.richtung) || tuerWandSeite(ziel) } : null; }\n    else if (prop === 'art') { ziel.art = t.value; const kat = GE.MOEBEL.byKey[t.value]; if (kat) { ziel.breite = kat.b; ziel.tiefe = kat.t; } renderPanel(); }\n    else if (prop === 'dicke' || prop === 'groesse' || prop === 'versatz' || prop === 'winkel' || prop === 'breite' || prop === 'tiefe') ziel[prop] = zahl(t.value, ziel[prop]);\n    else ziel[prop] = t.value;\n    if (prop === 'farbe') { const box = t.closest('.swatches'); if (box) { box.querySelectorAll('.swatch').forEach(s => s.classList.toggle('aktiv', s.dataset.wert === t.value)); const fw = box.querySelector('.farbwahl'); fw.classList.toggle('aktiv', !GE.FARBEN.some(f => f.hex === t.value)); fw.style.setProperty('--farbe', t.value); } }\n    if (st.auswahl) { infoAktualisieren(ziel); render(); }\n  }\n  function panelClick(e) {\n    const b = e.target.closest('button'); if (!b) return;\n    if (b.dataset.prop === 'farbe') { const ziel = panelZiel(); if (ziel) { ziel.farbe = b.dataset.wert; b.parentElement.querySelectorAll('.swatch').forEach(s => s.classList.toggle('aktiv', s === b)); const fw = b.parentElement.querySelector('.farbwahl'); if (fw) { fw.classList.remove('aktiv'); fw.querySelector('input').value = b.dataset.wert; fw.style.setProperty('--farbe', b.dataset.wert); } if (st.auswahl) { render(); commit(); } } return; }\n    const a = b.dataset.aktion; const el = st.auswahl ? elById(st.auswahl) : null;\n    if (a === 'loeschen') loescheAuswahl();\n    else if (a === 'spiegeln') { const z = panelZiel(); if (z) { z.spiegeln = !z.spiegeln; if (el) { render(); commit(); } } }\n    else if (a === 'anschlag' && el) { const t = el.p1; el.p1 = el.p2; el.p2 = t; el.spiegeln = !el.spiegeln; if (el.durchbruch) el.durchbruch.richtung = -el.durchbruch.richtung; render(); commit(); }\n    else if (a === 'durchbruchSeite' && el && (el.typ === 'tuer' || el.typ === 'fenster')) { el.durchbruchAuto = false; if (el.durchbruch) el.durchbruch.richtung = -el.durchbruch.richtung; else el.durchbruch = { tiefe: 24, richtung: -tuerWandSeite(el) }; renderPanel(); render(); commit(); }\n    else if (a === 'drehen') { const z = panelZiel(); if (z) { z.winkel = (((z.winkel || 0) + 90) % 360); renderPanel(); if (el) { render(); commit(); } } }\n    else if (a === 'wandmass' && el && el.typ === 'wand') { const m = neuesElement(st.einstellungen.mass, { p1: klon(el.p1), p2: klon(el.p2), versatz: Math.round(GE.dickePt(el, st.kalib) / 2 + 12) }); st.auswahl = m.id; renderPanel(); render(); }\n    else if (a === 'kalibrieren') setzeWerkzeug('kalib');\n    else if (a === 'massstab') { const m = zahl($('#kalibMassstab').value, 0); if (m > 0) { st.kalib = { ptProM: GE.ptProMausMassstab(m), quelle: 'massstab', massstab: m, einheit: st.pdf ? 'pt' : 'px' }; kalibChip(); renderPanel(); render(); } }\n    else if (a === 'ausschnittWeg') { st.ausschnitt = null; commit(); renderPanel(); render(); }\n  }\n\n  // ---------- Export ----------\n  function download(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000); }\n  function svgAufCanvas(svg, ctx, w, h) {\n    return new Promise((ok, err) => { const im = new Image(); const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' })); im.onload = () => { ctx.drawImage(im, 0, 0, w, h); URL.revokeObjectURL(url); ok(); }; im.onerror = () => { URL.revokeObjectURL(url); err(new Error('Beschriftungen konnten nicht gerendert werden.')); }; im.src = url; });\n  }\n  async function exportPng() {\n    if (!st.breite) return;\n    zeigeLaden(true, 'PNG wird erzeugt …');\n    try {\n      const lang = +$('#exportGroesse').value || 4000;\n      const reg = st.ausschnitt || { x: 0, y: 0, w: st.breite, h: st.hoehe };\n      const S = lang / Math.max(reg.w, reg.h);\n      const c = document.createElement('canvas'); c.width = Math.round(reg.w * S); c.height = Math.round(reg.h * S);\n      const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);\n      if (st.seite) await st.seite.render({ canvasContext: ctx, viewport: st.seite.getViewport({ scale: S, offsetX: -reg.x * S, offsetY: -reg.y * S }) }).promise;\n      else if (st.bild) ctx.drawImage(seiteCanvas, reg.x, reg.y, reg.w, reg.h, 0, 0, c.width, c.height);\n      const svg = `<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"${c.width}\" height=\"${c.height}\" viewBox=\"${reg.x} ${reg.y} ${reg.w} ${reg.h}\">${st.elemente.map(el => GE.svgAus(primsFuer(el))).join('')}</svg>`;\n      await svgAufCanvas(svg, ctx, c.width, c.height);\n      await new Promise(ok => c.toBlob(b => { download(b, st.dateiName + '_bearbeitet.png'); ok(); }, 'image/png'));\n    } catch (e) { alert('PNG-Export fehlgeschlagen: ' + e.message); } finally { zeigeLaden(false); }\n  }\n  async function exportPdf() {\n    if (!st.breite) return;\n    zeigeLaden(true, 'PDF wird geschrieben …');\n    try {\n      const { PDFDocument, StandardFonts } = PDFLib;\n      st.proSeite[st.seiteNr] = st.elemente;\n      let doc;\n      if (st.pdfBytes) {\n        doc = await PDFDocument.load(st.pdfBytes, { ignoreEncryption: true });\n        const font = await doc.embedFont(StandardFonts.Helvetica); const pages = doc.getPages();\n        for (const [nr, els] of Object.entries(st.proSeite)) {\n          if (!els.length) continue;\n          const pg = pages[nr - 1]; if (!pg) continue;\n          const vp = (+nr === st.seiteNr) ? st.viewport : (await st.pdf.getPage(+nr)).getViewport({ scale: 1 });\n          const toPdf = (p) => vp.convertToPdfPoint(p.x, p.y);\n          for (const el of els) GE.pdfZeichnen(primsFuer(el, els), pg, font, toPdf, PDFLib);\n        }\n      } else {\n        doc = await PDFDocument.create();\n        const pg = doc.addPage([st.breite, st.hoehe]);\n        if (st.bild) { const png = await new Promise(ok => seiteCanvas.toBlob(b => b.arrayBuffer().then(ok), 'image/png')); const img = await doc.embedPng(png); pg.drawImage(img, { x: 0, y: 0, width: st.breite, height: st.hoehe }); }\n        const font = await doc.embedFont(StandardFonts.Helvetica); const toPdf = (p) => [p.x, st.hoehe - p.y];\n        for (const el of st.elemente) GE.pdfZeichnen(primsFuer(el), pg, font, toPdf, PDFLib);\n      }\n      const bytes = await doc.save(); download(new Blob([bytes], { type: 'application/pdf' }), st.dateiName + '_bearbeitet.pdf');\n    } catch (e) { alert('PDF-Export fehlgeschlagen: ' + e.message); } finally { zeigeLaden(false); }\n  }\n  function projektSpeichern() {\n    st.proSeite[st.seiteNr] = st.elemente;\n    const p = { app: 'grundriss-editor', version: 2, datei: st.dateiName, kalib: st.kalib, ausschnitt: st.ausschnitt, proSeite: st.proSeite, naechsteId: st.naechsteId, blank: st.blank, rasterCm: st.rasterCm, einstellungen: st.einstellungen };\n    download(new Blob([JSON.stringify(p, null, 1)], { type: 'application/json' }), st.dateiName + '_bearbeitung.json');\n  }\n  async function projektLaden(file) {\n    try {\n      const p = JSON.parse(await file.text()); if (p.app !== 'grundriss-editor') throw new Error('Kein Bearbeitungsstand des Grundriss-Editors.');\n      if (p.blank && !st.pdf && !st.bild) neuesBlatt(p.blank.format, p.blank.massstab, p.blank.titel);   // Neuzeichnung: Blatt aus dem Stand anlegen\n      if (!st.breite) { alert('Bitte zuerst den Plan (PDF) laden, dann den Bearbeitungsstand.'); return; }\n      if (p.einstellungen) for (const k of Object.keys(p.einstellungen)) if (st.einstellungen[k]) st.einstellungen[k] = { ...st.einstellungen[k], ...p.einstellungen[k] };\n      if (p.rasterCm != null) st.rasterCm = p.rasterCm;\n      st.kalib = p.kalib || st.kalib; st.ausschnitt = p.ausschnitt || null; st.proSeite = p.proSeite || {}; st.naechsteId = p.naechsteId || 1;\n      st.elemente = st.proSeite[st.seiteNr] || []; st.auswahl = null; commit(); kalibChip(); renderPanel(); render();\n    } catch (e) { alert('Bearbeitungsstand konnte nicht geladen werden: ' + e.message); }\n  }\n  function zeigeLaden(an, text) { const l = $('#laden'); l.classList.toggle('aus', !an); if (text) l.querySelector('span').textContent = text; }\n\n  // ---------- Ereignisse ----------\n  overlay.addEventListener('pointerdown', onDown);\n  overlay.addEventListener('pointermove', onMove);\n  overlay.addEventListener('pointerup', onUp);\n  overlay.addEventListener('pointerleave', () => { if (!st.drag && !st.zeichnung) { st.fang = null; st.maus = null; render(); } });\n  overlay.addEventListener('dblclick', onDblClick);\n  overlay.addEventListener('contextmenu', e => e.preventDefault());\n  werkstatt.addEventListener('pointerdown', (e) => { if (e.target === werkstatt || e.target === blatt) { if (st.werkzeug === 'auswahl' && st.auswahl) { st.auswahl = null; renderPanel(); render(); } if (e.button === 1 || st.leertaste || st.werkzeug === 'hand') { st.pan = { x: e.clientX, y: e.clientY, sl: werkstatt.scrollLeft, stp: werkstatt.scrollTop }; werkstatt.classList.add('greift'); } } });\n  werkstatt.addEventListener('pointermove', (e) => { if (st.pan && e.target !== overlay) onMove(e); });\n  werkstatt.addEventListener('pointerup', () => { if (st.pan) { st.pan = null; werkstatt.classList.remove('greift'); } });\n  werkstatt.addEventListener('wheel', (e) => { if (!st.breite) return; if (e.ctrlKey || e.metaKey) { e.preventDefault(); setzeZoom(st.zoom * (e.deltaY < 0 ? 1.15 : 1 / 1.15), { x: e.clientX, y: e.clientY }); } }, { passive: false });\n  document.querySelectorAll('.tool').forEach(b => b.addEventListener('click', () => setzeWerkzeug(b.dataset.tool)));\n  panel.addEventListener('input', panelInput);\n  panel.addEventListener('change', (e) => { panelInput(e); if (e.target.dataset.optZahl) { st[e.target.dataset.optZahl] = +e.target.value; if (e.target.dataset.optZahl === 'rasterCm' && st.rasterCm > 0 && !st.rasterZeigen && st.blank) st.rasterZeigen = true; renderPanel(); render(); return; } if (e.target.dataset.opt) { st[e.target.dataset.opt] = e.target.checked; if (e.target.dataset.opt === 'aufhellen' && st.bild) { bildAufbereiten(); renderPanel(); render(); } if (e.target.dataset.opt === 'rasterZeigen') render(); return; } if (st.auswahl) commit(); });\n  panel.addEventListener('click', panelClick);\n  $('#btnUndo').addEventListener('click', rueckgaengig); $('#btnRedo').addEventListener('click', wiederholen);\n  $('#btnZoomPlus').addEventListener('click', () => setzeZoom(st.zoom * 1.25)); $('#btnZoomMinus').addEventListener('click', () => setzeZoom(st.zoom / 1.25)); $('#btnZoomFit').addEventListener('click', (e) => zoomAnpassen(e.shiftKey));\n  $('#btnPng').addEventListener('click', exportPng); $('#btnPdf').addEventListener('click', exportPdf); $('#btnJson').addEventListener('click', projektSpeichern);\n  $('#btnLeeren').addEventListener('click', () => { if (st.elemente.length && !confirm('Alle Einträge auf dieser Seite löschen?')) return; st.elemente = []; st.auswahl = null; st.zeichnung = null; commit(); renderPanel(); render(); });\n  $('#kalibOk').addEventListener('click', kalibUebernehmen); $('#kalibAbbruch').addEventListener('click', () => { st.zeichnung = null; kalibPop(false); render(); });\n  $('#kalibMeter').addEventListener('keydown', (e) => { if (e.key === 'Enter') kalibUebernehmen(); if (e.key === 'Escape') { st.zeichnung = null; kalibPop(false); render(); } });\n  $('#kalibChip').addEventListener('click', () => setzeWerkzeug('kalib'));\n  const vollbildAktiv = () => !!(document.fullscreenElement || document.webkitFullscreenElement);\n  function vollbildKnopf() { const b = $('#btnVollbild'); if (b) { b.textContent = vollbildAktiv() ? 'Vollbild beenden' : 'Vollbild'; b.title = vollbildAktiv() ? 'Vollbild beenden (Esc)' : 'Editor bildschirmfüllend anzeigen'; } }\n  async function vollbildWechseln() {\n    try {\n      if (vollbildAktiv()) { await (document.exitFullscreen ? document.exitFullscreen() : document.webkitExitFullscreen()); return; }\n      const de = document.documentElement;\n      if (de.requestFullscreen) await de.requestFullscreen(); else if (de.webkitRequestFullscreen) await de.webkitRequestFullscreen(); else throw new Error('nicht unterstützt');\n    } catch (e) { alert('Vollbild ist hier nicht möglich' + (e && e.message ? ' (' + e.message + ')' : '') + '. Alternativ: F11 im Browser.'); }\n  }\n  $('#btnVollbild').addEventListener('click', vollbildWechseln);\n  ['fullscreenchange', 'webkitfullscreenchange'].forEach(ev => document.addEventListener(ev, () => { vollbildKnopf(); if (st.breite) zoomAnpassen(); }));\n  vollbildKnopf();\n  $('#seitenWahl').addEventListener('change', (e) => zeigeSeite(+e.target.value));\n  $('#dateiInput').addEventListener('change', (e) => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; if (/\\.json$/i.test(f.name)) projektLaden(f); else ladeDatei(f); });\n  $('#btnOeffnen').addEventListener('click', () => $('#dateiInput').click()); $('#btnOeffnen2').addEventListener('click', () => $('#dateiInput').click());\n  $('#btnJsonLaden').addEventListener('click', () => $('#dateiInput').click());\n  $('#btnNeu').addEventListener('click', () => { if (st.elemente.length && !confirm('Neues leeres Blatt anlegen? Die aktuellen Einträge gehen verloren (vorher „Stand sichern\").')) return; neuPop(true); });\n  $('#btnNeu2').addEventListener('click', () => neuPop(true));\n  $('#neuAbbruch').addEventListener('click', () => neuPop(false));\n  $('#neuOk').addEventListener('click', () => { const m = zahl($('#neuMassstab').value, 100); neuPop(false); neuesBlatt($('#neuFormat').value, m > 0 ? m : 100, $('#neuTitel').value.trim()); });\n  $('#neuTitel').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#neuOk').click(); if (e.key === 'Escape') neuPop(false); });\n  ['dragenter', 'dragover'].forEach(ev => document.addEventListener(ev, (e) => { e.preventDefault(); $('#app').classList.add('drop'); }));\n  ['dragleave', 'drop'].forEach(ev => document.addEventListener(ev, (e) => { e.preventDefault(); if (ev === 'drop' || e.target === document.documentElement) $('#app').classList.remove('drop'); }));\n  document.addEventListener('drop', (e) => { const f = e.dataTransfer && e.dataTransfer.files[0]; if (!f) return; if (/\\.json$/i.test(f.name)) projektLaden(f); else ladeDatei(f); });\n  window.addEventListener('resize', () => { if (st.breite) render(); });\n  window.addEventListener('keydown', (e) => {\n    const inInput = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement && document.activeElement.tagName);\n    if (e.key === 'Shift') { st.shift = true; onMove({ _p: true }); }\n    if (e.key === ' ' && !inInput) { st.leertaste = true; werkstatt.classList.add('hand'); e.preventDefault(); return; }\n    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); if (e.shiftKey) wiederholen(); else rueckgaengig(); return; }\n    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); wiederholen(); return; }\n    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); projektSpeichern(); return; }\n    if (e.key === 'Escape') { if (inInput) { document.activeElement.blur(); return; } abbrechen(); return; }\n    if (inInput) return;\n    if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); loescheAuswahl(); return; }\n    if (e.key === 'Enter' && st.zeichnung && st.zeichnung.art === 'flaeche') { flaecheSchliessen(); return; }\n    if (e.key === '+' || e.key === '=') { setzeZoom(st.zoom * 1.25); return; }\n    if (e.key === '-') { setzeZoom(st.zoom / 1.25); return; }\n    if (e.key === '0') { zoomAnpassen(e.shiftKey); return; }\n    if (e.key.toUpperCase() === 'R' && !e.ctrlKey && !e.metaKey) { const el = st.auswahl ? elById(st.auswahl) : null; const z = el && el.typ === 'moebel' ? el : (st.werkzeug === 'moebel' ? st.einstellungen.moebel : null); if (z) { z.winkel = (((z.winkel || 0) + (e.shiftKey ? -90 : 90)) % 360 + 360) % 360; renderPanel(); render(); if (el) commit(); return; } }\n    const k = e.key.toUpperCase(); const w = Object.keys(WERKZEUGE).find(n => WERKZEUGE[n].taste === k); if (w && !e.ctrlKey && !e.metaKey && !e.altKey) setzeWerkzeug(w);\n  });\n  window.addEventListener('keyup', (e) => { if (e.key === 'Shift') { st.shift = false; onMove({ _p: true }); } if (e.key === ' ') { st.leertaste = false; if (st.werkzeug !== 'hand') werkstatt.classList.remove('hand'); } });\n\n  // Start\n  const toolLeiste = document.querySelectorAll('.tool');\n  toolLeiste.forEach(b => { const w = WERKZEUGE[b.dataset.tool]; if (w) b.title = w.name + ' (' + w.taste + ')'; });\n  setzeWerkzeug('auswahl'); kalibChip(); renderPanel(); verlaufKnoepfe();\n  window.GrundrissEditor = { st, ladeDatei, neuesBlatt, render, renderPanel, setzeWerkzeug, exportPng, exportPdf, commit, onDown, onMove, onUp, kalibUebernehmen, flaecheSchliessen, bildAufbereiten, rasterFang, GE };\n})();\n\n<\/script>\n</body>\n</html>\n";
+const GE_EDITOR_HTML = "<!doctype html>\n<html lang=\"de\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>Grundriss-Editor – ImmoOffice</title>\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link href=\"https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js\"><\/script>\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js\"><\/script>\n<script>if (window.self !== window.top) document.documentElement.classList.add(\"eingebettet\");<\/script>\n<style>\n  :root { --navy: #263159; --navy-dark: #1a2342; --gold: #D4A567; --gold-dunkel: #a87b2e; --ink: #1f2433; --muted: #6b7280; --line: #e1e4ec; --bg: #eef0f5; --rot: #d2232a; --gruen: #2f8f5b; --amber: #c98a12; }\n  * { box-sizing: border-box; }\n  html, body { height: 100%; margin: 0; }\n  body { font-family: 'Montserrat', system-ui, sans-serif; font-size: 13px; color: var(--ink); background: var(--bg); overflow: hidden; }\n  button, input, select, textarea { font: inherit; color: inherit; }\n  #app { display: grid; grid-template-columns: 64px 1fr 276px; grid-template-rows: 56px 1fr; height: 100vh; position: relative; }\n  #app.drop::after { content: 'Loslassen zum Laden'; position: absolute; inset: 0; background: rgba(38,49,89,.55); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 600; z-index: 50; pointer-events: none; }\n\n  /* Kopf */\n  header { grid-column: 1 / -1; background: var(--navy-dark); color: #fff; display: flex; align-items: center; gap: 14px; padding: 0 16px 0 14px; }\n  .marke { display: flex; flex-direction: column; line-height: 1.15; min-width: 150px; }\n  .marke .eyebrow { font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); font-weight: 600; }\n  .marke .titel { font-size: 15px; font-weight: 600; }\n  html.eingebettet .marke { display: none; }\n  .datei { display: flex; align-items: center; gap: 8px; padding-left: 14px; border-left: 1px solid rgba(255,255,255,.15); min-width: 0; }\n  #dateiName { color: rgba(255,255,255,.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; font-weight: 500; }\n  .kopfrest { margin-left: auto; display: flex; align-items: center; gap: 10px; }\n  .kbtn { background: transparent; border: 1px solid rgba(255,255,255,.22); color: #fff; border-radius: 6px; padding: 6px 10px; cursor: pointer; font-weight: 500; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }\n  .kbtn:hover { background: rgba(255,255,255,.08); }\n  .kbtn:disabled { opacity: .35; cursor: default; }\n  .kbtn.gold { background: var(--gold); border-color: var(--gold); color: var(--navy-dark); font-weight: 600; }\n  .kbtn.gold:hover { background: #e0b77b; }\n  .gruppe { display: inline-flex; border: 1px solid rgba(255,255,255,.22); border-radius: 6px; overflow: hidden; }\n  .gruppe .kbtn { border: 0; border-radius: 0; padding: 6px 9px; }\n  .gruppe .kbtn + .kbtn { border-left: 1px solid rgba(255,255,255,.18); }\n  #btnOrtho.aktiv { background: rgba(212,165,103,.22); border-color: #D4A567; } #btnOrtho:not(.aktiv) { color: #ffd9a0; border-style: dashed; }\n  #zoomWert { min-width: 52px; text-align: center; font-variant-numeric: tabular-nums; }\n  select.kopf { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.22); border-radius: 6px; padding: 5px 8px; font-size: 12px; }\n  select.kopf option { color: var(--ink); }\n\n  /* Maßstab-Chip: das Schriftfeld des Blattes */\n  .chip { display: inline-flex; align-items: center; gap: 10px; border-radius: 6px; padding: 5px 10px 5px 8px; cursor: pointer; border: 1px solid transparent; }\n  .chip svg { width: 18px; height: 18px; flex: none; }\n  .chip .chip-wert { font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .02em; }\n  .chip .chip-info { font-size: 11px; opacity: .85; }\n  .chip-amber { background: rgba(201,138,18,.18); border-color: rgba(201,138,18,.6); color: #ffd47a; }\n  .chip-gruen { background: rgba(47,143,91,.2); border-color: rgba(47,143,91,.7); color: #8be0ad; }\n  .chip:hover { filter: brightness(1.12); }\n\n  /* Werkzeugleiste */\n  nav { background: var(--navy); display: flex; flex-direction: column; padding: 10px 0; gap: 2px; }\n  .tool { background: transparent; border: 0; color: rgba(255,255,255,.72); width: 100%; padding: 7px 0 6px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 9.5px; letter-spacing: .04em; text-transform: uppercase; border-left: 3px solid transparent; }\n  .tool svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }\n  .tool:hover { color: #fff; background: rgba(255,255,255,.06); }\n  .tool.aktiv { color: #fff; border-left-color: var(--gold); background: rgba(255,255,255,.1); }\n  .tool.aktiv svg { stroke: var(--gold); }\n  nav .trenner { height: 1px; background: rgba(255,255,255,.12); margin: 6px 12px; }\n  /* ep-ge-kompakt: Werkzeugleiste passt in niedrige Rahmen (Stufe 129) */\n  nav { overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }\n  nav::-webkit-scrollbar { display: none; }\n  @media (max-height: 820px) { nav { padding: 6px 0; gap: 0; } .tool { padding: 5px 0 4px; gap: 2px; font-size: 8.5px; letter-spacing: .02em; } .tool svg { width: 18px; height: 18px; } nav .trenner { margin: 3px 12px; } }\n  @media (max-height: 640px) { nav { padding: 3px 0; } .tool { padding: 3px 0 2px; gap: 1px; font-size: 8px; } .tool svg { width: 16px; height: 16px; } nav .trenner { margin: 2px 12px; } }\n\n  /* Werkstatt */\n  #werkstatt { position: relative; overflow: auto; background-color: var(--bg); background-image: radial-gradient(rgba(38,49,89,.13) 1px, transparent 1px); background-size: 18px 18px; cursor: crosshair; }\n  #werkstatt.hand { cursor: grab; } #werkstatt.greift { cursor: grabbing; }\n  #blatt { position: relative; margin: 24px; background: #fff; box-shadow: 0 1px 2px rgba(26,35,66,.12), 0 10px 30px rgba(26,35,66,.16); }\n  #seite { position: absolute; left: 0; top: 0; display: block; }\n  #overlay { position: absolute; left: 0; top: 0; overflow: visible; touch-action: none; }\n  #overlay[data-werkzeug=\"auswahl\"] { cursor: default; }\n  #overlay:not([data-werkzeug=\"auswahl\"]) .el, #overlay:not([data-werkzeug=\"auswahl\"]) .el * { pointer-events: none !important; }\n  #overlay .el:hover .hit { cursor: move; }\n  #overlay .griff { cursor: move; }\n  #leer { position: absolute; left: 64px; top: 56px; right: 276px; bottom: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }\n  #leer .box { pointer-events: auto; border: 1.5px dashed var(--gold); border-radius: 10px; background: rgba(255,255,255,.9); padding: 34px 40px; text-align: center; max-width: 440px; }\n  #leer h2 { margin: 0 0 6px; font-size: 17px; font-weight: 600; color: var(--navy); }\n  #leer p { margin: 0 0 16px; color: var(--muted); line-height: 1.5; }\n  .aus { display: none !important; }\n  #laden { position: absolute; left: 64px; top: 56px; right: 276px; bottom: 0; background: rgba(238,240,245,.7); display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--navy); font-weight: 600; z-index: 30; }\n  #laden i { width: 18px; height: 18px; border: 2.5px solid rgba(38,49,89,.25); border-top-color: var(--navy); border-radius: 50%; animation: dreh .8s linear infinite; }\n  @keyframes dreh { to { transform: rotate(360deg); } }\n  @media (prefers-reduced-motion: reduce) { #laden i { animation: none; } }\n  #neuPop { position: absolute; z-index: 41; left: 50%; top: 40%; transform: translate(-50%, -50%); background: #fff; border: 1px solid var(--line); border-top: 3px solid var(--gold); border-radius: 8px; box-shadow: 0 10px 30px rgba(26,35,66,.18); padding: 14px 16px; width: 340px; }\n  #neuPop .t { font-weight: 600; color: var(--navy); margin-bottom: 4px; }\n  #neuPop .s { color: var(--muted); font-size: 11.5px; margin-bottom: 10px; }\n  #neuPop .feld { display: block; margin-bottom: 8px; }\n  #neuPop .feld span { display: block; font-size: 11px; color: var(--muted); margin-bottom: 3px; }\n  #neuPop select, #neuPop input { width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; font: inherit; }\n  #neuPop .knopfzeile { display: flex; gap: 8px; margin-top: 10px; }\n  #kalibPop { position: absolute; z-index: 40; background: #fff; border: 1px solid var(--line); border-top: 3px solid var(--gold); border-radius: 8px; box-shadow: 0 10px 30px rgba(26,35,66,.18); padding: 12px 14px; width: 280px; }\n  #kalibPop .t { font-weight: 600; color: var(--navy); margin-bottom: 4px; }\n  #kalibPop .s { color: var(--muted); font-size: 11.5px; margin-bottom: 8px; }\n  #kalibPop .zeile { display: flex; gap: 6px; align-items: center; }\n  #kalibPop input { flex: 1; }\n\n  /* Eigenschaften */\n  aside { background: #fff; border-left: 1px solid var(--line); overflow: auto; padding: 4px 0 20px; }\n  .abschnitt { padding: 14px 16px 16px; border-bottom: 1px solid var(--line); }\n  .abschnitt-titel { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-dunkel); font-weight: 700; margin-bottom: 10px; }\n  .feld { display: block; margin-bottom: 10px; }\n  .feld > span { display: block; font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 500; }\n  .feld input[type=\"text\"], .feld input[type=\"number\"], .feld select, .feld textarea, #kalibPop input { width: 100%; border: 1px solid #cfd4e0; border-radius: 6px; padding: 7px 9px; background: #fff; font-size: 13px; }\n  .feld input:focus, .feld select:focus, .feld textarea:focus, #kalibPop input:focus { outline: 2px solid rgba(212,165,103,.55); outline-offset: 0; border-color: var(--gold); }\n  .feld textarea { resize: vertical; min-height: 54px; }\n  .zeile { display: flex; gap: 6px; }\n  .zeile input { flex: 1; }\n  .swatches { display: flex; gap: 8px; }\n  .swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #cfd4e0; cursor: pointer; padding: 0; }\n  .swatch.aktiv { box-shadow: 0 0 0 2px var(--gold); }\n  .farbwahl { position: relative; width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #cfd4e0; cursor: pointer; background: conic-gradient(#e2412f, #f0b400, #45b356, #2f80d6, #8e44ad, #e2412f); display: flex; align-items: center; justify-content: center; overflow: hidden; }\n  .farbwahl.aktiv { box-shadow: 0 0 0 2px var(--gold); background: var(--farbe, #263159); }\n  .farbwahl span { color: #fff; font-weight: 700; font-size: 15px; line-height: 1; text-shadow: 0 0 2px rgba(0,0,0,.5); pointer-events: none; }\n  .farbwahl.aktiv span { display: none; }\n  .zeile2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }\n  .griff.dreh { cursor: grab; }\n  .farbwahl input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; padding: 0; border: 0; }\n  .check { display: flex; gap: 8px; align-items: flex-start; margin: 8px 0; line-height: 1.35; cursor: pointer; }\n  .check input { margin: 2px 0 0; accent-color: var(--navy); }\n  .check em { font-style: normal; color: var(--muted); font-size: 11px; }\n  .hinweis { color: var(--muted); line-height: 1.5; margin: 6px 0 0; }\n  .hinweis.klein { font-size: 11px; }\n  .elinfo { font-weight: 600; color: var(--navy); margin: 6px 0 12px; font-variant-numeric: tabular-nums; }\n  .knopfzeile { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }\n  .btn { border: 1px solid #cfd4e0; background: #fff; border-radius: 6px; padding: 7px 11px; cursor: pointer; font-weight: 500; font-size: 12px; color: var(--navy); }\n  .btn:hover { background: #f3f4f8; border-color: #b9c0d1; }\n  .btn-rot { color: var(--rot); border-color: rgba(210,35,42,.4); }\n  .btn-rot:hover { background: rgba(210,35,42,.06); }\n  .btn.gold { background: var(--gold); border-color: var(--gold); color: var(--navy-dark); font-weight: 600; }\n  .kv { display: grid; grid-template-columns: 70px 1fr; gap: 5px 8px; margin-bottom: 12px; line-height: 1.4; }\n  .kv span { color: var(--muted); font-size: 11px; padding-top: 1px; }\n  .kv b { font-weight: 500; word-break: break-word; }\n  :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }\n  @media (max-width: 900px) { #app { grid-template-columns: 64px 1fr; } #leer, #laden { right: 0; } aside { position: absolute; right: 0; top: 56px; bottom: 0; width: 276px; box-shadow: -6px 0 20px rgba(26,35,66,.12); } }\n</style>\n</head>\n<body>\n<div id=\"app\">\n  <header>\n    <div class=\"marke\"><span class=\"eyebrow\">ImmoOffice · Werkzeuge</span><span class=\"titel\">Grundriss-Editor</span></div>\n    <div class=\"datei\">\n      <button type=\"button\" class=\"kbtn\" id=\"btnNeu\" title=\"Neues leeres Zeichenblatt anlegen\">Neu</button>\n      <button type=\"button\" class=\"kbtn\" id=\"btnOeffnen\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M4 4h7l2 2h7v13H4z\"/></svg>Plan öffnen</button>\n      <span id=\"dateiName\">Kein Plan geladen</span>\n      <select class=\"kopf\" id=\"seitenWahl\" style=\"display:none\"></select>\n    </div>\n    <div class=\"chip chip-amber\" id=\"kalibChip\" title=\"Maßstab prüfen oder kalibrieren (K)\">\n      <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"><rect x=\"2.5\" y=\"8\" width=\"19\" height=\"8\" rx=\"1\"/><path d=\"M6.5 8v3M10 8v4.5M13.5 8v3M17 8v4.5\"/></svg>\n      <span><span class=\"chip-wert\">1 : 100</span><br><span class=\"chip-info\">angenommen · bitte prüfen</span></span>\n    </div>\n    <div class=\"kopfrest\">\n      <div class=\"gruppe\">\n        <button type=\"button\" class=\"kbtn\" id=\"btnUndo\" title=\"Rückgängig (Strg+Z)\">↶</button>\n        <button type=\"button\" class=\"kbtn\" id=\"btnRedo\" title=\"Wiederholen (Strg+Y)\">↷</button>\n      </div>\n      <div class=\"gruppe\">\n        <button type=\"button\" class=\"kbtn\" id=\"btnZoomMinus\" title=\"Verkleinern (−)\">−</button>\n        <button type=\"button\" class=\"kbtn\" id=\"btnZoomFit\" title=\"Zeichnung einpassen (0) · mit Shift: ganzes Blatt\"><span id=\"zoomWert\">100 %</span></button>\n        <button type=\"button\" class=\"kbtn\" id=\"btnZoomPlus\" title=\"Vergrößern (+)\">+</button>\n      </div>\n      <button type=\"button\" class=\"kbtn\" id=\"btnLeeren\" title=\"Alle Einträge dieser Seite löschen\">Leeren</button>\n      <button type=\"button\" class=\"kbtn\" id=\"btnVollbild\" title=\"Editor bildschirmfüllend anzeigen\">Vollbild</button>\n      <button type=\"button\" class=\"kbtn\" id=\"btnSchraegen\" data-ep-schraegen title=\"Dachschrägen aus der Punktwolke: je Raumfläche lichte Höhe messen, 2-m- und 1-m-Linie und Teilflächen „Schräge 1–2 m“ / „unter 1 m“ nach § 4 WoFlV anlegen\">Schrägen</button>\n      <button type=\"button\" class=\"kbtn\" id=\"btnKanten\" data-ep-kanten title=\"Alle Wände auf die Schnittkanten der Punktwolke setzen: Innenseite der Wand = ausgeglichene Wandfläche der Wolke. Macht die Innenmaße und die Wohnfläche reproduzierbar.\">Wände auf Kanten</button>\n      <button type=\"button\" class=\"kbtn\" id=\"btnRaeume\" data-ep-raeume title=\"Räume und Innenmaße aus den gezeichneten Wänden erzeugen: geschlossene Wandzüge werden zu Flächen (lichte Maße), jede Raumkante bekommt ein Innenmaß\">Räume + Maße</button>\n      <button type=\"button\" class=\"kbtn aktiv\" id=\"btnOrtho\" data-ep-ortho title=\"Rechtwinklig zeichnen an/aus (Taste O). Aus: Wände in jedem Winkel. An: rechtwinklig, schräge Wolken- und Planlinien gehen vor.\">⟂ 90°</button>\n      <div class=\"gruppe\">\n        <button type=\"button\" class=\"kbtn\" id=\"btnJsonLaden\" title=\"Gespeicherten Bearbeitungsstand (.json) laden\">Stand laden</button>\n        <button type=\"button\" class=\"kbtn\" id=\"btnJson\" title=\"Bearbeitungsstand als .json sichern (Strg+S)\">Stand sichern</button>\n      </div>\n      <select class=\"kopf\" id=\"exportGroesse\" title=\"Auflösung des PNG (längste Kante)\">\n        <option value=\"2500\">PNG 2500 px</option>\n        <option value=\"4000\" selected>PNG 4000 px</option>\n        <option value=\"6000\">PNG 6000 px</option>\n      </select>\n      <button type=\"button\" class=\"kbtn\" id=\"btnPng\">PNG exportieren</button>\n      <button type=\"button\" class=\"kbtn gold\" id=\"btnPdf\">PDF exportieren</button>\n      <button type=\"button\" class=\"kbtn\" id=\"btnDok\" data-ep-dokument title=\"Grundriss und Wohnflächenberechnung nach WoFlV (aus den Räumen des Blatts: Dachschrägen, Gauben, Abzüge) als eine PDF-Datei\">Plan + Wohnfläche</button>\n    </div>\n  </header>\n\n  <nav>\n    <button type=\"button\" class=\"tool aktiv\" data-tool=\"auswahl\"><svg viewBox=\"0 0 24 24\"><path d=\"M5 3l14 8-6.5 1.5L9 19z\"/></svg>Auswahl</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"hand\"><svg viewBox=\"0 0 24 24\"><path d=\"M12 2v20M2 12h20M12 2l-3 3M12 2l3 3M12 22l-3-3M12 22l3-3M2 12l3-3M2 12l3 3M22 12l-3-3M22 12l-3 3\"/></svg>Bewegen</button>\n    <div class=\"trenner\"></div>\n    <button type=\"button\" class=\"tool\" data-tool=\"wand\"><svg viewBox=\"0 0 24 24\"><path d=\"M3 12h18\" stroke-width=\"5\"/></svg>Wand</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"tuer\"><svg viewBox=\"0 0 24 24\"><path d=\"M4 20V5M4 5c8 0 15 7 15 15M4 20h16\"/></svg>Tür</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"fenster\"><svg viewBox=\"0 0 24 24\"><path d=\"M3 9h18v6H3z\"/><path d=\"M3 12h18M12 9v6\"/></svg>Fenster</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"mass\"><svg viewBox=\"0 0 24 24\"><path d=\"M3 14h18M3 10v8M21 10v8M6 17l3-6M15 17l3-6\"/></svg>Maß</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"schraege\"><svg viewBox=\"0 0 24 24\"><path d=\"M3 19h18M3 19L19 5\" stroke-dasharray=\"3 2\"/><path d=\"M8 19v-5M13 19v-9\" stroke-width=\"1.2\"/></svg>Schräge</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"text\"><svg viewBox=\"0 0 24 24\"><path d=\"M5 5h14M12 5v15M9 20h6\"/></svg>Text</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"moebel\"><svg viewBox=\"0 0 24 24\"><path d=\"M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3\"/><path d=\"M3 11h18v6H3z\"/><path d=\"M5 17v2M19 17v2\"/></svg>Möbel</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"abdecken\"><svg viewBox=\"0 0 24 24\"><path d=\"M4 4h16v16H4z\"/><path d=\"M8 8l8 8M16 8l-8 8\" stroke-width=\"1.2\"/></svg>Abdecken</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"treppe\"><svg viewBox=\"0 0 24 24\"><path d=\"M3 20h4v-4h4v-4h4v-4h4V4h2\"/><path d=\"M3 20v-3\" stroke-width=\"1.2\"/></svg>Treppe</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"schnitt\" title=\"Schnittlinie: senkrechter Schnitt durch die Punktwolke im 3D-Fenster (Q)\"><svg viewBox=\"0 0 24 24\"><path d=\"M4 12h16\" stroke-dasharray=\"5 2 1 2\"/><path d=\"M4 8v8M20 8v8\"/><path d=\"M4 8l3 0M20 8l-3 0\" stroke-width=\"1.2\"/></svg>Schnitt</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"flaeche\"><svg viewBox=\"0 0 24 24\"><path d=\"M4 8l8-4 8 5v8l-8 4-8-5z\"/><path d=\"M8 11h8M8 14h5\" stroke-width=\"1.2\"/></svg>Fläche</button>\n    <div class=\"trenner\"></div>\n    <button type=\"button\" class=\"tool\" data-tool=\"kalib\"><svg viewBox=\"0 0 24 24\"><path d=\"M3 15l12-12 6 6-12 12z\"/><path d=\"M8 10l2 2M11 7l2 2M14 4l2 2\"/></svg>Maßstab</button>\n    <button type=\"button\" class=\"tool\" data-tool=\"ausschnitt\"><svg viewBox=\"0 0 24 24\"><path d=\"M7 3v14h14M3 7h14v14\"/></svg>Ausschnitt</button>\n  </nav>\n\n  <main id=\"werkstatt\">\n    <div id=\"blatt\"><canvas id=\"seite\"></canvas><svg id=\"overlay\" xmlns=\"http://www.w3.org/2000/svg\" data-werkzeug=\"auswahl\"></svg></div>\n  </main>\n\n  <aside id=\"eigenschaften\"></aside>\n  <div id=\"leer\"><div class=\"box\"><h2>Grundriss hierher ziehen – oder neu zeichnen</h2><p>PDF aus der Architektur-Software (Wände rasten exakt ein), aber auch Scans, Fotos, JPG oder PNG alter Grundrisse – dort werden Kanten im Bild erkannt; der Maßstab wird über eine bekannte Strecke kalibriert.<br>Ein gesicherter Bearbeitungsstand (.json) lässt sich zusätzlich laden.</p><button type=\"button\" class=\"btn gold\" id=\"btnOeffnen2\">Datei auswählen</button> <button type=\"button\" class=\"btn\" id=\"btnNeu2\">Neuen Grundriss zeichnen</button></div></div>\n  <div id=\"laden\" class=\"aus\"><i></i><span>Plan wird geladen …</span></div>\n  <div id=\"neuPop\" class=\"aus\">\n    <div class=\"t\">Neues Zeichenblatt</div>\n    <div class=\"s\">Leeres Blatt in Papiergröße – Wände, Türen, Fenster, Möbel und Maße wie gewohnt, mit Meterraster.</div>\n    <label class=\"feld\"><span>Blatt</span><select id=\"neuFormat\"></select></label>\n    <label class=\"feld\"><span>Maßstab 1 : …</span><select id=\"neuMassstab\"><option value=\"50\">50 (Wohnung, Detail)</option><option value=\"100\" selected>100 (Haus, Geschoss)</option><option value=\"200\">200 (große Anlage)</option></select></label>\n    <label class=\"feld\"><span>Titel (optional, z. B. Erdgeschoss · Musterstraße 1)</span><input type=\"text\" id=\"neuTitel\"></label>\n    <div class=\"knopfzeile\"><button type=\"button\" class=\"btn gold\" id=\"neuOk\">Blatt anlegen</button><button type=\"button\" class=\"btn\" id=\"neuAbbruch\">Abbrechen</button></div>\n  </div>\n  <div id=\"kalibPop\" class=\"aus\">\n    <div class=\"t\">Maßstab kalibrieren</div>\n    <div class=\"s\">Gemessene Strecke im Plan: <b id=\"kalibPt\">0 pt</b></div>\n      <label class=\"feld\"><span>Tatsächliche Länge (m)</span><div class=\"zeile\"><input type=\"text\" id=\"kalibMeter\" inputmode=\"decimal\"><button type=\"button\" class=\"btn gold\" id=\"kalibOk\">Übernehmen</button><button type=\"button\" class=\"btn\" id=\"kalibAbbruch\">✕</button></div></label>\n    </div>\n  <input type=\"file\" id=\"dateiInput\" accept=\".pdf,.png,.jpg,.jpeg,.webp,.json,application/pdf,image/*\" class=\"aus\">\n</div>\n<script>\n  if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';\n// ===== Grundriss-Editor · Kern (renderer-neutral, ohne DOM) =====\n// Koordinaten: Seiten-Einheiten (pt) im pdf.js-Viewport bei scale 1, y nach unten.\nconst GE = (() => {\n  const PT_PRO_MM = 72 / 25.4;\n  const ptProMausMassstab = (m) => 1000 * PT_PRO_MM / m;   // 1:100 → 28,346 pt je Meter\n  const massstabAusPtProM = (p) => 1000 * PT_PRO_MM / p;\n\n  const V = {\n    sub: (a, b) => ({ x: a.x - b.x, y: a.y - b.y }),\n    add: (a, b) => ({ x: a.x + b.x, y: a.y + b.y }),\n    mul: (a, s) => ({ x: a.x * s, y: a.y * s }),\n    len: (a) => Math.hypot(a.x, a.y),\n    dist: (a, b) => Math.hypot(a.x - b.x, a.y - b.y),\n    norm: (a) => { const l = Math.hypot(a.x, a.y) || 1; return { x: a.x / l, y: a.y / l }; },\n    perp: (a) => ({ x: -a.y, y: a.x }),\n    dot: (a, b) => a.x * b.x + a.y * b.y,\n    mid: (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }),\n    rot: (a, deg) => { const r = deg * Math.PI / 180, c = Math.cos(r), s = Math.sin(r); return { x: a.x * c - a.y * s, y: a.x * s + a.y * c }; },\n    // Lotfußpunkt von p auf die Strecke ab (geklemmt)\n    fuss: (p, a, b) => {\n      const ab = V.sub(b, a); const l2 = ab.x * ab.x + ab.y * ab.y;\n      if (l2 < 1e-9) return { p: a, t: 0 };\n      let t = ((p.x - a.x) * ab.x + (p.y - a.y) * ab.y) / l2; t = Math.max(0, Math.min(1, t));\n      return { p: { x: a.x + ab.x * t, y: a.y + ab.y * t }, t };\n    },\n  };\n\n  const FARBEN = [\n    { hex: '#d2232a', name: 'Rot – Neubau' },\n    { hex: '#e0b400', name: 'Gelb – Abbruch' },\n    { hex: '#263159', name: 'Navy – ImmoOffice' },\n    { hex: '#1f2433', name: 'Schwarz' },\n  ];\n  const STILE = [\n    { key: 'massiv', name: 'Massiv (gefüllt)' },\n    { key: 'schraffur', name: 'Mauerwerk (schraffiert)' },\n    { key: 'hohl', name: 'Trockenbau (Umriss)' },\n    { key: 'glas', name: 'Glaswand (Doppellinie)' },\n    { key: 'abbruch', name: 'Abbruch (gelb hinterlegt)' },\n  ];\n  const NEU = {\n    wand: () => ({ typ: 'wand', dicke: 12.5, stil: 'massiv', farbe: '#d2232a' }),\n    tuer: () => ({ typ: 'tuer', variante: 'dreh', farbe: '#d2232a', spiegeln: false, durchbruch: null, breiteCm: 0, hoeheCm: 0 }),   // durchbruch: { tiefe (cm), richtung ±1 } = Öffnung in einer PLAN-Wand (weiß + Laibungen)\n    fenster: () => ({ typ: 'fenster', variante: 'einfach', farbe: '#d2232a', spiegeln: false, durchbruch: null, breiteCm: 0, hoeheCm: 0, bruestungCm: 0, tiefeCm: 118 }),\n    treppe: () => ({ typ: 'treppe', variante: 'gerade', breite: 100, stufen: 0, farbe: '#d2232a', text: '', lage: 'antritt', steigung: 18, platte: 20 }),\n    schnitt: () => ({ typ: 'schnitt', farbe: '#2b6cb0', text: '', groesse: 7 }),\n    schraege: () => ({ typ: 'schraege', hoeheM: 2, farbe: '#d2232a', groesse: 6, text: '' }),\n    mass: () => ({ typ: 'mass', farbe: '#d2232a', versatz: 14, groesse: 7, text: '' }),\n    text: () => ({ typ: 'text', farbe: '#d2232a', groesse: 8, winkel: 0, text: 'Text', halo: true }),\n    flaeche: () => ({ typ: 'flaeche', farbe: '#263159', groesse: 8, text: '', fuellen: true }),\n    abdecken: () => ({ typ: 'abdecken' }),\n    moebel: () => ({ typ: 'moebel', art: 'schreibtisch', breite: 160, tiefe: 80, winkel: 0, farbe: '#263159', fuellen: true, text: '' }),\n  };\n  // Blattformate (mm) für leere Zeichenblätter\n  const BLAETTER = [['a4q', 'A4 quer', 297, 210], ['a4h', 'A4 hoch', 210, 297], ['a3q', 'A3 quer', 420, 297], ['a3h', 'A3 hoch', 297, 420], ['a2q', 'A2 quer', 594, 420], ['a1q', 'A1 quer', 841, 594]];\n  const K = { dimLinie: 0.5, dimTick: 2.2, dimUeberstand: 2, dimGap: 1.5, textGap: 1.4, tuerLinie: 0.6, glasLinie: 0.7, umriss: 0.8, moebel: 0.5, duenn: 0.35 };\n  // Baurichtmaße (cm) für Tür- und Fensterbreiten – 0 = frei aus der gezeichneten Strecke\n  const TUERBREITEN = [63.5, 76, 88.5, 101, 113.5, 126, 138.5, 151, 176, 201];\n  const FENSTERBREITEN = [51, 63.5, 76, 88.5, 101, 113.5, 126, 138.5, 151, 176, 201, 226, 251, 301];\n  const TUEREN = [['dreh', 'Drehtür, einflügelig'], ['doppel', 'Doppeltür, zweiflügelig'], ['schiebe', 'Schiebetür'], ['pendel', 'Pendeltür'], ['oeffnung', 'Durchgang ohne Tür']];\n  const FENSTER = [['einfach', 'Fenster, einflügelig'], ['zweifluegelig', 'Fenster, zweiflügelig'], ['dreifluegelig', 'Fenster, dreiflügelig'], ['bodentief', 'Bodentiefes Fenster / Fenstertür'], ['schiebe', 'Hebe-Schiebe-Tür'], ['dach', 'Dachflächenfenster (im Dach, gestrichelt)']];\n  const DACHFENSTER = [[55, 78], [66, 118], [78, 98], [78, 118], [78, 140], [94, 118], [114, 118], [134, 140]];   // gängige Größen Breite × Höhe (cm)\n  // Linienstärken sind in pt gedacht; bei Pixelquellen (Scans) skaliert der Faktor mit der Auflösung (1 m = 28,35 px entspräche 72 dpi bei 1:100)\n  const linienSkala = (kalib) => (kalib && kalib.einheit === 'px') ? Math.max(1, kalib.ptProM / 28.35) : 1;\n\n  // ---------- Formatierung ----------\n  // Meter → Bauzeichnungs-Schreibweise wie im Plan: 2.26 · 24 (cm) · 1.13⁵ (halber Zentimeter hochgestellt)\n  const formatMass = (m) => {\n    const halbe = Math.round(Math.abs(m) * 200);\n    const ganzCm = Math.floor(halbe / 2), hoch = halbe % 2 ? '5' : null;\n    if (ganzCm < 100) return { haupt: String(ganzCm), hoch };\n    return { haupt: Math.floor(ganzCm / 100) + '.' + String(ganzCm % 100).padStart(2, '0'), hoch };\n  };\n  const formatMeter = (m) => m.toFixed(2).replace('.', ',') + ' m';\n  const formatFlaeche = (m2) => m2.toFixed(2).replace('.', ',') + ' m²';\n\n  // ---------- Element-Geometrie ----------\n  const massGeometrie = (el) => {\n    const d0 = V.sub(el.p2, el.p1); const L = V.len(d0); if (L < 1e-6) return null;\n    const d = V.mul(d0, 1 / L); const n = V.perp(d); const v = (el.versatz == null ? 14 : el.versatz);\n    const D1 = V.add(el.p1, V.mul(n, v)), D2 = V.add(el.p2, V.mul(n, v));\n    let r = d; if (r.x < -1e-9 || (Math.abs(r.x) < 1e-9 && r.y > 0)) r = V.mul(r, -1);   // Leserichtung: von links / von rechts lesbar\n    const up = { x: r.y, y: -r.x };                                                      // \"oben\" des gedrehten Textes\n    return { d, n, L, D1, D2, r, up, winkel: Math.atan2(r.y, r.x) * 180 / Math.PI, v, s: v < 0 ? -1 : 1 };\n  };\n  const flaecheInhalt = (pts) => { let a = 0; for (let i = 0; i < pts.length; i++) { const p = pts[i], q = pts[(i + 1) % pts.length]; a += p.x * q.y - q.x * p.y; } return Math.abs(a) / 2; };\n  const schwerpunkt = (pts) => {\n    let a = 0, cx = 0, cy = 0;\n    for (let i = 0; i < pts.length; i++) { const p = pts[i], q = pts[(i + 1) % pts.length]; const f = p.x * q.y - q.x * p.y; a += f; cx += (p.x + q.x) * f; cy += (p.y + q.y) * f; }\n    if (Math.abs(a) < 1e-9) { const s = pts.reduce((o, p) => ({ x: o.x + p.x, y: o.y + p.y }), { x: 0, y: 0 }); return { x: s.x / pts.length, y: s.y / pts.length }; }\n    return { x: cx / (3 * a), y: cy / (3 * a) };\n  };\n  const rechteck = (p1, p2, dickePt) => { const n = V.mul(V.perp(V.norm(V.sub(p2, p1))), dickePt / 2); return [V.add(p1, n), V.add(p2, n), V.sub(p2, n), V.sub(p1, n)]; };\n  const tuerGeometrie = (el) => {\n    const w = V.dist(el.p1, el.p2); if (w < 1e-6) return null;\n    const d = V.norm(V.sub(el.p2, el.p1)); const q = V.rot(d, el.spiegeln ? 90 : -90);\n    const E = V.add(el.p1, V.mul(q, w));                               // Blattende\n    const k = 0.5523 * w;                                              // Viertelkreis E → p2 um p1 als Bézier\n    return { w, d, E, c1: V.add(E, V.mul(d, k)), c2: V.add(el.p2, V.mul(q, k)) };\n  };\n  const dickePt = (el, kalib) => (el.dicke || 12.5) / 100 * kalib.ptProM;\n\n\n  // ---------- Einrichtung (Möbelsymbole in Draufsicht) ----------\n  // Bauteile in Einheitskoordinaten: u 0..1 = Breite, v 0..1 = Tiefe, v = 0 ist die Rück-/Wandseite.\n  const MOEBEL = (() => {\n    const kb = 0.5523;\n    const rect = (u0, v0, u1, v1) => ({ art: 'polygon', punkte: [{ x: u0, y: v0 }, { x: u1, y: v0 }, { x: u1, y: v1 }, { x: u0, y: v1 }] });\n    const line = (u0, v0, u1, v1) => ({ art: 'linie', p1: { x: u0, y: v0 }, p2: { x: u1, y: v1 } });\n    const kreis = (cu, cv, ru, rv) => ({ art: 'pfad', d: [['M', { x: cu + ru, y: cv }],\n      ['C', { x: cu + ru, y: cv + rv * kb }, { x: cu + ru * kb, y: cv + rv }, { x: cu, y: cv + rv }],\n      ['C', { x: cu - ru * kb, y: cv + rv }, { x: cu - ru, y: cv + rv * kb }, { x: cu - ru, y: cv }],\n      ['C', { x: cu - ru, y: cv - rv * kb }, { x: cu - ru * kb, y: cv - rv }, { x: cu, y: cv - rv }],\n      ['C', { x: cu + ru * kb, y: cv - rv }, { x: cu + ru, y: cv - rv * kb }, { x: cu + ru, y: cv }], ['Z']] });\n    const rrect = (u0, v0, u1, v1, ru, rv) => ({ art: 'pfad', d: [['M', { x: u0 + ru, y: v0 }], ['L', { x: u1 - ru, y: v0 }],\n      ['C', { x: u1 - ru + ru * kb, y: v0 }, { x: u1, y: v0 + rv - rv * kb }, { x: u1, y: v0 + rv }], ['L', { x: u1, y: v1 - rv }],\n      ['C', { x: u1, y: v1 - rv + rv * kb }, { x: u1 - ru + ru * kb, y: v1 }, { x: u1 - ru, y: v1 }], ['L', { x: u0 + ru, y: v1 }],\n      ['C', { x: u0 + ru - ru * kb, y: v1 }, { x: u0, y: v1 - rv + rv * kb }, { x: u0, y: v1 - rv }], ['L', { x: u0, y: v0 + rv }],\n      ['C', { x: u0, y: v0 + rv - rv * kb }, { x: u0 + ru - ru * kb, y: v0 }, { x: u0 + ru, y: v0 }], ['Z']] });\n    // Stuhl: Sitz + Rückenlehne an der angegebenen Seite (Mitte cu/cv, Größe wu/hv in Einheitskoordinaten)\n    const stuhl = (cu, cv, wu, hv, seite) => {\n      const u0 = cu - wu / 2, u1 = cu + wu / 2, v0 = cv - hv / 2, v1 = cv + hv / 2, d = 0.18;\n      const out = [rrect(u0, v0, u1, v1, wu * 0.12, hv * 0.12)];\n      if (seite === 'oben') out.push(rect(u0, v0, u1, v0 + hv * d)); else if (seite === 'unten') out.push(rect(u0, v1 - hv * d, u1, v1));\n      else if (seite === 'links') out.push(rect(u0, v0, u0 + wu * d, v1)); else out.push(rect(u1 - wu * d, v0, u1, v1));\n      return out;\n    };\n    const buerostuhl = (cu, cv, wu, hv) => [kreis(cu, cv + hv * 0.06, wu * 0.36, hv * 0.36), rrect(cu - wu * 0.4, cv - hv * 0.5, cu + wu * 0.4, cv - hv * 0.3, wu * 0.08, hv * 0.08), line(cu - wu * 0.5, cv + hv * 0.06, cu - wu * 0.36, cv + hv * 0.06), line(cu + wu * 0.36, cv + hv * 0.06, cu + wu * 0.5, cv + hv * 0.06)];\n    const sofa = (n) => { const out = [rect(0, 0, 1, 1), rect(0, 0, 1, 0.2), rect(0, 0.2, 0.12, 1), rect(0.88, 0.2, 1, 1)]; for (let i = 1; i < n; i++) { const u = 0.12 + 0.76 * i / n; out.push(line(u, 0.2, u, 1)); } return out; };\n    // Tischgruppe: Box B×T cm, Tisch tb×tt cm mittig, n Stühle je Längsseite, optional Kopfstühle\n    const tischGruppe = (B, T, tb, tt, n, kopf) => {\n      const su = 45 / B, sv = 45 / T, u0 = 0.5 - tb / 2 / B, u1 = 0.5 + tb / 2 / B, v0 = 0.5 - tt / 2 / T, v1 = 0.5 + tt / 2 / T;\n      const out = [rect(u0, v0, u1, v1)];\n      for (let i = 0; i < n; i++) { const cu = u0 + (u1 - u0) * (i + 0.5) / n; out.push(...stuhl(cu, v0 - sv / 2 - 0.01, su, sv, 'oben'), ...stuhl(cu, v1 + sv / 2 + 0.01, su, sv, 'unten')); }\n      if (kopf) out.push(...stuhl(u0 - su / 2 - 0.01, 0.5, su, sv, 'links'), ...stuhl(u1 + su / 2 + 0.01, 0.5, su, sv, 'rechts'));\n      return out;\n    };\n    const kueche = () => [rect(0, 0, 1, 1), rrect(0.07, 0.2, 0.25, 0.8, 0.02, 0.1), kreis(0.16, 0.11, 0.012, 0.06), kreis(0.62, 0.35, 0.03, 0.15), kreis(0.72, 0.35, 0.03, 0.15), kreis(0.62, 0.65, 0.03, 0.15), kreis(0.72, 0.65, 0.03, 0.15), line(0.42, 0, 0.42, 1), line(0.86, 0, 0.86, 1)];\n    const KATALOG = [\n      { key: 'rechteck', name: 'Freies Rechteck mit Beschriftung', gruppe: 'Allgemein', b: 100, t: 60, teile: () => [rect(0, 0, 1, 1)] },\n      { key: 'pflanze', name: 'Pflanze Ø 60', gruppe: 'Allgemein', b: 60, t: 60, teile: () => [kreis(0.5, 0.5, 0.5, 0.5), kreis(0.5, 0.5, 0.28, 0.28), line(0.5, 0, 0.5, 1), line(0, 0.5, 1, 0.5)] },\n      { key: 'sofa-2', name: 'Sofa 2-Sitzer 160 × 90', gruppe: 'Wohnen', b: 160, t: 90, teile: () => sofa(2) },\n      { key: 'sofa-3', name: 'Sofa 3-Sitzer 220 × 90', gruppe: 'Wohnen', b: 220, t: 90, teile: () => sofa(3) },\n      { key: 'sessel', name: 'Sessel 80 × 85', gruppe: 'Wohnen', b: 80, t: 85, teile: () => sofa(1) },\n      { key: 'couchtisch', name: 'Couchtisch 100 × 60', gruppe: 'Wohnen', b: 100, t: 60, teile: () => [rrect(0, 0, 1, 1, 0.08, 0.13)] },\n      { key: 'tv', name: 'TV-Board 160 × 45', gruppe: 'Wohnen', b: 160, t: 45, teile: () => [rect(0, 0, 1, 1), rect(0.2, 0.06, 0.8, 0.18)] },\n      { key: 'regal', name: 'Regal / Sideboard 120 × 40', gruppe: 'Wohnen', b: 120, t: 40, teile: () => [rect(0, 0, 1, 1), line(0, 0.5, 1, 0.5)] },\n      { key: 'esstisch-4', name: 'Esstisch 120 × 80 mit 4 Stühlen', gruppe: 'Essen', b: 220, t: 180, teile: () => tischGruppe(220, 180, 120, 80, 2, false) },\n      { key: 'esstisch-6', name: 'Esstisch 180 × 90 mit 6 Stühlen', gruppe: 'Essen', b: 280, t: 190, teile: () => tischGruppe(280, 190, 180, 90, 3, false) },\n      { key: 'bett-einzel', name: 'Bett 90 × 200', gruppe: 'Schlafen', b: 90, t: 200, teile: () => [rect(0, 0, 1, 1), rrect(0.12, 0.05, 0.88, 0.22, 0.04, 0.02), line(0, 0.32, 1, 0.32)] },\n      { key: 'bett-doppel', name: 'Doppelbett 180 × 200', gruppe: 'Schlafen', b: 180, t: 200, teile: () => [rect(0, 0, 1, 1), rrect(0.06, 0.05, 0.47, 0.22, 0.03, 0.02), rrect(0.53, 0.05, 0.94, 0.22, 0.03, 0.02), line(0, 0.32, 1, 0.32), line(0.5, 0.32, 0.5, 1)] },\n      { key: 'nachttisch', name: 'Nachttisch 45 × 40', gruppe: 'Schlafen', b: 45, t: 40, teile: () => [rect(0, 0, 1, 1), kreis(0.5, 0.5, 0.14, 0.14)] },\n      { key: 'schrank', name: 'Kleiderschrank 100 × 60', gruppe: 'Schlafen', b: 100, t: 60, teile: () => [rect(0, 0, 1, 1), line(0.5, 0, 0.5, 1), line(0, 0.5, 1, 0.5)] },\n      { key: 'schreibtisch', name: 'Schreibtisch 160 × 80', gruppe: 'Arbeiten', b: 160, t: 80, teile: () => [rect(0, 0, 1, 1), rect(0.36, 0.08, 0.64, 0.16)] },\n      { key: 'arbeitsplatz', name: 'Arbeitsplatz Tisch + Stuhl 160 × 150', gruppe: 'Arbeiten', b: 160, t: 150, teile: () => [rect(0, 0, 1, 0.53), rect(0.36, 0.05, 0.64, 0.1), ...buerostuhl(0.5, 0.78, 60 / 160, 60 / 150)] },\n      { key: 'buerostuhl', name: 'Bürostuhl 60 × 60', gruppe: 'Arbeiten', b: 60, t: 60, teile: () => buerostuhl(0.5, 0.5, 1, 1) },\n      { key: 'besprechung-6', name: 'Besprechungstisch 200 × 100 mit 6 Stühlen', gruppe: 'Arbeiten', b: 300, t: 200, teile: () => tischGruppe(300, 200, 200, 100, 3, false) },\n      { key: 'besprechung-8', name: 'Besprechungstisch 240 × 100 mit 8 Stühlen', gruppe: 'Arbeiten', b: 340, t: 200, teile: () => tischGruppe(340, 200, 240, 100, 3, true) },\n      { key: 'aktenschrank', name: 'Aktenschrank 80 × 42', gruppe: 'Arbeiten', b: 80, t: 42, teile: () => [rect(0, 0, 1, 1), line(0.5, 0, 0.5, 1)] },\n      { key: 'kueche', name: 'Küchenzeile 300 × 60', gruppe: 'Küche', b: 300, t: 60, teile: () => kueche() },\n      { key: 'kuehlschrank', name: 'Kühlschrank 60 × 60', gruppe: 'Küche', b: 60, t: 60, teile: () => [rect(0, 0, 1, 1), line(0, 0, 1, 1), line(0, 1, 1, 0)] },\n      { key: 'wc', name: 'WC 40 × 65', gruppe: 'Bad', b: 40, t: 65, teile: () => [rect(0.05, 0, 0.95, 0.3), kreis(0.5, 0.65, 0.42, 0.33)] },\n      { key: 'waschbecken', name: 'Waschbecken 60 × 45', gruppe: 'Bad', b: 60, t: 45, teile: () => [rect(0, 0, 1, 1), kreis(0.5, 0.58, 0.36, 0.32), kreis(0.5, 0.16, 0.05, 0.06)] },\n      { key: 'dusche', name: 'Dusche 90 × 90', gruppe: 'Bad', b: 90, t: 90, teile: () => [rect(0, 0, 1, 1), rect(0.08, 0.08, 0.92, 0.92), line(0.08, 0.08, 0.92, 0.92), line(0.92, 0.08, 0.08, 0.92), kreis(0.5, 0.5, 0.06, 0.06)] },\n      { key: 'badewanne', name: 'Badewanne 170 × 75', gruppe: 'Bad', b: 170, t: 75, teile: () => [rect(0, 0, 1, 1), rrect(0.06, 0.12, 0.94, 0.88, 0.08, 0.3), kreis(0.16, 0.5, 0.03, 0.07)] },\n      { key: 'waschmaschine', name: 'Waschmaschine 60 × 60', gruppe: 'Bad', b: 60, t: 60, teile: () => [rect(0, 0, 1, 1), rect(0, 0, 1, 0.15), kreis(0.5, 0.58, 0.3, 0.3)] },\n      // Bauteile: Schornstein, Pfeiler, Stütze – massiv (Schraffur/Kreuz), zählen in der Wohnflächenrechnung als Abzug (§ 3 Abs. 3 Nr. 1), wenn > 0,1 m²\n      { key: 'schornstein', name: 'Schornstein 40 × 40', gruppe: 'Bauteile', b: 40, t: 40, wofl: 'pfeiler', teile: () => [rect(0, 0, 1, 1), line(0, 0, 1, 1), line(1, 0, 0, 1), rect(0.3, 0.3, 0.7, 0.7), { art: 'beschriftung', u: 0.5, v: -0.22, text: 'Schornstein', groesse: 4 }] },\n      { key: 'schornstein2', name: 'Schornstein 60 × 40, zwei Züge', gruppe: 'Bauteile', b: 60, t: 40, wofl: 'pfeiler', teile: () => [rect(0, 0, 1, 1), line(0, 0, 1, 1), line(1, 0, 0, 1), rect(0.12, 0.3, 0.42, 0.7), rect(0.58, 0.3, 0.88, 0.7), { art: 'beschriftung', u: 0.5, v: -0.22, text: 'Schornstein', groesse: 4 }] },\n      { key: 'pfeiler', name: 'Pfeiler 30 × 30', gruppe: 'Bauteile', b: 30, t: 30, wofl: 'pfeiler', teile: () => [rect(0, 0, 1, 1), line(0, 0.5, 0.5, 0), line(0, 1, 1, 0), line(0.5, 1, 1, 0.5), { art: 'beschriftung', u: 0.5, v: -0.3, text: 'Pfeiler', groesse: 4 }] },\n      // Gaube/Erker: Außenwände kräftig, zum Raum hin offen (gestrichelt); keine Wohnflächen-Wirkung – die Fläche gehört zum Raum, die Höhe regelt die Automatik („Schrägen“) oder eine Zone von Hand\n      { key: 'gaube', name: 'Gaube 120 × 90 (Wangen, zum Raum offen)', gruppe: 'Bauteile', b: 120, t: 90, teile: () => [{ art: 'linie', p1: { x: 0, y: 0 }, p2: { x: 1, y: 0 }, breite: 1.4 }, { art: 'linie', p1: { x: 0, y: 0 }, p2: { x: 0, y: 1 }, breite: 1.1 }, { art: 'linie', p1: { x: 1, y: 0 }, p2: { x: 1, y: 1 }, breite: 1.1 }, { art: 'linie', p1: { x: 0, y: 1 }, p2: { x: 1, y: 1 }, breite: 0.5, dash: [3, 2] }, { art: 'linie', p1: { x: 0.2, y: 0 }, p2: { x: 0.8, y: 0 }, breite: 0.5, dash: [1.5, 1.5] }, { art: 'beschriftung', u: 0.5, v: 0.5, text: 'Gaube', groesse: 4 }] },\n      { key: 'erker', name: 'Erker 200 × 100 (drei Seiten, zum Raum offen)', gruppe: 'Bauteile', b: 200, t: 100, teile: () => [{ art: 'linie', p1: { x: 0, y: 1 }, p2: { x: 0.2, y: 0 }, breite: 1.4 }, { art: 'linie', p1: { x: 0.2, y: 0 }, p2: { x: 0.8, y: 0 }, breite: 1.4 }, { art: 'linie', p1: { x: 0.8, y: 0 }, p2: { x: 1, y: 1 }, breite: 1.4 }, { art: 'linie', p1: { x: 0, y: 1 }, p2: { x: 1, y: 1 }, breite: 0.5, dash: [3, 2] }, { art: 'linie', p1: { x: 0.3, y: 0 }, p2: { x: 0.7, y: 0 }, breite: 0.5, dash: [1.5, 1.5] }, { art: 'beschriftung', u: 0.5, v: 0.55, text: 'Erker', groesse: 4 }] },\n      { key: 'stuetze', name: 'Stütze rund Ø 30', gruppe: 'Bauteile', b: 30, t: 30, wofl: 'pfeiler', rund: true, teile: () => [kreis(0.5, 0.5, 0.5, 0.5), line(0.15, 0.15, 0.85, 0.85), line(0.85, 0.15, 0.15, 0.85), { art: 'beschriftung', u: 0.5, v: -0.3, text: 'Stütze', groesse: 4 }] },\n    ];\n    const byKey = Object.fromEntries(KATALOG.map(k => [k.key, k]));\n    return { KATALOG, byKey };\n  })();\n\n  // Element → Primitive (linie / polygon / kurve / pfad / text). ctx.oeffnungen: Intervalle [a, b] in pt entlang der Wandachse, die frei bleiben (Türen)\n  // Parameterintervall der Strecke a→b innerhalb eines konvexen Vierecks (Cyrus–Beck); null = kein Inneres. Ränder zählen nicht als innen.\n  function innenIntervall(a, b, quad) {\n    let t0 = 0, t1 = 1; const d = V.sub(b, a);\n    const or = Math.sign((quad[1].x - quad[0].x) * (quad[2].y - quad[1].y) - (quad[1].y - quad[0].y) * (quad[2].x - quad[1].x)) || 1;\n    for (let i = 0; i < 4; i++) {\n      const p = quad[i], q = quad[(i + 1) % 4], n = V.mul(V.perp(V.sub(q, p)), -or), num = V.dot(V.sub(a, p), n) / (V.len(n) || 1), den = V.dot(d, n) / (V.len(n) || 1);\n      if (Math.abs(den) < 1e-6) { if (num > -0.25) return null; continue; }\n      const tt = -(num + 0.25) / den;   // 0,25 pt nach innen gerückt: Linien auf der Fläche einer anderen Wand bleiben stehen\n      if (den < 0) t0 = Math.max(t0, tt); else t1 = Math.min(t1, tt);\n      if (t0 >= t1) return null;\n    }\n    return t1 - t0 > 1e-4 ? [t0, t1] : null;\n  }\n  // Umriss eines Wandrechtecks als Linien, ohne die Stücke, die in anderen Wänden (quads) liegen\n  function umrissLinien(quad, andere, breite, farbe) {\n    const out = [];\n    for (let i = 0; i < 4; i++) {\n      const a = quad[i], b = quad[(i + 1) % 4]; let frei = [[0, 1]];\n      for (const q of andere) { const iv = innenIntervall(a, b, q); if (!iv) continue; const neu = []; for (const [f0, f1] of frei) { if (iv[1] <= f0 || iv[0] >= f1) { neu.push([f0, f1]); continue; } if (iv[0] > f0) neu.push([f0, iv[0]]); if (iv[1] < f1) neu.push([iv[1], f1]); } frei = neu; if (!frei.length) break; }\n      for (const [f0, f1] of frei) { const p = V.add(a, V.mul(V.sub(b, a), f0)), q = V.add(a, V.mul(V.sub(b, a), f1)); if (V.dist(p, q) > 0.15) out.push({ art: 'linie', p1: p, p2: q, breite, farbe, cap: 'butt', dash: null, ebene: 1 }); }\n    }\n    return out;\n  }\n  // ---------- Bogenwand (Stufe 149): Kreisbogen durch p1, p2 und den Scheitel; Stich (cm) quer zur Sehne, Vorzeichen = Seite links/rechts von p1→p2 ----------\n  const bogenDaten = (el, kalib) => {\n    if (!el || !el.p1 || !el.p2 || !kalib) return null; const s = (el.stich || 0) / 100 * kalib.ptProM; if (Math.abs(s) < 0.3) return null;\n    const L = V.dist(el.p1, el.p2); if (L < 1e-6) return null;\n    const d = V.mul(V.sub(el.p2, el.p1), 1 / L), n = V.perp(d), M = V.mid(el.p1, el.p2), c = L / 2, r = (c * c + s * s) / (2 * Math.abs(s)), vz = s > 0 ? 1 : -1;\n    const C = V.add(M, V.mul(n, vz * (Math.abs(s) - r)));\n    const a1 = Math.atan2(el.p1.y - C.y, el.p1.x - C.x), a2 = Math.atan2(el.p2.y - C.y, el.p2.x - C.x); let da = a2 - a1; while (da > Math.PI) da -= 2 * Math.PI; while (da < -Math.PI) da += 2 * Math.PI;\n    return { C, r, a1, da, s, L, d, n, M, scheitel: V.add(M, V.mul(n, s)), laenge: Math.abs(da) * r };\n  };\n  const bogenPunkte = (el, kalib, anzahl) => {\n    const b = bogenDaten(el, kalib); if (!b) return [el.p1, el.p2];\n    const k = anzahl || Math.max(6, Math.ceil(b.laenge / (0.3 * kalib.ptProM))), out = [];\n    for (let i = 0; i <= k; i++) { const a = b.a1 + b.da * i / k; out.push({ x: b.C.x + b.r * Math.cos(a), y: b.C.y + b.r * Math.sin(a) }); }\n    out[0] = { x: el.p1.x, y: el.p1.y }; out[k] = { x: el.p2.x, y: el.p2.y }; return out;\n  };\n  // Bogenwand als Kette kurzer gerader Wände (für Räume, Maße, Fang)\n  const wandSegmente = (el, kalib) => { const pts = bogenPunkte(el, kalib); if (pts.length <= 2) return [el]; const out = []; for (let i = 0; i + 1 < pts.length; i++) out.push(Object.assign({}, el, { p1: pts[i], p2: pts[i + 1], stich: 0, bogenVon: el.id, bogenTeil: i })); return out; };\n  function prims(el, kalib, ctx) {\n    const out = []; const f = el.farbe || '#d2232a'; const sk = linienSkala(kalib);\n    const linie = (p1, p2, breite, farbe, cap, dash) => ({ art: 'linie', p1, p2, breite, farbe, cap: cap || 'butt', dash: dash || null });\n    switch (el.typ) {\n      case 'wand': {\n        const t = dickePt(el, kalib), L0 = V.dist(el.p1, el.p2); if (L0 < 1e-6) break;\n        const bg = bogenDaten(el, kalib);\n        if (bg) {   // Bogenwand: Band aus Außen- und Innenbogen (Öffnungen und Anschlüsse gibt es auf Bogenwänden nicht)\n          const pts = bogenPunkte(el, kalib), aussen = [], innen = [];\n          for (const q of pts) { const rx = (q.x - bg.C.x) / bg.r, ry = (q.y - bg.C.y) / bg.r; aussen.push({ x: q.x + rx * t / 2, y: q.y + ry * t / 2 }); innen.push({ x: q.x - rx * t / 2, y: q.y - ry * t / 2 }); }\n          const fuell = el.stil === 'abbruch' ? '#f3e2a3' : (el.stil === 'hohl' || el.stil === 'glas' || el.stil === 'schraffur') ? '#ffffff' : f;\n          out.push({ art: 'polygon', punkte: aussen.concat(innen.slice().reverse()), fuellung: fuell, deckkraft: 1, rand: f, randBreite: K.umriss * sk });\n          if (el.stil === 'schraffur') for (let i = 0; i + 1 < pts.length; i += 2) out.push(linie(aussen[i], innen[Math.min(innen.length - 1, i + 1)], K.duenn * sk, f));\n          break;\n        }\n        const d = V.mul(V.sub(el.p2, el.p1), 1 / L0);\n        // Anschlüsse: an Ecken und T-Stößen wird das Wandende um die halbe Dicke der Nachbarwand verlängert (ctx.enden = [Anfang, Ende] in pt)\n        const e1 = (ctx && ctx.enden ? ctx.enden[0] : 0) || 0, e2 = (ctx && ctx.enden ? ctx.enden[1] : 0) || 0;\n        const P1 = V.sub(el.p1, V.mul(d, e1)), L = L0 + e1 + e2;\n        // Wandstücke = Achse ohne die Öffnungen (Öffnungen sind relativ zu el.p1 → um e1 verschieben)\n        const stuecke = []; let a = 0;\n        for (const [o0, o1] of (ctx && ctx.oeffnungen ? ctx.oeffnungen : []).map(o => [o[0] + e1, o[1] + e1]).sort((x, y) => x[0] - y[0])) { const s0 = Math.max(a, Math.min(L, o0)), s1 = Math.max(a, Math.min(L, o1)); if (s0 > a + 0.1) stuecke.push([a, s0]); a = Math.max(a, s1); }\n        if (L > a + 0.1) stuecke.push([a, L]);\n        for (const [s0, s1] of stuecke) {\n          const p1 = V.add(P1, V.mul(d, s0)), p2 = V.add(P1, V.mul(d, s1));\n          if (el.stil === 'glas') {\n            const n = V.mul(V.perp(d), t / 2);\n            out.push(linie(V.add(p1, n), V.add(p2, n), K.glasLinie * sk, f));\n            out.push(linie(V.sub(p1, n), V.sub(p2, n), K.glasLinie * sk, f));\n            out.push(linie(p1, p2, K.glasLinie * 0.6 * sk, f, 'butt', [3 * sk, 2 * sk]));\n          } else if (el.stil === 'hohl') {\n            const q = rechteck(p1, p2, t); if (ctx && ctx.andere) { out.push({ art: 'polygon', punkte: q, fuellung: '#ffffff', deckkraft: 1, rand: null, randBreite: 0 }); out.push(...umrissLinien(q, ctx.andere, K.umriss * sk, f)); } else out.push({ art: 'polygon', punkte: q, fuellung: '#ffffff', deckkraft: 1, rand: f, randBreite: K.umriss * sk });\n          } else if (el.stil === 'abbruch') {\n            out.push({ art: 'polygon', punkte: rechteck(p1, p2, t), fuellung: '#f2c200', deckkraft: 0.45, rand: f, randBreite: K.umriss * sk, dash: [3 * sk, 2 * sk] });\n          } else if (el.stil === 'schraffur') {\n            const q = rechteck(p1, p2, t); if (ctx && ctx.andere) { out.push({ art: 'polygon', punkte: q, fuellung: '#ffffff', deckkraft: 1, rand: null, randBreite: 0 }); out.push(...umrissLinien(q, ctx.andere, K.umriss * sk, f)); } else out.push({ art: 'polygon', punkte: q, fuellung: '#ffffff', deckkraft: 1, rand: f, randBreite: K.umriss * sk });\n            // 45°-Schraffur im lokalen System (u entlang, v quer), auf das Rechteck geschnitten\n            const n = V.perp(d), Ls = s1 - s0, ab = Math.max(2 * sk, Math.min(6 * sk, t / 3)) * Math.SQRT2;\n            for (let c = -t / 2; c < Ls + t / 2; c += ab) {\n              const u0 = Math.max(0, c - t / 2), u1 = Math.min(Ls, c + t / 2); if (u1 - u0 < 0.05) continue;\n              out.push(linie(V.add(V.add(p1, V.mul(d, u0)), V.mul(n, u0 - c)), V.add(V.add(p1, V.mul(d, u1)), V.mul(n, u1 - c)), K.duenn * sk, f));\n            }\n          } else {\n            out.push(linie(p1, p2, t, f));\n          }\n        }\n        break;\n      }\n      case 'tuer': case 'fenster': {\n        const w = V.dist(el.p1, el.p2); if (w < 1e-6) break;\n        const d = V.mul(V.sub(el.p2, el.p1), 1 / w), n = V.perp(d), q = V.rot(d, el.spiegeln ? 90 : -90);\n        if (el.typ === 'fenster' && el.variante === 'dach') {\n          // Dachflächenfenster: Rechteck ab der gezeichneten Kante zur Aufschlagseite, gestrichelt (liegt über dem Raum), Kreuz, Beschriftung\n          const T = (el.tiefeCm || 118) / 100 * kalib.ptProM, D = [3 * sk, 1.6 * sk], c0 = el.p1, c1 = el.p2, c2 = V.add(el.p2, V.mul(q, T)), c3 = V.add(el.p1, V.mul(q, T));\n          [[c0, c1], [c1, c2], [c2, c3], [c3, c0], [c0, c2], [c1, c3]].forEach(([a, b], i) => out.push(linie(a, b, (i < 4 ? K.umriss : K.duenn) * sk, f, 'butt', D)));\n          let wT = Math.atan2(d.y, d.x) * 180 / Math.PI; if (wT > 90 || wT <= -90) wT += 180; const M = V.mid(c0, c2);\n          out.push({ art: 'text', x: M.x, y: M.y + 1.5, winkel: wT, groesse: 4.5, farbe: f, text: 'DFF ' + Math.round(w / kalib.ptProM * 100) + '/' + Math.round(el.tiefeCm || 118), hoch: null, anker: 'mitte', halo: true });\n          break;\n        }\n        const db = el.durchbruch, tW = ctx && ctx.wandDicke;\n        // Querausdehnung der Öffnung entlang n: gezeichnete Wand → mittig um die Achse; Plan-Wand → von der Linie bis zur Gegenkante\n        let a0 = 0, a1 = 0;\n        if (tW) { a0 = -tW / 2; a1 = tW / 2; }\n        else if (db && db.tiefe > 0) {\n          const tp = db.tiefe / 100 * kalib.ptProM * (db.richtung || 1); a0 = Math.min(0, tp); a1 = Math.max(0, tp);\n          const ue = 0.35 * sk;   // weiß abdecken + Laibungen in Elementfarbe\n          out.push({ art: 'polygon', punkte: [V.add(el.p1, V.mul(n, a0 - ue)), V.add(el.p2, V.mul(n, a0 - ue)), V.add(el.p2, V.mul(n, a1 + ue)), V.add(el.p1, V.mul(n, a1 + ue))], fuellung: '#ffffff', deckkraft: 1, rand: null, randBreite: 0 });\n          out.push(linie(V.add(el.p1, V.mul(n, a0)), V.add(el.p1, V.mul(n, a1)), K.umriss * sk, f));\n          out.push(linie(V.add(el.p2, V.mul(n, a0)), V.add(el.p2, V.mul(n, a1)), K.umriss * sk, f));\n        } else { const t0 = 0.125 * kalib.ptProM; a0 = -t0 / 2; a1 = t0 / 2; }\n        const am = (a0 + a1) / 2, at = (u) => V.mul(n, a0 + (a1 - a0) * u);   // Punkt in Querrichtung als Anteil 0..1 der Wanddicke\n        const ql = (u, dash) => out.push(linie(V.add(el.p1, at(u)), V.add(el.p2, at(u)), (u === 0 || u === 1 ? K.duenn : K.glasLinie) * sk, f, 'butt', dash));   // Linie über die ganze Breite\n        // Türflügel: Angel H, Anschlagpunkt T auf der Öffnungslinie, Radius r, Aufschlagseite qv, gestrichelt optional\n        const fluegel = (H, T, r, qv, dash) => {\n          const dir = V.norm(V.sub(T, H)), E = V.add(H, V.mul(qv, r)), k = 0.5523 * r;\n          out.push(linie(H, E, K.tuerLinie * sk, f, 'butt', dash));\n          out.push({ art: 'kurve', punkte: [E, V.add(E, V.mul(dir, k)), V.add(T, V.mul(qv, k)), T], breite: K.tuerLinie * sk, farbe: f, dash: dash || null });\n        };\n        // Schiebeflügel: dünnes Rechteck parallel zur Öffnung auf der Aufschlagseite + Pfeil\n        const schiebeFluegel = (u0, u1, off, links) => {\n          const A = V.add(el.p1, V.mul(d, w * u0)), B = V.add(el.p1, V.mul(d, w * u1)), o = V.mul(n, off), dk = 1.1 * sk, nn = V.mul(n, dk / 2);\n          out.push({ art: 'polygon', punkte: [V.add(V.add(A, o), nn), V.add(V.add(B, o), nn), V.sub(V.add(B, o), nn), V.sub(V.add(A, o), nn)], fuellung: '#ffffff', deckkraft: 1, rand: f, randBreite: K.duenn * sk });\n          const L = V.dist(A, B), pa = V.add(V.add(A, o), V.mul(d, L * (links ? 0.62 : 0.38))), pb = V.add(V.add(A, o), V.mul(d, L * (links ? 0.2 : 0.8))), sp = V.mul(d, (links ? 1 : -1) * 2.2 * sk);\n          out.push(linie(pa, pb, K.duenn * sk, f));\n          out.push(linie(pb, V.add(V.add(pb, sp), V.mul(n, 1.6 * sk)), K.duenn * sk, f)); out.push(linie(pb, V.add(V.add(pb, sp), V.mul(n, -1.6 * sk)), K.duenn * sk, f));\n        };\n        const dashK = [3 * sk, 2 * sk], m = V.mid(el.p1, el.p2);\n        if (el.typ === 'tuer') {\n          const v = el.variante || 'dreh';\n          if (v === 'dreh') fluegel(el.p1, el.p2, w, q);\n          else if (v === 'doppel') { fluegel(el.p1, m, w / 2, q); fluegel(el.p2, m, w / 2, q); }\n          else if (v === 'pendel') { fluegel(el.p1, el.p2, w, q); fluegel(el.p1, el.p2, w, V.mul(q, -1), dashK); }\n          else if (v === 'schiebe') { const sq = V.dot(q, n) > 0 ? 1 : -1; schiebeFluegel(0, 1, (sq > 0 ? a1 : a0) + sq * 1.4 * sk, el.spiegeln); }\n          else if (v === 'oeffnung') out.push(linie(el.p1, el.p2, K.duenn * sk, f, 'butt', dashK));   // Sturz\n        } else {\n          const v = el.variante || 'einfach';\n          ql(0); ql(1);                                                                  // Wandflächen / Brüstung (dünn)\n          if (v === 'schiebe') {\n            // Hebe-Schiebe: zwei Glasebenen, überlappend; Pfeil am beweglichen Flügel\n            ql(0.4); ql(0.6);\n            const sq = V.dot(q, n) > 0 ? 1 : -1;\n            schiebeFluegel(el.spiegeln ? 0.48 : 0, el.spiegeln ? 1 : 0.52, a0 + (a1 - a0) * (sq > 0 ? 0.72 : 0.28), !el.spiegeln);\n          } else {\n            ql(0.4); ql(0.6);                                                            // Rahmen/Glas\n            const teile = v === 'zweifluegelig' ? 2 : v === 'dreifluegelig' ? 3 : 1;\n            for (let i = 1; i < teile; i++) { const P = V.add(el.p1, V.mul(d, w * i / teile)); out.push(linie(V.add(P, at(0.3)), V.add(P, at(0.7)), K.glasLinie * sk, f)); }\n            if (v === 'bodentief') {   // Fenstertür: Aufschlag gestrichelt, ab 1,30 m zweiflügelig\n              if (w / kalib.ptProM > 1.3) { fluegel(el.p1, m, w / 2, q, dashK); fluegel(el.p2, m, w / 2, q, dashK); } else fluegel(el.p1, el.p2, w, q, dashK);\n            }\n          }\n        }\n        break;\n      }\n      case 'schnitt': {\n        // Schnittlinie wie im Bauplan: Strichpunkt, kurze Endstriche zur Blickseite, Kennung an beiden Enden\n        const L = V.dist(el.p1, el.p2); if (L < 1e-6) break;\n        const d = V.mul(V.sub(el.p2, el.p1), 1 / L), n = V.perp(d), g6 = (el.groesse || 7), bl = g6 * 0.9;\n        out.push(linie(el.p1, el.p2, K.umriss * 1.6 * sk, f, 'butt', [9 * sk, 3 * sk, 1.5 * sk, 3 * sk]));\n        out.push(linie(el.p1, V.add(el.p1, V.mul(n, bl)), K.umriss * 1.6 * sk, f)); out.push(linie(el.p2, V.add(el.p2, V.mul(n, bl)), K.umriss * 1.6 * sk, f));\n        const kenn = (el.text || '').trim() || 'A';\n        let w = Math.atan2(d.y, d.x) * 180 / Math.PI; if (w > 90 || w <= -90) w += 180;\n        for (const P of [el.p1, el.p2]) out.push({ art: 'text', x: P.x + n.x * bl * 1.9, y: P.y + n.y * bl * 1.9, winkel: w, groesse: g6, farbe: f, text: kenn, hoch: null, anker: 'mitte', halo: true });\n        break;\n      }\n      case 'mass': {\n        const g = massGeometrie(el); if (!g) break;\n        const nn = V.mul(g.n, g.s);\n        out.push(linie(V.add(el.p1, V.mul(nn, K.dimGap)), V.add(g.D1, V.mul(nn, K.dimUeberstand)), K.dimLinie * sk, f));\n        out.push(linie(V.add(el.p2, V.mul(nn, K.dimGap)), V.add(g.D2, V.mul(nn, K.dimUeberstand)), K.dimLinie * sk, f));\n        out.push(linie(g.D1, g.D2, K.dimLinie * sk, f));\n        const tk = V.mul(V.norm(V.add(g.r, g.up)), K.dimTick * sk);\n        out.push(linie(V.sub(g.D1, tk), V.add(g.D1, tk), K.dimLinie * sk * 1.6, f));\n        out.push(linie(V.sub(g.D2, tk), V.add(g.D2, tk), K.dimLinie * sk * 1.6, f));\n        const M = V.add(V.mid(g.D1, g.D2), V.mul(g.up, K.textGap));\n        const fm = formatMass(g.L / kalib.ptProM);\n        const eigen = (el.text || '').trim();\n        out.push({ art: 'text', x: M.x, y: M.y, winkel: g.winkel, groesse: el.groesse || 7, farbe: f, text: eigen || fm.haupt, hoch: eigen ? null : fm.hoch, anker: 'mitte', halo: el.halo !== false });\n        break;\n      }\n      case 'treppe': {\n        const L = V.dist(el.p1, el.p2); if (L < 1e-6) break;\n        const kb = 0.5523, kreisPfad = (c, r) => ({ art: 'pfad', d: [['M', { x: c.x + r, y: c.y }], ['C', { x: c.x + r, y: c.y + r * kb }, { x: c.x + r * kb, y: c.y + r }, { x: c.x, y: c.y + r }], ['C', { x: c.x - r * kb, y: c.y + r }, { x: c.x - r, y: c.y + r * kb }, { x: c.x - r, y: c.y }], ['C', { x: c.x - r, y: c.y - r * kb }, { x: c.x - r * kb, y: c.y - r }, { x: c.x, y: c.y - r }], ['C', { x: c.x + r * kb, y: c.y - r }, { x: c.x + r, y: c.y - r * kb }, { x: c.x + r, y: c.y }], ['Z']], fuellung: '#ffffff', deckkraft: 1, rand: f, randBreite: K.umriss * sk });\n        const pfeil = (spitze, richtung) => { const r = V.norm(richtung), q = V.perp(r), l = 3.2 * sk; out.push(linie(spitze, V.add(V.sub(spitze, V.mul(r, l)), V.mul(q, l * 0.6)), K.duenn * 1.3 * sk, f)); out.push(linie(spitze, V.sub(V.sub(spitze, V.mul(r, l)), V.mul(q, l * 0.6)), K.duenn * 1.3 * sk, f)); };\n        const d = V.mul(V.sub(el.p2, el.p1), 1 / L), Lm = L / kalib.ptProM;\n        if (el.variante === 'spindel') {\n          // Spindeltreppe: p1 Mitte, p2 Radius; Stufen als Radien von der Spindel, Lauflinie als Bogen (300°) mit Pfeil\n          const r = L, n = el.stufen > 0 ? el.stufen : Math.max(8, Math.round(2 * Math.PI * r * 0.6 / kalib.ptProM / 0.26)), rs = Math.max(2 * sk, r * 0.14);\n          out.push(kreisPfad(el.p1, r)); out.push(kreisPfad(el.p1, rs));\n          const a0 = Math.atan2(d.y, d.x);\n          for (let i = 0; i < n; i++) { const a = a0 + i / n * 2 * Math.PI, u = { x: Math.cos(a), y: Math.sin(a) }; out.push(linie(V.add(el.p1, V.mul(u, rs)), V.add(el.p1, V.mul(u, r)), K.duenn * sk, f)); }\n          const rl = r * 0.6, schritte = 36, bogen = Math.PI * 5 / 3; let vorher = null;\n          for (let i = 0; i <= schritte; i++) { const a = a0 + Math.PI / n + bogen * i / schritte, p = { x: el.p1.x + rl * Math.cos(a), y: el.p1.y + rl * Math.sin(a) }; if (vorher) out.push(linie(vorher, p, K.duenn * 1.3 * sk, f)); vorher = p; }\n          const ae = a0 + Math.PI / n + bogen; pfeil(vorher, { x: -Math.sin(ae), y: Math.cos(ae) });\n          out.push(kreisPfad({ x: el.p1.x + rl * Math.cos(a0 + Math.PI / n), y: el.p1.y + rl * Math.sin(a0 + Math.PI / n) }, 1.6 * sk));\n          out.push({ art: 'text', x: el.p1.x, y: el.p1.y - r - 2.5 * sk, winkel: 0, groesse: 4.5, farbe: f, text: (el.text || '').trim() || (n + ' Stg · Ø ' + formatMeter(2 * Lm)), hoch: null, anker: 'mitte', halo: true });\n          break;\n        }\n        // Gerade Treppe: Lauf von Antritt (p1) zu Austritt (p2), Laufbreite quer; Stufen aus der Lauflänge (Auftritt ≈ 28 cm) oder fest\n        const n = V.perp(d), hb = (el.breite || 100) / 200 * kalib.ptProM, nSt = el.stufen > 0 ? el.stufen : Math.max(2, Math.round(Lm / 0.28));\n        out.push({ art: 'polygon', punkte: [V.add(el.p1, V.mul(n, hb)), V.add(el.p2, V.mul(n, hb)), V.sub(el.p2, V.mul(n, hb)), V.sub(el.p1, V.mul(n, hb))], fuellung: '#ffffff', deckkraft: 1, rand: f, randBreite: K.umriss * sk });\n        for (let i = 1; i < nSt; i++) { const P = V.add(el.p1, V.mul(d, L * i / nSt)); out.push(linie(V.add(P, V.mul(n, hb)), V.sub(P, V.mul(n, hb)), K.duenn * sk, f)); }\n        const A = V.add(el.p1, V.mul(d, Math.min(L * 0.5, 0.12 * kalib.ptProM))), E = V.sub(el.p2, V.mul(d, Math.min(L * 0.3, 0.08 * kalib.ptProM)));\n        out.push(kreisPfad(A, 1.6 * sk)); out.push(linie(A, E, K.duenn * 1.3 * sk, f)); pfeil(E, d);\n        let wT = Math.atan2(d.y, d.x) * 180 / Math.PI; if (wT > 90 || wT <= -90) wT += 180; const M = V.add(V.mid(el.p1, el.p2), V.mul(n, hb * 0.5));\n        out.push({ art: 'text', x: M.x, y: M.y + 1.5, winkel: wT, groesse: 4, farbe: f, text: (el.text || '').trim() || (nSt + ' Stg · ' + Math.round(Lm / nSt * 100) + ' cm'), hoch: null, anker: 'mitte', halo: true });\n        // Stufe 148: Wohnfläche unter der Treppe – Austritt hier = Luftraum; sonst Marken, wo die Unterkante des Laufs 1 m und 2 m erreicht\n        if (el.lage === 'austritt') {\n          out.push(linie(V.add(el.p1, V.mul(n, hb)), V.sub(el.p2, V.mul(n, hb)), K.duenn * sk, '#c83c3c', 'butt', [2 * sk, 2 * sk])); out.push(linie(V.sub(el.p1, V.mul(n, hb)), V.add(el.p2, V.mul(n, hb)), K.duenn * sk, '#c83c3c', 'butt', [2 * sk, 2 * sk]));\n          out.push({ art: 'text', x: M.x - n.x * hb * 1.1, y: M.y - n.y * hb * 1.1 + 1.5, winkel: wT, groesse: 3.6, farbe: '#c83c3c', text: 'Luftraum · keine Wohnfläche', hoch: null, anker: 'mitte', halo: true });\n        } else {\n          const auftritt = Lm / nSt, stg = (el.steigung > 0 ? el.steigung : 18) / 100, platte = (el.platte >= 0 ? el.platte : 20) / 100, sFuer = (h) => (h + platte) * auftritt / stg * kalib.ptProM;\n          for (const [h, lbl] of [[1, '1 m'], [2, '2 m']]) { const sH = sFuer(h); if (sH <= 0.2 * kalib.ptProM || sH >= L - 0.05 * kalib.ptProM) continue; const P = V.add(el.p1, V.mul(d, sH)); out.push(linie(V.add(P, V.mul(n, hb * 1.25)), V.sub(P, V.mul(n, hb * 1.25)), K.umriss * sk, h === 2 ? '#a87b2e' : '#c83c3c', 'butt', [3 * sk, 1.5 * sk])); out.push({ art: 'text', x: P.x + n.x * hb * 1.55, y: P.y + n.y * hb * 1.55 + 1.2, winkel: wT, groesse: 3.4, farbe: h === 2 ? '#a87b2e' : '#c83c3c', text: lbl, hoch: null, anker: 'mitte', halo: true }); }\n        }\n        break;\n      }\n      case 'schraege': {\n        // Linie der lichten Höhe: 2 m strichpunktiert, 1 m gepunktet; kurze Striche zur niedrigen Seite gibt es nicht – die Beschriftung sagt die Höhe\n        const L = V.dist(el.p1, el.p2); if (L < 1e-6) break;\n        const d = V.mul(V.sub(el.p2, el.p1), 1 / L), n = V.perp(d), hm = el.hoeheM || 2;\n        out.push(linie(el.p1, el.p2, K.umriss * sk, f, 'butt', hm >= 1.5 ? [6 * sk, 2 * sk, 1 * sk, 2 * sk] : [1 * sk, 2.2 * sk]));\n        const eigen = (el.text || '').trim(), txt = eigen || ('lichte Höhe ' + hm.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' m');\n        let w = Math.atan2(d.y, d.x) * 180 / Math.PI; if (w > 90 || w <= -90) w += 180;\n        const lage = el.textLage == null ? 0.5 : Math.max(0.05, Math.min(0.95, +el.textLage || 0.5));   // Stelle entlang der Linie (0,5 = Mitte; die 1-m-Linie der Automatik bei ¼, weg von der Maßzahl)\n        const M = V.add(V.add(el.p1, V.mul(V.sub(el.p2, el.p1), lage)), V.mul(n, (n.y > 0 ? -1 : 1) * ((el.groesse || 6) * 0.9)));   // Beschriftung auf der oberen Seite der Linie\n        out.push({ art: 'text', x: M.x, y: M.y, winkel: w, groesse: el.groesse || 6, farbe: f, text: txt, hoch: null, anker: 'mitte', halo: el.halo !== false });\n        break;\n      }\n      case 'text': {\n        out.push({ art: 'text', x: el.p.x, y: el.p.y, winkel: el.winkel || 0, groesse: el.groesse || 8, farbe: f, text: el.text || '', hoch: null, anker: el.anker === 'mitte' || el.anker === 'ende' ? el.anker : 'start', halo: el.halo !== false });\n        break;\n      }\n      case 'abdecken': {\n        const x1 = Math.min(el.p1.x, el.p2.x), x2 = Math.max(el.p1.x, el.p2.x), y1 = Math.min(el.p1.y, el.p2.y), y2 = Math.max(el.p1.y, el.p2.y);\n        out.push({ art: 'polygon', punkte: [{ x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 }], fuellung: '#ffffff', deckkraft: 1, rand: null, randBreite: 0 });\n        break;\n      }\n      case 'moebel': {\n        const kat = MOEBEL.byKey[el.art] || MOEBEL.byKey.rechteck;\n        const B = (el.breite || kat.b) / 100 * kalib.ptProM, T = (el.tiefe || kat.t) / 100 * kalib.ptProM;\n        const rad = (el.winkel || 0) * Math.PI / 180, c = Math.cos(rad), si = Math.sin(rad);\n        const map = (q) => { const x = (q.x - 0.5) * B, y = (q.y - 0.5) * T; return { x: el.p.x + x * c - y * si, y: el.p.y + x * si + y * c }; };\n        const fuell = el.fuellen !== false ? '#ffffff' : null, br = K.moebel * sk;\n        for (const t of kat.teile(el)) {\n          if (t.art === 'polygon') out.push({ art: 'polygon', punkte: t.punkte.map(map), fuellung: t.offen ? null : fuell, deckkraft: 1, rand: f, randBreite: br });\n          else if (t.art === 'linie') out.push(linie(map(t.p1), map(t.p2), t.breite ? t.breite * sk : br, f, t.cap || 'butt', t.dash ? t.dash.map(v => v * sk) : null));\n          else if (t.art === 'beschriftung') { const q = map({ x: t.u == null ? 0.5 : t.u, y: t.v == null ? 0.5 : t.v }); let w = (el.winkel || 0) % 360; if (w < 0) w += 360; if (w > 90 && w <= 270) w -= 180; out.push({ art: 'text', x: q.x, y: q.y + (t.groesse || 5) * 0.35, winkel: w, groesse: t.groesse || 5, farbe: f, text: typeof t.text === 'function' ? t.text(el) : t.text, hoch: null, anker: 'mitte', halo: true }); }\n          else if (t.art === 'pfad') out.push({ art: 'pfad', d: t.d.map(seg => [seg[0], ...seg.slice(1).map(map)]), fuellung: fuell, deckkraft: 1, rand: f, randBreite: br });\n        }\n        if (el.text) { let w = (el.winkel || 0) % 360; if (w < 0) w += 360; if (w > 90 && w <= 270) w -= 180; out.push({ art: 'text', x: el.p.x, y: el.p.y + (el.groesse || 7) * 0.35, winkel: w, groesse: el.groesse || 7, farbe: f, text: el.text, hoch: null, anker: 'mitte', halo: false }); }\n        break;\n      }\n      case 'flaeche': {\n        if (!el.punkte || el.punkte.length < 3) break;\n        if (el.fuellen !== false) out.push({ art: 'polygon', punkte: el.punkte, fuellung: f, deckkraft: 0.1, rand: f, randBreite: 0.6 * sk });\n        const c0 = schwerpunkt(el.punkte), c = el.textVersatz ? { x: c0.x + (el.textVersatz.x || 0), y: c0.y + (el.textVersatz.y || 0) } : c0; const eigen = (el.text || '').trim();\n        const inhaltM2 = flaecheInhalt(el.punkte) / (kalib.ptProM * kalib.ptProM), g = el.groesse || 8;\n        // Wohnfläche nach WoFlV direkt am Raum: Grundfläche abzüglich des gespeicherten Abzugs (½ der 1–2-m-Zone, unter 1 m, § 3-Abzüge)\n        const qm = el.wohnAbzugM2 != null ? 'Wohnfläche ' + formatFlaeche(Math.max(0, inhaltM2 - el.wohnAbzugM2)) : formatFlaeche(inhaltM2);\n        const tw = el.textWinkel || 0, rad = tw * Math.PI / 180, zeile = (dy) => ({ x: c.x - Math.sin(rad) * dy, y: c.y + Math.cos(rad) * dy });   // Zeilenversatz mitgedreht\n        if (eigen && !/m²|m2|qm/i.test(eigen)) {   // Raumname + Fläche in zwei Zeilen\n          const z1 = zeile(-g * 0.25), z2 = zeile(g * 1.05);\n          out.push({ art: 'text', x: z1.x, y: z1.y, winkel: tw, groesse: g, farbe: f, text: eigen, hoch: null, anker: 'mitte', halo: el.halo !== false });\n          out.push({ art: 'text', x: z2.x, y: z2.y, winkel: tw, groesse: g * 0.9, farbe: f, text: qm, hoch: null, anker: 'mitte', halo: el.halo !== false });\n        } else { const z1 = zeile(g * 0.35); out.push({ art: 'text', x: z1.x, y: z1.y, winkel: tw, groesse: g, farbe: f, text: eigen || qm, hoch: null, anker: 'mitte', halo: el.halo !== false }); }\n        break;\n      }\n    }\n    return out;\n  }\n\n  // ---------- SVG ----------\n  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');\n  const n2 = (v) => String(Math.round(v * 100) / 100);\n  function svgPrim(p) {\n    switch (p.art) {\n      case 'linie':\n        return `<line x1=\"${n2(p.p1.x)}\" y1=\"${n2(p.p1.y)}\" x2=\"${n2(p.p2.x)}\" y2=\"${n2(p.p2.y)}\" stroke=\"${p.farbe}\" stroke-width=\"${n2(p.breite)}\" stroke-linecap=\"${p.cap}\"${p.dash ? ` stroke-dasharray=\"${p.dash.join(' ')}\"` : ''}/>`;\n      case 'polygon':\n        return `<polygon points=\"${p.punkte.map(q => n2(q.x) + ',' + n2(q.y)).join(' ')}\" fill=\"${p.fuellung || 'none'}\" fill-opacity=\"${p.deckkraft == null ? 1 : p.deckkraft}\" stroke=\"${p.rand || 'none'}\" stroke-width=\"${n2(p.randBreite || 0)}\" stroke-linejoin=\"round\"${p.dash ? ` stroke-dasharray=\"${p.dash.join(' ')}\"` : ''}/>`;\n      case 'kurve': {\n        const [a, c1, c2, b] = p.punkte;\n        return `<path d=\"M${n2(a.x)} ${n2(a.y)} C${n2(c1.x)} ${n2(c1.y)} ${n2(c2.x)} ${n2(c2.y)} ${n2(b.x)} ${n2(b.y)}\" fill=\"none\" stroke=\"${p.farbe}\" stroke-width=\"${n2(p.breite)}\"${p.dash ? ` stroke-dasharray=\"${p.dash.join(' ')}\"` : ''}/>`;\n      }\n      case 'pfad': {\n        const d = p.d.map(seg => seg[0] === 'Z' ? 'Z' : seg[0] + seg.slice(1).map(q => n2(q.x) + ' ' + n2(q.y)).join(' ')).join(' ');\n        return `<path d=\"${d}\" fill=\"${p.fuellung || 'none'}\" fill-opacity=\"${p.deckkraft == null ? 1 : p.deckkraft}\" stroke=\"${p.rand || 'none'}\" stroke-width=\"${n2(p.randBreite || 0)}\" stroke-linejoin=\"round\"/>`;\n      }\n      case 'text': {\n        const halo = p.halo ? ` paint-order=\"stroke\" stroke=\"#ffffff\" stroke-width=\"${n2(p.groesse * 0.4)}\" stroke-linejoin=\"round\"` : '';\n        const hoch = p.hoch ? `<tspan font-size=\"${n2(p.groesse * 0.65)}\" dy=\"${n2(-p.groesse * 0.35)}\">${esc(p.hoch)}</tspan>` : '';\n        const tr = p.winkel ? ` transform=\"rotate(${n2(p.winkel)} ${n2(p.x)} ${n2(p.y)})\"` : '';\n        return `<text x=\"${n2(p.x)}\" y=\"${n2(p.y)}\"${tr} font-family=\"Helvetica, Arial, sans-serif\" font-size=\"${n2(p.groesse)}\" fill=\"${p.farbe}\" text-anchor=\"${p.anker === 'mitte' ? 'middle' : 'start'}\"${halo}>${esc(p.text)}${hoch}</text>`;\n      }\n    }\n    return '';\n  }\n  const svgAus = (ps) => ps.map(svgPrim).join('');\n\n  // ---------- PDF (pdf-lib) ----------\n  // toPdf(p) → [x, y] im PDF-Nutzerraum der Seite\n  function pdfZeichnen(ps, page, font, toPdf, PDFLib) {\n    const { rgb, degrees, LineCapStyle } = PDFLib;\n    const farbe = (hex) => { const n = parseInt(hex.slice(1), 16); return rgb(((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255); };\n    const pfad = (pts, schliessen) => pts.map((q, i) => { const u = toPdf(q); return (i ? 'L' : 'M') + n2(u[0]) + ' ' + n2(-u[1]); }).join(' ') + (schliessen ? ' Z' : '');\n    const winkelPdf = (p, d) => { const a = toPdf(p), b = toPdf(V.add(p, d)); return Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI; };\n    for (const p of ps) {\n      if (p.art === 'linie') {\n        const a = toPdf(p.p1), b = toPdf(p.p2);\n        page.drawLine({ start: { x: a[0], y: a[1] }, end: { x: b[0], y: b[1] }, thickness: p.breite, color: farbe(p.farbe), lineCap: p.cap === 'round' ? LineCapStyle.Round : LineCapStyle.Butt, dashArray: p.dash || undefined });\n      } else if (p.art === 'polygon') {\n        page.drawSvgPath(pfad(p.punkte, true), { x: 0, y: 0, color: p.fuellung ? farbe(p.fuellung) : undefined, opacity: p.deckkraft == null ? 1 : p.deckkraft, borderColor: p.rand ? farbe(p.rand) : undefined, borderWidth: p.rand ? (p.randBreite || 0) : 0, borderDashArray: p.dash || undefined });\n      } else if (p.art === 'pfad') {\n        const d = p.d.map(seg => seg[0] === 'Z' ? 'Z' : seg[0] + seg.slice(1).map(q => { const u = toPdf(q); return n2(u[0]) + ' ' + n2(-u[1]); }).join(' ')).join(' ');\n        page.drawSvgPath(d, { x: 0, y: 0, color: p.fuellung ? farbe(p.fuellung) : undefined, opacity: p.deckkraft == null ? 1 : p.deckkraft, borderColor: p.rand ? farbe(p.rand) : undefined, borderWidth: p.rand ? (p.randBreite || 0) : 0 });\n      } else if (p.art === 'kurve') {\n        const [a, c1, c2, b] = p.punkte.map(toPdf);\n        page.drawSvgPath(`M${n2(a[0])} ${n2(-a[1])} C${n2(c1[0])} ${n2(-c1[1])} ${n2(c2[0])} ${n2(-c2[1])} ${n2(b[0])} ${n2(-b[1])}`, { x: 0, y: 0, color: undefined, borderColor: farbe(p.farbe), borderWidth: p.breite, borderDashArray: p.dash || undefined });\n      } else if (p.art === 'text') {\n        if (!p.text && !p.hoch) continue;\n        const g = p.groesse, gh = g * 0.65;\n        const w = font.widthOfTextAtSize(p.text || '', g), wh = p.hoch ? font.widthOfTextAtSize(p.hoch, gh) : 0;\n        const rad = (p.winkel || 0) * Math.PI / 180; const d = { x: Math.cos(rad), y: Math.sin(rad) }; const up = { x: d.y, y: -d.x };\n        const start = p.anker === 'mitte' ? V.sub({ x: p.x, y: p.y }, V.mul(d, (w + wh) / 2)) : { x: p.x, y: p.y };\n        if (p.halo) {\n          const pad = g * 0.18, oben = g * 0.78 + pad, unten = g * 0.22 + pad;\n          const a0 = V.sub(start, V.mul(d, pad)), a1 = V.add(start, V.mul(d, w + wh + pad));\n          page.drawSvgPath(pfad([V.add(a0, V.mul(up, oben)), V.add(a1, V.mul(up, oben)), V.sub(a1, V.mul(up, unten)), V.sub(a0, V.mul(up, unten))], true), { x: 0, y: 0, color: rgb(1, 1, 1), borderColor: undefined, borderWidth: 0 });\n        }\n        const u = toPdf(start); const rot = degrees(winkelPdf(start, d)); const col = farbe(p.farbe);\n        if (p.text) page.drawText(p.text, { x: u[0], y: u[1], size: g, font, color: col, rotate: rot });\n        if (p.hoch) { const s2 = V.add(V.add(start, V.mul(d, w)), V.mul(up, g * 0.35)); const u2 = toPdf(s2); page.drawText(p.hoch, { x: u2[0], y: u2[1], size: gh, font, color: col, rotate: rot }); }\n      }\n    }\n  }\n\n  // ---------- Fang ----------\n  // quellen: Array von { punkte: [{x,y}], segmente: [[x1,y1,x2,y2]] }\n  function fangFrei(p, r, quellen) {\n    let best = null, bd = r;\n    for (const q of quellen) for (const e of q.punkte) { const d = V.dist(p, e); if (d < bd) { bd = d; best = { p: { x: e.x, y: e.y }, art: 'Endpunkt' }; } }\n    if (best) return best;\n    bd = r; const nah = [];\n    for (const q of quellen) for (const s of q.segmente) {\n      if (Math.min(s[0], s[2]) > p.x + r || Math.max(s[0], s[2]) < p.x - r || Math.min(s[1], s[3]) > p.y + r || Math.max(s[1], s[3]) < p.y - r) continue;\n      const f = V.fuss(p, { x: s[0], y: s[1] }, { x: s[2], y: s[3] }); const d = V.dist(p, f.p);\n      if (d < r) nah.push({ s, d, f: f.p });\n      if (d < bd) { bd = d; best = { p: f.p, art: 'Linie', s }; }\n    }\n    // Zwei nahe, nicht parallele Linien → Schnittpunkt (Innenecken von Räumen, Kreuzungen)\n    if (nah.length >= 2) {\n      nah.sort((a, b) => a.d - b.d);\n      for (let i = 0; i < Math.min(nah.length, 4); i++) for (let j = i + 1; j < Math.min(nah.length, 4); j++) {\n        const A = nah[i].s, B = nah[j].s, ax = A[2] - A[0], ay = A[3] - A[1], bx = B[2] - B[0], by = B[3] - B[1], det = ax * by - ay * bx;\n        if (Math.abs(det) < 1e-6 * Math.hypot(ax, ay) * Math.hypot(bx, by)) continue;\n        const t = ((B[0] - A[0]) * by - (B[1] - A[1]) * bx) / det, ip = { x: A[0] + ax * t, y: A[1] + ay * t };\n        if (V.dist(p, ip) <= r * 1.2) return { p: ip, art: 'Schnittpunkt' };\n      }\n    }\n    return best;\n  }\n  // Rechtwinklig zu S: Punkt auf die nähere Achse legen, dann entlang der Achse an Endpunkte / Schnittpunkte fangen\n  function fangAchse(S, p, r, quellen) {\n    const horiz = Math.abs(p.x - S.x) >= Math.abs(p.y - S.y);\n    const pa = horiz ? { x: p.x, y: S.y } : { x: S.x, y: p.y };\n    let best = null, bd = r;\n    for (const q of quellen) for (const e of q.punkte) {\n      if ((horiz ? Math.abs(e.y - S.y) : Math.abs(e.x - S.x)) > 0.6) continue;\n      const d = V.dist(pa, e); if (d < bd) { bd = d; best = { p: horiz ? { x: e.x, y: S.y } : { x: S.x, y: e.y }, art: 'Endpunkt' }; }\n    }\n    if (best) return { p: best.p, fang: best };\n    bd = r;\n    for (const q of quellen) for (const s of q.segmente) {\n      let ip = null;\n      if (horiz) { const y = S.y; if ((s[1] - y) * (s[3] - y) > 0 || Math.abs(s[3] - s[1]) < 1e-9) continue; const t = (y - s[1]) / (s[3] - s[1]); ip = { x: s[0] + (s[2] - s[0]) * t, y }; }\n      else { const x = S.x; if ((s[0] - x) * (s[2] - x) > 0 || Math.abs(s[2] - s[0]) < 1e-9) continue; const t = (x - s[0]) / (s[2] - s[0]); ip = { x, y: s[1] + (s[3] - s[1]) * t }; }\n      const d = V.dist(pa, ip); if (d < bd) { bd = d; best = { p: ip, art: 'Schnittpunkt' }; }\n    }\n    return best ? { p: best.p, fang: best } : { p: pa, fang: null };\n  }\n\n  // ---------- Plan-Linien aus einer pdf.js-Seite (für Fang) ----------\n  async function planSegmente(page, viewport, pdfjs) {\n    const OPS = pdfjs.OPS; const ol = await page.getOperatorList();\n    const segs = []; let ctm = [1, 0, 0, 1, 0, 0]; const stack = [];\n    const mul = (m1, m2) => [m1[0] * m2[0] + m1[2] * m2[1], m1[1] * m2[0] + m1[3] * m2[1], m1[0] * m2[2] + m1[2] * m2[3], m1[1] * m2[2] + m1[3] * m2[3], m1[0] * m2[4] + m1[2] * m2[5] + m1[4], m1[1] * m2[4] + m1[3] * m2[5] + m1[5]];\n    const ap = (m, x, y) => [m[0] * x + m[2] * y + m[4], m[1] * x + m[3] * y + m[5]];\n    const push = (x1, y1, x2, y2) => {\n      const p = ap(ctm, x1, y1), q = ap(ctm, x2, y2);\n      const P = viewport.convertToViewportPoint(p[0], p[1]), Q = viewport.convertToViewportPoint(q[0], q[1]);\n      const dx = Math.abs(Q[0] - P[0]), dy = Math.abs(Q[1] - P[1]); const L = Math.hypot(dx, dy);\n      if (L >= 3 && (dx < 0.05 * L || dy < 0.05 * L)) segs.push([P[0], P[1], Q[0], Q[1]]);   // nur waagerecht/senkrecht, ≥ 3 pt (Schraffuren fallen raus)\n    };\n    for (let i = 0; i < ol.fnArray.length; i++) {\n      const fn = ol.fnArray[i], a = ol.argsArray[i];\n      if (fn === OPS.save) stack.push(ctm);\n      else if (fn === OPS.restore) ctm = stack.pop() || [1, 0, 0, 1, 0, 0];\n      else if (fn === OPS.transform) ctm = mul(ctm, a);\n      else if (fn === OPS.constructPath) {\n        const ops = a[0], args = a[1]; let k = 0, cur = null, start = null;\n        for (const op of ops) {\n          switch (op) {\n            case OPS.moveTo: cur = [args[k], args[k + 1]]; start = cur; k += 2; break;\n            case OPS.lineTo: { const n = [args[k], args[k + 1]]; if (cur) push(cur[0], cur[1], n[0], n[1]); cur = n; k += 2; break; }\n            case OPS.curveTo: { const n = [args[k + 4], args[k + 5]]; if (cur) push(cur[0], cur[1], n[0], n[1]); cur = n; k += 6; break; }\n            case OPS.curveTo2: case OPS.curveTo3: { const n = [args[k + 2], args[k + 3]]; if (cur) push(cur[0], cur[1], n[0], n[1]); cur = n; k += 4; break; }\n            case OPS.closePath: if (cur && start) push(cur[0], cur[1], start[0], start[1]); cur = start; break;\n            case OPS.rectangle: { const x = args[k], y = args[k + 1], w = args[k + 2], h = args[k + 3]; push(x, y, x + w, y); push(x + w, y, x + w, y + h); push(x + w, y + h, x, y + h); push(x, y + h, x, y); cur = [x, y]; start = cur; k += 4; break; }\n            default: break;\n          }\n        }\n      }\n    }\n    // Endpunkte (dedupliziert auf 0,1 pt)\n    const seen = new Set(), punkte = [];\n    for (const s of segs) for (const [x, y] of [[s[0], s[1]], [s[2], s[3]]]) { const key = Math.round(x * 10) + ':' + Math.round(y * 10); if (!seen.has(key)) { seen.add(key); punkte.push({ x, y }); } }\n    return { segmente: segs, punkte };\n  }\n\n\n\n  // Öffnungen einer gezeichneten Wand durch Türen, die auf ihrer Achse liegen → Intervalle [a, b] in pt entlang der Achse\n  function wandOeffnungen(wand, elemente, kalib) {\n    const L = V.dist(wand.p1, wand.p2); if (L < 1e-6) return [];\n    const d = V.mul(V.sub(wand.p2, wand.p1), 1 / L), n = V.perp(d), tol = dickePt(wand, kalib) / 2 + 3;\n    const out = [];\n    for (const el of elemente) {\n      if ((el.typ !== 'tuer' && el.typ !== 'fenster') || el.id === wand.id || el.variante === 'dach') continue;\n      const a = V.sub(el.p1, wand.p1), b = V.sub(el.p2, wand.p1);\n      if (Math.abs(V.dot(a, n)) > tol || Math.abs(V.dot(b, n)) > tol) continue;\n      const u1 = V.dot(a, d), u2 = V.dot(b, d), lo = Math.min(u1, u2), hi = Math.max(u1, u2);\n      if (hi < -1 || lo > L + 1) continue;\n      out.push([Math.max(0, lo), Math.min(L, hi)]);\n    }\n    return out;\n  }\n  // Verlängerung der beiden Wandenden an Anschlüssen: halbe Dicke der Nachbarwand, wenn das Ende auf deren Achse liegt (Ecke / T-Stoß)\n  function wandEnden(wand, elemente, kalib) {\n    const out = [0, 0]; const t = dickePt(wand, kalib);\n    [wand.p1, wand.p2].forEach((P, i) => {\n      for (const w of elemente) {\n        if (w.typ !== 'wand' || w.id === wand.id) continue;\n        const tw = dickePt(w, kalib); const L = V.dist(w.p1, w.p2); if (L < 1e-6) continue;\n        const dA = V.norm(V.sub(wand.p2, wand.p1)), dB = V.mul(V.sub(w.p2, w.p1), 1 / L), nB = V.perp(dB);\n        if (Math.abs(V.dot(dA, dB)) > 0.98) continue;   // gerade Fortsetzung braucht keine Verlängerung\n        const u = V.dot(V.sub(P, w.p1), dB); if (u < -(tw + t) / 2 - 1 || u > L + (tw + t) / 2 + 1) continue;   // auch, wenn die Nachbarwand erst an der eigenen Fläche beginnt (Ecke)\n        const sAb = V.dot(V.sub(P, w.p1), nB); if (Math.abs(sAb) > tw / 2 + Math.max(1.5, t * 0.15)) continue;   // Ende liegt im Band der Nachbarwand (Achse bis Fläche)\n        const eA = i === 0 ? V.mul(dA, -1) : dA, c = V.dot(eA, nB); if (Math.abs(c) < 0.3) continue;\n        const ext = ((c > 0 ? tw / 2 : -tw / 2) - sAb) / c;   // bis zur abgewandten Fläche der Nachbarwand, auch bei schrägem Anschluss\n        out[i] = Math.max(out[i], Math.min(Math.max(0, ext), 2 * tw));\n      }\n    });\n    return out;\n  }\n  // Umriss einer gezeichneten Wand (mit Anschluss-Verlängerungen): 4 Ecken + 4 Kanten – Fangziele für Flächen, Maße, Möbel\n  function wandUmriss(wand, elemente, kalib) {\n    const t = dickePt(wand, kalib), e = wandEnden(wand, elemente, kalib), L = V.dist(wand.p1, wand.p2); if (L < 1e-6) return null;\n    const d = V.mul(V.sub(wand.p2, wand.p1), 1 / L);\n    return rechteck(V.sub(wand.p1, V.mul(d, e[0])), V.add(wand.p2, V.mul(d, e[1])), t);\n  }\n  // Liegt die Tür auf der Achse einer gezeichneten Wand? → dann öffnet sich die Wand selbst\n  const tuerAufWand = (tuer, elemente, kalib) => elemente.some(w => w.typ === 'wand' && wandOeffnungen(w, [tuer], kalib).length > 0);\n  // Dicke (pt) der gezeichneten Wand, auf der eine Tür/ein Fenster liegt – sonst null\n  const wandDickeAuf = (el, elemente, kalib) => { const w = elemente.find(x => x.typ === 'wand' && wandOeffnungen(x, [el], kalib).length > 0); return w ? dickePt(w, kalib) : null; };\n  // Durchbruch für eine Tür auf einer PLAN-Wand: gegenüberliegende parallele Plan-Linie (5–80 cm) suchen → { tiefe cm, richtung ±1 } oder null\n  function tuerDurchbruchErkennen(tuer, segmente, kalib) {\n    const w = V.dist(tuer.p1, tuer.p2); if (w < 1e-6 || !segmente || !segmente.length) return null;\n    const d = V.mul(V.sub(tuer.p2, tuer.p1), 1 / w), n = V.perp(d);\n    const min = 0.04 * kalib.ptProM, max = 0.5 * kalib.ptProM;   // Wanddicken 4–50 cm (Putz-, Dämm- und Mauerwerkslinien liegen dazwischen)\n    const kand = [];\n    for (const s of segmente) {\n      const sd = { x: s[2] - s[0], y: s[3] - s[1] }, sl = Math.hypot(sd.x, sd.y); if (sl < 1e-6) continue;\n      if (Math.abs(V.dot(V.mul(sd, 1 / sl), d)) < 0.985) continue;                    // nicht parallel\n      const a = V.dot(V.sub({ x: s[0], y: s[1] }, tuer.p1), d), b = V.dot(V.sub({ x: s[2], y: s[3] }, tuer.p1), d);\n      const ueberlappung = Math.min(Math.max(a, b), w) - Math.max(Math.min(a, b), 0);\n      if (ueberlappung < 0.6 * w) continue;                                           // muss die Türbreite überdecken\n      const dist = V.dot(V.sub({ x: (s[0] + s[2]) / 2, y: (s[1] + s[3]) / 2 }, tuer.p1), n), ad = Math.abs(dist);\n      if (ad < min || ad > max) continue;\n      kand.push({ ad, richtung: dist > 0 ? 1 : -1 });\n    }\n    if (!kand.length) return null;\n    // Wandseite = Seite der nächstgelegenen Parallelen; Gegenkante = die ENTFERNTESTE Parallele auf dieser Seite (Putz-/Schichtlinien liegen dazwischen)\n    kand.sort((x, y) => x.ad - y.ad); const seite = kand[0].richtung;\n    const best = kand.filter(k => k.richtung === seite).reduce((m, k) => k.ad > m.ad ? k : m);\n    return { tiefe: Math.round(best.ad / kalib.ptProM * 1000) / 10, richtung: seite };\n  }\n\n  // ---------- Rasterquellen (Scans, Fotos, JPG/PNG, gescannte PDFs) ----------\n  // Aufhellen wie im Grundriss-Aufbereiter, aber mit LOKALEM Weißpunkt: je Block (≈ 1/60 der Bildkante) das 95. Perzentil\n  // der Helligkeit als Papierweiß, über die Nachbarblöcke dilatiert und bilinear interpoliert → Schatten, Falten und\n  // Grauschleier fallen weg, graue Füllungen bleiben grau, Linien bleiben. Danach Papierton neutralisieren und Schwarzpunkt setzen.\n  function bildAufhellen(img) {\n    const w = img.width, h = img.height, d = img.data, n = w * h;\n    const g = new Uint8Array(n);\n    for (let i = 0, j = 0; i < n; i++, j += 4) g[i] = (d[j] * 77 + d[j + 1] * 151 + d[j + 2] * 28) >> 8;\n    const B = Math.max(24, Math.round(Math.max(w, h) / 60)), gw = Math.ceil(w / B), gh = Math.ceil(h / B);\n    const bg = new Float32Array(gw * gh), hist = new Uint32Array(256);\n    for (let by = 0; by < gh; by++) for (let bx = 0; bx < gw; bx++) {\n      hist.fill(0); let cnt = 0;\n      for (let y = by * B, ye = Math.min(h, y + B); y < ye; y++) for (let x = bx * B, xe = Math.min(w, x + B); x < xe; x++) { hist[g[y * w + x]]++; cnt++; }\n      let acc = 0, v = 255; const ziel = cnt * 0.95; for (v = 0; v < 256; v++) { acc += hist[v]; if (acc >= ziel) break; }\n      bg[by * gw + bx] = Math.min(255, v);\n    }\n    // Weites Nachbarschafts-Maximum (Radius ≈ 1/5 der Bildkante, mind. 300 px): dunkle Blöcke (Wandbalken, Schrift) und auch\n    // größere graue Füllungen erben das Papierweiß der Umgebung – nur eine Schattierung über das ganze Blatt bleibt zum Teil erhalten.\n    const Rb = Math.ceil(Math.max(300, Math.max(w, h) / 5) / B), dil = new Float32Array(gw * gh);\n    for (let by = 0; by < gh; by++) for (let bx = 0; bx < gw; bx++) { let m = 0; for (let yy = Math.max(0, by - Rb); yy <= Math.min(gh - 1, by + Rb); yy++) for (let xx = Math.max(0, bx - Rb); xx <= Math.min(gw - 1, bx + Rb); xx++) m = Math.max(m, bg[yy * gw + xx]); dil[by * gw + bx] = Math.max(40, m); }\n    // glätten (Kastenfilter, halber Radius), damit aus dem Fensterrand kein Helligkeitssprung wird\n    const Rs = Math.max(1, Math.round(Rb / 2)), gl = new Float32Array(gw * gh);\n    for (let by = 0; by < gh; by++) for (let bx = 0; bx < gw; bx++) { let sum = 0, cnt = 0; for (let yy = Math.max(0, by - Rs); yy <= Math.min(gh - 1, by + Rs); yy++) for (let xx = Math.max(0, bx - Rs); xx <= Math.min(gw - 1, bx + Rs); xx++) { sum += dil[yy * gw + xx]; cnt++; } gl[by * gw + bx] = sum / cnt; }\n    const at = (bx, by) => gl[Math.min(gh - 1, Math.max(0, by)) * gw + Math.min(gw - 1, Math.max(0, bx))];\n    for (let y = 0; y < h; y++) {\n      const fy = y / B - 0.5, by = Math.floor(fy), ty = fy - by;\n      for (let x = 0; x < w; x++) {\n        const fx = x / B - 0.5, bx = Math.floor(fx), tx = fx - bx;\n        const L = (at(bx, by) * (1 - tx) + at(bx + 1, by) * tx) * (1 - ty) + (at(bx, by + 1) * (1 - tx) + at(bx + 1, by + 1) * tx) * ty;\n        const s = 255 / L, j = (y * w + x) * 4;\n        d[j] = Math.min(255, d[j] * s); d[j + 1] = Math.min(255, d[j + 1] * s); d[j + 2] = Math.min(255, d[j + 2] * s);\n      }\n    }\n    // Papierton neutralisieren (je Kanal 95. Perzentil → Weiß) und Schwarzpunkt (1,5. Perzentil der Helligkeit, max. 120)\n    const hk = [new Uint32Array(256), new Uint32Array(256), new Uint32Array(256)];\n    for (let j = 0; j < d.length; j += 4) { hk[0][d[j]]++; hk[1][d[j + 1]]++; hk[2][d[j + 2]]++; }\n    const perz = (hh, p) => { let acc = 0; const ziel = n * p; for (let v = 0; v < 256; v++) { acc += hh[v]; if (acc >= ziel) return v; } return 255; };\n    const wpK = hk.map(hh => Math.max(120, perz(hh, 0.95)));\n    hist.fill(0);\n    for (let j = 0; j < d.length; j += 4) hist[Math.min(255, ((d[j] * 77 + d[j + 1] * 151 + d[j + 2] * 28) >> 8))]++;\n    const bp = Math.min(120, perz(hist, 0.015));\n    const luts = wpK.map(wp => { const lut = new Uint8ClampedArray(256); for (let v = 0; v < 256; v++) lut[v] = Math.round(Math.max(0, Math.min(1, (v - bp) / (wp - bp))) * 255); return lut; });\n    for (let j = 0; j < d.length; j += 4) { d[j] = luts[0][d[j]]; d[j + 1] = luts[1][d[j + 1]]; d[j + 2] = luts[2][d[j + 2]]; }\n    return { wp: wpK, bp, block: B };\n  }\n  // Fanglinien aus einem Rasterbild: waagerechte/senkrechte Kanten (Hell→Dunkel-Übergänge) – Wandbalken liefern ihre Außenkanten,\n  // dünne Linien ihre beiden Ränder. Gradient quer zur Kante mit Non-Maximum-Unterdrückung, ±1 px Toleranz gegen Zittern,\n  // kleine Lücken (Rauschen, Schraffurkreuzungen) werden überbrückt. img = ImageData in Arbeitsauflösung, faktor = Seiteneinheiten je Pixel.\n  function bildSegmente(img, faktor) {\n    const w = img.width, h = img.height, d = img.data, n = w * h, f = faktor || 1;\n    const g = new Uint8Array(n);\n    for (let i = 0, j = 0; i < n; i++, j += 4) g[i] = (d[j] * 77 + d[j + 1] * 151 + d[j + 2] * 28) >> 8;\n    // lokale Helligkeit (Integralbild) → Schwelle relativ zum Papierweiß der Umgebung\n    const R = Math.max(10, Math.round(Math.max(w, h) / 50)), W = w + 1, I = new Float64Array(W * (h + 1));\n    for (let y = 1; y <= h; y++) { let z = 0; const o = (y - 1) * w, r = y * W, ro = (y - 1) * W; for (let x = 1; x <= w; x++) { z += g[o + x - 1]; I[r + x] = I[ro + x] + z; } }\n    const schwelle = (x, y) => { const x0 = Math.max(0, x - R), x1 = Math.min(w, x + R + 1), y0 = Math.max(0, y - R), y1 = Math.min(h, y + R + 1); const m = (I[y1 * W + x1] - I[y0 * W + x1] - I[y1 * W + x0] + I[y0 * W + x0]) / ((x1 - x0) * (y1 - y0)); return Math.max(22, 0.16 * m); };\n    const minLen = Math.max(10, Math.round(Math.max(w, h) / 90)), luecke = 3, segs = [];\n    // Kantenkarte: +1 = Übergang hell→dunkel in Laufrichtung, −1 = dunkel→hell (Vorzeichen getrennt, damit Ober- und Unterkante nicht verschmelzen)\n    const kanten = (senkrecht) => {\n      const L1 = senkrecht ? w : h, L2 = senkrecht ? h : w;           // L1: Achse quer zur Kante, L2: Achse entlang der Kante\n      const gv = (a, b) => senkrecht ? g[b * w + a] : g[a * w + b];    // (quer, entlang)\n      const grad = new Int16Array(L1 * L2);\n      for (let a = 1; a < L1 - 1; a++) for (let b = 0; b < L2; b++) grad[a * L2 + b] = gv(a - 1, b) - gv(a + 1, b);\n      const E = new Int8Array(L1 * L2);\n      for (let a = 1; a < L1 - 1; a++) for (let b = 0; b < L2; b++) {\n        const v = grad[a * L2 + b], av = Math.abs(v); if (av < 22) continue;\n        const T = senkrecht ? schwelle(a, b) : schwelle(b, a); if (av < T) continue;\n        const o = Math.abs(grad[(a - 1) * L2 + b]), u = Math.abs(grad[(a + 1) * L2 + b]);\n        if (av >= o && av >= u) E[a * L2 + b] = v > 0 ? 1 : -1;      // Non-Maximum-Unterdrückung quer zur Kante\n      }\n      for (const vz of [1, -1]) for (let a = 1; a < L1 - 1; a++) {\n        let start = -1, letzte = -1;\n        for (let b = 0; b <= L2; b++) {\n          const k = b < L2 && (E[a * L2 + b] === vz || E[(a - 1) * L2 + b] === vz || E[(a + 1) * L2 + b] === vz);   // ±1 px Zittern\n          if (k) { if (start < 0) start = b; letzte = b; }\n          else if (start >= 0 && b - letzte > luecke) { if (letzte + 1 - start >= minLen) { const q = (a + 0.5) * f; segs.push(senkrecht ? [q, start * f, q, (letzte + 1) * f] : [start * f, q, (letzte + 1) * f, q]); } start = -1; }\n        }\n      }\n    };\n    kanten(false); kanten(true);\n    // Fast gleiche Parallelen (Zitter-Duplikate innerhalb 1 px) auf die längere reduzieren\n    const key = (s0) => (Math.abs(s0[3] - s0[1]) < 1e-9 ? 'h' : 'v') + ':' + Math.round((Math.abs(s0[3] - s0[1]) < 1e-9 ? s0[1] : s0[0]) / f);\n    segs.sort((a, b) => (Math.abs(b[2] - b[0]) + Math.abs(b[3] - b[1])) - (Math.abs(a[2] - a[0]) + Math.abs(a[3] - a[1])));\n    const behalten = [], lagen = new Map();\n    for (const s0 of segs) {\n      const waag = Math.abs(s0[3] - s0[1]) < 1e-9, lage = Math.round((waag ? s0[1] : s0[0]) / f), a0 = waag ? s0[0] : s0[1], a1 = waag ? s0[2] : s0[3];\n      let doppelt = false;\n      for (const dl of [-1, 0, 1]) { const liste = lagen.get((waag ? 'h' : 'v') + ':' + (lage + dl)); if (!liste) continue; for (const [b0, b1] of liste) if (a0 >= b0 - 1 && a1 <= b1 + 1) { doppelt = true; break; } if (doppelt) break; }\n      if (doppelt) continue;\n      behalten.push(s0); const k = key(s0); if (!lagen.has(k)) lagen.set(k, []); lagen.get(k).push([a0, a1]);\n      if (behalten.length >= 8000) break;\n    }\n    const seen = new Set(), punkte = [];\n    for (const s0 of behalten) for (const [x, y] of [[s0[0], s0[1]], [s0[2], s0[3]]]) { const kk = Math.round(x / f) + ':' + Math.round(y / f); if (!seen.has(kk)) { seen.add(kk); punkte.push({ x, y }); } }\n    return { segmente: behalten, punkte };\n  }\n\n  return { PT_PRO_MM, ptProMausMassstab, massstabAusPtProM, V, bogenDaten, bogenPunkte, wandSegmente, FARBEN, STILE, NEU, K, TUERBREITEN, FENSTERBREITEN, DACHFENSTER, formatMass, formatMeter, formatFlaeche, massGeometrie, tuerGeometrie, dickePt, flaecheInhalt, schwerpunkt, rechteck, prims, svgAus, svgPrim, pdfZeichnen, fangFrei, fangAchse, planSegmente, bildAufhellen, bildSegmente, MOEBEL, TUEREN, FENSTER, BLAETTER, wandEnden, wandUmriss, wandOeffnungen, tuerAufWand, wandDickeAuf, tuerDurchbruchErkennen, linienSkala, esc, n2 };\n})();\n\n// ===== Grundriss-Editor · Oberfläche =====\n(() => {\n  const $ = (s) => document.querySelector(s);\n  const V = GE.V;\n  const WERKZEUGE = {\n    auswahl: { name: 'Auswahl', taste: 'V', hinweis: 'Element anklicken, um es zu bearbeiten oder zu verschieben. Griffe ziehen ändert Endpunkte. Entf löscht.' },\n    hand: { name: 'Verschieben', taste: 'H', hinweis: 'Ziehen verschiebt den Ausschnitt. Alternativ Leertaste halten oder mittlere Maustaste. Strg + Mausrad zoomt.' },\n    wand: { name: 'Wand', taste: 'W', hinweis: 'Klick setzt den Anfang, Klick das Ende – die nächste Wand beginnt dort. Wände verbinden sich an Ecken und T-Stößen von selbst. Esc oder Rechtsklick beendet den Wandzug. Shift hebt den rechten Winkel auf.' },\n    tuer: { name: 'Tür', taste: 'T', hinweis: 'Klick auf den Anschlag (Band), Klick auf die Gegenseite – die Breite ergibt sich aus der Strecke. Aufschlagseite später in den Eigenschaften spiegeln.' },\n    fenster: { name: 'Fenster', taste: 'N', hinweis: 'Klick auf die eine Laibung, Klick auf die andere – die Breite ergibt sich aus der Strecke. Fensterart rechts wählen. Auf gezeichneten Wänden öffnet sich die Wand automatisch, in Plan-Wänden wird die Gegenkante gesucht.' },\n    mass: { name: 'Maß', taste: 'M', hinweis: 'Zwei Punkte anklicken. Die Maßzahl rechnet sich aus der Kalibrierung; der Abstand der Maßlinie lässt sich am Griff ziehen. Eigener Text ist möglich.' },\n    schnitt: { name: 'Schnitt', taste: 'Q', hinweis: 'Zwei Punkte anklicken – die Schnittlinie durch den Raum. Das 3D-Fenster der Punktwolke zeigt den senkrechten Schnitt: Höhen, 1-m- und 2-m-Linie, Blatt-Wände mit Deckenhöhe. Linie verschieben, der Schnitt folgt.' },\n    treppe: { name: 'Treppe', taste: 'P', hinweis: 'Klick auf den Antritt (unten), Klick auf den Austritt (oben) – Laufbreite und Stufenzahl rechts, Stufen sonst aus der Lauflänge. Spindeltreppe: erster Klick Mitte, zweiter Klick Radius.' },\n    schraege: { name: 'Dachschräge', taste: 'S', hinweis: 'Zwei Punkte anklicken: die Linie, ab der die lichte Höhe unter 2,00 m (oder 1,00 m) liegt. Höhe rechts wählen – im Plan strichpunktiert mit Beschriftung. Für die Wohnfläche zählt zwischen 1 m und 2 m die Hälfte.' },\n    text: { name: 'Text', taste: 'X', hinweis: 'Klick setzt die Beschriftung. Text, Größe und Drehung rechts anpassen.' },\n    flaeche: { name: 'Fläche', taste: 'F', hinweis: 'Ecken nacheinander anklicken. Doppelklick, Enter oder Klick auf den ersten Punkt schließt die Fläche – die Quadratmeter erscheinen automatisch.' },\n    kalib: { name: 'Kalibrieren', taste: 'K', hinweis: 'Zwei Punkte einer bekannten Strecke anklicken (z. B. die Enden einer Maßkette im Plan) und die Länge in Metern eingeben. Alternativ unten den Zeichnungsmaßstab setzen.' },\n    moebel: { name: 'Einrichtung', taste: 'E', hinweis: 'Möbelstück rechts wählen, Maße und Drehung anpassen, dann per Klick platzieren. Danach mit der Auswahl verschieben, am runden Griff oder mit R drehen.' },\n    abdecken: { name: 'Abdecken', taste: 'D', hinweis: 'Rechteck über den Bereich ziehen, der weiß abgedeckt werden soll – z. B. eine entfallende Wand oder alte Maßzahlen. Danach darüber neu zeichnen.' },\n    ausschnitt: { name: 'Ausschnitt', taste: 'A', hinweis: 'Rechteck aufziehen – der PNG-Export enthält nur diesen Bereich. Ohne Ausschnitt wird das ganze Blatt exportiert.' },\n  };\n  const NAME = { schnitt: 'Schnittlinie', wand: 'Wand', tuer: 'Tür', fenster: 'Fenster', mass: 'Maß', schraege: 'Dachschräge', treppe: 'Treppe', text: 'Text', flaeche: 'Fläche', abdecken: 'Abdeckung', moebel: 'Möbel' };\n  const PLURAL = { schnitt: ['Schnittlinie', 'Schnittlinien'], wand: ['Wand', 'Wände'], tuer: ['Tür', 'Türen'], fenster: ['Fenster', 'Fenster'], mass: ['Maß', 'Maße'], schraege: ['Dachschräge', 'Dachschrägen'], treppe: ['Treppe', 'Treppen'], text: ['Text', 'Texte'], flaeche: ['Fläche', 'Flächen'], abdecken: ['Abdeckung', 'Abdeckungen'], moebel: ['Möbelstück', 'Möbelstücke'] };\n\n  const st = {\n    pdf: null, pdfBytes: null, seite: null, seiteNr: 1, seitenAnzahl: 0, viewport: null, renderTask: null,\n    bild: null, bildBytes: null, dateiName: '', breite: 0, hoehe: 0, zoom: 1, inhalt: null,\n    werkzeug: 'auswahl', elemente: [], proSeite: {}, naechsteId: 1, auswahl: null,\n    kalib: { ptProM: GE.ptProMausMassstab(100), quelle: 'angenommen', massstab: 100 },\n    ortho: true, fangAn: true, segmente: [], punkte: [], fangIndex: [], fangArt: '', aufhellen: true, blank: null, rasterCm: 0, rasterZeigen: false,\n    zeichnung: null, maus: null, fang: null, drag: null, pan: null, leertaste: false, shift: false,\n    verlauf: [], verlaufPos: -1, ausschnitt: null,\n    einstellungen: { wand: GE.NEU.wand(), tuer: GE.NEU.tuer(), fenster: GE.NEU.fenster(), mass: GE.NEU.mass(), schraege: GE.NEU.schraege(), treppe: GE.NEU.treppe(), schnitt: GE.NEU.schnitt(), text: GE.NEU.text(), flaeche: GE.NEU.flaeche(), abdecken: GE.NEU.abdecken(), moebel: GE.NEU.moebel() },\n  };\n  const werkstatt = $('#werkstatt'), blatt = $('#blatt'), seiteCanvas = $('#seite'), overlay = $('#overlay'), panel = $('#eigenschaften');\n  const klon = (o) => JSON.parse(JSON.stringify(o));\n  const elById = (id) => st.elemente.find(e => e.id === id);\n  const wandWinkel = (el) => { let w = Math.atan2(-(el.p2.y - el.p1.y), el.p2.x - el.p1.x) * 180 / Math.PI; w = ((w % 360) + 360) % 360; if (w >= 180) w -= 180; return Math.round(w * 10) / 10; };\n  const zahl = (v, alt) => { const n = parseFloat(String(v).replace(',', '.')); return isNaN(n) ? alt : n; };\n\n  // ---------- Datei laden ----------\n  async function ladeDatei(file) {\n    if (!file) return;\n    zeigeLaden(true, 'Plan wird geladen …');\n    try {\n      st.dateiName = file.name.replace(/\\.[^.]+$/, ''); st.blank = null; st.rasterCm = 0; st.rasterZeigen = false;\n      st.elemente = []; st.proSeite = {}; st.auswahl = null; st.zeichnung = null; st.ausschnitt = null; st.verlauf = []; st.verlaufPos = -1;\n      st.segmente = []; st.punkte = []; st.wolke = null; window.epPwStandSichern = null; if (window.epP3Weg) window.epP3Weg();\n      const buf = await file.arrayBuffer();\n      if (/\\.pdf$/i.test(file.name) || file.type === 'application/pdf') {\n        st.pdfBytes = new Uint8Array(buf.slice(0)); st.bild = null; st.bildBytes = null;\n        st.pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;\n        st.seitenAnzahl = st.pdf.numPages;\n        await zeigeSeite(1);\n      } else {\n        st.pdf = null; st.pdfBytes = null; st.seite = null; st.viewport = null; st.seitenAnzahl = 1; st.seiteNr = 1;\n        st.bildBytes = new Uint8Array(buf);\n        st.bild = await new Promise((ok, err) => { const im = new Image(); im.onload = () => ok(im); im.onerror = () => err(new Error('Bild konnte nicht gelesen werden.')); im.src = URL.createObjectURL(file); });\n        st.breite = st.bild.naturalWidth; st.hoehe = st.bild.naturalHeight;\n        st.kalib = { ptProM: 50, quelle: 'angenommen', massstab: null, einheit: 'px' };   // Pixelquelle: Maßstab unbekannt → kalibrieren\n        bildAufbereiten();\n        nachSeite();\n      }\n      $('#leer').classList.add('aus');\n      commit();\n    } catch (e) {\n      alert('Die Datei konnte nicht geladen werden: ' + (e && e.message ? e.message : e));\n    } finally { zeigeLaden(false); }\n  }\n\n  async function zeigeSeite(n) {\n    if (st.seite && st.seiteNr) st.proSeite[st.seiteNr] = st.elemente;\n    st.seiteNr = n; st.elemente = st.proSeite[n] || []; st.auswahl = null; st.zeichnung = null;\n    st.seite = await st.pdf.getPage(n);\n    st.viewport = st.seite.getViewport({ scale: 1 });\n    st.breite = st.viewport.width; st.hoehe = st.viewport.height;\n    const R = Math.max(1, Math.min(2 * (window.devicePixelRatio || 1), 5000 / Math.max(st.breite, st.hoehe)));\n    seiteCanvas.width = Math.ceil(st.breite * R); seiteCanvas.height = Math.ceil(st.hoehe * R);\n    const ctx = seiteCanvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, seiteCanvas.width, seiteCanvas.height);\n    if (st.renderTask) { try { st.renderTask.cancel(); } catch (e) { /* egal */ } }\n    st.renderTask = st.seite.render({ canvasContext: ctx, viewport: st.seite.getViewport({ scale: R }) });\n    nachSeite();\n    try { await st.renderTask.promise; } catch (e) { /* abgebrochen */ }\n    st.renderTask = null;\n    inhaltErmitteln(); zoomAnpassen();\n    // Fanglinien im Hintergrund holen\n    st.segmente = []; st.punkte = []; st.wolke = null; window.epPwStandSichern = null; if (window.epP3Weg) window.epP3Weg(); st.fangArt = '';\n    try { const q = await GE.planSegmente(st.seite, st.viewport, pdfjsLib); if (st.seite && q) { st.segmente = q.segmente; st.punkte = q.punkte; st.fangArt = 'vektor'; } } catch (e) { console.warn('Fanglinien', e); }\n    if (st.seite && st.segmente.length < 30) rasterFang(seiteCanvas);   // gescanntes PDF: Kanten aus dem Bild\n    renderPanel();\n  }\n\n  // Leeres Zeichenblatt: Format (mm) + Maßstab → weißes Blatt, Raster, schwarze Bauteile\n  function neuesBlatt(format, massstab, titel) {\n    const bl = GE.BLAETTER.find(b => b[0] === format) || GE.BLAETTER[0];\n    if (st.renderTask) { try { st.renderTask.cancel(); } catch (e) { /* egal */ } st.renderTask = null; }\n    st.pdf = null; st.pdfBytes = null; st.seite = null; st.viewport = null; st.bild = null; st.bildBytes = null; st.seitenAnzahl = 1; st.seiteNr = 1;\n    st.blank = { format: bl[0], name: bl[1], mm: [bl[2], bl[3]], massstab, titel: titel || '' };\n    st.breite = Math.round(bl[2] * GE.PT_PRO_MM * 100) / 100; st.hoehe = Math.round(bl[3] * GE.PT_PRO_MM * 100) / 100;\n    st.dateiName = (titel || 'Grundriss').replace(/[\\\\/:*?\"<>|]+/g, '-').trim() || 'Grundriss';\n    st.kalib = { ptProM: GE.ptProMausMassstab(massstab), quelle: 'massstab', massstab, einheit: 'pt' };\n    st.elemente = []; st.proSeite = {}; st.auswahl = null; st.zeichnung = null; st.ausschnitt = null; st.verlauf = []; st.verlaufPos = -1; st.naechsteId = 1;\n    st.segmente = []; st.punkte = []; st.wolke = null; window.epPwStandSichern = null; if (window.epP3Weg) window.epP3Weg(); st.fangArt = 'leer'; st.inhalt = null; st.rasterCm = 10; st.rasterZeigen = true;\n    seiteCanvas.width = Math.ceil(st.breite * 2); seiteCanvas.height = Math.ceil(st.hoehe * 2);\n    const ctx = seiteCanvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, seiteCanvas.width, seiteCanvas.height);\n    // Neuzeichnung: Bauteile schwarz, Wände gemauert 24 cm\n    st.einstellungen.wand = { ...GE.NEU.wand(), dicke: 24, stil: 'schraffur', farbe: '#000000' };\n    for (const k of ['tuer', 'fenster', 'mass', 'text', 'flaeche']) st.einstellungen[k] = { ...GE.NEU[k](), farbe: k === 'flaeche' ? '#263159' : '#000000' };\n    if (titel) { const g = 10; st.elemente.push({ ...GE.NEU.text(), text: titel + ' · M 1:' + massstab, farbe: '#000000', groesse: g, halo: false, p: { x: 12 * GE.PT_PRO_MM, y: 12 * GE.PT_PRO_MM }, id: st.naechsteId++ }); }\n    nachSeite(); $('#leer').classList.add('aus'); commit(); setzeWerkzeug('wand');\n  }\n  function neuPop(zeigen) {\n    const pop = $('#neuPop'); pop.classList.toggle('aus', !zeigen);\n    if (zeigen) { const sel = $('#neuFormat'); if (!sel.options.length) for (const b of GE.BLAETTER) { const o = document.createElement('option'); o.value = b[0]; o.textContent = `${b[1]} (${b[2]} × ${b[3]} mm)`; sel.appendChild(o); } $('#neuTitel').focus(); }\n  }\n  // Rasterquelle: Rohbild → Blatt-Canvas (optional aufgehellt) → Fanglinien aus dem Bild\n  function bildAufbereiten() {\n    seiteCanvas.width = st.breite; seiteCanvas.height = st.hoehe;\n    const ctx = seiteCanvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, st.breite, st.hoehe); ctx.drawImage(st.bild, 0, 0);\n    if (st.aufhellen) { try { const id = ctx.getImageData(0, 0, st.breite, st.hoehe); GE.bildAufhellen(id); ctx.putImageData(id, 0, 0); } catch (e) { console.warn('Aufhellen', e); } }\n    inhaltErmitteln();\n    rasterFang(seiteCanvas);\n  }\n  function rasterFang(quelle) {\n    st.segmente = []; st.punkte = []; st.wolke = null; window.epPwStandSichern = null; if (window.epP3Weg) window.epP3Weg(); st.fangArt = 'raster';\n    try {\n      const w = Math.max(200, Math.round(Math.min(2600, quelle.width))), h = Math.max(1, Math.round(w * st.hoehe / st.breite)), f = st.breite / w;\n      const c = document.createElement('canvas'); c.width = w; c.height = h;\n      const cx = c.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, w, h); cx.drawImage(quelle, 0, 0, w, h);\n      const q = GE.bildSegmente(cx.getImageData(0, 0, w, h), f);\n      st.segmente = q.segmente; st.punkte = q.punkte;\n    } catch (e) { console.warn('Rasterfang', e); }\n  }\n\n  function nachSeite() {\n    const sel = $('#seitenWahl'); sel.innerHTML = '';\n    for (let i = 1; i <= st.seitenAnzahl; i++) { const o = document.createElement('option'); o.value = i; o.textContent = 'Seite ' + i + ' / ' + st.seitenAnzahl; sel.appendChild(o); }\n    sel.value = st.seiteNr; sel.style.display = st.seitenAnzahl > 1 ? '' : 'none';\n    $('#dateiName').textContent = st.dateiName || 'Kein Plan geladen';\n    zoomAnpassen(); renderPanel(); kalibChip(); render();\n  }\n\n  // ---------- Zoom / Pan ----------\n  function setzeZoom(z, ankerClient) {\n    z = Math.max(0.05, Math.min(12, z));\n    const wr = werkstatt.getBoundingClientRect();\n    let pp = null;\n    if (ankerClient) pp = seitenPunktAus(ankerClient.x, ankerClient.y);\n    st.zoom = z;\n    const w = st.breite * z, h = st.hoehe * z;\n    blatt.style.width = w + 'px'; blatt.style.height = h + 'px';\n    seiteCanvas.style.width = w + 'px'; seiteCanvas.style.height = h + 'px';\n    overlay.setAttribute('width', w); overlay.setAttribute('height', h); overlay.setAttribute('viewBox', `0 0 ${st.breite} ${st.hoehe}`);\n    if (pp) { werkstatt.scrollLeft = pp.x * z + 24 - (ankerClient.x - wr.left); werkstatt.scrollTop = pp.y * z + 24 - (ankerClient.y - wr.top); }\n    $('#zoomWert').textContent = Math.round(z * 100) + ' %';\n    render();\n  }\n  // Einpassen: auf die Zeichnung (Tinte ohne leeren Blattrand) oder auf das ganze Blatt\n  function zoomAnpassen(ganzesBlatt) {\n    if (!st.breite) return;\n    const r = (!ganzesBlatt && st.inhalt) ? st.inhalt : { x: 0, y: 0, w: st.breite, h: st.hoehe };\n    const z = Math.min((werkstatt.clientWidth - 48) / r.w, (werkstatt.clientHeight - 48) / r.h);\n    setzeZoom(z);\n    werkstatt.scrollLeft = Math.max(0, (r.x + r.w / 2) * st.zoom + 24 - werkstatt.clientWidth / 2);\n    werkstatt.scrollTop = Math.max(0, (r.y + r.h / 2) * st.zoom + 24 - werkstatt.clientHeight / 2);\n  }\n  // Tinten-Rechteck des Blatts aus dem gerenderten Canvas (Abtastung, Helligkeit < 235); mit 2 % Rand\n  function inhaltErmitteln() {\n    st.inhalt = null;\n    try {\n      const cw = seiteCanvas.width, ch = seiteCanvas.height; if (!cw || !ch) return;\n      const schritt = Math.max(1, Math.floor(Math.max(cw, ch) / 900));\n      const id = seiteCanvas.getContext('2d').getImageData(0, 0, cw, ch).data;\n      let x0 = cw, y0 = ch, x1 = -1, y1 = -1;\n      for (let y = 0; y < ch; y += schritt) for (let x = 0; x < cw; x += schritt) {\n        const j = (y * cw + x) * 4; if (id[j + 3] < 40) continue;\n        if (((id[j] * 77 + id[j + 1] * 151 + id[j + 2] * 28) >> 8) < 235) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }\n      }\n      if (x1 < 0) return;\n      const f = st.breite / cw, rand = 0.02 * Math.max(x1 - x0, y1 - y0) * f;\n      const X0 = Math.max(0, x0 * f - rand), Y0 = Math.max(0, y0 * f - rand), X1 = Math.min(st.breite, (x1 + schritt) * f + rand), Y1 = Math.min(st.hoehe, (y1 + schritt) * f + rand);\n      if ((X1 - X0) * (Y1 - Y0) < 0.9 * st.breite * st.hoehe) st.inhalt = { x: X0, y: Y0, w: X1 - X0, h: Y1 - Y0 };   // nur wenn es sich lohnt\n    } catch (e) { console.warn('Inhalt', e); }\n  }\n  const seitenPunktAus = (cx, cy) => { const r = overlay.getBoundingClientRect(); return { x: (cx - r.left) / st.zoom, y: (cy - r.top) / st.zoom }; };\n  const seitenPunkt = (e) => seitenPunktAus(e.clientX, e.clientY);\n\n  // ---------- Verlauf ----------\n  function commit() {\n    st.proSeite[st.seiteNr] = st.elemente;\n    const snap = JSON.stringify({ proSeite: st.proSeite, ausschnitt: st.ausschnitt, seiteNr: st.seiteNr });\n    st.verlauf = st.verlauf.slice(0, st.verlaufPos + 1); st.verlauf.push(snap); if (st.verlauf.length > 60) st.verlauf.shift();\n    st.verlaufPos = st.verlauf.length - 1; verlaufKnoepfe();\n  }\n  function verlaufAnwenden(pos) {\n    const s = JSON.parse(st.verlauf[pos]); st.verlaufPos = pos;\n    st.proSeite = s.proSeite; st.elemente = st.proSeite[st.seiteNr] || []; st.ausschnitt = s.ausschnitt;\n    st.auswahl = null; st.zeichnung = null; verlaufKnoepfe(); renderPanel(); render();\n  }\n  const rueckgaengig = () => { if (st.verlaufPos > 0) verlaufAnwenden(st.verlaufPos - 1); };\n  const wiederholen = () => { if (st.verlaufPos < st.verlauf.length - 1) verlaufAnwenden(st.verlaufPos + 1); };\n  function verlaufKnoepfe() { $('#btnUndo').disabled = st.verlaufPos <= 0; $('#btnRedo').disabled = st.verlaufPos >= st.verlauf.length - 1; }\n\n  // ---------- Fang ----------\n  function fangQuellen(ausserId, p) {\n    const punkte = [], segmente = [], flaechenFang = ['flaeche', 'mass', 'text', 'moebel', 'auswahl', 'abdecken'].includes(st.werkzeug);   // Wandflächen nur dort fangen, wo man an Wände anlegt\n    for (const el of st.elemente) {\n      if (el.id === ausserId) continue;\n      if (el.typ === 'wand' || el.typ === 'tuer' || el.typ === 'fenster' || el.typ === 'mass' || el.typ === 'schraege' || el.typ === 'treppe' || el.typ === 'schnitt') { punkte.push(el.p1, el.p2); if (el.typ === 'wand') segmente.push([el.p1.x, el.p1.y, el.p2.x, el.p2.y]); }\n      if (el.typ === 'wand' && flaechenFang) { const u = GE.wandUmriss(el, st.elemente, st.kalib); if (u) { punkte.push(...u); for (let i = 0; i < 4; i++) { const a = u[i], b = u[(i + 1) % 4]; segmente.push([a.x, a.y, b.x, b.y]); } } }\n      else if (el.typ === 'flaeche') punkte.push(...el.punkte);\n      else if (el.typ === 'text') punkte.push(el.p);\n    }\n    const q = [{ punkte, segmente }];\n    if (st.fangAn) q.push({ punkte: st.punkte, segmente: st.segmente });\n    if (st.fangAn && st.wolke && p && typeof st.wolke.quellen === 'function') { try { const wq = st.wolke.quellen(p, fangRadius() * 3, st.werkzeug); if (wq) q.push(wq); } catch (e) { /* Wolke ohne Fang */ } }\n    return q;\n  }\n  const fangRadius = () => 9 / st.zoom;\n  const rasterPt = () => st.rasterCm > 0 ? st.rasterCm / 100 * st.kalib.ptProM : 0;\n  const aufRaster = (p) => { const r = rasterPt(); return r ? { x: Math.round(p.x / r) * r, y: Math.round(p.y / r) * r } : p; };\n  function punktFreiOhneKante(p, ausserId) {\n    if (!st.fangAn && !st.elemente.length) { st.fang = null; return aufRaster(p); }\n    const f = GE.fangFrei(p, fangRadius(), fangQuellen(ausserId, p)); st.fang = f; return f ? f.p : aufRaster(p);\n  }\n  // Schräg-Prüfung (Stufe 131): Richtung S→q mindestens 1,5° neben beiden Achsen\n  const schraegZu = (S, q) => { const dx = Math.abs(q.x - S.x), dy = Math.abs(q.y - S.y); if (dx + dy < 1) return false; return Math.atan2(Math.min(dx, dy), Math.max(dx, dy)) * 180 / Math.PI >= 1.5; };\n  // Liegt S (bis 2 cm) auf der Geraden des Segments und ist das Segment selbst schräg? → der Wand entlang der Vorlage folgen\n  const aufSchraegerLinie = (S, s) => { if (!s) return false; const dx = s[2] - s[0], dy = s[3] - s[1], L = Math.hypot(dx, dy); if (L < 1e-6) return false; if (Math.atan2(Math.min(Math.abs(dx), Math.abs(dy)), Math.max(Math.abs(dx), Math.abs(dy))) * 180 / Math.PI < 1.5) return false; return Math.abs((S.x - s[0]) * -dy / L + (S.y - s[1]) * dx / L) <= Math.max(1.5, 0.02 * st.kalib.ptProM); };\n  // Tür/Fenster mit Standardbreite: das Ende liegt in Klickrichtung genau eine Standardbreite vom Anschlag entfernt\n  const standardEnde = (w, S, E) => { const e = st.einstellungen[w]; const b = (w === 'tuer' || w === 'fenster') && e && e.breiteCm > 0 ? e.breiteCm / 100 * st.kalib.ptProM : 0; if (!b) return E; const L = V.dist(E, S); if (L < 1e-6) return E; return V.add(S, V.mul(V.sub(E, S), b / L)); };\n  // Tür/Fenster: liegt der Anschlag S auf einer gezeichneten Wand, folgt die Öffnung deren Richtung (auch schräg, auch im rechtwinkligen Modus)\n  const aufWandRichten = (w, S, pRoh, E) => {\n    if (w !== 'tuer' && w !== 'fenster' || !pRoh) return E;\n    let best = null, bd = Infinity;\n    for (const el of st.elemente) { if (el.typ !== 'wand') continue; const L = V.dist(el.p1, el.p2); if (L < 1e-6) continue; const d = V.mul(V.sub(el.p2, el.p1), 1 / L), u = V.dot(V.sub(S, el.p1), d), a = Math.abs(V.dot(V.sub(S, el.p1), V.perp(d))); if (u < -2 || u > L + 2 || a > GE.dickePt(el, st.kalib) / 2 + 2 || a >= bd) continue; bd = a; best = d; }\n    if (!best) return E;\n    const e = st.einstellungen[w], b = e && e.breiteCm > 0 ? e.breiteCm / 100 * st.kalib.ptProM : 0, proj = V.dot(V.sub(pRoh, S), best);\n    const len = b ? (proj < 0 ? -b : b) : proj; if (Math.abs(len) < 0.5) return E;\n    return V.add(S, V.mul(best, len));\n  };\n  function punktZuStartOhneKante(S, p, ausserId) {\n    if (st.ortho && !st.shift) { const qq = fangQuellen(ausserId, p); const fs = GE.fangFrei(p, fangRadius(), qq); if (fs && (fs.art === 'Linie' ? aufSchraegerLinie(S, fs.s) && schraegZu(S, fs.p) : schraegZu(S, fs.p))) { st.fang = fs; return fs.p; } const r = GE.fangAchse(S, p, fangRadius(), qq); st.fang = r.fang; if (r.fang) return r.p; const g = aufRaster(p); return Math.abs(p.x - S.x) >= Math.abs(p.y - S.y) ? { x: g.x, y: S.y } : { x: S.x, y: g.y }; }\n    return punktFreiOhneKante(p, ausserId);\n  }\n  // ---------- Stufe 147: Schnittkanten – Wandendpunkte zwingend auf die Wandfläche der Wolke ----------\n  // Die Kante ist die Innenseite der Wand; die Wandachse liegt um die halbe Dicke außen davon. Ecke = Schnittpunkt zweier Achsen.\n  function schnittGeraden(P, d1, Q, d2) { const den = d1.x * d2.y - d1.y * d2.x; if (Math.abs(den) < 1e-9) return null; const t = ((Q.x - P.x) * d2.y - (Q.y - P.y) * d2.x) / den; return { x: P.x + d1.x * t, y: P.y + d1.y * t }; }\n  function kanteFang(q, dickeCm, radiusPt) {\n    const K = st.wolke && st.wolke.kanten; if (!K || !K.length || st.kantenFang === false || !q) return null;\n    const R = st.kalib.ptProM, r = radiusPt != null ? radiusPt : 0.30 * R, tw = (dickeCm || (st.einstellungen.wand && st.einstellungen.wand.dicke) || 12.5) / 100 * R;\n    const nahe = [];\n    for (const k of K) {\n      const L = Math.hypot(k.p2.x - k.p1.x, k.p2.y - k.p1.y); if (L < 1e-6) continue;\n      const t = (q.x - k.p1.x) * k.d.x + (q.y - k.p1.y) * k.d.y; if (t < -0.25 * R || t > L + 0.25 * R) continue;\n      const fx = k.p1.x + k.d.x * t, fy = k.p1.y + k.d.y * t, dist = Math.hypot(q.x - fx, q.y - fy); if (dist > r) continue;\n      let aussen; if (k.n) aussen = { x: -k.n.x, y: -k.n.y }; else { const nx = -k.d.y, ny = k.d.x, vz = ((q.x - fx) * nx + (q.y - fy) * ny) >= 0 ? 1 : -1; aussen = { x: nx * vz, y: ny * vz }; }\n      nahe.push({ k, dist, achse: { x: fx + aussen.x * tw / 2, y: fy + aussen.y * tw / 2 } });\n    }\n    if (!nahe.length) return null; nahe.sort((a, b) => a.dist - b.dist);\n    const a = nahe[0], b = nahe.find((x) => x !== a && Math.abs(x.k.d.x * a.k.d.x + x.k.d.y * a.k.d.y) < 0.7);\n    if (b) { const p = schnittGeraden(a.achse, a.k.d, b.achse, b.k.d); if (p && Math.hypot(p.x - q.x, p.y - q.y) <= r * 1.6) return { p, art: 'Schnittkante · Ecke', kanten: [a.k.idx, b.k.idx] }; }\n    return { p: a.achse, art: 'Schnittkante', kanten: [a.k.idx] };\n  }\n  const wandDickeAktiv = () => { const el = st.drag ? elById(st.drag.id) : null; if (el && el.typ === 'wand') return el.dicke; return st.einstellungen.wand ? st.einstellungen.wand.dicke : 12.5; };\n  const kantenAktiv = () => { if (st.werkzeug === 'wand') return true; if (!st.drag) return false; const el = elById(st.drag.id); return !!(el && el.typ === 'wand'); };\n  function punktFrei(p, ausserId) { const q = punktFreiOhneKante(p, ausserId); if (kantenAktiv()) { const k = kanteFang(q, wandDickeAktiv()); if (k) { st.fang = { p: k.p, art: k.art }; return k.p; } } return q; }\n  function punktZuStart(S, p, ausserId) { const q = punktZuStartOhneKante(S, p, ausserId); if (kantenAktiv()) { const k = kanteFang(q, wandDickeAktiv()); if (k) { st.fang = { p: k.p, art: k.art }; return k.p; } } return q; }\n  // Bestehende Wände auf die Kanten setzen (Anfang und Ende im Umkreis von 45 cm)\n  function waendeAufKanten() {\n    const K = st.wolke && st.wolke.kanten; if (!K || !K.length) { meldung('Keine Schnittkanten auf dem Blatt – Punktwolke übernehmen (oder einen Stand mit Wolke laden).'); return null; }\n    const R = st.kalib.ptProM, alt = st.kantenFang; st.kantenFang = true; let waende = 0, gesetzt = 0, maxCm = 0;\n    for (const el of st.elemente) { if (el.typ !== 'wand') continue; waende++; let traf = false; for (const h of ['p1', 'p2']) { const k = kanteFang(el[h], el.dicke, 0.45 * R); if (!k) continue; const v = Math.hypot(k.p.x - el[h].x, k.p.y - el[h].y) / R * 100; if (v > maxCm) maxCm = v; el[h] = k.p; traf = true; } if (traf) gesetzt++; }\n    st.kantenFang = alt; commit(); renderPanel(); render();\n    meldung(gesetzt ? `${gesetzt} von ${waende} Wänden auf die Schnittkanten der Wolke gesetzt (größte Verschiebung ${maxCm.toFixed(1).replace('.', ',')} cm). Danach „Räume + Maße“ neu rechnen.` : `Keine Wand im Umkreis von 45 cm einer Schnittkante (${waende} Wände geprüft).`);\n    return { waende, gesetzt, maxCm: Math.round(maxCm * 10) / 10 };\n  }\n\n  // ---------- Zeichnen (SVG-Overlay) ----------\n  function hitSvg(el) {\n    const z = st.zoom, b = GE.n2(8 / z), attr = `stroke=\"transparent\" fill=\"none\" stroke-width=\"${b}\" pointer-events=\"stroke\" class=\"hit\"`;\n    switch (el.typ) {\n      case 'wand': { const bd = GE.bogenDaten(el, st.kalib); if (bd) { const pts = GE.bogenPunkte(el, st.kalib), t = Math.max(GE.dickePt(el, st.kalib), 8 / z), a = [], b2 = []; for (const q of pts) { const rx = (q.x - bd.C.x) / bd.r, ry = (q.y - bd.C.y) / bd.r; a.push({ x: q.x + rx * t / 2, y: q.y + ry * t / 2 }); b2.push({ x: q.x - rx * t / 2, y: q.y - ry * t / 2 }); } return `<polygon points=\"${a.concat(b2.reverse()).map(p => GE.n2(p.x) + ',' + GE.n2(p.y)).join(' ')}\" fill=\"transparent\" pointer-events=\"fill\" class=\"hit\"/>`; }\n        return `<line x1=\"${el.p1.x}\" y1=\"${el.p1.y}\" x2=\"${el.p2.x}\" y2=\"${el.p2.y}\" stroke=\"transparent\" fill=\"none\" stroke-width=\"${Math.max(GE.dickePt(el, st.kalib), 8 / z)}\" pointer-events=\"stroke\" class=\"hit\"/>`; }\n      case 'tuer': { const g = GE.tuerGeometrie(el); if (!g) return ''; const t = GE.wandDickeAuf(el, st.elemente, st.kalib) || (el.durchbruch ? el.durchbruch.tiefe / 100 * st.kalib.ptProM : 0); return `<polyline points=\"${el.p1.x},${el.p1.y} ${g.E.x},${g.E.y} ${el.p2.x},${el.p2.y} ${el.p1.x},${el.p1.y}\" ${attr}/><line x1=\"${el.p1.x}\" y1=\"${el.p1.y}\" x2=\"${el.p2.x}\" y2=\"${el.p2.y}\" stroke=\"transparent\" fill=\"none\" stroke-width=\"${Math.max(t * 2, 10 / z)}\" pointer-events=\"stroke\" class=\"hit\"/>`; }\n      case 'fenster': { if (el.variante === 'dach') { const w = V.dist(el.p1, el.p2) || 1, q = V.rot(V.mul(V.sub(el.p2, el.p1), 1 / w), el.spiegeln ? 90 : -90), T = (el.tiefeCm || 118) / 100 * st.kalib.ptProM, c = [el.p1, el.p2, V.add(el.p2, V.mul(q, T)), V.add(el.p1, V.mul(q, T))]; return `<polygon points=\"${c.map(p => GE.n2(p.x) + ',' + GE.n2(p.y)).join(' ')}\" fill=\"transparent\" pointer-events=\"fill\" class=\"hit\"/>`; }\n        const t = GE.wandDickeAuf(el, st.elemente, st.kalib) || (el.durchbruch ? el.durchbruch.tiefe / 100 * st.kalib.ptProM : 0); return `<line x1=\"${el.p1.x}\" y1=\"${el.p1.y}\" x2=\"${el.p2.x}\" y2=\"${el.p2.y}\" stroke=\"transparent\" fill=\"none\" stroke-width=\"${Math.max(t * 2, 10 / z)}\" pointer-events=\"stroke\" class=\"hit\"/>`; }\n      case 'treppe': { if (el.variante === 'spindel') { const r = V.dist(el.p1, el.p2); return `<circle cx=\"${GE.n2(el.p1.x)}\" cy=\"${GE.n2(el.p1.y)}\" r=\"${GE.n2(r)}\" fill=\"transparent\" pointer-events=\"fill\" class=\"hit\"/>`; } const L = V.dist(el.p1, el.p2) || 1, n = V.perp(V.mul(V.sub(el.p2, el.p1), 1 / L)), hb = (el.breite || 100) / 200 * st.kalib.ptProM, c = [V.add(el.p1, V.mul(n, hb)), V.add(el.p2, V.mul(n, hb)), V.sub(el.p2, V.mul(n, hb)), V.sub(el.p1, V.mul(n, hb))]; return `<polygon points=\"${c.map(p => GE.n2(p.x) + ',' + GE.n2(p.y)).join(' ')}\" fill=\"transparent\" pointer-events=\"fill\" class=\"hit\"/>`; }\n      case 'schraege': return `<line x1=\"${el.p1.x}\" y1=\"${el.p1.y}\" x2=\"${el.p2.x}\" y2=\"${el.p2.y}\" ${attr}/>`;\n      case 'schnitt': return `<line x1=\"${el.p1.x}\" y1=\"${el.p1.y}\" x2=\"${el.p2.x}\" y2=\"${el.p2.y}\" ${attr}/>`;\n      case 'mass': { const g = GE.massGeometrie(el); if (!g) return ''; return `<polyline points=\"${el.p1.x},${el.p1.y} ${g.D1.x},${g.D1.y} ${g.D2.x},${g.D2.y} ${el.p2.x},${el.p2.y}\" ${attr}/>`; }\n      case 'text': { const g = el.groesse || 8, w = Math.max(10, (el.text || '').length * g * 0.56); return `<rect x=\"${el.p.x - 2}\" y=\"${el.p.y - g}\" width=\"${w + 4}\" height=\"${g * 1.35}\" transform=\"rotate(${el.winkel || 0} ${el.p.x} ${el.p.y})\" fill=\"transparent\" pointer-events=\"fill\" class=\"hit\"/>`; }\n      case 'flaeche': return `<polygon points=\"${el.punkte.map(q => q.x + ',' + q.y).join(' ')}\" fill=\"transparent\" pointer-events=\"fill\" class=\"hit\"/>`;\n      case 'moebel': return `<polygon points=\"${moebelEcken(el).map(q => GE.n2(q.x) + ',' + GE.n2(q.y)).join(' ')}\" fill=\"transparent\" pointer-events=\"fill\" class=\"hit\"/>`;\n      case 'abdecken': return `<rect x=\"${Math.min(el.p1.x, el.p2.x)}\" y=\"${Math.min(el.p1.y, el.p2.y)}\" width=\"${Math.abs(el.p2.x - el.p1.x)}\" height=\"${Math.abs(el.p2.y - el.p1.y)}\" fill=\"transparent\" stroke=\"#D4A567\" stroke-opacity=\".5\" stroke-width=\"${b}\" stroke-dasharray=\"${GE.n2(4 / z)} ${GE.n2(3 / z)}\" pointer-events=\"fill\" class=\"hit\"/>`;\n    }\n    return '';\n  }\n  function griffe(el) {\n    const z = st.zoom, r = GE.n2(5 / z), sw = GE.n2(1.5 / z);\n    const g = (name, p) => `<circle data-handle=\"${name}\" cx=\"${GE.n2(p.x)}\" cy=\"${GE.n2(p.y)}\" r=\"${r}\" fill=\"#fff\" stroke=\"#D4A567\" stroke-width=\"${sw}\" class=\"griff\"/>`;\n    let s = '';\n    if (el.typ === 'wand' || el.typ === 'tuer' || el.typ === 'fenster' || el.typ === 'mass' || el.typ === 'schraege' || el.typ === 'treppe' || el.typ === 'schnitt' || el.typ === 'abdecken') s += g('p1', el.p1) + g('p2', el.p2);\n    if (el.typ === 'wand') { const bd = GE.bogenDaten(el, st.kalib), B = bd ? bd.scheitel : V.mid(el.p1, el.p2); s += `<rect data-handle=\"bogen\" x=\"${GE.n2(B.x - 4 / z)}\" y=\"${GE.n2(B.y - 4 / z)}\" width=\"${GE.n2(8 / z)}\" height=\"${GE.n2(8 / z)}\" fill=\"#D4A567\" stroke=\"#fff\" stroke-width=\"${sw}\" class=\"griff\"><title>Bogen: ziehen biegt die Wand (Stich)</title></rect>`; }\n    if (el.typ === 'mass') { const m = GE.massGeometrie(el); if (m) s += `<rect data-handle=\"v\" x=\"${GE.n2(V.mid(m.D1, m.D2).x - 4 / z)}\" y=\"${GE.n2(V.mid(m.D1, m.D2).y - 4 / z)}\" width=\"${GE.n2(8 / z)}\" height=\"${GE.n2(8 / z)}\" fill=\"#D4A567\" stroke=\"#fff\" stroke-width=\"${sw}\" class=\"griff\"/>`; }\n    if (el.typ === 'text') s += g('p', el.p);\n    if (el.typ === 'flaeche') el.punkte.forEach((p, i) => { s += g('v' + i, p); });\n    if (el.typ === 'moebel') { const e = moebelEcken(el), o = V.mid(e[0], e[1]), c = el.p, dir = V.norm(V.sub(o, c)), rp = V.add(o, V.mul(dir, 16 / z)); s += `<line x1=\"${GE.n2(o.x)}\" y1=\"${GE.n2(o.y)}\" x2=\"${GE.n2(rp.x)}\" y2=\"${GE.n2(rp.y)}\" stroke=\"#D4A567\" stroke-width=\"${sw}\"/>` + g('rot', rp).replace('class=\"griff\"', 'class=\"griff dreh\"'); }\n    return s;\n  }\n  // Ecken des Möbel-Rechtecks (gedreht): [hinten-links, hinten-rechts, vorne-rechts, vorne-links]\n  function moebelEcken(el) {\n    const kat = GE.MOEBEL.byKey[el.art] || GE.MOEBEL.byKey.rechteck;\n    const B = (el.breite || kat.b) / 100 * st.kalib.ptProM, T = (el.tiefe || kat.t) / 100 * st.kalib.ptProM, rad = (el.winkel || 0) * Math.PI / 180, c = Math.cos(rad), si = Math.sin(rad);\n    const m = (x, y) => ({ x: el.p.x + x * c - y * si, y: el.p.y + x * si + y * c });\n    return [m(-B / 2, -T / 2), m(B / 2, -T / 2), m(B / 2, T / 2), m(-B / 2, T / 2)];\n  }\n  function elementSvg(el, sel) {\n    const ps = primsFuer(el);\n    let glanz = '';\n    if (sel) {\n      const z = st.zoom;\n      if (el.typ === 'wand' || el.typ === 'mass' || el.typ === 'schraege' || el.typ === 'schnitt' || el.typ === 'tuer' || el.typ === 'fenster') glanz = `<line x1=\"${el.p1.x}\" y1=\"${el.p1.y}\" x2=\"${el.p2.x}\" y2=\"${el.p2.y}\" stroke=\"#D4A567\" stroke-opacity=\".35\" stroke-width=\"${GE.n2(Math.max(el.typ === 'wand' ? GE.dickePt(el, st.kalib) + 6 / z : 10 / z, 6 / z))}\" stroke-linecap=\"round\"/>`;\n      if (el.typ === 'flaeche') glanz = `<polygon points=\"${el.punkte.map(q => q.x + ',' + q.y).join(' ')}\" fill=\"none\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(3 / z)}\" stroke-opacity=\".6\"/>`;\n      if (el.typ === 'text') { const g = el.groesse || 8, w = Math.max(10, (el.text || '').length * g * 0.56); glanz = `<rect x=\"${el.p.x - 2}\" y=\"${el.p.y - g}\" width=\"${w + 4}\" height=\"${g * 1.35}\" transform=\"rotate(${el.winkel || 0} ${el.p.x} ${el.p.y})\" fill=\"none\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(1.5 / z)}\" stroke-dasharray=\"${GE.n2(4 / z)} ${GE.n2(3 / z)}\"/>`; }\n      if (el.typ === 'abdecken') glanz = `<rect x=\"${Math.min(el.p1.x, el.p2.x)}\" y=\"${Math.min(el.p1.y, el.p2.y)}\" width=\"${Math.abs(el.p2.x - el.p1.x)}\" height=\"${Math.abs(el.p2.y - el.p1.y)}\" fill=\"none\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(2 / z)}\"/>`;\n      if (el.typ === 'moebel') glanz = `<polygon points=\"${moebelEcken(el).map(q => GE.n2(q.x) + ',' + GE.n2(q.y)).join(' ')}\" fill=\"none\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(1.5 / z)}\" stroke-dasharray=\"${GE.n2(4 / z)} ${GE.n2(3 / z)}\"/>`;\n    }\n    return `<g data-id=\"${el.id}\" class=\"el${sel ? ' sel' : ''}\">${glanz}${GE.svgAus(ps.filter(p => !p.ebene))}${hitSvg(el)}</g>`;\n  }\n  function beschriftung(p, text, z) {\n    return `<text x=\"${GE.n2(p.x + 12 / z)}\" y=\"${GE.n2(p.y - 10 / z)}\" font-family=\"Montserrat, sans-serif\" font-weight=\"600\" font-size=\"${GE.n2(12 / z)}\" fill=\"#263159\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"${GE.n2(4 / z)}\" stroke-linejoin=\"round\" pointer-events=\"none\">${GE.esc(text)}</text>`;\n  }\n  function vorschauSvg() {\n    const m0 = st.maus;\n    if (!st.zeichnung && st.werkzeug === 'moebel' && m0 && !st.drag) return `<g class=\"vorschau\" opacity=\".6\">${GE.svgAus(GE.prims({ ...st.einstellungen.moebel, p: m0 }, st.kalib))}</g>`;\n    const zn = st.zeichnung, m = st.maus, z = st.zoom; if (!zn || !m) return '';\n    const cur = zn.cursor || m;\n    if (zn.art === 'wand' || zn.art === 'tuer' || zn.art === 'fenster' || zn.art === 'mass' || zn.art === 'schraege' || zn.art === 'treppe' || zn.art === 'schnitt') {\n      const tmp = { ...st.einstellungen[zn.art], p1: zn.start, p2: aufWandRichten(zn.art, zn.start, m, standardEnde(zn.art, zn.start, cur)) };\n      const L = V.dist(zn.start, tmp.p2) / st.kalib.ptProM;\n      const wv = zn.art === 'wand' ? wandWinkel({ p1: zn.start, p2: cur }) : 0, wq = Math.abs(((wv % 90) + 90) % 90), schraegText = zn.art === 'wand' && wq > 0.3 && wq < 89.7 ? ' · ' + wv.toLocaleString('de-DE') + '°' : '';\n      return `<g class=\"vorschau\" opacity=\".85\">${GE.svgAus(primsFuer(tmp))}</g>` + beschriftung(cur, GE.formatMeter(L) + schraegText, z);\n    }\n    if (zn.art === 'flaeche') {\n      const pts = [...zn.punkte, cur];\n      let s = `<polyline points=\"${pts.map(q => GE.n2(q.x) + ',' + GE.n2(q.y)).join(' ')}\" fill=\"${st.einstellungen.flaeche.farbe}\" fill-opacity=\".12\" stroke=\"${st.einstellungen.flaeche.farbe}\" stroke-width=\"${GE.n2(1 / z)}\" stroke-dasharray=\"${GE.n2(4 / z)} ${GE.n2(3 / z)}\"/>`;\n      s += zn.punkte.map((q, i) => `<circle cx=\"${q.x}\" cy=\"${q.y}\" r=\"${GE.n2((i ? 3 : 5) / z)}\" fill=\"${i ? st.einstellungen.flaeche.farbe : '#D4A567'}\"/>`).join('');\n      if (pts.length >= 3) s += beschriftung(cur, GE.formatFlaeche(GE.flaecheInhalt(pts) / (st.kalib.ptProM * st.kalib.ptProM)), z);\n      return s;\n    }\n    if (zn.art === 'kalib') {\n      return `<line x1=\"${zn.start.x}\" y1=\"${zn.start.y}\" x2=\"${cur.x}\" y2=\"${cur.y}\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(2 / z)}\" stroke-dasharray=\"${GE.n2(6 / z)} ${GE.n2(4 / z)}\"/><circle cx=\"${zn.start.x}\" cy=\"${zn.start.y}\" r=\"${GE.n2(4 / z)}\" fill=\"#D4A567\"/>` + beschriftung(cur, 'Strecke: ' + GE.formatMeter(V.dist(zn.start, cur) / st.kalib.ptProM) + ' (bisherige Kalibrierung)', z);\n    }\n    if (zn.art === 'abdecken') {\n      const x = Math.min(zn.start.x, m.x), y = Math.min(zn.start.y, m.y), w = Math.abs(m.x - zn.start.x), h = Math.abs(m.y - zn.start.y);\n      return `<rect x=\"${x}\" y=\"${y}\" width=\"${w}\" height=\"${h}\" fill=\"#fff\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(1.5 / z)}\" stroke-dasharray=\"${GE.n2(4 / z)} ${GE.n2(3 / z)}\"/>`;\n    }\n    if (zn.art === 'ausschnitt') {\n      const x = Math.min(zn.start.x, m.x), y = Math.min(zn.start.y, m.y), w = Math.abs(m.x - zn.start.x), h = Math.abs(m.y - zn.start.y);\n      return `<rect x=\"${x}\" y=\"${y}\" width=\"${w}\" height=\"${h}\" fill=\"#D4A567\" fill-opacity=\".12\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(1.5 / z)}\" stroke-dasharray=\"${GE.n2(6 / z)} ${GE.n2(4 / z)}\"/>`;\n    }\n    return '';\n  }\n  function render() {\n    if (!st.breite) { overlay.innerHTML = ''; return; }\n    const z = st.zoom, W = st.breite, H = st.hoehe, teile = [];\n    if (st.rasterZeigen && st.kalib.ptProM > 0) {   // Meterraster mit 10-cm-Unterteilung (nur Anzeige, nicht im Export)\n      const m = st.kalib.ptProM, k = m / 10; let d = '';\n      for (let i = 1; i < 10; i++) d += `M${GE.n2(i * k)} 0V${GE.n2(m)}M0 ${GE.n2(i * k)}H${GE.n2(m)}`;\n      teile.push(`<defs><pattern id=\"raster\" width=\"${GE.n2(m)}\" height=\"${GE.n2(m)}\" patternUnits=\"userSpaceOnUse\"><path d=\"${d}\" stroke=\"#eef0f4\" stroke-width=\"${GE.n2(0.6 / z)}\"/><path d=\"M0 0H${GE.n2(m)}V${GE.n2(m)}\" fill=\"none\" stroke=\"#d9dde6\" stroke-width=\"${GE.n2(0.8 / z)}\"/></pattern></defs><rect width=\"${W}\" height=\"${H}\" fill=\"url(#raster)\" pointer-events=\"none\"/>`);\n    }\n    if (st.ausschnitt) { const a = st.ausschnitt; teile.push(`<path d=\"M0 0H${W}V${H}H0Z M${a.x} ${a.y}H${a.x + a.w}V${a.y + a.h}H${a.x}Z\" fill=\"#263159\" fill-opacity=\".14\" fill-rule=\"evenodd\" pointer-events=\"none\"/><rect x=\"${a.x}\" y=\"${a.y}\" width=\"${a.w}\" height=\"${a.h}\" fill=\"none\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(1.5 / z)}\" stroke-dasharray=\"${GE.n2(6 / z)} ${GE.n2(4 / z)}\" pointer-events=\"none\"/>`); }\n    for (const el of st.elemente) teile.push(elementSvg(el, el.id === st.auswahl));\n    { const um = []; for (const el of st.elemente) if (el.typ === 'wand') for (const p of primsFuer(el)) if (p.ebene) um.push(p); if (um.length) teile.push(`<g class=\"umrisse\">${GE.svgAus(um)}</g>`); }\n    if (st.zeichnung && st.maus) teile.push(vorschauSvg());\n    if (st.fang && st.werkzeug !== 'auswahl' && st.werkzeug !== 'hand') {\n      const f = st.fang; teile.push(`<g pointer-events=\"none\"><circle cx=\"${GE.n2(f.p.x)}\" cy=\"${GE.n2(f.p.y)}\" r=\"${GE.n2(5 / z)}\" fill=\"none\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(1.5 / z)}\"/><text x=\"${GE.n2(f.p.x + 8 / z)}\" y=\"${GE.n2(f.p.y + 14 / z)}\" font-family=\"Montserrat, sans-serif\" font-size=\"${GE.n2(10 / z)}\" fill=\"#a87b2e\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"${GE.n2(3 / z)}\">${f.art}</text></g>`);\n    } else if (st.fang && st.drag) {\n      const f = st.fang; teile.push(`<circle cx=\"${GE.n2(f.p.x)}\" cy=\"${GE.n2(f.p.y)}\" r=\"${GE.n2(5 / z)}\" fill=\"none\" stroke=\"#D4A567\" stroke-width=\"${GE.n2(1.5 / z)}\" pointer-events=\"none\"/>`);\n    }\n    const sel = st.auswahl && elById(st.auswahl); if (sel && st.werkzeug === 'auswahl') teile.push(griffe(sel));\n    overlay.innerHTML = teile.join('');\n    try { if (st.wolke && st.wolke.kanten && window.parent && window.parent.epWkZeichnen) window.parent.epWkZeichnen(window); } catch (e) { /* Anzeige darf das Blatt nie stören */ }\n  }\n\n  // ---------- Werkzeuge ----------\n  function setzeWerkzeug(w) {\n    if (!st.einstellungen.schnitt) st.einstellungen.schnitt = GE.NEU.schnitt();   // ältere gespeicherte Projekte kennen das Werkzeug noch nicht\n    st.werkzeug = w; st.zeichnung = null; st.fang = null; kalibPop(false);\n    document.querySelectorAll('.tool').forEach(b => b.classList.toggle('aktiv', b.dataset.tool === w));\n    overlay.dataset.werkzeug = w;\n    werkstatt.classList.toggle('hand', w === 'hand');\n    renderPanel(); render();\n  }\n  function abbrechen() {\n    if (st.zeichnung) { st.zeichnung = null; st.fang = null; kalibPop(false); render(); return; }\n    if (st.auswahl) { st.auswahl = null; renderPanel(); render(); return; }\n    setzeWerkzeug('auswahl');\n  }\n  function neuesElement(basis, extra) {\n    const el = { ...klon(basis), ...extra, id: st.naechsteId++ };\n    const sk = GE.linienSkala(st.kalib);   // Pixelquellen: Schrift und Abstände mit der Auflösung skalieren\n    if (sk > 1 && !extra.groesse) { if (el.groesse) el.groesse = Math.round(el.groesse * sk * 10) / 10; if (el.versatz) el.versatz = Math.round(el.versatz * sk); }\n    st.elemente.push(el); commit(); return el;\n  }\n  // Primitive eines Elements – Wände bekommen ihre Türöffnungen mit\n  const primsFuer = (el, elemente) => {\n    const alle = elemente || st.elemente;\n    if (el.typ === 'wand') return GE.prims(el, st.kalib, { oeffnungen: GE.wandOeffnungen(el, alle, st.kalib), enden: GE.wandEnden(el, alle, st.kalib), andere: alle.filter(w => w.typ === 'wand' && w.id !== el.id && w.stil !== 'glas' && w.stil !== 'abbruch').map(w => GE.wandUmriss(w, alle, st.kalib)).filter(Boolean) });\n    if (el.typ === 'tuer' || el.typ === 'fenster') return GE.prims(el, st.kalib, { wandDicke: GE.wandDickeAuf(el, alle, st.kalib) });\n    return GE.prims(el, st.kalib);\n  };\n  // Wand quer um ihre Dicke versetzen (richtung ±1, bezogen auf die Normale der Zeichenrichtung); Öffnungen auf der Wand wandern mit\n  function wandVersetzen(el, richtung) {\n    const L = V.dist(el.p1, el.p2); if (L < 1e-6) return;\n    const n = V.mul(V.perp(V.mul(V.sub(el.p2, el.p1), 1 / L)), richtung * GE.dickePt(el, st.kalib));\n    const mit = st.elemente.filter(o => (o.typ === 'tuer' || o.typ === 'fenster') && o.variante !== 'dach' && GE.wandOeffnungen(el, [o], st.kalib).length > 0);\n    el.p1 = V.add(el.p1, n); el.p2 = V.add(el.p2, n);\n    for (const o of mit) { o.p1 = V.add(o.p1, n); o.p2 = V.add(o.p2, n); }\n  }\n  // Alle Elemente in Zeichenreihenfolge, Wandumrisse (ebene 1) als eigene Ebene zuletzt – für PNG/PDF\n  const primsGeordnet = (els) => { const a = [], b = []; for (const el of els) for (const p of primsFuer(el, els)) (p.ebene ? b : a).push(p); return a.concat(b); };\n  // Tür: liegt sie auf einer Plan-Wand, Durchbruch (Gegenkante) automatisch bestimmen; auf gezeichneter Wand öffnet die Wand selbst\n  function tuerDurchbruch(el) {\n    if (el.variante === 'dach') { el.durchbruch = null; return; }\n    if (el.durchbruchAuto === false) return;\n    el.durchbruch = GE.tuerAufWand(el, st.elemente, st.kalib) ? null : GE.tuerDurchbruchErkennen(el, st.fangAn ? st.segmente : [], st.kalib);\n  }\n  function loescheAuswahl() {\n    if (!st.auswahl) return;\n    st.elemente = st.elemente.filter(e => e.id !== st.auswahl); st.auswahl = null; commit(); renderPanel(); render();\n  }\n  function flaecheSchliessen() {\n    const zn = st.zeichnung; if (!zn || zn.art !== 'flaeche') return;\n    if (zn.punkte.length >= 3) { const el = neuesElement(st.einstellungen.flaeche, { punkte: zn.punkte }); st.auswahl = el.id; }\n    st.zeichnung = null; st.fang = null; renderPanel(); render();\n  }\n\n  function onDown(e) {\n    if (!st.breite) return;\n    if (e.target.closest('#kalibPop')) return;\n    const p = seitenPunkt(e);\n    if (e.button === 1 || st.leertaste || st.werkzeug === 'hand') { st.pan = { x: e.clientX, y: e.clientY, sl: werkstatt.scrollLeft, stp: werkstatt.scrollTop }; werkstatt.classList.add('greift'); e.preventDefault(); return; }\n    if (e.button === 2) { if (st.zeichnung) { if (st.zeichnung.art === 'flaeche') flaecheSchliessen(); else { st.zeichnung = null; st.fang = null; render(); } } return; }\n    if (e.button !== 0) return;\n    overlay.setPointerCapture(e.pointerId);\n    const w = st.werkzeug;\n    if (w === 'auswahl') {\n      const h = e.target.closest('[data-handle]');\n      if (h && st.auswahl) { st.drag = { id: st.auswahl, handle: h.dataset.handle, start: p, vorher: klon(elById(st.auswahl)), bewegt: false }; return; }\n      const g = e.target.closest('[data-id]');\n      if (g) { const id = +g.dataset.id; st.auswahl = id; st.drag = { id, handle: 'body', start: p, vorher: klon(elById(id)), bewegt: false }; renderPanel(); render(); return; }\n      if (st.auswahl) { st.auswahl = null; renderPanel(); render(); }\n      return;\n    }\n    if (w === 'wand' || w === 'tuer' || w === 'fenster' || w === 'mass' || w === 'schraege' || w === 'treppe' || w === 'schnitt') {\n      if (!st.zeichnung) { st.zeichnung = { art: w, start: punktFrei(p) }; render(); return; }\n      const ende = aufWandRichten(w, st.zeichnung.start, p, standardEnde(w, st.zeichnung.start, punktZuStart(st.zeichnung.start, p)));\n      if (V.dist(ende, st.zeichnung.start) < 0.5) return;\n      const el = neuesElement(st.einstellungen[w], { p1: st.zeichnung.start, p2: ende });\n      if (w === 'tuer' || w === 'fenster') tuerDurchbruch(el);\n      if (w === 'schnitt') schnittZeigen(el);\n      if (w === 'wand') st.zeichnung = { art: 'wand', start: ende };          // Wandzug fortsetzen\n      else { st.zeichnung = null; st.auswahl = el.id; setzeWerkzeug('auswahl'); }\n      renderPanel(); render(); return;\n    }\n    if (w === 'flaeche') {\n      if (st.zeichnung && st.zeichnung.punkte.length >= 3 && V.dist(p, st.zeichnung.punkte[0]) < fangRadius() * 1.5) { flaecheSchliessen(); return; }\n      const q = punktFrei(p);\n      if (!st.zeichnung) { st.zeichnung = { art: 'flaeche', punkte: [q] }; render(); return; }\n      st.zeichnung.punkte.push(q); render(); return;\n    }\n    if (w === 'text') {\n      const el = neuesElement(st.einstellungen.text, { p }); st.auswahl = el.id; st.fang = null; setzeWerkzeug('auswahl');\n      const ta = panel.querySelector('[data-prop=\"text\"]'); if (ta) { ta.focus(); ta.select(); }\n      return;\n    }\n    if (w === 'kalib') {\n      if (!st.zeichnung) { st.zeichnung = { art: 'kalib', start: punktFrei(p) }; render(); return; }\n      const ende = punktZuStart(st.zeichnung.start, p);\n      st.zeichnung.ende = ende; st.zeichnung.cursor = ende; render();\n      kalibPop(true, e.clientX, e.clientY, V.dist(st.zeichnung.start, ende)); return;\n    }\n    if (w === 'ausschnitt' || w === 'abdecken') { st.zeichnung = { art: w, start: p }; st.fang = null; render(); return; }\n    if (w === 'moebel') {\n      const el = neuesElement(st.einstellungen.moebel, { p }); st.auswahl = el.id; st.fang = null; setzeWerkzeug('auswahl');\n      renderPanel(); render(); return;\n    }\n  }\n  function onMove(e) {\n    if (!st.breite) return;\n    if (e._p) { const zn = st.zeichnung; if (!st.maus || !zn) return; if (zn.art !== 'flaeche' && zn.art !== 'ausschnitt' && zn.art !== 'abdecken' && !(zn.art === 'kalib' && zn.ende)) { zn.cursor = punktZuStart(zn.start, st.maus); render(); } return; }\n    if (st.pan) { werkstatt.scrollLeft = st.pan.sl - (e.clientX - st.pan.x); werkstatt.scrollTop = st.pan.stp - (e.clientY - st.pan.y); return; }\n    const p = seitenPunkt(e); st.maus = p;\n    if (st.drag) {\n      const el = elById(st.drag.id); if (!el) return; const vh = st.drag.vorher; const d = V.sub(p, st.drag.start); const h = st.drag.handle;\n      st.drag.bewegt = true; st.fang = null;\n      if (h === 'body') {\n        if (el.typ === 'text' || el.typ === 'moebel') el.p = V.add(vh.p, d);\n        else if (el.typ === 'flaeche') el.punkte = vh.punkte.map(q => V.add(q, d));\n        else { el.p1 = V.add(vh.p1, d); el.p2 = V.add(vh.p2, d); }\n      } else if (h === 'v') {\n        const g = GE.massGeometrie({ ...el, versatz: 0 }); if (g) el.versatz = Math.round(V.dot(V.sub(p, V.mid(el.p1, el.p2)), g.n) * 10) / 10;\n      } else if (h === 'bogen' && el.typ === 'wand') {\n        const L = V.dist(el.p1, el.p2) || 1, d = V.mul(V.sub(el.p2, el.p1), 1 / L), n = V.perp(d), sCm = V.dot(V.sub(p, V.mid(el.p1, el.p2)), n) / st.kalib.ptProM * 100;\n        el.stich = Math.abs(sCm) < 2 ? 0 : Math.round(sCm);\n      } else if (h === 'p') { el.p = el.typ === 'moebel' ? p : punktFrei(p, el.id); }\n      else if (h === 'rot') { let w = Math.atan2(p.y - el.p.y, p.x - el.p.x) * 180 / Math.PI + 90; if (!st.shift) w = Math.round(w / 15) * 15; el.winkel = ((w % 360) + 360) % 360; }\n      else if (h[0] === 'v') { el.punkte[+h.slice(1)] = punktFrei(p, el.id); }\n      else if (h === 'p1' || h === 'p2') { const andere = h === 'p1' ? el.p2 : el.p1; el[h] = el.typ === 'abdecken' ? p : punktZuStart(andere, p, el.id); }\n      infoAktualisieren(el); render(); return;\n    }\n    if (st.zeichnung && st.zeichnung.art !== 'ausschnitt' && st.zeichnung.art !== 'abdecken' && !(st.zeichnung.art === 'kalib' && st.zeichnung.ende)) {\n      const zn = st.zeichnung;\n      if (zn.art === 'flaeche') zn.cursor = punktFrei(p);\n      else zn.cursor = punktZuStart(zn.start, p);\n      render(); return;\n    }\n    if (st.zeichnung && (st.zeichnung.art === 'ausschnitt' || st.zeichnung.art === 'abdecken')) { render(); return; }\n    if (st.werkzeug === 'moebel') { render(); return; }\n    if (!['auswahl', 'hand', 'text', 'ausschnitt', 'abdecken'].includes(st.werkzeug) && !(st.zeichnung && st.zeichnung.art === 'kalib' && st.zeichnung.ende)) { punktFrei(p); render(); }\n  }\n  function onUp(e) {\n    if (st.pan) { st.pan = null; werkstatt.classList.remove('greift'); return; }\n    if (st.drag) { const bewegt = st.drag.bewegt, el = elById(st.drag.id); st.drag = null; st.fang = null; if (bewegt && el && (el.typ === 'tuer' || el.typ === 'fenster')) tuerDurchbruch(el); if (bewegt) commit(); renderPanel(); render(); return; }\n    if (st.zeichnung && st.zeichnung.art === 'abdecken') {\n      const p = seitenPunkt(e), s = st.zeichnung.start; st.zeichnung = null;\n      if (Math.abs(p.x - s.x) > 2 && Math.abs(p.y - s.y) > 2) { const el = neuesElement(st.einstellungen.abdecken, { p1: s, p2: p }); st.auswahl = el.id; setzeWerkzeug('auswahl'); }\n      render(); return;\n    }\n    if (st.zeichnung && st.zeichnung.art === 'ausschnitt') {\n      const p = seitenPunkt(e), s = st.zeichnung.start; st.zeichnung = null;\n      const w = Math.abs(p.x - s.x), h = Math.abs(p.y - s.y);\n      st.ausschnitt = (w > 5 && h > 5) ? { x: Math.min(s.x, p.x), y: Math.min(s.y, p.y), w, h } : null;\n      commit(); renderPanel(); render();\n    }\n  }\n  function onDblClick(e) {\n    if (st.zeichnung && st.zeichnung.art === 'flaeche') { flaecheSchliessen(); return; }\n    if (st.zeichnung && st.zeichnung.art === 'wand') { st.zeichnung = null; st.fang = null; render(); return; }\n    if (st.werkzeug === 'auswahl' && st.auswahl) { const el = elById(st.auswahl); if (el && el.typ === 'text') { const ta = panel.querySelector('[data-prop=\"text\"]'); if (ta) { ta.focus(); ta.select(); } } }\n  }\n\n  // ---------- Kalibrier-Dialog ----------\n  function kalibPop(zeigen, cx, cy, strecke) {\n    const pop = $('#kalibPop');\n    if (!zeigen) { pop.classList.add('aus'); return; }\n    const app = $('#app').getBoundingClientRect();\n    pop.style.left = Math.max(70, Math.min(cx - app.left + 14, app.width - 300)) + 'px'; pop.style.top = Math.max(60, Math.min(cy - app.top + 14, app.height - 150)) + 'px';\n    pop.dataset.strecke = strecke;\n    $('#kalibPt').textContent = strecke.toFixed(1) + ' pt';\n    const inp = $('#kalibMeter'); inp.value = (strecke / st.kalib.ptProM).toFixed(2).replace('.', ','); pop.classList.remove('aus'); inp.focus(); inp.select();\n  }\n  function kalibUebernehmen() {\n    const strecke = parseFloat($('#kalibPop').dataset.strecke); const m = zahl($('#kalibMeter').value, 0);\n    if (!(m > 0) || !(strecke > 0)) return;\n    st.kalib = { ptProM: strecke / m, quelle: 'zweipunkt', massstab: st.pdf ? GE.massstabAusPtProM(strecke / m) : null, einheit: st.pdf ? 'pt' : 'px' };\n    st.zeichnung = null; st.fang = null; kalibPop(false); kalibChip(); renderPanel(); render(); setzeWerkzeug('auswahl');\n  }\n  function kalibChip() {\n    const c = $('#kalibChip'); const k = st.kalib;\n    const ms = k.massstab ? '1 : ' + (Math.abs(k.massstab - Math.round(k.massstab)) < 0.05 ? Math.round(k.massstab) : k.massstab.toFixed(1).replace('.', ',')) : '1 m = ' + k.ptProM.toFixed(1).replace('.', ',') + ' px';\n    c.className = 'chip ' + (k.quelle === 'angenommen' ? 'chip-amber' : 'chip-gruen');\n    c.querySelector('.chip-wert').textContent = ms;\n    c.querySelector('.chip-info').textContent = k.quelle === 'angenommen' ? 'angenommen · bitte prüfen' : (k.quelle === 'zweipunkt' ? 'kalibriert (2 Punkte)' : 'gesetzt');\n  }\n\n  // ---------- Eigenschaften-Panel ----------\n  const swatches = (aktiv) => `<div class=\"swatches\">${GE.FARBEN.map(f => `<button type=\"button\" class=\"swatch${aktiv === f.hex ? ' aktiv' : ''}\" data-prop=\"farbe\" data-wert=\"${f.hex}\" title=\"${f.name}\" style=\"background:${f.hex}\"></button>`).join('')}<label class=\"farbwahl${GE.FARBEN.some(f => f.hex === aktiv) ? '' : ' aktiv'}\" title=\"Eigene Farbe wählen\" style=\"--farbe:${aktiv}\"><input type=\"color\" data-prop=\"farbe\" value=\"${/^#[0-9a-f]{6}$/i.test(aktiv || '') ? aktiv : '#263159'}\"><span>+</span></label></div>`;\n  const feld = (label, inner) => `<label class=\"feld\"><span>${label}</span>${inner}</label>`;\n  function felder(z, istElement) {\n    let h = '';\n    if (z.typ === 'wand') {\n      h += feld('Wanddicke (cm)', `<input type=\"number\" step=\"0.5\" min=\"1\" data-prop=\"dicke\" value=\"${z.dicke}\">`);\n      if (istElement) h += feld('Bogen: Stich (cm, 0 = gerade; Vorzeichen = Seite; oder Mittelgriff ziehen)', `<input type=\"number\" step=\"1\" data-prop=\"stich\" value=\"${z.stich || 0}\">`);\n      if (istElement && z.p1 && z.p2) h += feld('Länge (m) · Winkel (°, gegen den Uhrzeigersinn)', `<div class=\"zeile\"><input type=\"number\" step=\"0.01\" min=\"0.01\" data-prop=\"laengeM\" value=\"${(V.dist(z.p1, z.p2) / st.kalib.ptProM).toFixed(2)}\"><input type=\"number\" step=\"0.5\" data-prop=\"winkelGrad\" value=\"${wandWinkel(z)}\"></div>`);\n      h += feld('Darstellung', `<select data-prop=\"stil\">${GE.STILE.map(s => `<option value=\"${s.key}\"${z.stil === s.key ? ' selected' : ''}>${s.name}</option>`).join('')}</select>`);\n      h += feld('Farbe', swatches(z.farbe));\n      if (istElement) h += `<div class=\"knopfzeile\"><button type=\"button\" class=\"btn\" data-aktion=\"wandmass\">Maß an dieser Wand anlegen</button></div>`\n        + `<div class=\"knopfzeile\"><button type=\"button\" class=\"btn\" data-aktion=\"wandSeiteA\" title=\"Wand quer um eine Wanddicke versetzen\">◀ um Dicke versetzen</button><button type=\"button\" class=\"btn\" data-aktion=\"wandSeiteB\" title=\"Wand quer um eine Wanddicke versetzen\">um Dicke versetzen ▶</button></div>`\n        + `<p class=\"hinweis klein\">Steht die Wand auf der falschen Seite der Wolkenkante (Innenmaß um eine Wanddicke zu klein), versetzt ein Klick sie um genau ihre Dicke; Türen und Fenster auf der Wand wandern mit.</p>`;\n    } else if (z.typ === 'abdecken') {\n      h += `<p class=\"hinweis\">Deckt den Bereich im Export weiß ab. Ecken an den Griffen ziehen.</p>`;\n    } else if (z.typ === 'tuer' || z.typ === 'fenster') {\n      const arten = z.typ === 'tuer' ? GE.TUEREN : GE.FENSTER;\n      h += feld(z.typ === 'tuer' ? 'Türart' : 'Fensterart', `<select data-prop=\"variante\">${arten.map(([k, n]) => `<option value=\"${k}\"${(z.variante || arten[0][0]) === k ? ' selected' : ''}>${n}</option>`).join('')}</select>`);\n      { const masse = z.typ === 'tuer' ? GE.TUERBREITEN : GE.FENSTERBREITEN, bc = +z.breiteCm || 0, std = masse.includes(bc);\n        h += feld(istElement ? 'Breite (cm) – Standardmaß wählen oder eintragen' : 'Breite (cm) – Standardmaß, 0 = frei aus der Strecke', `<div class=\"zeile\"><select data-prop=\"breiteStd\"><option value=\"0\"${bc === 0 ? ' selected' : ''}>frei</option>${masse.map(m => `<option value=\"${m}\"${bc === m ? ' selected' : ''}>${m.toLocaleString('de-DE')} cm</option>`).join('')}${bc && !std ? `<option value=\"${bc}\" selected>${bc.toLocaleString('de-DE')} cm</option>` : ''}</select><input type=\"number\" step=\"0.5\" min=\"0\" data-prop=\"breiteCm\" value=\"${bc || ''}\" placeholder=\"cm\"></div>`);\n        h += feld(z.typ === 'tuer' ? 'Höhe (cm, nur Info)' : 'Höhe · Brüstung (cm, nur Info)', z.typ === 'tuer' ? `<input type=\"number\" step=\"0.5\" min=\"0\" data-prop=\"hoeheCm\" value=\"${z.hoeheCm || ''}\" placeholder=\"z. B. 201\">` : `<div class=\"zeile\"><input type=\"number\" step=\"0.5\" min=\"0\" data-prop=\"hoeheCm\" value=\"${z.hoeheCm || ''}\" placeholder=\"Höhe\"><input type=\"number\" step=\"0.5\" min=\"0\" data-prop=\"bruestungCm\" value=\"${z.bruestungCm || ''}\" placeholder=\"Brüstung\"></div>`); }\n      if (z.typ === 'fenster' && z.variante === 'dach') h += feld('Dachflächenfenster: Größe (Breite × Höhe cm) · Tiefe im Grundriss (cm)', `<div class=\"zeile\"><select data-prop=\"dachGroesse\"><option value=\"\">Größe wählen …</option>${GE.DACHFENSTER.map(([b, t]) => `<option value=\"${b}x${t}\"${(+z.breiteCm === b && +z.tiefeCm === t) ? ' selected' : ''}>${b} × ${t}</option>`).join('')}</select><input type=\"number\" step=\"0.5\" min=\"10\" data-prop=\"tiefeCm\" value=\"${z.tiefeCm || 118}\"></div>`) + `<p class=\"hinweis klein\">Zwei Klicks setzen die untere Kante (Breite = Standardmaß oder Strecke); das Fenster liegt zur Aufschlagseite („Seite spiegeln“). Gestrichelt, weil es über dem Raum liegt – öffnet keine Wand.</p>`;\n      h += feld('Farbe', swatches(z.farbe));\n      h += `<div class=\"knopfzeile\"><button type=\"button\" class=\"btn\" data-aktion=\"spiegeln\">${z.typ === 'tuer' ? 'Aufschlag spiegeln' : 'Seite spiegeln'}</button>${istElement ? '<button type=\"button\" class=\"btn\" data-aktion=\"anschlag\">Anschlag wechseln</button>' : ''}</div>`;\n      if (istElement && z.variante !== 'dach') {\n        if (GE.tuerAufWand(z, st.elemente, st.kalib)) h += `<p class=\"hinweis klein\">Liegt auf einer gezeichneten Wand – die Wand öffnet sich in ${z.typ === 'tuer' ? 'Türbreite' : 'Fensterbreite'} automatisch.</p>`;\n        else {\n          h += feld('Wandöffnung in der Plan-Wand (cm, 0 = keine)', `<input type=\"number\" step=\"0.5\" min=\"0\" data-prop=\"durchbruchTiefe\" value=\"${z.durchbruch ? z.durchbruch.tiefe : 0}\">`);\n          h += `<div class=\"knopfzeile\"><button type=\"button\" class=\"btn\" data-aktion=\"durchbruchSeite\">Öffnung: andere Seite</button></div>`;\n          h += `<p class=\"hinweis klein\">${z.durchbruch ? 'Gegenkante der Wand automatisch erkannt – die Wand wird in Elementbreite weiß geöffnet, Laibungen in Elementfarbe.' : 'Keine Gegenkante gefunden. Wanddicke eintragen, um die Plan-Wand hier zu öffnen.'}</p>`;\n        }\n      }\n    } else if (z.typ === 'treppe') {\n      h += feld('Art', `<select data-prop=\"variante\">${[['gerade', 'Gerade Treppe (Antritt → Austritt)'], ['spindel', 'Spindeltreppe (Mitte → Radius)']].map(([k, n]) => `<option value=\"${k}\"${(z.variante || 'gerade') === k ? ' selected' : ''}>${n}</option>`).join('')}</select>`);\n      if ((z.variante || 'gerade') === 'gerade') h += feld('Laufbreite (cm)', `<input type=\"number\" step=\"1\" min=\"40\" data-prop=\"breite\" value=\"${z.breite || 100}\">`);\n      h += feld('Stufen (0 = aus der Lauflänge, Auftritt ≈ 28 cm)', `<input type=\"number\" step=\"1\" min=\"0\" data-prop=\"stufen\" value=\"${z.stufen || 0}\">`);\n      h += feld('Lage im Geschoss (Wohnfläche)', `<select data-prop=\"lage\">${[['antritt', 'Antritt hier – Treppe führt nach oben (Fläche darunter nach lichter Höhe)'], ['austritt', 'Austritt hier – Treppe kommt von unten (Luftraum, keine Wohnfläche)']].map(([k, nm]) => `<option value=\"${k}\"${(z.lage || 'antritt') === k ? ' selected' : ''}>${nm}</option>`).join('')}</select>`);\n      if ((z.variante || 'gerade') === 'gerade' && (z.lage || 'antritt') === 'antritt') h += feld('Steigung (cm) · Laufplattendicke (cm) – lichte Höhe darunter: unter 1 m nicht, 1–2 m zur Hälfte', `<div class=\"zeile\"><input type=\"number\" step=\"0.5\" min=\"10\" max=\"25\" data-prop=\"steigung\" value=\"${z.steigung > 0 ? z.steigung : 18}\"><input type=\"number\" step=\"1\" min=\"0\" max=\"60\" data-prop=\"platte\" value=\"${z.platte >= 0 ? z.platte : 20}\"></div>`);\n      h += feld('Beschriftung (leer = automatisch)', `<input type=\"text\" data-prop=\"text\" value=\"${GE.esc(z.text || '')}\" placeholder=\"14 Stg · 29 cm\">`);\n      h += feld('Farbe', swatches(z.farbe));\n      if (istElement) h += `<p class=\"hinweis klein\">Griffe ziehen verschiebt Antritt und Austritt. Für ein Podest zwei gerade Treppen hintereinander zeichnen.</p>`;\n    } else if (z.typ === 'schraege') {\n      h += feld('Lichte Höhe der Linie', `<select data-prop=\"hoeheM\">${[[2, '2,00 m – ab hier zählt die Fläche nur halb'], [1, '1,00 m – ab hier zählt die Fläche nicht'], [1.5, '1,50 m'], [2.3, '2,30 m']].map(([v, n]) => `<option value=\"${v}\"${(+z.hoeheM || 2) === v ? ' selected' : ''}>${n}</option>`).join('')}</select>`);\n      h += feld('Beschriftung (leer = automatisch)', `<input type=\"text\" data-prop=\"text\" value=\"${GE.esc(z.text || '')}\" placeholder=\"lichte Höhe 2,00 m\">`);\n      h += feld('Schriftgröße (pt)', `<input type=\"number\" step=\"0.5\" min=\"3\" data-prop=\"groesse\" value=\"${z.groesse || 6}\">`);\n      h += feld('Farbe', swatches(z.farbe));\n      h += `<p class=\"hinweis klein\">Im Dachgeschoss: Linie dort zeichnen, wo die Schräge 2,00 m lichte Höhe unterschreitet (Fläche zählt halb), und eine zweite bei 1,00 m (zählt nicht). Dachflächenfenster liegen unter Einrichtung → Dach.</p>`;\n    } else if (z.typ === 'schnitt') {\n      h += feld('Kennung (z. B. A, B)', `<input type=\"text\" data-prop=\"text\" value=\"${GE.esc(z.text || '')}\" placeholder=\"A\">`);\n      h += feld('Schriftgröße (pt)', `<input type=\"number\" step=\"0.5\" min=\"3\" data-prop=\"groesse\" value=\"${z.groesse}\">`);\n      h += feld('Farbe', swatches(z.farbe));\n      if (z.id != null) h += `<div class=\"knopfzeile\"><button type=\"button\" class=\"btn\" data-aktion=\"schnittZeigen\" data-ep-schnitt-zeigen title=\"Senkrechter Schnitt durch die Punktwolke entlang dieser Linie im 3D-Fenster\">Schnitt im 3D-Fenster</button></div>`;\n    } else if (z.typ === 'mass') {\n      h += feld('Maßtext (leer = automatisch)', `<input type=\"text\" data-prop=\"text\" value=\"${GE.esc(z.text || '')}\" placeholder=\"automatisch\">`);\n      h += feld('Schriftgröße (pt)', `<input type=\"number\" step=\"0.5\" min=\"3\" data-prop=\"groesse\" value=\"${z.groesse}\">`);\n      h += feld('Abstand Maßlinie (pt)', `<input type=\"number\" step=\"1\" data-prop=\"versatz\" value=\"${z.versatz}\">`);\n      h += feld('Farbe', swatches(z.farbe));\n    } else if (z.typ === 'text') {\n      h += feld('Text', `<textarea rows=\"2\" data-prop=\"text\">${GE.esc(z.text || '')}</textarea>`);\n      h += feld('Schriftgröße (pt)', `<input type=\"number\" step=\"0.5\" min=\"3\" data-prop=\"groesse\" value=\"${z.groesse}\">`);\n      h += feld('Drehung', `<select data-prop=\"winkel\">${[[0, 'waagerecht'], [-90, 'senkrecht (von unten lesbar)'], [90, 'senkrecht (von oben lesbar)'], [-45, '45° steigend'], [45, '45° fallend']].map(([w, n]) => `<option value=\"${w}\"${(z.winkel || 0) === w ? ' selected' : ''}>${n}</option>`).join('')}</select>`);\n      h += `<label class=\"check\"><input type=\"checkbox\" data-prop=\"halo\"${z.halo !== false ? ' checked' : ''}> Weißer Hintergrund hinter der Schrift</label>`;\n      h += feld('Farbe', swatches(z.farbe));\n    } else if (z.typ === 'moebel') {\n      const gruppen = [...new Set(GE.MOEBEL.KATALOG.map(k => k.gruppe))];\n      h += feld('Möbelstück', `<select data-prop=\"art\">${gruppen.map(g => `<optgroup label=\"${g}\">${GE.MOEBEL.KATALOG.filter(k => k.gruppe === g).map(k => `<option value=\"${k.key}\"${z.art === k.key ? ' selected' : ''}>${k.name}</option>`).join('')}</optgroup>`).join('')}</select>`);\n      h += `<div class=\"zeile2\">${feld('Breite (cm)', `<input type=\"number\" step=\"1\" min=\"5\" data-prop=\"breite\" value=\"${z.breite}\">`)}${feld('Tiefe (cm)', `<input type=\"number\" step=\"1\" min=\"5\" data-prop=\"tiefe\" value=\"${z.tiefe}\">`)}</div>`;\n      h += feld('Drehung (°)', `<div class=\"zeile\"><input type=\"number\" step=\"15\" data-prop=\"winkel\" value=\"${z.winkel || 0}\"><button type=\"button\" class=\"btn\" data-aktion=\"drehen\" title=\"90° drehen (R)\">↻ 90°</button></div>`);\n      h += feld('Beschriftung (optional)', `<input type=\"text\" data-prop=\"text\" value=\"${GE.esc(z.text || '')}\" placeholder=\"z. B. Sideboard\">`);\n      h += `<label class=\"check\"><input type=\"checkbox\" data-prop=\"fuellen\"${z.fuellen !== false ? ' checked' : ''}> Weiß hinterlegen (verdeckt den Plan darunter)</label>`;\n      h += feld('Farbe', swatches(z.farbe));\n    } else if (z.typ === 'flaeche') {\n      h += feld('Raumname (m² werden ergänzt)', `<input type=\"text\" data-prop=\"text\" value=\"${GE.esc(z.text || '')}\" placeholder=\"z. B. Wohnen\">`);\n      h += `<label class=\"check\"><input type=\"checkbox\" data-prop=\"fuellen\"${z.fuellen !== false ? ' checked' : ''}> Fläche leicht einfärben</label>`;\n      if (z.id != null) h += feld('WoFlV-Abzug (m², leer = Grundfläche zeigen)', `<input type=\"number\" step=\"0.01\" min=\"0\" data-prop=\"wohnAbzugM2\" value=\"${z.wohnAbzugM2 != null ? z.wohnAbzugM2 : ''}\" placeholder=\"aus „Schrägen“\">`);\n      h += feld('Schriftgröße (pt)', `<input type=\"number\" step=\"0.5\" min=\"3\" data-prop=\"groesse\" value=\"${z.groesse}\">`);\n      h += feld('Farbe', swatches(z.farbe));\n    }\n    return h;\n  }\n  // Seite der Wand relativ zu perp(p1→p2): entgegen der Aufschlagseite\n  const tuerWandSeite = (el) => { const g = GE.tuerGeometrie(el); if (!g) return 1; const q = V.rot(g.d, el.spiegeln ? 90 : -90); return V.dot(q, V.perp(g.d)) > 0 ? -1 : 1; };\n  function infoText(el) {\n    const k = st.kalib.ptProM;\n    if (el.typ === 'moebel') { const kat = GE.MOEBEL.byKey[el.art]; return (kat ? kat.name.replace(/ \\d.*$/, '') : 'Möbel') + ' · ' + el.breite + ' × ' + el.tiefe + ' cm'; }\n    if (el.typ === 'wand' || el.typ === 'tuer' || el.typ === 'fenster') return (el.typ === 'wand' ? (GE.bogenDaten(el, st.kalib) ? 'Bogenwand · Sehne ' : 'Länge ') : 'Breite ') + GE.formatMeter(V.dist(el.p1, el.p2) / k) + (el.typ === 'wand' && GE.bogenDaten(el, st.kalib) ? ' · Bogen ' + GE.formatMeter(GE.bogenDaten(el, st.kalib).laenge / k) + ' · Stich ' + Math.abs(Math.round(el.stich)) + ' cm · R ' + GE.formatMeter(GE.bogenDaten(el, st.kalib).r / k) : '') + (el.hoeheCm ? ' · Höhe ' + el.hoeheCm.toLocaleString('de-DE') + ' cm' : '') + (el.bruestungCm ? ' · Brüstung ' + el.bruestungCm.toLocaleString('de-DE') + ' cm' : '');\n    if (el.typ === 'treppe') { const Lm = V.dist(el.p1, el.p2) / k; const tw = (() => { if (el.lage === 'austritt') return ' · Luftraum, keine Wohnfläche'; if (el.variante === 'spindel') return ' · Grundfläche zählt nicht'; const nS = el.stufen > 0 ? el.stufen : Math.max(2, Math.round(Lm / 0.28)), a = Lm / nS, stg = (el.steigung > 0 ? el.steigung : 18) / 100, pl = (el.platte >= 0 ? el.platte : 20) / 100; return ' · darunter bis ' + GE.formatMeter(Math.min(Lm, (1 + pl) * a / stg)) + ' keine, bis ' + GE.formatMeter(Math.min(Lm, (2 + pl) * a / stg)) + ' zur Hälfte'; })(); return el.variante === 'spindel' ? 'Spindeltreppe · Ø ' + GE.formatMeter(2 * Lm) + tw : 'Treppe · Lauflänge ' + GE.formatMeter(Lm) + tw + ' · ' + (el.stufen > 0 ? el.stufen : Math.max(2, Math.round(Lm / 0.28))) + ' Stufen · Laufbreite ' + (el.breite || 100) + ' cm'; }\n    if (el.typ === 'schraege') return 'Dachschräge · lichte Höhe ' + (+el.hoeheM || 2).toLocaleString('de-DE', { minimumFractionDigits: 2 }) + ' m · Länge ' + GE.formatMeter(V.dist(el.p1, el.p2) / k);\n    if (el.typ === 'mass') return 'gemessen ' + GE.formatMeter(V.dist(el.p1, el.p2) / k);\n    if (el.typ === 'schnitt') return 'Schnittlinie · Länge ' + GE.formatMeter(V.dist(el.p1, el.p2) / k) + ' · Schnitt im 3D-Fenster der Punktwolke';\n    if (el.typ === 'flaeche') return 'Fläche ' + GE.formatFlaeche(GE.flaecheInhalt(el.punkte) / (k * k));\n    return '';\n  }\n  function infoAktualisieren(el) { const s = $('#elInfo'); if (s && el) s.textContent = infoText(el); }\n  function renderPanel() {\n    const el = st.auswahl ? elById(st.auswahl) : null;\n    const wz = WERKZEUGE[st.werkzeug];\n    const ziel = el || (st.einstellungen[st.werkzeug] || null);\n    let h = `<div class=\"abschnitt\"><div class=\"abschnitt-titel\">${el ? 'Auswahl · ' + NAME[el.typ] : 'Werkzeug · ' + wz.name}</div>`;\n    if (ziel) h += `<div class=\"felder\" data-ziel=\"${el ? 'element' : 'werkzeug'}\">${felder(ziel, !!el)}</div>`;\n    if (el) h += `<div class=\"elinfo\" id=\"elInfo\">${infoText(el)}</div><button type=\"button\" class=\"btn btn-rot\" data-aktion=\"loeschen\">Löschen (Entf)</button>`;\n    else {\n      h += `<p class=\"hinweis\">${wz.hinweis}</p>`;\n      if (st.werkzeug === 'kalib') h += `<div class=\"felder\"><label class=\"feld\"><span>Zeichnungsmaßstab 1 : …</span><div class=\"zeile\"><input type=\"number\" id=\"kalibMassstab\" value=\"${st.kalib.massstab ? Math.round(st.kalib.massstab) : 100}\" min=\"1\"><button type=\"button\" class=\"btn\" data-aktion=\"massstab\">Setzen</button></div></label><p class=\"hinweis klein\">Gilt für PDFs, die maßstäblich exportiert wurden (Blatt = Papierformat). Bei Scans oder Fotos immer über zwei Punkte kalibrieren.</p></div>`;\n      if (st.werkzeug === 'ausschnitt' && st.ausschnitt) h += `<button type=\"button\" class=\"btn\" data-aktion=\"ausschnittWeg\">Ausschnitt entfernen</button>`;\n    }\n    h += '</div>';\n    h += `<div class=\"abschnitt\"><div class=\"abschnitt-titel\">Zeichnen</div>${st.wolke && st.wolke.kanten && st.wolke.kanten.length ? `<label class=\"check\"><input type=\"checkbox\" data-opt=\"kantenFang\"${st.kantenFang !== false ? ' checked' : ''}> Wände rasten zwingend auf die Schnittkanten der Wolke ein (Innenseite = Wandfläche, ${st.wolke.kanten.length} Kanten)</label><label class=\"check\"><input type=\"checkbox\" data-opt=\"kantenZeigen\"${st.kantenZeigen !== false ? ' checked' : ''}> Schnittkanten zeigen (rot strichpunktiert, nicht im Export)</label>${st.wolke.kantenAlle && st.wolke.kantenAlle.length > (st.wolke.kantenAussen || []).length ? `<label class=\"check\"><input type=\"checkbox\" data-opt=\"kantenInnen\"${st.kantenInnen ? ' checked' : ''}> auch erkannte Innenwände als Schnittkanten (${st.wolke.kantenAlle.length - (st.wolke.kantenAussen || []).length} weitere – Kamin, Treppe, Schränke prüfen)</label>` : ''}` : ''}<label class=\"check\"><input type=\"checkbox\" data-opt=\"ortho\"${st.ortho ? ' checked' : ''}> Rechtwinklig zeichnen (Taste O, Shift hebt auf; schräge Wolken- und Planlinien gehen vor)</label><label class=\"check\"><input type=\"checkbox\" data-opt=\"fangAn\"${st.fangAn ? ' checked' : ''}> An Plan-Linien fangen${st.breite && !st.blank ? ` <em>${st.segmente.length ? st.segmente.length.toLocaleString('de-DE') + (st.fangArt === 'raster' ? ' Kanten im Bild erkannt' : ' Linien erkannt') : (st.fangArt ? 'keine Linien erkannt' : 'werden gelesen …')}</em>` : ''}</label><label class=\"feld\"><span>Raster (fängt, wenn sonst nichts fängt)</span><div class=\"zeile\"><select data-opt-zahl=\"rasterCm\">${[[0, 'aus'], [1, '1 cm'], [5, '5 cm'], [10, '10 cm'], [25, '25 cm'], [50, '50 cm'], [100, '1 m']].map(([v, n]) => `<option value=\"${v}\"${st.rasterCm === v ? ' selected' : ''}>${n}</option>`).join('')}</select><label class=\"check\" style=\"margin:0\"><input type=\"checkbox\" data-opt=\"rasterZeigen\"${st.rasterZeigen ? ' checked' : ''}> anzeigen</label></div></label></div>`;\n    const anz = {}; for (const e of st.elemente) anz[e.typ] = (anz[e.typ] || 0) + 1;\n    const mm = st.blank ? `${st.blank.name}, leer` : st.pdf ? `${(st.breite / GE.PT_PRO_MM).toFixed(0)} × ${(st.hoehe / GE.PT_PRO_MM).toFixed(0)} mm` : `${st.breite} × ${st.hoehe} px`;\n    h += `<div class=\"abschnitt\"><div class=\"abschnitt-titel\">Plan</div><div class=\"kv\"><span>Datei</span><b>${GE.esc(st.dateiName || '–')}</b><span>Blatt</span><b>${st.breite ? mm : '–'}</b><span>Maßstab</span><b>1 m = ${st.kalib.ptProM.toFixed(2).replace('.', ',')} ${st.pdf ? 'pt' : 'px'}</b><span>Elemente</span><b>${Object.keys(anz).length ? Object.entries(anz).map(([t, n]) => n + ' ' + PLURAL[t][n > 1 ? 1 : 0]).join(', ') : 'noch keine'}</b></div>${st.bild ? `<label class=\"check\"><input type=\"checkbox\" data-opt=\"aufhellen\"${st.aufhellen ? ' checked' : ''}> Scan aufhellen (Papiergrau → Weiß)</label>` : ''}<button type=\"button\" class=\"btn\" data-aktion=\"kalibrieren\">Maßstab kalibrieren</button></div>`;\n    panel.innerHTML = h;\n  }\n  function panelZiel() { const f = panel.querySelector('.felder'); if (!f) return null; return f.dataset.ziel === 'element' ? elById(st.auswahl) : st.einstellungen[st.werkzeug]; }\n  function panelInput(e) {\n    const t = e.target; const prop = t.dataset.prop; if (!prop) return;\n    const ziel = panelZiel(); if (!ziel) return;\n    if (t.type === 'checkbox') ziel[prop] = t.checked;\n    else if (prop === 'durchbruchTiefe') { const tiefe = zahl(t.value, 0); ziel.durchbruchAuto = false; ziel.durchbruch = tiefe > 0 ? { tiefe, richtung: (ziel.durchbruch && ziel.durchbruch.richtung) || tuerWandSeite(ziel) } : null; }\n    else if (prop === 'art') { ziel.art = t.value; const kat = GE.MOEBEL.byKey[t.value]; if (kat) { ziel.breite = kat.b; ziel.tiefe = kat.t; } renderPanel(); }\n    else if (prop === 'laengeM' || prop === 'winkelGrad') { if (ziel.p1 && ziel.p2) { const L0 = V.dist(ziel.p1, ziel.p2), L = prop === 'laengeM' ? zahl(t.value, L0 / st.kalib.ptProM) * st.kalib.ptProM : L0, w = (prop === 'winkelGrad' ? zahl(t.value, wandWinkel(ziel)) : wandWinkel(ziel)) * Math.PI / 180; if (L > 0.01) ziel.p2 = { x: ziel.p1.x + Math.cos(w) * L, y: ziel.p1.y - Math.sin(w) * L }; } }\n    else if (prop === 'variante') { ziel.variante = t.value; if (ziel.typ === 'fenster' && t.value === 'dach') ziel.durchbruch = null; if (ziel.typ === 'fenster' || ziel.typ === 'treppe') renderPanel(); }\n    else if (prop === 'dachGroesse') { const mm = String(t.value).split('x').map(Number); if (mm.length === 2 && mm[0] > 0) { ziel.breiteCm = mm[0]; ziel.tiefeCm = mm[1]; if (ziel.p1 && ziel.p2) { const L = V.dist(ziel.p1, ziel.p2); if (L > 1e-6) ziel.p2 = V.add(ziel.p1, V.mul(V.sub(ziel.p2, ziel.p1), mm[0] / 100 * st.kalib.ptProM / L)); } renderPanel(); } }\n    else if (prop === 'tiefeCm') ziel.tiefeCm = zahl(t.value, 118);\n    else if (prop === 'stufen') ziel.stufen = Math.max(0, Math.round(zahl(t.value, 0)));\n    else if (prop === 'breiteStd' || prop === 'breiteCm') { const b = prop === 'breiteStd' ? +t.value : zahl(t.value, 0); ziel.breiteCm = b > 0 ? b : 0; if (ziel.p1 && ziel.p2 && b > 0) { const L = V.dist(ziel.p1, ziel.p2); if (L > 1e-6) ziel.p2 = V.add(ziel.p1, V.mul(V.sub(ziel.p2, ziel.p1), b / 100 * st.kalib.ptProM / L)); tuerDurchbruch(ziel); } renderPanel(); }\n    else if (prop === 'hoeheCm' || prop === 'bruestungCm') ziel[prop] = zahl(t.value, 0);\n    else if (prop === 'hoeheM') ziel.hoeheM = zahl(t.value, 2);\n    else if (prop === 'wohnAbzugM2') { const v = String(t.value).trim(); if (v === '') delete ziel.wohnAbzugM2; else ziel.wohnAbzugM2 = Math.max(0, zahl(v, 0)); }\n    else if (prop === 'lage') { ziel.lage = t.value === 'austritt' ? 'austritt' : 'antritt'; renderPanel(); }\n    else if (prop === 'stich') { const v = zahl(t.value, 0); ziel.stich = Math.abs(v) < 0.5 ? 0 : Math.round(v); }\n    else if (prop === 'steigung') ziel.steigung = Math.max(10, Math.min(25, zahl(t.value, 18)));\n    else if (prop === 'platte') ziel.platte = Math.max(0, Math.min(60, zahl(t.value, 20)));\n    else if (prop === 'dicke' || prop === 'groesse' || prop === 'versatz' || prop === 'winkel' || prop === 'breite' || prop === 'tiefe') ziel[prop] = zahl(t.value, ziel[prop]);\n    else ziel[prop] = t.value;\n    if (prop === 'farbe') { const box = t.closest('.swatches'); if (box) { box.querySelectorAll('.swatch').forEach(s => s.classList.toggle('aktiv', s.dataset.wert === t.value)); const fw = box.querySelector('.farbwahl'); fw.classList.toggle('aktiv', !GE.FARBEN.some(f => f.hex === t.value)); fw.style.setProperty('--farbe', t.value); } }\n    if (st.auswahl) { infoAktualisieren(ziel); render(); }\n  }\n  function panelClick(e) {\n    const b = e.target.closest('button'); if (!b) return;\n    if (b.dataset.prop === 'farbe') { const ziel = panelZiel(); if (ziel) { ziel.farbe = b.dataset.wert; b.parentElement.querySelectorAll('.swatch').forEach(s => s.classList.toggle('aktiv', s === b)); const fw = b.parentElement.querySelector('.farbwahl'); if (fw) { fw.classList.remove('aktiv'); fw.querySelector('input').value = b.dataset.wert; fw.style.setProperty('--farbe', b.dataset.wert); } if (st.auswahl) { render(); commit(); } } return; }\n    const a = b.dataset.aktion; const el = st.auswahl ? elById(st.auswahl) : null;\n    if (a === 'loeschen') loescheAuswahl();\n    else if (a === 'spiegeln') { const z = panelZiel(); if (z) { z.spiegeln = !z.spiegeln; if (el) { render(); commit(); } } }\n    else if (a === 'anschlag' && el) { const t = el.p1; el.p1 = el.p2; el.p2 = t; el.spiegeln = !el.spiegeln; if (el.durchbruch) el.durchbruch.richtung = -el.durchbruch.richtung; render(); commit(); }\n    else if (a === 'durchbruchSeite' && el && (el.typ === 'tuer' || el.typ === 'fenster')) { el.durchbruchAuto = false; if (el.durchbruch) el.durchbruch.richtung = -el.durchbruch.richtung; else el.durchbruch = { tiefe: 24, richtung: -tuerWandSeite(el) }; renderPanel(); render(); commit(); }\n    else if (a === 'drehen') { const z = panelZiel(); if (z) { z.winkel = (((z.winkel || 0) + 90) % 360); renderPanel(); if (el) { render(); commit(); } } }\n    else if (a === 'schnittZeigen' && el && el.typ === 'schnitt') schnittZeigen(el);\n    else if ((a === 'wandSeiteA' || a === 'wandSeiteB') && el && el.typ === 'wand') { wandVersetzen(el, a === 'wandSeiteA' ? -1 : 1); render(); commit(); }\n    else if (a === 'wandmass' && el && el.typ === 'wand') { const m = neuesElement(st.einstellungen.mass, { p1: klon(el.p1), p2: klon(el.p2), versatz: Math.round(GE.dickePt(el, st.kalib) / 2 + 12) }); st.auswahl = m.id; renderPanel(); render(); }\n    else if (a === 'kalibrieren') setzeWerkzeug('kalib');\n    else if (a === 'massstab') { const m = zahl($('#kalibMassstab').value, 0); if (m > 0) { st.kalib = { ptProM: GE.ptProMausMassstab(m), quelle: 'massstab', massstab: m, einheit: st.pdf ? 'pt' : 'px' }; kalibChip(); renderPanel(); render(); } }\n    else if (a === 'ausschnittWeg') { st.ausschnitt = null; commit(); renderPanel(); render(); }\n  }\n\n  // ---------- Export ----------\n  function download(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000); }\n  function svgAufCanvas(svg, ctx, w, h) {\n    return new Promise((ok, err) => { const im = new Image(); const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' })); im.onload = () => { ctx.drawImage(im, 0, 0, w, h); URL.revokeObjectURL(url); ok(); }; im.onerror = () => { URL.revokeObjectURL(url); err(new Error('Beschriftungen konnten nicht gerendert werden.')); }; im.src = url; });\n  }\n  async function exportPng() {\n    if (!st.breite) return;\n    zeigeLaden(true, 'PNG wird erzeugt …');\n    try {\n      const lang = +$('#exportGroesse').value || 4000;\n      const reg = st.ausschnitt || { x: 0, y: 0, w: st.breite, h: st.hoehe };\n      const S = lang / Math.max(reg.w, reg.h);\n      const c = document.createElement('canvas'); c.width = Math.round(reg.w * S); c.height = Math.round(reg.h * S);\n      const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);\n      if (st.seite) await st.seite.render({ canvasContext: ctx, viewport: st.seite.getViewport({ scale: S, offsetX: -reg.x * S, offsetY: -reg.y * S }) }).promise;\n      else if (st.bild) ctx.drawImage(seiteCanvas, reg.x, reg.y, reg.w, reg.h, 0, 0, c.width, c.height);\n      const svg = `<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"${c.width}\" height=\"${c.height}\" viewBox=\"${reg.x} ${reg.y} ${reg.w} ${reg.h}\">${GE.svgAus(primsGeordnet(st.elemente))}</svg>`;\n      await svgAufCanvas(svg, ctx, c.width, c.height);\n      await new Promise(ok => c.toBlob(b => { download(b, st.dateiName + '_bearbeitet.png'); ok(); }, 'image/png'));\n    } catch (e) { alert('PNG-Export fehlgeschlagen: ' + e.message); } finally { zeigeLaden(false); }\n  }\n  async function exportPdf(opt) {\n    const nurBytes = !!(opt && opt.nurBytes === true);\n    if (!st.breite) return null;\n    zeigeLaden(true, 'PDF wird geschrieben …');\n    try {\n      const { PDFDocument, StandardFonts } = PDFLib;\n      st.proSeite[st.seiteNr] = st.elemente;\n      let doc;\n      if (st.pdfBytes) {\n        doc = await PDFDocument.load(st.pdfBytes, { ignoreEncryption: true });\n        const font = await doc.embedFont(StandardFonts.Helvetica); const pages = doc.getPages();\n        for (const [nr, els] of Object.entries(st.proSeite)) {\n          if (!els.length) continue;\n          const pg = pages[nr - 1]; if (!pg) continue;\n          const vp = (+nr === st.seiteNr) ? st.viewport : (await st.pdf.getPage(+nr)).getViewport({ scale: 1 });\n          const toPdf = (p) => vp.convertToPdfPoint(p.x, p.y);\n          GE.pdfZeichnen(primsGeordnet(els), pg, font, toPdf, PDFLib);\n        }\n      } else {\n        doc = await PDFDocument.create();\n        const pg = doc.addPage([st.breite, st.hoehe]);\n        if (st.bild) { const png = await new Promise(ok => seiteCanvas.toBlob(b => b.arrayBuffer().then(ok), 'image/png')); const img = await doc.embedPng(png); pg.drawImage(img, { x: 0, y: 0, width: st.breite, height: st.hoehe }); }\n        const font = await doc.embedFont(StandardFonts.Helvetica); const toPdf = (p) => [p.x, st.hoehe - p.y];\n        GE.pdfZeichnen(primsGeordnet(st.elemente), pg, font, toPdf, PDFLib);\n      }\n      const bytes = await doc.save(); if (nurBytes) return bytes;\n      download(new Blob([bytes], { type: 'application/pdf' }), st.dateiName + '_bearbeitet.pdf');\n    } catch (e) { if (nurBytes) throw e; alert('PDF-Export fehlgeschlagen: ' + e.message); } finally { zeigeLaden(false); }\n    return null;\n  }\n  function projektSpeichern() {\n    st.proSeite[st.seiteNr] = st.elemente;\n    const p = { app: 'grundriss-editor', version: 2, datei: st.dateiName, kalib: st.kalib, ausschnitt: st.ausschnitt, proSeite: st.proSeite, naechsteId: st.naechsteId, blank: st.blank, rasterCm: st.rasterCm, einstellungen: st.einstellungen };\n    let wolkeText = '';\n    if (window.epPwStandSichern) { try { const w = window.epPwStandSichern(); if (w) { p.punktwolke = w; wolkeText = ' – mit Punktwolke (' + (w.punkte || 0).toLocaleString('de-DE') + ' Punkte)'; } } catch (e) { console.warn('Punktwolke im Stand', e); } }\n    download(new Blob([JSON.stringify(p, null, 1)], { type: 'application/json' }), st.dateiName + '_bearbeitung.json');\n    meldung('Stand gesichert' + wolkeText + '.');\n  }\n  async function projektLaden(file) {\n    try {\n      const p = JSON.parse(await file.text()); if (p.app !== 'grundriss-editor') throw new Error('Kein Bearbeitungsstand des Grundriss-Editors.');\n      if (p.blank && !st.pdf && !st.bild) neuesBlatt(p.blank.format, p.blank.massstab, p.blank.titel);   // Neuzeichnung: Blatt aus dem Stand anlegen\n      if (!st.breite) { alert('Bitte zuerst den Plan (PDF) laden, dann den Bearbeitungsstand.'); return; }\n      if (p.einstellungen) for (const k of Object.keys(p.einstellungen)) if (st.einstellungen[k]) st.einstellungen[k] = { ...st.einstellungen[k], ...p.einstellungen[k] };\n      if (p.rasterCm != null) st.rasterCm = p.rasterCm;\n      st.kalib = p.kalib || st.kalib; st.ausschnitt = p.ausschnitt || null; st.proSeite = p.proSeite || {}; st.naechsteId = p.naechsteId || 1;\n      st.elemente = st.proSeite[st.seiteNr] || []; st.auswahl = null; commit(); kalibChip(); renderPanel(); render();\n      if (p.punktwolke && window.parent && window.parent.epPwWolkeAusStand) { try { const r = window.parent.epPwWolkeAusStand(window, p.punktwolke); if (r && r.text) meldung(r.text); else if (r && r.fehler) meldung(r.fehler); } catch (e) { console.warn('Punktwolke aus dem Stand', e); meldung('Punktwolke aus dem Stand konnte nicht geladen werden: ' + (e.message || e)); } }\n    } catch (e) { alert('Bearbeitungsstand konnte nicht geladen werden: ' + e.message); }\n  }\n  function zeigeLaden(an, text) { const l = $('#laden'); l.classList.toggle('aus', !an); if (text) l.querySelector('span').textContent = text; }\n\n  // ---------- Ereignisse ----------\n  overlay.addEventListener('pointerdown', onDown);\n  overlay.addEventListener('pointermove', onMove);\n  overlay.addEventListener('pointerup', onUp);\n  overlay.addEventListener('pointerleave', () => { if (!st.drag && !st.zeichnung) { st.fang = null; st.maus = null; render(); } });\n  overlay.addEventListener('dblclick', onDblClick);\n  overlay.addEventListener('contextmenu', e => e.preventDefault());\n  werkstatt.addEventListener('pointerdown', (e) => { if (e.target === werkstatt || e.target === blatt) { if (st.werkzeug === 'auswahl' && st.auswahl) { st.auswahl = null; renderPanel(); render(); } if (e.button === 1 || st.leertaste || st.werkzeug === 'hand') { st.pan = { x: e.clientX, y: e.clientY, sl: werkstatt.scrollLeft, stp: werkstatt.scrollTop }; werkstatt.classList.add('greift'); } } });\n  werkstatt.addEventListener('pointermove', (e) => { if (st.pan && e.target !== overlay) onMove(e); });\n  werkstatt.addEventListener('pointerup', () => { if (st.pan) { st.pan = null; werkstatt.classList.remove('greift'); } });\n  werkstatt.addEventListener('wheel', (e) => { if (!st.breite) return; if (e.ctrlKey || e.metaKey) { e.preventDefault(); setzeZoom(st.zoom * (e.deltaY < 0 ? 1.15 : 1 / 1.15), { x: e.clientX, y: e.clientY }); } }, { passive: false });\n  document.querySelectorAll('.tool').forEach(b => b.addEventListener('click', () => setzeWerkzeug(b.dataset.tool)));\n  panel.addEventListener('input', panelInput);\n  panel.addEventListener('change', (e) => { panelInput(e); if (e.target.dataset.optZahl) { st[e.target.dataset.optZahl] = +e.target.value; if (e.target.dataset.optZahl === 'rasterCm' && st.rasterCm > 0 && !st.rasterZeigen && st.blank) st.rasterZeigen = true; renderPanel(); render(); return; } if (e.target.dataset.opt) { st[e.target.dataset.opt] = e.target.checked; if (e.target.dataset.opt === 'ortho') orthoKnopf(); if (e.target.dataset.opt === 'aufhellen' && st.bild) { bildAufbereiten(); renderPanel(); render(); } if (e.target.dataset.opt === 'kantenInnen' && st.wolke && st.wolke.kantenAlle) { st.wolke.kanten = st.kantenInnen ? st.wolke.kantenAlle : (st.wolke.kantenAussen || []); renderPanel(); } if (e.target.dataset.opt === 'rasterZeigen' || e.target.dataset.opt === 'kantenZeigen' || e.target.dataset.opt === 'kantenFang' || e.target.dataset.opt === 'kantenInnen') render(); return; } if (st.auswahl) commit(); });\n  panel.addEventListener('click', panelClick);\n  $('#btnUndo').addEventListener('click', rueckgaengig); $('#btnRedo').addEventListener('click', wiederholen);\n  function orthoKnopf() { const b = $('#btnOrtho'); if (!b) return; b.classList.toggle('aktiv', !!st.ortho); b.textContent = st.ortho ? '⟂ 90°' : '∠ frei'; }\n  function orthoUmschalten() { st.ortho = !st.ortho; orthoKnopf(); renderPanel(); onMove({ _p: true }); }\n  $('#btnOrtho').addEventListener('click', orthoUmschalten); orthoKnopf();\n  $('#btnZoomPlus').addEventListener('click', () => setzeZoom(st.zoom * 1.25)); $('#btnZoomMinus').addEventListener('click', () => setzeZoom(st.zoom / 1.25)); $('#btnZoomFit').addEventListener('click', (e) => zoomAnpassen(e.shiftKey));\n  $('#btnPng').addEventListener('click', exportPng); $('#btnPdf').addEventListener('click', exportPdf); $('#btnJson').addEventListener('click', projektSpeichern);\n  $('#btnDok').addEventListener('click', async () => { if (!st.breite) return; zeigeLaden(true, 'Dokument wird geschrieben …'); try { const r = window.parent && window.parent.epDokErzeugen ? await window.parent.epDokErzeugen(window) : { fehler: 'Dokument-Stufe fehlt.' }; meldung(r && r.text ? r.text : (r && r.fehler ? r.fehler : 'Dokument erzeugt.')); } catch (e) { meldung('Dokument fehlgeschlagen: ' + (e.message || e)); } finally { zeigeLaden(false); } });\n  $('#btnLeeren').addEventListener('click', () => { if (st.elemente.length && !confirm('Alle Einträge auf dieser Seite löschen?')) return; st.elemente = []; st.auswahl = null; st.zeichnung = null; commit(); renderPanel(); render(); });\n  $('#kalibOk').addEventListener('click', kalibUebernehmen); $('#kalibAbbruch').addEventListener('click', () => { st.zeichnung = null; kalibPop(false); render(); });\n  $('#kalibMeter').addEventListener('keydown', (e) => { if (e.key === 'Enter') kalibUebernehmen(); if (e.key === 'Escape') { st.zeichnung = null; kalibPop(false); render(); } });\n  $('#kalibChip').addEventListener('click', () => setzeWerkzeug('kalib'));\n  const vollbildAktiv = () => !!(document.fullscreenElement || document.webkitFullscreenElement);\n  function vollbildKnopf() { const b = $('#btnVollbild'); if (b) { b.textContent = vollbildAktiv() ? 'Vollbild beenden' : 'Vollbild'; b.title = vollbildAktiv() ? 'Vollbild beenden (Esc)' : 'Editor bildschirmfüllend anzeigen'; } }\n  async function vollbildWechseln() {\n    try {\n      if (vollbildAktiv()) { await (document.exitFullscreen ? document.exitFullscreen() : document.webkitExitFullscreen()); return; }\n      const de = document.documentElement;\n      if (de.requestFullscreen) await de.requestFullscreen(); else if (de.webkitRequestFullscreen) await de.webkitRequestFullscreen(); else throw new Error('nicht unterstützt');\n    } catch (e) { alert('Vollbild ist hier nicht möglich' + (e && e.message ? ' (' + e.message + ')' : '') + '. Alternativ: F11 im Browser.'); }\n  }\n  $('#btnVollbild').addEventListener('click', vollbildWechseln);\n  ['fullscreenchange', 'webkitfullscreenchange'].forEach(ev => document.addEventListener(ev, () => { vollbildKnopf(); if (st.breite) zoomAnpassen(); }));\n  vollbildKnopf();\n  $('#seitenWahl').addEventListener('change', (e) => zeigeSeite(+e.target.value));\n  $('#dateiInput').addEventListener('change', (e) => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; if (/\\.json$/i.test(f.name)) projektLaden(f); else ladeDatei(f); });\n  $('#btnOeffnen').addEventListener('click', () => $('#dateiInput').click()); $('#btnOeffnen2').addEventListener('click', () => $('#dateiInput').click());\n  $('#btnJsonLaden').addEventListener('click', () => $('#dateiInput').click());\n  $('#btnNeu').addEventListener('click', () => { if (st.elemente.length && !confirm('Neues leeres Blatt anlegen? Die aktuellen Einträge gehen verloren (vorher „Stand sichern\").')) return; neuPop(true); });\n  $('#btnNeu2').addEventListener('click', () => neuPop(true));\n  $('#neuAbbruch').addEventListener('click', () => neuPop(false));\n  $('#neuOk').addEventListener('click', () => { const m = zahl($('#neuMassstab').value, 100); neuPop(false); neuesBlatt($('#neuFormat').value, m > 0 ? m : 100, $('#neuTitel').value.trim()); });\n  $('#neuTitel').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#neuOk').click(); if (e.key === 'Escape') neuPop(false); });\n  ['dragenter', 'dragover'].forEach(ev => document.addEventListener(ev, (e) => { e.preventDefault(); $('#app').classList.add('drop'); }));\n  ['dragleave', 'drop'].forEach(ev => document.addEventListener(ev, (e) => { e.preventDefault(); if (ev === 'drop' || e.target === document.documentElement) $('#app').classList.remove('drop'); }));\n  document.addEventListener('drop', (e) => { const f = e.dataTransfer && e.dataTransfer.files[0]; if (!f) return; if (/\\.json$/i.test(f.name)) projektLaden(f); else ladeDatei(f); });\n  window.addEventListener('resize', () => { if (st.breite) render(); });\n  window.addEventListener('keydown', (e) => {\n    const inInput = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement && document.activeElement.tagName);\n    if (e.key === 'Shift') { st.shift = true; onMove({ _p: true }); }\n    if (e.key === ' ' && !inInput) { st.leertaste = true; werkstatt.classList.add('hand'); e.preventDefault(); return; }\n    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); if (e.shiftKey) wiederholen(); else rueckgaengig(); return; }\n    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); wiederholen(); return; }\n    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); projektSpeichern(); return; }\n    if (e.key === 'Escape') { if (inInput) { document.activeElement.blur(); return; } abbrechen(); return; }\n    if (inInput) return;\n    if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); loescheAuswahl(); return; }\n    if (e.key === 'Enter' && st.zeichnung && st.zeichnung.art === 'flaeche') { flaecheSchliessen(); return; }\n    if (e.key === '+' || e.key === '=') { setzeZoom(st.zoom * 1.25); return; }\n    if (e.key === '-') { setzeZoom(st.zoom / 1.25); return; }\n    if (e.key === '0') { zoomAnpassen(e.shiftKey); return; }\n    if (e.key.toUpperCase() === 'R' && !e.ctrlKey && !e.metaKey) { const el = st.auswahl ? elById(st.auswahl) : null; const z = el && el.typ === 'moebel' ? el : (st.werkzeug === 'moebel' ? st.einstellungen.moebel : null); if (z) { z.winkel = (((z.winkel || 0) + (e.shiftKey ? -90 : 90)) % 360 + 360) % 360; renderPanel(); render(); if (el) commit(); return; } }\n    if (e.key.toUpperCase() === 'O' && !e.ctrlKey && !e.metaKey && !e.altKey) { orthoUmschalten(); return; }\n    const k = e.key.toUpperCase(); const w = Object.keys(WERKZEUGE).find(n => WERKZEUGE[n].taste === k); if (w && !e.ctrlKey && !e.metaKey && !e.altKey) setzeWerkzeug(w);\n  });\n  window.addEventListener('keyup', (e) => { if (e.key === 'Shift') { st.shift = false; onMove({ _p: true }); } if (e.key === ' ') { st.leertaste = false; if (st.werkzeug !== 'hand') werkstatt.classList.remove('hand'); } });\n\n  // Start\n  const toolLeiste = document.querySelectorAll('.tool');\n  toolLeiste.forEach(b => { const w = WERKZEUGE[b.dataset.tool]; if (w) b.title = w.name + ' (' + w.taste + ')'; });\n  setzeWerkzeug('auswahl'); kalibChip(); renderPanel(); verlaufKnoepfe();\n  // ---------- Räume und Innenmaße aus den gezeichneten Wänden (Stufe 138) ----------\n  // Wandachsen werden an Kreuzungen und T-Stößen geteilt, Enden bis 12 cm zusammengefasst, daraus die geschlossenen\n  // Maschen (Räume) gesucht; jede Masche wird um die halben Wanddicken nach innen versetzt → lichte Raumfläche (§ 3 WoFlV)\n  // als Fläche mit Namen, dazu Innenmaße entlang jeder Raumkante. Wände ohne Anschluss (Stummel) bleiben als Nische erhalten.\n  const raumSchnitt = (a, b, c, d) => { const r = V.sub(b, a), s = V.sub(d, c), den = r.x * s.y - r.y * s.x; if (Math.abs(den) < 1e-9) return null; const q = V.sub(c, a); return { t: (q.x * s.y - q.y * s.x) / den, u: (q.x * r.y - q.y * r.x) / den }; };\n  const raumInnen = (p, poly) => { let c = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const a = poly[i], b = poly[j]; if ((a.y > p.y) !== (b.y > p.y) && p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x) c = !c; } return c; };\n  const raumSigniert = (poly) => { let a = 0; for (let i = 0; i < poly.length; i++) { const p = poly[i], q = poly[(i + 1) % poly.length]; a += p.x * q.y - q.x * p.y; } return a / 2; };\n  function raeumeAusWaenden(opt) {\n    opt = opt || {};\n    const R = st.kalib.ptProM, tol0 = Math.max(3, (opt.toleranzCm == null ? 12 : opt.toleranzCm) / 100 * R);\n    const waende = st.elemente.filter(e => e.typ === 'wand' && V.dist(e.p1, e.p2) > 1e-6).flatMap(e => GE.wandSegmente(e, st.kalib));   // Bogenwände als Segmentketten (Stufe 149)\n    // Anschlusstoleranz: mindestens die halbe dickste Wand + 2 pt (eine Trennwand endet an der Fläche der Außenwand, also eine halbe Dicke vor deren Achse)\n    const tol = Math.max(tol0, waende.reduce((m, w) => Math.max(m, GE.dickePt(w, st.kalib)), 0) / 2 + 2);\n    // Vorherige automatische Räume und Maße entfernen\n    st.elemente = st.elemente.filter(e => e.herkunft !== 'raumautomatik');\n    if (waende.length < 3) return { raeume: 0, masse: 0, hinweis: 'Mindestens drei Wände nötig.' };\n    // 1. Achsen an Kreuzungen und T-Stößen teilen\n    const segs = waende.map(w => ({ a: w.p1, b: w.p2, wand: w })), teile = [];\n    for (const s of segs) {\n      const d = V.sub(s.b, s.a), L2 = V.dot(d, d), ts = [0, 1];\n      for (const o of segs) {\n        if (o === s) continue;\n        const x = raumSchnitt(s.a, s.b, o.a, o.b); if (x && x.t > 1e-6 && x.t < 1 - 1e-6 && x.u > -1e-6 && x.u < 1 + 1e-6) ts.push(x.t);\n        const tolT = Math.max(tol, GE.dickePt(s.wand, st.kalib) / 2 + 2);\n        for (const P of [o.a, o.b]) { const t = V.dot(V.sub(P, s.a), d) / L2; if (t > 1e-6 && t < 1 - 1e-6 && V.dist(V.add(s.a, V.mul(d, t)), P) <= tolT) ts.push(t); }\n      }\n      ts.sort((p, q) => p - q);\n      for (let i = 0; i + 1 < ts.length; i++) if ((ts[i + 1] - ts[i]) * Math.sqrt(L2) > 0.5) teile.push({ a: V.add(s.a, V.mul(d, ts[i])), b: V.add(s.a, V.mul(d, ts[i + 1])), wand: s.wand });\n    }\n    // 2. Knoten zusammenfassen (Mittelwert der zusammengefassten Punkte)\n    const knoten = [], summen = [];\n    const knotenFuer = (P) => { for (let i = 0; i < knoten.length; i++) if (V.dist(knoten[i], P) <= tol) { summen[i].x += P.x; summen[i].y += P.y; summen[i].n++; knoten[i] = { x: summen[i].x / summen[i].n, y: summen[i].y / summen[i].n }; return i; } knoten.push({ x: P.x, y: P.y }); summen.push({ x: P.x, y: P.y, n: 1 }); return knoten.length - 1; };\n    const kanten = [], kantenKey = new Map();\n    for (const t of teile) { const i = knotenFuer(t.a), j = knotenFuer(t.b); if (i === j) continue; const key = i < j ? i + '-' + j : j + '-' + i; if (kantenKey.has(key)) continue; kantenKey.set(key, kanten.length); kanten.push({ i, j, wand: t.wand }); }\n    const kanteVon = (i, j) => kanten[kantenKey.get(i < j ? i + '-' + j : j + '-' + i)];\n    // Knoten exakt auf den Schnittpunkt der beteiligten Wandachsen legen (Lücken an Ecken und Trennwand-Enden an der Fläche verfälschen sonst die Lage)\n    knoten.forEach((K, idx) => {\n      const ws = []; for (const k of kanten) if ((k.i === idx || k.j === idx) && !ws.includes(k.wand)) ws.push(k.wand);\n      for (let a = 0; a < ws.length && ws.length > 1; a++) for (let b = a + 1; b < ws.length; b++) {\n        const da = V.norm(V.sub(ws[a].p2, ws[a].p1)), db = V.norm(V.sub(ws[b].p2, ws[b].p1)); if (Math.abs(da.x * db.y - da.y * db.x) < 0.3) continue;\n        const x = raumSchnitt(ws[a].p1, ws[a].p2, ws[b].p1, ws[b].p2); if (!x) continue;\n        const S = V.add(ws[a].p1, V.mul(V.sub(ws[a].p2, ws[a].p1), x.t)); if (V.dist(S, K) <= tol * 1.5) { knoten[idx] = S; return; }\n      }\n    });\n    // 3. Halbkanten je Knoten nach Winkel\n    const um = knoten.map(() => []); kanten.forEach(k => { um[k.i].push(k.j); um[k.j].push(k.i); });\n    const winkel = (i, j) => Math.atan2(knoten[j].y - knoten[i].y, knoten[j].x - knoten[i].x);\n    um.forEach((l, i) => l.sort((p, q) => winkel(i, p) - winkel(i, q)));\n    const besucht = new Set(), maschen = [];\n    for (let i = 0; i < knoten.length; i++) for (const j0 of um[i]) {\n      if (besucht.has(i + '>' + j0)) continue;\n      const zyklus = []; let a = i, b = j0, ok = true, schritte = 0;\n      while (schritte++ < 5000) {\n        besucht.add(a + '>' + b); zyklus.push(a);\n        const l = um[b], w0 = winkel(b, a); let best = -1, bestD = Infinity;\n        for (const n of l) { if (l.length > 1 && n === a) continue; let dw = winkel(b, n) - w0; while (dw <= 1e-9) dw += 2 * Math.PI; if (dw < bestD) { bestD = dw; best = n; } }\n        if (best < 0) { ok = false; break; }\n        a = b; b = best;\n        if (a === i && b === j0) break;\n        if (besucht.has(a + '>' + b)) { ok = false; break; }\n      }\n      if (!ok || zyklus.length < 3) continue;\n      const poly = zyklus.map(k => knoten[k]), A = raumSigniert(poly);\n      if (Math.abs(A) / (R * R) < 0.3) continue;\n      maschen.push({ zyklus, poly, A });\n    }\n    if (!maschen.length) return { raeume: 0, masse: 0, hinweis: 'Kein geschlossener Wandzug gefunden – Wandenden bis ' + Math.round(tol / R * 100) + ' cm Abstand gelten als verbunden.' };\n    // Außenmasche(n): die größte Masche gibt die Umlaufrichtung des Äußeren vor; alle mit gleichem Vorzeichen sind Außenmaschen\n    maschen.sort((p, q) => Math.abs(q.A) - Math.abs(p.A));\n    const aussenZeichen = Math.sign(maschen[0].A);\n    const raeume = maschen.filter(m => Math.sign(m.A) !== aussenZeichen);\n    // 4. Innenpolygone: jede Kante um die halbe Wanddicke zur Rauminnenseite versetzen, Nachbarkanten schneiden\n    const vorhandene = st.elemente.filter(e => e.typ === 'flaeche' && e.punkte && e.punkte.length > 2);\n    let nr = vorhandene.length, erzeugt = 0, masse = 0;\n    const vMass = Math.max(8, (opt.massAbstandCm == null ? 22 : opt.massAbstandCm) / 100 * R);\n    for (const m of raeume) {\n      const n = m.zyklus.length, linien = [];\n      for (let k = 0; k < n; k++) {\n        const i = m.zyklus[k], j = m.zyklus[(k + 1) % n], P = knoten[i], Q = knoten[j], kante = kanteVon(i, j);\n        const d = V.norm(V.sub(Q, P)), nn = V.perp(d), t = kante ? GE.dickePt(kante.wand, st.kalib) : 0;\n        const innenSeite = m.A > 0 ? 1 : -1;   // Innenseite aus der Umlaufrichtung (gilt auch für Stummel, die hin und zurück durchlaufen werden)\n        const off = V.mul(nn, innenSeite * t / 2);\n        linien.push({ p: V.add(P, off), q: V.add(Q, off), d });\n      }\n      const innen = [];\n      for (let k = 0; k < n; k++) {\n        const a = linien[(k - 1 + n) % n], b = linien[k];\n        const kr = a.d.x * b.d.y - a.d.y * b.d.x;\n        if (Math.abs(kr) < 0.05) { innen.push(a.q); if (V.dist(a.q, b.p) > 0.3) innen.push(b.p); }   // gerade Fortsetzung: ein Punkt; Stummel (hin und zurück): beide Spitzen\n        else { const x = raumSchnitt(a.p, a.q, b.p, b.q); innen.push(x ? V.add(a.p, V.mul(V.sub(a.q, a.p), x.t)) : b.p); }\n      }\n      // doppelte Punkte (Stummel) ausdünnen\n      const pts = innen.filter((p, k) => V.dist(p, innen[(k + 1) % innen.length]) > 0.3);\n      if (pts.length < 3) continue;\n      const qm = flaecheInhaltPt(pts) / (R * R); if (qm < 0.3) continue;\n      // Vorhandene (von Hand gezeichnete) Fläche mit Schwerpunkt im Raum? → nicht doppelt anlegen\n      const c = GE.schwerpunkt(pts);\n      const schon = vorhandene.some(f => raumInnen(c, f.punkte) || raumInnen(GE.schwerpunkt(f.punkte), pts));\n      if (!schon) { nr++; neuesElement(st.einstellungen.flaeche, { punkte: pts, text: opt.name ? opt.name(nr) : 'Raum ' + nr, herkunft: 'raumautomatik' }); erzeugt++; }\n      // Innenmaße entlang der Raumkanten, Maßlinie im Raum\n      if (opt.masse !== false) for (let k = 0; k < pts.length; k++) {\n        const P = pts[k], Q = pts[(k + 1) % pts.length]; if (V.dist(P, Q) / R < 0.4) continue;\n        const probe = { p1: P, p2: Q, versatz: vMass }, g = GE.massGeometrie(probe); if (!g) continue;\n        const v = raumInnen(V.mid(g.D1, g.D2), pts) ? vMass : -vMass;\n        neuesElement(st.einstellungen.mass, { p1: { ...P }, p2: { ...Q }, versatz: v, groesse: 6, text: '', herkunft: 'raumautomatik' }); masse++;\n      }\n    }\n    // Bogenwände: ein Maß auf der Sehne mit Stich und Radius (die kurzen Segmente bekommen keine eigenen Maße)\n    if (opt.masse !== false) for (const w of st.elemente) { if (w.typ !== 'wand') continue; const bd = GE.bogenDaten(w, st.kalib); if (!bd) continue; neuesElement(st.einstellungen.mass, { p1: { ...w.p1 }, p2: { ...w.p2 }, versatz: -Math.sign(w.stich || 1) * 14, groesse: 6, text: 'Sehne ' + GE.formatMeter(bd.L / R) + ' · Stich ' + Math.abs(Math.round(w.stich)) + ' cm · R ' + GE.formatMeter(bd.r / R), herkunft: 'raumautomatik' }); masse++; }\n    return { raeume: raeume.length, flaechen: erzeugt, masse, knoten: knoten.length, kanten: kanten.length, hinweis: erzeugt || masse ? '' : 'Räume schon vorhanden – keine neuen Flächen.' };\n  }\n  const flaecheInhaltPt = (pts) => { let a = 0; for (let i = 0; i < pts.length; i++) { const p = pts[i], q = pts[(i + 1) % pts.length]; a += p.x * q.y - q.x * p.y; } return Math.abs(a) / 2; };\n  function schnittZeigen(el) {\n    let r = null; try { r = window.epPsZeigen ? window.epPsZeigen(el) : null; } catch (e) { r = { fehler: String(e) }; }\n    if (!r) { meldung('Schnitt braucht eine übernommene Punktwolke – dann zeigt das 3D-Fenster den Schnitt entlang dieser Linie.'); return null; }\n    if (r.fehler) { meldung(r.fehler); return r; }\n    meldung(r.text || 'Schnitt im 3D-Fenster.'); return r;\n  }\n  function schnittSetzen(p1, p2, text) { if (!st.einstellungen.schnitt) st.einstellungen.schnitt = GE.NEU.schnitt(); const el = neuesElement(st.einstellungen.schnitt, { p1: { ...p1 }, p2: { ...p2 }, text: text || '' }); st.auswahl = el.id; renderPanel(); render(); return { el, schnitt: schnittZeigen(el) }; }\n  function meldung(text) {\n    let m = document.getElementById('geMeldung'); if (!m) { m = document.createElement('div'); m.id = 'geMeldung'; m.style.cssText = 'position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#1d2541;color:#fff;padding:8px 14px;border-radius:8px;font-size:12px;z-index:60;box-shadow:0 6px 20px rgba(26,35,66,.3);max-width:70vw'; document.body.appendChild(m); }\n    m.textContent = text; m.style.display = 'block'; clearTimeout(m._t); m._t = setTimeout(() => { m.style.display = 'none'; }, 7000);\n  }\n  function raeumeKnopf() {\n    const r = raeumeAusWaenden();\n    if (r.raeume) { commit(); renderPanel(); render(); }\n    meldung(r.raeume ? `${r.raeume} ${r.raeume === 1 ? 'Raum' : 'Räume'} aus den Wänden gebildet, ${r.flaechen} neue ${r.flaechen === 1 ? 'Fläche' : 'Flächen'}, ${r.masse} Innenmaße. Erneut klicken erzeugt alles neu; von Hand gezeichnete Flächen bleiben.` : (r.hinweis || 'Keine Räume gefunden.'));\n    return r;\n  }\n  $('#btnRaeume').addEventListener('click', raeumeKnopf);\n  $('#btnKanten').addEventListener('click', waendeAufKanten);\n  $('#btnSchraegen').addEventListener('click', () => { let r = null; try { r = window.parent && window.parent.epDsKnopf ? window.parent.epDsKnopf(window) : null; } catch (e) { r = { fehler: String(e) }; } if (!r) { meldung('Dachschrägen brauchen eine übernommene Punktwolke (Höhen aus der Wolke).'); return; } if (r.fehler) { meldung(r.fehler); return; } renderPanel(); render(); meldung(r.mitSchraege ? `${r.mitSchraege} ${r.mitSchraege === 1 ? 'Raum' : 'Räume'} mit Dachschräge: ${r.zonen} Teilflächen, ${r.linien} Höhenlinien. ${r.text}` : r.text); });\n  window.GrundrissEditor = { st, ladeDatei, neuesBlatt, render, primsFuer, primsGeordnet, raeumeAusWaenden, raeumeKnopf, renderPanel, setzeWerkzeug, schnittSetzen, schnittZeigen, projektLaden, projektSpeichern, kanteFang, waendeAufKanten, punktFrei, punktZuStart, exportPng, exportPdf, commit, onDown, onMove, onUp, kalibUebernehmen, flaecheSchliessen, bildAufbereiten, rasterFang, GE };\n})();\n\n<\/script>\n</body>\n</html>\n";
 
 function GrundrissEditorWerkzeug({
-  user: e
+  user: e,
+  onWerkzeug: epGkWz
 }) {
   const t = useRef(null),
     n = useRef(null),
@@ -19293,7 +19318,38 @@ function GrundrissEditorWerkzeug({
       }))
     },
     disabled: u || !(!c || "laeuft" !== c.art)
-  }, "📱 Raum scannen"), React.createElement(WzButton, {
+  }, "📱 Raum scannen"), React.createElement(EpGrundrissKiKnopf, {
+    editorRef: t,
+    titel: o,
+    immobilie: l,
+    onStatus: d,
+    gesperrt: u,
+    onWerkzeug: epGkWz
+  }), React.createElement(EpPunktwolkeKnopf, {
+    editorRef: t,
+    titel: o,
+    immobilie: l,
+    onStatus: d,
+    gesperrt: u,
+    onWerkzeug: epGkWz
+  }), React.createElement(EpAufmassKnopf, {
+    editorRef: t,
+    immobilie: l,
+    onStatus: d,
+    gesperrt: u
+  }), React.createElement(EpScanAblageKnopf, {
+    editorRef: t,
+    titel: o,
+    onStatus: d,
+    gesperrt: u
+  }), React.createElement(EpGrundrissWohnflaecheKnopf, {
+    editorRef: t,
+    titel: o,
+    immobilie: l,
+    onStatus: d,
+    gesperrt: u,
+    onWerkzeug: epGkWz
+  }), React.createElement(WzButton, {
     klein: !0,
     variante: "hell",
     disabled: u,
@@ -19388,13 +19444,14 @@ function GrundrissEditorWerkzeug({
       e && (r.current = null, setTimeout(() => A(e, l ? "Objekt" : "Start"), 60))
     },
     title: "Grundriss-Editor",
+    "data-ep-ge-iframe": "",
     srcDoc: GE_EDITOR_HTML,
     allowFullScreen: !0,
     style: {
       display: "block",
       width: "100%",
       height: "calc(100vh - 264px)",
-      minHeight: 640,
+      minHeight: 520,
       border: 0
     }
   }))
@@ -19521,6 +19578,13 @@ function WerkzeugePage({
     titel: "Sonnenverlauf",
     text: "Sonnenstand und Schattenwurf der Nachbarbebauung in der geneigten 3D-Karte — Aufgang, Untergang, Verschattungszeiten und fertiger Exposé-Absatz."
   }];
+  !e || "chef" !== e.role && "mitarbeiter" !== e.role || a.push({
+    id: "transfer",
+    gruppe: "Dateien & Versand",
+    icon: "📤",
+    titel: "Transfer",
+    text: "Dateien hochladen und per Link verschicken – wie WeTransfer: Ablaufdatum, Passwort, Download-Protokoll und Mail bei Download."
+  });
   a.push({
     id: "offline",
     gruppe: "Unterwegs",
@@ -19542,8 +19606,8 @@ function WerkzeugePage({
     titel: "Objektkosten",
     text: "Kosten je Objekt aus Terminen, Fahrten, Telefonaten und Pauschalen — mit erwarteter Provision und Deckungsbeitrag."
   });
-  // Die Kachel "Fremdsystem-Verbindung" ist am 28.09.2026 entfallen: onOffice
-  // war in der Vorlage DIE Anbindung, nicht EINE, und welche Software ein
+  // Die Kachel "Fremdsystem-Verbindung" ist am 28.09.2026 entfallen: das
+  // CRM der Vorlage war DIE Anbindung, nicht EINE, und welche Software ein
   // neuer Mandant benutzt, weiss niemand. Die Edge Functions sind
   // gestrichen, die Cron-Jobs abbestellt (fork_20).
   const r = a.find(e => e.id === t) || null,
@@ -19566,67 +19630,10 @@ function WerkzeugePage({
     style: {
       color: CI.blau
     }
-  }, "nicht hochgeladen"), " und verlassen dieses Gerät nicht."), l.map(e => React.createElement("div", {
-    key: e.name,
-    style: {
-      marginBottom: 26
-    }
-  }, React.createElement("div", {
-    style: {
-      display: "flex",
-      alignItems: "baseline",
-      gap: 10,
-      marginBottom: 12,
-      paddingBottom: 8,
-      borderBottom: `1px solid ${CI.border}`
-    }
-  }, React.createElement("div", {
-    style: {
-      fontSize: 12,
-      fontWeight: 700,
-      letterSpacing: "0.1em",
-      textTransform: "uppercase",
-      color: CI.blau
-    }
-  }, e.name), React.createElement("div", {
-    style: {
-      fontSize: 11.5,
-      color: CI.muted
-    }
-  }, e.werkzeuge.length + (1 === e.werkzeuge.length ? " Werkzeug" : " Werkzeuge"))), React.createElement("div", {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fill, minmax(min(260px, 100%), 1fr))",
-      gap: 14
-    }
-  }, e.werkzeuge.map(e => React.createElement("div", {
-    key: e.id,
-    onClick: () => n(e.id),
-    style: {
-      border: `1px solid ${CI.border}`,
-      background: "#fff",
-      padding: 20,
-      cursor: "pointer"
-    }
-  }, React.createElement("div", {
-    style: {
-      fontSize: 28,
-      marginBottom: 10
-    }
-  }, e.icon), React.createElement("div", {
-    style: {
-      fontSize: 15,
-      fontWeight: 600,
-      color: CI.blau,
-      marginBottom: 6
-    }
-  }, e.titel), React.createElement("div", {
-    style: {
-      fontSize: 12.5,
-      color: CI.muted,
-      lineHeight: 1.55
-    }
-  }, e.text))))))), r && React.createElement("div", null, React.createElement("div", {
+  }, "nicht hochgeladen"), " und verlassen dieses Gerät nicht."), React.createElement(EpWerkzeugKacheln, {
+    gruppen: l,
+    waehle: n
+  })), r && React.createElement("div", null, React.createElement("div", {
     style: {
       display: "flex",
       alignItems: "center",
@@ -19636,15 +19643,19 @@ function WerkzeugePage({
   }, React.createElement(WzButton, {
     klein: !0,
     variante: "hell",
-    onClick: () => n(null)
-  }, "← Alle Werkzeuge"), React.createElement("div", {
+    onClick: () => {
+      window.__epWkOffen = epWkKachelFuer(a, t);
+      n(null)
+    }
+  }, epWkZurueckText(a, t)), React.createElement("div", {
     style: {
       fontSize: 16,
       fontWeight: 600,
       color: CI.blau
     }
   }, r.icon, " ", r.titel)), "merge" === t && React.createElement(PdfZusammenfuegen, null), "split" === t && React.createElement(PdfTeilen, null), "compress" === t && React.createElement(PdfKomprimieren, null), "onoffice" === t && React.createElement(OnOfficeTest, null), "edit" === t && React.createElement(PdfSeitenBearbeiten, null), "grundriss" === t && React.createElement(GrundrissEditorWerkzeug, {
-    user: e
+    user: e,
+    onWerkzeug: e => n(e)
   }), "raumscan" === t && React.createElement(RaumscanWerkzeug, {
     user: e,
     onWerkzeug: e => n(e)
@@ -19653,6 +19664,8 @@ function WerkzeugePage({
   }), "sonnenverlauf" === t && React.createElement(SonnenverlaufWerkzeug, {
     user: e
   }), "objektkosten" === t && React.createElement(ObjektkostenUebersicht, {
+    user: e
+  }), "transfer" === t && React.createElement(EpTransferWerkzeug, {
     user: e
   }), "zinspreis" === t && React.createElement(ZinsPreisRechner, {
     user: e
@@ -31606,10 +31619,20 @@ function ImmobilieSeite({
     let n = !1;
     "pdf" === e && (n = confirm("Ist dieses Exposé FINAL und darf an Interessenten versendet werden?\n\nOK = final: wird bei Exposé-Anfragen versendet, ältere Exposé-PDFs des Objekts werden ersetzt.\nAbbrechen = Entwurf: nur intern, bisheriges finales Exposé bleibt gültig.")), Fe(e), Me(null), "pdf" === e && Ne(null);
     try {
+      ("pdf" === e || "distanzen" === e) && await epKoordinatenSichern(t.id);
+      const _epDist = "distanzen" === e ? await epDistanzenBrowser(t.id) : ("pdf" === e && await epDistanzenBrowser(t.id, {
+        nurWennLeer: !0
+      }), null);
       const {
         data: a,
         error: r
-      } = await window._sb.functions.invoke("expose-pdf-erzeugen", {
+      } = _epDist ? {
+        data: {
+          ok: !0,
+          ..._epDist
+        },
+        error: null
+      } : await window._sb.functions.invoke("expose-pdf-erzeugen", {
         body: {
           immobilie_id: t.id,
           modus: e
@@ -31629,7 +31652,7 @@ function ImmobilieSeite({
         lage_distanzen: a.lage_distanzen || []
       })), Me({
         typ: "ok",
-        text: `${(a.lage_distanzen||[]).length} Distanzen automatisch ermittelt und gespeichert — unten anpassbar.`
+        text: `${(a.lage_distanzen||[]).length} Distanzen automatisch ermittelt und gespeichert — unten anpassbar.${"nominatim"===a.quelle?" (Ersatzweg über die OpenStreetMap-Suche, weil der Overpass-Dienst gerade ausgelastet ist – bitte kurz prüfen.)":""}`
       });
       else if ("highlights" === e) f(e => ({
         ...e,
@@ -32984,7 +33007,10 @@ function ImmobilieSeite({
       color: CI.blau,
       marginBottom: 12
     }
-  }, "Miete"), React.createElement("div", {
+  }, "Miete"), React.createElement(EpMieteProvision, {
+    werte: A,
+    setze: Qe
+  }), React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "1fr 1fr 1fr 1fr",
@@ -33143,7 +33169,7 @@ function ImmobilieSeite({
       color: CI.muted,
       flex: "1 1 320px"
     }
-  }, "Diese Texte werden in Exposés und beim Portal-Export (ImmoScout/Immowelt) verwendet. Die Limits entsprechen den Portal-Vorgaben — darüber hinaus wird beim Export abgeschnitten. Fett, kursiv, Zwischenüberschriften und Aufzählungen (Leiste über dem Feld) wirken im Exposé-PDF; die Portale erhalten reinen Text."), t && React.createElement("button", {
+  }, "Diese Texte werden in Exposés und beim Portal-Export (ImmoScout/Immowelt) verwendet. Die Limits entsprechen den Portal-Vorgaben — darüber hinaus wird beim Export abgeschnitten. Fett, kursiv, Zwischenüberschriften und Aufzählungen (Leiste über dem Feld) siehst du direkt im Feld; sie wirken im Exposé-PDF und auf der Objektseite, die Portale erhalten reinen Text."), t && React.createElement("button", {
     type: "button",
     onClick: () => re(!0),
     title: "Exposé-Schmiede mit den Eckdaten dieses Objekts öffnen — KI-Texte generieren und direkt hierher übernehmen",
@@ -33757,7 +33783,7 @@ function ImmobilieSeite({
       id: "immoscout24",
       label: "ImmobilienScout24",
       angebunden: !1
-    }].map(e => {
+    }, ...epPortaleZusatz()].map(e => {
       const n = e.id,
         a = (C.portale || []).find(e => e.portal === n) || null,
         r = !!a && "inseriert" === a.status,
@@ -34822,6 +34848,10 @@ function ImmobilieSeite({
           datei: l,
           laden: Xe,
           gesperrt: le
+        }), React.createElement(EpPrivatBadge, {
+          datei: l,
+          laden: Xe,
+          gesperrt: le
         }), React.createElement("input", {
           key: "t" + (l.titel || ""),
           type: "text",
@@ -35172,6 +35202,11 @@ function ImmobilieSeite({
       bilder: [...nt, ...rt, ...lt],
       gesperrt: le || ce,
       laden: Xe
+    }), React.createElement(EpPrivatKnopf, {
+      immobilieId: t && t.id,
+      bilder: [...nt, ...rt, ...lt],
+      gesperrt: le || ce,
+      laden: Xe
     }), [...nt, ...rt, ...lt].some(e => e.ki_bearbeitet) && React.createElement("button", {
       onClick: () => (async e => {
         const t = e.filter(e => e.ki_bearbeitet);
@@ -35303,7 +35338,11 @@ function ImmobilieSeite({
       gap: 6,
       flexWrap: "wrap"
     }
-  }, React.createElement("button", {
+  }, React.createElement(EpUnterlagenLinkKnopf, {
+    immobilie: t,
+    dateien: [...it, ...rt, ...lt, ...nt],
+    gesperrt: le
+  }), React.createElement("button", {
     onClick: () => V(!0),
     disabled: le,
     title: "Dokument aus OneDrive ans Objekt holen (Kopie im Portal, mit Verweis auf die OneDrive-Datei)",
@@ -35336,7 +35375,9 @@ function ImmobilieSeite({
     style: {
       verticalAlign: "middle"
     }
-  }), " Datei hochladen"))), L && React.createElement(OneDriveDateiPicker, {
+  }), " Datei hochladen"))), React.createElement(EpUnterlagenLinkListe, {
+    immobilie: t
+  }), L && React.createElement(OneDriveDateiPicker, {
     titel: "Dokument aus OneDrive ans Objekt holen",
     driveId: null,
     itemId: null,
@@ -35967,6 +36008,7 @@ function ImmobilieSeite({
               console.warn("Alten Lageplan entfernen:", e)
             }
           }
+          await epKoordinatenSichern(t.id);
           const {
             data: l,
             error: i
@@ -36293,19 +36335,24 @@ function ImmobilieSeite({
       r(t.id), await Xe()
     }
   }), N && t && React.createElement(ImmobilieDateiUploadModal, {
+    _epFotoStand: window.epFotoStandMerken(t.id),
     immobilie: {
       ...t,
       hauptbild_url: A.hauptbild_url
     },
     user: e,
     verknuepfteMails: C.mails,
-    onSchliessen: () => O(!1),
+    onSchliessen: () => {
+      window.epFotoStandVergessen(), O(!1)
+    },
     onUploaded: async () => {
+      const _epErst = window.epErstbefuellung(t.id);
       O(!1), r(t.id), "dokumente" === d && setTimeout(K, 400), await Xe();
+      epPrivatNachUpload(t.id, Xe);
       try {
         const k = await window.epBildTitelKi(t.id, {
           nurOhneTitel: !0,
-          sortieren: !0
+          sortieren: await _epErst
         });
         k && (k.vorgeschlagen || k.sortiert) && await Xe()
       } catch (e) {
@@ -38573,13 +38620,18 @@ function KontaktePage({
     }),
     b = [...p].sort((e, t) => "neueste" === c ? String(t.created_at || "").localeCompare(String(e.created_at || "")) : "ort" === c ? h(e.ort, t.ort) || h(e.nachname, t.nachname) : "firma" === c ? h(e.firma, t.firma) || h(e.nachname, t.nachname) : h(e.nachname || e.firma, t.nachname || t.firma));
   return u ? React.createElement(KontaktSeite, {
+    key: u.id || "neu",
     user: e,
     kontakt: u,
     onZurueck: () => {
       epVerlassenPruefen() && m(null)
     },
-    onGespeichert: () => {
-      window._epUngespeichert = null, m(null), f()
+    onGespeichert: (kid, werte) => {
+      window._epUngespeichert = null, kid ? (m(alt => ({
+        ...(alt || {}),
+        ...(werte || {}),
+        id: kid
+      })), window._epKontaktOeffnen = kid) : m(null), f()
     }
   }) : React.createElement(React.Fragment, null, React.createElement("div", {
     style: {
@@ -38768,6 +38820,7 @@ function KontaktSeite({
       emails_weitere: []
     }),
     [_epGel, _epSetGel] = useState(0),
+    [_epKontaktGespeichert, _epSetKontaktGespeichert] = useState(!1),
     [o, s] = useState(!1),
     [c, d] = useState(""),
     [u, m] = useState(t.kontakt_objekt || []),
@@ -38852,6 +38905,7 @@ function KontaktSeite({
     onClick: async () => {
       s(!0), d("");
       try {
+        let _epNeuId = null;
         const n = e => e && String(e).trim() ? String(e).trim() : null;
         if (!n(l.nachname) && !n(l.firma)) throw new Error("Bitte mindestens einen Nachnamen oder eine Firma angeben.");
         const i = {
@@ -38882,7 +38936,8 @@ function KontaktSeite({
             ersteller_id: e.id
           }).select("id").single();
           if (t) throw t;
-          await epKontaktEmailsSpeichern(_neu && _neu.id, l.emails_weitere, i.email)
+          await epKontaktEmailsSpeichern(_neu && _neu.id, l.emails_weitere, i.email);
+          _epNeuId = _neu && _neu.id
         } else {
           const {
             error: e
@@ -38890,18 +38945,19 @@ function KontaktSeite({
           if (e) throw e;
           await epKontaktEmailsSpeichern(t.id, l.emails_weitere, i.email)
         }
-        window._epUngespeichert = null, a()
+        window._epUngespeichert = null, _epSetGel(e => e + 1), r || (_epSetKontaktGespeichert(!0), setTimeout(() => _epSetKontaktGespeichert(!1), 2500)), a(r ? _epNeuId : t.id, i)
       } catch (e) {
         d(e.message || String(e))
       }
       s(!1)
     },
     disabled: o,
+    "data-ep-kontakt-speichern": "1",
     style: {
       ...primaryBtn,
       opacity: o ? .6 : 1
     }
-  }, o ? "Speichert…" : "Speichern")), c && React.createElement("div", {
+  }, o ? "Speichert…" : _epKontaktGespeichert ? "✓ Gespeichert" : "Speichern")), c && React.createElement("div", {
     style: {
       ...cardStyle,
       borderLeft: `3px solid ${CI.danger}`,
@@ -39638,7 +39694,7 @@ function EigentuemerBerichtDialog({
           u = m.filter(e => A[e.email]).map(e => `${"Herr"===e.anrede?"Sehr geehrter Herr":"Frau"===e.anrede?"Sehr geehrte Frau":"Guten Tag"} ${e.anrede?e.nachname:[e.vorname,e.nachname].filter(Boolean).join(" ")}`),
           g = e.objekttitel || e.bezeichnung || [e.strasse, e.hausnummer].filter(Boolean).join(" "),
           f = e => new Date(e).toLocaleDateString("de-DE"),
-          p = `${u.length?u.join(", "):"Sehr geehrte Eigentümer"},\n\nanbei erhalten Sie den Vermarktungsbericht für Ihre Immobilie „${g}“ für den Zeitraum ${f(r)} bis ${f(i)}.\n\nKurz zusammengefasst:\n- ${d.expose_versendet??d.expose_links??0} Exposé(s) versendet\n- ${d.besichtigungen_geplant??d.besichtigungen??0} Besichtigung(en) geplant\n- ${d.absagen||0} Absage(n)${epBerichtAbsagenText(d," – ")}\n\n${s.trim()?s.trim()+"\n\n":""}Bei Fragen erreichen Sie mich jederzeit.`;
+          p = `${u.length?u.join(", "):"Sehr geehrte Eigentümer"},\n\nanbei erhalten Sie den Vermarktungsbericht für Ihre Immobilie „${g}“ für den Zeitraum ${f(r)} bis ${f(i)}.\n\nKurz zusammengefasst:\n${d.anfragen!=null?"- "+d.anfragen+" Anfrage(n)\n":""}- ${d.expose_versendet??d.expose_links??0} Exposé(s) versendet${d.expose_angesehen!=null?", davon "+d.expose_angesehen+" angesehen":""}\n${d.besichtigungen_durchgefuehrt!=null?"- "+d.besichtigungen_durchgefuehrt+" Besichtigung(en) durchgeführt\n":""}- ${d.besichtigungen_geplant??d.besichtigungen??0} Besichtigung(en) geplant\n- ${(d.absagen||0)+(d.besichtigungen_abgesagt||0)} Absage(n)${epBerichtAbsagenText(d," – ")}\n\n${s.trim()?s.trim()+"\n\n":""}Bei Fragen erreichen Sie mich jederzeit.`;
         window._epMailAn = {
           an: a.join(", "),
           betreff: `Vermarktungsbericht ${f(r)} – ${f(i)}: ${g}`,
@@ -39711,7 +39767,7 @@ function EigentuemerBerichtDialog({
       color: CI.muted,
       marginBottom: 12
     }
-  }, "Das PDF zeigt die versendeten Exposés im Zeitraum, die geplanten Besichtigungen und die Absagen mit Gründen (aus den Exposé-Rückmeldungen der Interessenten) und wird unter Dateien abgelegt."), React.createElement("div", {
+  }, "Das PDF zeigt für den Zeitraum Anfragen nach Herkunft, versendete und angesehene Exposés (mit Status je Interessent), durchgeführte und geplante Besichtigungen, Absagen mit Gründen, den Wochenverlauf, die Online-Präsenz und den Gesamtstand seit Vermarktungsbeginn. Es wird unter Dateien abgelegt."), React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "1fr 1fr 1fr",
@@ -39896,7 +39952,7 @@ function EigentuemerBerichtDialog({
       marginTop: 4,
       color: "#374151"
     }
-  }, `${w.expose_versendet??w.expose_links??0} Exposés versendet · ${w.besichtigungen_geplant??w.besichtigungen??0} Besichtigungen geplant · ${w.absagen||0} Absagen${epBerichtAbsagenText(w)}`) : null, b.url ? React.createElement("a", {
+  }, `${w.anfragen!=null?w.anfragen+" Anfragen · ":""}${w.expose_versendet??w.expose_links??0} Exposés versendet · ${w.besichtigungen_durchgefuehrt!=null?w.besichtigungen_durchgefuehrt+" Besichtigungen durchgeführt · "+(w.besichtigungen_geplant??0)+" geplant":(w.besichtigungen_geplant??w.besichtigungen??0)+" Besichtigungen geplant"} · ${(w.absagen||0)+(w.besichtigungen_abgesagt||0)} Absagen${epBerichtAbsagenText(w)}`) : null, b.url ? React.createElement("a", {
     href: b.url,
     target: "_blank",
     rel: "noopener",
@@ -40669,7 +40725,13 @@ function AdminPage({
   }, "Push"), "chef" === e.role && React.createElement("button", {
     onClick: () => n("kostensaetze"),
     style: a("kostensaetze" === t)
-  }, "Kostensätze"), React.createElement("button", {
+  }, "Kostensätze"), "chef" === e.role && React.createElement("button", {
+    onClick: () => n("portale"),
+    style: a("portale" === t)
+  }, "Portale"), "chef" === e.role && React.createElement("button", {
+    onClick: () => n("kosten"),
+    style: a("kosten" === t)
+  }, "Kosten"), React.createElement("button", {
     onClick: () => n("aktivitaet"),
     style: a("aktivitaet" === t)
   }, "Aktivitäts-Log")), "mitarbeiter" === t && React.createElement(AdminMitarbeiter, {
@@ -40693,6 +40755,10 @@ function AdminPage({
   }), "push" === t && React.createElement(AdminPush, {
     user: e
   }), "kostensaetze" === t && React.createElement(AdminKostensaetze, {
+    user: e
+  }), "portale" === t && React.createElement(EpAdminPortale, {
+    user: e
+  }), "kosten" === t && React.createElement(EpAdminKosten, {
     user: e
   }), "aktivitaet" === t && React.createElement(AktivitaetsLog, {
     user: e
@@ -68625,49 +68691,7 @@ function BewertungPage({
       fontFamily: FONT,
       cursor: "pointer"
     }
-  }, "+ Seite hinzufügen"), React.createElement("div", {
-    style: {
-      borderTop: `1px solid ${CI.border}`,
-      marginTop: 18,
-      paddingTop: 14
-    }
-  }, React.createElement("div", {
-    style: {
-      fontSize: 11,
-      color: CI.gold,
-      letterSpacing: "0.15em",
-      fontWeight: 600,
-      marginBottom: 8
-    }
-  }, "ZUSÄTZE AUF DER KAUFPREISEMPFEHLUNG"), React.createElement("div", {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      gap: 10,
-      marginBottom: 10
-    }
-  }, React.createElement("div", null, React.createElement("label", {
-    style: labelStyle
-  }, "Zusatzzeile unter dem Kaufpreisvolumen"), React.createElement("input", {
-    value: C.kp_zusatz_volumen || "",
-    onChange: e => O("kp_zusatz_volumen", e.target.value),
-    style: inputStyle,
-    placeholder: "z.B. inkl. Stellplatz"
-  })), React.createElement("div", null, React.createElement("label", {
-    style: labelStyle
-  }, "Zusatzzeile unter dem Angebotspreis"), React.createElement("input", {
-    value: C.kp_zusatz_angebot || "",
-    onChange: e => O("kp_zusatz_angebot", e.target.value),
-    style: inputStyle,
-    placeholder: "z.B. zzgl. Agio"
-  }))), React.createElement("label", {
-    style: labelStyle
-  }, "Prämissen-Fußnote (erscheint klein unter der Empfehlung, mit *)"), React.createElement("input", {
-    value: C.kp_praemisse || "",
-    onChange: e => O("kp_praemisse", e.target.value),
-    style: inputStyle,
-    placeholder: "z.B. Prämisse: geräumtes, besenreines Objekt ohne Investitionsstau"
-  }))), React.createElement(Akkordeon, {
+  }, "+ Seite hinzufügen")), React.createElement(Akkordeon, {
     titel: "Kaufpreisempfehlung (Slide 11)",
     nummer: "07",
     offen: f.kp,
@@ -68693,6 +68717,23 @@ function BewertungPage({
     onChange: e => O("realistisches_volumen", e.target.value),
     style: inputStyle,
     placeholder: "z.B. 420.000"
+  }), React.createElement("div", {
+    style: {
+      fontSize: 10.5,
+      color: CI.muted,
+      marginTop: 6,
+      marginBottom: 2
+    }
+  }, "Zusatzzeile darunter (auf der Kaufpreisempfehlung)"), React.createElement("input", {
+    value: C.kp_zusatz_volumen || "",
+    onChange: e => O("kp_zusatz_volumen", e.target.value),
+    style: {
+      ...inputStyle,
+      fontSize: 12
+    },
+    placeholder: "z.B. inkl. Stellplatz",
+    "data-kp-zusatz": "volumen",
+    title: "Zusatzzeile unter dem Kaufpreisvolumen"
   })), React.createElement("div", null, React.createElement("label", {
     style: labelStyle
   }, "Angebotspreis"), React.createElement("input", {
@@ -68700,6 +68741,23 @@ function BewertungPage({
     onChange: e => O("angebotspreis", e.target.value),
     style: inputStyle,
     placeholder: "z.B. 449.000"
+  }), React.createElement("div", {
+    style: {
+      fontSize: 10.5,
+      color: CI.muted,
+      marginTop: 6,
+      marginBottom: 2
+    }
+  }, "Zusatzzeile darunter (auf der Kaufpreisempfehlung)"), React.createElement("input", {
+    value: C.kp_zusatz_angebot || "",
+    onChange: e => O("kp_zusatz_angebot", e.target.value),
+    style: {
+      ...inputStyle,
+      fontSize: 12
+    },
+    placeholder: "z.B. zzgl. Agio",
+    "data-kp-zusatz": "angebot",
+    title: "Zusatzzeile unter dem Angebotspreis"
   })), React.createElement(NachfrageZeile, {
     vertragsart: "verkauf",
     objektart: C.objektart,
@@ -68731,7 +68789,19 @@ function BewertungPage({
     onChange: e => O("vermarktungsdauer_bis", e.target.value),
     style: inputStyle,
     placeholder: "bis"
-  })))), (() => {
+  })))), React.createElement("div", {
+    style: {
+      marginTop: 12
+    }
+  }, React.createElement("label", {
+    style: labelStyle
+  }, "Prämissen-Fußnote (erscheint klein unter der Empfehlung, mit *)"), React.createElement("input", {
+    value: C.kp_praemisse || "",
+    onChange: e => O("kp_praemisse", e.target.value),
+    style: inputStyle,
+    placeholder: "z.B. Prämisse: geräumtes, besenreines Objekt ohne Investitionsstau",
+    "data-kp-zusatz": "praemisse"
+  })), (() => {
     const e = parseMoney(C.angebotspreis),
       t = parseMoney(C.wohnflaeche);
     if (!e || !t) return null;
@@ -76676,7 +76746,8 @@ function MailEinstellungenModal({
     betreff: "",
     text: "",
     html: "",
-    geteilt: !1
+    geteilt: !1,
+    anhaenge: []
   }, [S, z] = useState([]), [C, I] = useState(x), B = async () => {
     try {
       const {
@@ -76698,7 +76769,8 @@ function MailEinstellungenModal({
           betreff: v.betreff || "",
           text: v.text || "",
           html: v.html || "",
-          geteilt: !!v.geteilt
+          geteilt: !!v.geteilt,
+          anhaenge: v.anhaenge || []
         })
       }
     } catch (e) {
@@ -77611,7 +77683,7 @@ function MailEinstellungenModal({
       fontSize: 10,
       textTransform: "uppercase"
     }
-  }, "Team") : null), React.createElement("div", {
+  }, "Team") : null, epVorlageAnhangZeichen(e)), React.createElement("div", {
     style: {
       fontSize: 11.5,
       color: CI.muted,
@@ -77633,7 +77705,8 @@ function MailEinstellungenModal({
       betreff: e.betreff || "",
       text: e.text || "",
       html: e.html || "",
-      geteilt: !!e.geteilt
+      geteilt: !!e.geteilt,
+      anhaenge: e.anhaenge || []
     }),
     style: V
   }, "Bearbeiten"), React.createElement("button", {
@@ -77748,6 +77821,9 @@ function MailEinstellungenModal({
     wert: C,
     setzen: I,
     istMobile: d
+  }), React.createElement(EpVorlageAnhaenge, {
+    wert: C,
+    setzen: I
   }), React.createElement("div", {
     style: {
       display: "flex",
@@ -77792,6 +77868,7 @@ function MailEinstellungenModal({
             text: C.text,
             html: C.html && C.html.trim() ? C.html : null,
             geteilt: !!C.geteilt,
+            anhaenge: epVorlageAnhangListe(C),
             updated_at: (new Date).toISOString()
           };
           if (C.id) {
@@ -78577,7 +78654,7 @@ function MailVorlagenPicker({
       textOverflow: "ellipsis",
       whiteSpace: "nowrap"
     }
-  }, e.titel), e.geteilt && e.benutzer_id !== r.id ? React.createElement("span", {
+  }, e.titel, epVorlageAnhangZeichen(e)), e.geteilt && e.benutzer_id !== r.id ? React.createElement("span", {
     title: "Team-Vorlage",
     style: {
       fontSize: 10,
@@ -78670,7 +78747,9 @@ function MailVorlagenPicker({
       color: CI.muted,
       marginBottom: 8
     }
-  }, "Betreff: ", h.betreff), React.createElement("div", {
+  }, "Betreff: ", h.betreff), React.createElement(EpVorlageAnhangVorschau, {
+    vorlage: h
+  }), React.createElement("div", {
     style: {
       whiteSpace: "pre-wrap",
       fontSize: 13,
@@ -80075,6 +80154,7 @@ function PosteingangPage({
     })()
   }, [z]);
   const We = async (e = !1) => {
+    const _epWeNr = window.__epWeLauf = (window.__epWeLauf || 0) + 1;
     e || d(!0);
     try {
       let e = [];
@@ -80120,12 +80200,8 @@ function PosteingangPage({
         h ? r = r.eq("postfach_id", h) : l.length > 0 && (r = r.in("postfach_id", l.map(e => e.id)));
         const {
           data: i
-        } = await r, o = new Set(e.map(e => e.message_id).filter(Boolean));
-        for (const t of i || []) t.message_id && o.has(t.message_id) || e.push({
-          ...t,
-          _typ: "eingang",
-          gelesen: !0
-        });
+        } = await r;
+        e = epGesendetZusammenfuehren(e, i || []);
         e.sort((e, t) => new Date(t.gesendet_am || 0) - new Date(e.gesendet_am || 0))
       } else {
         let t = window._sb.from("mail_eingang").select("*").eq("ordner", y).order("gesendet_am", {
@@ -80146,10 +80222,12 @@ function PosteingangPage({
           _typ: "eingang"
         }))
       }
-      if (s(e), v) {
-        const t = e.find(e => e.id === v.id);
-        k(t || (v.ordner !== y ? v : null))
-      }
+      if (_epWeNr !== window.__epWeLauf) return;
+      s(e), k(a => {
+        if (!a) return a;
+        const t = e.find(e => e.id === a.id);
+        return t || (a.ordner !== y ? a : null)
+      })
     } catch (e) {
       console.error(e), p("Fehler: " + e.message)
     }
@@ -80218,7 +80296,7 @@ function PosteingangPage({
     if (!e.gelesen && "versendet" !== e._typ) try {
       await window._sb.from("mail_eingang").update({
         gelesen: !0
-      }).eq("id", e.id), epMailGelesenZumServer(e, !0), s(o.map(t => t.id === e.id ? {
+      }).eq("id", e.id), epMailGelesenZumServer(e, !0), s(n => n.map(t => t.id === e.id ? {
         ...t,
         gelesen: !0
       } : t)), De()
@@ -80226,7 +80304,7 @@ function PosteingangPage({
       console.error(e)
     }
   }, Oe = e => {
-    k(e), Ne(e), e && "versendet" !== e._typ && "entwuerfe" !== e.ordner && e.imap_uid && "extrahiert" !== e.anhaenge_status && "keine_anhaenge" !== e.anhaenge_status && (Dt(!0), Promise.resolve(ha(e, !0)).finally(() => Dt(!1))), t && r("ansicht")
+    window._epMailOeffnen = null, k(e), Ne(e), e && "versendet" !== e._typ && "entwuerfe" !== e.ordner && e.imap_uid && "extrahiert" !== e.anhaenge_status && "keine_anhaenge" !== e.anhaenge_status && (Dt(!0), Promise.resolve(ha(e, !0)).finally(() => Dt(!1))), t && r("ansicht")
   }, Le = async (e, t) => {
     if (!e || "versendet" === e._typ) return p("Gesendete Mails können nicht verschoben werden."), void setTimeout(() => p(""), 3e3);
     if (t && t !== e.ordner) try {
@@ -81175,11 +81253,10 @@ function PosteingangPage({
     if ("buchhaltung" === le && "weitergeleitet" !== e.rechnung_status) return !1;
     if ("rechnung_offen" === le && ("weitergeleitet" === e.rechnung_status || !(Array.isArray(e.anhaenge) && e.anhaenge.some(e => /pdf/i.test(e.contentType || e.filename || "")) && /rechnung|invoice|beleg|zahlung|mahnung/i.test(e.betreff || "")))) return !1;
     if (x) {
-      const t = x.toLowerCase();
-      if (!((e.betreff || "").toLowerCase().includes(t) || (e.absender_email || "").toLowerCase().includes(t) || (e.absender_name || "").toLowerCase().includes(t) || (e.empfaenger_email || "").toLowerCase().includes(t) || mailKoerper(e).toLowerCase().includes(t))) return !1
+      if (!epMailSuchTreffer(e, x)) return !1
     }
     return !0
-  }).sort((e, t) => "datum_asc" === ae ? new Date(e.gesendet_am || 0) - new Date(t.gesendet_am || 0) : "absender" === ae ? (e.absender_name || e.absender_email || "").localeCompare(t.absender_name || t.absender_email || "", "de") : "betreff" === ae ? (e.betreff || "").localeCompare(t.betreff || "", "de") : "ungelesen" === ae && !!e.gelesen != !!t.gelesen ? e.gelesen ? 1 : -1 : new Date(t.gesendet_am || 0) - new Date(e.gesendet_am || 0)), xa = [{
+  }).sort((e, t) => (x ? epMailKopfTreffer(t, x) - epMailKopfTreffer(e, x) : 0) || ("datum_asc" === ae ? new Date(e.gesendet_am || 0) - new Date(t.gesendet_am || 0) : "absender" === ae ? (e.absender_name || e.absender_email || "").localeCompare(t.absender_name || t.absender_email || "", "de") : "betreff" === ae ? (e.betreff || "").localeCompare(t.betreff || "", "de") : "ungelesen" === ae && !!e.gelesen != !!t.gelesen ? e.gelesen ? 1 : -1 : new Date(t.gesendet_am || 0) - new Date(e.gesendet_am || 0))), xa = [{
     key: "posteingang",
     label: "Posteingang",
     icon: "📥"
@@ -81399,7 +81476,7 @@ function PosteingangPage({
       position: "relative",
       background: "#fff",
       border: t ? "none" : `1px solid ${CI.border}`,
-      height: t ? "auto" : "calc(100vh - 220px)",
+      height: t ? "auto" : "calc(100vh - 190px)",
       minHeight: t ? "calc(100vh - 200px)" : 560
     },
     className: "mail-outlook-grid"
@@ -81596,7 +81673,7 @@ function PosteingangPage({
     }
   }, React.createElement("input", {
     type: "text",
-    placeholder: "Suchen (Betreff, Absender) …",
+    placeholder: "Suchen (Betreff, Absender, Text) …",
     value: x,
     onChange: e => S(e.target.value),
     style: {
@@ -81903,7 +81980,7 @@ function PosteingangPage({
         letterSpacing: "0.05em",
         whiteSpace: "nowrap"
       }
-    }, a ? "versendet" === e._typ ? "Portal" : "Postfach" : ka[e.quelle] || e.quelle), "weitergeleitet" === e.rechnung_status && React.createElement("span", {
+    }, a ? "versendet" === e._typ || e._versendet ? "Portal" : "Postfach" : ka[e.quelle] || e.quelle), "weitergeleitet" === e.rechnung_status && React.createElement("span", {
       title: "An die Buchhaltung weitergeleitet" + (e.rechnung_weitergeleitet_am ? " am " + new Date(e.rechnung_weitergeleitet_am).toLocaleString("de-DE", {
         day: "2-digit",
         month: "2-digit",
@@ -82935,6 +83012,8 @@ function PosteingangPage({
     key: "einl-" + v.id,
     mail: v,
     user: window._epMailNutzer || null
+  }), "versendet" === v._typ && React.createElement(EpVersendetAnhangHinweis, {
+    mail: v
   }), "versendet" !== v._typ && "entwuerfe" !== v.ordner && (() => {
     const e = v.anhaenge_status || "unbekannt",
       t = Array.isArray(v.anhaenge) ? v.anhaenge : [];
@@ -84614,7 +84693,7 @@ function PosteingangPage({
           try {
             const {
               data: e
-            } = await window._sb.from("immobilien").select("immo_nr, objekttitel, bezeichnung, strasse, hausnummer, plz, ort, zimmer, wohnflaeche, angebotspreis, kaltmiete, provision_aussen, provisionsfrei, vertragsart, adresse_freigeben").eq("id", o).maybeSingle();
+            } = await window._sb.from("immobilien").select("immo_nr, objekttitel, bezeichnung, strasse, hausnummer, plz, ort, zimmer, wohnflaeche, angebotspreis, kaltmiete, provision_aussen, provisionsfrei, vertragsart, adresse_freigeben, objektart").eq("id", o).maybeSingle();
             if (e) {
               const t = e => null == e || "" === e ? "" : new Intl.NumberFormat("de-DE", {
                   style: "currency",
@@ -84636,7 +84715,7 @@ function PosteingangPage({
                 wohnflaeche: n(e.wohnflaeche),
                 kaufpreis: t(e.angebotspreis),
                 kaltmiete: t(e.kaltmiete),
-                provision: o ? "keine (Bestellerprinzip)" : e.provisionsfrei || !l || /^0([.,]0+)? %$/.test(l) ? "provisionsfrei" : `${l} inkl. gesetzl. MwSt.`
+                provision: o ? epMieteProvisionText(e) : e.provisionsfrei || !l || /^0([.,]0+)? %$/.test(l) ? "provisionsfrei" : `${l} inkl. gesetzl. MwSt.`
               }
             }
           } catch (e) {}
@@ -84695,6 +84774,7 @@ function PosteingangPage({
           mein_name: epHtmlEscape(o.mein_name)
         }) : epTextZuHtml(s)), M(n)
       } else Nn(s);
+      epVorlageAnhaengeAnhaengen(t, Et, vt, p);
       setTimeout(() => {
         An(ta(s))
       }, 0)
@@ -111301,7 +111381,7 @@ function EigentuemerDetail({
   useEffect(() => {
     ke(), Re()
   }, []);
-  const [xe, Se] = useState(!1), [ze, Ce] = useState("expose"), [Ie, Be] = useState(""), [Te, Fe] = useState(!0), [We, je] = useState(""), [Pe, Me] = useState(""), [De, Ne] = useState(!1), [Oe, Le] = useState(0);
+  const [xe, Se] = useState(!1), [ze, Ce] = useState("expose"), [Ie, Be] = useState(""), [Te, Fe] = useState(!0), [We, je] = useState(""), [Pe, Me] = useState(""), [De, Ne] = useState(!1), [Oe, Le] = useState(0), [_epEigWahl, _epSetEigWahl] = useState([]);
   useEffect(() => {
     e?.id && (async () => {
       try {
@@ -112464,7 +112544,7 @@ function EigentuemerDetail({
       marginBottom: 12,
       lineHeight: 1.5
     }
-  }, "Stellen Sie dem Eigentümer Unterlagen zur Verfügung — Bewertung, Exposé, Bestätigungen etc. Der Eigentümer sieht das Dokument im Portal und kann es löschen ", React.createElement("em", null, "nicht"), ". Er erhält eine Benachrichtigung beim nächsten Login."), React.createElement("div", {
+  }, "Stellen Sie dem Eigentümer Unterlagen zur Verfügung — Bewertung, Exposé, Bestätigungen etc. Datei wählen, Nachricht schreiben, dann „An Eigentümer senden“: Der Eigentümer sieht das Dokument im Portal (löschen kann er es ", React.createElement("em", null, "nicht"), ") und erhält wenige Minuten später eine E-Mail mit Ihrer Nachricht."), React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "1.5fr 1fr auto",
@@ -112537,25 +112617,14 @@ function EigentuemerDetail({
     }
   }, React.createElement(Upload, {
     size: 12
-  }), " ", xe ? "Lädt …" : "+ Hochladen", React.createElement("input", {
+  }), " ", xe ? "Lädt …" : "+ Datei wählen", React.createElement("input", {
     type: "file",
     multiple: !0,
     disabled: xe,
+    "data-ep-eig-datei-wahl": !0,
     onChange: e => {
       const t = Array.from(e.target.files || []);
-      e.target.value = "", t.length > 0 && (async e => {
-        if (!e || 0 === e.length) return;
-        je("");
-        const t = e.length;
-        let n = 0,
-          a = 0;
-        for (let t = 0; t < e.length; t++) try {
-          await Ve(e[t]), n++
-        } catch (n) {
-          a++, console.error("Datei " + e[t].name + " fehlgeschlagen:", n)
-        }
-        n > 0 && Me(""), t > 1 && je(0 === a ? `✓ ${n} Dateien für Eigentümer hinterlegt` : `${n} von ${t} hochgeladen, ${a} fehlgeschlagen`)
-      })(t)
+      e.target.value = "", t.length > 0 && (_epSetEigWahl(a => [...a, ...t]), je(""))
     },
     style: {
       display: "none"
@@ -112613,7 +112682,26 @@ function EigentuemerDetail({
       resize: "vertical",
       background: "#fff"
     }
-  })), React.createElement("div", {
+  })), React.createElement(EpEigVersandLeiste, {
+    dateien: _epEigWahl,
+    setDateien: _epSetEigWahl,
+    busy: xe,
+    senden: async () => {
+      const e = _epEigWahl;
+      if (!e.length || xe) return;
+      je("");
+      const t = e.length;
+      let n = 0,
+        a = 0;
+      const rest = [];
+      for (let i = 0; i < e.length; i++) try {
+        await Ve(e[i]), n++
+      } catch (x) {
+        a++, rest.push(e[i]), console.error("Datei " + e[i].name + " fehlgeschlagen:", x)
+      }
+      _epSetEigWahl(rest), n > 0 && 0 === a && Me(""), t > 1 && je(0 === a ? `✓ ${n} Dateien für Eigentümer hinterlegt` : `${n} von ${t} hochgeladen, ${a} fehlgeschlagen`)
+    }
+  }), React.createElement("div", {
     style: {
       marginTop: 14
     }
@@ -123253,6 +123341,7 @@ function App() {
         title: "Posteingang",
         subtitle: "E-Mails aus dem Postfach",
         breit: !0,
+        ohneTitel: !0,
         comp: React.createElement(PosteingangPage, {
           user: k
         })
@@ -123431,6 +123520,7 @@ function App() {
     title: R[g].title,
     subtitle: R[g].subtitle,
     breit: !!R[g].breit,
+    ohneTitel: !!R[g].ohneTitel,
     user: k,
     onBack: () => f("home"),
     onLogout: h,
@@ -127758,6 +127848,7 @@ function ObjektInteressenten({ item }) {
     } catch (e) { setFehler(kwFehlertext(e)); setListe([]); }
   }, [item && item.id]);
   useEffect(() => { laden(); }, [laden]);
+  useEffect(() => { const h = (ev) => { const d = ev && ev.detail; if (d && d.quelle === "interessenten") return; if (!d || !d.immobilie_id || d.immobilie_id === (item && item.id)) laden(); }; window.addEventListener("ep-expose-gesendet", h); return () => window.removeEventListener("ep-expose-gesendet", h); }, [laden]);
   if (!item || !item.id) return null;
   const abgleich = async () => {
     setBusy(true); setFehler(""); setMeldung("");
@@ -127782,7 +127873,7 @@ function ObjektInteressenten({ item }) {
       catch (e) { if (kwFehlertext(e) === "abgebrochen") break; fehl.push(kwName(t.kontakte) + ": " + kwFehlertext(e)); }
     }
     setMeldung(`${ok} Exposé-Link${ok === 1 ? "" : "s"} gesendet.`); if (fehl.length) setFehler(fehl.join(" · "));
-    setWahl({}); await laden(); setBusy(false);
+    setWahl({}); await laden(); epExposeGesendetMelden(item && item.id, null, "interessenten"); setBusy(false);
   };
   const n = liste ? liste.length : 0;
   return React.createElement("div", { style: { ...cardStyle, padding: 20, marginBottom: 14 } },
@@ -130518,7 +130609,7 @@ function ExposeOffenKarte({ user: e, onOpen: t }) {
 // Lage, Ausstattung Exposé). Die Knöpfe setzen die Auszeichnung, die expose-pdf-erzeugen (ab v49)
 // im PDF umsetzt: **fett**, *kursiv*, "## Zwischenüberschrift" und "- Aufzählung" am Zeilenanfang.
 // Portale (ImmoScout, Immowelt, Homepage) erhalten den Text ohne diese Zeichen (portal-export).
-function EPTextFormat({ feld, wert, setzen, style }) {
+function EPTextFormatRoh({ feld, wert, setzen, style }) {
   const ref = React.useRef(null);
   const [hilfe, setHilfe] = React.useState(false);
   const mitExpose = /^beschreibung_(objekt|lage|ausstattung|ausstattung_expose)$/.test(feld || "");
@@ -132253,6 +132344,7 @@ function LandingZugaenge({ item }) {
   const [faqBearbeiten, setFaqBearbeiten] = useState({}); const [faqAuf, setFaqAuf] = useState(false);
   const laden = useCallback(async () => { if (!item || !item.id) return; try { setDaten(await lpZugaengeLaden(item.id)); setFehler(""); } catch (e) { setFehler(lpFehler(e)); setDaten({ zugaenge: [], wuensche: [], fragen: [], faq: [] }); } }, [item && item.id]);
   useEffect(() => { laden(); }, [laden]);
+  useEffect(() => { const h = (ev) => { const d = ev && ev.detail; if (d && d.quelle === "zugaenge") return; if (!d || !d.immobilie_id || d.immobilie_id === (item && item.id)) laden(); }; window.addEventListener("ep-expose-gesendet", h); return () => window.removeEventListener("ep-expose-gesendet", h); }, [laden]);
   if (!item || !item.id) return null;
   const d = daten || { zugaenge: [], wuensche: [], fragen: [], faq: [] };
   const zugangVon = (id) => d.zugaenge.find((z) => z.id === id) || null;
@@ -132292,7 +132384,7 @@ function LandingZugaenge({ item }) {
     d.zugaenge.length ? liste.map((z) => { const wz = d.wuensche.filter((w) => w.freigabe_id === z.id); const fz = d.fragen.filter((q) => q.freigabe_id === z.id);
       return React.createElement("div", { key: z.id, "data-lp-zugang": z.id, style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", padding: "6px 0", borderTop: `1px solid ${CI.border}`, fontSize: 12.5 } },
         React.createElement("span", { style: { flex: "1 1 200px", minWidth: 0 } }, React.createElement("strong", null, z.name || z.email), z.name ? React.createElement("span", { style: { color: CI.muted } }, " · ", z.email) : null, React.createElement("span", { style: { color: CI.muted } }, " · ", lpZeitpunkt(z.created_at), z.downloads ? ` · ${z.downloads}× geladen` : "", wz.length ? ` · ${wz.length} Terminwunsch${wz.length === 1 ? "" : "e"}` : "", fz.length ? ` · ${fz.length} Frage${fz.length === 1 ? "" : "n"}` : "")),
-        React.createElement("span", { style: { display: "inline-flex", gap: 4, flexWrap: "wrap" } }, lpStatusChips(z)),
+        React.createElement("span", { style: { display: "inline-flex", gap: 4, flexWrap: "wrap" } }, lpStatusChips(z).concat([epZugangAdressbuchChip(z)])),
         z.absage_text ? React.createElement("div", { "data-lp-absagetext": "1", style: { flexBasis: "100%", fontSize: 12.5, background: /angebot/i.test(z.absage_grund || "") ? "#e6f4ea" : "#fff7d6", padding: "6px 10px", whiteSpace: "pre-wrap" } }, React.createElement("strong", null, /angebot/i.test(z.absage_grund || "") ? "Angebot: " : "Nachricht: "), z.absage_text) : null,
         knopf("Link kopieren", async () => { const url = (z.landing ? LP_OBJEKT_BASIS : "https://immooffice.example/freigabe.html?expose=") + z.token; try { await navigator.clipboard.writeText(url); setMeldung("Link kopiert: " + url); } catch (e) { prompt("Link:", url); } }, { hell: true, style: { padding: "3px 8px", fontSize: 11 } })); })
       : React.createElement("div", { style: { color: CI.muted, fontSize: 12.5, marginTop: 4 } }, "Noch keine Zugänge. Exposé-Links entstehen wie bisher über „Exposé senden“ im Posteingang, am Kontakt oder bei den passenden Interessenten – mit eingeschaltetem Standard führen sie auf die Objektseite."),
@@ -134434,11 +134526,22 @@ function ObjektExposeVersand({ item }) {
     epExposeAnschreiben({ objekt: item, kontakt: e, nutzer, url: "[EXPOSÉ-LINK]" }).then((av) => { if (av) { setBetreff(av.betreff); setText(av.text); } }).catch(() => {});
   };
   const waehlen = (k) => uebernehmen({ kontakt_id: k.id, email: k.email, name: kwName(k), anrede: k.anrede || "", nachname: k.nachname || "" });
-  const neuUebernehmen = () => {
+  const neuUebernehmen = async () => {
     const email = String(neu.email || "").trim();
     if (!gueltig(email)) { setMeldung("Fehler: Bitte eine gültige E-Mail-Adresse eingeben."); return; }
     const name = [neu.vorname, neu.nachname].map((x) => String(x || "").trim()).filter(Boolean).join(" ");
+    let k = null, geprueft = true;
+    setBusy(true); setMeldung("");
+    try { k = await epKontaktZurEmail(email); } catch (x) { geprueft = false; }
+    setBusy(false);
+    if (k) {
+      const kName = kwName(k) || name;
+      uebernehmen({ kontakt_id: k.id, email, name: kName, anrede: k.anrede || neu.anrede || "", nachname: String(k.nachname || neu.nachname || "").trim() });
+      setMeldung("Steht bereits im Adressbuch: " + kName + " – der Versand wird diesem Kontakt zugeordnet.");
+      return;
+    }
     uebernehmen({ kontakt_id: null, email, name, anrede: neu.anrede || "", nachname: String(neu.nachname || "").trim() });
+    setMeldung(geprueft ? "Noch nicht im Adressbuch – wird an die neue Adresse gesendet." : "Fehler: Adressbuch konnte nicht geprüft werden – wird als neue Adresse gesendet.");
   };
   const senden = async () => {
     if (!empf || busy) return;
@@ -134448,6 +134551,7 @@ function ObjektExposeVersand({ item }) {
       const r = await epObjektExposeSenden({ objekt: item, empfaenger: empf, nutzer, betreff, text,
         provisionFragen: () => prompt("Am Objekt ist keine Käuferprovision hinterlegt. Provision für den Käufer (z. B. 3,57 % inkl. MwSt.) — leer lassen = provisionsfrei:", epEinst("provision_kaeufer_standard", "3,57 %")) });
       setErgebnis(r); setMeldung("Exposé-Link an " + empf.email + " gesendet.");
+      epExposeGesendetMelden(item.id, empf.email, "objekt");
     } catch (e) { if (!/abgebrochen/.test(kwFehlertext(e))) setMeldung("Fehler: " + kwFehlertext(e)); }
     setBusy(false);
   };
@@ -135528,6 +135632,5893 @@ function ZugangLinkAnfordern() {
         problem && React.createElement("div", { "data-ep": "zugang-link-problem", style: { color: CI.danger, marginTop: 6 } }, problem)));
 }
 window.epZugangFehlerLesen = epZugangFehlerLesen; window.epZugangFehlerText = epZugangFehlerText; window.ZugangLinkAnfordern = ZugangLinkAnfordern;
+// Stufe 98: Objektnachweis (Word) mit Widerrufsbelehrung nach § 356 BGB – Telefon und E-Mail der Belehrung
+// je Standort (firma_stammdaten; Beispielstadt ohne eigene Nummer → Musterstadt wie in den Edge Functions).
+const WIDERRUF_356_KONTAKT={musterstadt:{telefon:"0381 / 36779988",email:"info@immooffice.example"},beispielstadt:{telefon:"0381 / 36779988",email:"beispielstadt@immooffice.example"},berlin:{telefon:"030 75 43 56 71",email:"berlin@immooffice.example"}};
+function widerrufKontaktSetzen(xml,standort){const k=WIDERRUF_356_KONTAKT[standort||"musterstadt"]||WIDERRUF_356_KONTAKT.musterstadt;return xml.split("0381 / 36779988").join(escapeXml(k.telefon)).split("info@immooffice.example").join(escapeXml(k.email))}
+// Stufe 101 – Exposé aus dem Objekt: Adressbuch-Abgleich und sofort aktuelle Listen (29.09.2026)
+/** Sucht zu einer E-Mail-Adresse den Kontakt im Adressbuch (Haupt-Adresse in kontakte, sonst weitere Adressen in
+ *  kontakt_emails). Groß-/Kleinschreibung egal, sonst exakt; aktive Kontakte zuerst. Liefert den Kontakt oder null. */
+async function epKontaktZurEmail(email) {
+  const e = String(email || "").trim().toLowerCase();
+  if (!e) return null;
+  const muster = e.replace(/[\\%_]/g, (z) => "\\" + z);
+  const felder = "id, anrede, titel, vorname, nachname, firma, email, aktiv, created_at";
+  const passend = (liste, f) => (liste || []).filter((k) => k && String(f(k) || "").trim().toLowerCase() === e);
+  const bester = (liste) => liste.sort((a, b) => (b.aktiv === false ? 0 : 1) - (a.aktiv === false ? 0 : 1) || String(a.created_at || "").localeCompare(String(b.created_at || "")))[0] || null;
+  const { data, error } = await window._sb.from("kontakte").select(felder).ilike("email", muster).limit(10);
+  if (error) throw error;
+  const direkt = bester(passend(data, (k) => k.email));
+  if (direkt) return direkt;
+  const { data: weitere, error: e2 } = await window._sb.from("kontakt_emails").select("kontakt_id, email").ilike("email", muster).limit(10);
+  if (e2) throw e2;
+  const ids = [...new Set(passend(weitere, (w) => w.email).map((w) => w.kontakt_id).filter(Boolean))];
+  if (!ids.length) return null;
+  const { data: ks, error: e3 } = await window._sb.from("kontakte").select(felder).in("id", ids);
+  if (e3) throw e3;
+  return bester((ks || []).filter((k) => ids.includes(k.id)));
+}
+/** Meldet allen Karten im Reiter Vermarktung, dass zu einem Objekt ein Exposé-Link verschickt wurde. */
+function epExposeGesendetMelden(immobilieId, email, quelle) {
+  try { window.dispatchEvent(new CustomEvent("ep-expose-gesendet", { detail: { immobilie_id: immobilieId || null, email: email || null, quelle: quelle || "" } })); } catch (x) { /* ohne CustomEvent: Liste bleibt bis „Neu laden“ */ }
+}
+/** Hinweis am Zugang: steht der Empfänger im Adressbuch? Mit Kontakt → anklickbar (öffnet den Kontakt). */
+function epZugangAdressbuchChip(z) {
+  const stil = { fontSize: 10.5, fontWeight: 700, padding: "2px 7px", whiteSpace: "nowrap" };
+  if (z && z.kontakt_id) return React.createElement("span", { key: "adressbuch", "data-lp-adressbuch": "ja", title: "Kontakt im Adressbuch öffnen",
+    onClick: () => { window._epKontaktOeffnen = z.kontakt_id; if (typeof window.setView === "function") window.setView("kontakte"); },
+    style: { ...stil, background: "#e6f4ea", color: "#1e7e34", cursor: "pointer" } }, "👤 im Adressbuch");
+  return React.createElement("span", { key: "adressbuch", "data-lp-adressbuch": "nein", title: "Zu dieser E-Mail-Adresse gibt es (noch) keinen Kontakt. Er wird bei der Bestätigung automatisch zugeordnet, sobald ein Kontakt mit dieser Adresse existiert.",
+    style: { ...stil, background: "#fff7d6", color: "#8a5a00" } }, "nicht im Adressbuch");
+}
+window.epKontaktZurEmail = epKontaktZurEmail; window.epExposeGesendetMelden = epExposeGesendetMelden; window.epZugangAdressbuchChip = epZugangAdressbuchChip;
+// Stufe 102 – Freitexte am Objekt: Formatierung direkt sehen statt Sternchen (29.09.2026)
+/** Umwandlung zwischen den gespeicherten Zeichen (**fett**, *kursiv*, „## “, „- “ – so liest sie expose-pdf-erzeugen)
+ *  und der formatierten Anzeige im Editor. Gespeichert wird weiter der Text mit Zeichen. */
+const EPWysiwyg = (() => {
+  const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  function inlineHtml(t) {
+    let h = esc(t);
+    h = h.replace(/\*\*\*([^\s*](?:[^*]*?[^\s*])?)\*\*\*/g, "<strong><em>$1</em></strong>");
+    h = h.replace(/\*\*([^\s*](?:[\s\S]*?[^\s*])?)\*\*/g, "<strong>$1</strong>");
+    h = h.replace(/(^|[^\w])__([^\s_](?:[^_]*?[^\s_])?)__(?!\w)/g, "$1<strong>$2</strong>");
+    h = h.replace(/\*([^\s*](?:[^*]*?[^\s*])?)\*/g, "<em>$1</em>");
+    h = h.replace(/(^|[^\w])_([^\s_](?:[^_]*?[^\s_])?)_(?!\w)/g, "$1<em>$2</em>");
+    return h;
+  }
+  function zuHtml(md) {
+    const zeilen = String(md || "").replace(/\r\n?/g, "\n").split("\n");
+    let h = "", liste = false;
+    for (const z of zeilen) {
+      const li = z.match(/^[-•*]\s+(.*)$/), ue = z.match(/^#{1,3}\s+(.*)$/);
+      if (li) { if (!liste) { h += "<ul>"; liste = true; } h += "<li>" + (inlineHtml(li[1]) || "<br>") + "</li>"; continue; }
+      if (liste) { h += "</ul>"; liste = false; }
+      h += ue ? "<h3>" + (inlineHtml(ue[1]) || "<br>") + "</h3>" : "<div>" + (inlineHtml(z) || "<br>") + "</div>";
+    }
+    if (liste) h += "</ul>";
+    return h;
+  }
+  const BLOCK = /^(DIV|P|H[1-6]|LI|UL|OL|BLOCKQUOTE|PRE|SECTION|ARTICLE|HEADER|FOOTER)$/;
+  const istFett = (el) => { if (el.tagName === "B" || el.tagName === "STRONG") return true; const w = (el.style && el.style.fontWeight) || ""; return w === "bold" || w === "bolder" || Number(w) >= 600; };
+  const istKursiv = (el) => el.tagName === "I" || el.tagName === "EM" || !!(el.style && el.style.fontStyle === "italic");
+  const umschliessen = (s, m) => s.split("\n").map((seg) => { const x = seg.match(/^(\s*)([\s\S]*?)(\s*)$/); return x[2] ? x[1] + m + x[2] + m + x[3] : seg; }).join("\n");
+  function inlineMd(n, fett, kursiv) {
+    if (n.nodeType === 3) return n.nodeValue;
+    if (n.nodeType !== 1) return "";
+    if (n.tagName === "BR") return "\n";
+    const f = !fett && istFett(n), k = !kursiv && istKursiv(n);
+    let s = [...n.childNodes].map((c) => inlineMd(c, fett || f, kursiv || k)).join("");
+    if (BLOCK.test(n.tagName)) s = "\n" + s + "\n";
+    if (k) s = umschliessen(s, "*");
+    if (f) s = umschliessen(s, "**");
+    return s;
+  }
+  function zuMd(root) {
+    const zeilen = [""]; let belegt = false, nurPraefix = false, nachBlock = false;
+    const neu = () => { zeilen.push(""); belegt = false; nurPraefix = false; };
+    const schreib = (t) => { if (nachBlock) { neu(); nachBlock = false; } if (!t) return; zeilen[zeilen.length - 1] += t; belegt = true; nurPraefix = false; };
+    const letzterInhalt = (n) => { let x = n.nextSibling; while (x && x.nodeType === 3 && !x.nodeValue) x = x.nextSibling; return !x && (n.parentNode === root || BLOCK.test(n.parentNode.tagName || "")); };
+    function knoten(n) {
+      if (n.nodeType === 1 && BLOCK.test(n.tagName)) {
+        if ((belegt && !nurPraefix) || nachBlock) neu();
+        nachBlock = false;
+        const pre = /^H[1-6]$/.test(n.tagName) ? "## " : n.tagName === "LI" ? "- " : "";
+        if (pre && !nurPraefix) { zeilen[zeilen.length - 1] += pre; belegt = true; nurPraefix = true; }
+        [...n.childNodes].forEach(knoten);
+        belegt = true; nurPraefix = false; nachBlock = true;
+        return;
+      }
+      if (n.nodeType === 1 && n.tagName === "BR") {
+        if (letzterInhalt(n)) { belegt = true; return; }
+        if (nachBlock) { neu(); nachBlock = false; }
+        neu(); belegt = true; return;
+      }
+      let s = inlineMd(n, false, false);
+      if (s.endsWith("\n") && letzterInhalt(n)) s = s.slice(0, -1);
+      s.split("\n").forEach((seg, i) => { if (i > 0) { if (nachBlock) { neu(); nachBlock = false; } neu(); belegt = true; } schreib(seg); });
+    }
+    [...root.childNodes].forEach(knoten);
+    return zeilen.join("\n");
+  }
+  return { inlineHtml, zuHtml, zuMd };
+})();
+let _epWysiwygStil = false;
+function epWysiwygStil() {
+  if (_epWysiwygStil) return; _epWysiwygStil = true;
+  try {
+    const st = document.createElement("style");
+    st.textContent = `[data-ep-wysiwyg]{white-space:pre-wrap;overflow-y:auto;line-height:1.5;cursor:text;background:#fff;word-break:break-word}
+[data-ep-wysiwyg] h3{font-size:1.08em;font-weight:700;color:${CI.blau};margin:8px 0 2px}
+[data-ep-wysiwyg] ul{margin:2px 0;padding-left:22px}[data-ep-wysiwyg] li{margin:1px 0}
+[data-ep-wysiwyg] div,[data-ep-wysiwyg] p{margin:0}[data-ep-wysiwyg] strong,[data-ep-wysiwyg] b{font-weight:700}`;
+    document.head.appendChild(st);
+  } catch (e) {}
+}
+/** Formatierter Editor: zeigt fett/kursiv/Überschrift/Liste direkt, speichert weiter mit Zeichen. */
+function EPTextEditor({ feld, wert, setzen, style }) {
+  const ref = React.useRef(null), zuletzt = React.useRef(null);
+  epWysiwygStil();
+  React.useLayoutEffect(() => {
+    const el = ref.current; if (!el) return;
+    const w = wert || "";
+    if (zuletzt.current === w) return;
+    zuletzt.current = w; el.innerHTML = EPWysiwyg.zuHtml(w);
+  }, [wert]);
+  const melden = () => { const el = ref.current; if (!el) return; const md = EPWysiwyg.zuMd(el); if (md !== zuletzt.current) { zuletzt.current = md; setzen(md); } };
+  const blockVon = () => { const el = ref.current, sel = window.getSelection(); let n = sel && sel.anchorNode; while (n && n !== el) { if (n.nodeType === 1 && /^(DIV|P|H[1-6]|LI)$/.test(n.tagName)) return n; n = n.parentNode; } return null; };
+  const befehle = {
+    fett: () => document.execCommand("bold", false, null),
+    kursiv: () => document.execCommand("italic", false, null),
+    ueberschrift: () => { const b = blockVon(); document.execCommand("formatBlock", false, b && /^H[1-6]$/.test(b.tagName) ? "div" : "h3"); },
+    liste: () => document.execCommand("insertUnorderedList", false, null),
+  };
+  const ausfuehren = (name) => { const el = ref.current; if (!el) return; if (document.activeElement !== el) el.focus(); befehle[name](); melden(); };
+  const knopf = (beschriftung, titel, name, extra) => React.createElement("button", {
+    type: "button", title: titel, "data-ep-format": beschriftung,
+    onMouseDown: (e) => { e.preventDefault(); ausfuehren(name); },
+    onClick: (e) => { if (e.detail === 0) ausfuehren(name); },
+    style: { border: `1px solid ${CI.border}`, background: "#fff", color: CI.blau, borderRadius: 3, padding: "3px 9px", fontFamily: FONT, fontSize: 12, lineHeight: 1.3, cursor: "pointer", ...extra },
+  }, beschriftung);
+  const einfuegen = (e) => {
+    e.preventDefault();
+    const t = ((e.clipboardData || window.clipboardData) && (e.clipboardData || window.clipboardData).getData("text/plain")) || "";
+    document.execCommand("insertHTML", false, t.replace(/\r\n?/g, "\n").split("\n").map(EPWysiwyg.inlineHtml).join("<br>"));
+    melden();
+  };
+  const taste = (e) => { if ((e.ctrlKey || e.metaKey) && /^u$/i.test(e.key)) e.preventDefault(); };
+  const ablegen = (e) => { if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) e.preventDefault(); };
+  return React.createElement(React.Fragment, null,
+    React.createElement("div", { style: { display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap", marginBottom: 6 } },
+      knopf("F", "Fett (Strg+B)", "fett", { fontWeight: 700 }),
+      knopf("K", "Kursiv (Strg+I)", "kursiv", { fontStyle: "italic" }),
+      knopf("Überschrift", "Zwischenüberschrift ein/aus für die Zeile", "ueberschrift"),
+      knopf("• Liste", "Aufzählung ein/aus für die markierten Zeilen", "liste")),
+    React.createElement("div", { ref, contentEditable: true, suppressContentEditableWarning: true, role: "textbox", "aria-multiline": "true", "data-ep-wysiwyg": feld || "",
+      onInput: melden, onBlur: melden, onPaste: einfuegen, onKeyDown: taste, onDrop: ablegen, style: { ...style, height: undefined } }));
+}
+/** Reiter „Texte“: Exposé-Felder formatiert (umschaltbar auf die Zeichen-Ansicht), übrige Felder wie bisher. */
+function EPTextFormat(props) {
+  const mitExpose = /^beschreibung_(objekt|lage|ausstattung|ausstattung_expose)$/.test(props.feld || "");
+  const [roh, setRoh] = React.useState(() => { try { return localStorage.getItem("ep_texte_zeichen") === "1"; } catch (e) { return false; } });
+  if (!mitExpose) return React.createElement(EPTextFormatRoh, props);
+  const umschalten = () => { const v = !roh; setRoh(v); try { localStorage.setItem("ep_texte_zeichen", v ? "1" : "0"); } catch (e) {} };
+  return React.createElement("div", { "data-ep-texte-ansicht": roh ? "zeichen" : "formatiert" },
+    roh ? React.createElement(EPTextFormatRoh, props) : React.createElement(EPTextEditor, props),
+    React.createElement("button", { type: "button", onClick: umschalten, "data-ep-texte-umschalten": true,
+      title: roh ? "Fett, kursiv usw. direkt sehen" : "Die gespeicherten Zeichen (**fett**, *kursiv*, ## …, - …) anzeigen und bearbeiten",
+      style: { border: "none", background: "transparent", color: CI.muted, fontFamily: FONT, fontSize: 11.5, cursor: "pointer", textDecoration: "underline dotted", padding: "4px 0 0" } },
+      roh ? "Formatiert anzeigen" : "Zeichen anzeigen"));
+}
+window.EPWysiwyg = EPWysiwyg; window.EPTextEditor = EPTextEditor; window.EPTextFormat = EPTextFormat;
+// Stufe 104 – Posteingang: richtige Mail beim Anklicken, Suche findet Namen (29.09.2026)
+/** Suche im Posteingang: jedes Wort muss vorkommen (Reihenfolge egal). Betreff, Absender und Empfänger werden als
+ *  Teilwort durchsucht, der Mailtext nur an Wortanfängen – sonst trifft z. B. „liche“ jede Mail mit „freundliche Grüße“. */
+function epMailSuchWoerter(x) { return String(x || "").toLowerCase().split(/\s+/).filter(Boolean); }
+function epMailKopfText(e) { return [e.betreff, e.absender_email, e.absender_name, e.empfaenger_email, e.empfaenger_name].map((v) => String(v || "").toLowerCase()).join(" | "); }
+function epMailSuchTreffer(e, x) {
+  const w = epMailSuchWoerter(x); if (!w.length) return true;
+  const kopf = epMailKopfText(e);
+  let koerper = null;
+  return w.every((t) => {
+    if (kopf.includes(t)) return true;
+    if (koerper === null) koerper = " " + String((typeof mailKoerper === "function" ? mailKoerper(e) : (e.text || "")) || "").toLowerCase();
+    const re = new RegExp("[^0-9a-zäöüß]" + t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    return re.test(koerper);
+  });
+}
+/** 1, wenn alle Suchwörter in Betreff/Absender/Empfänger stehen (diese Mails kommen in der Trefferliste zuerst). */
+function epMailKopfTreffer(e, x) { const w = epMailSuchWoerter(x); if (!w.length) return 0; const kopf = epMailKopfText(e); return w.every((t) => kopf.includes(t)) ? 1 : 0; }
+window.epMailSuchTreffer = epMailSuchTreffer; window.epMailKopfTreffer = epMailKopfTreffer;
+// Stufe 106 – Objekt-Koordinaten vor dem Exposé-Dienst sichern (29.09.2026)
+/** Ortsnamen-Varianten für die Suche: „Musterstadt-Ortsamt 5“ → „Musterstadt“, „X OT Y“ → „Y“, „X“; „A / B“ → „A“, „B“;
+ *  „Stadt-Stadtteil“ → zusätzlich „Stadt“ (als spätere Variante). */
+function epOrtVarianten(ort) {
+  const o = String(ort || "").trim(); if (!o) return [];
+  const out = [o];
+  const ot = o.match(/^(.+?)\s+(?:OT|Ortsteil)\s+(.+)$/i); if (ot) { out.push(ot[2].trim()); out.push(ot[1].trim()); }
+  if (o.includes("/")) o.split("/").forEach((t) => { if (t.trim()) out.push(t.trim()); });
+  const bez = o.match(/^(.+?)\s*-\s*(?:Ortsamt|Ortsbeirat|Ortsbezirk|Stadtbezirk|Stadtteil|Bezirk)\b.*$/i); if (bez) out.push(bez[1].trim());
+  const bind = o.match(/^([^\s\-\/]{3,})-([^\s\/]{3,})$/); if (bind) out.push(bind[1]);
+  return [...new Set(out.filter(Boolean))];
+}
+const epStrassenKern = (x) => String(x || "").toLowerCase().replace(/ß/g, "ss").replace(/[^a-zäöü]/g, "").replace(/(strasse|str)$/, "").slice(0, 5);
+/** Eine Adresse im Browser suchen: Nominatim (OSM), sonst Photon (OSM); bei Photon nur Deutschland, passende PLZ und Straße. */
+async function epAdresseSuchen(q, plz, strasse) {
+  try {
+    const r = await fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=de&q=" + encodeURIComponent(q));
+    if (r.ok) { const j = await r.json(); if (j && j[0]) return { lat: parseFloat(j[0].lat), lon: parseFloat(j[0].lon) }; }
+  } catch (e) { /* weiter mit Photon */ }
+  try {
+    const r = await fetch("https://photon.komoot.io/api/?limit=1&lang=de&q=" + encodeURIComponent(q));
+    if (r.ok) {
+      const j = await r.json(); const f = j && j.features && j.features[0];
+      if (f && f.geometry && Array.isArray(f.geometry.coordinates)) {
+        const p = f.properties || {};
+        const kern = epStrassenKern(strasse), treffer = epStrassenKern(p.street || p.name);
+        if ((!p.countrycode || String(p.countrycode).toUpperCase() === "DE") && (!plz || !p.postcode || String(p.postcode).trim() === plz) && (!kern || !treffer || kern === treffer)) {
+          const lon = Number(f.geometry.coordinates[0]), lat = Number(f.geometry.coordinates[1]);
+          if (isFinite(lat) && isFinite(lon)) return { lat, lon };
+        }
+      }
+    }
+  } catch (e) { /* nichts gefunden */ }
+  return null;
+}
+/** Hat das Objekt noch keine Koordinaten, sucht der Browser die Adresse (Straße + Hausnummer mit PLZ/Ort-Varianten) und
+ *  speichert sie in immobilien.lage_koordinaten. Der Exposé-Dienst nutzt dann die gespeicherten Koordinaten und muss nicht
+ *  selbst suchen (dort scheiterten Ortsangaben wie „Musterstadt-Ortsamt 5“). Nur genaue Treffer (mit Straße) werden gespeichert;
+ *  ohne Straße bleibt es beim bisherigen Weg. Wirft nie – im Zweifel läuft alles wie bisher. */
+async function epKoordinatenSichern(immobilieId) {
+  try {
+    if (!immobilieId || !window._sb) return null;
+    const { data: im } = await window._sb.from("immobilien").select("id, strasse, hausnummer, plz, ort, lage_koordinaten").eq("id", immobilieId).maybeSingle();
+    if (!im) return null;
+    const k = im.lage_koordinaten;
+    if (k && k.lat && k.lon) return k;
+    const strasse = [im.strasse, im.hausnummer].filter(Boolean).join(" ").trim(), plz = String(im.plz || "").trim();
+    if (!strasse) return null;
+    const kandidaten = [];
+    for (const ort of epOrtVarianten(im.ort)) { if (plz) kandidaten.push(strasse + ", " + plz + " " + ort); kandidaten.push(strasse + ", " + ort); }
+    if (plz) kandidaten.push(strasse + ", " + plz + ", Deutschland");
+    for (let i = 0; i < kandidaten.length; i++) {
+      if (i) await new Promise((r) => setTimeout(r, 1100)); // Nominatim: höchstens eine Anfrage je Sekunde
+      const pos = await epAdresseSuchen(kandidaten[i], plz, im.strasse);
+      if (pos) { await window._sb.from("immobilien").update({ lage_koordinaten: pos }).eq("id", immobilieId); return pos; }
+    }
+  } catch (e) { console.warn("Koordinaten sichern:", e); }
+  return null;
+}
+window.epOrtVarianten = epOrtVarianten; window.epKoordinatenSichern = epKoordinatenSichern;
+// Stufe 107 – Distanzen: im Browser ermitteln, Ersatzweg bei Overpass-Ausfall (29.09.2026)
+const IMMO_DIST_ORDNUNG = [["bus", "Bushaltestelle"], ["kita", "Kindergarten"], ["grundschule", "Grundschule"], ["weiterf", "Weiterf. Schule"], ["einkaufen", "Einkaufen"], ["zentrum", "Zentrum"], ["autobahn", "Autobahn"]];
+function epDistMeter(a, b) {
+  const R = 6371000, rad = Math.PI / 180, dLat = (b.lat - a.lat) * rad, dLon = (b.lon - a.lon) * rad;
+  const s = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+/** wie im Exposé-Dienst: auf 100 m gerundet, mindestens 0,1 km */
+function epDistKm(m) { return (Math.max(0.1, Math.round(m / 100) / 10)).toLocaleString("de-DE") + " km"; }
+function epDistListe(kat) {
+  const gs = kat.grundschule != null ? kat.grundschule : kat.grundschule_fallback;
+  const wf = kat.weiterf != null ? kat.weiterf : kat.weiterf_fallback;
+  const werte = { ...kat, grundschule: gs, weiterf: wf };
+  return IMMO_DIST_ORDNUNG.filter(([k]) => werte[k] != null).map(([k, label]) => ({ label, wert: epDistKm(werte[k]) }));
+}
+function epDistSchule(kat, name, d, merke) {
+  const n = String(name || "").toLowerCase();
+  if (n.includes("grundschule")) merke("grundschule", d);
+  else if (/gymnasium|gesamtschule|oberschule|realschule|regionale/.test(n)) merke("weiterf", d);
+  else { merke("grundschule_fallback", d); merke("weiterf_fallback", d); }
+}
+async function epDistMitTimeout(url, opt, ms) {
+  const c = typeof AbortController === "function" ? new AbortController() : null;
+  const t = c ? setTimeout(() => c.abort(), ms) : null;
+  try { return await fetch(url, { ...(opt || {}), ...(c ? { signal: c.signal } : {}) }); } finally { if (t) clearTimeout(t); }
+}
+/** Weg 1: Overpass (wie der Exposé-Dienst), zwei Server mit je 12 s. */
+async function epDistOverpass(pos) {
+  const q = "[out:json][timeout:25];(node(around:2500," + pos.lat + "," + pos.lon + ")[\"highway\"=\"bus_stop\"];nwr(around:3000," + pos.lat + "," + pos.lon + ")[\"amenity\"=\"kindergarten\"];nwr(around:5000," + pos.lat + "," + pos.lon + ")[\"amenity\"=\"school\"];nwr(around:3000," + pos.lat + "," + pos.lon + ")[\"shop\"~\"^(supermarket|convenience)$\"];node(around:9000," + pos.lat + "," + pos.lon + ")[\"highway\"=\"motorway_junction\"];);out center 400;";
+  for (const server of ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter"]) {
+    try {
+      const r = await epDistMitTimeout(server, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: "data=" + encodeURIComponent(q) }, 12000);
+      if (!r.ok) continue;
+      const j = await r.json(); const kat = {};
+      const merke = (k, d) => { if (kat[k] == null || d < kat[k]) kat[k] = d; };
+      for (const el of j.elements || []) {
+        const p = el.type === "node" ? { lat: el.lat, lon: el.lon } : (el.center ? { lat: el.center.lat, lon: el.center.lon } : null);
+        if (!p) continue;
+        const d = epDistMeter(pos, p), t = el.tags || {};
+        if (t.highway === "bus_stop") merke("bus", d);
+        else if (t.amenity === "kindergarten") merke("kita", d);
+        else if (t.amenity === "school") epDistSchule(kat, t.name, d, merke);
+        else if (t.shop) merke("einkaufen", d);
+        else if (t.highway === "motorway_junction") merke("autobahn", d);
+      }
+      return kat;
+    } catch (e) { /* nächster Server */ }
+  }
+  return null;
+}
+/** Weg 2 (Overpass ausgefallen): Nominatim-Kategoriesuche im Umkreis, Autobahn über Photon. Höchstens 1 Anfrage/s. */
+async function epDistNominatim(pos, ort) {
+  const kasten = (km) => { const dLat = km / 111, dLon = km / (111 * Math.cos(pos.lat * Math.PI / 180)); return [pos.lon - dLon, pos.lat + dLat, pos.lon + dLon, pos.lat - dLat].map((x) => x.toFixed(5)).join(","); };
+  const pause = () => new Promise((r) => setTimeout(r, 1100));
+  const suche = async (begriff, km) => {
+    try {
+      const r = await epDistMitTimeout("https://nominatim.openstreetmap.org/search?format=json&limit=40&bounded=1&viewbox=" + kasten(km) + "&q=" + encodeURIComponent(begriff), {}, 15000);
+      return r.ok ? (await r.json()) || [] : [];
+    } catch (e) { return []; }
+  };
+  const kat = {}; let treffer = 0;
+  const merke = (k, d) => { if (kat[k] == null || d < kat[k]) kat[k] = d; };
+  const abstand = (x) => epDistMeter(pos, { lat: parseFloat(x.lat), lon: parseFloat(x.lon) });
+  const reihe = [["Bushaltestelle", 2.5, (x, d) => merke("bus", d)], ["Kindergarten", 3, (x, d) => merke("kita", d)],
+    ["Grundschule", 5, (x, d) => merke("grundschule", d)], ["Schule", 5, (x, d) => epDistSchule(kat, x.name || x.display_name, d, merke)],
+    ["Gymnasium", 5, (x, d) => merke("weiterf", d)], ["Supermarkt", 3, (x, d) => merke("einkaufen", d)]];
+  for (let i = 0; i < reihe.length; i++) {
+    if (i) await pause();
+    const [begriff, km, f] = reihe[i];
+    for (const x of await suche(begriff, km)) { const d = abstand(x); if (d <= km * 1000) { f(x, d); treffer++; } }
+  }
+  const basis = (typeof epOrtVarianten === "function" ? epOrtVarianten(ort) : [ort]).filter(Boolean);
+  // Autobahn-Anschlussstellen heißen meist nach dem Ort („Musterstadt-Süd“) → Photon mit Kategorie und Umkreis 9 km
+  for (const o of basis.slice(-1)) {
+    try {
+      const r = await epDistMitTimeout("https://photon.komoot.io/api/?limit=20&osm_tag=highway:motorway_junction&bbox=" + kasten(9) + "&q=" + encodeURIComponent(o), {}, 12000);
+      if (r.ok) for (const f of ((await r.json()).features || [])) { const c = f.geometry && f.geometry.coordinates; if (c) { const d = epDistMeter(pos, { lat: c[1], lon: c[0] }); if (d <= 9000) { merke("autobahn", d); treffer++; } } }
+    } catch (e) { /* ohne Autobahn */ }
+  }
+  return treffer ? kat : null;
+}
+/** Zentrum = Entfernung zum Ortsmittelpunkt (wie der Exposé-Dienst). */
+async function epDistZentrum(pos, ort) {
+  for (const o of (typeof epOrtVarianten === "function" ? epOrtVarianten(ort) : [ort]).filter(Boolean)) {
+    try {
+      const r = await epDistMitTimeout("https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=de&q=" + encodeURIComponent(o + ", Deutschland"), {}, 15000);
+      const j = r.ok ? await r.json() : null;
+      if (j && j[0]) return epDistMeter(pos, { lat: parseFloat(j[0].lat), lon: parseFloat(j[0].lon) });
+    } catch (e) { /* nächste Variante */ }
+    await new Promise((r) => setTimeout(r, 1100));
+  }
+  return null;
+}
+/** Distanzen im Browser ermitteln und am Objekt speichern (lage_distanzen, vom updated_at-Trigger ausgenommen).
+ *  nurWennLeer: nichts tun, wenn schon Distanzen gespeichert sind. Liefert { lage_distanzen, lage_koordinaten, quelle } oder null
+ *  (dann übernimmt wie bisher der Exposé-Dienst). Wirft nie. */
+async function epDistanzenBrowser(immobilieId, opt) {
+  try {
+    if (!immobilieId || !window._sb) return null;
+    const pos = typeof epKoordinatenSichern === "function" ? await epKoordinatenSichern(immobilieId) : null;
+    const { data: im } = await window._sb.from("immobilien").select("id, ort, lage_koordinaten, lage_distanzen").eq("id", immobilieId).maybeSingle();
+    if (!im) return null;
+    if (opt && opt.nurWennLeer && Array.isArray(im.lage_distanzen) && im.lage_distanzen.length) return null;
+    const p = (pos && pos.lat) ? pos : im.lage_koordinaten;
+    if (!p || !p.lat || !p.lon) return null;
+    let quelle = "overpass", kat = await epDistOverpass(p);
+    if (!kat) { quelle = "nominatim"; kat = await epDistNominatim(p, im.ort); }
+    if (!kat) return null;
+    const z = await epDistZentrum(p, im.ort); if (z != null) kat.zentrum = z;
+    const liste = epDistListe(kat);
+    if (!liste.length) return null;
+    const { error } = await window._sb.from("immobilien").update({ lage_distanzen: liste }).eq("id", immobilieId);
+    if (error) return null;
+    return { lage_distanzen: liste, lage_koordinaten: p, quelle };
+  } catch (e) { console.warn("Distanzen im Browser:", e); return null; }
+}
+window.epDistanzenBrowser = epDistanzenBrowser; window.epDistListe = epDistListe; window.epDistKm = epDistKm;
+// Stufe 108 – Dokument für Eigentümer: erst auswählen, dann bewusst senden (29.09.2026)
+/** Leiste unter der Nachricht: ausgewählte Dateien (entfernbar) und der Knopf „An Eigentümer senden“.
+ *  Vorher löste schon die Dateiauswahl Hochladen, Portal-Meldung und E-Mail mit der Nachricht aus. */
+function EpEigVersandLeiste({ dateien, setDateien, busy, senden }) {
+  const liste = Array.isArray(dateien) ? dateien : [];
+  if (!liste.length) return React.createElement("div", { "data-ep-eig-versand": "leer", style: { fontSize: 11, color: CI.muted, marginTop: 8, lineHeight: 1.5 } },
+    "Datei über „+ Datei wählen“ auswählen, Nachricht schreiben – verschickt wird erst mit „An Eigentümer senden“.");
+  const groesse = (b) => b >= 1048576 ? (b / 1048576).toLocaleString("de-DE", { maximumFractionDigits: 1 }) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB";
+  return React.createElement("div", { "data-ep-eig-versand": liste.length, style: { marginTop: 10, background: "#fff", border: `1px solid ${CI.border}`, padding: 10 } },
+    React.createElement("div", { style: { fontSize: 11, color: CI.blau, fontWeight: 700, marginBottom: 6 } }, liste.length === 1 ? "Ausgewählte Datei" : `${liste.length} ausgewählte Dateien`),
+    liste.map((f, i) => React.createElement("div", { key: i + ":" + f.name, "data-ep-eig-datei": f.name, style: { display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: CI.blau, padding: "3px 0" } },
+      React.createElement("span", { style: { flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "📄 ", f.name),
+      React.createElement("span", { style: { color: CI.muted, fontSize: 11 } }, groesse(f.size || 0)),
+      React.createElement("button", { type: "button", disabled: busy, title: "Aus der Auswahl entfernen", "data-ep-eig-entfernen": f.name,
+        onClick: () => setDateien((a) => a.filter((_, j) => j !== i)),
+        style: { background: "transparent", border: "none", color: CI.muted, cursor: busy ? "default" : "pointer", fontSize: 14, padding: "0 4px" } }, "✕"))),
+    React.createElement("div", { style: { display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" } },
+      React.createElement("button", { type: "button", disabled: busy, "data-ep-eig-senden": true, onClick: senden,
+        style: { background: CI.gold, color: "#fff", border: "none", padding: "8px 16px", fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", cursor: busy ? "wait" : "pointer", fontFamily: FONT, opacity: busy ? 0.6 : 1 } },
+        busy ? "Sendet …" : "📤 An Eigentümer senden"),
+      React.createElement("button", { type: "button", disabled: busy, "data-ep-eig-verwerfen": true, onClick: () => setDateien([]),
+        style: { background: "transparent", color: CI.blau, border: `1px solid ${CI.border}`, padding: "8px 14px", fontSize: 11, cursor: "pointer", fontFamily: FONT } }, "Auswahl verwerfen")),
+    React.createElement("div", { style: { fontSize: 10.5, color: CI.muted, marginTop: 6 } }, "Beim Senden sieht der Eigentümer das Dokument im Portal und erhält eine E-Mail mit Ihrer Nachricht."));
+}
+window.EpEigVersandLeiste = EpEigVersandLeiste;
+// ---- Stufe 109: KI-Sortierung der Fotos nur beim ersten Befüllen oder per Knopf ----
+// Beim Öffnen des Upload-Dialogs wird festgehalten, ob das Objekt schon Fotos hat. Nach dem Upload beschriftet die KI
+// weiterhin neue Bilder ohne Titel; neu sortiert wird nur, wenn vorher kein Foto da war (Erstbefüllung).
+// Sonst bleibt die Reihenfolge, die neuen Bilder hängen hinten an. „⇅ Sortieren (KI)“ sortiert jederzeit auf Wunsch.
+window._epFotoStand = null;
+window.epFotoStandMerken = function (immobilieId) {
+  if (!immobilieId) return null;
+  if (window._epFotoStand && window._epFotoStand.id === immobilieId) return null;
+  const p = (async () => {
+    try {
+      const { data, error } = await window._sb.from("immobilie_datei").select("id").eq("immobilie_id", immobilieId).eq("kategorie", "foto").limit(1);
+      if (error) return null;
+      return Array.isArray(data) ? data.length : null;
+    } catch (e) { return null; }
+  })();
+  window._epFotoStand = { id: immobilieId, p };
+  return null;
+};
+window.epFotoStandVergessen = function () { window._epFotoStand = null; };
+// true nur, wenn sicher feststeht, dass vor dem Upload kein Foto am Objekt war
+window.epErstbefuellung = async function (immobilieId) {
+  const st = window._epFotoStand; window._epFotoStand = null;
+  if (!st || st.id !== immobilieId) return false;
+  const n = await st.p;
+  return n === 0;
+};
+// ---- Stufe 111: Anhänge im Ordner „Gesendet“ ----
+// Aus dem Portal gesendete Mails stehen doppelt bereit: als Versandprotokoll (mail_versendet, ohne Anhänge) und –
+// sobald der Abruf sie aus „Gesendet“ des Postfachs geholt hat – als Kopie in mail_eingang mit Anhängen.
+// Bisher gewann das Protokoll; jetzt gewinnt die Kopie (Anhänge laden, weiterleiten), Empfängername und
+// Mietanfrage kommen aus dem Protokoll. Ohne Kopie bleibt das Protokoll stehen.
+function epGesendetZusammenfuehren(versendet, eingang) {
+  const kopie = new Map();
+  for (const t of eingang || []) if (t && t.message_id && !kopie.has(t.message_id)) kopie.set(t.message_id, t);
+  const genutzt = new Set(); const out = [];
+  for (const v of versendet || []) {
+    const k = v && v.message_id ? kopie.get(v.message_id) : null;
+    if (k) {
+      genutzt.add(k.id);
+      out.push({ ...k, _typ: "eingang", gelesen: !0, empfaenger_name: v.empfaenger_name || k.empfaenger_name || null, mietanfrage_id: k.mietanfrage_id || v.mietanfrage_id || null, _versendet: v._orig || !0 });
+    } else out.push(v);
+  }
+  for (const t of eingang || []) if (t && !genutzt.has(t.id)) out.push({ ...t, _typ: "eingang", gelesen: !0 });
+  return out;
+}
+
+// Hinweis bei Portal-Mails, deren Kopie in „Gesendet“ fehlgeschlagen ist: Anhänge sind dann nirgends gespeichert
+function EpVersendetAnhangHinweis({ mail }) {
+  const f = String((mail && mail._orig && mail._orig.fehler_text) || "");
+  if (!/Gesendet-Kopie/.test(f)) return null;
+  return React.createElement("div", { "data-ep-versendet-hinweis": "", style: { marginBottom: 14, padding: 10, background: "#fff8e6", borderLeft: "3px solid #d9a400", fontSize: 11, color: "#6b5200" } },
+    "📎 Diese Mail wurde gesendet, aber die Kopie im Ordner „Gesendet“ des Postfachs ist fehlgeschlagen. Mitgeschickte Anhänge sind deshalb weder hier noch in Outlook gespeichert.");
+}
+// ---- Stufe 112: KI prüft Objektfotos auf private Details, Retusche nur als Vorschlag ----
+// Nach dem Upload (und per Knopf „🔒 Private Details prüfen (KI)“) prüft die Edge Function bild-privat-retusche jedes
+// neue Foto auf Familienfotos, Personen und weitere private Details. Bei einem Fund liegt ein retuschierter Vorschlag
+// neben dem Original; übernommen wird erst per Klick. Das Original bleibt im Speicher und lässt sich zurückholen.
+function epPrivatUrl(pfad) {
+  if (!pfad) return "";
+  try { return window._sb.storage.from("immobilie-dateien").getPublicUrl(pfad).data.publicUrl; } catch (e) { return ""; }
+}
+function epPrivatWebPfad(p) { return String(p || "").replace(/\.[^./]+$/, "") + "_web.jpg"; }
+
+window.epPrivatPruefen = async function (immobilieId, opt) {
+  opt = opt || {};
+  if (!immobilieId) throw new Error("Objekt fehlt.");
+  const { data, error } = await window._sb.functions.invoke("bild-privat-retusche", {
+    body: { aktion: "pruefen", immobilie_id: immobilieId, nur_neue: opt.nurNeue === true, datei_ids: opt.dateiIds || null },
+  });
+  if (error) throw new Error(error.message || String(error));
+  if (!data || !data.ok) throw new Error((data && data.fehler) || "Prüfung auf private Details fehlgeschlagen.");
+  return data;
+};
+window.epPrivatAktion = async function (dateiId, aktion) {
+  const { data, error } = await window._sb.functions.invoke("bild-privat-retusche", { body: { aktion, datei_id: dateiId } });
+  if (error) throw new Error(error.message || String(error));
+  if (!data || !data.ok) throw new Error((data && data.fehler) || "Aktion fehlgeschlagen.");
+  return data;
+};
+// nach dem Upload: neue Fotos einreihen, Liste neu laden (die Prüfung läuft im Hintergrund)
+function epPrivatNachUpload(immobilieId, laden) {
+  if (!immobilieId || !window.epPrivatPruefen) return;
+  window.epPrivatPruefen(immobilieId, { nurNeue: true })
+    .then((r) => { if (r && r.eingereiht && laden) laden(); })
+    .catch((e) => console.warn("Privat-Prüfung:", e.message || e));
+}
+
+// Solange Fotos geprüft werden: höchstens alle 15 s neu laden (egal wie viele Kacheln warten)
+function epPrivatNachladen(laden) {
+  const jetzt = Date.now();
+  if (window.__epPrivatZuletzt && jetzt - window.__epPrivatZuletzt < 15000) return;
+  window.__epPrivatZuletzt = jetzt;
+  try { laden && laden(); } catch (e) { /* egal */ }
+}
+
+function EpPrivatVergleich({ datei, onSchliessen, onAktion, busy }) {
+  const funde = (datei.privat_befund && datei.privat_befund.funde) || [];
+  const bild = (titel, url) => React.createElement("div", { style: { flex: "1 1 320px", minWidth: 0 } },
+    React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: CI.muted, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 6 } }, titel),
+    React.createElement("img", { src: url, alt: titel, style: { width: "100%", maxHeight: "60vh", objectFit: "contain", background: "#f4f4f4", display: "block" } }));
+  const knopf = (farbe) => ({ background: farbe, color: "#fff", border: "none", padding: "8px 14px", fontSize: 12, fontWeight: 600, cursor: busy ? "wait" : "pointer", fontFamily: FONT });
+  return React.createElement("div", { "data-ep-privat-vergleich": "", onClick: onSchliessen, style: { position: "fixed", inset: 0, background: "rgba(20,24,40,.6)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 } },
+    React.createElement("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", maxWidth: 1100, width: "100%", maxHeight: "92vh", overflowY: "auto", padding: 18, fontFamily: FONT } },
+      React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: CI.blau, marginBottom: 6 } }, "🔒 Private Details – Retusche-Vorschlag"),
+      React.createElement("ul", { style: { margin: "0 0 12px 18px", padding: 0, fontSize: 12, color: CI.text || "#333" } }, funde.map((f, i) => React.createElement("li", { key: i }, f.beschreibung || f.art))),
+      React.createElement("div", { style: { display: "flex", gap: 12, flexWrap: "wrap" } },
+        bild("Original", epPrivatUrl(epPrivatWebPfad(datei.storage_path)) || epPrivatUrl(datei.storage_path)),
+        bild("KI-Vorschlag", epPrivatUrl(datei.privat_vorschlag_pfad))),
+      React.createElement("div", { style: { fontSize: 11, color: CI.muted, margin: "10px 0" } },
+        "Bitte genau prüfen: Die KI kann auch Kleinigkeiten verändern. Nach der Übernahme ist das Bild als „KI-bearbeitet“ markiert (Hinweis im Exposé); das Original bleibt gespeichert und lässt sich wiederherstellen."),
+      React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } },
+        React.createElement("button", { type: "button", "data-ep-privat-uebernehmen": "", disabled: busy, onClick: () => onAktion("uebernehmen"), style: knopf("#1e7e34") }, busy === "uebernehmen" ? "Übernehme …" : "✓ Retusche übernehmen"),
+        React.createElement("button", { type: "button", "data-ep-privat-verwerfen": "", disabled: busy, onClick: () => onAktion("verwerfen"), style: knopf("#c83c3c") }, busy === "verwerfen" ? "…" : "✕ Verwerfen – Original behalten"),
+        React.createElement("button", { type: "button", onClick: onSchliessen, style: { ...knopf(CI.muted), background: "transparent", color: CI.muted, border: `1px solid ${CI.border}` } }, "Später"))));
+}
+
+function EpPrivatBadge({ datei, laden, gesperrt }) {
+  const [offen, setOffen] = React.useState(false);
+  const [busy, setBusy] = React.useState("");
+  const st = datei && datei.privat_status;
+  React.useEffect(() => {
+    if (st !== "offen" && st !== "laeuft") return;
+    const t = setInterval(() => epPrivatNachladen(laden), 5000);
+    return () => clearInterval(t);
+  }, [st, datei && datei.id]);
+  if (!datei || !st || st === "ok" || st === "verworfen") return null;
+  const zeile = { fontSize: 10, padding: "4px 6px", margin: "4px 0", lineHeight: 1.35 };
+  const aktion = async (a) => {
+    if (a === "zuruecksetzen" && !window.confirm("Original-Bild wiederherstellen? Die Retusche wird aus dem Exposé genommen.")) return;
+    setBusy(a);
+    try {
+      const r = await window.epPrivatAktion(datei.id, a);
+      setOffen(false);
+      if (a === "uebernehmen" && r && r.onoffice) alert("Retusche übernommen. Hinweis: Im Fremdsystem liegt noch das bisherige Bild – bitte dort austauschen.");
+      laden && (await laden());
+    } catch (e) { alert("Fehler: " + (e.message || e)); }
+    setBusy("");
+  };
+  if (st === "offen" || st === "laeuft") {
+    return React.createElement("div", { "data-ep-privat": st, style: { ...zeile, background: "#eef2fb", color: CI.blau } }, "🔒 KI prüft auf private Details …");
+  }
+  if (st === "fehler") {
+    return React.createElement("div", { "data-ep-privat": st, style: { ...zeile, background: "#fde6e6", color: "#c83c3c" } },
+      "🔒 Prüfung fehlgeschlagen ",
+      React.createElement("a", { href: "#", onClick: (e) => { e.preventDefault(); if (!gesperrt) window.epPrivatPruefen(datei.immobilie_id, { dateiIds: [datei.id] }).then(() => laden && laden()).catch((x) => alert("Fehler: " + (x.message || x))); } }, "erneut"));
+  }
+  if (st === "uebernommen") {
+    return React.createElement("div", { "data-ep-privat": st, style: { ...zeile, background: "#eaf6ec", color: "#1e7e34" } },
+      "🔒 Private Details retuschiert (KI) · ",
+      React.createElement("a", { href: "#", "data-ep-privat-zurueck": "", onClick: (e) => { e.preventDefault(); if (!gesperrt && !busy) aktion("zuruecksetzen"); } }, busy ? "…" : "Original wiederherstellen"));
+  }
+  // vorschlag
+  const funde = (datei.privat_befund && datei.privat_befund.funde) || [];
+  return React.createElement(React.Fragment, null,
+    React.createElement("div", { "data-ep-privat": st, style: { ...zeile, background: "#fff8e6", color: "#6b5200", borderLeft: "3px solid #d9a400" } },
+      React.createElement("div", { style: { fontWeight: 700 } }, "🔒 Private Details gefunden"),
+      React.createElement("div", null, funde.map((f) => f.beschreibung || f.art).join(" · ")),
+      React.createElement("button", { type: "button", "data-ep-privat-ansehen": "", disabled: gesperrt, onClick: () => setOffen(true), style: { marginTop: 4, background: "#d9a400", color: "#fff", border: "none", padding: "3px 8px", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: FONT } }, "Retusche-Vorschlag ansehen")),
+    offen ? React.createElement(EpPrivatVergleich, { datei, busy, onSchliessen: () => !busy && setOffen(false), onAktion: aktion }) : null);
+}
+
+function EpPrivatKnopf({ immobilieId, bilder, gesperrt, laden }) {
+  const [busy, setBusy] = React.useState(false);
+  const fotos = (bilder || []).filter((b) => b && b.kategorie === "foto");
+  const vorschlaege = fotos.filter((b) => b.privat_status === "vorschlag").length;
+  const ungeprueft = fotos.filter((b) => !b.privat_status || b.privat_status === "fehler").length;
+  const laeuft = fotos.filter((b) => b.privat_status === "offen" || b.privat_status === "laeuft").length;
+  const stil = { background: "transparent", border: `1px solid ${CI.blau}`, color: CI.blau, padding: "6px 12px", fontSize: 11, cursor: "pointer", fontFamily: FONT, fontWeight: 700, letterSpacing: "0.05em" };
+  const text = busy ? "KI wird gestartet …" : laeuft ? `🔒 KI prüft … (${laeuft})` : `🔒 Private Details prüfen (KI)${ungeprueft ? " · " + ungeprueft : ""}`;
+  return React.createElement(React.Fragment, null,
+    React.createElement("button", { type: "button", "data-ep-privat-knopf": ungeprueft, disabled: gesperrt || busy || !ungeprueft || laeuft > 0, style: { ...stil, opacity: ungeprueft && !laeuft ? 1 : 0.5 },
+        title: ungeprueft ? `${ungeprueft} Foto(s) auf Familienfotos, Personen und private Details prüfen – bei einem Fund entsteht ein Retusche-Vorschlag (Original bleibt)` : "Alle Fotos sind geprüft",
+        onClick: async () => { setBusy(true); try { const r = await window.epPrivatPruefen(immobilieId, {}); if (!r.eingereiht) alert("Keine ungeprüften Fotos."); laden && (await laden()); } catch (e) { alert("Fehler: " + (e.message || e)); } setBusy(false); } },
+      text),
+    vorschlaege ? React.createElement("span", { "data-ep-privat-vorschlaege": vorschlaege, style: { fontSize: 11, color: "#6b5200", background: "#fff8e6", padding: "6px 10px", fontFamily: FONT } }, `🔒 ${vorschlaege} Retusche-Vorschlag/-Vorschläge zu prüfen`) : null);
+}
+// ---- Stufe 113: Standard-Anhänge an Mail-Vorlagen ----
+// In den E-Mail-Einstellungen (Reiter „Vorlagen“) lassen sich Dateien an eine Vorlage hängen. Sie liegen im privaten
+// Speicher „mail-vorlagen-anhaenge“ und stehen in mail_vorlagen.anhaenge. Beim Einfügen der Vorlage ins Schreibfenster
+// werden sie automatisch angehängt und mit der Mail verschickt (wie jeder andere Anhang, einzeln entfernbar).
+const IMMO_VORLAGE_BUCKET = "mail-vorlagen-anhaenge";
+const IMMO_VORLAGE_MAX_DATEI = 26214400; // 25 MB, wie im Schreibfenster
+const IMMO_VORLAGE_MAX_SUMME = 41943040; // 40 MB gesamt, wie im Schreibfenster
+
+function epVorlageGroesse(b) {
+  const n = Number(b) || 0;
+  return n >= 1048576 ? (n / 1048576).toLocaleString("de-DE", { maximumFractionDigits: 1 }) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB";
+}
+function epVorlageAnhangListe(v) { return v && Array.isArray(v.anhaenge) ? v.anhaenge.filter((a) => a && a.pfad) : []; }
+function epVorlageAnhangZeichen(v) {
+  const n = epVorlageAnhangListe(v).length;
+  return n ? React.createElement("span", { "data-vorlage-anhang-zahl": n, title: `${n} Datei(en) werden automatisch angehängt`, style: { color: CI.muted, fontWeight: 400, marginLeft: 8, fontSize: 11, flexShrink: 0 } }, `📎 ${n}`) : null;
+}
+
+/** Editor-Baustein: Dateien an die Vorlage hängen (Upload sofort, gespeichert wird mit „Speichern“). */
+function EpVorlageAnhaenge({ wert, setzen }) {
+  const [busy, setBusy] = React.useState(false);
+  const [fehler, setFehler] = React.useState("");
+  const ref = React.useRef(null);
+  const liste = epVorlageAnhangListe(wert);
+  const summe = liste.reduce((s, a) => s + (Number(a.groesse) || 0), 0);
+  const hochladen = async (dateien) => {
+    setFehler(""); setBusy(true);
+    try {
+      const { data: u } = await window._sb.auth.getUser();
+      const uid = u && u.user && u.user.id; if (!uid) throw new Error("Nicht angemeldet.");
+      let gesamt = summe; const neu = [];
+      for (const f of dateien) {
+        if (f.size > IMMO_VORLAGE_MAX_DATEI) throw new Error(`„${f.name}“ ist zu groß (${epVorlageGroesse(f.size)}, höchstens 25 MB).`);
+        if (gesamt + f.size > IMMO_VORLAGE_MAX_SUMME) throw new Error("Zusammen höchstens 40 MB je Vorlage (so viel passt in eine Mail).");
+        const sauber = String(f.name).replace(/[^\w.\-äöüÄÖÜß ]+/g, "_").replace(/\s+/g, "_").slice(0, 120) || "datei";
+        const pfad = `${uid}/${Date.now()}_${sauber}`;
+        const { error } = await window._sb.storage.from(IMMO_VORLAGE_BUCKET).upload(pfad, f, { contentType: f.type || "application/octet-stream", upsert: false });
+        if (error) throw new Error(`„${f.name}“ konnte nicht hochgeladen werden: ${error.message || error}`);
+        neu.push({ name: f.name, pfad, typ: f.type || "application/octet-stream", groesse: f.size });
+        gesamt += f.size;
+      }
+      if (neu.length) setzen((c) => ({ ...c, anhaenge: [...epVorlageAnhangListe(c), ...neu] }));
+    } catch (e) { setFehler(e.message || String(e)); }
+    setBusy(false);
+  };
+  const entfernen = (pfad) => setzen((c) => ({ ...c, anhaenge: epVorlageAnhangListe(c).filter((a) => a.pfad !== pfad) }));
+  return React.createElement("div", { "data-vorlage-anhaenge": "1", style: { margin: "4px 0 10px", padding: "8px 10px", border: `1px dashed ${CI.border}`, background: "#fafbfd" } },
+    React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" } },
+      React.createElement("span", { style: { fontSize: 12, fontWeight: 700, color: CI.blau } }, "📎 Standard-Anhänge", React.createElement("span", { style: { fontWeight: 400, color: CI.muted, marginLeft: 6 } }, "werden beim Einfügen der Vorlage automatisch angehängt")),
+      React.createElement("button", { type: "button", "data-vorlage-anhang-neu": "1", disabled: busy, onClick: () => ref.current && ref.current.click(), style: { background: "transparent", color: CI.blau, border: `1px solid ${CI.border}`, padding: "5px 10px", fontSize: 12, cursor: busy ? "wait" : "pointer", fontFamily: FONT } }, busy ? "Lädt hoch …" : "＋ Datei anhängen"),
+      React.createElement("input", { ref, type: "file", multiple: true, style: { display: "none" }, onChange: (e) => { const f = [...(e.target.files || [])]; e.target.value = ""; if (f.length) hochladen(f); } })),
+    liste.length ? React.createElement("div", { style: { marginTop: 6, display: "flex", flexDirection: "column", gap: 3 } },
+      liste.map((a) => React.createElement("div", { key: a.pfad, "data-vorlage-anhang": a.name, style: { display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "#1a1a1a" } },
+        React.createElement("span", { style: { flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "📄 ", a.name),
+        React.createElement("span", { style: { color: CI.muted, fontSize: 11 } }, epVorlageGroesse(a.groesse)),
+        React.createElement("button", { type: "button", "data-vorlage-anhang-weg": a.name, title: "Aus der Vorlage entfernen", onClick: () => entfernen(a.pfad), style: { background: "transparent", border: "none", color: "#c83c3c", cursor: "pointer", fontSize: 13, padding: "0 4px" } }, "✕"))),
+      liste.length > 1 ? React.createElement("div", { style: { fontSize: 11, color: CI.muted } }, `Zusammen ${epVorlageGroesse(summe)}`) : null)
+      : React.createElement("div", { style: { marginTop: 4, fontSize: 11, color: CI.muted, fontStyle: "italic" } }, "Keine Dateien – z. B. Widerrufsbelehrung, Datenschutzhinweise oder Preisliste hier hinterlegen."),
+    fehler ? React.createElement("div", { style: { marginTop: 6, fontSize: 12, color: "#c83c3c" } }, fehler) : null,
+    liste.length ? React.createElement("div", { style: { marginTop: 4, fontSize: 11, color: CI.muted } }, "Änderungen gelten nach „💾 Speichern“.") : null);
+}
+
+/** Vorschau in der Vorlagen-Auswahl: welche Dateien mitkommen. */
+function EpVorlageAnhangVorschau({ vorlage }) {
+  const liste = epVorlageAnhangListe(vorlage);
+  if (!liste.length) return null;
+  return React.createElement("div", { "data-vorlage-anhang-vorschau": liste.length, style: { fontSize: 12, color: CI.blau, background: "#f3f5fa", padding: "6px 8px", marginBottom: 8 } },
+    React.createElement("div", { style: { fontWeight: 600, marginBottom: 2 } }, `📎 Wird automatisch angehängt (${liste.length}):`),
+    liste.map((a) => React.createElement("div", { key: a.pfad, style: { color: "#1a1a1a" } }, `${a.name} · ${epVorlageGroesse(a.groesse)}`)));
+}
+
+/** Beim Einfügen einer Vorlage: ihre Dateien laden und als Anhänge ins Schreibfenster legen. */
+async function epVorlageAnhaengeAnhaengen(vorlage, vorhandene, setzeAnhaenge, status) {
+  const liste = epVorlageAnhangListe(vorlage);
+  if (!liste.length || typeof setzeAnhaenge !== "function") return 0;
+  const schon = new Set((vorhandene || []).map((a) => a && a.name));
+  let summe = (vorhandene || []).reduce((s, a) => s + ((a && a.size) || 0), 0);
+  const neu = [], fehlt = [];
+  for (const a of liste) {
+    if (schon.has(a.name)) continue;
+    try {
+      const { data, error } = await window._sb.storage.from(IMMO_VORLAGE_BUCKET).download(a.pfad);
+      if (error || !data) throw new Error((error && error.message) || "nicht gefunden");
+      if (summe + data.size > IMMO_VORLAGE_MAX_SUMME) { fehlt.push(`${a.name} (Gesamtgröße der Mail über 40 MB)`); continue; }
+      const base64 = await new Promise((ok, nein) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1] || ""); r.onerror = nein; r.readAsDataURL(data); });
+      neu.push({ name: a.name, size: data.size, contentType: a.typ || data.type || "application/octet-stream", base64 });
+      summe += data.size; schon.add(a.name);
+    } catch (e) { fehlt.push(`${a.name} (${e.message || e})`); }
+  }
+  if (neu.length) setzeAnhaenge((alt) => [...alt, ...neu.filter((n) => !alt.some((x) => x.name === n.name))]);
+  if (neu.length && typeof status === "function") { status(`✓ ${neu.length} Anhang/Anhänge aus der Vorlage angehängt`); setTimeout(() => status(""), 4000); }
+  if (fehlt.length) alert("Diese Anhänge der Vorlage konnten nicht angehängt werden:\n\n" + fehlt.join("\n"));
+  return neu.length;
+}
+window.epVorlageAnhaengeAnhaengen = epVorlageAnhaengeAnhaengen;
+// ---- Stufe 114: Download-Links für Objektunterlagen (wie WeTransfer) ----
+// Objekt → Dokumente: „🔗 Download-Link“ erstellt einen Link auf ausgewählte Dateien des Objekts (Dokumente, Grundrisse,
+// Lagepläne, Fotos) – mit Ablaufdatum, optional Passwort, Nachricht und Empfänger. Die Empfänger laden auf
+// unterlagen.html einzeln oder alles als ZIP. Jeder Abruf wird protokolliert; nach Downloads kommt eine Mail an den
+// Ersteller (Edge Function unterlagen-link, Cron alle 5 Minuten). Darunter die Liste der Links mit Protokoll.
+const IMMO_UL_TAG = 86400000;
+
+function epUlDatum(s, mitZeit) {
+  if (!s) return "";
+  return new Date(s).toLocaleString("de-DE", mitZeit === false ? { day: "2-digit", month: "2-digit", year: "numeric" } : { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+function epUlGroesse(n) {
+  n = Number(n) || 0;
+  return !n ? "" : n >= 1048576 ? (n / 1048576).toLocaleString("de-DE", { maximumFractionDigits: 1 }) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB";
+}
+function epUlPasswort() {
+  const z = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const r = crypto.getRandomValues(new Uint32Array(10));
+  return [...r].map((x) => z[x % z.length]).join("");
+}
+function epUlStatus(l) {
+  if (l.widerrufen_am) return { text: "zurückgezogen", farbe: "#6b7280", aktiv: false };
+  if (new Date(l.gueltig_bis).getTime() < Date.now()) return { text: "abgelaufen", farbe: "#c83c3c", aktiv: false };
+  return { text: "aktiv bis " + epUlDatum(l.gueltig_bis, false), farbe: "#1e7e34", aktiv: true };
+}
+function epUlUrl(token) {
+  const basis = /^https?:/.test(location.origin) && !/127\.0\.0\.1|localhost/.test(location.host) ? location.origin : "https://immooffice.example";
+  return basis + "/unterlagen.html?t=" + token;
+}
+async function epUlKopieren(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch (e) { window.prompt("Link kopieren:", text); return false; }
+}
+function epUlNeuLaden() { try { window.dispatchEvent(new CustomEvent("ep-unterlagen-links")); } catch (e) { /* egal */ } }
+
+const IMMO_UL_GRUPPEN = [["dokument", "📄 Dokumente"], ["grundriss", "📐 Grundrisse"], ["lageplan", "🗺️ Lagepläne"], ["foto", "🖼️ Fotos"]];
+
+function EpUnterlagenLinkDialog({ immobilie, dateien, onSchliessen }) {
+  const h = React.createElement;
+  const objektName = (immobilie && (immobilie.objekttitel || immobilie.bezeichnung)) || "";
+  const [titel, setTitel] = React.useState(objektName ? `Unterlagen ${objektName}` : "Unterlagen");
+  const [auswahl, setAuswahl] = React.useState(() => new Set());
+  const [tage, setTage] = React.useState(14);
+  const [datum, setDatum] = React.useState("");
+  const [mitPw, setMitPw] = React.useState(false);
+  const [pw, setPw] = React.useState(() => epUlPasswort());
+  const [empfName, setEmpfName] = React.useState("");
+  const [empfMail, setEmpfMail] = React.useState("");
+  const [kontakt, setKontakt] = React.useState(null); // aus dem Adressbuch gewählt
+  const [nachricht, setNachricht] = React.useState("");
+  const [melden, setMelden] = React.useState(true);
+  const [busy, setBusy] = React.useState(false);
+  const [fehler, setFehler] = React.useState("");
+  const [fertig, setFertig] = React.useState(null);
+  const [kopiert, setKopiert] = React.useState(false);
+  const liste = (dateien || []).filter((d) => d && d.id && d.storage_path && d.kategorie !== "foto_ausgeblendet");
+  const bis = datum ? new Date(datum + "T23:59:00") : new Date(Date.now() + tage * IMMO_UL_TAG);
+  const summe = liste.filter((d) => auswahl.has(d.id)).reduce((s, d) => s + (Number(d.size_bytes) || 0), 0);
+  const umschalten = (id) => setAuswahl((a) => { const n = new Set(a); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const gruppeAlle = (ids, an) => setAuswahl((a) => { const n = new Set(a); ids.forEach((id) => an ? n.add(id) : n.delete(id)); return n; });
+  const eingabe = { width: "100%", boxSizing: "border-box", padding: "8px 10px", border: `1px solid ${CI.border}`, fontSize: 13, fontFamily: FONT };
+  const knopf = (aktiv) => ({ background: aktiv ? CI.blau : "transparent", color: aktiv ? "#fff" : CI.blau, border: `1px solid ${CI.blau}`, padding: "5px 10px", fontSize: 12, cursor: "pointer", fontFamily: FONT });
+  const anlegen = async () => {
+    setFehler("");
+    if (!auswahl.size) { setFehler("Bitte mindestens eine Datei auswählen."); return; }
+    if (mitPw && pw.trim().length < 6) { setFehler("Das Passwort braucht mindestens 6 Zeichen."); return; }
+    if (bis.getTime() < Date.now() + 3600000) { setFehler("Das Ablaufdatum muss in der Zukunft liegen."); return; }
+    setBusy(true);
+    try {
+      const ids = liste.filter((d) => auswahl.has(d.id)).map((d) => d.id);
+      const { data, error } = await window._sb.functions.invoke("unterlagen-link", { body: { aktion: "anlegen", immobilie_id: immobilie.id, datei_ids: ids, gueltig_bis: bis.toISOString(),
+        passwort: mitPw ? pw.trim() : "", titel: titel.trim(), nachricht: nachricht.trim(), empfaenger_name: empfName.trim(), empfaenger_email: empfMail.trim(), kontakt_id: kontakt ? kontakt.id : null, benachrichtigen: melden } });
+      if (error) throw new Error(error.message || String(error));
+      if (!data || !data.ok) throw new Error((data && data.fehler) || "Link konnte nicht erstellt werden.");
+      setFertig({ ...data, url: data.url || epUlUrl(data.token), passwort: mitPw ? pw.trim() : "", bis: bis.toISOString() });
+      epUlNeuLaden();
+    } catch (e) { setFehler(e.message || String(e)); }
+    setBusy(false);
+  };
+  const perMail = () => {
+    const f = fertig;
+    const k = kontakt && kontakt.nachname && /^(Herr|Frau)$/i.test(String(kontakt.anrede || "").trim()) ? `${String(kontakt.anrede).trim()} ${kontakt.titel ? kontakt.titel + " " : ""}${kontakt.nachname}` : "";
+    const text = `${k ? "Guten Tag " + k : empfName.trim() ? "Guten Tag " + empfName.trim() : "Guten Tag"},\n\n` +
+      `über den folgenden Link können Sie die Unterlagen${objektName ? " zum Objekt „" + objektName + "“" : ""} herunterladen:\n${f.url}\n\n` +
+      `Der Link ist gültig bis ${epUlDatum(f.bis)} Uhr.${f.passwort ? "\nDas Passwort zum Öffnen erhalten Sie separat von mir." : ""}${nachricht.trim() ? "\n\n" + nachricht.trim() : ""}`;
+    window._epMailAn = { an: empfMail.trim(), name: empfName.trim(), kontakt_id: kontakt ? kontakt.id : null, betreff: titel.trim() || "Unterlagen", text, immobilie_id: immobilie.id };
+    onSchliessen();
+    window.setView && window.setView("posteingang");
+  };
+  const rahmen = (inhalt) => h("div", { "data-ep-ul-dialog": "", onClick: () => !busy && onSchliessen(), style: { position: "fixed", inset: 0, background: "rgba(38,49,89,0.55)", zIndex: 9300, display: "flex", alignItems: "center", justifyContent: "center", padding: 12 } },
+    h("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", width: "100%", maxWidth: 720, maxHeight: "94vh", overflowY: "auto", padding: 18, fontFamily: FONT, boxSizing: "border-box" } }, inhalt));
+
+  if (fertig) {
+    return rahmen(h(React.Fragment, null,
+      h("div", { style: { fontSize: 16, fontWeight: 700, color: CI.blau, marginBottom: 10 } }, "✓ Download-Link erstellt"),
+      h("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 4 } }, `${fertig.dateien} Datei(en) · gültig bis ${epUlDatum(fertig.bis)} Uhr`),
+      h("div", { style: { display: "flex", gap: 6, marginBottom: 12 } },
+        h("input", { "data-ep-ul-url": "", readOnly: true, value: fertig.url, onFocus: (e) => e.target.select(), style: { ...eingabe, flex: 1, fontFamily: "monospace", fontSize: 12 } }),
+        h("button", { type: "button", "data-ep-ul-kopieren": "", onClick: async () => { await epUlKopieren(fertig.url); setKopiert(true); setTimeout(() => setKopiert(false), 2500); }, style: { ...knopf(true), whiteSpace: "nowrap" } }, kopiert ? "✓ Kopiert" : "📋 Kopieren")),
+      fertig.passwort ? h("div", { "data-ep-ul-passwort": fertig.passwort, style: { background: "#fff8e6", borderLeft: "3px solid #d9a400", padding: "8px 10px", fontSize: 13, marginBottom: 12 } },
+        "🔒 Passwort: ", h("strong", { style: { fontFamily: "monospace", fontSize: 15, letterSpacing: "0.05em" } }, fertig.passwort),
+        h("div", { style: { fontSize: 11, color: "#6b5200", marginTop: 4 } }, "Nur jetzt sichtbar – bitte getrennt vom Link mitteilen (z. B. per SMS oder telefonisch).")) : null,
+      h("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } },
+        h("button", { type: "button", "data-ep-ul-mail": "", onClick: perMail, style: { background: CI.gold, color: "#fff", border: "none", padding: "9px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: FONT } }, "✉ Per E-Mail senden"),
+        h("button", { type: "button", onClick: onSchliessen, style: knopf(false) }, "Fertig"))));
+  }
+
+  return rahmen(h(React.Fragment, null,
+    h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 } },
+      h("div", { style: { fontSize: 16, fontWeight: 700, color: CI.blau } }, "🔗 Download-Link für Unterlagen"),
+      h("button", { type: "button", onClick: onSchliessen, style: { background: "transparent", border: "none", fontSize: 20, color: CI.muted, cursor: "pointer" } }, "✕")),
+    h("label", { style: { display: "block", fontSize: 12, color: CI.muted, marginBottom: 10 } }, "Titel (sieht der Empfänger)", h("input", { value: titel, onChange: (e) => setTitel(e.target.value), style: { ...eingabe, marginTop: 3 } })),
+    h("div", { style: { fontSize: 12, fontWeight: 700, color: CI.blau, margin: "6px 0 4px" } }, `Dateien (${auswahl.size} ausgewählt${summe ? ", " + epUlGroesse(summe) : ""})`),
+    h("div", { style: { border: `1px solid ${CI.border}`, maxHeight: 260, overflowY: "auto", marginBottom: 12 } },
+      liste.length ? IMMO_UL_GRUPPEN.map(([kat, name]) => {
+        const g = liste.filter((d) => d.kategorie === kat);
+        if (!g.length) return null;
+        const alle = g.every((d) => auswahl.has(d.id));
+        return h("div", { key: kat, "data-ep-ul-gruppe": kat },
+          h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "#f3f5fa", padding: "5px 10px", fontSize: 12, fontWeight: 700, color: CI.blau } },
+            `${name} (${g.length})`,
+            h("button", { type: "button", "data-ep-ul-alle": kat, onClick: () => gruppeAlle(g.map((d) => d.id), !alle), style: { background: "transparent", border: "none", color: CI.blau, fontSize: 11, cursor: "pointer", textDecoration: "underline", fontFamily: FONT } }, alle ? "keine" : "alle")),
+          g.map((d) => h("label", { key: d.id, style: { display: "flex", gap: 8, alignItems: "center", padding: "4px 10px", fontSize: 12, cursor: "pointer" } },
+            h("input", { type: "checkbox", "data-ep-ul-datei": d.id, checked: auswahl.has(d.id), onChange: () => umschalten(d.id) }),
+            h("span", { style: { flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, d.name || "Datei"),
+            h("span", { style: { color: CI.muted, fontSize: 11 } }, epUlGroesse(d.size_bytes)))));
+      }) : h("div", { style: { padding: 14, fontSize: 12, color: CI.muted } }, "Am Objekt liegen noch keine Dateien.")),
+    h("div", { style: { fontSize: 12, fontWeight: 700, color: CI.blau, marginBottom: 4 } }, "Gültig bis"),
+    h("div", { style: { display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginBottom: 4 } },
+      [3, 7, 14, 30, 90].map((t) => h("button", { key: t, type: "button", "data-ep-ul-tage": t, onClick: () => { setTage(t); setDatum(""); }, style: knopf(!datum && tage === t) }, `${t} Tage`)),
+      h("input", { type: "date", "data-ep-ul-datum": "", value: datum, min: new Date(Date.now() + IMMO_UL_TAG).toISOString().slice(0, 10), max: new Date(Date.now() + 365 * IMMO_UL_TAG).toISOString().slice(0, 10), onChange: (e) => setDatum(e.target.value), style: { ...eingabe, width: "auto", padding: "4px 8px" } })),
+    h("div", { "data-ep-ul-bis": bis.toISOString(), style: { fontSize: 11, color: CI.muted, marginBottom: 12 } }, `Abrufbar bis ${epUlDatum(bis)} Uhr`),
+    h("label", { style: { display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: CI.blau, cursor: "pointer" } },
+      h("input", { type: "checkbox", "data-ep-ul-mitpw": "", checked: mitPw, onChange: (e) => setMitPw(e.target.checked) }), "🔒 Mit Passwort schützen"),
+    mitPw ? h("div", { style: { display: "flex", gap: 6, margin: "6px 0 0 24px" } },
+      h("input", { "data-ep-ul-pw": "", value: pw, onChange: (e) => setPw(e.target.value), style: { ...eingabe, fontFamily: "monospace", maxWidth: 240 } }),
+      h("button", { type: "button", onClick: () => setPw(epUlPasswort()), title: "Neues Passwort erzeugen", style: knopf(false) }, "🎲 Neu")) : null,
+    h("div", { style: { display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", margin: "12px 0 0" } },
+      h("span", { style: { fontSize: 12, fontWeight: 700, color: CI.blau } }, "Empfänger"),
+      typeof KontaktWaehler === "function" ? h("span", { "data-ep-ul-adressbuch": "" }, h(KontaktWaehler, { label: "📇 Aus Adressbuch", knopfVariante: "hell", onWahl: (k) => {
+        if (!k) return;
+        setKontakt(k);
+        setEmpfName([k.vorname, k.nachname].filter(Boolean).join(" ") || k.firma || "");
+        setEmpfMail(k.email || "");
+      } })) : null,
+      kontakt ? h("span", { "data-ep-ul-kontakt": kontakt.id, style: { fontSize: 11, color: "#1e7e34", background: "#eaf6ec", padding: "3px 8px" } },
+        "✓ verknüpft mit Kontakt ", (typeof epKontaktName === "function" ? epKontaktName(kontakt) : empfName) || "",
+        h("button", { type: "button", title: "Verknüpfung lösen", onClick: () => setKontakt(null), style: { background: "transparent", border: "none", color: "#1e7e34", cursor: "pointer", marginLeft: 4 } }, "✕")) : null,
+      kontakt && !kontakt.email ? h("span", { style: { fontSize: 11, color: "#c83c3c" } }, "Kontakt hat keine E-Mail-Adresse") : null),
+    h("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, margin: "6px 0 8px" } },
+      h("label", { style: { fontSize: 12, color: CI.muted } }, "Name (optional)", h("input", { "data-ep-ul-empf": "", value: empfName, onChange: (e) => setEmpfName(e.target.value), placeholder: "Name", style: { ...eingabe, marginTop: 3 } })),
+      h("label", { style: { fontSize: 12, color: CI.muted } }, "E-Mail (optional)", h("input", { type: "email", "data-ep-ul-mailfeld": "", value: empfMail, onChange: (e) => setEmpfMail(e.target.value), placeholder: "name@beispiel.de", style: { ...eingabe, marginTop: 3 } }))),
+    h("label", { style: { display: "block", fontSize: 12, color: CI.muted, marginBottom: 8 } }, "Nachricht auf der Download-Seite (optional)",
+      h("textarea", { value: nachricht, onChange: (e) => setNachricht(e.target.value), rows: 3, style: { ...eingabe, marginTop: 3, resize: "vertical" } })),
+    h("label", { style: { display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: CI.blau, cursor: "pointer", marginBottom: 12 } },
+      h("input", { type: "checkbox", "data-ep-ul-melden": "", checked: melden, onChange: (e) => setMelden(e.target.checked) }), "✉ Mich per Mail benachrichtigen, wenn heruntergeladen wurde"),
+    fehler ? h("div", { "data-ep-ul-fehler": "", style: { background: "#fde6e6", color: "#c83c3c", padding: "8px 10px", fontSize: 12, marginBottom: 10 } }, fehler) : null,
+    h("div", { style: { display: "flex", gap: 8, justifyContent: "flex-end" } },
+      h("button", { type: "button", onClick: onSchliessen, style: knopf(false) }, "Abbrechen"),
+      h("button", { type: "button", "data-ep-ul-anlegen": "", disabled: busy, onClick: anlegen, style: { background: CI.gold, color: "#fff", border: "none", padding: "9px 18px", fontSize: 13, fontWeight: 700, cursor: busy ? "wait" : "pointer", fontFamily: FONT } }, busy ? "Erstelle …" : "🔗 Link erstellen"))));
+}
+
+function EpUnterlagenLinkKnopf({ immobilie, dateien, gesperrt }) {
+  const [offen, setOffen] = React.useState(false);
+  return React.createElement(React.Fragment, null,
+    React.createElement("button", { type: "button", "data-ep-ul-knopf": "", disabled: gesperrt || !immobilie, onClick: () => setOffen(true), title: "Link auf ausgewählte Unterlagen erstellen – mit Ablaufdatum, Passwort und Download-Protokoll",
+      style: { background: "transparent", border: `1px solid ${CI.blau}`, color: CI.blau, padding: "6px 12px", fontSize: 11, cursor: "pointer", fontFamily: FONT, fontWeight: 700, letterSpacing: "0.05em" } }, "🔗 Download-Link"),
+    offen ? React.createElement(EpUnterlagenLinkDialog, { immobilie, dateien, onSchliessen: () => setOffen(false) }) : null);
+}
+
+// transfer: Stufe 117 – Transfers ohne Objekt (Werkzeuge → Transfer); nutzerId: nur eigene, alle: ganzes Team
+function EpUnterlagenLinkListe({ immobilie, transfer, nutzerId, alle }) {
+  const h = React.createElement;
+  const [links, setLinks] = React.useState([]);
+  const [dateiInfo, setDateiInfo] = React.useState({});
+  const [auf, setAuf] = React.useState(!!transfer);
+  const [protokoll, setProtokoll] = React.useState({});
+  const [meldung, setMeldung] = React.useState("");
+  const id = transfer ? (alle ? "transfer:alle" : nutzerId ? "transfer:" + nutzerId : null) : immobilie && immobilie.id;
+  const laden = React.useCallback(async () => {
+    if (!id) return;
+    try {
+      let q = window._sb.from("unterlagen_links").select("id, token, titel, datei_ids, gueltig_bis, hat_passwort, empfaenger_name, empfaenger_email, benachrichtigen, created_at, widerrufen_am, aufrufe, downloads, zuletzt_geoeffnet_am, zuletzt_download_am, erstellt_von");
+      q = transfer ? (alle ? q.is("immobilie_id", null) : q.is("immobilie_id", null).eq("erstellt_von", nutzerId)) : q.eq("immobilie_id", id);
+      const { data, error } = await q.order("created_at", { ascending: false }).limit(100);
+      if (error) throw error;
+      setLinks(data || []);
+      if (transfer && data && data.length) {
+        const { data: ds } = await window._sb.from("transfer_dateien").select("link_id, name, groesse, geloescht_am").in("link_id", data.map((l) => l.id));
+        const info = {};
+        (ds || []).forEach((d) => { const x = info[d.link_id] || (info[d.link_id] = { namen: [], groesse: 0, weg: 0, anzahl: 0 }); x.anzahl++; x.namen.push(d.name); x.groesse += Number(d.groesse) || 0; if (d.geloescht_am) x.weg++; });
+        setDateiInfo(info);
+      }
+    } catch (e) { console.warn("Download-Links:", e.message || e); }
+  }, [id]);
+  React.useEffect(() => { laden(); const f = () => { laden(); setAuf(true); }; window.addEventListener("ep-unterlagen-links", f); return () => window.removeEventListener("ep-unterlagen-links", f); }, [laden]);
+  if (!links.length) return transfer ? h("div", { "data-ep-ul-liste": 0, style: { fontSize: 12, color: CI.muted, padding: "10px 0" } }, "Noch keine Transfers.") : null;
+  const kurz = (t) => { setMeldung(t); setTimeout(() => setMeldung(""), 3000); };
+  const aendern = async (l, werte, text) => {
+    const { error } = await window._sb.from("unterlagen_links").update(werte).eq("id", l.id);
+    if (error) { alert("Fehler: " + error.message); return; }
+    kurz(text); laden();
+  };
+  const protokollZeigen = async (l) => {
+    if (protokoll[l.id]) { setProtokoll((p) => { const n = { ...p }; delete n[l.id]; return n; }); return; }
+    const { data } = await window._sb.from("unterlagen_link_abrufe").select("art, datei_name, ip, created_at").eq("link_id", l.id).order("created_at", { ascending: false }).limit(100);
+    setProtokoll((p) => ({ ...p, [l.id]: data || [] }));
+  };
+  const mini = { background: "transparent", border: `1px solid ${CI.border}`, color: CI.blau, fontSize: 10.5, padding: "3px 8px", cursor: "pointer", fontFamily: FONT, whiteSpace: "nowrap" };
+  const aktiv = links.filter((l) => epUlStatus(l).aktiv).length;
+  const dateienLoeschen = async (l) => {
+    if (!window.confirm(`Dateien von „${l.titel || "Transfer"}“ jetzt endgültig löschen? Der Link funktioniert danach nicht mehr.`)) return;
+    const { data, error } = await window._sb.functions.invoke("unterlagen-link", { body: { aktion: "loeschen", id: l.id } });
+    if (error || !data || !data.ok) { alert("Fehler: " + ((data && data.fehler) || (error && error.message) || "Löschen fehlgeschlagen")); return; }
+    kurz("✓ Dateien gelöscht"); laden();
+  };
+  return h("div", { "data-ep-ul-liste": links.length, style: { border: `1px solid ${CI.border}`, marginBottom: 14, background: "#fafbfd" } },
+    h("button", { type: "button", "data-ep-ul-auf": "", onClick: () => setAuf(!auf), style: { width: "100%", textAlign: "left", background: "transparent", border: "none", padding: "8px 12px", fontSize: 12, fontWeight: 700, color: CI.blau, cursor: "pointer", fontFamily: FONT } },
+      `${auf ? "▾" : "▸"} ${transfer ? "📤 Transfers" : "🔗 Download-Links"} (${links.length}${aktiv !== links.length ? `, ${aktiv} aktiv` : ""})`, meldung ? h("span", { style: { color: "#1e7e34", fontWeight: 600, marginLeft: 10 } }, meldung) : null),
+    auf ? links.map((l) => {
+      const st = epUlStatus(l);
+      const ti = transfer ? dateiInfo[l.id] : null;
+      const weg = !!(ti && ti.anzahl && ti.weg === ti.anzahl);
+      return h("div", { key: l.id, "data-ep-ul-link": l.id, style: { borderTop: `1px solid ${CI.border}`, padding: "8px 12px", fontSize: 12 } },
+        h("div", { style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" } },
+          h("span", { style: { fontWeight: 700, color: CI.blau } }, l.titel || "Unterlagen"),
+          l.hat_passwort ? h("span", { title: "Mit Passwort" }, "🔒") : null,
+          h("span", { "data-ep-ul-status": st.text, style: { color: st.farbe, fontSize: 11, fontWeight: 600 } }, st.text),
+          h("span", { style: { color: CI.muted, fontSize: 11 } }, `${(l.datei_ids || []).length} Datei(en)${ti && ti.groesse ? ", " + epUlGroesse(ti.groesse) : ""}${l.empfaenger_name || l.empfaenger_email ? " · für " + (l.empfaenger_name || l.empfaenger_email) : ""}`),
+          weg ? h("span", { "data-ep-ul-weg": l.id, style: { color: "#6b7280", fontSize: 11, fontStyle: "italic" } }, "Dateien gelöscht") : null),
+        ti && ti.namen.length ? h("div", { style: { color: CI.text || "#374151", fontSize: 11, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, ti.namen.slice(0, 4).join(", ") + (ti.namen.length > 4 ? ` … (+${ti.namen.length - 4})` : "")) : null,
+        h("div", { "data-ep-ul-zahlen": `${l.aufrufe}/${l.downloads}`, style: { color: CI.muted, fontSize: 11, margin: "3px 0 5px" } },
+          `👁 ${l.aufrufe || 0}× geöffnet · ⬇ ${l.downloads || 0} Download(s)` + (l.zuletzt_download_am ? ` · zuletzt ${epUlDatum(l.zuletzt_download_am)}` : "") + ` · erstellt ${epUlDatum(l.created_at, false)}`),
+        h("div", { style: { display: "flex", gap: 5, flexWrap: "wrap" } },
+          st.aktiv ? h("button", { type: "button", "data-ep-ul-kopie": l.id, style: mini, onClick: async () => { await epUlKopieren(epUlUrl(l.token)); kurz("✓ Link kopiert"); } }, "📋 Link kopieren") : null,
+          !l.widerrufen_am && !weg ? h("button", { type: "button", "data-ep-ul-verlaengern": l.id, style: mini, onClick: () => aendern(l, { gueltig_bis: new Date(Math.max(Date.now(), new Date(l.gueltig_bis).getTime()) + 14 * IMMO_UL_TAG).toISOString() }, "✓ um 14 Tage verlängert") }, "⏱ +14 Tage") : null,
+          st.aktiv ? h("button", { type: "button", "data-ep-ul-zurueck": l.id, style: { ...mini, color: "#c83c3c" }, onClick: () => { if (window.confirm(`Link „${l.titel || "Unterlagen"}“ zurückziehen? Er funktioniert danach nicht mehr.`)) aendern(l, { widerrufen_am: new Date().toISOString() }, "✓ Link zurückgezogen"); } }, "⛔ Zurückziehen") : null,
+          l.widerrufen_am && !weg ? h("button", { type: "button", style: mini, onClick: () => aendern(l, { widerrufen_am: null }, "✓ Link wieder aktiv") }, "↺ Wieder freigeben") : null,
+          transfer && ti && !weg ? h("button", { type: "button", "data-ep-ul-loeschen": l.id, style: { ...mini, color: "#c83c3c" }, onClick: () => dateienLoeschen(l) }, "🗑 Dateien löschen") : null,
+          h("button", { type: "button", "data-ep-ul-protokoll": l.id, style: mini, onClick: () => protokollZeigen(l) }, protokoll[l.id] ? "▴ Protokoll" : "▾ Protokoll")),
+        protokoll[l.id] ? h("div", { "data-ep-ul-protokoll-liste": protokoll[l.id].length, style: { marginTop: 6, background: "#fff", border: `1px solid ${CI.border}`, maxHeight: 200, overflowY: "auto" } },
+          protokoll[l.id].length ? protokoll[l.id].map((a, i) => h("div", { key: i, style: { display: "flex", gap: 8, padding: "3px 8px", fontSize: 11, borderTop: i ? `1px solid ${CI.border}` : "none" } },
+            h("span", { style: { color: CI.muted, whiteSpace: "nowrap" } }, epUlDatum(a.created_at)),
+            h("span", { style: { color: a.art === "passwort_falsch" ? "#c83c3c" : a.art === "download" ? "#1e7e34" : CI.blau } }, a.art === "download" ? "⬇ " + (a.datei_name || "Datei") : a.art === "geoeffnet" ? "👁 Seite geöffnet" : "✕ falsches Passwort")))
+            : h("div", { style: { padding: "6px 8px", fontSize: 11, color: CI.muted } }, "Noch keine Abrufe.")) : null);
+    }) : null);
+}
+window.EpUnterlagenLinkKnopf = EpUnterlagenLinkKnopf; window.EpUnterlagenLinkListe = EpUnterlagenLinkListe;
+// ---- Stufe 115: Provision bei Vermietung (v. a. Gewerbe) ----
+// Das Bestellerprinzip (§ 2 Abs. 1a WoVermRG) gilt nur für Wohnraum. Bei Gewerbeflächen, Grundstücken, Stellplätzen usw.
+// zahlt der Mieter üblicherweise eine Provision (z. B. „2 Nettokaltmieten zzgl. MwSt.“). Bisher hatte der Bereich „Miete“
+// im Objektformular gar keine Provisionsfelder. provision_aussen = Mieterprovision, provision_innen = Vermieterprovision.
+function epIstWohnraum(o) { return /wohnung|haus/i.test(String((o && o.objektart) || "")); }
+function epMieteProvisionText(o) {
+  if (!o) return "";
+  if (epIstWohnraum(o)) return "keine (Bestellerprinzip)";
+  const t = String(o.provision_aussen == null ? "" : o.provision_aussen).trim();
+  if (o.provisionsfrei || !t || /^0([.,]0+)?\s*%?$/.test(t)) return "provisionsfrei";
+  return /mwst|umsatzsteuer|^[\d.,\s%]+$/i.test(t) ? t : t + " zzgl. MwSt.";
+}
+function EpMieteProvision({ werte, setze }) {
+  const A = werte || {};
+  const wohnraum = epIstWohnraum(A);
+  const feld = (label, key, platzhalter) => React.createElement(ImmoFeld, { label },
+    React.createElement("input", { type: "text", "data-ep-miete-provision": key, style: inputStyle, value: A[key] || "", placeholder: platzhalter, onChange: (e) => setze(key, e.target.value) }));
+  return React.createElement("div", { "data-ep-miete-provision-block": wohnraum ? "wohnraum" : "gewerbe", style: { marginBottom: 14 } },
+    React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 2fr", gap: 10, alignItems: "end" } },
+      feld(wohnraum ? "Provision Mieter (nur bei Suchauftrag)" : "Provision Mieter", "provision_aussen", wohnraum ? "i. d. R. leer (Bestellerprinzip)" : 'z. B. "2 Nettokaltmieten zzgl. MwSt."'),
+      feld("Provision Vermieter", "provision_innen", 'z. B. "2 Nettokaltmieten zzgl. MwSt."'),
+      React.createElement("div", { style: { fontSize: 11, color: CI.muted, paddingBottom: 8, lineHeight: 1.45 } },
+        wohnraum
+          ? "Wohnraum: Bestellerprinzip (§ 2 Abs. 1a WoVermRG) – der Mieter zahlt nur, wenn er selbst einen Suchauftrag erteilt hat. Im Exposé steht „provisionsfrei für den Mieter“."
+          : "Gewerbe / sonstige Vermietung: Die Mieterprovision erscheint im Exposé (Eckdaten, Courtage, Provisionsangaben) und in Mail-Vorlagen unter {provision}. Leer = provisionsfrei für den Mieter.")));
+}
+window.EpMieteProvision = EpMieteProvision; window.epMieteProvisionText = epMieteProvisionText;
+// ---- Stufe 117: Werkzeuge → Transfer (wie WeTransfer, ohne Objekt) ----
+// Beliebige Dateien vom Rechner hochladen (Bucket transfer-dateien/<uid>/<sitzung>/), daraus einen Download-Link machen –
+// gleiche Optionen wie die Objekt-Links aus Stufe 114 (Ablaufdatum, Passwort, Empfänger aus dem Adressbuch, Nachricht,
+// Mail bei Download). Empfängerseite ist unterlagen.html. Darunter „Meine Transfers“ mit Protokoll, Verlängern,
+// Zurückziehen und „Dateien löschen“. Dateien werden 30 Tage nach Ablauf automatisch gelöscht (Cron).
+const IMMO_TR_SB = "https://usguiggfciavwzkdfjgt.supabase.co";
+
+function epTrSitzung() {
+  const z = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ0123456789";
+  return [...crypto.getRandomValues(new Uint32Array(16))].map((x) => z[x % z.length]).join("");
+}
+// Speicher-Schlüssel: nur unkritische Zeichen, der echte Name bleibt in transfer_dateien.name
+function epTrSchluessel(name, i) {
+  const n = String(name || "Datei").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/ß/g, "ss")
+    .replace(/[^A-Za-z0-9._-]+/g, "_").replace(/^[_.]+/, "").slice(-120) || "Datei";
+  return String(i + 1).padStart(3, "0") + "-" + n;
+}
+// Upload mit Fortschritt (XHR auf die Storage-API); im Test austauschbar über window.epTransferHochladen
+async function epTrHochladenStandard(pfad, datei, fortschritt) {
+  const { data } = await window._sb.auth.getSession();
+  const token = data && data.session && data.session.access_token;
+  if (!token) throw new Error("Nicht angemeldet – bitte neu anmelden.");
+  const basis = window._sb.supabaseUrl || IMMO_TR_SB;
+  const url = basis + "/storage/v1/object/transfer-dateien/" + pfad.split("/").map(encodeURIComponent).join("/");
+  return new Promise((ok, nein) => {
+    const x = new XMLHttpRequest();
+    x.open("POST", url);
+    x.setRequestHeader("Authorization", "Bearer " + token);
+    if (window._sb.supabaseKey) x.setRequestHeader("apikey", window._sb.supabaseKey);
+    x.setRequestHeader("x-upsert", "false");
+    x.setRequestHeader("Content-Type", datei.type || "application/octet-stream");
+    x.upload.onprogress = (e) => { if (e.lengthComputable) fortschritt(e.loaded); };
+    x.onload = () => {
+      if (x.status < 300) { fortschritt(datei.size); ok(); return; }
+      let m = ""; try { const j = JSON.parse(x.responseText); m = j.message || j.error || ""; } catch (e) { m = x.responseText.slice(0, 160); }
+      nein(new Error(x.status === 413 || /maximum allowed size|too large/i.test(m) ? `„${datei.name}“ ist zu groß für den Speicher (Grenze je Datei im Supabase-Projekt).` : `Upload von „${datei.name}“ fehlgeschlagen (${x.status}${m ? ": " + m : ""}).`));
+    };
+    x.onerror = () => nein(new Error(`Upload von „${datei.name}“ abgebrochen – Verbindung prüfen und erneut versuchen.`));
+    x.send(datei);
+  });
+}
+
+function EpTransferWerkzeug({ user }) {
+  const h = React.createElement;
+  const [dateien, setDateien] = React.useState([]); // { key, datei, pfad?, geladen }
+  const [ziehen, setZiehen] = React.useState(false);
+  const [titel, setTitel] = React.useState("");
+  const [tage, setTage] = React.useState(7);
+  const [datum, setDatum] = React.useState("");
+  const [mitPw, setMitPw] = React.useState(false);
+  const [pw, setPw] = React.useState(() => epUlPasswort());
+  const [empfName, setEmpfName] = React.useState("");
+  const [empfMail, setEmpfMail] = React.useState("");
+  const [kontakt, setKontakt] = React.useState(null);
+  const [nachricht, setNachricht] = React.useState("");
+  const [melden, setMelden] = React.useState(true);
+  const [busy, setBusy] = React.useState(false);
+  const [stand, setStand] = React.useState("");
+  const [fehler, setFehler] = React.useState("");
+  const [fertig, setFertig] = React.useState(null);
+  const [kopiert, setKopiert] = React.useState(false);
+  const [alleTeam, setAlleTeam] = React.useState(false);
+  const sitzung = React.useRef(epTrSitzung());
+  const eingabeRef = React.useRef(null);
+  const nutzerId = user && user.id;
+  const istChef = user && user.role === "chef";
+  const bis = datum ? new Date(datum + "T23:59:00") : new Date(Date.now() + tage * IMMO_UL_TAG);
+  const summe = dateien.reduce((s, d) => s + (d.datei.size || 0), 0);
+  const geladen = dateien.reduce((s, d) => s + (d.geladen || 0), 0);
+  const eingabe = { width: "100%", boxSizing: "border-box", padding: "8px 10px", border: `1px solid ${CI.border}`, fontSize: 13, fontFamily: FONT };
+  const knopf = (aktiv) => ({ background: aktiv ? CI.blau : "transparent", color: aktiv ? "#fff" : CI.blau, border: `1px solid ${CI.blau}`, padding: "5px 10px", fontSize: 12, cursor: "pointer", fontFamily: FONT });
+
+  const hinzu = (liste) => {
+    const neu = [...(liste || [])].filter((f) => f && f.size >= 0);
+    if (!neu.length) return;
+    setFehler("");
+    setDateien((alt) => {
+      const namen = new Set(alt.map((d) => d.datei.name + "|" + d.datei.size));
+      return [...alt, ...neu.filter((f) => !namen.has(f.name + "|" + f.size)).map((f, i) => ({ key: Date.now() + "-" + i + "-" + f.name, datei: f, geladen: 0 }))].slice(0, 300);
+    });
+  };
+  const entfernen = (key) => setDateien((a) => a.filter((d) => d.key !== key));
+  const fortschritt = (key, n) => setDateien((a) => a.map((d) => d.key === key ? { ...d, geladen: n } : d));
+
+  const starten = async () => {
+    setFehler("");
+    if (!dateien.length) { setFehler("Bitte zuerst Dateien hinzufügen."); return; }
+    if (mitPw && pw.trim().length < 6) { setFehler("Das Passwort braucht mindestens 6 Zeichen."); return; }
+    if (bis.getTime() < Date.now() + 3600000) { setFehler("Das Ablaufdatum muss in der Zukunft liegen."); return; }
+    setBusy(true);
+    const hochladen = window.epTransferHochladen || epTrHochladenStandard;
+    const ordner = `${nutzerId}/${sitzung.current}`;
+    let liste = dateien;
+    try {
+      for (let i = 0; i < liste.length; i++) {
+        const d = liste[i];
+        if (d.pfad) continue; // schon hochgeladen (z. B. nach einem Abbruch)
+        setStand(`Lade ${i + 1} von ${liste.length} hoch: ${d.datei.name}`);
+        const pfad = `${ordner}/${epTrSchluessel(d.datei.name, i)}`;
+        await hochladen(pfad, d.datei, (n) => fortschritt(d.key, n));
+        liste = liste.map((x) => x.key === d.key ? { ...x, pfad, geladen: d.datei.size } : x);
+        setDateien(liste);
+      }
+      setStand("Link wird erstellt …");
+      const auto = liste.length === 1 ? liste[0].datei.name : `${liste.length} Dateien`;
+      const { data, error } = await window._sb.functions.invoke("unterlagen-link", { body: { aktion: "anlegen",
+        transfer: { ordner, dateien: liste.map((d) => ({ pfad: d.pfad, name: d.datei.name })) },
+        gueltig_bis: bis.toISOString(), passwort: mitPw ? pw.trim() : "", titel: titel.trim() || auto, nachricht: nachricht.trim(),
+        empfaenger_name: empfName.trim(), empfaenger_email: empfMail.trim(), kontakt_id: kontakt ? kontakt.id : null, benachrichtigen: melden } });
+      if (error) throw new Error(error.message || String(error));
+      if (!data || !data.ok) throw new Error((data && data.fehler) || "Link konnte nicht erstellt werden.");
+      setFertig({ ...data, url: data.url || epUlUrl(data.token), passwort: mitPw ? pw.trim() : "", bis: bis.toISOString(), titel: titel.trim() || auto, eigenerTitel: !!titel.trim(), summe });
+      epUlNeuLaden();
+    } catch (e) { setFehler(e.message || String(e)); }
+    setStand(""); setBusy(false);
+  };
+  const neuStarten = () => {
+    sitzung.current = epTrSitzung();
+    setDateien([]); setTitel(""); setNachricht(""); setEmpfName(""); setEmpfMail(""); setKontakt(null); setMitPw(false); setPw(epUlPasswort());
+    setDatum(""); setTage(7); setFertig(null); setFehler(""); setKopiert(false);
+  };
+  const perMail = () => {
+    const f = fertig;
+    const k = kontakt && kontakt.nachname && /^(Herr|Frau)$/i.test(String(kontakt.anrede || "").trim()) ? `${String(kontakt.anrede).trim()} ${kontakt.titel ? kontakt.titel + " " : ""}${kontakt.nachname}` : "";
+    const text = `${k ? "Guten Tag " + k : empfName.trim() ? "Guten Tag " + empfName.trim() : "Guten Tag"},\n\n` +
+      `über den folgenden Link können Sie ${f.dateien === 1 ? "die Datei" : "die " + f.dateien + " Dateien"} herunterladen:\n${f.url}\n\n` +
+      `Der Link ist gültig bis ${epUlDatum(f.bis)} Uhr.${f.passwort ? "\nDas Passwort zum Öffnen erhalten Sie separat von mir." : ""}${nachricht.trim() ? "\n\n" + nachricht.trim() : ""}`;
+    window._epMailAn = { an: empfMail.trim(), name: empfName.trim(), kontakt_id: kontakt ? kontakt.id : null, betreff: f.titel || "Dateien", text };
+    window.setView && window.setView("posteingang");
+  };
+
+  const kasten = { background: "#fff", border: `1px solid ${CI.border}`, padding: 16, marginBottom: 16 };
+
+  const formular = h("div", { "data-ep-tr-formular": "", style: kasten },
+    h("div", {
+      "data-ep-tr-ablage": "", onClick: () => !busy && eingabeRef.current && eingabeRef.current.click(),
+      onDragOver: (e) => { e.preventDefault(); if (!busy) setZiehen(true); }, onDragLeave: () => setZiehen(false),
+      onDrop: (e) => { e.preventDefault(); setZiehen(false); if (!busy) hinzu(e.dataTransfer && e.dataTransfer.files); },
+      style: { border: `2px dashed ${ziehen ? CI.gold : CI.border}`, background: ziehen ? "#fbf6ee" : "#fafbfd", padding: "26px 16px", textAlign: "center", cursor: busy ? "default" : "pointer", marginBottom: 12 } },
+      h("div", { style: { fontSize: 30, lineHeight: 1 } }, "📤"),
+      h("div", { style: { fontSize: 14, fontWeight: 700, color: CI.blau, marginTop: 6 } }, "Dateien hierher ziehen oder klicken"),
+      h("div", { style: { fontSize: 11, color: CI.muted, marginTop: 3 } }, "Beliebige Dateien, auch mehrere auf einmal – der Empfänger lädt einzeln oder alles als ZIP."),
+      h("input", { ref: eingabeRef, type: "file", multiple: true, "data-ep-tr-eingabe": "", style: { display: "none" }, onChange: (e) => { hinzu(e.target.files); e.target.value = ""; } })),
+    dateien.length ? h("div", { "data-ep-tr-liste": dateien.length, style: { border: `1px solid ${CI.border}`, maxHeight: 240, overflowY: "auto", marginBottom: 6 } },
+      dateien.map((d) => {
+        const p = d.datei.size ? Math.min(100, Math.round((d.geladen || 0) / d.datei.size * 100)) : d.pfad ? 100 : 0;
+        return h("div", { key: d.key, "data-ep-tr-datei": d.datei.name, style: { position: "relative", display: "flex", gap: 8, alignItems: "center", padding: "6px 10px", fontSize: 12, borderTop: `1px solid ${CI.border}` } },
+          busy || d.pfad ? h("div", { style: { position: "absolute", left: 0, bottom: 0, height: 2, width: p + "%", background: d.pfad ? "#1e7e34" : CI.gold } }) : null,
+          h("span", { style: { flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: CI.blau } }, d.datei.name),
+          h("span", { style: { color: CI.muted, fontSize: 11, whiteSpace: "nowrap" } }, d.pfad ? "✓ " + epUlGroesse(d.datei.size) : busy && d.geladen ? p + " %" : epUlGroesse(d.datei.size)),
+          !busy ? h("button", { type: "button", "data-ep-tr-weg": d.datei.name, title: "Entfernen", onClick: () => entfernen(d.key), style: { background: "transparent", border: "none", color: CI.muted, cursor: "pointer", fontSize: 14 } }, "✕") : null);
+      })) : null,
+    dateien.length ? h("div", { "data-ep-tr-summe": summe, style: { fontSize: 11, color: CI.muted, marginBottom: 12 } },
+      `${dateien.length} Datei(en), zusammen ${epUlGroesse(summe) || "0 KB"}` + (busy && summe ? ` · ${Math.round(geladen / summe * 100)} % hochgeladen` : "")) : null,
+    h("label", { style: { display: "block", fontSize: 12, color: CI.muted, marginBottom: 10 } }, "Titel (sieht der Empfänger)",
+      h("input", { "data-ep-tr-titel": "", value: titel, onChange: (e) => setTitel(e.target.value), placeholder: dateien.length === 1 ? dateien[0].datei.name : dateien.length ? `${dateien.length} Dateien` : "z. B. Fotos Notartermin", style: { ...eingabe, marginTop: 3 } })),
+    h("div", { style: { fontSize: 12, fontWeight: 700, color: CI.blau, marginBottom: 4 } }, "Gültig bis"),
+    h("div", { style: { display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginBottom: 4 } },
+      [3, 7, 14, 30, 90].map((t) => h("button", { key: t, type: "button", "data-ep-tr-tage": t, onClick: () => { setTage(t); setDatum(""); }, style: knopf(!datum && tage === t) }, `${t} Tage`)),
+      h("input", { type: "date", "data-ep-tr-datum": "", value: datum, min: new Date(Date.now() + IMMO_UL_TAG).toISOString().slice(0, 10), max: new Date(Date.now() + 365 * IMMO_UL_TAG).toISOString().slice(0, 10), onChange: (e) => setDatum(e.target.value), style: { ...eingabe, width: "auto", padding: "4px 8px" } })),
+    h("div", { "data-ep-tr-bis": bis.toISOString(), style: { fontSize: 11, color: CI.muted, marginBottom: 12 } }, `Abrufbar bis ${epUlDatum(bis)} Uhr · die Dateien werden 30 Tage danach automatisch gelöscht`),
+    h("label", { style: { display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: CI.blau, cursor: "pointer" } },
+      h("input", { type: "checkbox", "data-ep-tr-mitpw": "", checked: mitPw, onChange: (e) => setMitPw(e.target.checked) }), "🔒 Mit Passwort schützen"),
+    mitPw ? h("div", { style: { display: "flex", gap: 6, margin: "6px 0 0 24px" } },
+      h("input", { "data-ep-tr-pw": "", value: pw, onChange: (e) => setPw(e.target.value), style: { ...eingabe, fontFamily: "monospace", maxWidth: 240 } }),
+      h("button", { type: "button", onClick: () => setPw(epUlPasswort()), title: "Neues Passwort erzeugen", style: knopf(false) }, "🎲 Neu")) : null,
+    h("div", { style: { display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", margin: "12px 0 0" } },
+      h("span", { style: { fontSize: 12, fontWeight: 700, color: CI.blau } }, "Empfänger"),
+      typeof KontaktWaehler === "function" ? h("span", { "data-ep-tr-adressbuch": "" }, h(KontaktWaehler, { label: "📇 Aus Adressbuch", knopfVariante: "hell", onWahl: (k) => {
+        if (!k) return;
+        setKontakt(k);
+        setEmpfName([k.vorname, k.nachname].filter(Boolean).join(" ") || k.firma || "");
+        setEmpfMail(k.email || "");
+      } })) : null,
+      kontakt ? h("span", { "data-ep-tr-kontakt": kontakt.id, style: { fontSize: 11, color: "#1e7e34", background: "#eaf6ec", padding: "3px 8px" } },
+        "✓ verknüpft mit Kontakt ", (typeof epKontaktName === "function" ? epKontaktName(kontakt) : empfName) || "",
+        h("button", { type: "button", title: "Verknüpfung lösen", onClick: () => setKontakt(null), style: { background: "transparent", border: "none", color: "#1e7e34", cursor: "pointer", marginLeft: 4 } }, "✕")) : null,
+      kontakt && !kontakt.email ? h("span", { style: { fontSize: 11, color: "#c83c3c" } }, "Kontakt hat keine E-Mail-Adresse") : null),
+    h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 8, margin: "6px 0 8px" } },
+      h("label", { style: { fontSize: 12, color: CI.muted } }, "Name (optional)", h("input", { "data-ep-tr-empf": "", value: empfName, onChange: (e) => setEmpfName(e.target.value), placeholder: "Name", style: { ...eingabe, marginTop: 3 } })),
+      h("label", { style: { fontSize: 12, color: CI.muted } }, "E-Mail (optional)", h("input", { type: "email", "data-ep-tr-mailfeld": "", value: empfMail, onChange: (e) => setEmpfMail(e.target.value), placeholder: "name@beispiel.de", style: { ...eingabe, marginTop: 3 } }))),
+    h("label", { style: { display: "block", fontSize: 12, color: CI.muted, marginBottom: 8 } }, "Nachricht auf der Download-Seite (optional)",
+      h("textarea", { "data-ep-tr-nachricht": "", value: nachricht, onChange: (e) => setNachricht(e.target.value), rows: 3, style: { ...eingabe, marginTop: 3, resize: "vertical" } })),
+    h("label", { style: { display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: CI.blau, cursor: "pointer", marginBottom: 12 } },
+      h("input", { type: "checkbox", "data-ep-tr-melden": "", checked: melden, onChange: (e) => setMelden(e.target.checked) }), "✉ Mich per Mail benachrichtigen, wenn heruntergeladen wurde"),
+    fehler ? h("div", { "data-ep-tr-fehler": "", style: { background: "#fde6e6", color: "#c83c3c", padding: "8px 10px", fontSize: 12, marginBottom: 10 } }, fehler) : null,
+    stand ? h("div", { "data-ep-tr-stand": "", style: { fontSize: 12, color: CI.blau, marginBottom: 10 } }, stand) : null,
+    h("div", { style: { display: "flex", gap: 8, justifyContent: "flex-end" } },
+      h("button", { type: "button", "data-ep-tr-start": "", disabled: busy, onClick: starten, style: { background: CI.gold, color: "#fff", border: "none", padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: busy ? "wait" : "pointer", fontFamily: FONT } },
+        busy ? "Lädt hoch …" : dateien.some((d) => d.pfad) ? "↻ Fortsetzen & Link erstellen" : "📤 Hochladen & Link erstellen")));
+
+  const ergebnis = fertig ? h("div", { "data-ep-tr-fertig": "", style: kasten },
+    h("div", { style: { fontSize: 16, fontWeight: 700, color: CI.blau, marginBottom: 6 } }, "✓ Transfer bereit"),
+    h("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 6 } }, `${fertig.eigenerTitel ? fertig.titel + " · " : ""}${fertig.dateien} Datei(en)${fertig.summe ? ", " + epUlGroesse(fertig.summe) : ""} · gültig bis ${epUlDatum(fertig.bis)} Uhr`),
+    h("div", { style: { display: "flex", gap: 6, marginBottom: 12 } },
+      h("input", { "data-ep-tr-url": "", readOnly: true, value: fertig.url, onFocus: (e) => e.target.select(), style: { ...eingabe, flex: 1, fontFamily: "monospace", fontSize: 12 } }),
+      h("button", { type: "button", "data-ep-tr-kopieren": "", onClick: async () => { await epUlKopieren(fertig.url); setKopiert(true); setTimeout(() => setKopiert(false), 2500); }, style: { ...knopf(true), whiteSpace: "nowrap" } }, kopiert ? "✓ Kopiert" : "📋 Kopieren")),
+    fertig.passwort ? h("div", { "data-ep-tr-passwort": fertig.passwort, style: { background: "#fff8e6", borderLeft: "3px solid #d9a400", padding: "8px 10px", fontSize: 13, marginBottom: 12 } },
+      "🔒 Passwort: ", h("strong", { style: { fontFamily: "monospace", fontSize: 15, letterSpacing: "0.05em" } }, fertig.passwort),
+      h("div", { style: { fontSize: 11, color: "#6b5200", marginTop: 4 } }, "Nur jetzt sichtbar – bitte getrennt vom Link mitteilen (z. B. per SMS oder telefonisch).")) : null,
+    h("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } },
+      h("button", { type: "button", "data-ep-tr-mail": "", onClick: perMail, style: { background: CI.gold, color: "#fff", border: "none", padding: "9px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: FONT } }, "✉ Per E-Mail senden"),
+      h("button", { type: "button", "data-ep-tr-neu": "", onClick: neuStarten, style: knopf(false) }, "＋ Neuer Transfer"))) : null;
+
+  return h("div", { "data-ep-transfer": "", style: { fontFamily: FONT, maxWidth: 820 } },
+    h("div", { style: { fontSize: 13, color: CI.muted, marginBottom: 14, lineHeight: 1.5 } },
+      "Dateien vom Rechner per Link verschicken – mit Ablaufdatum, optional Passwort und Nachricht. Sie sehen, wann geöffnet und heruntergeladen wurde, und bekommen auf Wunsch eine Mail. Für Unterlagen, die schon an einem Objekt liegen: Objekt → Dokumente → „🔗 Download-Link“."),
+    ergebnis || formular,
+    h("div", { style: { display: "flex", alignItems: "center", gap: 10, margin: "4px 0 6px" } },
+      h("div", { style: { fontSize: 13, fontWeight: 700, color: CI.blau } }, alleTeam ? "Alle Transfers im Team" : "Meine Transfers"),
+      istChef ? h("label", { style: { fontSize: 11, color: CI.muted, display: "flex", gap: 4, alignItems: "center", cursor: "pointer" } },
+        h("input", { type: "checkbox", "data-ep-tr-alle": "", checked: alleTeam, onChange: (e) => setAlleTeam(e.target.checked) }), "alle im Team") : null),
+    h(EpUnterlagenLinkListe, { key: alleTeam ? "alle" : "meine", transfer: true, nutzerId, alle: alleTeam }));
+}
+window.EpTransferWerkzeug = EpTransferWerkzeug;
+// ---- Stufe 118: Grundriss-Editor – alten Grundriss per KI auslesen und neu zeichnen ----
+// „✨ Alter Grundriss → KI“: Foto, Scan oder PDF eines alten Plans (oder einen Grundriss des gewählten Objekts)
+// an die Edge Function grundriss-ki-lesen schicken. Die KI liest die Maßketten und liefert Räume (lichte Maße),
+// Türen, Fenster und Treppen in Metern. Daraus wird ein Raumscan-JSON (docs/scan-format.md), das der Editor mit
+// EPScanEditor.inEditorLaden als normales Zeichenblatt anlegt – Wände mit Dicke, Türen, Fenster, Räume, Maße.
+// Vorher: Vorschau neben dem Original, Raumliste mit Flächen, Hinweise der KI, Auswahl der Einheiten
+// (z. B. nur „Haus I“) und „Nachbessern“ mit einer Korrektur in eigenen Worten.
+// Stufe 119: Dachschrägen (Seite, Kniestock, Neigung oder 1-m-/2-m-Linie) → Höhenzonen je Raum (≥ 2 m / 1–2 m / < 1 m),
+// Raumart (Wohnen / Nutzfläche / Balkon), Wohnfläche nach WoFlV schon im Dialog, Zonen farbig im Plan und
+// „📏 Wohnflächenberechnung →“ in den vorhandenen Wohnflächenrechner (WF.ausScan liest hoehenzonen und zuordnung).
+
+function epGkFlaeche(p) {
+  let s = 0;
+  for (let i = 0; i < p.length; i++) { const a = p[i], b = p[(i + 1) % p.length]; s += a[0] * b[1] - b[0] * a[1]; }
+  return Math.abs(s) / 2;
+}
+const epGkZahl = (x) => (typeof x === "number" && isFinite(x) ? x : null);
+const epGkRund = (x) => Math.round(x * 1000) / 1000;
+const epGkR2 = (x) => Math.round(x * 100) / 100;
+
+// Polygon an einer Halbebene abschneiden (behält nx·x + ny·y ≥ c)
+function epGkHalbebene(poly, nx, ny, c) {
+  const out = [];
+  for (let i = 0; i < poly.length; i++) {
+    const a = poly[i], b = poly[(i + 1) % poly.length];
+    const fa = nx * a[0] + ny * a[1] - c, fb = nx * b[0] + ny * b[1] - c;
+    if (fa >= 0) out.push(a);
+    if ((fa >= 0) !== (fb >= 0)) { const t = fa / (fa - fb); out.push([a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])]); }
+  }
+  return out;
+}
+// Abstand der 1-m- und 2-m-Linie von der Wand: aus dem Plan (Vorrang) oder aus Kniestock und Neigung
+function epGkAbstaende(sch, dach) {
+  if (!sch) return null;
+  const k = sch.kniestock_m > 0 ? sch.kniestock_m : (dach && dach.kniestock_m > 0 ? dach.kniestock_m : 0);
+  const n = sch.neigung_grad > 0 ? sch.neigung_grad : (dach && dach.neigung_grad > 0 ? dach.neigung_grad : 0);
+  const tan = n > 0 && n < 89 ? Math.tan(n * Math.PI / 180) : 0;
+  const d1 = sch.abstand_1m_m > 0 ? sch.abstand_1m_m : tan ? Math.max(0, (1 - k) / tan) : null;
+  let d2 = sch.abstand_2m_m > 0 ? sch.abstand_2m_m : tan ? Math.max(0, (2 - k) / tan) : null;
+  if (d2 == null) return null;
+  if (d1 != null && d2 < d1) d2 = d1;
+  return { d1: d1 == null ? 0 : d1, d2, k, n, ausPlan: sch.abstand_2m_m > 0, d1Unbekannt: d1 == null };
+}
+// Höhenzonen eines KI-Raums (Bildkoordinaten, y nach unten): Flächen ≥ 2 m, 1–2 m, < 1 m und Streifen fürs Zeichnen
+function epGkZonen(raum, dach) {
+  const pts = (raum.polygon || []).filter((q) => q && epGkZahl(q.x) != null && epGkZahl(q.y) != null).map((q) => [q.x, q.y]);
+  if (pts.length < 3) return null;
+  const gesamt = epGkFlaeche(pts);
+  const lh = epGkZahl(raum.lichte_hoehe_m);
+  if (lh && lh > 0 && lh < 2) return lh < 1 ? { voll: 0, halb: 0, keine: epGkR2(gesamt), streifen: [{ art: "keine", poly: pts }], text: `lichte Höhe ${String(lh).replace(".", ",")} m` }
+    : { voll: 0, halb: epGkR2(gesamt), keine: 0, streifen: [{ art: "halb", poly: pts }], text: `lichte Höhe ${String(lh).replace(".", ",")} m` };
+  const sch = (raum.schraegen || []).map((x) => ({ x, a: epGkAbstaende(x, dach) })).filter((x) => x.a && ["oben", "unten", "links", "rechts"].includes(x.x.seite));
+  if (!sch.length) return null;
+  const xs = pts.map((q) => q[0]), ys = pts.map((q) => q[1]);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  // Halbebene „Abstand zur Wand der Seite ≥ D“
+  const hp = (seite, D, umkehren) => {
+    const e = seite === "oben" ? [0, 1, minY + D] : seite === "unten" ? [0, -1, -(maxY - D)] : seite === "links" ? [1, 0, minX + D] : [-1, 0, -(maxX - D)];
+    return umkehren ? [-e[0], -e[1], -e[2]] : e;
+  };
+  let p2 = pts, p1 = pts;
+  const streifen = [];
+  sch.forEach(({ x, a }) => {
+    p2 = epGkHalbebene(p2, ...hp(x.seite, a.d2));
+    p1 = epGkHalbebene(p1, ...hp(x.seite, a.d1));
+    const halb = epGkHalbebene(epGkHalbebene(pts, ...hp(x.seite, a.d1)), ...hp(x.seite, a.d2, true));
+    if (halb.length >= 3 && epGkFlaeche(halb) > 0.01) streifen.push({ art: "halb", poly: halb });
+    if (a.d1 > 0) { const kein = epGkHalbebene(pts, ...hp(x.seite, a.d1, true)); if (kein.length >= 3 && epGkFlaeche(kein) > 0.01) streifen.push({ art: "keine", poly: kein }); }
+  });
+  const voll = p2.length >= 3 ? epGkFlaeche(p2) : 0, a1 = p1.length >= 3 ? epGkFlaeche(p1) : 0;
+  const text = sch.map(({ x, a }) => `Schräge ${x.seite}` + (a.ausPlan ? ` (2-m-Linie ${String(epGkR2(a.d2)).replace(".", ",")} m aus dem Plan)` : `, Kniestock ${String(a.k).replace(".", ",")} m, ${Math.round(a.n)}°`) + (a.d1Unbekannt ? ", 1-m-Linie unbekannt" : "")).join(" · ");
+  return { voll: epGkR2(voll), halb: epGkR2(Math.max(0, a1 - voll)), keine: epGkR2(Math.max(0, gesamt - a1)), streifen, text };
+}
+function epGkInnen(pt, poly) {
+  let drin = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const a = poly[i], b = poly[j];
+    if ((a[1] > pt[1]) !== (b[1] > pt[1]) && pt[0] < (b[0] - a[0]) * (pt[1] - a[1]) / (b[1] - a[1]) + a[0]) drin = !drin;
+  }
+  return drin;
+}
+
+// KI-Ergebnis (y nach unten, Meter) → Raumscan-JSON (y nach oben, Meter). einheiten: Set der übernommenen Einheiten oder null = alle
+function epGrundrissKiZuScan(ki, optionen) {
+  optionen = optionen || {};
+  const wahl = optionen.einheiten || null;
+  const passt = (e) => !wahl || !e || !String(e).trim() || wahl.has(String(e));
+  let n = 0;
+  const id = (p) => `ki-${p}-${++n}`;
+  const P = (x, y) => [epGkRund(x), epGkRund(-y)];
+  const raeume = [];
+  const zuordnung = {};
+  const arten = optionen.arten || {};
+  const geschoss = ki && Number.isInteger(ki.geschoss_nr) ? ki.geschoss_nr : null;
+  (ki && Array.isArray(ki.raeume) ? ki.raeume : []).forEach((r, kiIndex) => {
+    if (!r || !passt(r.einheit) || !Array.isArray(r.polygon)) return;
+    const pts = r.polygon.map((q) => q && epGkZahl(q.x) != null && epGkZahl(q.y) != null ? P(q.x, q.y) : null).filter(Boolean);
+    if (pts.length < 3) return;
+    const flaeche = Math.round(epGkFlaeche(pts) * 100) / 100;
+    if (flaeche < 0.2) return;
+    const waende = pts.map((a, i) => { const b = pts[(i + 1) % pts.length];
+      return { id: id("w"), x1: a[0], y1: a[1], x2: b[0], y2: b[1], laenge: epGkRund(Math.hypot(b[0] - a[0], b[1] - a[1])), hoehe: 2.5, unterkante: 0, gekruemmt: false }; });
+    const mx = pts.reduce((s, q) => s + q[0], 0) / pts.length, my = pts.reduce((s, q) => s + q[1], 0) / pts.length;
+    const name = String(r.name || "Raum").trim() || "Raum";
+    const art = ["wohn", "nutz", "balkon"].includes(arten[kiIndex]) ? arten[kiIndex] : ["wohn", "nutz", "balkon"].includes(r.art) ? r.art : "wohn";
+    const z = epGkZonen(r, ki.dach);
+    const rid = id("r");
+    zuordnung[rid] = art;
+    raeume.push({ id: rid, bezeichnung: name, geschoss, flaeche, einheit: r.einheit || "", flaeche_plan: epGkZahl(r.flaeche_plan_m2) || 0, ki_index: kiIndex, ki_art: art,
+      hoehenzonen: z ? { voll: z.voll, halb: z.halb, keine: z.keine, unbekannt: 0 } : null, ki_zonen_text: z ? z.text : "",
+      ki_streifen: z ? z.streifen.map((st) => ({ art: st.art, polygon: st.poly.map((q) => P(q[0], q[1])) })) : [],
+      ki_schraege: (Array.isArray(r.schraegen) && r.schraegen.length) || (r.lichte_hoehe_m > 0 && r.lichte_hoehe_m < 2) ? (() => {
+        const xs = r.polygon.map((q) => q.x), ys = r.polygon.map((q) => q.y);
+        return { laenge: epGkRund(Math.max(...xs) - Math.min(...xs)), breite: epGkRund(Math.max(...ys) - Math.min(...ys)), schraegen: r.schraegen || [],
+          lichte_hoehe_m: r.lichte_hoehe_m || 0, dach: ki.dach || null, quelle: "ki" };
+      })() : null,
+      waende, tueren: [], fenster: [], oeffnungen: [], objekte: [],
+      boeden: [{ id: id("b"), polygon: pts, flaeche, niveau: 0 }], abschnitte: [{ bezeichnung: name, x: epGkRund(mx), y: epGkRund(my), geschoss: null }] });
+  });
+  if (!raeume.length) return { version: 1, quelle: "ki-grundriss", einheit: "m", titel: optionen.titel || "", raeume: [], zuordnung };
+  const ziel = raeume[0];
+  const strecke = (o) => {
+    const x1 = epGkZahl(o.x1), y1 = epGkZahl(o.y1), x2 = epGkZahl(o.x2), y2 = epGkZahl(o.y2);
+    if (x1 == null || y1 == null || x2 == null || y2 == null) return null;
+    const a = P(x1, y1), b = P(x2, y2), breite = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    return breite < 0.3 || breite > 6 ? null : { id: id("o"), wandId: null, x1: a[0], y1: a[1], x2: b[0], y2: b[1], breite: epGkRund(breite) };
+  };
+  (ki.tueren || []).forEach((t) => {
+    if (!t || !passt(t.einheit)) return;
+    const s = strecke(t); if (!s) return;
+    if (t.art === "durchgang" || t.art === "schiebe") ziel.oeffnungen.push({ ...s, hoehe: 2.05, unterkante: 0, offen: null });
+    else ziel.tueren.push({ ...s, breite: t.art === "doppel" ? Math.max(s.breite, 1.51) : s.breite, hoehe: 2.05, unterkante: 0, offen: false });
+  });
+  (ki.fenster || []).forEach((f) => {
+    if (!f || !passt(f.einheit)) return;
+    const s = strecke(f); if (!s) return;
+    const br = epGkZahl(f.bruestung_m);
+    ziel.fenster.push({ ...s, hoehe: 1.2, unterkante: br != null && br >= 0 && br < 3 ? br : 0.9, offen: null });
+  });
+  (ki.treppen || []).forEach((t) => {
+    if (!t || !passt(t.einheit)) return;
+    const x = epGkZahl(t.x), y = epGkZahl(t.y), b = epGkZahl(t.breite_m), d = epGkZahl(t.tiefe_m);
+    if (x == null || y == null || !b || !d) return;
+    const pt = [epGkRund(x), epGkRund(-y)];
+    const raum = raeume.find((rr) => epGkInnen(pt, rr.boeden[0].polygon)) || ziel; // Treppenabzug gilt im Raum der Treppe
+    raum.objekte.push({ id: id("t"), kategorie: "stairs", x: pt[0], y: pt[1], breite: epGkRund(b), tiefe: epGkRund(d), hoehe: 2.5, winkel: 0 });
+  });
+  return { version: 1, quelle: "ki-grundriss", einheit: "m", erzeugt: new Date().toISOString(), titel: optionen.titel || ki.geschoss || "", raeume, zuordnung,
+    ki_hinweise: Array.isArray(ki.hinweise) ? ki.hinweise.slice(0, 20) : [] };
+}
+
+// Wohnfläche nach WoFlV je Raum – mit dem Rechenkern des Wohnflächenrechners (WF), damit Dialog und Berechnung gleich rechnen
+function epGkWohnflaechen(scan) {
+  const proRaum = {}; let wohn = 0, nutz = 0;
+  try {
+    if (typeof WF !== "undefined" && WF.ausScan && WF.ergebnis && typeof EPScan !== "undefined") {
+      const erg = WF.ergebnis(WF.ausScan(scan, null, EPScan));
+      const liste = erg.geschosse.flatMap((g) => g.raeume);
+      if (liste.length === scan.raeume.length) {
+        liste.forEach((x, i) => { proRaum[scan.raeume[i].id] = { wohn: x.wohn, nutz: x.nutz }; });
+        return { proRaum, wohn: erg.wohnflaeche, nutz: erg.nutzflaeche };
+      }
+    }
+  } catch (e) { console.warn("Wohnfläche:", e); }
+  scan.raeume.forEach((r) => {
+    const z = r.hoehenzonen;
+    const w = r.ki_art === "nutz" ? 0 : r.ki_art === "balkon" ? r.flaeche * 0.25 : z ? z.voll + 0.5 * z.halb : r.flaeche;
+    proRaum[r.id] = { wohn: epGkR2(w), nutz: r.ki_art === "nutz" ? r.flaeche : 0 };
+    wohn += w; nutz += proRaum[r.id].nutz;
+  });
+  return { proRaum, wohn: epGkR2(wohn), nutz: epGkR2(nutz) };
+}
+
+// Bild vorbereiten: PDF → erste Seite, Bild → richtig gedreht, längste Seite höchstens 2000 px, JPEG
+async function epGkBildVorbereiten(datei, seite) {
+  const LANG = 2000;
+  let quelle;
+  if (datei.type === "application/pdf" || /\.pdf$/i.test(datei.name || "")) {
+    const lib = window.pdfjsLib || window["pdfjs-dist/build/pdf"];
+    if (!lib) throw new Error("PDF-Anzeige ist nicht geladen – bitte die Seite neu laden oder ein Bild verwenden.");
+    const pdf = await lib.getDocument({ data: await datei.arrayBuffer() }).promise;
+    const p = await pdf.getPage(Math.min(Math.max(1, seite || 1), pdf.numPages));
+    const v1 = p.getViewport({ scale: 1 });
+    const v = p.getViewport({ scale: LANG / Math.max(v1.width, v1.height) });
+    const c = document.createElement("canvas"); c.width = Math.round(v.width); c.height = Math.round(v.height);
+    const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height);
+    await p.render({ canvasContext: g, viewport: v }).promise;
+    quelle = c;
+  } else {
+    if (!/^image\//.test(datei.type || "") && !/\.(jpe?g|png|webp|gif|heic)$/i.test(datei.name || "")) throw new Error("Bitte ein Foto, einen Scan (JPG/PNG) oder ein PDF wählen.");
+    quelle = await createImageBitmap(datei, { imageOrientation: "from-image" });
+  }
+  const f = Math.min(1, LANG / Math.max(quelle.width, quelle.height));
+  const c = document.createElement("canvas"); c.width = Math.round(quelle.width * f); c.height = Math.round(quelle.height * f);
+  const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(quelle, 0, 0, c.width, c.height);
+  const url = c.toDataURL("image/jpeg", 0.9);
+  return { base64: url.split(",")[1], mime: "image/jpeg", vorschau: url, breite: c.width, hoehe: c.height };
+}
+
+// Nach dem Laden: Legende „KI-Vorschlag“ statt LiDAR-Text, Gesamtmaße von Außenkante zu Außenkante (oben und links)
+function epGkNachbearbeiten(editorFenster, scan, dicke) {
+  const ge = editorFenster && editorFenster.GrundrissEditor;
+  if (!ge || !ge.st) return;
+  const st = ge.st;
+  const el = st.elemente.find((e) => e.typ === "text" && /LiDAR/.test(e.text || ""));
+  if (el) el.text = `KI-Vorschlag aus einem Bestandsgrundriss (${new Date().toLocaleDateString("de-DE")}): Innenmaße aus den Maßketten des alten Plans, Außenwände ${dicke} cm. Bitte vor Verwendung mit dem Original abgleichen.`;
+  // Umrechnung Meter → Blatt aus der ersten Raumfläche ableiten (Räume werden weder gedreht noch begradigt)
+  const fl = st.elemente.find((e) => e.typ === "flaeche" && e.punkte && e.punkte.length);
+  const R = st.kalib && st.kalib.ptProM;
+  const p0 = scan.raeume[0] && scan.raeume[0].boeden[0].polygon[0];
+  if (fl && R && p0) {
+    const ax = fl.punkte[0].x - p0[0] * R, by = fl.punkte[0].y + p0[1] * R;
+    const I = (x, y) => ({ x: Math.round((ax + x * R) * 100) / 100, y: Math.round((by - y * R) * 100) / 100 });
+    const alle = scan.raeume.flatMap((r) => r.boeden[0].polygon);
+    const d = dicke / 100;
+    const minX = Math.min(...alle.map((q) => q[0])) - d, maxX = Math.max(...alle.map((q) => q[0])) + d;
+    const minY = Math.min(...alle.map((q) => q[1])) - d, maxY = Math.max(...alle.map((q) => q[1])) + d;
+    const abstand = Math.round(0.9 * R);
+    [{ p1: I(minX, maxY), p2: I(maxX, maxY), versatz: -abstand }, { p1: I(minX, maxY), p2: I(minX, minY), versatz: abstand }].forEach((m) => {
+      st.elemente.push({ typ: "mass", farbe: "#000000", groesse: 8, text: "", id: st.naechsteId++, ...m });
+    });
+    // Dachschrägen: Zone 1–2 m gold, unter 1 m rot – mit Fläche, wie in Dachgeschoss-Plänen üblich
+    scan.raeume.forEach((r) => (r.ki_streifen || []).forEach((z) => {
+      st.elemente.push({ typ: "flaeche", farbe: z.art === "halb" ? "#D4A567" : "#c83c3c", groesse: 6, fuellen: true,
+        text: z.art === "halb" ? "Schräge 1–2 m" : "unter 1 m", punkte: z.polygon.map((q) => I(q[0], q[1])), id: st.naechsteId++ });
+    }));
+  }
+  ge.commit(); ge.render(); ge.renderPanel && ge.renderPanel();
+}
+
+function EpGrundrissKiDialog({ editorRef, titel, immobilie, onSchliessen, onStatus, onWerkzeug }) {
+  const h = React.createElement;
+  const [bild, setBild] = React.useState(null); // { base64, mime, vorschau, name }
+  const [hinweis, setHinweis] = React.useState("");
+  const [phase, setPhase] = React.useState("quelle"); // quelle | laeuft | ergebnis
+  const [fehler, setFehler] = React.useState("");
+  const [sekunden, setSekunden] = React.useState(0);
+  const [geschrieben, setGeschrieben] = React.useState(0); // Zeichen, die die KI schon geschrieben hat (Stream)
+  const [ki, setKi] = React.useState(null);
+  const [wahl, setWahl] = React.useState(null); // Set der Einheiten
+  const [korrektur, setKorrektur] = React.useState("");
+  const [objektDateien, setObjektDateien] = React.useState([]);
+  const [arten, setArten] = React.useState({}); // Raumart von Hand geändert: KI-Index → wohn | nutz | balkon
+  const [lade, setLade] = React.useState(false);
+  const eingabeRef = React.useRef(null);
+  const lauf = React.useRef(0);
+  React.useEffect(() => () => { lauf.current++; }, []);
+  React.useEffect(() => {
+    if (!immobilie || !immobilie.id) return;
+    window._sb.from("immobilie_datei").select("id, name, storage_path, mime_type").eq("immobilie_id", immobilie.id).eq("kategorie", "grundriss").not("storage_path", "is", null).limit(40)
+      .then(({ data }) => setObjektDateien(data || []), () => {});
+  }, [immobilie && immobilie.id]);
+
+  const dateiNehmen = async (datei) => {
+    if (!datei) return;
+    setFehler(""); setLade(true);
+    try { setBild({ ...(await epGkBildVorbereiten(datei)), name: datei.name || "Grundriss" }); }
+    catch (e) { setFehler(e.message || String(e)); }
+    setLade(false);
+  };
+  const objektDatei = async (d) => {
+    setFehler(""); setLade(true);
+    try {
+      const { data, error } = await window._sb.storage.from("immobilie-dateien").download(d.storage_path);
+      if (error) throw error;
+      await dateiNehmen(new File([data], d.name || "Grundriss", { type: d.mime_type || data.type || "image/jpeg" }));
+    } catch (e) { setFehler("Datei konnte nicht geladen werden: " + (e.message || e)); setLade(false); }
+  };
+
+  const auslesen = async (mitKorrektur) => {
+    if (!bild) return;
+    setFehler(""); setPhase("laeuft"); setSekunden(0); setGeschrieben(0);
+    const meinLauf = ++lauf.current;
+    const start = Date.now();
+    try {
+      const { data, error } = await window._sb.functions.invoke("grundriss-ki-lesen", { body: { aktion: "starten", bild_base64: bild.base64, mime: bild.mime, hinweis: hinweis.trim(),
+        immobilie_id: immobilie ? immobilie.id : null, vorher: mitKorrektur ? ki : null, korrektur: mitKorrektur ? korrektur.trim() : null } });
+      if (error) throw new Error(error.message || String(error));
+      if (!data || !data.ok) throw new Error((data && data.fehler) || "Auswertung konnte nicht gestartet werden.");
+      while (lauf.current === meinLauf) {
+        await new Promise((r) => setTimeout(r, window.__epGkTakt || 3000));
+        if (lauf.current !== meinLauf) return;
+        setSekunden(Math.round((Date.now() - start) / 1000));
+        const { data: a } = await window._sb.from("grundriss_ki_auftraege").select("status, ergebnis, fehler, dauer_ms, fortschritt").eq("id", data.id).maybeSingle();
+        if (a && a.fortschritt && a.fortschritt.zeichen) setGeschrieben(a.fortschritt.zeichen);
+        if (a && a.status === "fertig") {
+          setKi(a.ergebnis); setWahl(new Set((a.ergebnis && a.ergebnis.einheiten) || [])); setArten({}); setKorrektur(""); setPhase("ergebnis"); return;
+        }
+        if (a && a.status === "fehler") throw new Error(a.fehler || "Die Auswertung ist fehlgeschlagen.");
+        if (Date.now() - start > 7 * 60000) throw new Error("Die Auswertung dauert ungewöhnlich lange – bitte später erneut versuchen.");
+      }
+    } catch (e) { if (lauf.current === meinLauf) { setFehler(e.message || String(e)); setPhase(ki ? "ergebnis" : "quelle"); } }
+  };
+
+  const scan = React.useMemo(() => ki ? epGrundrissKiZuScan(ki, { einheiten: wahl && wahl.size && ki.einheiten && ki.einheiten.length > 1 ? wahl : null, titel, arten }) : null, [ki, wahl, titel, arten]);
+  const wf = React.useMemo(() => scan && scan.raeume.length ? epGkWohnflaechen(scan) : null, [scan]);
+  const zurWohnflaeche = () => {
+    epWerkzeugOeffnen("wohnflaeche", { scan, immobilie: immobilie || null, titel: titel || (ki && ki.geschoss) || "" });
+    onSchliessen();
+    onWerkzeug && onWerkzeug("wohnflaeche");
+  };
+  const svg = React.useMemo(() => {
+    if (!scan || !scan.raeume.length || typeof EPScan === "undefined") return "";
+    try { return EPScan.zuSvg(scan, { breite: 640, ausrichten: false, moebel: true }); } catch (e) { return ""; }
+  }, [scan]);
+  const dicke = Math.round(((ki && ki.aussenwand_dicke_m) || 0.3) * 100) || 30;
+
+  const uebernehmen = () => {
+    const ifr = editorRef && editorRef.current;
+    const fenster = ifr && ifr.contentWindow;
+    const ge = fenster && fenster.GrundrissEditor;
+    if (ge && ge.st && ge.st.elemente && ge.st.elemente.length && !window.confirm("Das aktuelle Zeichenblatt wird durch den KI-Vorschlag ersetzt. Fortfahren?")) return;
+    try {
+      const r = EPScanEditor.inEditorLaden(ifr, scan, { titel: titel || (ki && ki.geschoss) || "", aussenDicke: dicke, ausrichten: false, masse: false });
+      epGkNachbearbeiten(fenster, scan, dicke);
+      onStatus && onStatus({ art: "ok", text: "KI-Vorschlag übernommen: " + r.text.replace(/\d+ Wände, /, "") + " – bitte mit dem Original abgleichen." });
+      onSchliessen();
+    } catch (e) { setFehler(e.message || String(e)); }
+  };
+
+  const knopf = (aktiv) => ({ background: aktiv ? CI.blau : "transparent", color: aktiv ? "#fff" : CI.blau, border: `1px solid ${CI.blau}`, padding: "6px 12px", fontSize: 12, cursor: "pointer", fontFamily: FONT });
+  const gold = (an) => ({ background: CI.gold, color: "#fff", border: "none", padding: "9px 18px", fontSize: 13, fontWeight: 700, cursor: an ? "pointer" : "default", opacity: an ? 1 : 0.5, fontFamily: FONT });
+  const eingabe = { width: "100%", boxSizing: "border-box", padding: "8px 10px", border: `1px solid ${CI.border}`, fontSize: 13, fontFamily: FONT };
+  const kopf = h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 } },
+    h("div", { style: { fontSize: 16, fontWeight: 700, color: CI.blau } }, "✨ Alten Grundriss mit KI neu zeichnen"),
+    h("button", { type: "button", onClick: onSchliessen, style: { background: "transparent", border: "none", fontSize: 20, color: CI.muted, cursor: "pointer" } }, "✕"));
+  const fehlerBox = fehler ? h("div", { "data-ep-gk-fehler": "", style: { background: "#fde6e6", color: "#c83c3c", padding: "8px 10px", fontSize: 12, margin: "10px 0" } }, fehler) : null;
+
+  let inhalt;
+  if (phase === "laeuft") {
+    inhalt = h("div", { "data-ep-gk-laeuft": "", style: { textAlign: "center", padding: "50px 10px" } },
+      h("div", { style: { fontSize: 34 } }, "📐"),
+      h("div", { style: { fontSize: 14, fontWeight: 700, color: CI.blau, marginTop: 8 } }, "Die KI liest den Grundriss …"),
+      h("div", { style: { fontSize: 12, color: CI.muted, marginTop: 6 } }, `Maßketten, Räume, Türen und Fenster – das dauert meist 1–3 Minuten (${sekunden} s).`),
+      h("div", { "data-ep-gk-fortschritt": geschrieben, style: { fontSize: 12, color: CI.blau, marginTop: 6, minHeight: 16 } },
+        geschrieben ? `Die KI schreibt die Zeichnung … ${geschrieben.toLocaleString("de-DE")} Zeichen` : "Die KI sieht sich den Plan an …"),
+      h("button", { type: "button", style: { ...knopf(false), marginTop: 18 }, onClick: () => { lauf.current++; setPhase(ki ? "ergebnis" : "quelle"); } }, "Abbrechen"));
+  } else if (phase === "ergebnis" && ki) {
+    const liste = scan ? scan.raeume : [];
+    const fmtQm = (x) => (Number(x) || 0).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
+    const summe = liste.reduce((s, r) => s + r.flaeche, 0);
+    const masse = (r) => { const xs = r.boeden[0].polygon.map((p) => p[0]), ys = r.boeden[0].polygon.map((p) => p[1]);
+      return `${(Math.max(...xs) - Math.min(...xs)).toLocaleString("de-DE", { maximumFractionDigits: 3 })} × ${(Math.max(...ys) - Math.min(...ys)).toLocaleString("de-DE", { maximumFractionDigits: 3 })} m`; };
+    const sicher = ki.sicherheit === "hoch" ? ["hoch", "#1e7e34"] : ki.sicherheit === "niedrig" ? ["niedrig – genau prüfen", "#c83c3c"] : ["mittel", "#b07a00"];
+    inhalt = h(React.Fragment, null,
+      h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 } },
+        h("div", null, h("div", { style: { fontSize: 11, color: CI.muted, marginBottom: 4 } }, "Original"),
+          h("img", { src: bild && bild.vorschau, alt: "Original", style: { width: "100%", border: `1px solid ${CI.border}`, display: "block" } })),
+        h("div", null, h("div", { style: { fontSize: 11, color: CI.muted, marginBottom: 4 } }, `KI-Vorschlag${ki.geschoss ? " · " + ki.geschoss : ""}`),
+          h("div", { "data-ep-gk-vorschau": liste.length, style: { border: `1px solid ${CI.border}`, background: "#fff" }, dangerouslySetInnerHTML: { __html: svg || "<div style='padding:20px;font-size:12px;color:#888'>Keine Räume erkannt.</div>" } }))),
+      ki.einheiten && ki.einheiten.length > 1 ? h("div", { "data-ep-gk-einheiten": "", style: { display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", margin: "10px 0 0", fontSize: 12 } },
+        h("span", { style: { fontWeight: 700, color: CI.blau } }, "Übernehmen:"),
+        ki.einheiten.map((e) => h("label", { key: e, style: { display: "flex", gap: 4, alignItems: "center", cursor: "pointer" } },
+          h("input", { type: "checkbox", "data-ep-gk-einheit": e, checked: !!(wahl && wahl.has(e)), onChange: () => setWahl((w) => { const n = new Set(w || []); n.has(e) ? n.delete(e) : n.add(e); return n; }) }), e))) : null,
+      h("table", { "data-ep-gk-raeume": liste.length, style: { width: "100%", borderCollapse: "collapse", fontSize: 12, margin: "10px 0" } },
+        h("thead", null, h("tr", { style: { textAlign: "left", color: CI.muted } }, h("th", null, "Raum"), h("th", null, "Art"), h("th", null, "Innenmaße"), h("th", { style: { textAlign: "right" } }, "Grundfläche"),
+          h("th", { style: { textAlign: "right" } }, "Wohnfläche"), h("th", { style: { textAlign: "right" } }, "lt. Plan"))),
+        h("tbody", null, liste.map((r) => {
+          const w = wf && wf.proRaum[r.id];
+          return h("tr", { key: r.id, "data-ep-gk-raum": r.bezeichnung, style: { borderTop: `1px solid ${CI.border}`, verticalAlign: "top" } },
+            h("td", null, r.bezeichnung + (r.einheit && ki.einheiten && ki.einheiten.length > 1 ? ` (${r.einheit})` : ""),
+              r.hoehenzonen ? h("div", { "data-ep-gk-zonen": `${r.hoehenzonen.voll}/${r.hoehenzonen.halb}/${r.hoehenzonen.keine}`, style: { fontSize: 10.5, color: "#8a6a2f" } },
+                `${r.ki_zonen_text} → ab 2 m ${fmtQm(r.hoehenzonen.voll)}, 1–2 m ${fmtQm(r.hoehenzonen.halb)}, unter 1 m ${fmtQm(r.hoehenzonen.keine)}`) : null),
+            h("td", null, h("select", { "data-ep-gk-art": r.ki_index, value: r.ki_art, onChange: (e) => { const v = e.target.value; setArten((a) => ({ ...a, [r.ki_index]: v })); },
+              style: { fontSize: 11, fontFamily: FONT, padding: "2px 4px", border: `1px solid ${CI.border}` } },
+              h("option", { value: "wohn" }, "Wohnen"), h("option", { value: "nutz" }, "Nutzfläche"), h("option", { value: "balkon" }, "Balkon/Terrasse"))),
+            h("td", null, masse(r)),
+            h("td", { style: { textAlign: "right" } }, fmtQm(r.flaeche)),
+            h("td", { "data-ep-gk-wohn": w ? w.wohn : "", style: { textAlign: "right", fontWeight: 600 } }, w ? (r.ki_art === "nutz" ? "–" : fmtQm(w.wohn)) : "–"),
+            h("td", { style: { textAlign: "right", color: r.flaeche_plan && Math.abs(r.flaeche_plan - r.flaeche) > 0.5 ? "#c83c3c" : CI.muted } }, r.flaeche_plan ? fmtQm(r.flaeche_plan) : "–"));
+        }),
+          h("tr", { style: { borderTop: `2px solid ${CI.blau}`, fontWeight: 700 } }, h("td", null, "Summe"), h("td", null, ""), h("td", null, ""),
+            h("td", { "data-ep-gk-summe": summe.toFixed(2), style: { textAlign: "right" } }, fmtQm(summe)),
+            h("td", { "data-ep-gk-wohnsumme": wf ? wf.wohn.toFixed(2) : "", style: { textAlign: "right" } }, wf ? fmtQm(wf.wohn) : "–"), h("td", null, "")),
+          wf && wf.nutz > 0 ? h("tr", null, h("td", { colSpan: 6, "data-ep-gk-nutz": wf.nutz.toFixed(2), style: { textAlign: "right", fontSize: 11, color: CI.muted } }, `davon keine Wohnfläche: Nutzfläche ${fmtQm(wf.nutz)}`)) : null)),
+      h("div", { style: { fontSize: 10.5, color: CI.muted, margin: "-4px 0 8px" } }, "Wohnfläche nach WoFlV: lichte Höhe ab 2 m voll, 1–2 m zur Hälfte, unter 1 m nicht; Balkone/Terrassen 25 %; Treppen mit mehr als drei Stufen abgezogen. Raumart bei Bedarf umstellen."),
+      h("div", { style: { fontSize: 12, marginBottom: 6 } }, "Sicherheit der KI: ", h("strong", { "data-ep-gk-sicherheit": ki.sicherheit, style: { color: sicher[1] } }, sicher[0]), ` · Außenwände ${dicke} cm`),
+      (ki.hinweise || []).length ? h("ul", { "data-ep-gk-hinweise": ki.hinweise.length, style: { fontSize: 12, color: "#6b5200", background: "#fff8e6", margin: "0 0 10px", padding: "8px 10px 8px 28px" } }, ki.hinweise.map((t, i) => h("li", { key: i }, t))) : null,
+      h("label", { style: { display: "block", fontSize: 12, color: CI.muted } }, "Etwas falsch? In eigenen Worten korrigieren (z. B. „Der Flur ist 1,35 m breit“, „Fenster im Bad fehlt“)",
+        h("div", { style: { display: "flex", gap: 6, marginTop: 3 } },
+          h("input", { "data-ep-gk-korrektur": "", value: korrektur, onChange: (e) => setKorrektur(e.target.value), style: eingabe }),
+          h("button", { type: "button", "data-ep-gk-nachbessern": "", disabled: !korrektur.trim(), onClick: () => auslesen(true), style: { ...knopf(false), whiteSpace: "nowrap", opacity: korrektur.trim() ? 1 : 0.5 } }, "↻ Nachbessern"))),
+      fehlerBox,
+      h("div", { style: { display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 12, flexWrap: "wrap" } },
+        h("button", { type: "button", onClick: () => { setPhase("quelle"); setKi(null); }, style: knopf(false) }, "Anderes Bild"),
+        onWerkzeug ? h("button", { type: "button", "data-ep-gk-wohnflaeche": "", disabled: !liste.length, onClick: zurWohnflaeche, style: knopf(false) }, "📏 Wohnflächenberechnung →") : null,
+        h("button", { type: "button", "data-ep-gk-uebernehmen": "", disabled: !liste.length, onClick: uebernehmen, style: gold(liste.length > 0) }, "📐 In den Editor übernehmen")));
+  } else {
+    inhalt = h(React.Fragment, null,
+      h("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 10, lineHeight: 1.5 } },
+        "Foto oder Scan eines alten Grundrisses (gern schräg fotografiert) oder ein PDF. Die KI liest die Maßketten und schlägt eine neue Zeichnung vor – Sie sehen sie vor der Übernahme neben dem Original und können sie im Editor weiter bearbeiten."),
+      h("div", { "data-ep-gk-ablage": "", onClick: () => eingabeRef.current && eingabeRef.current.click(),
+        onDragOver: (e) => e.preventDefault(), onDrop: (e) => { e.preventDefault(); dateiNehmen(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]); },
+        style: { border: `2px dashed ${CI.border}`, background: "#fafbfd", padding: bild ? 8 : "26px 16px", textAlign: "center", cursor: "pointer" } },
+        bild ? h("img", { src: bild.vorschau, alt: "Grundriss", "data-ep-gk-bild": bild.name, style: { maxWidth: "100%", maxHeight: 340, display: "block", margin: "0 auto" } })
+          : h(React.Fragment, null, h("div", { style: { fontSize: 30 } }, "🗺️"), h("div", { style: { fontSize: 14, fontWeight: 700, color: CI.blau, marginTop: 6 } }, lade ? "Bild wird vorbereitet …" : "Grundriss hierher ziehen oder klicken"),
+            h("div", { style: { fontSize: 11, color: CI.muted, marginTop: 3 } }, "JPG, PNG oder PDF (erste Seite)")),
+        h("input", { ref: eingabeRef, type: "file", accept: "image/*,application/pdf", "data-ep-gk-eingabe": "", style: { display: "none" }, onChange: (e) => { dateiNehmen(e.target.files && e.target.files[0]); e.target.value = ""; } })),
+      objektDateien.length ? h("div", { "data-ep-gk-objekt": objektDateien.length, style: { marginTop: 8, fontSize: 12 } },
+        h("span", { style: { color: CI.muted, marginRight: 6 } }, "Oder einen Grundriss vom Objekt:"),
+        objektDateien.map((d) => h("button", { key: d.id, type: "button", "data-ep-gk-objektdatei": d.id, onClick: () => objektDatei(d), style: { ...knopf(false), padding: "3px 8px", fontSize: 11, margin: "2px 4px 2px 0" } }, d.name))) : null,
+      h("label", { style: { display: "block", fontSize: 12, color: CI.muted, marginTop: 12 } }, "Hinweis an die KI (optional)",
+        h("input", { "data-ep-gk-hinweis": "", value: hinweis, onChange: (e) => setHinweis(e.target.value), placeholder: "z. B. nur das Kellergeschoss, nur Haus I, Maße in cm", style: { ...eingabe, marginTop: 3 } })),
+      fehlerBox,
+      h("div", { style: { display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 } },
+        h("button", { type: "button", onClick: onSchliessen, style: knopf(false) }, "Abbrechen"),
+        h("button", { type: "button", "data-ep-gk-start": "", disabled: !bild || lade, onClick: () => auslesen(false), style: gold(!!bild && !lade) }, "✨ KI auslesen")));
+  }
+  return h("div", { "data-ep-gk-dialog": phase, onClick: () => phase !== "laeuft" && onSchliessen(), style: { position: "fixed", inset: 0, background: "rgba(38,49,89,0.55)", zIndex: 9300, display: "flex", alignItems: "center", justifyContent: "center", padding: 12 } },
+    h("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", width: "100%", maxWidth: phase === "ergebnis" ? 1100 : 680, maxHeight: "94vh", overflowY: "auto", padding: 18, fontFamily: FONT, boxSizing: "border-box" } }, kopf, inhalt));
+}
+
+function EpGrundrissKiKnopf({ editorRef, titel, immobilie, onStatus, gesperrt, onWerkzeug }) {
+  const [offen, setOffen] = React.useState(false);
+  return React.createElement(React.Fragment, null,
+    React.createElement(WzButton, { klein: !0, variante: "hell", disabled: gesperrt, onClick: () => setOffen(true) }, "✨ Alter Grundriss → KI"),
+    offen ? React.createElement(EpGrundrissKiDialog, { editorRef, titel, immobilie, onStatus, onWerkzeug, onSchliessen: () => setOffen(false) }) : null);
+}
+// Wohnflächenrechner: bei KI-Grundrissen Messmethode und Teilflächen-Texte passend benennen (statt „LiDAR-Raumscan“)
+(function () {
+  if (typeof WF === "undefined" || !WF || typeof WF.ausScan !== "function" || WF.__kiGrundriss) return;
+  const orig = WF.ausScan;
+  WF.ausScan = function (scan, dok, ep) {
+    const g = orig.call(this, scan, dok, ep);
+    if (scan && scan.quelle === "ki-grundriss" && g) {
+      g.messung = Object.assign({}, g.messung || {}, { methode: "Aus einem Bestandsgrundriss per KI ausgelesen (Maßketten des Plans, lichte Maße) – Wohnfläche nach WoFlV; Maße und Höhen vor Verwendung prüfen",
+        geraet: "", app: "ImmoOffice · Grundriss-KI", qualitaet: "", hinweise: scan.ki_hinweise || [], kontrollmasse: [] });
+      (g.geschosse || []).forEach((gs) => (gs.raeume || []).forEach((r) => (r.teile || []).forEach((t) => { if (t.bez) t.bez = t.bez.replace(/lt\. Raumscan/g, "lt. KI-Auslesung"); })));
+      // Stufe 122: Schrägen-Werte der KI an den Raum hängen – „⟋ Dachschräge“ im Wohnflächenrechner ist damit vorbelegt
+      const neu = (g.geschosse || []).slice(-1)[0];
+      if (neu && neu.raeume && neu.raeume.length === (scan.raeume || []).length) neu.raeume.forEach((r, i) => { if (scan.raeume[i].ki_schraege) r.schraege = scan.raeume[i].ki_schraege; });
+    }
+    return g;
+  };
+  WF.__kiGrundriss = true;
+})();
+window.EpGrundrissKiKnopf = EpGrundrissKiKnopf; window.epGrundrissKiZuScan = epGrundrissKiZuScan; window.epGkWohnflaechen = epGkWohnflaechen;
+// ---- Stufe 120: Admin → Portale (Schnittstellen zu den Immobilienportalen) ----
+// Je Portal aus portal_zugaenge (Internetseite, Immowelt, Kleinanzeigen – OpenImmo 1.2.7 per FTP):
+// Zugang pflegen (Anbieter-Nr., Server, Benutzer, Passwort nur setzen – lesbar ist es im Browser nicht, Ordner, aktiv),
+// „Verbindung testen“ (portal-export v6, nur Anmeldung + Ordnerliste), Übersicht aus immobilie_portal_status
+// (online / entfernt / Fehler), „↻ Alle Inserate aktualisieren“ (jedes online stehende Objekt neu übertragen, mit
+// Fortschritt und Abbruch), Fehlerliste mit „Erneut übertragen“ und Warnliste „verkauft/archiviert, aber noch online“
+// mit „Vom Portal nehmen“. ImmobilienScout24 ist nicht über World angebunden (läuft über onOffice) – nur Hinweis.
+// Stufe 121: „＋ Neues Portal anlegen“ (weiteres OpenImmo-FTP-Portal), Bezeichnung und Kosten je Monat je Portal
+// (fließen in Admin → Kosten ein); neue Portale erscheinen im Objekt unter Vermarktungskanäle (portale_liste()).
+const IMMO_PS_NAMEN = { homepage: "Eigene Internetseite", immowelt: "Immowelt", kleinanzeigen: "Kleinanzeigen", immoscout24: "ImmobilienScout24" };
+const IMMO_PS_ONLINE = ["inseriert", "uebertragen"];
+const IMMO_PS_NICHT_MEHR = ["verkauft", "vermietet", "archiviert"];
+
+function epPsDatum(s) { return s ? new Date(s).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : ""; }
+const epPsTitel = (z) => (z && (z.bezeichnung || IMMO_PS_NAMEN[z.portal] || z.portal)) || "";
+function epPsName(o) { return o ? `${o.immo_nr ? o.immo_nr + " · " : ""}${o.objekttitel || o.bezeichnung || "Objekt"}` : "Objekt"; }
+
+// Ein Objekt an ein Portal übertragen oder dort löschen – dieselben Funktionen wie im Objekt (Vermarktung)
+async function epPsUebertragen(portal, immobilieId, aktion) {
+  const fn = portal === "homepage" ? "portal-export-homepage" : "portal-export";
+  const { data, error } = await window._sb.functions.invoke(fn, { body: { immobilie_id: immobilieId, portal, aktion: aktion || "uebertragen" } });
+  if (error) throw new Error(error.message || String(error));
+  if (!data || !data.ok) throw new Error((data && data.fehler) || "Übertragung fehlgeschlagen");
+  return data;
+}
+
+function EpAdminPortalKarte({ zugang, eintraege, websiteObjekte, onNeuLaden }) {
+  const h = React.createElement;
+  const p = zugang.portal;
+  const [form, setForm] = React.useState({ bezeichnung: zugang.bezeichnung || IMMO_PS_NAMEN[zugang.portal] || "", kosten_monat: zugang.kosten_monat != null ? String(zugang.kosten_monat).replace(".", ",") : "", anbieter_nr: zugang.anbieter_nr || "", ftp_host: zugang.ftp_host || "", ftp_user: zugang.ftp_user || "", ftp_ordner: zugang.ftp_ordner || ".", passwort: "" });
+  const [offen, setOffen] = React.useState(false);
+  const [meldung, setMeldung] = React.useState(null);
+  const [test, setTest] = React.useState(null);
+  const [lauf, setLauf] = React.useState(null); // { gesamt, fertig, fehler: [], aktuell }
+  const stopp = React.useRef(false);
+  const online = p === "homepage" ? websiteObjekte : eintraege.filter((e) => IMMO_PS_ONLINE.includes(e.status) && e.objekt && !IMMO_PS_NICHT_MEHR.includes(e.objekt.status)).map((e) => e.objekt);
+  const fehler = eintraege.filter((e) => e.status === "fehler");
+  const warnung = eintraege.filter((e) => IMMO_PS_ONLINE.includes(e.status) && e.objekt && IMMO_PS_NICHT_MEHR.includes(e.objekt.status));
+  const entfernt = eintraege.filter((e) => ["entfernt", "geloescht"].includes(e.status)).length;
+  const letzte = eintraege.map((e) => e.uebertragen_am).filter(Boolean).sort().pop();
+  const kurz = (art, text) => { setMeldung({ art, text }); if (art === "ok") setTimeout(() => setMeldung(null), 4000); };
+
+  const speichern = async () => {
+    const kosten = form.kosten_monat.trim() ? Number(form.kosten_monat.trim().replace(/\./g, "").replace(",", ".")) : null;
+    if (kosten != null && (!isFinite(kosten) || kosten < 0)) { kurz("fehler", "Kosten bitte als Betrag in € eingeben, z. B. 89,00"); return; }
+    const werte = { bezeichnung: form.bezeichnung.trim() || null, kosten_monat: kosten, anbieter_nr: form.anbieter_nr.trim() || null, ftp_host: form.ftp_host.trim() || null, ftp_user: form.ftp_user.trim() || null, ftp_ordner: form.ftp_ordner.trim() || "." };
+    if (form.passwort) werte.ftp_passwort = form.passwort;
+    const { error } = await window._sb.from("portal_zugaenge").update(werte).eq("id", zugang.id);
+    if (error) { kurz("fehler", "Speichern fehlgeschlagen: " + error.message); return; }
+    setForm((f) => ({ ...f, passwort: "" })); kurz("ok", "✓ Zugang gespeichert"); onNeuLaden();
+  };
+  const aktivSetzen = async (an) => {
+    const { error } = await window._sb.from("portal_zugaenge").update({ aktiv: an }).eq("id", zugang.id);
+    if (error) { kurz("fehler", error.message); return; }
+    kurz("ok", an ? "✓ Schnittstelle eingeschaltet" : "Schnittstelle ausgeschaltet – Übertragungen an dieses Portal sind gesperrt"); onNeuLaden();
+  };
+  const testen = async () => {
+    setTest({ laeuft: true });
+    try {
+      const { data, error } = await window._sb.functions.invoke("portal-export", { body: { aktion: "verbindung_testen", portal: p } });
+      if (error) throw new Error(error.message || String(error));
+      if (!data || !data.ok) throw new Error((data && data.fehler) || "Verbindung fehlgeschlagen");
+      setTest({ ok: true, text: `✓ Verbunden (${data.protokoll}, ${(data.dauer_ms / 1000).toLocaleString("de-DE", { maximumFractionDigits: 1 })} s) · ${data.dateien} Datei(en) im Ordner` + (data.neueste ? ` · zuletzt ${data.neueste.name}${data.neueste.datum ? " (" + epPsDatum(data.neueste.datum) + ")" : ""}` : "") });
+    } catch (e) { setTest({ ok: false, text: "✕ " + (e.message || e) }); }
+  };
+  const sammel = async (liste, aktion, titel) => {
+    if (!liste.length) return;
+    if (!window.confirm(`${titel}: ${liste.length} Objekt(e) an ${epPsTitel(zugang)} – jetzt starten?`)) return;
+    stopp.current = false;
+    const stand = { titel, gesamt: liste.length, fertig: 0, fehler: [], aktuell: "" };
+    setLauf({ ...stand });
+    for (const o of liste) {
+      if (stopp.current) break;
+      stand.aktuell = epPsName(o); setLauf({ ...stand });
+      try { await epPsUebertragen(p, o.id, aktion); } catch (e) { stand.fehler.push(`${epPsName(o)}: ${e.message || e}`); }
+      stand.fertig++; setLauf({ ...stand });
+    }
+    stand.aktuell = ""; stand.ende = true; stand.abgebrochen = stopp.current; setLauf({ ...stand });
+    onNeuLaden();
+  };
+
+  const knopf = (aktiv) => ({ background: aktiv ? CI.blau : "transparent", color: aktiv ? "#fff" : CI.blau, border: `1px solid ${CI.blau}`, padding: "6px 12px", fontSize: 11.5, cursor: "pointer", fontFamily: FONT, fontWeight: 600 });
+  const feld = (label, key, extra) => h("label", { style: { fontSize: 11, color: CI.muted, display: "block" } }, label,
+    h("input", { "data-ep-ps-feld": key, value: form[key], onChange: (e) => setForm({ ...form, [key]: e.target.value }), autoComplete: "off", ...extra,
+      style: { display: "block", width: "100%", boxSizing: "border-box", marginTop: 3, padding: "6px 8px", border: `1px solid ${CI.border}`, fontSize: 13, fontFamily: FONT } }));
+  const zahl = (n, text, farbe) => h("div", { style: { minWidth: 92 } }, h("div", { style: { fontSize: 20, fontWeight: 700, color: farbe || CI.blau } }, n), h("div", { style: { fontSize: 10.5, color: CI.muted, textTransform: "uppercase", letterSpacing: "0.04em" } }, text));
+
+  return h("div", { "data-ep-ps-portal": p, style: { border: `1px solid ${CI.border}`, background: "#fff", padding: 16, marginBottom: 14 } },
+    h("div", { style: { display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 10 } },
+      h("span", { style: { width: 10, height: 10, borderRadius: "50%", background: zugang.aktiv ? "#1e7e34" : "#9aa0ad", display: "inline-block" } }),
+      h("span", { style: { fontSize: 15, fontWeight: 700, color: CI.blau } }, epPsTitel(zugang)),
+      zugang.kosten_monat != null ? h("span", { "data-ep-ps-kosten": zugang.kosten_monat, style: { fontSize: 11, color: CI.muted } }, `${Number(zugang.kosten_monat).toLocaleString("de-DE", { minimumFractionDigits: 2 })} € / Monat`) : null,
+      h("span", { style: { fontSize: 10, color: CI.muted, border: `1px solid ${CI.border}`, padding: "1px 6px", fontWeight: 700 } }, "OpenImmo 1.2.7 · FTP"),
+      h("label", { style: { marginLeft: "auto", fontSize: 12, color: CI.blau, display: "flex", gap: 6, alignItems: "center", cursor: "pointer" } },
+        h("input", { type: "checkbox", "data-ep-ps-aktiv": p, checked: !!zugang.aktiv, onChange: (e) => aktivSetzen(e.target.checked) }), "Schnittstelle aktiv")),
+    h("div", { style: { display: "flex", gap: 18, flexWrap: "wrap", marginBottom: 10 } },
+      zahl(online.length, p === "homepage" ? "freigegeben" : "online"), zahl(fehler.length, "Fehler", fehler.length ? "#c83c3c" : CI.muted),
+      p !== "homepage" ? zahl(entfernt, "entfernt", CI.muted) : null, warnung.length ? zahl(warnung.length, "prüfen", "#b07a00") : null,
+      h("div", { style: { fontSize: 11, color: CI.muted, alignSelf: "flex-end" } }, letzte ? "letzte Übertragung " + epPsDatum(letzte) : "")),
+    h("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" } },
+      h("button", { type: "button", "data-ep-ps-alle": p, disabled: !zugang.aktiv || !online.length || (lauf && !lauf.ende), onClick: () => sammel(online, "uebertragen", "Alle Inserate aktualisieren"),
+        style: { ...knopf(true), background: CI.gold, borderColor: CI.gold, opacity: !zugang.aktiv || !online.length ? 0.5 : 1 } }, `↻ Alle Inserate aktualisieren (${online.length})`),
+      h("button", { type: "button", "data-ep-ps-test": p, onClick: testen, disabled: test && test.laeuft, style: knopf(false) }, test && test.laeuft ? "Teste …" : "Verbindung testen"),
+      h("button", { type: "button", "data-ep-ps-zugang": p, onClick: () => setOffen(!offen), style: knopf(false) }, offen ? "▴ Zugangsdaten" : "▾ Zugangsdaten"),
+      meldung ? h("span", { "data-ep-ps-meldung": "", style: { fontSize: 12, color: meldung.art === "ok" ? "#1e7e34" : "#c83c3c" } }, meldung.text) : null),
+    test && !test.laeuft ? h("div", { "data-ep-ps-testergebnis": test.ok ? "ok" : "fehler", style: { fontSize: 12, marginTop: 8, color: test.ok ? "#1e7e34" : "#c83c3c" } }, test.text) : null,
+    lauf ? h("div", { "data-ep-ps-lauf": lauf.ende ? "fertig" : "laeuft", style: { marginTop: 10, background: "#f7f8fb", border: `1px solid ${CI.border}`, padding: 10, fontSize: 12 } },
+      h("div", { style: { display: "flex", justifyContent: "space-between", gap: 8 } },
+        h("strong", { style: { color: CI.blau } }, `${lauf.titel}: ${lauf.fertig} von ${lauf.gesamt}` + (lauf.ende ? (lauf.abgebrochen ? " – abgebrochen" : " – fertig") : "")),
+        !lauf.ende ? h("button", { type: "button", onClick: () => { stopp.current = true; }, style: { ...knopf(false), padding: "2px 8px" } }, "Anhalten") : h("button", { type: "button", onClick: () => setLauf(null), style: { ...knopf(false), padding: "2px 8px" } }, "Schließen")),
+      h("div", { style: { height: 5, background: "#e3e6ee", margin: "6px 0" } }, h("div", { style: { height: 5, width: `${Math.round(lauf.fertig / lauf.gesamt * 100)}%`, background: CI.gold } })),
+      lauf.aktuell ? h("div", { style: { color: CI.muted } }, "Überträgt: " + lauf.aktuell) : null,
+      lauf.ende ? h("div", { "data-ep-ps-bilanz": `${lauf.fertig - lauf.fehler.length}/${lauf.fehler.length}`, style: { color: lauf.fehler.length ? "#c83c3c" : "#1e7e34" } },
+        `${lauf.fertig - lauf.fehler.length} übertragen, ${lauf.fehler.length} Fehler` + (p !== "homepage" ? " – die Bestätigung des Portals kommt per Importbericht." : "")) : null,
+      lauf.fehler.length ? h("ul", { style: { margin: "4px 0 0", paddingLeft: 18, color: "#c83c3c" } }, lauf.fehler.slice(0, 30).map((f, i) => h("li", { key: i }, f))) : null) : null,
+    offen ? h("div", { "data-ep-ps-form": p, style: { marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 } },
+      feld("Bezeichnung", "bezeichnung"), feld("Kosten je Monat (€)", "kosten_monat", { placeholder: "z. B. 89,00", inputMode: "decimal" }),
+      feld("Anbieter-Nr. (OpenImmo)", "anbieter_nr"), feld("FTP-Server", "ftp_host", { placeholder: "ftp.beispiel.de" }), feld("Benutzer", "ftp_user"),
+      feld("Passwort", "passwort", { type: "password", placeholder: zugang.hat_passwort ? "•••••• hinterlegt – nur zum Ändern eingeben" : "noch keines hinterlegt", autoComplete: "new-password" }),
+      feld("Ordner auf dem Server", "ftp_ordner", { placeholder: "." }),
+      h("div", { style: { alignSelf: "end" } }, h("button", { type: "button", "data-ep-ps-speichern": p, onClick: speichern, style: knopf(true) }, "Zugang speichern"))) : null,
+    warnung.length ? h("div", { "data-ep-ps-warnung": warnung.length, style: { marginTop: 12 } },
+      h("div", { style: { fontSize: 12, fontWeight: 700, color: "#b07a00", marginBottom: 4 } }, `⚠ Noch online, obwohl verkauft/vermietet/archiviert (${warnung.length})`),
+      h("div", { style: { display: "flex", gap: 8, marginBottom: 6 } }, h("button", { type: "button", "data-ep-ps-alle-weg": p, disabled: !zugang.aktiv, onClick: () => sammel(warnung.map((e) => e.objekt), "loeschen", "Vom Portal nehmen"), style: { ...knopf(false), color: "#c83c3c", borderColor: "#c83c3c" } }, `Alle ${warnung.length} vom Portal nehmen`)),
+      warnung.slice(0, 50).map((e) => h("div", { key: e.immobilie_id, style: { fontSize: 12, padding: "3px 0", borderTop: `1px solid ${CI.border}` } }, `${epPsName(e.objekt)} – Status „${e.objekt.status}“, ${e.status} seit ${epPsDatum(e.uebertragen_am) || "?"}`))) : null,
+    fehler.length ? h("div", { "data-ep-ps-fehler": fehler.length, style: { marginTop: 12 } },
+      h("div", { style: { fontSize: 12, fontWeight: 700, color: "#c83c3c", marginBottom: 4 } }, `Fehler bei der Übertragung (${fehler.length})`),
+      fehler.slice(0, 50).map((e) => h("div", { key: e.immobilie_id, style: { display: "flex", gap: 8, alignItems: "flex-start", fontSize: 12, padding: "4px 0", borderTop: `1px solid ${CI.border}` } },
+        h("div", { style: { flex: 1, minWidth: 0 } }, h("div", { style: { fontWeight: 600, color: CI.blau } }, epPsName(e.objekt)), h("div", { style: { color: CI.muted, overflowWrap: "anywhere" } }, e.meldung || "ohne Meldung")),
+        e.objekt && !IMMO_PS_NICHT_MEHR.includes(e.objekt.status) ? h("button", { type: "button", "data-ep-ps-erneut": e.immobilie_id, disabled: !zugang.aktiv, onClick: async () => {
+          try { await epPsUebertragen(p, e.immobilie_id, "uebertragen"); kurz("ok", "✓ Erneut übertragen: " + epPsName(e.objekt)); } catch (x) { kurz("fehler", x.message || String(x)); }
+          onNeuLaden();
+        }, style: { ...knopf(false), padding: "3px 8px", whiteSpace: "nowrap" } }, "Erneut übertragen") : null))) : null);
+}
+
+function EpAdminPortale({ user }) {
+  const h = React.createElement;
+  const [zugaenge, setZugaenge] = React.useState(null);
+  const [status, setStatus] = React.useState([]);
+  const [website, setWebsite] = React.useState([]);
+  const [fehler, setFehler] = React.useState("");
+  const laden = React.useCallback(async () => {
+    try {
+      const [z, s, w] = await Promise.all([
+        window._sb.from("portal_zugaenge").select("id, portal, bezeichnung, kosten_monat, notiz, anbieter_nr, ftp_host, ftp_user, ftp_ordner, format, aktiv, hat_passwort").order("portal"),
+        window._sb.from("immobilie_portal_status").select("immobilie_id, portal, status, meldung, uebertragen_am, quelle, immobilien(id, immo_nr, objekttitel, bezeichnung, status)").limit(5000),
+        window._sb.from("immobilien").select("id, immo_nr, objekttitel, bezeichnung, status").eq("website_veroeffentlichen", true).limit(1000),
+      ]);
+      if (z.error) throw z.error;
+      setZugaenge(z.data || []);
+      setStatus((s.data || []).map((e) => ({ ...e, objekt: e.immobilien || null })));
+      setWebsite((w.data || []).filter((o) => !IMMO_PS_NICHT_MEHR.includes(o.status)));
+    } catch (e) { setFehler(e.message || String(e)); setZugaenge([]); }
+  }, []);
+  React.useEffect(() => { laden(); }, [laden]);
+  if (user && user.role !== "chef") return h("div", { style: { fontSize: 13, color: CI.muted } }, "Die Portal-Schnittstellen verwaltet die Geschäftsführung.");
+  if (!zugaenge) return h("div", { style: { fontSize: 13, color: CI.muted } }, "Lädt …");
+  return h("div", { "data-ep-admin-portale": zugaenge.length, style: { fontFamily: FONT, maxWidth: 980 } },
+    h("div", { style: { fontSize: 13, color: CI.muted, marginBottom: 14, lineHeight: 1.5 } },
+      "Schnittstellen zu den Immobilienportalen: Zugänge pflegen, Verbindung prüfen und alle laufenden Inserate auf einmal neu übertragen (z. B. nach geänderten Texten, Bildern oder Preisen). Einzelne Objekte überträgt man weiter im Objekt unter Vermarktung."),
+    fehler ? h("div", { style: { background: "#fde6e6", color: "#c83c3c", padding: "8px 10px", fontSize: 12, marginBottom: 10 } }, fehler) : null,
+    zugaenge.map((z) => h(EpAdminPortalKarte, { key: z.id, zugang: z, eintraege: status.filter((e) => e.portal === z.portal), websiteObjekte: website, onNeuLaden: laden })),
+    h(EpAdminPortalNeu, { vorhanden: zugaenge.map((z) => z.portal), onAngelegt: laden }),
+    h("div", { "data-ep-ps-portal": "immoscout24", style: { border: `1px dashed ${CI.border}`, padding: 14, fontSize: 12.5, color: CI.muted } },
+      h("strong", { style: { color: CI.blau } }, "ImmobilienScout24"), " – nicht direkt angebunden. Inserate laufen über das Fremdsystem; der Status kommt über die Importberichte."));
+}
+// Stufe 121: weiteres Portal anlegen (OpenImmo 1.2.7 per FTP – wie Immowelt und Kleinanzeigen)
+const IMMO_PS_RESERVIERT = ["homepage", "website", "immoscout24"];
+function epPsSchluessel(name) {
+  return String(name || "").toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss").replace(/[^a-z0-9]+/g, "").slice(0, 30);
+}
+function EpAdminPortalNeu({ vorhanden, onAngelegt }) {
+  const h = React.createElement;
+  const leer = { bezeichnung: "", portal: "", anbieter_nr: "", ftp_host: "", ftp_user: "", passwort: "", ftp_ordner: ".", kosten_monat: "" };
+  const [offen, setOffen] = React.useState(false);
+  const [f, setF] = React.useState(leer);
+  const [schluesselHand, setSchluesselHand] = React.useState(false);
+  const [fehler, setFehler] = React.useState("");
+  const [busy, setBusy] = React.useState(false);
+  const schluessel = schluesselHand ? f.portal : epPsSchluessel(f.bezeichnung);
+  const setze = (k, v) => setF((x) => ({ ...x, [k]: v }));
+  const anlegen = async () => {
+    setFehler("");
+    if (!f.bezeichnung.trim()) { setFehler("Bitte den Namen des Portals eintragen."); return; }
+    if (!/^[a-z0-9]{2,30}$/.test(schluessel)) { setFehler("Kurzname: 2–30 Kleinbuchstaben oder Ziffern, ohne Leerzeichen."); return; }
+    if (vorhanden.includes(schluessel) || IMMO_PS_RESERVIERT.includes(schluessel)) { setFehler(`Den Kurznamen „${schluessel}“ gibt es schon.`); return; }
+    if (!f.ftp_host.trim() || !f.ftp_user.trim() || !f.passwort) { setFehler("FTP-Server, Benutzer und Passwort sind nötig – die gibt das Portal für den OpenImmo-Import vor."); return; }
+    const kosten = f.kosten_monat.trim() ? Number(f.kosten_monat.trim().replace(/\./g, "").replace(",", ".")) : null;
+    if (kosten != null && (!isFinite(kosten) || kosten < 0)) { setFehler("Kosten bitte als Betrag in € eingeben, z. B. 89,00"); return; }
+    setBusy(true);
+    const { error } = await window._sb.from("portal_zugaenge").insert({ portal: schluessel, bezeichnung: f.bezeichnung.trim(), anbieter_nr: f.anbieter_nr.trim() || null,
+      ftp_host: f.ftp_host.trim(), ftp_user: f.ftp_user.trim(), ftp_passwort: f.passwort, ftp_ordner: f.ftp_ordner.trim() || ".", format: "openimmo_127", aktiv: true, kosten_monat: kosten });
+    setBusy(false);
+    if (error) { setFehler("Anlegen fehlgeschlagen: " + error.message); return; }
+    setF(leer); setSchluesselHand(false); setOffen(false); onAngelegt();
+    if (typeof window.epPortaleZusatzLaden === "function") window.epPortaleZusatzLaden();
+  };
+  const eingabe = { display: "block", width: "100%", boxSizing: "border-box", marginTop: 3, padding: "6px 8px", border: `1px solid ${CI.border}`, fontSize: 13, fontFamily: FONT };
+  const feld = (label, key, extra) => h("label", { style: { fontSize: 11, color: CI.muted, display: "block" } }, label,
+    h("input", { "data-ep-psn-feld": key, value: f[key], onChange: (e) => setze(key, e.target.value), autoComplete: "off", ...extra, style: eingabe }));
+  if (!offen) return h("button", { type: "button", "data-ep-psn-oeffnen": "", onClick: () => setOffen(true),
+    style: { background: "transparent", border: `1px dashed ${CI.blau}`, color: CI.blau, padding: "10px 14px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: FONT, width: "100%", marginBottom: 14 } }, "＋ Neues Portal anlegen");
+  return h("div", { "data-ep-psn-form": "", style: { border: `1px solid ${CI.blau}`, background: "#fafbfd", padding: 16, marginBottom: 14 } },
+    h("div", { style: { fontSize: 14, fontWeight: 700, color: CI.blau, marginBottom: 4 } }, "Neues Portal anlegen"),
+    h("div", { style: { fontSize: 11.5, color: CI.muted, marginBottom: 10, lineHeight: 1.5 } }, "Für Portale mit OpenImmo-Import per FTP (die Zugangsdaten schickt das Portal). Danach erscheint es im Objekt unter Vermarktungskanäle und hier mit Verbindungstest und Sammelaktualisierung."),
+    h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 } },
+      feld("Name des Portals", "bezeichnung", { placeholder: "z. B. Immonet" }),
+      h("label", { style: { fontSize: 11, color: CI.muted, display: "block" } }, "Kurzname (intern)",
+        h("input", { "data-ep-psn-feld": "portal", value: schluessel, onChange: (e) => { setSchluesselHand(true); setze("portal", epPsSchluessel(e.target.value)); }, style: eingabe })),
+      feld("Anbieter-Nr. (OpenImmo)", "anbieter_nr"), feld("FTP-Server", "ftp_host", { placeholder: "ftp.portal.de" }), feld("Benutzer", "ftp_user"),
+      feld("Passwort", "passwort", { type: "password", autoComplete: "new-password" }), feld("Ordner auf dem Server", "ftp_ordner", { placeholder: "." }),
+      feld("Kosten je Monat (€)", "kosten_monat", { placeholder: "z. B. 89,00", inputMode: "decimal" })),
+    fehler ? h("div", { "data-ep-psn-fehler": "", style: { background: "#fde6e6", color: "#c83c3c", padding: "8px 10px", fontSize: 12, marginTop: 10 } }, fehler) : null,
+    h("div", { style: { display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 12 } },
+      h("button", { type: "button", onClick: () => { setOffen(false); setF(leer); setFehler(""); }, style: { background: "transparent", border: `1px solid ${CI.blau}`, color: CI.blau, padding: "7px 14px", fontSize: 12, cursor: "pointer", fontFamily: FONT } }, "Abbrechen"),
+      h("button", { type: "button", "data-ep-psn-anlegen": "", disabled: busy, onClick: anlegen, style: { background: CI.gold, color: "#fff", border: "none", padding: "8px 16px", fontSize: 12.5, fontWeight: 700, cursor: busy ? "wait" : "pointer", fontFamily: FONT } }, busy ? "Lege an …" : "Portal anlegen")));
+}
+window.EpAdminPortale = EpAdminPortale;
+// ---- Stufe 121: Admin → Kosten (geschätzte Monatskosten der ImmoOffice, je nach Nutzung) ----
+// Drei Blöcke: feste Kosten (kosten_posten, art 'fix', monatlich oder jährlich), Kosten nach Nutzung (kosten_posten,
+// art 'nutzung': Menge der letzten 30 Tage aus admin_kosten_messwerte() × Preis je Vorgang; KI-Mailvorschläge und
+// Grundriss-KI mit echtem Token-Verbrauch) und Portalgebühren (portal_zugaenge.kosten_monat, gepflegt unter Admin →
+// Portale). Alles ist vom Chef änderbar; Mitarbeiter sehen den Reiter nicht.
+// Dazu: weitere Portale aus portale_liste() erscheinen im Objekt unter Vermarktungskanäle (epPortaleZusatz).
+const IMMO_AK_KATEGORIEN = { plattform: "Plattform & Hosting", ki: "Künstliche Intelligenz", mail: "E-Mail-Versand", portal: "Immobilienportale", geraete: "App & Geräte", sonstiges: "Sonstiges" };
+const epAkEuro = (x) => (Number(x) || 0).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+const epAkZahl = (t) => { const s = String(t == null ? "" : t).trim(); if (!s) return null; const n = Number(s.replace(/\s/g, "").replace(/\.(?=\d{3}(\D|$))/g, "").replace(",", ".")); return isFinite(n) ? n : NaN; };
+const epAkText = (x, stellen) => x == null ? "" : String(Number(x).toLocaleString("de-DE", { maximumFractionDigits: stellen == null ? 4 : stellen, useGrouping: false }));
+
+// Monatsbetrag eines Postens: fix (jährlich / 12) oder Menge × Preis
+function epAkMonat(p, mess) {
+  if (!p || p.aktiv === false) return 0;
+  if (p.art === "nutzung") { const m = Number(mess && mess[p.messgroesse]) || 0; return m * (Number(p.preis_je_einheit) || 0); }
+  const b = Number(p.betrag) || 0;
+  return p.abrechnung === "jaehrlich" ? b / 12 : b;
+}
+
+function EpAdminKostenZeile({ posten, mess, onGespeichert }) {
+  const h = React.createElement;
+  const nutzung = posten.art === "nutzung";
+  const [f, setF] = React.useState({ bezeichnung: posten.bezeichnung || "", anbieter: posten.anbieter || "", betrag: epAkText(posten.betrag, 2), abrechnung: posten.abrechnung || "monatlich",
+    preis: epAkText(posten.preis_je_einheit), notiz: posten.notiz || "", aktiv: posten.aktiv !== false, kategorie: posten.kategorie || "sonstiges" });
+  const [fehler, setFehler] = React.useState("");
+  const geaendert = f.bezeichnung !== (posten.bezeichnung || "") || f.anbieter !== (posten.anbieter || "") || f.betrag !== epAkText(posten.betrag, 2) || f.abrechnung !== (posten.abrechnung || "monatlich")
+    || f.preis !== epAkText(posten.preis_je_einheit) || f.notiz !== (posten.notiz || "") || f.aktiv !== (posten.aktiv !== false) || f.kategorie !== (posten.kategorie || "sonstiges");
+  const vorschau = { ...posten, aktiv: f.aktiv, betrag: epAkZahl(f.betrag), abrechnung: f.abrechnung, preis_je_einheit: epAkZahl(f.preis) };
+  const setze = (k, v) => setF((x) => ({ ...x, [k]: v }));
+  const speichern = async () => {
+    setFehler("");
+    const betrag = epAkZahl(f.betrag), preis = epAkZahl(f.preis);
+    if (!f.bezeichnung.trim()) { setFehler("Bezeichnung fehlt."); return; }
+    if (!nutzung && (betrag == null || isNaN(betrag) || betrag < 0)) { setFehler("Betrag bitte als Zahl, z. B. 23,00"); return; }
+    if (nutzung && (preis == null || isNaN(preis) || preis < 0)) { setFehler("Preis je Vorgang bitte als Zahl, z. B. 0,02"); return; }
+    const werte = { bezeichnung: f.bezeichnung.trim(), anbieter: f.anbieter.trim() || null, notiz: f.notiz.trim() || null, aktiv: f.aktiv, kategorie: f.kategorie, updated_at: new Date().toISOString(),
+      ...(nutzung ? { preis_je_einheit: preis } : { betrag, abrechnung: f.abrechnung }) };
+    const { error } = await window._sb.from("kosten_posten").update(werte).eq("id", posten.id);
+    if (error) { setFehler(error.message); return; }
+    onGespeichert();
+  };
+  const loeschen = async () => {
+    if (!window.confirm(`Kostenposten „${posten.bezeichnung}“ löschen?`)) return;
+    const { error } = await window._sb.from("kosten_posten").delete().eq("id", posten.id);
+    if (error) { setFehler(error.message); return; }
+    onGespeichert();
+  };
+  const ein = (k, extra) => h("input", { "data-ep-ak-feld": k, value: f[k], onChange: (e) => setze(k, e.target.value), ...extra,
+    style: { width: "100%", boxSizing: "border-box", padding: "4px 6px", border: `1px solid ${CI.border}`, fontSize: 12, fontFamily: FONT, background: "#fff", ...(extra && extra.style) } });
+  const menge = nutzung ? Number(mess && mess[posten.messgroesse]) || 0 : null;
+  return h("tr", { "data-ep-ak-posten": posten.id, style: { borderTop: `1px solid ${CI.border}`, verticalAlign: "top", opacity: f.aktiv ? 1 : 0.5 } },
+    h("td", { style: { padding: "5px 4px", width: 22 } }, h("input", { type: "checkbox", "data-ep-ak-aktiv": posten.id, checked: f.aktiv, onChange: (e) => setze("aktiv", e.target.checked), title: "in die Summe einrechnen" })),
+    h("td", { style: { padding: "5px 4px", minWidth: 180 } }, ein("bezeichnung"),
+      h("div", { style: { display: "flex", gap: 4, marginTop: 3 } }, ein("anbieter", { placeholder: "Anbieter", style: { flex: 1 } }),
+        h("select", { "data-ep-ak-feld": "kategorie", value: f.kategorie, onChange: (e) => setze("kategorie", e.target.value), style: { fontSize: 11, fontFamily: FONT, border: `1px solid ${CI.border}` } },
+          Object.entries(IMMO_AK_KATEGORIEN).filter(([k]) => k !== "portal").map(([k, v]) => h("option", { key: k, value: k }, v)))),
+      ein("notiz", { placeholder: "Notiz", style: { marginTop: 3, color: CI.muted } })),
+    nutzung
+      ? h("td", { style: { padding: "5px 4px", whiteSpace: "nowrap", fontSize: 12 } },
+          h("div", { "data-ep-ak-menge": menge }, `${menge.toLocaleString("de-DE", { maximumFractionDigits: 2 })} ${posten.einheit || ""}`), h("div", { style: { fontSize: 10.5, color: CI.muted } }, "letzte 30 Tage"),
+          h("div", { style: { display: "flex", alignItems: "center", gap: 4, marginTop: 3 } }, "× ", ein("preis", { style: { width: 70 } }), h("span", { style: { fontSize: 11, color: CI.muted } }, "€")))
+      : h("td", { style: { padding: "5px 4px", whiteSpace: "nowrap" } },
+          h("div", { style: { display: "flex", alignItems: "center", gap: 4 } }, ein("betrag", { style: { width: 80 } }), "€"),
+          h("select", { "data-ep-ak-feld": "abrechnung", value: f.abrechnung, onChange: (e) => setze("abrechnung", e.target.value), style: { marginTop: 3, fontSize: 11, fontFamily: FONT, border: `1px solid ${CI.border}` } },
+            h("option", { value: "monatlich" }, "monatlich"), h("option", { value: "jaehrlich" }, "jährlich"))),
+    h("td", { "data-ep-ak-monat": epAkMonat(vorschau, mess).toFixed(2), style: { padding: "5px 4px", textAlign: "right", fontWeight: 700, color: CI.blau, whiteSpace: "nowrap" } }, epAkEuro(epAkMonat(vorschau, mess))),
+    h("td", { style: { padding: "5px 4px", whiteSpace: "nowrap", textAlign: "right" } },
+      geaendert ? h("button", { type: "button", "data-ep-ak-speichern": posten.id, onClick: speichern, style: { background: CI.blau, color: "#fff", border: "none", padding: "4px 9px", fontSize: 11, cursor: "pointer", fontFamily: FONT } }, "Speichern") : null,
+      h("button", { type: "button", "data-ep-ak-loeschen": posten.id, onClick: loeschen, title: "Löschen", style: { background: "transparent", border: "none", color: CI.muted, cursor: "pointer", fontSize: 13, marginLeft: 4 } }, "✕"),
+      fehler ? h("div", { style: { color: "#c83c3c", fontSize: 11, whiteSpace: "normal" } }, fehler) : null));
+}
+
+function EpAdminKosten({ user }) {
+  const h = React.createElement;
+  const [posten, setPosten] = React.useState(null);
+  const [mess, setMess] = React.useState(null);
+  const [portale, setPortale] = React.useState([]);
+  const [fehler, setFehler] = React.useState("");
+  const laden = React.useCallback(async () => {
+    try {
+      const [p, m, z] = await Promise.all([
+        window._sb.from("kosten_posten").select("*").order("sortierung").order("created_at"),
+        window._sb.rpc("admin_kosten_messwerte"),
+        window._sb.from("portal_zugaenge").select("id, portal, bezeichnung, kosten_monat, aktiv").order("portal"),
+      ]);
+      if (p.error) throw p.error;
+      setPosten(p.data || []); setMess(m.error ? {} : (m.data || {})); setPortale(z.data || []);
+      if (m.error) setFehler("Messwerte konnten nicht geladen werden: " + m.error.message);
+    } catch (e) { setFehler(e.message || String(e)); setPosten([]); }
+  }, []);
+  React.useEffect(() => { laden(); }, [laden]);
+  if (user && user.role !== "chef") return h("div", { style: { fontSize: 13, color: CI.muted } }, "Die Kostenübersicht sieht nur die Geschäftsführung.");
+  if (!posten) return h("div", { style: { fontSize: 13, color: CI.muted } }, "Lädt …");
+
+  const fix = posten.filter((p) => p.art !== "nutzung");
+  const nutz = posten.filter((p) => p.art === "nutzung");
+  const portalZeilen = portale.filter((z) => z.aktiv && Number(z.kosten_monat) > 0);
+  const summeFix = fix.reduce((s, p) => s + epAkMonat(p, mess), 0);
+  const summeNutz = nutz.reduce((s, p) => s + epAkMonat(p, mess), 0);
+  const summePortale = portalZeilen.reduce((s, z) => s + Number(z.kosten_monat), 0);
+  const gesamt = summeFix + summeNutz + summePortale;
+  const jeKategorie = {};
+  posten.forEach((p) => { jeKategorie[p.kategorie] = (jeKategorie[p.kategorie] || 0) + epAkMonat(p, mess); });
+  if (summePortale) jeKategorie.portal = (jeKategorie.portal || 0) + summePortale;
+  const maxKat = Math.max(1, ...Object.values(jeKategorie));
+
+  const neu = async (art) => {
+    const { error } = await window._sb.from("kosten_posten").insert(art === "nutzung"
+      ? { bezeichnung: "Neuer Posten nach Nutzung", kategorie: "ki", art: "nutzung", messgroesse: "mail_eingang", einheit: "Mail", preis_je_einheit: 0, sortierung: 999 }
+      : { bezeichnung: "Neuer Kostenposten", kategorie: "sonstiges", art: "fix", betrag: 0, abrechnung: "monatlich", sortierung: 999 });
+    if (error) { setFehler(error.message); return; }
+    laden();
+  };
+  const kachel = (titel, wert, sub, attr) => h("div", { ...attr, style: { flex: "1 1 160px", border: `1px solid ${CI.border}`, background: "#fff", padding: "12px 14px" } },
+    h("div", { style: { fontSize: 10.5, color: CI.muted, textTransform: "uppercase", letterSpacing: "0.05em" } }, titel),
+    h("div", { style: { fontSize: 22, fontWeight: 700, color: CI.blau, marginTop: 4 } }, wert), sub ? h("div", { style: { fontSize: 11, color: CI.muted, marginTop: 2 } }, sub) : null);
+  const tabelle = (titel, kopf, inhalt, extra) => h("div", { style: { border: `1px solid ${CI.border}`, background: "#fff", padding: 14, marginBottom: 14 } },
+    h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 } }, h("div", { style: { fontSize: 14, fontWeight: 700, color: CI.blau } }, titel), extra || null),
+    h("div", { style: { overflowX: "auto" } }, h("table", { style: { width: "100%", borderCollapse: "collapse", fontSize: 12.5 } },
+      h("thead", null, h("tr", { style: { textAlign: "left", color: CI.muted, fontSize: 10.5, textTransform: "uppercase" } }, kopf.map((k, i) => h("th", { key: i, style: { padding: "4px", textAlign: i === kopf.length - 2 ? "right" : "left" } }, k)))),
+      h("tbody", null, inhalt))));
+  const plus = (art) => h("button", { type: "button", "data-ep-ak-neu": art, onClick: () => neu(art), style: { background: "transparent", border: `1px solid ${CI.blau}`, color: CI.blau, padding: "4px 10px", fontSize: 11.5, cursor: "pointer", fontFamily: FONT } }, "＋ Posten");
+
+  return h("div", { "data-ep-admin-kosten": gesamt.toFixed(2), style: { fontFamily: FONT, maxWidth: 1040 } },
+    h("div", { style: { fontSize: 13, color: CI.muted, marginBottom: 14, lineHeight: 1.5 } },
+      "Geschätzte monatliche Kosten der ImmoOffice. Feste Beträge pflegen Sie hier, Portalgebühren unter Admin → Portale. Nutzungsabhängige Posten rechnet World aus den tatsächlichen Mengen der letzten 30 Tage mal dem Preis je Vorgang – die Preise sind Erfahrungswerte und lassen sich an die echten Rechnungen anpassen."),
+    fehler ? h("div", { style: { background: "#fde6e6", color: "#c83c3c", padding: "8px 10px", fontSize: 12, marginBottom: 10 } }, fehler) : null,
+    h("div", { style: { display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 14 } },
+      kachel("Geschätzt pro Monat", epAkEuro(gesamt), `ca. ${epAkEuro(gesamt * 12)} im Jahr`, { "data-ep-ak-gesamt": gesamt.toFixed(2) }),
+      kachel("Feste Kosten", epAkEuro(summeFix), `${fix.filter((p) => p.aktiv !== false).length} Posten`, { "data-ep-ak-fix": summeFix.toFixed(2) }),
+      kachel("Nach Nutzung", epAkEuro(summeNutz), "letzte 30 Tage", { "data-ep-ak-nutzung": summeNutz.toFixed(2) }),
+      kachel("Portale", epAkEuro(summePortale), `${portalZeilen.length} mit Gebühr`, { "data-ep-ak-portale": summePortale.toFixed(2) })),
+    h("div", { "data-ep-ak-kategorien": "", style: { border: `1px solid ${CI.border}`, background: "#fff", padding: 14, marginBottom: 14 } },
+      h("div", { style: { fontSize: 14, fontWeight: 700, color: CI.blau, marginBottom: 8 } }, "Nach Bereich"),
+      Object.entries(jeKategorie).filter(([, v]) => v > 0.004).sort((a, b) => b[1] - a[1]).map(([k, v]) => h("div", { key: k, style: { display: "grid", gridTemplateColumns: "170px 1fr 90px", gap: 10, alignItems: "center", fontSize: 12.5, padding: "3px 0" } },
+        h("span", null, IMMO_AK_KATEGORIEN[k] || k),
+        h("div", { style: { height: 10, background: "#eef0f5" } }, h("div", { style: { height: 10, width: `${Math.max(2, v / maxKat * 100)}%`, background: k === "ki" ? CI.gold : CI.blau } })),
+        h("span", { style: { textAlign: "right", fontWeight: 600 } }, epAkEuro(v))))),
+    tabelle("Feste Kosten", ["", "Posten", "Betrag", "je Monat", ""],
+      fix.map((p) => h(EpAdminKostenZeile, { key: p.id + (p.updated_at || ""), posten: p, mess, onGespeichert: laden })), plus("fix")),
+    tabelle("Nach Nutzung (letzte 30 Tage)", ["", "Posten", "Menge × Preis", "je Monat", ""],
+      nutz.map((p) => h(EpAdminKostenZeile, { key: p.id + (p.updated_at || ""), posten: p, mess, onGespeichert: laden })), plus("nutzung")),
+    tabelle("Immobilienportale", ["Portal", "Status", "je Monat", ""],
+      portale.length ? portale.map((z) => h("tr", { key: z.id, "data-ep-ak-portal": z.portal, style: { borderTop: `1px solid ${CI.border}` } },
+        h("td", { style: { padding: "5px 4px" } }, z.bezeichnung || z.portal), h("td", { style: { padding: "5px 4px", color: z.aktiv ? "#1e7e34" : CI.muted } }, z.aktiv ? "aktiv" : "aus"),
+        h("td", { style: { padding: "5px 4px", textAlign: "right", fontWeight: 700, color: CI.blau } }, z.aktiv && Number(z.kosten_monat) > 0 ? epAkEuro(z.kosten_monat) : "–"), h("td", null, "")))
+        : h("tr", null, h("td", { colSpan: 4, style: { color: CI.muted, padding: 6 } }, "Keine Portale angelegt.")),
+      h("span", { style: { fontSize: 11, color: CI.muted } }, "Beträge unter Admin → Portale pflegen")),
+    mess ? h("div", { "data-ep-ak-stand": "", style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.6 } },
+      `Stand ${mess.stand ? new Date(mess.stand).toLocaleString("de-DE") : "–"} · Datenbank ${mess.datenbank_mb || 0} MB von 8 GB · Speicher ${String(mess.speicher_gb || 0).replace(".", ",")} GB von 100 GB (+${String(mess.speicher_zuwachs_gb || 0).replace(".", ",")} GB in 30 Tagen) · ${mess.mail_eingang || 0} eingegangene Mails und ${mess.dateien_neu || 0} neue Dateien in 30 Tagen. `
+      + "Nicht enthalten: CRM-Lizenz, Microsoft 365, Mail-Hosting. Zum Abgleich: Anthropic-Konto → Usage, Supabase → Billing, Resend → Usage.") : null);
+}
+
+// Weitere Portale (Admin → Portale → „Neues Portal anlegen“) im Objekt unter Vermarktungskanäle
+const IMMO_PORTALE_FEST = ["homepage", "website", "immowelt", "kleinanzeigen", "immoscout24"];
+let epPortaleZusatzStand = null; // Promise, solange geladen wird
+async function epPortaleZusatzLaden() {
+  try {
+    const { data, error } = await window._sb.rpc("portale_liste");
+    if (error) throw error;
+    window.__epPortaleZusatz = (data || []).filter((p) => !IMMO_PORTALE_FEST.includes(p.portal)).map((p) => ({ id: p.portal, label: p.bezeichnung || p.portal, angebunden: !!p.aktiv }));
+  } catch (e) { window.__epPortaleZusatz = window.__epPortaleZusatz || []; }
+  epPortaleZusatzStand = window.__epPortaleZusatz;
+  return epPortaleZusatzStand;
+}
+function epPortaleZusatz() {
+  const laeuft = epPortaleZusatzStand && typeof epPortaleZusatzStand.then === "function";
+  if (!Array.isArray(window.__epPortaleZusatz) && !laeuft && window._sb && typeof window._sb.rpc === "function") epPortaleZusatzStand = epPortaleZusatzLaden();
+  return Array.isArray(window.__epPortaleZusatz) ? window.__epPortaleZusatz : [];
+}
+window.EpAdminKosten = EpAdminKosten; window.epPortaleZusatz = epPortaleZusatz; window.epPortaleZusatzLaden = epPortaleZusatzLaden;
+// ---- Stufe 122: Wohnflächenrechner – „⟋ Dachschräge“ je Raum ----
+// Raum als Rechteck (Länge = links→rechts, Breite = oben→unten wie im Grundriss), Schrägen je Seite mit Kniestock und
+// Dachneigung – oder mit den gemessenen Abständen der 1,00-m- und 2,00-m-Linie (haben Vorrang). Daraus entstehen die
+// Teilflächen nach § 4 WoFlV: lichte Höhe ab 2 m (100 %), 1–2 m (50 %), unter 1 m (0 %) – mit Maßen und Rechenweg im
+// Text, damit die Berechnung im PDF nachvollziehbar ist. Abzüge (Treppe, Schornstein) bleiben erhalten.
+// Räume aus der KI-Grundriss-Auslesung bringen ihre Werte mit (raum.schraege) – hier nur prüfen und korrigieren.
+const IMMO_DS_SEITEN = [["oben", "oben"], ["unten", "unten"], ["links", "links"], ["rechts", "rechts"]];
+const epDsZahl = (t) => { const n = Number(String(t == null ? "" : t).replace(",", ".").trim()); return String(t == null ? "" : t).trim() === "" ? 0 : isFinite(n) ? n : NaN; };
+const epDsText = (x) => (x ? String(Math.round(x * 1000) / 1000).replace(".", ",") : "");
+const epDsM = (x) => (Math.round((Number(x) || 0) * 100) / 100).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+// Zonen eines Rechtecks: nutzt die Geometrie der Grundriss-KI (epGkZonen), sonst eigene Rechnung
+function epDsZonen(laenge, breite, schraegen, dach) {
+  const raum = { polygon: [{ x: 0, y: 0 }, { x: laenge, y: 0 }, { x: laenge, y: breite }, { x: 0, y: breite }], schraegen, lichte_hoehe_m: 0 };
+  if (typeof epGkZonen === "function") return epGkZonen(raum, dach) || { voll: Math.round(laenge * breite * 100) / 100, halb: 0, keine: 0, streifen: [], text: "" };
+  return null;
+}
+// Abstände der Linien je Seite (für Text und Volle-Höhe-Rechteck)
+function epDsAbstaende(s, dach) {
+  if (typeof epGkAbstaende === "function") return epGkAbstaende(s, dach);
+  return null;
+}
+
+function EpWfDachschraegeDialog({ raum, onUebernehmen, onSchliessen }) {
+  const h = React.createElement;
+  const vor = raum && raum.schraege ? raum.schraege : null;
+  const ersterTeil = raum && raum.teile && raum.teile.find((t) => !t.abzug && t.laenge && t.breite);
+  const [laenge, setLaenge] = React.useState(vor ? epDsText(vor.laenge) : ersterTeil ? String(ersterTeil.laenge) : "");
+  const [breite, setBreite] = React.useState(vor ? epDsText(vor.breite) : ersterTeil ? String(ersterTeil.breite) : "");
+  const start = {};
+  IMMO_DS_SEITEN.forEach(([k]) => {
+    const s = vor && (vor.schraegen || []).find((x) => x.seite === k);
+    const d = vor && vor.dach ? vor.dach : {};
+    start[k] = { an: !!s, kniestock: s && s.kniestock_m ? epDsText(s.kniestock_m) : d.kniestock_m ? epDsText(d.kniestock_m) : "", neigung: s && s.neigung_grad ? epDsText(s.neigung_grad) : d.neigung_grad ? epDsText(d.neigung_grad) : "",
+      a1: s && s.abstand_1m_m ? epDsText(s.abstand_1m_m) : "", a2: s && s.abstand_2m_m ? epDsText(s.abstand_2m_m) : "" };
+  });
+  const [seiten, setSeiten] = React.useState(start);
+  const [fehler, setFehler] = React.useState("");
+  const setze = (k, f, v) => setSeiten((x) => ({ ...x, [k]: { ...x[k], [f]: v } }));
+  const L = epDsZahl(laenge), B = epDsZahl(breite);
+  const liste = IMMO_DS_SEITEN.filter(([k]) => seiten[k].an).map(([k]) => ({ seite: k, kniestock_m: epDsZahl(seiten[k].kniestock), neigung_grad: epDsZahl(seiten[k].neigung),
+    abstand_1m_m: epDsZahl(seiten[k].a1), abstand_2m_m: epDsZahl(seiten[k].a2) }));
+  const ungueltig = !(L > 0 && B > 0) || liste.some((s) => [s.kniestock_m, s.neigung_grad, s.abstand_1m_m, s.abstand_2m_m].some((x) => isNaN(x)));
+  const fehlend = liste.filter((s) => !(s.abstand_2m_m > 0) && !(s.neigung_grad > 0 && s.neigung_grad < 89));
+  const z = !ungueltig && !fehlend.length ? epDsZonen(L, B, liste, null) : null;
+  const wohn = z ? Math.round((z.voll + 0.5 * z.halb) * 100) / 100 : 0;
+
+  // Rechteck „ab 2 m“: Länge/Breite abzüglich der 2-m-Linien der Seiten
+  const abst = {};
+  liste.forEach((s) => { abst[s.seite] = epDsAbstaende(s, null); });
+  const d2 = (k) => (abst[k] ? abst[k].d2 : 0), d1 = (k) => (abst[k] ? abst[k].d1 : 0);
+  const vollL = Math.max(0, L - d2("links") - d2("rechts")), vollB = Math.max(0, B - d2("oben") - d2("unten"));
+
+  const uebernehmen = () => {
+    setFehler("");
+    if (ungueltig) { setFehler("Bitte Länge und Breite des Raums und alle Werte als Zahl eintragen (z. B. 4,25)."); return; }
+    if (fehlend.length) { setFehler(`Für „${fehlend.map((s) => s.seite).join(", ")}“ fehlt die Dachneigung oder der Abstand der 2-m-Linie.`); return; }
+    const rechenweg = liste.map((s) => {
+      const a = abst[s.seite];
+      return `Schräge ${s.seite}: ` + (s.abstand_2m_m > 0 ? `1-m-Linie ${epDsM(a.d1)} m, 2-m-Linie ${epDsM(a.d2)} m (gemessen)`
+        : `Kniestock ${epDsM(s.kniestock_m)} m, ${String(s.neigung_grad).replace(".", ",")}° → 1-m-Linie ${epDsM(a.d1)} m, 2-m-Linie ${epDsM(a.d2)} m`);
+    }).join("; ");
+    const teile = [];
+    if (z.voll > 0.005) teile.push(WF.neuTeil({ bez: `lichte Höhe ab 2 m (Raum ${epDsM(L)} × ${epDsM(B)} m; ${rechenweg})`, laenge: epDsM(vollL), breite: epDsM(vollB), hoehe: "voll", quelle: "dachschraege" }));
+    if (z.halb > 0.005) teile.push(WF.neuTeil({ bez: "Dachschräge, lichte Höhe 1 bis 2 m (zwischen 1-m- und 2-m-Linie)", flaeche: epDsM(z.halb), hoehe: "halb", quelle: "dachschraege" }));
+    if (z.keine > 0.005) teile.push(WF.neuTeil({ bez: "Dachschräge, lichte Höhe unter 1 m (bis zur 1-m-Linie)", flaeche: epDsM(z.keine), hoehe: "null", quelle: "dachschraege" }));
+    const abzuege = (raum.teile || []).filter((t) => t.abzug);
+    onUebernehmen([...teile, ...abzuege], { laenge: L, breite: B, schraegen: liste, quelle: "hand" });
+  };
+
+  // Skizze
+  const W = 260, S = Math.min(W / (L || 1), 180 / (B || 1)), sx = (x) => 10 + x * S, sy = (y) => 10 + y * S;
+  const skizze = L > 0 && B > 0 ? h("svg", { "data-ep-ds-skizze": "", width: sx(L) + 10, height: sy(B) + 10, style: { display: "block", margin: "6px 0" } },
+    h("rect", { x: sx(0), y: sy(0), width: L * S, height: B * S, fill: "#eef2fb", stroke: "#263159", strokeWidth: 2 }),
+    ...(z ? z.streifen.map((st, i) => h("polygon", { key: i, points: st.poly.map((q) => `${sx(q[0])},${sy(q[1])}`).join(" "), fill: st.art === "halb" ? "#D4A567" : "#c83c3c", fillOpacity: 0.45, stroke: "none" })) : []),
+    h("text", { x: sx(L / 2), y: sy(B / 2), textAnchor: "middle", fontSize: 11, fill: "#263159" }, z ? `${epDsM(wohn)} m² Wohnfläche` : "")) : null;
+
+  const ein = (wert, set, attr) => h("input", { value: wert, onChange: (e) => set(e.target.value), inputMode: "decimal", ...attr,
+    style: { width: 64, padding: "4px 6px", border: `1px solid ${CI.border}`, fontSize: 12, fontFamily: FONT, ...(attr && attr.style) } });
+  return h("div", { "data-ep-ds-dialog": "", onClick: onSchliessen, style: { position: "fixed", inset: 0, background: "rgba(38,49,89,0.55)", zIndex: 9300, display: "flex", alignItems: "center", justifyContent: "center", padding: 12 } },
+    h("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", width: "100%", maxWidth: 640, maxHeight: "94vh", overflowY: "auto", padding: 18, fontFamily: FONT, boxSizing: "border-box" } },
+      h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 } },
+        h("div", { style: { fontSize: 16, fontWeight: 700, color: CI.blau } }, `⟋ Dachschräge – ${raum.name || "Raum"}`),
+        h("button", { type: "button", onClick: onSchliessen, style: { background: "transparent", border: "none", fontSize: 20, color: CI.muted, cursor: "pointer" } }, "✕")),
+      vor && vor.quelle === "ki" ? h("div", { "data-ep-ds-ki": "", style: { fontSize: 11.5, color: "#6b5200", background: "#fff8e6", padding: "6px 8px", marginBottom: 8 } }, "Vorbelegt mit den Werten der KI-Auslesung – bitte mit Plan oder Aufmaß prüfen.") : null,
+      h("div", { style: { fontSize: 12, color: CI.muted, lineHeight: 1.5, marginBottom: 10 } },
+        "Höhe an einer Stelle = Kniestock + Abstand zur Wand × tan(Neigung). Die 1-m-Linie liegt bei (1 − Kniestock) / tan(Neigung), die 2-m-Linie bei (2 − Kniestock) / tan(Neigung). Wer die Linien vor Ort gemessen hat, trägt die Abstände ein – sie haben Vorrang."),
+      h("div", { style: { display: "flex", gap: 10, alignItems: "center", fontSize: 12.5, marginBottom: 10, flexWrap: "wrap" } },
+        "Raum (lichte Maße):", ein(laenge, setLaenge, { "data-ep-ds-laenge": "", placeholder: "Länge" }), "m (links → rechts) ×", ein(breite, setBreite, { "data-ep-ds-breite": "", placeholder: "Breite" }), "m (oben → unten)"),
+      h("table", { style: { width: "100%", borderCollapse: "collapse", fontSize: 12 } },
+        h("thead", null, h("tr", { style: { color: CI.muted, textAlign: "left", fontSize: 10.5, textTransform: "uppercase" } },
+          h("th", null, "Schräge an"), h("th", null, "Kniestock m"), h("th", null, "Neigung °"), h("th", null, "oder 1-m-Linie m"), h("th", null, "2-m-Linie m"))),
+        h("tbody", null, IMMO_DS_SEITEN.map(([k, name]) => h("tr", { key: k, style: { borderTop: `1px solid ${CI.border}` } },
+          h("td", { style: { padding: "5px 2px" } }, h("label", { style: { display: "flex", gap: 6, alignItems: "center", cursor: "pointer" } },
+            h("input", { type: "checkbox", "data-ep-ds-seite": k, checked: seiten[k].an, onChange: (e) => setze(k, "an", e.target.checked) }), `Seite ${name}`)),
+          ...["kniestock", "neigung", "a1", "a2"].map((f) => h("td", { key: f, style: { padding: "5px 2px" } },
+            ein(seiten[k][f], (v) => setze(k, f, v), { "data-ep-ds-wert": `${k}-${f}`, disabled: !seiten[k].an, style: { opacity: seiten[k].an ? 1 : 0.4 } }))))))),
+      skizze,
+      z ? h("div", { "data-ep-ds-ergebnis": `${z.voll}/${z.halb}/${z.keine}/${wohn}`, style: { fontSize: 12.5, lineHeight: 1.6 } },
+        `ab 2 m: ${epDsM(z.voll)} m² (100 %) · 1–2 m: ${epDsM(z.halb)} m² (50 %) · unter 1 m: ${epDsM(z.keine)} m² (0 %)`,
+        h("div", { style: { fontWeight: 700, color: CI.blau } }, `Wohnfläche: ${epDsM(wohn)} m² von ${epDsM(L * B)} m² Grundfläche`)) : null,
+      fehler ? h("div", { "data-ep-ds-fehler": "", style: { background: "#fde6e6", color: "#c83c3c", padding: "8px 10px", fontSize: 12, marginTop: 8 } }, fehler) : null,
+      h("div", { style: { display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 12 } },
+        h("button", { type: "button", onClick: onSchliessen, style: { background: "transparent", border: `1px solid ${CI.blau}`, color: CI.blau, padding: "7px 14px", fontSize: 12, cursor: "pointer", fontFamily: FONT } }, "Abbrechen"),
+        h("button", { type: "button", "data-ep-ds-uebernehmen": "", onClick: uebernehmen, style: { background: CI.gold, color: "#fff", border: "none", padding: "8px 16px", fontSize: 12.5, fontWeight: 700, cursor: "pointer", fontFamily: FONT } }, "Teilflächen übernehmen"))));
+}
+
+function EpWfDachschraegeKnopf({ raum, onUebernehmen }) {
+  const [offen, setOffen] = React.useState(false);
+  const hatKi = raum && raum.schraege && raum.schraege.quelle === "ki";
+  return React.createElement(React.Fragment, null,
+    React.createElement("button", { type: "button", "data-ep-ds-knopf": "", onClick: () => setOffen(true), title: "Teilflächen aus Dachschrägen berechnen (Kniestock, Neigung oder 1-m-/2-m-Linie)",
+      style: { border: `1px solid ${hatKi ? CI.gold : CI.border}`, background: "#fff", cursor: "pointer", fontSize: 11, padding: "3px 8px", fontFamily: FONT, color: CI.blau } }, hatKi ? "⟋ Dachschräge prüfen" : "⟋ Dachschräge"),
+    offen ? React.createElement(EpWfDachschraegeDialog, { raum, onSchliessen: () => setOffen(false), onUebernehmen: (teile, schraege) => { onUebernehmen(teile, schraege); setOffen(false); } }) : null);
+}
+window.EpWfDachschraegeKnopf = EpWfDachschraegeKnopf;
+// ---- Stufe 123: Raumscan mit Feinvermessung (App) – Methode im Wohnflächen-PDF nennen ----
+// Die App gleicht seit 01.10.2026 die Wandebenen aus den LiDAR-Tiefenpunkten aus, schließt Ecken und stellt
+// rechte Winkel (Bericht je Raum in raum.feinvermessung, Text in scan.messung.feinvermessung).
+// Hier: Methode und Prüfvermerk der Wohnflächenberechnung um die Feinvermessung ergänzen.
+function epFvText(scan) {
+  const rs = (scan && scan.raeume) || [];
+  const f = rs.map((r) => r && r.feinvermessung).filter(Boolean);
+  if (!f.length) return null;
+  const punkte = f.reduce((s, x) => s + (x.ausPunkten || 0), 0), kanten = f.reduce((s, x) => s + (x.kanten || 0), 0);
+  const maxCm = Math.max(0, ...f.map((x) => Number(x.maxVerschiebungCm) || 0));
+  const str = f.filter((x) => x.streuungMm > 0).map((x) => Number(x.streuungMm));
+  const mittel = str.length ? str.reduce((s, x) => s + x, 0) / str.length : 0;
+  const de = (x, n) => Number(x).toLocaleString("de-DE", { minimumFractionDigits: n, maximumFractionDigits: n });
+  return {
+    methode: "mit ImmoOffice-Feinvermessung (Wandebenen aus LiDAR-Tiefenpunkten ausgeglichen, Ecken als Schnittpunkte, rechte Winkel bis 1,5°)",
+    hinweis: `Feinvermessung: ${punkte} von ${kanten} Wänden aus LiDAR-Punkten ausgeglichen` + (str.length ? `, Streuung im Mittel ${de(mittel, 1)} mm` : "") +
+      `, größte Korrektur ${de(maxCm, 1)} cm; ${f.length} von ${rs.length} Räumen feinvermessen.`,
+  };
+}
+(function () {
+  if (typeof WF === "undefined" || !WF || typeof WF.ausScan !== "function" || WF.__feinvermessung) return;
+  const orig = WF.ausScan;
+  WF.ausScan = function (scan, dok, ep) {
+    const g = orig.call(this, scan, dok, ep);
+    const t = scan && scan.quelle !== "ki-grundriss" ? epFvText(scan) : null;
+    if (t && g && g.messung) {
+      g.messung = Object.assign({}, g.messung, { methode: (g.messung.methode || "LiDAR-Raumscan") + " – " + t.methode,
+        hinweise: [...(g.messung.hinweise || []), t.hinweis] });
+    }
+    return g;
+  };
+  WF.__feinvermessung = true;
+})();
+window.epFvText = epFvText;
+// ---- Stufe 124: Grundriss-Editor – Punktwolke laden, Wände erkennen, Schnitt als Hintergrund ----
+// Anlass (01.10.2026): Punktwolken aus der App („Punktwolke aufnehmen“, Punktwolke.ply / .xyz) im Grundriss-Werkzeug auswerten.
+// Ablauf: Datei lesen (im Browser, nichts wird hochgeladen) → Hochachse, Boden und Decke aus der Höhenverteilung →
+// 2-cm-Zellen mit Höhenbelegung: Wand = Punkte im Wandband (0,90–1,90 m) plus Decken- oder Bodenanschluss, Möbel fallen heraus →
+// Boden-Decken-Abgleich (02.10.2026): Kandidaten, hinter denen die Decke weiterläuft, der Boden aber nicht, sind Möbelfronten (Küche,
+// Hochschrank, Regal); die Wand dahinter liegt am Deckenende und wird als Stück ergänzt bzw. entlang der Deckenkante verlängert →
+// Hauptrichtung → Wände entlang der Achsen (Häufungen quer zur Achse, Läufe entlang), schräge Wände streng per RANSAC →
+// Ecken als Schnittpunkte → Räume aus geschlossenen Wandzügen → Lücken: mit Brüstung Fenster, sonst Tür/Öffnung →
+// als Raumscan (EPScan-Format) ins Zeichenblatt, Wandzellen als Hintergrund. Nachgeschärft 01.10.2026 nach dem ersten Bürotest.
+// Klassen (01.10.2026): trägt die Wolke „property uchar klasse“ (App: ARKit-Netz – 0 keine, 1 Wand, 2 Boden, 3 Decke, 4 Tisch,
+// 5 Sitz, 6 Fenster, 7 Tür), zählen Wandzellen auch ohne Deckenanschluss, Möbel fallen heraus, Türen/Fenster kommen direkt
+// aus den Klassen (auch geschlossene Türen im Blatt), die 3D-Ansicht kann nach Klassen färben.
+
+const IMMO_PW_KLASSENFARBE = { 0: [150, 150, 150], 1: [70, 130, 220], 2: [90, 170, 90], 3: [175, 175, 190], 4: [230, 150, 60], 5: [230, 150, 60], 6: [90, 180, 230], 7: [212, 165, 103] };
+const IMMO_PW_GROESSEN = { char: 1, int8: 1, uchar: 1, uint8: 1, short: 2, int16: 2, ushort: 2, uint16: 2, int: 4, int32: 4, uint: 4, uint32: 4, float: 4, float32: 4, double: 8, float64: 8 };
+
+// ---------- Lesen ----------
+function epPwLesen(buf, name, maxPunkte) {
+  const max = maxPunkte || 3000000;
+  const u8 = new Uint8Array(buf);
+  const anfang = new TextDecoder("latin1").decode(u8.subarray(0, Math.min(u8.length, 8192)));
+  if (/^ply\r?\n/.test(anfang)) return epPwPly(u8, anfang, max);
+  return epPwText(new TextDecoder("utf-8").decode(u8), max);
+}
+
+function epPwPly(u8, anfang, max) {
+  const ende = anfang.indexOf("end_header");
+  if (ende < 0) throw new Error("Die PLY-Datei hat keinen vollständigen Kopf.");
+  let start = ende + 10;
+  if (anfang[start] === "\r") start++;
+  if (anfang[start] === "\n") start++;
+  const zeilen = anfang.slice(0, ende).split(/\r?\n/).map((z) => z.trim()).filter(Boolean);
+  const format = ((zeilen.find((z) => z.startsWith("format ")) || "").split(/\s+/)[1]) || "";
+  let n = 0, imVertex = false, vorher = false;
+  const props = [];
+  for (const z of zeilen) {
+    const t = z.split(/\s+/);
+    if (t[0] === "element") { imVertex = t[1] === "vertex"; if (imVertex) { n = parseInt(t[2], 10) || 0; if (props.length) vorher = true; } else if (!n) vorher = true; }
+    else if (t[0] === "property" && imVertex) {
+      if (t[1] === "list") throw new Error("PLY: Listen-Eigenschaften an Punkten werden nicht unterstützt.");
+      props.push({ typ: t[1], name: t[2], groesse: IMMO_PW_GROESSEN[t[1]] || 0 });
+    }
+  }
+  if (vorher) throw new Error("PLY: Die Punkte müssen das erste Element der Datei sein.");
+  const ix = props.findIndex((p) => p.name === "x"), iy = props.findIndex((p) => p.name === "y"), iz = props.findIndex((p) => p.name === "z");
+  if (!n || ix < 0 || iy < 0 || iz < 0) throw new Error("PLY: keine Punkte mit x, y, z gefunden.");
+  const ir = props.findIndex((p) => /^(red|r|diffuse_red)$/.test(p.name)), ig = props.findIndex((p) => /^(green|g|diffuse_green)$/.test(p.name)), ib = props.findIndex((p) => /^(blue|b|diffuse_blue)$/.test(p.name));
+  const mitFarbe = ir >= 0 && ig >= 0 && ib >= 0 && [ir, ig, ib].every((i) => props[i].groesse === 1);
+  const ik = props.findIndex((p) => /^(klasse|class|classification|label|scalar_classification)$/i.test(p.name)), mitKlasse = ik >= 0 && props[ik].groesse === 1;   // Klasse je Punkt (App: ARKit-Netz)
+  const schritt = Math.max(1, Math.ceil(n / max)), m = Math.ceil(n / schritt);
+  const X = new Float32Array(m), Y = new Float32Array(m), Z = new Float32Array(m), F = mitFarbe ? new Uint8Array(3 * m) : null, K = mitKlasse ? new Uint8Array(m) : null;
+  if (format === "ascii") {
+    const text = new TextDecoder("latin1").decode(u8.subarray(start));
+    let pos = 0, k = 0;
+    for (let i = 0; i < n && pos < text.length; i++) {
+      let nl = text.indexOf("\n", pos); if (nl < 0) nl = text.length;
+      if (i % schritt === 0 && k < m) { const t = text.slice(pos, nl).trim().split(/\s+/); X[k] = +t[ix]; Y[k] = +t[iy]; Z[k] = +t[iz]; if (F) { F[3 * k] = +t[ir]; F[3 * k + 1] = +t[ig]; F[3 * k + 2] = +t[ib]; } if (K) K[k] = +t[ik] & 255; k++; }
+      pos = nl + 1;
+    }
+    return { x: X.subarray(0, k), y: Y.subarray(0, k), z: Z.subarray(0, k), farben: F ? F.subarray(0, 3 * k) : null, klassen: K ? K.subarray(0, k) : null, n: k, gesamt: n };
+  }
+  if (format !== "binary_little_endian" && format !== "binary_big_endian") throw new Error("PLY: Format „" + format + "“ wird nicht unterstützt.");
+  const le = format === "binary_little_endian";
+  if (props.some((p) => !p.groesse)) throw new Error("PLY: unbekannter Datentyp an den Punkten.");
+  const stride = props.reduce((s, p) => s + p.groesse, 0);
+  const off = (i) => props.slice(0, i).reduce((s, p) => s + p.groesse, 0);
+  const ox = off(ix), oy = off(iy), oz = off(iz), orr = mitFarbe ? off(ir) : 0, og = mitFarbe ? off(ig) : 0, ob = mitFarbe ? off(ib) : 0, okl = mitKlasse ? off(ik) : 0;
+  const lies = (typ) => (typ === "double" || typ === "float64") ? (dv, o) => dv.getFloat64(o, le) : (dv, o) => dv.getFloat32(o, le);
+  const fx = lies(props[ix].typ), fy = lies(props[iy].typ), fz = lies(props[iz].typ);
+  if (start + n * stride > u8.length) throw new Error("PLY: Die Datei ist kürzer als im Kopf angegeben (abgeschnitten?).");
+  const dv = new DataView(u8.buffer, u8.byteOffset + start, n * stride);
+  let k = 0;
+  for (let i = 0; i < n; i += schritt) { const b = i * stride; X[k] = fx(dv, b + ox); Y[k] = fy(dv, b + oy); Z[k] = fz(dv, b + oz); if (F) { F[3 * k] = dv.getUint8(b + orr); F[3 * k + 1] = dv.getUint8(b + og); F[3 * k + 2] = dv.getUint8(b + ob); } if (K) K[k] = dv.getUint8(b + okl); k++; }
+  return { x: X.subarray(0, k), y: Y.subarray(0, k), z: Z.subarray(0, k), farben: F ? F.subarray(0, 3 * k) : null, klassen: K ? K.subarray(0, k) : null, n: k, gesamt: n };
+}
+
+function epPwText(text, max) {
+  const zeilen = text.split(/\r?\n/);
+  const schritt = Math.max(1, Math.ceil(zeilen.length / max));
+  const X = [], Y = [], Z = [], F = []; let farbig = true;
+  for (let i = 0; i < zeilen.length; i += schritt) {
+    const t = zeilen[i].trim().split(/[\s,;]+/);
+    if (t.length < 3) continue;
+    const a = +t[0], b = +t[1], c = +t[2];
+    if (isFinite(a) && isFinite(b) && isFinite(c) && t[0] !== "") { X.push(a); Y.push(b); Z.push(c); if (t.length >= 6 && farbig) F.push(+t[3] & 255, +t[4] & 255, +t[5] & 255); else farbig = false; }
+  }
+  if (X.length < 100) throw new Error("In der Datei wurden keine Punkte (x y z je Zeile) gefunden.");
+  return { x: Float32Array.from(X), y: Float32Array.from(Y), z: Float32Array.from(Z), farben: farbig && F.length === 3 * X.length ? Uint8Array.from(F) : null, n: X.length, gesamt: X.length };
+}
+
+// Ausgedünnte Kopie als binäre PLY (Voxelraster, Standard 3 cm): für Grundriss und Ablage reicht das – die App-Wolke (1,5 cm) wird etwa ein Viertel so groß
+function epPwAusduennen(w, raster, name) {
+  const r = raster || 0.03, belegt = new Set(), idx = [];
+  for (let i = 0; i < w.n; i++) {
+    const k = (Math.round(w.x[i] / r) + 32768) * 4294967296 + (Math.round(w.y[i] / r) + 32768) * 65536 + (Math.round(w.z[i] / r) + 32768);
+    if (belegt.has(k)) continue; belegt.add(k); idx.push(i);
+  }
+  const mitFarbe = !!w.farben, mitKlasse = !!w.klassen, stride = 12 + (mitFarbe ? 3 : 0) + (mitKlasse ? 1 : 0), cm = Math.round(r * 100);
+  const kopf = new TextEncoder().encode(`ply\nformat binary_little_endian 1.0\ncomment ImmoOffice - Punktwolke ausgeduennt (${cm} cm Raster)\n${mitKlasse ? "comment klasse (ARKit-Netz): 0 keine, 1 Wand, 2 Boden, 3 Decke, 4 Tisch, 5 Sitz, 6 Fenster, 7 Tuer\n" : ""}element vertex ${idx.length}\nproperty float x\nproperty float y\nproperty float z\n${mitFarbe ? "property uchar red\nproperty uchar green\nproperty uchar blue\n" : ""}${mitKlasse ? "property uchar klasse\n" : ""}end_header\n`);
+  const buf = new Uint8Array(kopf.length + idx.length * stride); buf.set(kopf, 0);
+  const dv = new DataView(buf.buffer); let o = kopf.length;
+  for (const i of idx) { dv.setFloat32(o, w.x[i], true); dv.setFloat32(o + 4, w.y[i], true); dv.setFloat32(o + 8, w.z[i], true); let o2 = o + 12; if (mitFarbe) { buf[o2] = w.farben[3 * i]; buf[o2 + 1] = w.farben[3 * i + 1]; buf[o2 + 2] = w.farben[3 * i + 2]; o2 += 3; } if (mitKlasse) buf[o2] = w.klassen[i]; o += stride; }
+  return new File([buf], (name || "Punktwolke").replace(/\.[^.]+$/, "") + `_${cm}cm.ply`, { type: "application/octet-stream" });
+}
+
+// ---------- Herunterladen aus dem Speicher ----------
+// Große Dateien (10–90 MB) robust laden: direkte URL (öffentlich bzw. signiert) statt download() – ein einfacher GET ohne
+// Vorab-Anfrage, mit Fortschritt über den Lesestrom und einem zweiten Versuch bei Netzabbruch. Ohne URL (z. B. Test-Attrappe)
+// wie bisher download().
+async function epPwHerunterladen(bucket, pfad, fortschritt) {
+  const sf = window._sb.storage.from(bucket);
+  let url = null;
+  try {
+    if (bucket === "immobilie-dateien" && typeof sf.getPublicUrl === "function") { const r = sf.getPublicUrl(pfad); url = r && r.data && r.data.publicUrl || null; }
+    else if (typeof sf.createSignedUrl === "function") { const { data, error } = await sf.createSignedUrl(pfad, 600); if (!error && data && data.signedUrl) url = data.signedUrl; }
+  } catch (e) { url = null; }
+  if (!url) { const { data, error } = await sf.download(pfad); if (error) throw error; return data; }
+  let letzter = null;
+  for (let versuch = 0; versuch < 2; versuch++) {
+    try {
+      const antwort = await fetch(url, { cache: "no-store" });
+      if (!antwort.ok) throw new Error("HTTP " + antwort.status);
+      const gesamt = +antwort.headers.get("content-length") || 0;
+      if (!antwort.body || typeof antwort.body.getReader !== "function") return await antwort.blob();
+      const leser = antwort.body.getReader(), teile = []; let geladen = 0;
+      for (;;) { const { done, value } = await leser.read(); if (done) break; teile.push(value); geladen += value.length; if (fortschritt) fortschritt(geladen, gesamt); }
+      return new Blob(teile);
+    } catch (e) { letzter = e; if (versuch === 0) await new Promise((r) => setTimeout(r, 1000)); }
+  }
+  // letzter Weg: download() über die Bibliothek (anderer Pfad, eigene Kopfzeilen)
+  try { const { data, error } = await sf.download(pfad); if (!error && data) return data; } catch (e) { /* unten melden */ }
+  throw new Error("Netzfehler beim Herunterladen (" + (letzter && letzter.message || "Verbindung abgebrochen") + ") – Verbindung prüfen und noch einmal versuchen; bei großen Dateien hilft die 3-cm-Variante.");
+}
+
+// ---------- Hilfen ----------
+function epPwZufall(seed) { let s = (seed >>> 0) || 1; return () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296; }
+function epPwLinie(pts, idx) {
+  // Ausgleichsgerade (totale kleinste Quadrate) durch pts[idx]: Schwerpunkt p, Richtung d
+  let mx = 0, my = 0; for (const i of idx) { mx += pts[2 * i]; my += pts[2 * i + 1]; } mx /= idx.length; my /= idx.length;
+  let sxx = 0, syy = 0, sxy = 0;
+  for (const i of idx) { const dx = pts[2 * i] - mx, dy = pts[2 * i + 1] - my; sxx += dx * dx; syy += dy * dy; sxy += dx * dy; }
+  const w = 0.5 * Math.atan2(2 * sxy, sxx - syy);
+  return { p: { x: mx, y: my }, d: { x: Math.cos(w), y: Math.sin(w) } };
+}
+const epPwAbst = (pts, i, l) => (pts[2 * i] - l.p.x) * -l.d.y + (pts[2 * i + 1] - l.p.y) * l.d.x;
+const epPwT = (pts, i, l) => (pts[2 * i] - l.p.x) * l.d.x + (pts[2 * i + 1] - l.p.y) * l.d.y;
+const epPwR = (x, n) => Math.round(x * Math.pow(10, n == null ? 3 : n)) / Math.pow(10, n == null ? 3 : n);
+
+// 2D-Punkte (Plan) aus einem Höhenband, 1-cm-Raster ohne Doppelte
+function epPwBand(w, achse, von, bis) {
+  const seen = new Set(), out = [];
+  const auf = achse === "z" ? w.z : w.y;
+  for (let i = 0; i < w.n; i++) {
+    const h = auf[i]; if (h < von || h > bis) continue;
+    const px = w.x[i], py = achse === "z" ? w.y[i] : -w.z[i];
+    const k = Math.round(px * 100) * 1048576 + Math.round(py * 100);
+    if (seen.has(k)) continue; seen.add(k); out.push(px, py);
+  }
+  return Float64Array.from(out);
+}
+
+// Hochachse, Boden und Decke aus der Höhenverteilung (1-cm-Klassen)
+// Höhenversatz im Scan ausgleichen („verrutscht“: ARKit verliert das Tracking und setzt neu an – ein Teil der Wohnung liegt
+// dann um Dezimeter bis Meter höher oder tiefer; die Rohpunkte werden anders als das ARKit-Netz nicht nachkorrigiert).
+// Je 0,5-m-Fenster wird der Boden als unterste dichte Höhenschicht bestimmt (Histogramm 2 cm), über die Nachbarn geglättet
+// (Median 3×3, Ausreißer > 12 cm ersetzt), Lücken aus dem nächsten Fenster gefüllt; dann wird jeder Punkt um den örtlichen
+// Boden (bilinear zwischen den Fenstermitten) auf den Referenzboden gehoben. Nur wenn der Boden um > 8 cm schwankt.
+function epPwNivellieren(w, achse) {
+  if (w.nivelliert) return w.nivelliert;
+  const auf = achse === "z" ? w.z : w.y, F = 0.5, key = (fx, fy) => (fx + 32768) * 65536 + (fy + 32768);
+  const fenster = new Map();
+  for (let i = 0; i < w.n; i++) {
+    const px = w.x[i], py = achse === "z" ? w.y[i] : -w.z[i], k = key(Math.floor(px / F), Math.floor(py / F));
+    let f = fenster.get(k); if (!f) { f = []; fenster.set(k, f); } f.push(auf[i]);
+  }
+  const boden = new Map();
+  fenster.forEach((hs, k) => {
+    if (hs.length < 60) return;
+    let lo = Infinity, hi = -Infinity; for (const v of hs) { if (v < lo) lo = v; if (v > hi) hi = v; }
+    const bin = 0.02, n = Math.ceil((hi - lo) / bin) + 3, hist = new Int32Array(n);
+    for (const v of hs) hist[Math.floor((v - lo) / bin)]++;
+    let maxDrei = 0; for (let b = 0; b + 2 < n; b++) maxDrei = Math.max(maxDrei, hist[b] + hist[b + 1] + hist[b + 2]);
+    const mind = Math.max(25, 0.06 * hs.length, 0.3 * maxDrei);
+    // oberer Rand des Fensters (98 %) – über einem Boden muss ein Raum stehen (2,0–3,6 m), sonst ist die unterste dichte
+    // Schicht kein Boden, sondern Decke (Boden hier nicht erfasst) oder Tischplatte
+    let rest = Math.ceil(hs.length * 0.02), p98 = hi; for (let b = n - 1; b >= 0; b--) { rest -= hist[b]; if (rest <= 0) { p98 = lo + (b + 0.5) * bin; break; } }
+    for (let b = 0; b + 2 < n; b++) { const drei = hist[b] + hist[b + 1] + hist[b + 2]; if (drei >= mind) { const f = lo + (b + 1.5) * bin; if (p98 - f >= 2.0 && p98 - f <= 3.6) boden.set(k, f); break; } }
+  });
+  if (boden.size < 4) return null;
+  // Nur Bodenniveaus, die viele Fenster teilen (≥ 10 %, mindestens 8): einzelne Sofas oder Podeste sind kein eigenes Niveau
+  { const bins = new Map(); boden.forEach((v) => { const b = Math.round(v / 0.1); bins.set(b, (bins.get(b) || 0) + 1); });
+    const mind = Math.max(8, 0.1 * boden.size), ok = (v) => { const b = Math.round(v / 0.1); return (bins.get(b) || 0) + (bins.get(b - 1) || 0) + (bins.get(b + 1) || 0) >= mind; };
+    [...boden.keys()].forEach((k) => { if (!ok(boden.get(k))) boden.delete(k); });
+    if (boden.size < 4) return null; }
+  const nachbarn = (k, r) => { const fx = Math.floor(k / 65536) - 32768, fy = (k % 65536) - 32768, out = []; for (let dx = -r; dx <= r; dx++) for (let dy = -r; dy <= r; dy++) { const v = boden.get(key(fx + dx, fy + dy)); if (v != null) out.push(v); } return out; };
+  const median = (arr) => { const a = arr.slice().sort((p, q) => p - q); return a[a.length >> 1]; };
+  for (let runde = 0; runde < 2; runde++) {
+    const neu = new Map();
+    boden.forEach((v, k) => { const nb = nachbarn(k, 1); const m = median(nb); neu.set(k, nb.length >= 3 && Math.abs(v - m) > 0.12 ? m : v); });
+    neu.forEach((v, k) => boden.set(k, v));
+  }
+  // Lücken (Fenster ohne Boden, aber mit Punkten) aus dem nächsten Fenster füllen – Ringe bis Radius 6
+  fenster.forEach((hs, k) => { if (boden.has(k)) return; for (let r = 1; r <= 6; r++) { const nb = nachbarn(k, r); if (nb.length) { boden.set(k, median(nb)); break; } } });
+  const werte = [...boden.values()].sort((p, q) => p - q);
+  const spanne = werte[werte.length - 1] - werte[0], ref = werte[werte.length >> 1];
+  // Ausgleichen nur, wenn ein nennenswerter Bereich (≥ 10 % der Fenster) um mehr als 8 cm vom Referenzboden abweicht
+  const abweichend = werte.filter((v) => Math.abs(v - ref) > 0.08).length;
+  if (spanne <= 0.08 || abweichend < Math.max(6, 0.1 * werte.length)) { w.nivelliert = { spanne: epPwR(spanne, 2), ref, fenster: boden.size, angewendet: false }; return w.nivelliert; }
+  // bilinear zwischen den Fenstermitten – aber nur zwischen Fenstern desselben Niveaus (≤ 30 cm Unterschied zum eigenen
+  // Fenster), sonst würden Wände an einer Sprungkante zu Kurven verbogen
+  const bodenBei = (px, py) => {
+    const eigen = boden.get(key(Math.floor(px / F), Math.floor(py / F)));
+    const gx = px / F - 0.5, gy = py / F - 0.5, fx = Math.floor(gx), fy = Math.floor(gy), tx = gx - fx, ty = gy - fy;
+    let sum = 0, gew = 0;
+    for (const [dx, dy, g] of [[0, 0, (1 - tx) * (1 - ty)], [1, 0, tx * (1 - ty)], [0, 1, (1 - tx) * ty], [1, 1, tx * ty]]) {
+      const v = boden.get(key(fx + dx, fy + dy)); if (v == null || g <= 0) continue;
+      if (eigen != null && Math.abs(v - eigen) > 0.3) continue;
+      sum += v * g; gew += g;
+    }
+    if (gew > 0) return sum / gew;
+    return eigen != null ? eigen : ref;
+  };
+  for (let i = 0; i < w.n; i++) { const px = w.x[i], py = achse === "z" ? w.y[i] : -w.z[i]; auf[i] = auf[i] - bodenBei(px, py) + ref; }
+  w.nivelliert = { spanne: epPwR(spanne, 2), ref, fenster: boden.size, angewendet: true };
+  return w.nivelliert;
+}
+
+function epPwHoehen(w) {
+  const stich = (arr) => { const s = []; const st = Math.max(1, Math.floor(w.n / 200000)); for (let i = 0; i < w.n; i += st) s.push(arr[i]); return s.sort((a, b) => a - b); };
+  const auswerten = (arr) => {
+    const s = stich(arr); if (s.length < 100) return null;
+    const lo = s[Math.floor(s.length * 0.005)], hi = s[Math.floor(s.length * 0.995)];
+    if (!(hi - lo > 0.5)) return null;
+    const bins = new Map();
+    for (let i = 0; i < w.n; i++) { const v = arr[i]; if (v < lo || v > hi) continue; const b = Math.round(v * 100); bins.set(b, (bins.get(b) || 0) + 1); }
+    const spanne = hi - lo; let boden = null, decke = null, bMax = 0, dMax = 0; const oben = [];
+    bins.forEach((c, b) => { const v = b / 100; if (v <= lo + spanne * 0.4 && c > bMax) { bMax = c; boden = v; } if (v >= hi - spanne * 0.4) { oben.push(c); if (c > dMax) { dMax = c; decke = v; } } });
+    oben.sort((a, b) => a - b); const typisch = oben.length ? oben[oben.length >> 1] : 0;   // mittlere Besetzung der oberen Schichten (Wandpunkte)
+    return { boden, decke, bMax, dMax, hi, deckeDeutlich: dMax >= 4 * Math.max(1, typisch), schaerfe: (bMax + dMax) / w.n };
+  };
+  let ay = auswerten(w.y), az = auswerten(w.z);
+  const achse = az && (!ay || az.schaerfe > ay.schaerfe * 1.5) ? "z" : "y";
+  // Höhenversatz („verrutscht“) ausgleichen und Boden/Decke danach neu bestimmen
+  const niv = epPwNivellieren(w, achse);
+  if (niv && niv.angewendet) { if (achse === "z") az = auswerten(w.z); else ay = auswerten(w.y); }
+  const a = achse === "z" ? az : ay;
+  if (!a) throw new Error("Boden und Decke konnten nicht erkannt werden – ist das eine Raum-Punktwolke?");
+  const deckeOk = a.decke != null && a.deckeDeutlich && a.dMax >= a.bMax * 0.05 && a.decke - a.boden > 1.6;
+  // Höhenraster (10 cm): örtliche Deckenhöhe je Zelle (höchster Punkt bis zur 99,5-%-Höhe) – Grundlage für Dachschrägen:
+  // Drempel-Wände, Wandband relativ zur Dachhöhe, Flächenanteile nach § 4 WoFlV je Raum
+  const auf = achse === "z" ? w.z : w.y, zelle = 0.1, map = new Map(), belegt = new Set(), grenze = a.hi - a.boden + 0.05;
+  for (let i = 0; i < w.n; i++) {
+    const hh = auf[i] - a.boden; if (hh > grenze) continue;
+    const px = w.x[i], py = achse === "z" ? w.y[i] : -w.z[i], ix = Math.floor(px / zelle) + 32768, iy = Math.floor(py / zelle) + 32768;
+    if (ix < 0 || iy < 0 || ix > 65535 || iy > 65535) continue;
+    const k = ix * 65536 + iy; belegt.add(k);
+    if (hh < 0.3) continue;
+    const alt = map.get(k); if (alt == null || hh > alt) map.set(k, hh);
+  }
+  // Dachschräge: keine flache Decke, aber über den meisten Bodenzellen etwas Hohes, dessen Höhe räumlich stark schwankt –
+  // UND das Höhenfeld besteht in 1-m-Fenstern überwiegend aus geneigten Ebenen. Ein unvollständiger Scan (Obergrenze der App,
+  // Räume nur durch Türen gestreift) schwankt auch stark, aber regellos: Möbeloberkanten, Wandreste, Deckenfetzen.
+  let schraeg = false, ebenen = null, lokal = null;
+  // Flache Decke mit Höhendrift (iPhone über eine ganze Wohnung: die Decke „wellt“ sich um ± 10 cm, der globale Höhen-Peak
+  // verschmiert): je 1-m-Fenster die Deckenhöhe örtlich bestimmen – dann gilt die Decke als erkannt, nur eben örtlich
+  if (!deckeOk && map.size >= 200) { const l = epPwDeckeLokal(map, zelle); if (l.anteil >= 0.6 && l.glatt >= 0.8 && l.median > 1.6) lokal = l; }
+  if (!deckeOk && !lokal && map.size >= 200 && map.size >= 0.6 * belegt.size) {
+    const v = [...map.values()].sort((p, q) => p - q), med = v[v.length >> 1], p10 = v[Math.floor(v.length * 0.1)], p90 = v[Math.floor(v.length * 0.9)];
+    if (med > 1.0 && p90 - p10 > 0.6) { ebenen = epPwEbenenAnteil(map, zelle); schraeg = ebenen.geneigt >= 0.25 && ebenen.geneigt >= ebenen.regellos; }
+  }
+  const hoeheMax = epPwR(a.hi - a.boden, 2);
+  const versatz = niv && niv.angewendet ? niv.spanne : 0;
+  if (lokal) return { achse, boden: a.boden, decke: epPwR(a.boden + lokal.median, 2), hoehe: epPwR(lokal.median, 2), drift: lokal.spanne, versatz, raster: { zelle, map, hoeheMax, schraeg: false, lokal: true, decken: lokal.decken, deckeHoch: lokal.hoch, ebenen } };
+  return { achse, boden: a.boden, decke: deckeOk ? a.decke : null, hoehe: deckeOk ? epPwR(a.decke - a.boden, 2) : (schraeg ? hoeheMax : null), versatz, raster: { zelle, map, hoeheMax, schraeg, ebenen } };
+}
+
+// Fensterschlüssel (1 m × 1 m) für eine Rasterzelle ix/iy (10 cm) bzw. für Meter-Koordinaten
+function epPwFensterKey(fx, fy) { return (fx + 32768) * 65536 + (fy + 32768); }
+function epPwFensterVon(px, py) { return epPwFensterKey(Math.floor(px), Math.floor(py)); }
+
+// Decke mit Drift: je 1-m-Fenster ist die Deckenhöhe das 90-%-Quantil der Zellhöhen, wenn ≥ 30 % der Zellen innerhalb
+// ± 8 cm davon liegen (eine Schräge hat das nicht: dort liegt nur ein schmaler Streifen auf gleicher Höhe). Glatt heißt:
+// benachbarte Fenster unterscheiden sich ≤ 15 cm. Liefert decken (Fensterschlüssel → Höhe über Boden), Anteil, Glätte.
+function epPwDeckeLokal(map, zelle) {
+  const fenster = new Map();
+  map.forEach((hh, k) => {
+    const ix = Math.floor(k / 65536) - 32768, iy = (k % 65536) - 32768, fk = epPwFensterKey(Math.floor(ix * zelle), Math.floor(iy * zelle));
+    let f = fenster.get(fk); if (!f) { f = []; fenster.set(fk, f); } f.push(hh);
+  });
+  const decken = new Map(); let n = 0, ok = 0;
+  fenster.forEach((hs, fk) => {
+    if (hs.length < 30) return; n++;
+    hs.sort((p, q) => p - q); const d = hs[Math.floor(hs.length * 0.9)]; let st = 0;
+    for (const v of hs) if (Math.abs(v - d) <= 0.08) st++;
+    if (d > 1.6 && st >= 0.3 * hs.length) { ok++; decken.set(fk, d); }
+  });
+  let paare = 0, glatt = 0; const werte = [];
+  decken.forEach((d, fk) => {
+    werte.push(d); const fx = Math.floor(fk / 65536) - 32768, fy = (fk % 65536) - 32768;
+    for (const [ax, ay] of [[1, 0], [0, 1]]) { const e = decken.get(epPwFensterKey(fx + ax, fy + ay)); if (e != null) { paare++; if (Math.abs(e - d) <= 0.15) glatt++; } }
+  });
+  werte.sort((p, q) => p - q);
+  const median = werte.length ? werte[werte.length >> 1] : 0, hoch = werte.length ? werte[Math.floor(werte.length * 0.95)] : 0;
+  return { n, anteil: n ? ok / n : 0, glatt: paare ? glatt / paare : 0, decken, median, hoch, spanne: werte.length ? epPwR(werte[werte.length - 1] - werte[0], 2) : 0 };
+}
+
+// Höhenfeld in Fenstern von 10 × 10 Rasterzellen (1 m²) je als Ebene h = a·x + b·y + c ausgleichen (kleinste Quadrate).
+// geneigt: Restfehler ≤ 12 cm und Gefälle ≥ 0,3 (≈ 17°) – ein Stück Dachschräge; flach: Restfehler ≤ 12 cm, Gefälle < 0,1;
+// regellos: Restfehler > 12 cm. Liefert die Anteile an den Fenstern mit mindestens 40 belegten Zellen.
+function epPwEbenenAnteil(map, zelle) {
+  const fenster = new Map();
+  map.forEach((hh, k) => {
+    const ix = Math.floor(k / 65536) - 32768, iy = (k % 65536) - 32768, fk = Math.floor(ix / 10) * 100000 + Math.floor(iy / 10);
+    let f = fenster.get(fk); if (!f) { f = []; fenster.set(fk, f); } f.push(ix * zelle, iy * zelle, hh);
+  });
+  let n = 0, geneigt = 0, flach = 0, regellos = 0;
+  fenster.forEach((f) => {
+    const m = f.length / 3; if (m < 40) return;
+    let sx = 0, sy = 0, sh = 0; for (let i = 0; i < f.length; i += 3) { sx += f[i]; sy += f[i + 1]; sh += f[i + 2]; }
+    const mx = sx / m, my = sy / m, mh = sh / m; let sxx = 0, sxy = 0, syy = 0, sxh = 0, syh = 0;
+    for (let i = 0; i < f.length; i += 3) { const dx = f[i] - mx, dy = f[i + 1] - my, dh = f[i + 2] - mh; sxx += dx * dx; sxy += dx * dy; syy += dy * dy; sxh += dx * dh; syh += dy * dh; }
+    const det = sxx * syy - sxy * sxy; if (Math.abs(det) < 1e-9) return;
+    const a = (sxh * syy - syh * sxy) / det, b = (syh * sxx - sxh * sxy) / det;
+    let r2 = 0; for (let i = 0; i < f.length; i += 3) { const e = (f[i + 2] - mh) - a * (f[i] - mx) - b * (f[i + 1] - my); r2 += e * e; }
+    const rms = Math.sqrt(r2 / m), gef = Math.hypot(a, b); n++;
+    if (rms > 0.12) regellos++; else if (gef >= 0.3) geneigt++; else if (gef < 0.1) flach++;
+  });
+  return { n, geneigt: n ? geneigt / n : 0, flach: n ? flach / n : 0, regellos: n ? regellos / n : 0 };
+}
+
+// Flächenanteile nach § 4 WoFlV je Raum aus dem Höhenraster: ab 2 m voll, 1–2 m halb, unter 1 m nichts; Zellen ohne Dachpunkte
+// → unbekannt (die 3×3-Nachbarn füllen kleine Löcher). Raumpolygon liegt in der gedrehten Draufsicht, das Raster nicht.
+function epPwZonen(raum, h, dreh) {
+  const R = h.raster; if (!R) return null;
+  const c = Math.cos(dreh || 0), si = Math.sin(dreh || 0);
+  const poly = raum.polygon.map(([X, Y]) => [X * c - Y * si, X * si + Y * c]);
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity; poly.forEach(([x, y]) => { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); });
+  const innen = (x, y) => { let d = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const a = poly[i], b = poly[j]; if ((a[1] > y) !== (b[1] > y) && x < (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]) + a[0]) d = !d; } return d; };
+  const z = R.zelle, key = (ix, iy) => (ix + 32768) * 65536 + (iy + 32768);
+  const hoehe = (ix, iy) => { let best = R.map.get(key(ix, iy)); if (best == null) for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) { const v = R.map.get(key(ix + dx, iy + dy)); if (v != null && (best == null || v > best)) best = v; } return best; };
+  const zonen = { voll: 0, halb: 0, keine: 0, unbekannt: 0 }, f = z * z;
+  for (let ix = Math.floor(x0 / z); ix <= Math.floor(x1 / z); ix++) for (let iy = Math.floor(y0 / z); iy <= Math.floor(y1 / z); iy++) {
+    if (!innen((ix + 0.5) * z, (iy + 0.5) * z)) continue;
+    const hl = hoehe(ix, iy);
+    if (hl == null || hl < 0.3) zonen.unbekannt += f; else if (hl >= 2) zonen.voll += f; else if (hl >= 1) zonen.halb += f; else zonen.keine += f;
+  }
+  for (const k in zonen) zonen[k] = epPwR(zonen[k], 2);
+  return zonen;
+}
+
+// Netz-Wandzellen (ARKit-Klasse Wand mit Mehrheit) quer zur Wandrichtung um eine Zelle verdicken (siehe epPwZellen)
+function epPwNetzVerdicken(map, zaehl, zelle) {
+  const wand = new Set();
+  zaehl.forEach((q, k) => { if (q[0] >= 2 && q[0] >= q[1] + q[2] + q[3]) wand.add(k); });
+  if (wand.size < 50) return;
+  const zusatz = new Map(), R = 3;
+  wand.forEach((k) => {
+    const ix = Math.floor(k / 65536), iy = k % 65536;
+    let n = 0, sx = 0, sy = 0, sxx = 0, sxy = 0, syy = 0;
+    for (let dx = -R; dx <= R; dx++) for (let dy = -R; dy <= R; dy++) { if (!wand.has((ix + dx) * 65536 + (iy + dy))) continue; n++; sx += dx; sy += dy; sxx += dx * dx; sxy += dx * dy; syy += dy * dy; }
+    if (n < 4) return;
+    const mx = sx / n, my = sy / n, cxx = sxx / n - mx * mx, cxy = sxy / n - mx * my, cyy = syy / n - my * my;
+    const w = 0.5 * Math.atan2(2 * cxy, cxx - cyy);   // Wandrichtung; senkrecht dazu verdicken
+    const nx = -Math.sin(w), ny = Math.cos(w), v = map.get(k) || 0; if (!v) return;
+    const ox = Math.abs(nx) >= Math.abs(ny) ? Math.sign(nx) || 1 : 0, oy = ox ? 0 : (Math.sign(ny) || 1);
+    for (const f of [1, -1]) { const kk = (ix + f * ox) * 65536 + (iy + f * oy); zusatz.set(kk, (zusatz.get(kk) || 0) | v); }
+  });
+  zusatz.forEach((v, k) => map.set(k, (map.get(k) || 0) | v));
+}
+
+// ---------- Zellen: 2-cm-Raster der Draufsicht mit Höhenbelegung ----------
+// Je Zelle ein Bitmuster, welche Höhenschichten (ab 25 cm über dem Boden bis 10 cm unter der Decke) Punkte haben.
+// Wand = Punkte im Wandband (Standard 0,90–1,90 m) UND Anschluss nach oben (Decke) oder unten (Boden).
+// Möbel haben keinen Deckenanschluss (Schrank, Regal) oder nur die Mitte (Monitor, Stuhllehne, Pflanze, Mensch).
+function epPwZellen(w, h, bandVon, bandBis) {
+  const auf = h.achse === "z" ? w.z : w.y;
+  const R = h.raster && h.raster.schraeg ? h.raster : null;   // Dachschrägen: örtliche Dachhöhe je 10-cm-Zelle
+  const L = h.raster && h.raster.lokal ? h.raster.decken : null;   // Decke mit Drift: Deckenhöhe je 1-m-Fenster
+  let H = L ? h.raster.deckeHoch + 0.1 : h.decke != null ? h.decke - h.boden : (R ? R.hoeheMax : 0);
+  const lokalH = (px, py) => { if (!L) return null; const fx = Math.floor(px), fy = Math.floor(py); let v = L.get(epPwFensterKey(fx, fy)); if (v != null) return v;
+    for (let dx = -1; dx <= 1 && v == null; dx++) for (let dy = -1; dy <= 1; dy++) { const e = L.get(epPwFensterKey(fx + dx, fy + dy)); if (e != null && (v == null || e > v)) v = e; } return v; };
+  if (!(H > 1.6)) { const st = Math.max(1, Math.floor(w.n / 100000)), v = []; for (let i = 0; i < w.n; i += st) v.push(auf[i] - h.boden); v.sort((a, b) => a - b); H = v[Math.floor(v.length * 0.98)] || 2.5; }
+  const s0 = 0.25, s1 = Math.max(s0 + 0.6, H - 0.10);
+  const schicht = Math.max(0.1, (s1 - s0) / 31), nBins = Math.max(1, Math.min(31, Math.ceil((s1 - s0) / schicht)));
+  const zelle = 0.02, map = new Map();
+  // ARKit-Klassen je Zelle (App ab Build 25): [Wand, Tür, Fenster, Möbel] – nur Punkte im Wandband zählen: Brüstung und
+  // Sturz sind Wand, entscheidend ist, was in Wandhöhe steht (Türblatt, Jalousie, Schrank oder eben Wand)
+  const K = w.klassen || null, zaehl = K ? new Map() : null;
+  // Deckenkante: Punkte 3–12 cm unter der Decke – eine Wand reicht bis zur Decke, ein hoher Schrank meist nicht
+  const kanten = new Map(), mitDecke = h.decke != null;
+  // Boden-Decken-Abgleich (02.10.2026): Bodenpunkte (±12 cm) und Deckenpunkte (15 cm unter bis 12 cm über der örtlichen Decke)
+  // als Draufsicht-Koordinaten mitnehmen – damit lässt sich je Wandkandidat prüfen, ob dahinter die Decke weiterläuft (Möbel)
+  const bdSchritt = Math.max(1, Math.floor(w.n / 600000)), bodenPts = [], deckePts = [], mitDeckeBD = mitDecke || !!R || !!L;
+  for (let i = 0; i < w.n; i++) {
+    const hh = auf[i] - h.boden;
+    const HD = L ? (lokalH(w.x[i], h.achse === "z" ? w.y[i] : -w.z[i]) || H) : H;
+    if (mitDeckeBD && i % bdSchritt === 0) {
+      if (hh > -0.12 && hh < 0.12) bodenPts.push(w.x[i], h.achse === "z" ? w.y[i] : -w.z[i]);
+      else if (hh > 0.6) { let HR = HD; if (R) { const px = w.x[i], py = h.achse === "z" ? w.y[i] : -w.z[i]; const hl = R.map.get((Math.floor(px / R.zelle) + 32768) * 65536 + (Math.floor(py / R.zelle) + 32768)); HR = hl != null && hl >= 0.6 ? hl : null; }
+        if (HR != null && hh >= HR - 0.15 && hh < HR + 0.12) deckePts.push(w.x[i], h.achse === "z" ? w.y[i] : -w.z[i]); }
+    }
+    if (mitDecke && hh >= HD - 0.12 && hh < HD - 0.03) {
+      const px0 = w.x[i], py0 = h.achse === "z" ? w.y[i] : -w.z[i], ix0 = Math.round(px0 / zelle) + 32768, iy0 = Math.round(py0 / zelle) + 32768;
+      if (ix0 >= 0 && iy0 >= 0 && ix0 <= 65535 && iy0 <= 65535) { const k0 = ix0 * 65536 + iy0; kanten.set(k0, (kanten.get(k0) || 0) + 1); }
+    }
+    if (hh < s0 || hh >= s1) continue;
+    const px = w.x[i], py = h.achse === "z" ? w.y[i] : -w.z[i];
+    const ix = Math.round(px / zelle) + 32768, iy = Math.round(py / zelle) + 32768;
+    if (ix < 0 || iy < 0 || ix > 65535 || iy > 65535) continue;
+    const k = ix * 65536 + iy, b = Math.min(nBins - 1, Math.floor((hh - s0) / schicht));
+    map.set(k, (map.get(k) || 0) | (1 << b));
+    if (K && hh >= bandVon && hh < bandBis) { const kl = K[i]; if (kl === 1 || kl === 7 || kl === 6 || kl === 4 || kl === 5) { let q = zaehl.get(k); if (!q) { q = [0, 0, 0, 0]; zaehl.set(k, q); } if (kl === 1) q[0]++; else if (kl === 7) q[1]++; else if (kl === 6) q[2]++; else q[3]++; } }
+  }
+  const maske = (von, bis) => { let m = 0; for (let b = 0; b < nBins; b++) { const lo = s0 + b * schicht, hi = lo + schicht; if (hi > von && lo < bis) m |= (1 << b); } return m; };
+  const ohneDecke = h.decke == null && !R;   // keine verlässliche Decke erfasst → Wand = Mitte + Bodenanschluss (Möbel können durchrutschen)
+  const mB = maske(s0, 0.85), mM = maske(bandVon, bandBis), mT = ohneDecke ? 0 : maske(s1 - 0.30, s1);   // Decke: oberste 30 cm – Türblätter (2,0 m) und Schränke reichen nicht hin
+  const pop = (v) => { v = v - ((v >>> 1) & 0x55555555); v = (v & 0x33333333) + ((v >>> 2) & 0x33333333); return (((v + (v >>> 4)) & 0x0F0F0F0F) * 0x01010101) >>> 24; };
+  const nM = pop(mM), mindestens = Math.max(2, Math.ceil(nM * 0.5));
+  // Dachschrägen: Wandband relativ zur örtlichen Dachhöhe; statt Deckenanschluss zählt Lückenlosigkeit – eine Wand ist vom
+  // Boden bis knapp unter die Schräge durchgehend belegt (≥ 80 % der Schichten), ein Sofa oder eine Kommode hat eine Lücke zum Dach
+  const relCache = new Map();
+  const rel = (hl) => { const key = Math.round(hl * 20); let c = relCache.get(key); if (!c) { const hr = key / 20, von = Math.min(bandVon, 0.35 * hr), bis = Math.min(bandBis, Math.max(von + 0.2, 0.75 * hr)), mm = maske(von, bis), mk = maske(s0, hr - 0.05); c = { mM: mm, mK: mk, nK: Math.max(1, pop(mk)), mind: Math.max(1, Math.ceil(pop(mm) * 0.5)) }; relCache.set(key, c); } return c; };
+  // 1 = Wand (Mitte + Decke), 4 = hoch ohne Decke (Schrank, Türblatt, Mensch), 2 = Brüstung (nur unten), 3 = Sturz (nur oben), 0 = sonst
+  const xs = [], ys = [], klasse = [], keys = [], mitBoden = [], oeffnung = [], kante = [];
+  // Netz-Wände quer zur Wandrichtung verdicken: eine ARKit-Netzwand ist nur eine dünne, leicht geneigte Fläche – in einer
+  // einzelnen 2-cm-Spalte liegt dann nur der obere oder der untere Teil der Wand (Zelle würde „Sturz“ oder „Brüstung“).
+  // Zellen mit ARKit-Wandpunkten geben ihre Höhenschichten an die beiden Nachbarzellen senkrecht zur örtlichen Wandrichtung
+  // weiter (Richtung aus den Wandzellen im Umkreis von 6 cm). Entlang der Wand passiert nichts – Türen und Fenster bleiben
+  // zellgenau; Fenster-, Tür- und Möbelpunkte werden nicht verdickt.
+  if (zaehl) epPwNetzVerdicken(map, zaehl, zelle);
+  map.forEach((v, k) => {
+    let mMk = mM, mind = mindestens, deckeHier = !ohneDecke, schraegZelle = null, mTk = mT, mTu = 0;
+    if (R) {
+      const px = (Math.floor(k / 65536) - 32768) * zelle, py = (k % 65536 - 32768) * zelle;
+      const hl = R.map.get((Math.floor(px / R.zelle) + 32768) * 65536 + (Math.floor(py / R.zelle) + 32768));
+      if (hl != null && hl >= 0.6) { schraegZelle = rel(hl); mMk = schraegZelle.mM; mind = schraegZelle.mind; } else deckeHier = false;
+    } else if (L) {
+      const hl = lokalH((Math.floor(k / 65536) - 32768) * zelle, (k % 65536 - 32768) * zelle);
+      if (hl != null) { mTk = maske(hl - 0.30, hl + 0.02); mTu = maske(hl - 0.30, hl - 0.18); } else deckeHier = false;   // Deckenanschluss: oberste 30 cm unter der örtlichen Decke; Sturz braucht Punkte deutlich (≥ 1 Schicht) unter der Decke
+    }
+    const m = pop(v & mMk), t = pop(v & mTk), b = pop(v & mB);
+    let kl = 0;
+    if (m >= mind) kl = (schraegZelle ? (b > 0 && pop(v & schraegZelle.mK) >= 0.8 * schraegZelle.nK) : (deckeHier ? t > 0 : b > 0)) ? 1 : 4;
+    else if (m <= 1 && b >= 2) kl = 2;
+    else if (m <= 1 && t > 0 && b === 0 && (!L || pop(v & mTu) > 0)) kl = 3;   // mit Drift-Decke: Punkte nur in den obersten 10 cm sind die Decke selbst, kein Sturz
+    // ARKit-Klassen: „hoch ohne Decke“ mit klarer Wandmehrheit ist doch Wand (Decke nicht erfasst); Möbelmehrheit ist keine Wand;
+    // Tür-/Fensterzellen merken (geschlossene Türen im Blatt, Fensterrahmen) – die Öffnungssuche zählt sie je Lücke
+    let oe = 0;
+    if (zaehl) {
+      const q = zaehl.get(k);
+      if (q) {
+        const ges = q[0] + q[1] + q[2] + q[3], oeffn = q[1] + q[2];
+        if (kl === 1 && oeffn >= 3 && oeffn >= 0.5 * (q[0] + oeffn)) kl = 4;        // Tür-/Fensterfläche in der Wandebene (geschlossene Tür, Jalousie): keine Wand
+        else if (kl === 4 && q[0] >= 3 && q[0] >= 0.6 * ges) kl = 1;
+        else if (kl === 1 && q[3] >= 3 && q[3] > 2 * q[0]) kl = 4;
+        if (q[1] >= 2 && q[1] >= q[2]) oe = 7; else if (q[2] >= 2) oe = 6;
+      }
+    }
+    xs.push((Math.floor(k / 65536) - 32768) * zelle); ys.push((k % 65536 - 32768) * zelle); klasse.push(kl); keys.push(k); mitBoden.push(b > 0 ? 1 : 0); oeffnung.push(oe); kante.push((kanten.get(k) || 0) >= 2 ? 1 : 0);
+  });
+  let hinweis = ohneDecke ? "Die Decke ist kaum erfasst – Wände wurden über den Bodenanschluss bestimmt; Schränke und Türblätter können als Wände erscheinen. Beim nächsten Scan die Decke mit aufnehmen."
+    : R ? `Dachschrägen erkannt (Raumhöhe bis ${String(epPwR(H, 2)).replace(".", ",")} m) – Wände mit Anschluss an die örtliche Dachhöhe (Drempel ab 0,6 m), Flächenanteile nach § 4 WoFlV je Raum aus dem Höhenraster.`
+    : L ? `Decke mit Höhendrift (${Math.round((h.drift || 0) * 100)} cm über die Wohnung) – Deckenanschluss je 1-m-Fenster örtlich geprüft, Raumhöhe im Mittel ${String(h.hoehe).replace(".", ",")} m.` : "";
+  if (!ohneDecke && klasse.filter((k) => k === 1).length < 100) {   // Decke zwar da, aber kaum Wandzellen → ebenfalls Bodenanschluss zulassen
+    for (let i = 0; i < klasse.length; i++) if (klasse[i] === 4 && mitBoden[i]) klasse[i] = 1;
+    hinweis = "Nur wenige Wände reichen bis zur erfassten Decke – Wände wurden auch über den Bodenanschluss bestimmt; Schränke und Türblätter können als Wände erscheinen.";
+  }
+  if (h.versatz) hinweis = `Höhenversatz im Scan ausgeglichen (der Boden lag je nach Bereich bis ${Math.round(h.versatz * 100)} cm auseinander – ${h.versatz > 0.4 ? "Tracking-Sprung" : "Drift"} beim Scannen). ` + hinweis;
+  const wandKeys = new Set(); for (let i = 0; i < klasse.length; i++) if (klasse[i] === 1) wandKeys.add(keys[i]);
+  return { x: Float64Array.from(xs), y: Float64Array.from(ys), klasse: Uint8Array.from(klasse), oeffnung: zaehl ? Uint8Array.from(oeffnung) : null, mitKlassen: !!K,
+    kante: ohneDecke ? null : Uint8Array.from(kante), keys: Float64Array.from(keys), ohneDecke, zelle, hoehe: H, wandZellen: wandKeys.size, wandKeys, hinweis,
+    boden: mitDeckeBD && bodenPts.length >= 400 ? Float64Array.from(bodenPts) : null, decke: mitDeckeBD && deckePts.length >= 400 ? Float64Array.from(deckePts) : null };
+}
+
+// Hauptrichtung des Gebäudes: Drehwinkel, bei dem die Wandzellen in möglichst wenige Spalten/Zeilen fallen
+function epPwHauptrichtung(z) {
+  const idx = []; for (let i = 0; i < z.klasse.length; i++) if (z.klasse[i] === 1) idx.push(i);
+  if (idx.length < 50) return 0;
+  const st = Math.max(1, Math.ceil(idx.length / 40000)), probe = idx.filter((_, i) => i % st === 0);
+  const score = (th) => {
+    const c = Math.cos(th), si = Math.sin(th), hx = new Map(), hy = new Map(); let sum = 0;
+    for (const i of probe) { const x = z.x[i] * c + z.y[i] * si, y = -z.x[i] * si + z.y[i] * c; const kx = Math.round(x / 0.02), ky = Math.round(y / 0.02); hx.set(kx, (hx.get(kx) || 0) + 1); hy.set(ky, (hy.get(ky) || 0) + 1); }
+    hx.forEach((v) => { sum += v * v; }); hy.forEach((v) => { sum += v * v; }); return sum;
+  };
+  let best = 0, bs = -1;
+  for (let g = 0; g < 90; g++) { const th = g * Math.PI / 180, sc = score(th); if (sc > bs) { bs = sc; best = th; } }
+  const grob = best;
+  for (let d = -0.9; d <= 0.95; d += 0.1) { const th = grob + d * Math.PI / 180, sc = score(th); if (sc > bs) { bs = sc; best = th; } }
+  return best;
+}
+
+// Stücke derselben Wandfläche (gleiche Achse, ≤ 15 cm versetzt, überlappend oder ≤ 30 cm Abstand) zu einer Wand verschmelzen –
+// Drift lässt eine Wand in mehreren Spalten erscheinen. Lage = nach Punkten gewichtetes Mittel; Lücken der Stücke bleiben.
+function epPwZusammenlegen(liste) {
+  let waende = liste.map((w) => Object.assign({}, w, { luecken: w.luecken.map((l) => l.slice()) }));
+  let geaendert = true;
+  while (geaendert) {
+    geaendert = false;
+    aussen: for (let i = 0; i < waende.length; i++) for (let j = i + 1; j < waende.length; j++) {
+      const a = waende[i], b = waende[j];
+      if (a.achse !== b.achse || Math.abs(a.pos - b.pos) > 0.125) continue;
+      const ueber = Math.min(a.t1, b.t1) - Math.max(a.t0, b.t0);
+      if (ueber < -0.3) continue;
+      const n = a.punkte + b.punkte, neu = { achse: a.achse, pos: (a.pos * a.punkte + b.pos * b.punkte) / n, t0: Math.min(a.t0, b.t0), t1: Math.max(a.t1, b.t1), punkte: n, luecken: [] };
+      // belegte Abschnitte beider Stücke vereinigen; Lücken sind, was dazwischen frei bleibt
+      const abschnitte = [];
+      for (const w of [a, b]) { let von = w.t0; for (const [u, v] of w.luecken.slice().sort((x, y) => x[0] - y[0])) { if (u > von) abschnitte.push([von, u]); von = Math.max(von, v); } if (w.t1 > von) abschnitte.push([von, w.t1]); }
+      abschnitte.sort((x, y) => x[0] - y[0]);
+      const vereint = []; for (const [u, v] of abschnitte) { const l = vereint[vereint.length - 1]; if (l && u <= l[1] + 0.01) l[1] = Math.max(l[1], v); else vereint.push([u, v]); }
+      for (let k = 0; k + 1 < vereint.length; k++) if (vereint[k + 1][0] - vereint[k][1] > 0.01) neu.luecken.push([vereint[k][1], vereint[k + 1][0]]);
+      waende.splice(j, 1); waende.splice(i, 1, neu); geaendert = true; break aussen;
+    }
+  }
+  return waende;
+}
+
+// Wände entlang der Hauptachsen: Häufung der Wandzellen quer zur Achse (2-cm-Klassen) → Linie; entlang der Linie
+// Läufe von Wandzellen (Lücke ≤ 35 cm, ≥ 55 % belegt, ≥ 50 cm) → Wand; Läufe mit Lücke ≤ 2,5 m werden eine Wand mit Öffnung.
+// Feinlage aus den Rohpunkten des Wandbands (Median ±4 cm, dann Mittel ±2,5 cm).
+function epPwAchsenWaende(z, band, o) {
+  const waende = [];
+  const suche = (achse) => {
+    const P = achse === "x" ? z.x : z.y, Q = achse === "x" ? z.y : z.x;
+    let lo = Infinity, hi = -Infinity;
+    for (let i = 0; i < P.length; i++) if (z.klasse[i] === 1) { if (P[i] < lo) lo = P[i]; if (P[i] > hi) hi = P[i]; }
+    if (!(hi > lo)) return;
+    const bin = 0.02, n = Math.ceil((hi - lo) / bin) + 5, hist = new Float64Array(n);
+    for (let i = 0; i < P.length; i++) if (z.klasse[i] === 1) hist[Math.round((P[i] - lo) / bin) + 2]++;
+    // Glättung über ±4 Klassen (18 cm): echte Wände liegen durch Drift als Band von 5–15 cm Breite vor
+    const gl = new Float64Array(n); for (let i = 4; i < n - 4; i++) for (let k = -4; k <= 4; k++) gl[i] += hist[i + k];
+    const peaks = [];
+    for (let i = 4; i < n - 4; i++) if (gl[i] >= o.minPeak && gl[i] >= gl[i - 1] && gl[i] >= gl[i + 1] && gl[i] >= gl[i - 2] && gl[i] >= gl[i + 2] && gl[i] >= gl[i - 3] && gl[i] >= gl[i + 3]) peaks.push(i);
+    peaks.sort((a, b) => gl[b] - gl[a]);
+    const genommen = []; for (const p of peaks) if (!genommen.some((q) => Math.abs(q - p) <= 5)) genommen.push(p);   // zwei Wandflächen erst ab 10 cm Abstand getrennt
+    // Doppelgipfel: die beiden Flächen einer 15–20 cm dicken Innenwand fallen bei ±4 Glättung in einen Gipfel – im fein
+    // geglätteten Histogramm (±1) zeigen sie sich als zwei Maxima ≥ 7 Klassen (14 cm) auseinander mit einem Tal (≤ 50 %) dazwischen.
+    // Dann bekommt jede Fläche ihre eigene Wand (Zellen bis zur Mitte zwischen beiden); Drift-Lagen ohne Tal bleiben eine Wand.
+    const g1 = new Float64Array(n); for (let i = 1; i < n - 1; i++) g1[i] = hist[i - 1] + hist[i] + hist[i + 1];
+    const zentren = [];
+    for (const p of genommen) {
+      const kand = [];
+      for (let i = Math.max(2, p - 7); i <= Math.min(n - 3, p + 7); i++) if (g1[i] >= o.minPeak / 4 && g1[i] >= g1[i - 1] && g1[i] >= g1[i + 1] && g1[i] >= g1[i - 2] && g1[i] >= g1[i + 2]) kand.push(i);
+      kand.sort((a, b) => g1[b] - g1[a]);
+      let geteilt = null;
+      for (let u = 0; u < kand.length && !geteilt; u++) for (let v = u + 1; v < kand.length && !geteilt; v++) {
+        const a = Math.min(kand[u], kand[v]), b = Math.max(kand[u], kand[v]); if (b - a < 7) continue;
+        let tal = Infinity; for (let j = a + 1; j < b; j++) tal = Math.min(tal, g1[j]);
+        if (tal <= 0.5 * Math.min(g1[a], g1[b])) geteilt = [a, b];
+      }
+      if (geteilt) { const halb = Math.min(o.breite, (geteilt[1] - geteilt[0]) * bin / 2 - 0.01); zentren.push([geteilt[0], halb], [geteilt[1], halb]); }
+      else zentren.push([p, o.breite]);
+    }
+    for (const [p, breite] of zentren) {
+      const p0 = lo + (p - 2) * bin, wandIdx = [];
+      for (let i = 0; i < P.length; i++) if (z.klasse[i] === 1 && Math.abs(P[i] - p0) <= breite) wandIdx.push(i);
+      if (wandIdx.length < o.minPeak) continue;
+      const sortiert = wandIdx.map((i) => P[i]).sort((a, b) => a - b), pm = sortiert[sortiert.length >> 1];   // Median: unempfindlich gegen Ausreißer
+      const ts = wandIdx.map((i) => Q[i]).sort((a, b) => a - b);
+      const laeufe = []; let st = [ts[0]];
+      for (let j = 1; j < ts.length; j++) { if (ts[j] - ts[j - 1] > o.luecke) { laeufe.push(st); st = []; } st.push(ts[j]); }
+      laeufe.push(st);
+      const gut = laeufe.filter((l) => { const L = l[l.length - 1] - l[0]; if (L < o.minLaenge) return false; const belegt = new Set(l.map((t) => Math.floor(t / 0.05))); return belegt.size >= o.deckung * (L / 0.05); })
+        .map((l) => ({ a: l[0] - z.zelle / 2, b: l[l.length - 1] + z.zelle / 2, n: l.length }));
+      let w = null;
+      const start = waende.length;
+      const fertig = () => { if (w) waende.push(w); w = null; };
+      for (const g of gut) {
+        if (w && g.a - w.t1 <= o.brueckeMax) { if (g.a - w.t1 > o.stumm) w.luecken.push([w.t1, g.a]); w.t1 = g.b; w.punkte += g.n; }
+        else { fertig(); w = { achse, pos: pm, t0: g.a, t1: g.b, luecken: [], punkte: g.n }; }
+      }
+      fertig();
+      // Sturz-Lücken: Abschnitte ≥ 0,6 m, in denen auf der Wandlinie Sturz- und Brüstungszellen (nur oben / nur unten) klar
+      // über den Wandzellen liegen → Tür oder Fenster, auch wenn ein angelehntes Türblatt oder Rahmen einzelne Wandzellen liefert
+      for (let j = start; j < waende.length; j++) {
+        const wd = waende[j], bins = new Map();
+        for (let i = 0; i < P.length; i++) { if (Math.abs(P[i] - wd.pos) > o.breite) continue; const t = Q[i]; if (t < wd.t0 || t > wd.t1) continue; const b = Math.floor(t / 0.1); let c = bins.get(b); if (!c) { c = [0, 0, 0, 0, 0]; bins.set(b, c); } c[z.klasse[i]]++; }
+        const keys = [...bins.keys()].sort((a, b) => a - b), neu = [];
+        let a = null, prev = null;
+        const schliesse = () => { if (a != null && prev - a + 1 >= 6) neu.push([a * 0.1, (prev + 1) * 0.1]); a = null; };
+        for (const b of keys) { const c = bins.get(b), offen = c[2] + c[3] >= 2 * c[1] + 2 && c[1] <= 6; if (offen) { if (a == null || b !== prev + 1) { schliesse(); a = b; } prev = b; } else schliesse(); }
+        schliesse();
+        for (const l of neu) if (!wd.luecken.some(([u, v]) => Math.min(v, l[1]) - Math.max(u, l[0]) > 0.3)) wd.luecken.push(l);
+        wd.luecken.sort((x, y) => x[0] - y[0]);
+      }
+    }
+  };
+  suche("x"); suche("y");
+  return epPwZusammenlegen(waende).map((w) => {
+    const l = { p: w.achse === "x" ? { x: w.pos, y: 0 } : { x: 0, y: w.pos }, d: w.achse === "x" ? { x: 0, y: 1 } : { x: 1, y: 0 }, t0: w.t0, t1: w.t1, luecken: w.luecken, punkte: w.punkte, rms: 0.01, achse: w.achse };
+    const res = [];
+    for (let i = 0; i < band.length; i += 2) { const dd = epPwAbst(band, i / 2, l); if (Math.abs(dd) > 0.04) continue; const t = epPwT(band, i / 2, l); if (t >= l.t0 && t <= l.t1) res.push(dd); }
+    if (res.length >= 20) {
+      res.sort((a, b) => a - b); const med = res[res.length >> 1], nah = res.filter((r) => Math.abs(r - med) <= 0.025);
+      if (nah.length >= 10) { const m = nah.reduce((a, b) => a + b, 0) / nah.length; l.p = { x: l.p.x - l.d.y * m, y: l.p.y + l.d.x * m }; let v = 0; for (const r of nah) v += (r - m) * (r - m); l.rms = Math.sqrt(v / nah.length); }
+    }
+    return l;
+  });
+}
+
+// Schräg laufende Wände (2,5°–15° neben der Achse): die Achsensuche zerlegt sie in Treppenstufen von ~1 m (so weit, wie
+// die Wand im 10-cm-Streifen bleibt) oder zieht sie gerade. Je Achsen-Wand werden ihre Wandzellen (Streifen ± 10 cm) als
+// Ausgleichsgerade (PCA) geprüft: läuft die Gerade ≥ 2,5° gegen die Achse, passt sie deutlich besser (RMS ≤ 60 % der
+// Achsenstreuung, ≤ 3 cm) und ist das Stück ≥ 1 m lang, läuft die Wand schräg. Gleichlinige Schrägstücke (≤ 1,5°,
+// ≤ 8 cm daneben, Lücke ≤ 60 cm) werden zu einer Wand verbunden; die Lücke bleibt als Öffnung erhalten.
+function epPwSchraegNachziehen(z, waende) {
+  const pts = []; const idxAlle = [];
+  for (let i = 0; i < z.x.length; i++) if (z.klasse[i] === 1) { idxAlle.push(pts.length / 2); pts.push(z.x[i], z.y[i]); }
+  if (idxAlle.length < 40) return waende;
+  const zellenVon = (w, breite) => idxAlle.filter((i) => { const d = epPwAbst(pts, i, w), t = epPwT(pts, i, w); return Math.abs(d) <= breite && t >= w.t0 - 0.05 && t <= w.t1 + 0.05; });
+  const rmsZu = (idx, l) => { let s = 0; for (const i of idx) { const r = epPwAbst(pts, i, l); s += r * r; } return Math.sqrt(s / Math.max(1, idx.length)); };
+  // robuste Ausgleichsgerade: Zellen der Querwände an den Enden (im ± 10-cm-Streifen) fliegen als Ausreißer raus (2 Runden)
+  const robust = (idx) => { let l = epPwLinie(pts, idx), nutz = idx; for (let r = 0; r < 2; r++) { const rms = rmsZu(nutz, l), grenze = Math.max(0.03, 2.5 * rms); const neu = nutz.filter((i) => Math.abs(epPwAbst(pts, i, l)) <= grenze); if (neu.length < 40 || neu.length === nutz.length) break; nutz = neu; l = epPwLinie(pts, nutz); } return { l, idx: nutz }; };
+  const umlegen = (w, l, idx) => {   // Wand w auf die Linie l legen: Lage, Richtung, Enden, Lücken
+    if (l.d.x * w.d.x + l.d.y * w.d.y < 0) { l.d.x = -l.d.x; l.d.y = -l.d.y; }
+    // alle Wandzellen entlang der neuen Linie einsammeln (± 6 cm) – die Stufenstreifen (± 10 cm um die Achsenlage) lassen
+    // zwischen zwei Stufen ein Stück der schrägen Wand aus; Lücken neu aus den Zellen (Abstand > 30 cm): Tür/Fenster bleiben
+    let tMin = Infinity, tMax = -Infinity; for (const i of idx) { const t = epPwT(pts, i, l); if (t < tMin) tMin = t; if (t > tMax) tMax = t; }
+    idx = idxAlle.filter((i) => Math.abs(epPwAbst(pts, i, l)) <= 0.06 && epPwT(pts, i, l) >= tMin - 0.1 && epPwT(pts, i, l) <= tMax + 0.1);
+    const ts = idx.map((i) => epPwT(pts, i, l)).sort((a, b) => a - b), luecken = [];
+    for (let j = 1; j < ts.length; j++) if (ts[j] - ts[j - 1] > 0.3) luecken.push([ts[j - 1] + z.zelle / 2, ts[j] - z.zelle / 2]);
+    w.p = l.p; w.d = l.d; w.t0 = ts[0] - z.zelle / 2; w.t1 = ts[ts.length - 1] + z.zelle / 2; w.luecken = luecken; w.idx = idx; w.punkte = idx.length; w.rms = rmsZu(idx, l); w.schraeg = true; delete w.achse;
+  };
+  waende.forEach((w) => {
+    if (w.synthetisch || w.t1 - w.t0 < 1.0) return;
+    const alle = zellenVon(w, 0.10); if (alle.length < 40) return;
+    const { l, idx } = robust(alle);
+    const dev = Math.asin(Math.min(1, Math.abs(w.d.x * l.d.y - w.d.y * l.d.x))) * 180 / Math.PI;
+    if (dev < 2.5 || dev > 15) return;
+    const rmsAchse = rmsZu(idx, w), rmsNeu = rmsZu(idx, l);
+    if (!(rmsNeu <= 0.6 * rmsAchse && rmsNeu <= 0.03)) return;
+    umlegen(w, l, idx);
+  });
+  // gleichlinige Schrägstücke verbinden
+  let geaendert = true;
+  while (geaendert) {
+    geaendert = false;
+    aussen: for (let i = 0; i < waende.length; i++) {
+      const a = waende[i]; if (!a.schraeg) continue;
+      for (let j = i + 1; j < waende.length; j++) {
+        const b = waende[j]; if (!b.schraeg) continue;
+        if (Math.abs(a.d.x * b.d.y - a.d.y * b.d.x) > Math.sin(3 * Math.PI / 180)) continue;   // Stufen derselben Wand: Winkel streuen um 1–3°
+        const mb = { x: b.p.x + b.d.x * (b.t0 + b.t1) / 2, y: b.p.y + b.d.y * (b.t0 + b.t1) / 2 };
+        if (Math.abs((mb.x - a.p.x) * -a.d.y + (mb.y - a.p.y) * a.d.x) > 0.12) continue;
+        const tp = (q) => (q.x - a.p.x) * a.d.x + (q.y - a.p.y) * a.d.y;
+        const b0 = tp({ x: b.p.x + b.d.x * b.t0, y: b.p.y + b.d.y * b.t0 }), b1 = tp({ x: b.p.x + b.d.x * b.t1, y: b.p.y + b.d.y * b.t1 });
+        const lo = Math.min(b0, b1), hi = Math.max(b0, b1), luecke = Math.max(a.t0, lo) - Math.min(a.t1, hi);
+        if (luecke > 0.6) continue;
+        const { l, idx } = robust(a.idx.concat(b.idx));
+        umlegen(a, l, idx);
+        waende.splice(j, 1); geaendert = true; break aussen;
+      }
+    }
+  }
+  return waende;
+}
+
+// Restsuche (schräge Wände): RANSAC auf den Wandzellen, die keine Achsen-Wand erklärt – streng (≥ 1 m, 70 % belegt)
+function epPwRestWaende(pts, opt) {
+  const o = Object.assign({ tol: 0.02, minPunkte: 60, minLaenge: 1.0, luecke: 0.3, brueckeMax: 2.5, iter: 300, maxWaende: 12, deckung: 0.7 }, opt || {});
+  const N = pts.length / 2, zufall = epPwZufall(4711);
+  let rest = new Int32Array(N); for (let i = 0; i < N; i++) rest[i] = i;
+  const waende = [];
+  while (rest.length >= o.minPunkte && waende.length < o.maxWaende) {
+    // Raster für die Nachbarsuche
+    const zelle = 0.5, gitter = new Map(), key = (x, y) => Math.floor(x / zelle) * 100003 + Math.floor(y / zelle);
+    for (const i of rest) { const k = key(pts[2 * i], pts[2 * i + 1]); let a = gitter.get(k); if (!a) gitter.set(k, a = []); a.push(i); }
+    const probe = []; const pz = Math.min(rest.length, 4000);
+    for (let j = 0; j < pz; j++) probe.push(rest[Math.floor(zufall() * rest.length)]);
+    let beste = null, besteZahl = 0;
+    for (let it = 0; it < o.iter; it++) {
+      const a = rest[Math.floor(zufall() * rest.length)], ax = pts[2 * a], ay = pts[2 * a + 1];
+      let b = -1;
+      for (let v = 0; v < 12 && b < 0; v++) {
+        const k = key(ax + (zufall() * 2 - 1) * 0.8, ay + (zufall() * 2 - 1) * 0.8), z = gitter.get(k);
+        if (!z) continue; const c = z[Math.floor(zufall() * z.length)];
+        const dd = Math.hypot(pts[2 * c] - ax, pts[2 * c + 1] - ay); if (dd >= 0.25 && dd <= 1.0) b = c;
+      }
+      if (b < 0) continue;
+      const L = Math.hypot(pts[2 * b] - ax, pts[2 * b + 1] - ay), l = { p: { x: ax, y: ay }, d: { x: (pts[2 * b] - ax) / L, y: (pts[2 * b + 1] - ay) / L } };
+      let zahl = 0; for (const i of probe) if (Math.abs(epPwAbst(pts, i, l)) < o.tol) zahl++;
+      if (zahl > besteZahl) { besteZahl = zahl; beste = l; }
+    }
+    if (!beste) break;
+    let inl = rest.filter((i) => Math.abs(epPwAbst(pts, i, beste)) < 0.03);
+    if (inl.length < o.minPunkte) break;
+    let lin = epPwLinie(pts, inl);
+    inl = rest.filter((i) => Math.abs(epPwAbst(pts, i, lin)) < 0.015);
+    if (inl.length < o.minPunkte) { rest = rest.filter((i) => Math.abs(epPwAbst(pts, i, beste)) >= 0.03); continue; }
+    lin = epPwLinie(pts, inl);
+    const alle = Array.from(rest.filter((i) => Math.abs(epPwAbst(pts, i, lin)) < o.tol));   // echtes Array: .map liefert Paare
+    // entlang der Linie in Stücke teilen (Lücke > 25 cm)
+    const ts = alle.map((i) => [epPwT(pts, i, lin), i]).sort((a, b) => a[0] - b[0]);
+    const stuecke = []; let st = [ts[0]];
+    for (let j = 1; j < ts.length; j++) { if (ts[j][0] - ts[j - 1][0] > o.luecke) { stuecke.push(st); st = []; } st.push(ts[j]); }
+    stuecke.push(st);
+    const gut = stuecke.filter((s) => { const L = s[s.length - 1][0] - s[0][0]; if (s.length < 25 || L < o.minLaenge) return false; const belegt = new Set(s.map((q) => Math.floor(q[0] / 0.1))); return belegt.size >= o.deckung * (L / 0.1); });
+    // gleichlinige Stücke über Lücken bis 2,5 m zu einer Wand verbinden, die Lücken merken (Tür/Fenster)
+    let w = null;
+    const fertig = () => { if (w && w.t1 - w.t0 >= o.minLaenge) waende.push(w); w = null; };
+    for (const s of gut) {
+      const a0 = s[0][0], a1 = s[s.length - 1][0];
+      if (w && a0 - w.t1 <= o.brueckeMax) { if (a0 - w.t1 > o.luecke) w.luecken.push([w.t1, a0]); w.t1 = a1; s.forEach((q) => w.idx.push(q[1])); }
+      else { fertig(); w = { lin, t0: a0, t1: a1, idx: s.map((q) => q[1]), luecken: [] }; }
+    }
+    fertig();
+    const weg = new Set(alle);
+    rest = rest.filter((i) => !weg.has(i));
+  }
+  // Feinausgleich je Wand, Streuung
+  waende.forEach((w) => {
+    const l = epPwLinie(pts, w.idx);
+    if (l.d.x * w.lin.d.x + l.d.y * w.lin.d.y < 0) { l.d.x = -l.d.x; l.d.y = -l.d.y; }
+    const a = { x: w.lin.p.x + w.lin.d.x * w.t0, y: w.lin.p.y + w.lin.d.y * w.t0 }, b = { x: w.lin.p.x + w.lin.d.x * w.t1, y: w.lin.p.y + w.lin.d.y * w.t1 };
+    const tp = (q) => (q.x - l.p.x) * l.d.x + (q.y - l.p.y) * l.d.y;
+    w.luecken = w.luecken.map(([u, v]) => { const pu = { x: w.lin.p.x + w.lin.d.x * u, y: w.lin.p.y + w.lin.d.y * u }, pv = { x: w.lin.p.x + w.lin.d.x * v, y: w.lin.p.y + w.lin.d.y * v }; return [tp(pu), tp(pv)]; });
+    w.p = l.p; w.d = l.d; w.t0 = tp(a); w.t1 = tp(b);
+    let s = 0; for (const i of w.idx) { const r = epPwAbst(pts, i, w); s += r * r; } w.rms = Math.sqrt(s / w.idx.length);
+    w.punkte = w.idx.length;
+  });
+  return waende;
+}
+
+// rechte Winkel (bis grad°), dann Ecken schließen:
+//  1. nächster Schnittpunkt mit einer Querwand bis 60 cm (T-Stoß oder Ecke); endet die Querwand genau dort (L-Ecke) und
+//     steht geradeaus bis 60 cm weiter eine andere Querwand, läuft die Wand bis dorthin (Stirnseite einer dicken Wand);
+//  2. Versprung: gleich gerichtete Wand 12–60 cm daneben, deren Ende hier anschließt → kurzes Verbindungsstück;
+//  3. freies Ende bis 1,5 m vor einer Querwand → verlängern, das Stück wird eine Lücke (Durchgang/Tür).
+function epPwOrdnen(waende, grad) {
+  const g = (grad == null ? 2 : grad) * Math.PI / 180;
+  // Hauptrichtung aus den achsnahen Wänden – schräg laufende Wände (epPwSchraegNachziehen) dürfen sie nicht verdrehen
+  let sx = 0, sy = 0; waende.forEach((w) => { if (w.schraeg) return; const a = Math.atan2(w.d.y, w.d.x), L = w.t1 - w.t0; sx += L * Math.cos(4 * a); sy += L * Math.sin(4 * a); });
+  if (sx === 0 && sy === 0) waende.forEach((w) => { const a = Math.atan2(w.d.y, w.d.x), L = w.t1 - w.t0; sx += L * Math.cos(4 * a); sy += L * Math.sin(4 * a); });
+  const haupt = Math.atan2(sy, sx) / 4;
+  let rechtwinklig = 0;
+  waende.forEach((w) => {
+    if (w.schraeg) return;
+    const a = Math.atan2(w.d.y, w.d.x), ziel = haupt + Math.round((a - haupt) / (Math.PI / 2)) * (Math.PI / 2);
+    if (Math.abs(a - ziel) > g) return;
+    const ende = (t) => ({ x: w.p.x + w.d.x * t, y: w.p.y + w.d.y * t });
+    const A = ende(w.t0), B = ende(w.t1), L = ende(0);
+    w.d = { x: Math.cos(ziel), y: Math.sin(ziel) }; w.p = L;
+    const tp = (q) => (q.x - w.p.x) * w.d.x + (q.y - w.p.y) * w.d.y;
+    w.t0 = tp(A); w.t1 = tp(B); w.luecken = w.luecken.map(([u, v]) => [tp(ende(u)), tp(ende(v))].sort((x, y) => x - y));
+    w.rechtwinklig = true; rechtwinklig++;
+  });
+  const ende = (w, e) => { const t = e ? w.t1 : w.t0; return { x: w.p.x + w.d.x * t, y: w.p.y + w.d.y * t }; };
+  const schnitt = (a, b) => { const det = a.d.x * -b.d.y - a.d.y * -b.d.x; if (Math.abs(det) < 1e-9) return null; const rx = b.p.x - a.p.x, ry = b.p.y - a.p.y; return (rx * -b.d.y - ry * -b.d.x) / det; };
+  const quer = (a, b) => Math.abs(a.d.x * b.d.y - a.d.y * b.d.x) > 0.5;
+  const fest = waende.map(() => [false, false]);
+  // 1) Schnittpunkte mit Querwänden
+  waende.forEach((w, i) => [0, 1].forEach((e) => {
+    const t = e ? w.t1 : w.t0, P = ende(w, e), richtung = e ? 1 : -1;   // Blick über das Ende hinaus
+    let best = null, bd = 0.6, bestV = null, bestTj = 0;
+    for (const spiel of [0.15, 0.6]) {   // erst Querwände, die den Punkt wirklich überdecken, dann solche knapp über ihr Ende hinaus
+      waende.forEach((v, j) => {
+        if (j === i || !quer(w, v)) return;
+        const ti = schnitt(w, v); if (ti == null) return;
+        const X = { x: w.p.x + w.d.x * ti, y: w.p.y + w.d.y * ti }, dd = Math.hypot(X.x - P.x, X.y - P.y);
+        const tj = (X.x - v.p.x) * v.d.x + (X.y - v.p.y) * v.d.y;
+        if (tj < v.t0 - spiel || tj > v.t1 + spiel) return;
+        if (dd < bd) { bd = dd; best = ti; bestV = v; bestTj = tj; }
+      });
+      if (best != null) break;
+    }
+    if (best == null) return;
+    // L-Ecke (Querwand endet hier) → geradeaus weiter bis zur nächsten Querwand innerhalb 60 cm (Stirnseite einer dicken Wand)
+    if (Math.abs(bestTj - bestV.t0) <= 0.15 || Math.abs(bestTj - bestV.t1) <= 0.15) {
+      let weiter = null, wd = 0.6;
+      waende.forEach((u, j) => {
+        if (j === i || u === bestV || !quer(w, u)) return;
+        const tu = schnitt(w, u); if (tu == null) return;
+        const voraus = (tu - best) * richtung; if (voraus <= 0.02 || voraus > wd) return;
+        const X = { x: w.p.x + w.d.x * tu, y: w.p.y + w.d.y * tu }, tj = (X.x - u.p.x) * u.d.x + (X.y - u.p.y) * u.d.y;
+        if (tj < u.t0 - 0.6 || tj > u.t1 + 0.6) return;
+        wd = voraus; weiter = tu;
+      });
+      if (weiter != null) best = weiter;
+    }
+    if (e) w.t1 = best; else w.t0 = best;
+    fest[i][e] = true;
+  }));
+  // 2) Versprünge: gleich gerichtete Wand 12–60 cm daneben, Enden schließen aneinander an → Verbindungsstück
+  const verbinder = [];
+  waende.forEach((a, i) => waende.forEach((b, j) => {
+    if (j <= i || Math.abs(a.d.x * b.d.x + a.d.y * b.d.y) < 0.98) return;
+    const n = { x: -a.d.y, y: a.d.x }, off = (b.p.x - a.p.x) * n.x + (b.p.y - a.p.y) * n.y;
+    if (Math.abs(off) <= 0.12 || Math.abs(off) > 0.6) return;
+    const gleich = a.d.x * b.d.x + a.d.y * b.d.y > 0, sh = (b.p.x - a.p.x) * a.d.x + (b.p.y - a.p.y) * a.d.y;
+    const tb0 = gleich ? sh + b.t0 : sh - b.t1, tb1 = gleich ? sh + b.t1 : sh - b.t0;   // b im Maß von a
+    // a endet, b beginnt (oder umgekehrt): Abstand der Enden entlang der Achse zwischen −60 cm (Überlappung) und +60 cm
+    const faelle = [{ ga: a.t1, gb: tb0, aEnde: 1, bEnde: gleich ? 0 : 1, lueckeAb: tb0 - a.t1 }, { ga: a.t0, gb: tb1, aEnde: 0, bEnde: gleich ? 1 : 0, lueckeAb: a.t0 - tb1 }];
+    for (const f of faelle) {
+      if (f.lueckeAb < -0.6 || f.lueckeAb > 0.6) continue;
+      if (fest[i][f.aEnde] || fest[j][f.bEnde]) continue;
+      const tc = (f.ga + f.gb) / 2;
+      if (f.aEnde) a.t1 = tc; else a.t0 = tc;
+      const tcB = gleich ? tc - sh : sh - tc;
+      if (f.bEnde) b.t1 = tcB; else b.t0 = tcB;
+      fest[i][f.aEnde] = true; fest[j][f.bEnde] = true;
+      const P = { x: a.p.x + a.d.x * tc, y: a.p.y + a.d.y * tc };
+      verbinder.push({ p: P, d: n, t0: Math.min(0, off), t1: Math.max(0, off), luecken: [], punkte: 0, rms: 0.01, rechtwinklig: true, synthetisch: true });
+      break;
+    }
+  }));
+  // 3) freie Enden bis 1,5 m vor einer Querwand verlängern – das Stück wird eine Lücke (Durchgang)
+  waende.forEach((w, i) => [0, 1].forEach((e) => {
+    if (fest[i][e]) return;
+    const t = e ? w.t1 : w.t0, richtung = e ? 1 : -1;
+    let best = null, bd = 1.5;
+    waende.forEach((v, j) => {
+      if (j === i || !quer(w, v)) return;
+      const ti = schnitt(w, v); if (ti == null) return;
+      const voraus = (ti - t) * richtung; if (voraus <= 0 || voraus > bd) return;
+      const X = { x: w.p.x + w.d.x * ti, y: w.p.y + w.d.y * ti }, tj = (X.x - v.p.x) * v.d.x + (X.y - v.p.y) * v.d.y;
+      if (tj < v.t0 - 0.3 || tj > v.t1 + 0.3) return;
+      bd = voraus; best = ti;
+    });
+    if (best == null) return;
+    if (bd > 0.3) w.luecken.push(e ? [t, best] : [best, t]);
+    if (e) w.t1 = best; else w.t0 = best;
+    fest[i][e] = true;
+  }));
+  waende.forEach((w) => { if (w.t1 < w.t0) { const x = w.t0; w.t0 = w.t1; w.t1 = x; } w.luecken.sort((a, b) => a[0] - b[0]); });
+  verbinder.forEach((v) => waende.push(v));
+  return { haupt, rechtwinklig, verbinder: verbinder.length };
+}
+
+// Räume als Flächen des Wandnetzes: Wände werden an T-Stößen und Kreuzungen geteilt (Knoten auf 6 cm zusammengefasst),
+// dann die kleinsten Umläufe („immer links herum“) gesucht. Außenfläche fällt weg, schmale Flächen (Wanddicke) ebenso.
+function epPwRaeume(waende) {
+  const ende = (w, t) => ({ x: w.p.x + w.d.x * t, y: w.p.y + w.d.y * t });
+  const TOL = 0.06;
+  // 1) Teilungspunkte: Endpunkte anderer Wände, die auf der Wand liegen (T-Stoß), und echte Kreuzungen
+  const teil = waende.map((w) => [w.t0, w.t1]);
+  waende.forEach((w, i) => waende.forEach((v, j) => {
+    if (i === j) return;
+    const kreuz = w.d.x * v.d.y - w.d.y * v.d.x;
+    [v.t0, v.t1].forEach((tv) => {   // Endpunkt von v auf w?
+      const q = ende(v, tv), t = (q.x - w.p.x) * w.d.x + (q.y - w.p.y) * w.d.y, d = (q.x - w.p.x) * -w.d.y + (q.y - w.p.y) * w.d.x;
+      if (Math.abs(d) <= TOL && t > w.t0 + TOL && t < w.t1 - TOL) teil[i].push(t);
+    });
+    if (Math.abs(kreuz) > 0.5) {       // Kreuzung im Inneren beider
+      const det = w.d.x * -v.d.y - w.d.y * -v.d.x, rx = v.p.x - w.p.x, ry = v.p.y - w.p.y;
+      const tw = (rx * -v.d.y - ry * -v.d.x) / det, X = ende(w, tw), tv = (X.x - v.p.x) * v.d.x + (X.y - v.p.y) * v.d.y;
+      if (tw > w.t0 + TOL && tw < w.t1 - TOL && tv > v.t0 + TOL && tv < v.t1 - TOL) teil[i].push(tw);
+    }
+  }));
+  // 2) Knoten (auf 6 cm zusammengefasst) und Kanten
+  const knoten = [];
+  const knotenId = (q) => { for (let k = 0; k < knoten.length; k++) if (Math.hypot(knoten[k].x - q.x, knoten[k].y - q.y) <= TOL) return k; knoten.push({ x: q.x, y: q.y }); return knoten.length - 1; };
+  const kanten = new Map();   // "a-b" → {a, b, wand}
+  waende.forEach((w, i) => {
+    const ts = [...new Set(teil[i].map((t) => Math.round(t * 1000) / 1000))].sort((a, b) => a - b);
+    for (let k = 0; k + 1 < ts.length; k++) {
+      if (ts[k + 1] - ts[k] < TOL) continue;
+      const a = knotenId(ende(w, ts[k])), b = knotenId(ende(w, ts[k + 1]));
+      if (a !== b) kanten.set(a < b ? `${a}-${b}` : `${b}-${a}`, { a, b, wand: i });
+    }
+  });
+  // Sackgassen (Knoten mit nur einer Kante) wiederholt entfernen – freistehende Wandstücke gehören zu keiner Raumkontur
+  let entfernt = true;
+  while (entfernt) {
+    entfernt = false;
+    const grad = knoten.map(() => 0); kanten.forEach((e) => { grad[e.a]++; grad[e.b]++; });
+    for (const [k, e] of [...kanten]) if (grad[e.a] <= 1 || grad[e.b] <= 1) { kanten.delete(k); entfernt = true; }
+  }
+  const nachbarn = knoten.map(() => []);
+  kanten.forEach((e) => { nachbarn[e.a].push(e.b); nachbarn[e.b].push(e.a); });
+  // 3) Flächen: jede gerichtete Kante einmal, am Knoten die nächste Kante im Uhrzeigersinn (kleinster Linksknick)
+  const winkel = (a, b) => Math.atan2(knoten[b].y - knoten[a].y, knoten[b].x - knoten[a].x);
+  const benutzt = new Set(), flaechen = [];
+  kanten.forEach((e) => [[e.a, e.b], [e.b, e.a]].forEach(([s0, s1]) => {
+    if (benutzt.has(`${s0}>${s1}`)) return;
+    const zug = [s0]; let von = s0, zu = s1, schritte = 0;
+    while (schritte++ < 500) {
+      benutzt.add(`${von}>${zu}`); zug.push(zu);
+      if (zu === s0 && von !== s0) break;
+      const rueck = winkel(zu, von); let best = null, bw = Infinity;
+      // Fläche links der Laufrichtung: ab der Rückrichtung im Uhrzeigersinn die erste Kante nehmen (= schärfste Linkskurve)
+      for (const n of nachbarn[zu]) { if (n === von && nachbarn[zu].length > 1) continue; let dw = rueck - winkel(zu, n); while (dw <= 0) dw += 2 * Math.PI; while (dw > 2 * Math.PI) dw -= 2 * Math.PI; if (dw < bw) { bw = dw; best = n; } }
+      if (best == null) return;
+      von = zu; zu = best;
+    }
+    if (zug[zug.length - 1] !== s0 || zug.length < 4) return;
+    const pts = zug.slice(0, -1).map((k) => knoten[k]);
+    let f = 0; for (let k = 0; k < pts.length; k++) { const a = pts[k], b = pts[(k + 1) % pts.length]; f += a.x * b.y - b.x * a.y; }
+    flaechen.push({ pts, f: f / 2, zug: zug.slice(0, -1) });
+  }));
+  // 4) Innenflächen (mathematisch positiv bei Links-herum), ≥ 1 m², nicht schmal (2·A/U ≥ 35 cm) – Dopplungen weg
+  const raeume = [], gesehen = new Set();
+  flaechen.filter((fl) => fl.f > 1).forEach((fl) => {
+    const umfang = fl.pts.reduce((u, q, k) => u + Math.hypot(fl.pts[(k + 1) % fl.pts.length].x - q.x, fl.pts[(k + 1) % fl.pts.length].y - q.y), 0);
+    if (2 * fl.f / umfang < 0.35) return;
+    const schluessel = fl.zug.slice().sort((a, b) => a - b).join(",");
+    if (gesehen.has(schluessel)) return; gesehen.add(schluessel);
+    const wandIdx = new Set();
+    for (let k = 0; k < fl.zug.length; k++) { const a = fl.zug[k], b = fl.zug[(k + 1) % fl.zug.length]; const e = kanten.get(a < b ? `${a}-${b}` : `${b}-${a}`); if (e) wandIdx.add(e.wand); }
+    raeume.push({ waende: [...wandIdx], polygon: fl.pts.map((q) => [epPwR(q.x), epPwR(q.y)]), flaeche: epPwR(fl.f, 2) });
+  });
+  return raeume;
+}
+
+// Möbel an der Wand (Schränke, Regale, Küchenzeilen) – zwei Fälle, beide über die Deckenkante entschieden:
+// (b) Möbelfront: eine gefundene „Wand“, deren Zellen kaum bis zur Decke reichen, mit einer Linie aus Deckenanschluss-Zellen
+//     25–80 cm dahinter über ≥ 50 % ihrer Länge → die Front ist Möbel (Zellen → „hoch ohne Decke“), die Wand liegt dahinter.
+// (a) Wand oberhalb der Möbel: Zellen, die nur oben (Sturz) bis zur Decke reichen, auf einer Wandlinie oder ihrer Verlängerung,
+//     vor denen Hohes ohne Decke steht (0,15–0,9 m, kein Türblatt) → Wand. So wird die Wand über dem Schrank „verknüpft“;
+//     Türstürze bleiben Lücken, weil vor einer Tür nichts steht. Liefert true, wenn sich Zellen geändert haben.
+function epPwMoebelVerknuepfen(z, waende) {
+  const perp = (w, i) => (z.x[i] - w.p.x) * -w.d.y + (z.y[i] - w.p.y) * w.d.x, along = (w, i) => (z.x[i] - w.p.x) * w.d.x + (z.y[i] - w.p.y) * w.d.y;
+  let geaendert = false;
+  for (const w of waende) {
+    const L = w.t1 - w.t0; let eigene = 0, mitKante = 0; const hinten = new Map();
+    for (let i = 0; i < z.x.length; i++) {
+      const t = along(w, i); if (t < w.t0 - 0.05 || t > w.t1 + 0.05) continue;
+      const d = perp(w, i), ad = Math.abs(d);
+      if (ad <= 0.08) { if (z.klasse[i] === 1) { eigene++; if (z.kante[i]) mitKante++; } continue; }
+      if (ad < 0.25 || ad > 0.8 || !z.kante[i] || (z.klasse[i] !== 3 && z.klasse[i] !== 1)) continue;
+      const sIdx = Math.round(d / 0.06); let m = hinten.get(sIdx); if (!m) { m = new Set(); hinten.set(sIdx, m); } m.add(Math.floor(t / 0.05));
+    }
+    if (!eigene || mitKante / eigene >= 0.2) continue;
+    let bestN = 0; hinten.forEach((m) => { if (m.size > bestN) bestN = m.size; });
+    if (bestN < 0.5 * (L / 0.05)) continue;
+    for (let i = 0; i < z.x.length; i++) { if (z.klasse[i] !== 1) continue; const t = along(w, i); if (t < w.t0 - 0.05 || t > w.t1 + 0.05) continue; if (Math.abs(perp(w, i)) <= 0.08) { z.klasse[i] = 4; geaendert = true; } }
+    w.moebelfront = true;
+  }
+  for (const w of waende) {
+    if (w.moebelfront) continue;
+    // Hohes ohne Decke vor der Wand, nach Abstand (10-cm-Stufen) und Lage entlang der Wand (10-cm-Stufen) gesammelt –
+    // eine Möbelfront läuft parallel zur Wand (mehrere Stufen entlang bei gleichem Abstand), ein offenes Türblatt steht quer (eine Stufe)
+    const front = new Map(); let anzahl = 0;
+    for (let i = 0; i < z.x.length; i++) {
+      if (z.klasse[i] !== 4 || (z.oeffnung && z.oeffnung[i] === 7)) continue;
+      const ad = Math.abs(perp(w, i)); if (ad < 0.15 || ad > 0.9) continue;
+      const t = along(w, i); if (t < w.t0 - 2.5 || t > w.t1 + 2.5) continue;
+      const k = Math.round(perp(w, i) / 0.1); let m = front.get(k); if (!m) { m = new Set(); front.set(k, m); } m.add(Math.floor(t / 0.1)); anzahl++;
+    }
+    if (anzahl < 10) continue;
+    const davor = (t) => { const a = Math.floor((t - 0.35) / 0.1), b = Math.floor((t + 0.35) / 0.1); for (const m of front.values()) { let n = 0; for (let q = a; q <= b; q++) if (m.has(q)) n++; if (n >= 4) return true; } return false; };
+    for (let i = 0; i < z.x.length; i++) { if (z.klasse[i] !== 3 || !z.kante[i] || Math.abs(perp(w, i)) > 0.08) continue; const t = along(w, i); if (t < w.t0 - 2.5 || t > w.t1 + 2.5) continue; if (davor(t)) { z.klasse[i] = 1; geaendert = true; } }
+  }
+  return geaendert;
+}
+
+// Boden-Decken-Abgleich (02.10.2026): Küchenzeilen, Hochschränke und Regale, deren Oberkante in die obersten 30 cm unter der
+// Decke reicht, sehen in der Draufsicht wie Wände aus. Unterschied: Hinter einer Möbelfront läuft die DECKE weiter (sie ist über
+// dem Möbel zu sehen), der BODEN aber nicht (Sockel, Möbel steht darauf). Hinter einer echten Wand gibt es entweder gar nichts
+// (Außenwand) oder – bei gescanntem Nachbarraum – Boden UND Decke erst ab der Wanddicke. Je Wandkandidat werden alle 10 cm
+// beide Seiten geprüft: Raumseite = Boden daneben (10–30 cm); Möbel = dahinter kein Boden (10–30 cm), aber Decke
+// (10–27 cm). Ein zusammenhängender Möbel-Abschnitt (ab 0,6 m oder der Hälfte des Kandidaten) ist eine Möbelfront: seine Wandzellen werden „hoch ohne Decke“, und wo die
+// Decke dahinter endet (letzte Deckenzelle vor einer Lücke ≥ 15 cm, bis 1,5 m), liegt die echte Wand – sie wird als Stück
+// ergänzt bzw. an vorhandene Wände angeschlossen („Linien verbinden“). Taucht der Boden vor dem Deckenende wieder auf, steht das
+// Möbel frei (Regal, Raumteiler): keine Wand, auch nicht dahinter. Grenze: reicht ein Möbel bis auf ≈ 15 cm an die Decke, ist
+// die Decke dahinter vom Raum aus nicht zu sehen – dann bleibt nur die Deckenkante (epPwMoebelVerknuepfen) oder die Hand.
+function epPwBodenDeckenAbgleich(z, waende) {
+  const aus = { geaendert: false, moebel: 0, stuecke: [], frei: 0 };
+  if (!z.boden || !z.decke || z.ohneDecke) return aus;
+  const G = 0.05, key = (x, y) => Math.floor(x / G) * 100003 + Math.floor(y / G);
+  const B = new Set(), D = new Set();
+  for (let i = 0; i < z.boden.length; i += 2) B.add(key(z.boden[i], z.boden[i + 1]));
+  for (let i = 0; i < z.decke.length; i += 2) D.add(key(z.decke[i], z.decke[i + 1]));
+  // Zellen in einem Rechteck: quer zur Wand u0..u1 (Vorzeichen = Seite), längs ±0,1 m um die Stützstelle
+  const rect = (S, px, py, n, d, u0, u1) => { let k = 0; const seen = new Set(); for (let u = u0; u <= u1 + 1e-9; u += G) for (let v = -0.1; v <= 0.1 + 1e-9; v += G) { const kk = key(px + n.x * u + d.x * v, py + n.y * u + d.y * v); if (seen.has(kk)) continue; seen.add(kk); if (S.has(kk)) k++; } return k; };
+  for (const w of waende) {
+    if (w.decke || w.hinterMoebel || w.synthetisch) continue;
+    const L = w.t1 - w.t0; if (L < 0.5) continue;
+    const n = { x: -w.d.y, y: w.d.x }, proben = [];
+    for (let t = w.t0 + 0.05; t <= w.t1 - 0.05 + 1e-9; t += 0.1) {
+      if (w.luecken && w.luecken.some(([u, v]) => t > u && t < v)) continue;   // Lücken (Türen, überbrückte Abschnitte) sagen nichts über die Front
+      const px = w.p.x + w.d.x * t, py = w.p.y + w.d.y * t; let seite = 0;
+      for (const s of [1, -1]) {
+        const ns = { x: n.x * s, y: n.y * s }, nr = { x: -ns.x, y: -ns.y };
+        // ab 10 cm neben der Linie: die Fußpunkte der Wand (bzw. der Möbelfront) selbst zählen weder als Boden noch als Decke
+        const bodenRaum = rect(B, px, py, nr, w.d, 0.10, 0.30), bodenHinter = rect(B, px, py, ns, w.d, 0.10, 0.30), deckeHinter = rect(D, px, py, ns, w.d, 0.10, 0.27);
+        // Decke muss von der Linie weg lückenlos weiterlaufen (jede 5-cm-Reihe 5–30 cm belegt): hinter einer Innenwand mit gescanntem
+        // Nachbarraum fehlt die Decke über der Wanddicke – über einer Möbelfront nicht
+        const durchgehend = () => { let fehl = 0; for (let u = 0.05; u <= 0.30 + 1e-9; u += 0.05) if (rect(D, px, py, ns, w.d, u, u) < 2 && ++fehl > 1) return false; return true; };   // eine Fehlreihe (Lampe, Netzloch) erlaubt
+        if (bodenRaum >= 4 && bodenHinter <= 2 && deckeHinter >= 4 && durchgehend()) { seite = s; break; }
+      }
+      proben.push({ t, seite });
+    }
+    // Zusammenhängende Möbel-Abschnitte (eine Fehlstelle wird überbrückt): ab 0,6 m oder ab der Hälfte des Kandidaten.
+    // So bleibt eine Wand erhalten, die in Flucht einer Küchenzeile weiterläuft – nur der Möbelteil wird abgewertet.
+    const laeufe = []; let lauf = null, fehl = 0;
+    for (const p of proben) {
+      if (p.seite) { if (!lauf) lauf = { proben: [], seite: 0 }; lauf.proben.push(p); lauf.seite += p.seite; fehl = 0; }
+      else if (lauf && ++fehl > 1) { laeufe.push(lauf); lauf = null; }
+    }
+    if (lauf) laeufe.push(lauf);
+    for (const lf of laeufe) {
+      const m = lf.proben; if (m.length < 3 || (m.length < 6 && m.length < 0.5 * proben.length)) continue;
+      const s = lf.seite >= 0 ? 1 : -1, ns = { x: n.x * s, y: n.y * s };
+      const tMin = m[0].t - 0.1, tMax = m[m.length - 1].t + 0.1;
+      // Liegt auf der Raumseite 8–30 cm daneben ein gleich gerichteter Kandidat, ist dies die Rückseite einer Innenwand (Nachbarraum
+      // ohne erfassten Boden), keine Möbelfront
+      const rueckseite = waende.some((v) => { if (v === w || Math.abs(v.d.x * w.d.x + v.d.y * w.d.y) < 0.98) return false; const dq = (v.p.x - w.p.x) * -ns.x + (v.p.y - w.p.y) * -ns.y; if (dq < 0.08 || dq > 0.30) return false;
+        const vz = v.d.x * w.d.x + v.d.y * w.d.y > 0, s0 = (w.p.x - v.p.x) * v.d.x + (w.p.y - v.p.y) * v.d.y, a0 = vz ? s0 + tMin : s0 - tMax, a1 = vz ? s0 + tMax : s0 - tMin; return Math.min(a1, v.t1) - Math.max(a0, v.t0) >= 0.5 * (tMax - tMin); });
+      if (rueckseite) continue;
+      // Wo endet die Decke dahinter? Je Möbel-Stützstelle: letzte Deckenzelle vor einer Lücke ≥ 15 cm; Boden wieder da → frei stehend
+      const tiefen = []; let frei = 0;
+      for (const p of m) {
+        const px = w.p.x + w.d.x * p.t, py = w.p.y + w.d.y * p.t; let letzte = null, luecke = 0, bodenAb = null;
+        for (let u = 0.1; u <= 1.5 + 1e-9; u += G) {
+          const dk = rect(D, px, py, ns, w.d, u - 0.025, u + 0.025) >= 2, bd = rect(B, px, py, ns, w.d, u - 0.025, u + 0.025) >= 2;
+          if (bd && bodenAb == null && u >= 0.2) bodenAb = u;
+          if (dk) { letzte = u; luecke = 0; } else if (letzte != null && ++luecke >= 3) break;
+        }
+        if (letzte == null || letzte < 0.2) continue;
+        if (bodenAb != null && bodenAb < letzte - 0.1) { frei++; continue; }
+        if (letzte >= 1.45) continue;   // Decke endet nicht innerhalb von 1,5 m – keine verlässliche Wandlage
+        tiefen.push(letzte);
+      }
+      tiefen.sort((a, b) => a - b); let tiefe = tiefen.length ? tiefen[tiefen.length >> 1] + 0.02 : null;
+      // Deckenende nur verwerten, wenn sich ≥ 60 % der Stützstellen auf ± 10 cm einig sind (sonst Löcher in der Decke)
+      const einig = tiefe != null ? tiefen.filter((v) => Math.abs(v + 0.02 - tiefe) <= 0.1).length : 0;
+      if (tiefe != null && einig < 0.6 * tiefen.length) { tiefen.length = 0; tiefe = null; }
+      // Decke endet schon nach < 30 cm: das ist eine Wanddicke, keine Möbeltiefe – Kandidat bleibt Wand
+      if (tiefe != null && tiefe < 0.3 && frei <= tiefen.length) continue;
+      // Wandzellen des Kandidaten → hoch ohne Decke (nur im Abschnitt der Möbel-Stützstellen ± 0,1)
+      for (let i = 0; i < z.x.length; i++) { if (z.klasse[i] !== 1) continue; const dx = z.x[i] - w.p.x, dy = z.y[i] - w.p.y; if (Math.abs(dx * n.x + dy * n.y) > 0.08) continue; const t = dx * w.d.x + dy * w.d.y; if (t >= tMin && t <= tMax) { z.klasse[i] = 4; aus.geaendert = true; } }
+      w.moebel = true; aus.moebel++;
+      if (frei > tiefen.length) { aus.frei++; continue; }
+      if (tiefen.length < 3) continue;
+      aus.stuecke.push({ p: { x: w.p.x + ns.x * tiefe, y: w.p.y + ns.y * tiefe }, d: w.d, t0: tMin + 0.05, t1: tMax - 0.05, tiefe: epPwR(tiefe, 2), laenge: epPwR(tMax - tMin - 0.1, 2) });
+    }
+  }
+  return aus;
+}
+
+// Wandstücke (hinter Möbelfronten) einfügen: an eine gleich gerichtete Wand bis 15 cm daneben anschließen (Lücke ≤ 0,3 m
+// oder Überlappung), sonst als eigene Wand – Mindestlänge 0,6 m
+function epPwStueckeEinfuegen(waende, stuecke, z) {
+  const parallel = (w, c) => Math.abs(w.d.x * c.d.x + w.d.y * c.d.y) > 0.98, abstand = (w, x, y) => Math.abs((x - w.p.x) * -w.d.y + (y - w.p.y) * w.d.x);
+  for (const c of stuecke) {
+    if (c.t1 - c.t0 < 0.6) continue;
+    let angeschlossen = false;
+    for (const w of waende) {
+      if (!parallel(w, c) || abstand(w, c.p.x, c.p.y) > 0.15) continue;
+      const vz = w.d.x * c.d.x + w.d.y * c.d.y > 0, s0 = (c.p.x - w.p.x) * w.d.x + (c.p.y - w.p.y) * w.d.y;
+      const a0 = vz ? s0 + c.t0 : s0 - c.t1, a1 = vz ? s0 + c.t1 : s0 - c.t0;
+      if (a1 < w.t0 - 0.3 || a0 > w.t1 + 0.3) continue;
+      w.t0 = Math.min(w.t0, a0); w.t1 = Math.max(w.t1, a1); w.hinterMoebel = true; angeschlossen = true; break;
+    }
+    if (!angeschlossen) waende.push({ p: c.p, d: c.d, t0: c.t0, t1: c.t1, luecken: [], punkte: Math.round((c.t1 - c.t0) / z.zelle), rms: 0.01, achse: Math.abs(c.d.x) > 0.7 ? "x" : "y", hinterMoebel: true });
+  }
+  return waende;
+}
+
+// Wände entlang der Deckenkante verlängern („Linien verbinden“): Wo eine Wand endet, die Decke aber an derselben Linie weiter
+// endet (Raumseite: Decke 5–20 cm neben der Linie, Rückseite: keine Decke 10–30 cm), läuft die Wand weiter – typisch hinter einer
+// Küchenzeile oder einem Schrank, wo das Wandband verdeckt ist. Bedingung je 10-cm-Schritt: Deckenkante da UND irgendeine
+// Zellenstütze (Zelle beliebiger Klasse bis 10 cm an der Linie oder Hohes/Brüstung bis 0,9 m davor auf der Raumseite); Lücken bis
+// 0,3 m werden überbrückt, eine kreuzende Wand beendet die Verlängerung. Unterzüge und freie Deckenränder (fehlende Decke ohne
+// Wand) haben keine Zellenstütze und verlängern nichts.
+function epPwDeckenrandVerlaengern(z, waende) {
+  if (!z.decke || z.ohneDecke) return 0;
+  const G = 0.05, key = (x, y) => Math.floor(x / G) * 100003 + Math.floor(y / G), D = new Set();
+  for (let i = 0; i < z.decke.length; i += 2) D.add(key(z.decke[i], z.decke[i + 1]));
+  const ZG = 0.1, zk = (x, y) => Math.floor(x / ZG) * 100003 + Math.floor(y / ZG), zellen = new Map();
+  for (let i = 0; i < z.x.length; i++) { if (!z.klasse[i]) continue; const k = zk(z.x[i], z.y[i]); zellen.set(k, (zellen.get(k) || 0) | (1 << z.klasse[i])); }
+  const rect = (S, px, py, n, d, u0, u1) => { let k = 0; const seen = new Set(); for (let u = u0; u <= u1 + 1e-9; u += G) for (let v = -0.1; v <= 0.1 + 1e-9; v += G) { const kk = key(px + n.x * u + d.x * v, py + n.y * u + d.y * v); if (seen.has(kk)) continue; seen.add(kk); if (S.has(kk)) k++; } return k; };
+  const stuetze = (px, py, nr, d) => { for (let v = -0.1; v <= 0.1 + 1e-9; v += ZG) { if (zellen.has(zk(px + d.x * v, py + d.y * v))) return true; for (let u = 0.1; u <= 0.9 + 1e-9; u += ZG) { const m = zellen.get(zk(px + nr.x * u + d.x * v, py + nr.y * u + d.y * v)) || 0; if (m & ((1 << 4) | (1 << 2))) return true; } } return false; };
+  let verlaengert = 0;
+  for (const w of waende) {
+    if (w.schraeg || w.synthetisch) continue;
+    const n = { x: -w.d.y, y: w.d.x };
+    // Raumseite = Seite mit Decke neben der Linie (Mehrheit über die vorhandene Länge)
+    let plus = 0, minus = 0;
+    for (let t = w.t0 + 0.05; t <= w.t1 - 0.05 + 1e-9; t += 0.2) { const px = w.p.x + w.d.x * t, py = w.p.y + w.d.y * t; plus += rect(D, px, py, n, w.d, 0.05, 0.20); minus += rect(D, px, py, { x: -n.x, y: -n.y }, w.d, 0.05, 0.20); }
+    if (plus < 6 && minus < 6) continue;
+    const s = plus >= minus ? 1 : -1, nr = { x: n.x * s, y: n.y * s }, nh = { x: -nr.x, y: -nr.y };
+    const kante = (px, py) => rect(D, px, py, nr, w.d, 0.05, 0.20) >= 3 && rect(D, px, py, nh, w.d, 0.10, 0.30) <= 1;
+    const kreuzt = (px, py, t) => waende.some((v) => { if (v === w || Math.abs(v.d.x * w.d.x + v.d.y * w.d.y) > 0.3) return false; const dq = Math.abs((px - v.p.x) * -v.d.y + (py - v.p.y) * v.d.x); if (dq > 0.15) return false; const q = (px - v.p.x) * v.d.x + (py - v.p.y) * v.d.y; return q >= v.t0 - 0.2 && q <= v.t1 + 0.2; });
+    for (const richtung of [1, -1]) {
+      let t = richtung > 0 ? w.t1 : w.t0, ende = t, luecke = 0;
+      for (let k = 0; k < 150; k++) {
+        t += richtung * 0.1; const px = w.p.x + w.d.x * t, py = w.p.y + w.d.y * t;
+        if (kreuzt(px, py, t)) { ende = t; break; }
+        if (kante(px, py) && stuetze(px, py, nr, w.d)) { ende = t; luecke = 0; } else if (++luecke > 3) break;
+      }
+      if (richtung > 0 && ende - w.t1 >= 0.3) { w.t1 = ende; w.deckenrand = true; verlaengert++; }
+      if (richtung < 0 && w.t0 - ende >= 0.3) { w.t0 = ende; w.deckenrand = true; verlaengert++; }
+    }
+  }
+  return verlaengert;
+}
+
+// Deckenwände: Wände noch einmal aus den Zellen suchen, die bis zur Decke reichen (Wand oder Sturz mit Deckenkante) – in
+// Deckenhöhe stehen keine Möbel, nur Lampen. Wo diese Linien Wandstücke zeigen, die das Wandband nicht hat (hinter Schränken,
+// Küchenzeilen, Regalen), werden vorhandene Wände verlängert (Lücke ≤ 0,3 m) oder neue Stücke (≥ 0,8 m) ergänzt; Türen und
+// Fenster bleiben Lücken der Wandband-Wände. Unterzüge quer durch den Raum könnten so zu Wänden werden – daher nur
+// bei erkannter Decke und mit Mindestlänge.
+function epPwDeckenWaende(z, waende, P) {
+  const kl = new Uint8Array(z.klasse.length); let n = 0;
+  for (let i = 0; i < kl.length; i++) if (z.kante[i] && (z.klasse[i] === 1 || z.klasse[i] === 3)) { kl[i] = 1; n++; }
+  if (n < 100) return waende;
+  const decken = epPwAchsenWaende({ x: z.x, y: z.y, klasse: kl, zelle: z.zelle, hoehe: z.hoehe }, new Float64Array(0), P);
+  const ergebnis = waende.slice();
+  const parallel = (w, c) => Math.abs(w.d.x * c.d.x + w.d.y * c.d.y) > 0.98, abstand = (w, x, y) => Math.abs((x - w.p.x) * -w.d.y + (y - w.p.y) * w.d.x);
+  for (const c of decken) {
+    const frei = [];
+    for (let t = c.t0; t < c.t1 - 0.05; t += 0.1) {
+      const x = c.p.x + c.d.x * (t + 0.05), y = c.p.y + c.d.y * (t + 0.05);
+      const gedeckt = ergebnis.some((w) => { if (!parallel(w, c) || abstand(w, x, y) > 0.12) return false; const s = (x - w.p.x) * w.d.x + (y - w.p.y) * w.d.y; return s >= w.t0 - 0.15 && s <= w.t1 + 0.15; });
+      if (!gedeckt) frei.push(t);
+    }
+    const stuecke = []; let a = null, prev = null;
+    const schliesse = () => { if (a != null && prev + 0.1 - a >= 0.55) stuecke.push([a, prev + 0.1]); a = null; };
+    for (const t of frei) { if (a == null || t - prev > 0.11) { schliesse(); a = t; } prev = t; }
+    schliesse();
+    for (const [u, v] of stuecke) {
+      let angeschlossen = false;
+      for (const w of ergebnis) {
+        if (!parallel(w, c) || abstand(w, c.p.x, c.p.y) > 0.12) continue;
+        const vz = w.d.x * c.d.x + w.d.y * c.d.y > 0, s0 = (c.p.x - w.p.x) * w.d.x + (c.p.y - w.p.y) * w.d.y;
+        const a0 = vz ? s0 + u : s0 - v, a1 = vz ? s0 + v : s0 - u;
+        if (a0 >= w.t1 - 0.15 && a0 <= w.t1 + 0.3) { w.t1 = Math.max(w.t1, a1); w.decke = true; angeschlossen = true; break; }
+        if (a1 <= w.t0 + 0.15 && a1 >= w.t0 - 0.3) { w.t0 = Math.min(w.t0, a0); w.decke = true; angeschlossen = true; break; }
+      }
+      // neues Stück nur, wenn beide Enden an vorhandene Wände anschließen – Pendelleuchten und Unterzüge mitten im Raum nicht
+      const nahWand = (t) => { const x = c.p.x + c.d.x * t, y = c.p.y + c.d.y * t; return ergebnis.some((w) => { if (abstand(w, x, y) > 0.4) return false; const q = (x - w.p.x) * w.d.x + (y - w.p.y) * w.d.y; return q >= w.t0 - 0.4 && q <= w.t1 + 0.4; }); };
+      if (!angeschlossen && v - u >= 0.8 && nahWand(u) && nahWand(v)) ergebnis.push({ p: c.p, d: c.d, t0: u, t1: v, luecken: [], punkte: Math.round((v - u) / z.zelle), rms: c.rms, achse: c.achse, decke: true });
+    }
+  }
+  return ergebnis;
+}
+
+// Wandnetz aus den (ausgerichteten) Zellen: Achsen-Wände, schräge Reste, Doppelte, kurze Stücke, Ecken, Räume, Möbelfronten.
+// Eigene Funktion, damit sich eine Diagnose (Zellen + Klassen) ohne Rohpunkte nachrechnen lässt.
+function epPwKonstruktion(z, band, o) {
+  o = o || {};
+  const P = { minPeak: o.minPeak || 30, breite: 0.10, luecke: 0.5, stumm: 0.5, minLaenge: o.minLaenge || 0.6, deckung: 0.45, brueckeMax: 2.6 };
+  let waende = epPwAchsenWaende(z, band, P);
+  if (z.kante && !z.ohneDecke && epPwMoebelVerknuepfen(z, waende)) {
+    // Zellen haben sich geändert (Möbelfronten abgewertet, Wand oberhalb der Möbel aufgewertet) → Wände neu suchen
+    const wk = new Set(); for (let i = 0; i < z.klasse.length; i++) if (z.klasse[i] === 1) wk.add(z.keys[i]);
+    z.wandKeys = wk; z.wandZellen = wk.size;
+    waende = epPwAchsenWaende(z, band, P);
+  }
+  // Boden-Decken-Abgleich: Möbelfronten (Decke läuft dahinter weiter, Boden nicht) abwerten, Wand dahinter an der Deckenkante ergänzen
+  let abgleich = null;
+  if (z.boden && z.decke && !z.ohneDecke) {
+    abgleich = { moebel: 0, frei: 0, stuecke: [] };
+    for (let runde = 0; runde < 3; runde++) {   // weitere Durchgänge: nach dem Abwerten entstehen aus den Restzellen neue Kandidaten
+      const a = epPwBodenDeckenAbgleich(z, waende); abgleich.moebel += a.moebel; abgleich.frei += a.frei; abgleich.stuecke.push(...a.stuecke);
+      if (!a.geaendert) break;
+      const wk = new Set(); for (let i = 0; i < z.klasse.length; i++) if (z.klasse[i] === 1) wk.add(z.keys[i]);
+      z.wandKeys = wk; z.wandZellen = wk.size;
+      waende = epPwAchsenWaende(z, band, P);
+    }
+    if (abgleich.stuecke.length) waende = epPwStueckeEinfuegen(waende, abgleich.stuecke, z);
+  }
+  if (z.kante && !z.ohneDecke) waende = epPwDeckenWaende(z, waende, P);
+  if (abgleich) abgleich.verlaengert = epPwDeckenrandVerlaengern(z, waende);
+  waende = epPwSchraegNachziehen(z, waende);
+  // Wandzellen, die keine Achsen-Wand erklärt → schräge Wände (streng)
+  const restPts = [];
+  for (let i = 0; i < z.x.length; i++) {
+    if (z.klasse[i] !== 1) continue;
+    const qx = z.x[i], qy = z.y[i];
+    const erklaert = waende.some((w) => { const d = (qx - w.p.x) * -w.d.y + (qy - w.p.y) * w.d.x, t = (qx - w.p.x) * w.d.x + (qy - w.p.y) * w.d.y; return Math.abs(d) <= 0.15 && t >= w.t0 - 0.2 && t <= w.t1 + 0.2; });
+    if (!erklaert) restPts.push(qx, qy);
+  }
+  if (restPts.length / 2 >= 60) {
+    // nur echte Schrägen (≥ 8° neben den Achsen) oder lange Stücke ohne gleich gerichtete Wand bis 30 cm daneben –
+    // achsnahe Reste sind Heizkörper, Brüstungen, Sockel oder eine zweite Drift-Lage derselben Wand
+    const rest = epPwRestWaende(Float64Array.from(restPts), {}).filter((r) => {
+      const a = Math.atan2(r.d.y, r.d.x), ab = Math.abs(((a % (Math.PI / 2)) + Math.PI / 2) % (Math.PI / 2)), abw = Math.min(ab, Math.PI / 2 - ab) * 180 / Math.PI;
+      if (abw >= 8) return true;
+      if (r.t1 - r.t0 < 2.0) return false;
+      return !waende.some((w) => Math.abs(w.d.x * r.d.x + w.d.y * r.d.y) > 0.98 && Math.abs((r.p.x - w.p.x) * -w.d.y + (r.p.y - w.p.y) * w.d.x) <= 0.3);
+    });
+    waende = waende.concat(rest);
+  }
+  // Doppelte: gleiche Richtung, ≤ 15 cm daneben, ≥ 30 cm überlappend → kürzere weg; danach kurze Reststücke (< 60 cm) weg
+  waende.sort((a, b) => (b.t1 - b.t0) - (a.t1 - a.t0));
+  waende = waende.filter((w, i) => !waende.slice(0, i).some((v) => {
+    if (Math.abs(v.d.x * w.d.x + v.d.y * w.d.y) < 0.98) return false;
+    const abstand = (w.p.x - v.p.x) * -v.d.y + (w.p.y - v.p.y) * v.d.x; if (Math.abs(abstand) > 0.15) return false;
+    const s = (w.p.x - v.p.x) * v.d.x + (w.p.y - v.p.y) * v.d.y, vz = v.d.x * w.d.x + v.d.y * w.d.y > 0;
+    const a0 = vz ? s + w.t0 : s - w.t1, a1 = vz ? s + w.t1 : s - w.t0;
+    return Math.min(a1, v.t1) - Math.max(a0, v.t0) > 0.3;
+  }));
+  waende = waende.filter((w) => w.t1 - w.t0 >= 0.6);
+  const ordnung = epPwOrdnen(waende, o.grad);
+  waende = waende.filter((w) => w.synthetisch || w.t1 - w.t0 >= 0.3);   // beim Eckenschließen auf einen Punkt zusammengezogene Stücke
+  let raeume = epPwRaeume(waende);
+  // Möbelfronten (Schrank, Regal): kurze Linien ganz im Inneren eines Raums, mindestens 10 cm von dessen Kontur weg
+  const innen = (q, poly) => { let d = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const a = poly[i], b = poly[j]; if ((a[1] > q.y) !== (b[1] > q.y) && q.x < (b[0] - a[0]) * (q.y - a[1]) / (b[1] - a[1]) + a[0]) d = !d; } return d; };
+  const randAbstand = (q, poly) => Math.min(...poly.map((a, i) => { const b = poly[(i + 1) % poly.length], vx = b[0] - a[0], vy = b[1] - a[1], L2 = vx * vx + vy * vy || 1e-9;
+    const t = Math.max(0, Math.min(1, ((q.x - a[0]) * vx + (q.y - a[1]) * vy) / L2)); return Math.hypot(q.x - a[0] - vx * t, q.y - a[1] - vy * t); }));
+  const inRaum = new Set(); raeume.forEach((r) => r.waende.forEach((i) => inRaum.add(i)));
+  const moebel = new Set();
+  waende.forEach((w, i) => {
+    if (inRaum.has(i) || w.t1 - w.t0 > 2.5) return;
+    const P = [w.t0, w.t1, (w.t0 + w.t1) / 2].map((t) => ({ x: w.p.x + w.d.x * t, y: w.p.y + w.d.y * t }));
+    if (raeume.some((r) => P.slice(0, 2).every((q) => innen(q, r.polygon) || randAbstand(q, r.polygon) <= 0.05) && innen(P[2], r.polygon) && randAbstand(P[2], r.polygon) > 0.1)) moebel.add(i);
+  });
+  if (moebel.size) {
+    const alt = waende; waende = alt.filter((_, i) => !moebel.has(i));
+    const neuIndex = new Map(); alt.forEach((_, i) => { if (!moebel.has(i)) neuIndex.set(i, neuIndex.size); });
+    raeume = raeume.map((r) => Object.assign(r, { waende: r.waende.map((i) => neuIndex.get(i)) }));
+  }
+  return { waende, raeume, moebel: moebel.size, verbinder: ordnung.verbinder, abgleich: abgleich ? { moebel: abgleich.moebel, stuecke: abgleich.stuecke.map((c) => ({ tiefe: c.tiefe, laenge: c.laenge })), frei: abgleich.frei, verlaengert: abgleich.verlaengert || 0 } : null };
+}
+
+// ---------- Gesamtauswertung ----------
+function epPwAuswerten(wolke, opt) {
+  const o = Object.assign({ von: 0.9, bis: 1.9 }, opt || {});
+  const h = opt && opt.hoehen ? opt.hoehen : epPwHoehen(wolke);
+  const z = epPwZellen(wolke, h, o.von, o.bis);
+  if (z.wandZellen < 100) throw new Error("Zu wenige Wandpunkte: keine Flächen gefunden, die " + String(o.von).replace(".", ",") + "–" + String(o.bis).replace(".", ",") + " m über dem Boden stehen und bis zur Decke oder zum Boden reichen.");
+  // Hauptrichtung waagerecht legen – Zellen, Wandband und Brüstungsband gleich mit
+  const dreh = typeof o.dreh === "number" && isFinite(o.dreh) ? o.dreh : (o.ausrichten === false ? 0 : epPwHauptrichtung(z)), c = Math.cos(dreh), si = Math.sin(dreh);   // Stufe 144: Stand lädt mit der gesicherten Drehung
+  const drehen = (arr) => { for (let i = 0; i < arr.length; i += 2) { const x = arr[i], y = arr[i + 1]; arr[i] = x * c + y * si; arr[i + 1] = -x * si + y * c; } return arr; };
+  if (dreh) for (let i = 0; i < z.x.length; i++) { const x = z.x[i], y = z.y[i]; z.x[i] = x * c + y * si; z.y[i] = -x * si + y * c; }
+  if (dreh && z.boden) drehen(z.boden); if (dreh && z.decke) drehen(z.decke);
+  const band = drehen(epPwBand(wolke, h.achse, h.boden + o.von, h.boden + o.bis));
+  const k = epPwKonstruktion(z, band, o);
+  let waende = k.waende, raeume = k.raeume;
+  if (h.raster && h.raster.schraeg) raeume.forEach((r) => { r.zonen = epPwZonen(r, h, dreh); });
+  const moebel = { size: k.moebel };
+  // Lücken: steht dort Hohes ohne Deckenanschluss (Schrank, Türblatt) → verdeckte Wand, keine Öffnung;
+  // Brüstung (Zellen nur unten oder Punkte 30–80 cm über Boden) → Fenster; sonst Tür/Öffnung
+  const unten = drehen(epPwBand(wolke, h.achse, h.boden + 0.3, h.boden + 0.8));
+  const oeffnungen = [];
+  waende.forEach((w, wi) => w.luecken.forEach(([u, v]) => {
+    const breite = v - u; if (breite < 0.5) return;
+    const a = u + 0.1, b = v - 0.1; let zahl = 0, hoch = 0, bruestung = 0;   // Ränder aussparen: dort stehen oft noch Wandpunkte
+    for (let i = 0; i < unten.length / 2; i++) { const d = epPwAbst(unten, i, w); if (Math.abs(d) > 0.04) continue; const t = epPwT(unten, i, w); if (t > a && t < b) zahl++; }
+    // Hohes bis 80 cm vor der Wand (Schrank, Regal) verdeckt die Lücke; Brüstung nur dicht an der Wandlinie
+    for (let i = 0; i < z.x.length; i++) { const kl = z.klasse[i]; if (kl !== 4 && kl !== 2) continue; if (kl === 4 && z.oeffnung && z.oeffnung[i]) continue; const d = Math.abs((z.x[i] - w.p.x) * -w.d.y + (z.y[i] - w.p.y) * w.d.x); if (d > (kl === 4 ? 0.8 : 0.08)) continue; const t = (z.x[i] - w.p.x) * w.d.x + (z.y[i] - w.p.y) * w.d.y; if (t > a && t < b) { if (kl === 4) hoch++; else bruestung++; } }
+    const zellenProM = Math.max(0.1, b - a) / 0.02;
+    // ARKit-Klassen: Tür- oder Fensterzellen in der Lücke (dicht an der Wandlinie) entscheiden zuerst – so wird auch eine
+    // geschlossene Tür im Blatt zur Tür statt zur „verdeckten Wand“
+    let tuerZ = 0, fensterZ = 0;
+    if (z.oeffnung) for (let i = 0; i < z.x.length; i++) { const oe = z.oeffnung[i]; if (!oe) continue; const d = Math.abs((z.x[i] - w.p.x) * -w.d.y + (z.y[i] - w.p.y) * w.d.x); if (d > 0.15) continue; const t = (z.x[i] - w.p.x) * w.d.x + (z.y[i] - w.p.y) * w.d.y; if (t > a && t < b) { if (oe === 7) tuerZ++; else fensterZ++; } }
+    if (tuerZ >= 0.25 * zellenProM || fensterZ >= 0.25 * zellenProM) { oeffnungen.push({ wand: wi, u, v, breite: epPwR(breite, 2), art: fensterZ > tuerZ ? "fenster" : "tuer", quelle: "klasse" }); return; }
+    if (hoch >= 0.3 * zellenProM) return;   // verdeckt, keine Öffnung
+    oeffnungen.push({ wand: wi, u, v, breite: epPwR(breite, 2), art: zahl / Math.max(0.1, b - a) >= 60 || bruestung >= 0.3 * zellenProM ? "fenster" : "tuer" });
+  }));
+  // Hintergrund und 3D-Ansicht: die Wandzellen (nur Struktur, keine Möbel) und der Drehwinkel
+  const schnitt = []; for (let i = 0; i < z.x.length; i++) if (z.klasse[i] === 1) schnitt.push(z.x[i], z.y[i]);
+  return { hoehen: Object.assign({}, h, { hoehe: h.hoehe || epPwR(z.hoehe, 2), schraeg: !!(h.raster && h.raster.schraeg) }), schnitt: Float64Array.from(schnitt), waende, raeume, oeffnungen, rechtwinklig: waende.filter((w) => w.rechtwinklig).length, moebel: moebel.size,
+    zellen: z.wandZellen, wandKeys: z.wandKeys, zellenDaten: z, hinweis: z.hinweis || "", dreh, verbinder: k.verbinder, abgleich: k.abgleich, streuungMm: waende.length ? epPwR(waende.reduce((s, w) => s + w.rms, 0) / waende.length * 1000, 1) : 0 };
+}
+
+// Ergebnis → Raumscan im ImmoOffice-Format (docs/scan-format.md)
+// Raumseite einer Wandfläche aus der Wolke (Stufe 137): Bodenpunkte (−12 … +35 cm über dem Boden) gibt es nur im Raum.
+// Liefert eine Funktion e → +1 (Raum auf Seite +n), −1 (Raum auf Seite −n) oder 0 (unentschieden) für den Scan-Entwurf
+// (EPScanEditor.inEditorLaden, Option seiteFuer); e = { p1, p2, n } in Plan-Metern der Auswertung (gedreht wie die Zellen).
+function epPwBodenSeite(wolke, erg) {
+  if (!wolke || !erg || !erg.hoehen) return null;
+  const dreh = erg.dreh || 0, c = Math.cos(dreh), si = Math.sin(dreh), achse = erg.hoehen.achse, boden = erg.hoehen.boden || 0;
+  const auf = achse === "z" ? wolke.z : wolke.y, n = wolke.n, st = Math.max(1, Math.ceil(n / 1500000)), G = 0.1, zellen = new Set();
+  for (let i = 0; i < n; i += st) {
+    const z = auf[i] - boden; if (z <= -0.12 || z >= 0.35) continue;
+    const px = wolke.x[i], py = achse === "z" ? wolke.y[i] : -wolke.z[i];
+    zellen.add(Math.floor((px * c + py * si) / G) * 100003 + Math.floor((-px * si + py * c) / G));
+  }
+  const anzahl = (x, y, r) => { let k = 0; for (let gx = Math.floor((x - r) / G); gx <= Math.floor((x + r) / G); gx++) for (let gy = Math.floor((y - r) / G); gy <= Math.floor((y + r) / G); gy++) if (zellen.has(gx * 100003 + gy)) k++; return k; };
+  const f = (e) => {
+    if (!e || !e.p1 || !e.p2 || !e.n) return 0;
+    let plus = 0, minus = 0;
+    for (const t of [0.25, 0.5, 0.75]) {
+      const mx = e.p1.x + (e.p2.x - e.p1.x) * t, my = e.p1.y + (e.p2.y - e.p1.y) * t;
+      plus += anzahl(mx + e.n.x * 0.45, my + e.n.y * 0.45, 0.35); minus += anzahl(mx - e.n.x * 0.45, my - e.n.y * 0.45, 0.35);
+    }
+    if (plus >= 3 && plus > 1.5 * minus) return 1;
+    if (minus >= 3 && minus > 1.5 * plus) return -1;
+    return 0;
+  };
+  f.zellen = zellen.size;
+  return f;
+}
+
+function epPwZuScan(erg, titel) {
+  const hoehe = erg.hoehen.hoehe || 2.5;
+  const ende = (w, t) => ({ x: w.p.x + w.d.x * t, y: w.p.y + w.d.y * t });
+  const wand = (w, i) => { const a = ende(w, w.t0), b = ende(w, w.t1);
+    return { id: "pw-w" + (i + 1), x1: epPwR(a.x), y1: epPwR(a.y), x2: epPwR(b.x), y2: epPwR(b.y), laenge: epPwR(w.t1 - w.t0), hoehe, unterkante: 0,
+      winkel: epPwR(Math.atan2(w.d.y, w.d.x) * 180 / Math.PI, 2), gekruemmt: false, polygon: [], konfidenz: w.rms < 0.008 ? "high" : w.rms < 0.014 ? "medium" : "low" }; };
+  const oeff = (o) => { const w = erg.waende[o.wand], a = ende(w, o.u), b = ende(w, o.v);
+    return { id: "pw-o" + o.wand + "-" + Math.round(o.u * 100), wandId: "pw-w" + (o.wand + 1), x1: epPwR(a.x), y1: epPwR(a.y), x2: epPwR(b.x), y2: epPwR(b.y),
+      breite: o.breite, hoehe: o.art === "fenster" ? 1.3 : 2.0, unterkante: o.art === "fenster" ? 0.9 : 0, offen: o.art === "tuer" ? true : null, konfidenz: "medium" }; };
+  const raumVon = new Map(); erg.raeume.forEach((r, ri) => r.waende.forEach((wi) => raumVon.set(wi, ri)));
+  const leer = (id, name) => ({ id, bezeichnung: null, name, geschoss: 0, waende: [], tueren: [], fenster: [], oeffnungen: [], boeden: [], objekte: [], abschnitte: [] });
+  const raeume = erg.raeume.map((r, ri) => Object.assign(leer("pw-r" + (ri + 1), "Raum " + (ri + 1)),
+    { boeden: [{ id: "pw-b" + (ri + 1), polygon: r.polygon, flaeche: r.flaeche, niveau: 0 }], flaeche: r.flaeche }, r.zonen ? { hoehenzonen: r.zonen } : {}));
+  if (!raeume.length) raeume.push(leer("pw-r1", "Raum 1"));
+  erg.waende.forEach((w, i) => raeume[raumVon.has(i) ? raumVon.get(i) : 0].waende.push(wand(w, i)));
+  erg.oeffnungen.forEach((o) => { const r = raeume[raumVon.has(o.wand) ? raumVon.get(o.wand) : 0]; (o.art === "fenster" ? r.fenster : r.tueren).push(oeff(o)); });
+  return { version: 1, quelle: "punktwolke", app: "ImmoOffice · Punktwolke", erzeugt: new Date().toISOString(), einheit: "m", geraet: "", titel: titel || "", raeume,
+    messung: { methode: "LiDAR-Punktwolke: Wände aus einem waagerechten Schnitt ausgeglichen (totale kleinste Quadrate), Ecken als Schnittpunkte", herkunft: "sensor" } };
+}
+
+// Schnitt als Hintergrund aufs Zeichenblatt; Abbildung Meter → Blatt aus den Raumflächen (sonst Wänden) des geladenen Scans
+function epPwHintergrund(fenster, scan, schnitt) {
+  const ge = fenster && fenster.GrundrissEditor; if (!ge || !ge.st) return false;
+  const st = ge.st, R = st.kalib && st.kalib.ptProM, cv = fenster.document.getElementById("seite"); if (!R || !cv) return false;
+  const bbox = (pts) => pts.reduce((b, q) => ({ minX: Math.min(b.minX, q[0]), maxX: Math.max(b.maxX, q[0]), minY: Math.min(b.minY, q[1]), maxY: Math.max(b.maxY, q[1]) }), { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity });
+  let blatt, plan;
+  const fl = st.elemente.filter((e) => e.typ === "flaeche" && e.punkte && e.punkte.length);
+  const polys = scan.raeume.flatMap((r) => (r.boeden[0] ? r.boeden[0].polygon : []));
+  if (fl.length && polys.length) { blatt = bbox(fl.flatMap((e) => e.punkte.map((q) => [q.x, q.y]))); plan = bbox(polys); }
+  else {
+    const wa = st.elemente.filter((e) => e.typ === "wand"); if (!wa.length) return false;
+    blatt = bbox(wa.flatMap((e) => [[e.p1.x, e.p1.y], [e.p2.x, e.p2.y]])); plan = bbox(scan.raeume.flatMap((r) => r.waende.flatMap((w) => [[w.x1, w.y1], [w.x2, w.y2]])));
+  }
+  const ax = blatt.minX - plan.minX * R, by = blatt.minY + plan.maxY * R, k = cv.width / st.breite;
+  const g = cv.getContext("2d"); g.fillStyle = "rgba(40, 90, 200, 0.7)";
+  const s = Math.max(1.5, 0.02 * R * k);   // eine Wandzelle = 2 cm
+  for (let i = 0; i < schnitt.length; i += 2) g.fillRect((ax + schnitt[i] * R) * k - s / 2, (by - schnitt[i + 1] * R) * k - s / 2, s, s);
+  ge.render();
+  return true;
+}
+
+// ---------- 3D-Ansicht: eigener Punkt-Renderer auf Canvas (keine Bibliothek, läuft auch offline) ----------
+// Punkte in die ausgerichtete Draufsicht gedreht (x rechts, y hinten, z = Höhe über Boden), höchstens 400.000 Punkte,
+// Tiefenpuffer je Pixel, darüber die erkannten Wände als Rahmen und die Öffnungen (Tür gold, Fenster blau).
+function epPw3DVorbereiten(wolke, erg, max) {
+  const h = erg.hoehen, c = Math.cos(erg.dreh || 0), si = Math.sin(erg.dreh || 0);
+  const st = Math.max(1, Math.ceil(wolke.n / (max || 400000))), n = Math.ceil(wolke.n / st);
+  const X = new Float32Array(n), Y = new Float32Array(n), Z = new Float32Array(n), F = new Uint32Array(n), W = new Uint8Array(n), F2 = wolke.klassen ? new Uint32Array(n) : null;
+  const auf = h.achse === "z" ? wolke.z : wolke.y, Hmax = Math.max(1, h.hoehe || 2.5);
+  let k = 0;
+  for (let i = 0; i < wolke.n; i += st) {
+    const px = wolke.x[i], py = h.achse === "z" ? wolke.y[i] : -wolke.z[i], hh = auf[i] - h.boden;
+    X[k] = px * c + py * si; Y[k] = -px * si + py * c; Z[k] = hh;
+    W[k] = erg.wandKeys && erg.wandKeys.has((Math.round(px / 0.02) + 32768) * 65536 + (Math.round(py / 0.02) + 32768)) ? 1 : 0;
+    let r, g, b;
+    if (wolke.farben) { r = wolke.farben[3 * i]; g = wolke.farben[3 * i + 1]; b = wolke.farben[3 * i + 2]; }
+    else { const t = Math.max(0, Math.min(1, hh / Hmax)); r = Math.round(60 + 150 * t); g = Math.round(80 + 140 * t); b = Math.round(140 + 100 * t); }
+    F[k] = (255 << 24) | (b << 16) | (g << 8) | r;
+    if (F2) { const q = IMMO_PW_KLASSENFARBE[wolke.klassen[i]] || IMMO_PW_KLASSENFARBE[0]; F2[k] = (255 << 24) | (q[2] << 16) | (q[1] << 8) | q[0]; }
+    k++;
+  }
+  // Mitte und Größe aus den Wänden (sonst aus den Punkten)
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  const nimm = (x, y) => { if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y; };
+  erg.waende.forEach((w) => { nimm(w.p.x + w.d.x * w.t0, w.p.y + w.d.y * w.t0); nimm(w.p.x + w.d.x * w.t1, w.p.y + w.d.y * w.t1); });
+  if (!isFinite(minX)) for (let i = 0; i < k; i += 50) nimm(X[i], Y[i]);
+  return { X, Y, Z, F, F2, W, n: k, mitte: { x: (minX + maxX) / 2, y: (minY + maxY) / 2, z: Hmax / 2 }, groesse: Math.max(2, maxX - minX, maxY - minY, Hmax) };
+}
+
+function epPw3DZeichnen(cv, d, erg, a) {
+  const W = cv.width, Hh = cv.height, ctx = cv.getContext("2d");
+  const img = ctx.createImageData(W, Hh), buf = new Uint32Array(img.data.buffer); buf.fill(0xFFF7FAFA);
+  const tiefe = new Float32Array(W * Hh).fill(Infinity);
+  const cy = Math.cos(a.yaw), sy = Math.sin(a.yaw), cp = Math.cos(a.pitch), sp = Math.sin(a.pitch);
+  const f = Math.min(W, Hh) / d.groesse * 0.8 * a.zoom, D = 3 * d.groesse, ox = W / 2 + a.panX, oy = Hh / 2 + a.panY;
+  const proj = (x, y, z) => {
+    const x0 = x - d.mitte.x, y0 = y - d.mitte.y, z0 = z - d.mitte.z;
+    const x1 = x0 * cy - y0 * sy, y1 = x0 * sy + y0 * cy;
+    const t = y1 * cp - z0 * sp, up = y1 * sp + z0 * cp, p = D / (D + t);
+    return [ox + f * x1 * p, oy - f * up * p, t];
+  };
+  const dick = f > 90 ? 2 : 1, farben = a.klassen && d.F2 ? d.F2 : d.F;
+  for (let i = 0; i < d.n; i++) {
+    if (a.nurWaende && !d.W[i]) continue;
+    const q = proj(d.X[i], d.Y[i], d.Z[i]);
+    const sx = q[0] | 0, sy2 = q[1] | 0;
+    for (let dx = 0; dx < dick; dx++) for (let dy = 0; dy < dick; dy++) {
+      const px = sx + dx, py = sy2 + dy; if (px < 0 || py < 0 || px >= W || py >= Hh) continue;
+      const idx = py * W + px; if (q[2] < tiefe[idx]) { tiefe[idx] = q[2]; buf[idx] = farben[i]; }
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  if (!a.waende) return;
+  const Hw = Math.max(1, erg.hoehen.hoehe || 2.5);
+  const linie = (pts, farbe, breite, fuellen) => { ctx.beginPath(); pts.forEach((p, i) => { const q = proj(p[0], p[1], p[2]); if (i) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); }); ctx.closePath(); if (fuellen) { ctx.fillStyle = fuellen; ctx.fill(); } ctx.strokeStyle = farbe; ctx.lineWidth = breite; ctx.stroke(); };
+  erg.raeume.forEach((r) => linie(r.polygon.map((q) => [q[0], q[1], 0]), "rgba(38,49,89,0.5)", 1, "rgba(38,49,89,0.08)"));
+  erg.waende.forEach((w) => {
+    const e = (t, z) => [w.p.x + w.d.x * t, w.p.y + w.d.y * t, z];
+    linie([e(w.t0, 0), e(w.t1, 0), e(w.t1, Hw), e(w.t0, Hw)], "rgba(38,49,89,0.9)", 1.5);
+  });
+  erg.oeffnungen.forEach((o) => {
+    const w = erg.waende[o.wand]; if (!w) return;
+    const z0 = o.art === "fenster" ? 0.9 : 0, z1 = o.art === "fenster" ? Math.min(Hw - 0.2, 2.2) : Math.min(Hw - 0.3, 2.05);
+    const e = (t, z) => [w.p.x + w.d.x * t, w.p.y + w.d.y * t, z];
+    linie([e(o.u, z0), e(o.v, z0), e(o.v, z1), e(o.u, z1)], o.art === "fenster" ? "#3c8dc8" : "#D4A567", 2.5, o.art === "fenster" ? "rgba(60,141,200,0.18)" : "rgba(212,165,103,0.22)");
+  });
+}
+
+function EpPw3D({ wolke, erg }) {
+  const h = React.createElement;
+  const cvRef = React.useRef(null), ansicht = React.useRef({ yaw: -0.55, pitch: 0.6, zoom: 1, panX: 0, panY: 0, nurWaende: false, waende: true, klassen: false });
+  const [nurWaende, setNurWaende] = React.useState(false);
+  const [mitWaenden, setMitWaenden] = React.useState(true);
+  const [klassenAnsicht, setKlassenAnsicht] = React.useState(false);   // nach ARKit-Klassen färben statt Echtfarbe
+  const daten = React.useMemo(() => epPw3DVorbereiten(wolke, erg, 400000), [wolke, erg]);
+  const zeichnen = React.useCallback(() => { const cv = cvRef.current; if (cv) epPw3DZeichnen(cv, daten, erg, ansicht.current); }, [daten, erg]);
+  React.useEffect(() => { ansicht.current.nurWaende = nurWaende; ansicht.current.waende = mitWaenden; ansicht.current.klassen = klassenAnsicht; zeichnen(); }, [nurWaende, mitWaenden, klassenAnsicht, zeichnen]);
+  React.useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    let ziehen = null;
+    const start = (x, y, shift) => { ziehen = { x, y, shift }; };
+    const bewegen = (x, y) => {
+      if (!ziehen) return; const dx = x - ziehen.x, dy = y - ziehen.y; ziehen.x = x; ziehen.y = y; const a = ansicht.current;
+      if (ziehen.shift) { a.panX += dx; a.panY += dy; } else { a.yaw += dx * 0.01; a.pitch = Math.max(-0.2, Math.min(Math.PI / 2, a.pitch + dy * 0.01)); }
+      requestAnimationFrame(zeichnen);
+    };
+    const md = (e) => { start(e.clientX, e.clientY, e.shiftKey); e.preventDefault(); }, mm = (e) => bewegen(e.clientX, e.clientY), mu = () => { ziehen = null; };
+    const ts = (e) => { if (e.touches.length) start(e.touches[0].clientX, e.touches[0].clientY, e.touches.length > 1); };
+    const tm = (e) => { if (e.touches.length) { bewegen(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); } };
+    const rad = (e) => { e.preventDefault(); ansicht.current.zoom = Math.max(0.3, Math.min(8, ansicht.current.zoom * Math.pow(1.1, -e.deltaY / 100))); requestAnimationFrame(zeichnen); };
+    cv.addEventListener("mousedown", md); window.addEventListener("mousemove", mm); window.addEventListener("mouseup", mu);
+    cv.addEventListener("touchstart", ts, { passive: true }); cv.addEventListener("touchmove", tm, { passive: false }); cv.addEventListener("touchend", mu);
+    cv.addEventListener("wheel", rad, { passive: false });
+    return () => { cv.removeEventListener("mousedown", md); window.removeEventListener("mousemove", mm); window.removeEventListener("mouseup", mu); cv.removeEventListener("touchstart", ts); cv.removeEventListener("touchmove", tm); cv.removeEventListener("touchend", mu); cv.removeEventListener("wheel", rad); };
+  }, [zeichnen]);
+  const setzeBlick = (yaw, pitch) => { Object.assign(ansicht.current, { yaw, pitch, panX: 0, panY: 0, zoom: 1 }); zeichnen(); };
+  const knopf = (text, onClick, attr) => h("button", Object.assign({ type: "button", onClick, style: { background: "transparent", color: CI.blau, border: `1px solid ${CI.border}`, padding: "3px 8px", fontSize: 11, cursor: "pointer", fontFamily: FONT } }, attr), text);
+  return h("div", { "data-ep-pw-3d": daten.n },
+    h("canvas", { ref: cvRef, width: 640, height: 420, "data-ep-pw-3d-canvas": "", style: { display: "block", width: "100%", maxWidth: 640, background: "#fafaf7", border: `1px solid ${CI.border}`, cursor: "grab", touchAction: "none" } }),
+    h("div", { style: { display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap", marginTop: 6, fontSize: 11.5 } },
+      knopf("Draufsicht", () => setzeBlick(0, Math.PI / 2)), knopf("Schräg", () => setzeBlick(-0.55, 0.6)), knopf("Von vorn", () => setzeBlick(0, 0.15)), knopf("Von rechts", () => setzeBlick(-Math.PI / 2, 0.15)),
+      h("label", { style: { display: "flex", gap: 4, alignItems: "center", cursor: "pointer", marginLeft: 6 } }, h("input", { type: "checkbox", "data-ep-pw-nurwaende": "", checked: nurWaende, onChange: (e) => setNurWaende(e.target.checked) }), "nur Wandpunkte"),
+      h("label", { style: { display: "flex", gap: 4, alignItems: "center", cursor: "pointer" } }, h("input", { type: "checkbox", checked: mitWaenden, onChange: (e) => setMitWaenden(e.target.checked) }), "erkannte Wände/Öffnungen"),
+      daten.F2 ? h("label", { style: { display: "flex", gap: 4, alignItems: "center", cursor: "pointer" } }, h("input", { type: "checkbox", "data-ep-pw-klassenfarbe": "", checked: klassenAnsicht, onChange: (e) => setKlassenAnsicht(e.target.checked) }), "nach Klassen färben") : null,
+      h("span", { style: { color: CI.muted } }, `${daten.n.toLocaleString("de-DE")} Punkte` + (klassenAnsicht && daten.F2 ? " nach ARKit-Klassen: Wand blau, Boden grün, Decke grau, Tür gold, Fenster hellblau, Möbel orange" : wolke.farben ? " in Echtfarbe" : ", nach Höhe gefärbt"))));
+}
+
+// ---------- Dialog ----------
+function EpPunktwolkeDialog({ editorRef, titel, immobilie, onStatus, onWerkzeug, onSchliessen }) {
+  const h = React.createElement;
+  const letzte = window.__epPwLetzte || null;   // zuletzt geladene Wolke bleibt im Werkzeug (3D-Ansicht nach der Übernahme)
+  const [wolke, setWolke] = React.useState(letzte ? letzte.wolke : null);
+  const [name, setName] = React.useState(letzte ? letzte.name : "");
+  const [dreiD, setDreiD] = React.useState(false);
+  const [diagnoseStatus, setDiagnoseStatus] = React.useState("");
+  const [quelle, setQuelle] = React.useState(letzte ? letzte.quelle || "" : "");       // lokal | objekt | ablage
+  const [lokaleDatei, setLokaleDatei] = React.useState(letzte ? letzte.datei || null : null);
+  const [hochladenStatus, setHochladenStatus] = React.useState("");
+  const [ablageHinweis, setAblageHinweis] = React.useState("");   // z. B. Obergrenze der App erreicht (Scan unvollständig)
+  const [duenn, setDuenn] = React.useState(true);   // ausgedünnt (3-cm-Raster) hochladen – Standard, volle Auflösung nur auf Wunsch
+  const [ablageStand, setAblageStand] = React.useState(0);
+  const [von, setVon] = React.useState("0,90");
+  const [bis, setBis] = React.useState("1,90");
+  const [erg, setErg] = React.useState(null);
+  const [fehler, setFehler] = React.useState("");
+  const [lade, setLade] = React.useState("");
+  const [hg, setHg] = React.useState(true);
+  const [vorschlag, setVorschlag] = React.useState(false);   // Stufe 150: Wände/Türen/Fenster nicht mehr vorzeichnen (Vorgabe aus)
+  const [objektDateien, setObjektDateien] = React.useState([]);   // am Objekt abgelegte Punktwolken (App: „Am Objekt ablegen“)
+  React.useEffect(() => {
+    if (!immobilie || !immobilie.id) return;
+    window._sb.from("immobilie_datei").select("id, name, titel, storage_path, size_bytes, created_at").eq("immobilie_id", immobilie.id).eq("doktyp", "Punktwolke")
+      .not("storage_path", "is", null).order("created_at", { ascending: false }).limit(20)
+      .then(({ data }) => setObjektDateien(data || []), () => {});
+  }, [immobilie && immobilie.id]);
+  const zahl = (t) => Number(String(t).replace(",", "."));
+  const mbText = (b) => (b / 1048576).toFixed(1).replace(".", ",") + " MB";
+  const de = (x, n) => Number(x).toLocaleString("de-DE", { minimumFractionDigits: n == null ? 2 : n, maximumFractionDigits: n == null ? 2 : n });
+
+  const datei = async (f, herkunft) => {
+    if (herkunft !== "ablage") setAblageHinweis("");
+    if (!f) return;
+    setFehler(""); setErg(null); setWolke(null); setLade("Datei wird gelesen …"); setName(f.name || "Punktwolke"); setHochladenStatus("");
+    setQuelle(herkunft || "lokal"); setLokaleDatei(herkunft && herkunft !== "lokal" ? null : f);
+    await new Promise((r) => setTimeout(r, 20));
+    try {
+      const w = epPwLesen(await f.arrayBuffer(), f.name);
+      setLade("Boden und Decke werden gesucht …"); await new Promise((r) => setTimeout(r, 20));
+      w.hoehen = epPwHoehen(w);
+      window.__epPwLetzte = { wolke: w, name: f.name || "Punktwolke", quelle: herkunft || "lokal", datei: herkunft && herkunft !== "lokal" ? null : f };
+      setWolke(w);
+    } catch (e) { setFehler(e.message || String(e)); }
+    setLade("");
+  };
+  const ladeText = (was, geladen, gesamt) => setLade(`${was} … ${gesamt ? Math.round(geladen / gesamt * 100) + " % (" + mbText(geladen) + " von " + mbText(gesamt) + ")" : mbText(geladen)}`);
+  const objektDatei = async (d) => {
+    setFehler(""); setErg(null); setWolke(null); setLade("Punktwolke wird vom Objekt geladen …");
+    try {
+      const data = await epPwHerunterladen("immobilie-dateien", d.storage_path, (g, t) => ladeText("Punktwolke wird vom Objekt geladen", g, t));
+      await datei(new File([data], d.name || "Punktwolke.ply", { type: "application/octet-stream" }), "objekt");
+    } catch (e) { setFehler(`Punktwolke konnte nicht geladen werden${d.size_bytes ? " (" + mbText(d.size_bytes) + ")" : ""}: ` + (e.message || e)); setLade(""); }
+  };
+  // Ablage der World (Stufe 125): Punktwolken, die die App ohne Objekt hochgeladen hat
+  const ablageDatei = async (e) => {
+    setFehler(""); setErg(null); setWolke(null); setLade("Punktwolke wird aus der Ablage geladen …");
+    setAblageHinweis(epPwAblageHinweis(e.info) || epPwNetzHinweis(e.info, e.dateiname));
+    try { const blob = await epPwHerunterladen("scan-dateien", e.storage_path, (g, t) => ladeText("Punktwolke wird aus der Ablage geladen", g, t)); await datei(new File([blob], e.dateiname || "Punktwolke.ply", { type: "application/octet-stream" }), "ablage"); }
+    catch (x) { setFehler(`Punktwolke konnte nicht geladen werden${e.size_bytes ? " (" + mbText(e.size_bytes) + ")" : ""}: ` + (x.message || x)); setLade(""); }
+  };
+  // Aufmaß (02.10.2026): „Im Editor öffnen“ legt die gewünschte Wolke als Vorwahl ab – beim Öffnen gleich laden
+  React.useEffect(() => {
+    const v = window.__epPwVorwahl; if (!v || !v.pfad) return; window.__epPwVorwahl = null;
+    if (v.bucket === "scan-dateien") ablageDatei({ storage_path: v.pfad, dateiname: v.name, info: v.info || null, size_bytes: null }); else objektDatei({ storage_path: v.pfad, name: v.name, size_bytes: null });
+  }, []);
+  React.useEffect(() => {
+    if (!wolke) return;
+    const a = zahl(von), b = zahl(bis);
+    if (!(a >= 0 && b > a && b - a <= 1.5)) { setFehler("Wandband bitte als Höhe über dem Boden angeben, z. B. 0,90 bis 1,90 m."); return; }
+    setFehler(""); setLade("Wände werden erkannt …");
+    const t = setTimeout(() => {
+      try { setErg(epPwAuswerten(wolke, { von: a, bis: b, hoehen: wolke.hoehen })); } catch (e) { setErg(null); setFehler(e.message || String(e)); }
+      setLade("");
+    }, 30);
+    return () => clearTimeout(t);
+  }, [wolke, von, bis]);
+  const scan = React.useMemo(() => (erg ? epPwZuScan(erg, titel) : null), [erg, titel]);
+
+  const hochladen = async () => {
+    if (!lokaleDatei || typeof epScanAblageHochladen !== "function") return;
+    let datei = lokaleDatei, punkte = wolke ? wolke.gesamt : null;
+    if (duenn && wolke) { setHochladenStatus("Wird auf 3-cm-Raster ausgedünnt …"); await new Promise((r) => setTimeout(r, 30)); datei = epPwAusduennen(wolke, 0.03, name); punkte = Math.round((datei.size - 300) / ((wolke.farben ? 15 : 12) + (wolke.klassen ? 1 : 0))); }
+    setHochladenStatus(`Wird in die World-Ablage hochgeladen (${mbText(datei.size)}) …`);
+    try {
+      const nr = await epScanAblageHochladen(datei, { art: "punktwolke", titel: name.replace(/\.[^.]+$/, "") + (duenn ? " (3-cm-Raster)" : ""), punkte,
+        info: { hoehen: erg ? erg.hoehen : null, raeume: erg ? erg.raeume.length : null, waende: erg ? erg.waende.length : null, ausgeduennt: duenn ? 0.03 : null },
+        fortschritt: (geladen, gesamt) => setHochladenStatus(`Wird hochgeladen … ${Math.round(geladen / Math.max(1, gesamt) * 100)} % (${mbText(geladen)} von ${mbText(gesamt)})`) });
+      setHochladenStatus(`In der World-Ablage abgelegt (Nr. ${nr}) – jetzt an jedem Gerät unter „Ablage der World“ ladbar.`);
+      setAblageStand((x) => x + 1);
+    } catch (e) { setHochladenStatus("Hochladen fehlgeschlagen: " + (e.message || e)); }
+  };
+  const uebernehmen = () => {
+    const ifr = editorRef && editorRef.current, fenster = ifr && ifr.contentWindow, ge = fenster && fenster.GrundrissEditor;
+    if (ge && ge.st && ge.st.elemente && ge.st.elemente.length && !window.confirm("Das aktuelle Zeichenblatt wird durch die Punktwolke ersetzt. Fortfahren?")) return;
+    try {
+      const r = EPScanEditor.inEditorLaden(ifr, scan, { titel: titel || name.replace(/\.[^.]+$/, ""), aussenDicke: 30, ausrichten: false, begradigen: false, moebel: false, seiteFuer: typeof epPwBodenSeite === "function" && wolke ? epPwBodenSeite(wolke, erg) : null });
+      const st = fenster.GrundrissEditor.st;
+      const t = st.elemente.find((e) => e.typ === "text" && /LiDAR/.test(e.text || ""));
+      if (t) t.text = `Innenmaße aus LiDAR-Punktwolke (${new Date().toLocaleDateString("de-DE")}): Wandband ${von}–${bis} m über Boden mit Decken-/Bodenanschluss, ${erg.waende.length} Wände entlang der Hauptachsen ausgeglichen (Streuung im Mittel ${de(erg.streuungMm, 1)} mm)` +
+        (erg.hoehen.hoehe ? `, Raumhöhe ${de(erg.hoehen.hoehe)} m` : "") + `. Türen/Fenster aus Lücken in den Wänden; Außenwände 30 cm angenommen. Glasflächen und verdeckte Wände bitte prüfen.`;
+      if (!vorschlag) {   // Stufe 150: nur Blatt, Maßstab und Hinweistext behalten – Wände, Türen, Fenster, Räume, Maße setzt der Nutzer selbst
+        st.elemente = st.elemente.filter((e) => e.typ === "text");
+        if (t) t.text = `Innenmaße aus LiDAR-Punktwolke (${new Date().toLocaleDateString("de-DE")}): Wände an den Schnittkanten der Wolke gesetzt (Wandband ${von}–${bis} m über Boden, Streuung im Mittel ${de(erg.streuungMm, 1)} mm)` + (erg.hoehen.hoehe ? `, Raumhöhe ${de(erg.hoehen.hoehe)} m` : "") + ". Außenwände 30 cm angenommen. Glasflächen und verdeckte Wände bitte prüfen.";
+        r.text = "ohne Vorschlag – Wände, Türen und Fenster selbst zeichnen; Fang, Schnittkanten und 3D-Fenster helfen";
+      }
+      fenster.GrundrissEditor.commit();
+      let zeichnen = null;
+      if (typeof epPzEinrichten === "function") zeichnen = epPzEinrichten(fenster, scan, erg, wolke, { hintergrund: hg });   // Stufe 130: Wolke als Hintergrund, Fangen an der Wolke
+      if (typeof epPwStandPaket === "function") fenster.epPwStandSichern = () => epPwStandPaket(fenster, erg, wolke, name, { von: +von || 0.9, bis: +bis || 1.9, hintergrund: hg });   // Stufe 144: „Stand sichern“ nimmt die Wolke mit
+      if (typeof epWkEinrichten === "function") { try { epWkEinrichten(fenster, erg, wolke); } catch (e) { console.warn("Schnittkanten", e); } }   // Stufe 147: verbindliche Wandlage
+      else if (hg) epPwHintergrund(fenster, scan, erg.schnitt); else fenster.GrundrissEditor.render();
+      let autoRaeume = null;   // Stufe 138: ohne erkannte Räume die Räume aus den gezeichneten Wänden bilden
+      if (!erg.raeume.length && fenster.GrundrissEditor.raeumeAusWaenden) { try { autoRaeume = fenster.GrundrissEditor.raeumeAusWaenden(); if (autoRaeume.raeume) { fenster.GrundrissEditor.commit(); fenster.GrundrissEditor.render(); } } catch (e) { autoRaeume = null; } }
+      let dach = null;   // Stufe 139: Dachschrägen aus der Wolke je Raumfläche
+      window.__epDsLetzte = { fenster, erg, wolke };
+      if (typeof epDsBerechnen === "function" && fenster.GrundrissEditor.st.wolke && fenster.GrundrissEditor.st.wolke.abbildung) { try { dach = epDsBerechnen(fenster, erg, wolke, fenster.GrundrissEditor.st.wolke.abbildung); } catch (e) { console.warn("Dachschrägen", e); dach = null; } }
+      onStatus && onStatus({ art: "ok", text: "Punktwolke übernommen: " + r.text + (dach && dach.mitSchraege ? " · Dachschrägen: " + dach.text : "") + (zeichnen ? " · Wände mit dem Wand-Werkzeug entlang der dunklen Linien nachziehen – Endpunkte rasten an der Wolke ein, Türen/Fenster an Gold/Blau. Rechts neben dem Blatt: die Wolke in 3D zum Prüfen." : "") });
+      onSchliessen();
+    } catch (e) { setFehler(e.message || String(e)); }
+  };
+
+  // Vorschau (SVG): Schnittpunkte grau, Wände blau mit Länge, Fenster/Türen gold
+  let vorschau = null;
+  if (erg && erg.schnitt.length) {
+    const s = erg.schnitt; let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for (let i = 0; i < s.length; i += 2) { x0 = Math.min(x0, s[i]); x1 = Math.max(x1, s[i]); y0 = Math.min(y0, s[i + 1]); y1 = Math.max(y1, s[i + 1]); }
+    const W = 620, H = 380, m = Math.min((W - 40) / Math.max(0.5, x1 - x0), (H - 40) / Math.max(0.5, y1 - y0));
+    const X = (x) => 20 + (x - x0) * m, Y = (y) => 20 + (y1 - y) * m;
+    const st = Math.max(2, Math.ceil(s.length / 2 / 12000)) * 2;
+    let pfad = ""; for (let i = 0; i < s.length; i += st) pfad += `M${X(s[i]).toFixed(1)} ${Y(s[i + 1]).toFixed(1)}h1.2`;
+    const ende = (w, t) => ({ x: w.p.x + w.d.x * t, y: w.p.y + w.d.y * t });
+    vorschau = h("svg", { "data-ep-pw-vorschau": "", width: W, height: H, style: { display: "block", maxWidth: "100%", background: "#fafaf7", border: `1px solid ${CI.border}` } },
+      erg.raeume.map((r, i) => h("polygon", { key: "r" + i, points: r.polygon.map((q) => `${X(q[0])},${Y(q[1])}`).join(" "), fill: "#e8eefc", stroke: "none" })),
+      h("path", { d: pfad, stroke: "#9aa3b5", strokeWidth: 1.2, fill: "none" }),
+      erg.waende.map((w, i) => { const a = ende(w, w.t0), b = ende(w, w.t1);
+        return h("g", { key: "w" + i }, h("line", { x1: X(a.x), y1: Y(a.y), x2: X(b.x), y2: Y(b.y), stroke: CI.blau, strokeWidth: 2.5 }),
+          w.t1 - w.t0 >= 0.6 ? h("text", { x: (X(a.x) + X(b.x)) / 2, y: (Y(a.y) + Y(b.y)) / 2 - 4, fontSize: 10, fill: CI.blau, textAnchor: "middle", fontFamily: FONT }, de(w.t1 - w.t0)) : null); }),
+      erg.oeffnungen.map((o, i) => { const w = erg.waende[o.wand], a = ende(w, o.u), b = ende(w, o.v);
+        return h("line", { key: "o" + i, x1: X(a.x), y1: Y(a.y), x2: X(b.x), y2: Y(b.y), stroke: o.art === "fenster" ? "#3c8dc8" : CI.gold, strokeWidth: 4, strokeDasharray: o.art === "fenster" ? "4 2" : "" }); }));
+  }
+  const ein = (wert, set, attr) => h("input", Object.assign({ value: wert, onChange: (e) => set(e.target.value), inputMode: "decimal", style: { width: 56, padding: "4px 6px", border: `1px solid ${CI.border}`, fontSize: 12, fontFamily: FONT } }, attr));
+  const umschalter = (an, text, attr) => h("button", Object.assign({ type: "button", style: { background: an ? CI.blau : "transparent", color: an ? "#fff" : CI.blau, border: `1px solid ${CI.blau}`, padding: "4px 10px", fontSize: 11.5, cursor: "pointer", fontFamily: FONT } }, attr), text);
+  const gold = (an) => ({ background: CI.gold, color: "#fff", border: "none", padding: "9px 18px", fontSize: 13, fontWeight: 700, cursor: an ? "pointer" : "default", opacity: an ? 1 : 0.5, fontFamily: FONT });
+  const h0 = wolke && wolke.hoehen;
+  return h("div", { "data-ep-pw-dialog": erg ? "ergebnis" : "quelle", onClick: onSchliessen, style: { position: "fixed", inset: 0, background: "rgba(38,49,89,0.55)", zIndex: 9300, display: "flex", alignItems: "center", justifyContent: "center", padding: 12 } },
+    h("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", width: "100%", maxWidth: 700, maxHeight: "94vh", overflowY: "auto", padding: 18, fontFamily: FONT, boxSizing: "border-box" } },
+      h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 } },
+        h("div", { style: { fontSize: 16, fontWeight: 700, color: CI.blau } }, "☁ Punktwolke auswerten"),
+        h("button", { type: "button", onClick: onSchliessen, style: { background: "transparent", border: "none", fontSize: 20, color: CI.muted, cursor: "pointer" } }, "✕")),
+      h("div", { style: { fontSize: 12, color: CI.muted, lineHeight: 1.5, marginBottom: 10 } },
+        "Punktwolke aus der App – in der World hochgeladen (am Objekt oder ohne Objekt in der Ablage) oder als Datei (Dateien → ImmoOffice → Scans → …-Punktwolke → Punktwolke.ply, auch .xyz). Die Datei wird nur im Browser gelesen. Als Wand zählt, was vom Boden bis zur Decke steht; Möbel fallen heraus. Die Wände werden entlang der Hauptrichtungen des Gebäudes ausgeglichen, Lücken werden zu Türen (ohne Brüstung) oder Fenstern. Trägt die Wolke ARKit-Klassen (App ab Build 25), zählen Tür- und Fensterflächen direkt, Möbel fallen heraus."),
+      immobilie && immobilie.id ? h("div", { "data-ep-pw-objekt": objektDateien.length, style: { marginBottom: 10 } },
+        h("div", { style: { fontSize: 10.5, color: CI.muted, textTransform: "uppercase", marginBottom: 4 } }, "Am Objekt abgelegt" + (immobilie.bezeichnung || immobilie.titel ? ` · ${immobilie.bezeichnung || immobilie.titel}` : "")),
+        objektDateien.length ? h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } }, objektDateien.map((d) => h("button", { key: d.id, type: "button", "data-ep-pw-objektdatei": d.id, onClick: () => objektDatei(d),
+          style: { background: "transparent", color: CI.blau, border: `1px solid ${CI.blau}`, padding: "5px 10px", fontSize: 12, cursor: "pointer", fontFamily: FONT, textAlign: "left" } },
+          `☁ ${d.titel || d.name}` + (d.size_bytes ? ` · ${(d.size_bytes / 1048576).toFixed(1).replace(".", ",")} MB` : "") + (d.created_at ? ` · ${new Date(d.created_at).toLocaleDateString("de-DE")}` : ""))))
+        : h("div", { style: { fontSize: 12, color: CI.muted } }, "Noch keine Punktwolke am Objekt – in der App: Scans → Punktwolke → „Am Objekt ablegen“.")) : null,
+      typeof EpScanAblageListe === "function" ? h("div", { "data-ep-pw-ablage": "", style: { marginBottom: 10 } },
+        h("div", { style: { fontSize: 10.5, color: CI.muted, textTransform: "uppercase", marginBottom: 4 } }, "Ablage der World (ohne Objekt)"),
+        h(EpScanAblageListe, { key: ablageStand, art: "punktwolke", onWaehlen: ablageDatei, leer: "Noch keine Punktwolke in der Ablage – in der App nach der Aufnahme „In die World hochladen (ohne Objekt)“ oder hier eine Datei wählen und hochladen." })) : null,
+      h("label", { style: { display: "block", border: `2px dashed ${CI.border}`, padding: 14, textAlign: "center", cursor: "pointer", fontSize: 13, color: CI.blau, marginBottom: 10 } },
+        name ? `📄 ${name}` : "Datei wählen (Punktwolke.ply oder .xyz – auch aus der Dateien-App am iPhone)",
+        h("input", { type: "file", "data-ep-pw-datei": "", style: { display: "none" }, onChange: (e) => datei(e.target.files && e.target.files[0], "lokal") })),   // kein accept: iOS graut unbekannte Endungen sonst aus
+      lokaleDatei && quelle === "lokal" && typeof epScanAblageHochladen === "function" ? h("div", { style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 10, fontSize: 12 } },
+        h("button", { type: "button", "data-ep-pw-hochladen": "", disabled: /Wird/.test(hochladenStatus), onClick: hochladen, style: { background: "transparent", color: CI.blau, border: `1px solid ${CI.blau}`, padding: "5px 10px", fontSize: 12, cursor: "pointer", fontFamily: FONT } }, "📤 In die World-Ablage hochladen"),
+        h("label", { style: { display: "flex", gap: 4, alignItems: "center", cursor: "pointer" } }, h("input", { type: "checkbox", "data-ep-pw-duenn": "", checked: duenn, onChange: (e) => setDuenn(e.target.checked) }),
+          `ausgedünnt (3-cm-Raster statt ${mbText(lokaleDatei.size)} – deutlich kleiner, reicht für den Grundriss)`),
+        h("span", { "data-ep-pw-hochladen-status": "", style: { color: /fehlgeschlagen/.test(hochladenStatus) ? "#c83c3c" : CI.muted } }, hochladenStatus || "Damit liegt die Wolke in der World und lässt sich an jedem Gerät wieder öffnen.")) : null,
+      lade ? h("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 8 } }, "⏳ " + lade) : null,
+      h0 ? h("div", { "data-ep-pw-info": `${wolke.n}/${h0.achse}/${h0.boden}/${h0.decke}/${h0.hoehe}`, "data-ep-pw-klassen": wolke.klassen ? "1" : "0", style: { fontSize: 12.5, marginBottom: 8 } },
+        `${de(wolke.gesamt, 0)} Punkte${wolke.gesamt > wolke.n ? ` (ausgewertet ${de(wolke.n, 0)})` : ""} · Boden erkannt` + (h0.hoehe ? ` · Decke erkannt · lichte Raumhöhe ${de(h0.hoehe)} m` : " · keine Decke erkannt") + (wolke.klassen ? " · mit ARKit-Klassen (Wand, Boden, Decke, Tür, Fenster, Möbel)" : "")) : null,
+      wolke ? h("div", { style: { display: "flex", gap: 8, alignItems: "center", fontSize: 12.5, marginBottom: 8, flexWrap: "wrap" } },
+        "Wandband von", ein(von, setVon, { "data-ep-pw-von": "" }), "bis", ein(bis, setBis, { "data-ep-pw-bis": "" }), "m über dem Boden",
+        h("span", { style: { color: CI.muted, fontSize: 11 } }, "(als Wand gilt, was in dieser Höhe Punkte hat und bis zur Decke oder zum Boden reicht – höher legen, wenn Möbel stören)")) : null,
+      erg ? h("div", { style: { display: "flex", gap: 6, alignItems: "center", margin: "4px 0 6px" } },
+        umschalter(!dreiD, "Draufsicht (2D)", { "data-ep-pw-2d": "", onClick: () => setDreiD(false) }),
+        umschalter(dreiD, "🧊 3D-Ansicht", { "data-ep-pw-3d-knopf": "", onClick: () => setDreiD(true) }),
+        h("span", { style: { fontSize: 11, color: CI.muted } }, dreiD ? "Ziehen dreht, Mausrad zoomt, Shift + Ziehen verschiebt · Türen gold, Fenster blau" : "Wandzellen grau, Wände blau, Türen gold, Fenster blau gestrichelt")) : null,
+      erg && dreiD ? h(EpPw3D, { wolke, erg }) : vorschau,
+      erg && erg.hinweis ? h("div", { "data-ep-pw-hinweis": "", style: { background: "#fff8e6", color: "#6b5200", padding: "6px 8px", fontSize: 12, marginTop: 8 } }, erg.hinweis) : null,
+      erg && erg.abgleich && (erg.abgleich.moebel || erg.abgleich.verlaengert) ? h("div", { "data-ep-pw-abgleich": JSON.stringify(erg.abgleich), style: { background: "#eef3fb", color: "#1f3a5f", padding: "6px 8px", fontSize: 12, marginTop: 8 } },
+        `Boden-Decken-Abgleich: ${erg.abgleich.moebel} Möbelfront${erg.abgleich.moebel === 1 ? "" : "en"} (Küche, Schrank, Regal – Decke läuft dahinter weiter, Boden nicht) nicht als Wand gezählt` + (erg.abgleich.frei ? `, davon ${erg.abgleich.frei} frei stehend` : "") + (erg.abgleich.stuecke.length ? `; ${erg.abgleich.stuecke.length} Wandstück${erg.abgleich.stuecke.length === 1 ? "" : "e"} dahinter an der Deckenkante ergänzt (${erg.abgleich.stuecke.map((c) => de(c.tiefe) + " m tief").join(", ")})` : "") + (erg.abgleich.verlaengert ? `; ${erg.abgleich.verlaengert} Wand${erg.abgleich.verlaengert === 1 ? "" : "ände"} entlang der Deckenkante verlängert` : "") + ".") : null,
+      wolke && ablageHinweis ? h("div", { "data-ep-pw-ablage-hinweis": "", style: Object.assign({ padding: "6px 8px", fontSize: 12, marginTop: 8 }, (ablageHinweis.indexOf("Netz-Punktwolke") === 0 || ablageHinweis.indexOf("Driftkorrigierte") === 0) ? { background: "#e9f3ea", color: "#1f4d2a" } : { background: "#fdecec", color: "#7a1f1f" }) }, ablageHinweis) : null,
+      erg ? h("div", { "data-ep-pw-waende": erg.waende.length, "data-ep-pw-raeume": JSON.stringify(erg.raeume.map((r) => r.flaeche)), style: { fontSize: 12.5, lineHeight: 1.6, marginTop: 8 } },
+        `${erg.waende.length} Wände aus ${de(erg.zellen, 0)} Wandzellen (Streuung im Mittel ${de(erg.streuungMm, 1)} mm, ${erg.rechtwinklig} rechtwinklig gestellt) · ` +
+        (erg.raeume.length ? erg.raeume.map((r, i) => `Raum ${i + 1}: ${de(r.flaeche)} m²` + (r.zonen ? ` (Schräge: ${de(r.zonen.halb)} m² zur Hälfte, ${de(r.zonen.keine)} m² ohne Anrechnung${r.zonen.unbekannt > 0.2 ? `, ${de(r.zonen.unbekannt)} m² ohne Dachpunkte` : ""})` : "")).join(" · ") : "kein geschlossener Raum erkannt") +
+        ` · ${erg.oeffnungen.filter((o) => o.art === "tuer").length} Türen/Öffnungen, ${erg.oeffnungen.filter((o) => o.art === "fenster").length} Fenster` + (erg.oeffnungen.some((o) => o.quelle === "klasse") ? ` (${erg.oeffnungen.filter((o) => o.quelle === "klasse").length} aus ARKit-Klassen)` : "")) : null,
+      erg ? h("label", { style: { display: "flex", gap: 6, alignItems: "center", fontSize: 12, marginTop: 8, cursor: "pointer" } },
+        h("input", { type: "checkbox", "data-ep-pw-hintergrund": "", checked: hg, onChange: (e) => setHg(e.target.checked) }), "Punktwolke als Hintergrund auf dem Blatt zeigen – Wände dunkel, Türen gold, Fenster blau (nur Anzeige, nicht im Export); Zeichnen rastet an der Wolke ein") : null,
+      erg ? h("label", { style: { display: "flex", gap: 6, alignItems: "center", fontSize: 12, marginTop: 6, cursor: "pointer" } },
+        h("input", { type: "checkbox", "data-ep-pw-vorschlag": "", checked: vorschlag, onChange: (e) => setVorschlag(e.target.checked) }), "Entwurf vorzeichnen (erkannte Wände, Türen, Fenster, Räume als Vorschlag) – sonst nur Maßstab, Hintergrund, Fang, Schnittkanten und 3D-Fenster; Wände, Türen und Fenster werden selbst gesetzt") : null,
+      fehler ? h("div", { "data-ep-pw-fehler": "", style: { background: "#fde6e6", color: "#c83c3c", padding: "8px 10px", fontSize: 12, marginTop: 8 } }, fehler) : null,
+      h("div", { style: { display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 12 } },
+        erg ? h("div", { style: { display: "flex", gap: 6, alignItems: "center", marginRight: "auto", flexWrap: "wrap" } },
+          h("button", { type: "button", "data-ep-pw-diagnose-world": "", title: "Legt die Auswertung (Wandzellen, Wände, Räume, Öffnungen) als Diagnose in der World ab – ohne Datei, auch vom Handy", disabled: /wird/.test(diagnoseStatus),
+            onClick: async () => { setDiagnoseStatus("Diagnose wird abgelegt …"); try { const nr = await epPwDiagnoseInWorld(erg, name, wolke); setDiagnoseStatus(`Diagnose Nr. ${nr} in der World abgelegt – bitte Bescheid geben.`); } catch (e) { setDiagnoseStatus("Ablegen fehlgeschlagen: " + (e.message || e)); } },
+            style: { background: "transparent", border: `1px solid ${CI.border}`, color: CI.blau, padding: "7px 10px", fontSize: 11.5, cursor: "pointer", fontFamily: FONT } }, "📤 Diagnose in die World"),
+          h("button", { type: "button", "data-ep-pw-diagnose": "", title: "Dieselbe Diagnose als JSON-Datei herunterladen", onClick: () => epPwDiagnoseSpeichern(erg, name, wolke), style: { background: "transparent", border: `1px solid ${CI.border}`, color: CI.muted, padding: "7px 10px", fontSize: 11.5, cursor: "pointer", fontFamily: FONT } }, "🛠 als Datei"),
+          diagnoseStatus ? h("span", { "data-ep-pw-diagnose-status": "", style: { fontSize: 11.5, color: /fehlgeschlagen/.test(diagnoseStatus) ? "#c83c3c" : CI.muted } }, diagnoseStatus) : null,
+          erg.raeume.length && scan ? h("button", { type: "button", "data-ep-pw-wohnflaeche": "", title: "Räume mit Flächenanteilen nach § 4 WoFlV (Dachschrägen) direkt in die Wohnflächenberechnung",
+            onClick: () => { epWerkzeugOeffnen("wohnflaeche", { scan, immobilie: immobilie || null, titel: titel || name.replace(/\.[^.]+$/, "") }); onStatus && onStatus({ art: "ok", text: `${erg.raeume.length} Räume aus der Punktwolke in die Wohnflächenberechnung übergeben` }); onSchliessen(); onWerkzeug && onWerkzeug("wohnflaeche"); },
+            style: { background: "transparent", border: `1px solid ${CI.blau}`, color: CI.blau, padding: "7px 10px", fontSize: 11.5, cursor: "pointer", fontFamily: FONT } }, "📏 Wohnfläche (WoFlV) →") : null) : null,
+        h("button", { type: "button", onClick: onSchliessen, style: { background: "transparent", border: `1px solid ${CI.blau}`, color: CI.blau, padding: "7px 14px", fontSize: 12, cursor: "pointer", fontFamily: FONT } }, "Abbrechen"),
+        h("button", { type: "button", "data-ep-pw-uebernehmen": "", disabled: !scan || !!lade, onClick: uebernehmen, style: gold(!!scan && !lade) }, "In den Editor übernehmen"))));
+}
+
+// Diagnose: alle Zellen mit Klasse (in der ausgerichteten Draufsicht), Wände, Räume, Öffnungen – klein genug zum Teilen,
+// und reicht, um die Achsen-Suche ohne die Rohpunkte nachzurechnen.
+// Verkleinerte Kopie der Wolke (Voxel 3 cm, höchstens ~400.000 Punkte, sonst 5 bzw. 7 cm) als Base64: x, y, z float32 LE + klasse
+// uint8 je Punkt – damit die Diagnose die echten Daten mitnimmt und sich die Auswertung außerhalb des Portals exakt nachstellen lässt
+function epPwWolkeKompakt(w, raster, maxPunkte, erg) {
+  if (!w || !w.n) return null;
+  raster = raster || 0.03; maxPunkte = maxPunkte || (erg ? 500000 : 400000);
+  // Wanddetail erhalten (02.10.2026, „so kann ich die Innenwandstärken nicht messen“): Punkte bis 35 cm an einer erkannten
+  // Wandlinie behalten ein feines Raster (2 cm – die Netz-Wolke der App hat 2,5 cm, es geht also nichts verloren), Boden, Decke
+  // und Möbel werden grob (5 cm) ausgedünnt. So bleiben im gesicherten Stand beide Wandflächen scharf, und der Schnitt kann die
+  // Wandstärke messen. Ohne Wandliste wie bisher ein Raster für alles.
+  let wandnah = null, fein = 0.02, grob = 0.05;
+  if (erg && erg.waende && erg.waende.length && erg.hoehen) {
+    const dreh = erg.dreh || 0, c = Math.cos(dreh), si = Math.sin(dreh), achse = erg.hoehen.achse, G = 0.1, zellen = new Set();
+    const key = (x, y) => Math.floor(x / G) * 100003 + Math.floor(y / G);
+    for (const wd of erg.waende) { const n = { x: -wd.d.y, y: wd.d.x }; for (let t = wd.t0 - 0.1; t <= wd.t1 + 0.1; t += 0.05) for (let u = -0.35; u <= 0.35 + 1e-9; u += 0.05) zellen.add(key(wd.p.x + wd.d.x * t + n.x * u, wd.p.y + wd.d.y * t + n.y * u)); }
+    wandnah = (i) => { const px0 = w.x[i], py0 = achse === "z" ? w.y[i] : -w.z[i]; return zellen.has(key(px0 * c + py0 * si, -px0 * si + py0 * c)); };
+  }
+  const rasterVon = (i) => wandnah ? (wandnah(i) ? fein : grob) : raster;
+  const key3 = (i, r) => (Math.round(w.x[i] / r) + 32768) * 4294967296 + (Math.round(w.y[i] / r) + 32768) * 65536 + (Math.round(w.z[i] / r) + 32768) + (r === fein ? 0.5 : 0);
+  let idx, nah;
+  for (let versuch = 0; versuch < 4; versuch++) {
+    const seen = new Set(); idx = []; nah = 0;
+    for (let i = 0; i < w.n; i++) { const r = rasterVon(i), k = key3(i, r); if (seen.has(k)) continue; seen.add(k); idx.push(i); if (wandnah && r === fein) nah++; }
+    if (idx.length <= maxPunkte) break;
+    if (wandnah) { fein = fein < 0.03 ? 0.03 : fein < 0.04 ? 0.04 : 0.05; grob = Math.min(0.07, grob + 0.01); if (fein >= 0.05 && grob >= 0.07) break; }
+    else { if (raster >= 0.07) break; raster = raster < 0.05 ? 0.05 : 0.07; }
+  }
+  const buf = new ArrayBuffer(idx.length * 13), dv = new DataView(buf);
+  idx.forEach((i, j) => { const o = j * 13; dv.setFloat32(o, w.x[i], true); dv.setFloat32(o + 4, w.y[i], true); dv.setFloat32(o + 8, w.z[i], true); dv.setUint8(o + 12, w.klassen ? w.klassen[i] : 0); });
+  const u8 = new Uint8Array(buf); let bin = ""; for (let i = 0; i < u8.length; i += 0x8000) bin += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
+  return { raster: wandnah ? fein : raster, rasterGrob: wandnah ? grob : null, wandnahPunkte: wandnah ? nah : null, punkte: idx.length, felder: "x,y,z float32 LE, klasse uint8 (13 Byte je Punkt)", nivelliert: !!(w.nivelliert && w.nivelliert.angewendet), base64: btoa(bin) };
+}
+// Wolke aus einer Diagnose zurücklesen (Gegenstück zu epPwWolkeKompakt) – für Nachstellen und Test-Fixtures
+function epPwWolkeAusDiagnose(diag) {
+  const k = diag && diag.wolke; if (!k || !k.base64) return null;
+  const bin = atob(k.base64), n = Math.floor(bin.length / 13), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  const dv = new DataView(u8.buffer), x = new Float32Array(n), y = new Float32Array(n), z = new Float32Array(n), kl = new Uint8Array(n); let mitKlasse = false;
+  for (let j = 0; j < n; j++) { const o = j * 13; x[j] = dv.getFloat32(o, true); y[j] = dv.getFloat32(o + 4, true); z[j] = dv.getFloat32(o + 8, true); kl[j] = dv.getUint8(o + 12); if (kl[j]) mitKlasse = true; }
+  return { x, y, z, farben: null, klassen: mitKlasse ? kl : null, n, gesamt: n, nivelliert: k.nivelliert ? { angewendet: true, ausDiagnose: true } : undefined };
+}
+function epPwDiagnose(erg, name, wolke) {
+  const z = erg.zellenDaten, zellen = [], oeffnungZellen = [];
+  if (z) for (let i = 0; i < z.x.length; i++) { if (z.klasse[i]) zellen.push(z.kante ? [Math.round(z.x[i] * 100), Math.round(z.y[i] * 100), z.klasse[i], z.kante[i] ? 1 : 0] : [Math.round(z.x[i] * 100), Math.round(z.y[i] * 100), z.klasse[i]]); if (z.oeffnung && z.oeffnung[i]) oeffnungZellen.push([Math.round(z.x[i] * 100), Math.round(z.y[i] * 100), z.oeffnung[i]]); }
+  const hoehen = Object.assign({}, erg.hoehen, { raster: erg.hoehen.raster ? { zelle: erg.hoehen.raster.zelle, zellen: erg.hoehen.raster.map.size, hoeheMax: erg.hoehen.raster.hoeheMax, schraeg: erg.hoehen.raster.schraeg, lokal: !!erg.hoehen.raster.lokal, fenster: erg.hoehen.raster.decken ? erg.hoehen.raster.decken.size : 0, ebenen: erg.hoehen.raster.ebenen || null } : undefined });
+  return { art: "punktwolke-diagnose", version: 2, erzeugt: new Date().toISOString(), datei: name || "", abgleich: erg.abgleich || null, punkte: wolke ? wolke.gesamt : null, hoehen, raeumeZonen: erg.raeume.map((r) => r.zonen || null), drehGrad: epPwR((erg.dreh || 0) * 180 / Math.PI, 2), hinweis: erg.hinweis || "",
+    waende: erg.waende.map((w) => ({ p: [epPwR(w.p.x), epPwR(w.p.y)], d: [epPwR(w.d.x, 4), epPwR(w.d.y, 4)], t0: epPwR(w.t0), t1: epPwR(w.t1), luecken: w.luecken.map((l) => l.map((v) => epPwR(v))), punkte: w.punkte, rmsMm: epPwR(w.rms * 1000, 1) })),
+    raeume: erg.raeume, oeffnungen: erg.oeffnungen, zellenEinheit: "cm", zellenKlassen: { 1: "Wand", 2: "Brüstung", 3: "Sturz", 4: "hoch ohne Decke" }, zellenFelder: z && z.kante ? ["x cm", "y cm", "Klasse", "Deckenkante"] : ["x cm", "y cm", "Klasse"], zellen,
+    klassifiziert: !!(wolke && wolke.klassen), oeffnungZellenKlassen: { 6: "Fenster (ARKit)", 7: "Tür (ARKit)" }, oeffnungZellen, wolke: epPwWolkeKompakt(wolke, undefined, undefined, erg) };
+}
+// Diagnose in der World ablegen (Tabelle punktwolke_diagnose) – ohne Datei, auch vom Handy aus. Liefert die Nummer.
+async function epPwDiagnoseInWorld(erg, name, wolke) {
+  const { data: nutzer } = await window._sb.auth.getUser();
+  const id = nutzer && nutzer.user && nutzer.user.id; if (!id) throw new Error("Nicht angemeldet.");
+  const { data, error } = await window._sb.from("punktwolke_diagnose").insert({ name: (name || "Punktwolke").replace(/\.[^.]+$/, ""), datei: name || "", inhalt: epPwDiagnose(erg, name, wolke), ersteller_id: id }).select("id").single();
+  if (error) throw error;
+  return data && data.id;
+}
+function epPwDiagnoseSpeichern(erg, name, wolke) {
+  const text = JSON.stringify(epPwDiagnose(erg, name, wolke));
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type: "application/json" }));
+  a.download = (name || "punktwolke").replace(/\.[^.]+$/, "") + "-diagnose.json"; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+}
+
+// Hinweis aus den App-Angaben eines Ablage-Eintrags: Apps bis Build 27 hörten bei 6 Mio. Punkten einfach auf zu sammeln –
+// der Rest der Wohnung fehlt dann in der Wolke (das Netz hat ihn meist trotzdem). Ab Build 28 wird stattdessen das Raster vergröbert.
+function epPwAblageHinweis(info) {
+  if (!info || typeof info !== "object") return "";
+  const n = Number(info.punkte) || 0, grenze = 6000000;
+  if (n >= grenze && !(Number(info.vergroebert) > 0)) return `Die App hat beim Scannen die Obergrenze von ${grenze.toLocaleString("de-DE")} Punkten erreicht und danach nichts mehr aufgenommen – was zuletzt gescannt wurde, fehlt in dieser Wolke. Mit der App ab Build 28 noch einmal scannen: dort wird das Raster bei Bedarf vergröbert, der Scan bricht nicht mehr ab.`;
+  if (Number(info.vergroebert) > 0 && info.raster_m) return `Große Wohnung: die App hat das Raster beim Scannen auf ${(info.raster_m * 100).toFixed(1).replace(".", ",")} cm vergröbert, damit alles in die Wolke passt.`;
+  return "";
+}
+// Netz-Punktwolke (App ab Build 29): Punkte aus dem von ARKit nachkorrigierten Netz – kein Höhenversatz durch Tracking-Sprünge
+function epPwNetzHinweis(info, dateiname) {
+  if (!info || typeof info !== "object") return "";
+  // Driftkorrigierte Rohwolke (App ab Build 34): Punkte an ARKit-Netz-Anker gebunden, Weltlage folgt der nachkorrigierten Ankerlage
+  if (info.driftkorrektur && !/_netz\.ply$/i.test(dateiname || "")) { const d = info.driftkorrektur, cm = (v) => (Number(v) || 0).toFixed(1).replace(".", ","); return `Driftkorrigierte Rohwolke: ${Number(d.punkte_gebunden || 0).toLocaleString("de-DE")} Punkte an ${d.anker || 0} Netz-Anker gebunden (${Math.round((d.anteil_gebunden || 0) * 100)} %), Verschiebung durch Nachkorrektur im Mittel ${cm(d.mittel_cm)} cm, höchstens ${cm(d.max_cm)} cm – scharf wie die Rohwolke, lagerichtig wie das Netz.`; }
+  if (!info.netz_punktwolke) return "";
+  if (!/_netz\.ply$/i.test(dateiname || "")) return "";
+  const np = info.netz_punktwolke;
+  return `Netz-Punktwolke: Lage und Klassen aus dem von ARKit laufend nachkorrigierten Netz (${Number(np.punkte || 0).toLocaleString("de-DE")} Punkte, ${((np.raster_m || 0.025) * 100).toFixed(1).replace(".", ",")} cm), Farbe aus den Rohpunkten – Tracking-Sprünge des Scans sind hier bereits ausgeglichen.`;
+}
+window.epPwNetzHinweis = epPwNetzHinweis;
+window.epPwAblageHinweis = epPwAblageHinweis;
+
+function EpPunktwolkeKnopf({ editorRef, titel, immobilie, onStatus, gesperrt, onWerkzeug }) {
+  const [offen, setOffen] = React.useState(false);
+  React.useEffect(() => { const f = () => setOffen(true); window.addEventListener("ep-pw-oeffnen", f); return () => window.removeEventListener("ep-pw-oeffnen", f); }, []);   // Aufmaß: „Im Editor öffnen“
+  return React.createElement(React.Fragment, null,
+    React.createElement(WzButton, { klein: !0, variante: "hell", disabled: gesperrt, onClick: () => setOffen(true) }, "☁ Punktwolke laden"),
+    offen ? React.createElement(EpPunktwolkeDialog, { editorRef, titel, immobilie, onStatus, onWerkzeug, onSchliessen: () => setOffen(false) }) : null);
+}
+// Wohnflächenrechner: Punktwolken-Scans benennen (Teilflächen „lt. Punktwolke“, Methode)
+(function () {
+  if (typeof WF === "undefined" || !WF || typeof WF.ausScan !== "function" || WF.__punktwolke) return;
+  const orig = WF.ausScan;
+  WF.ausScan = function (scan, dok, ep) {
+    const g = orig.call(this, scan, dok, ep);
+    if (scan && scan.quelle === "punktwolke" && g) {
+      (g.geschosse || []).forEach((gs) => (gs.raeume || []).forEach((r) => (r.teile || []).forEach((t) => { if (t.bez) t.bez = t.bez.replace(/lt\. Raumscan/g, "lt. Punktwolke"); })));
+      g.messung = Object.assign({}, g.messung || {}, { methode: (scan.messung && scan.messung.methode) || "LiDAR-Punktwolke", app: "ImmoOffice · Punktwolke", hinweise: (g.messung && g.messung.hinweise) || [] });
+    }
+    return g;
+  };
+  WF.__punktwolke = true;
+})();
+window.EpPunktwolkeKnopf = EpPunktwolkeKnopf;
+window.epPwLesen = epPwLesen; window.epPwAuswerten = epPwAuswerten; window.epPwEbenenAnteil = epPwEbenenAnteil; window.epPwBodenSeite = epPwBodenSeite; window.epPwDeckeLokal = epPwDeckeLokal; window.epPwNivellieren = epPwNivellieren; window.epPwHoehen = epPwHoehen; window.epPwWolkeKompakt = epPwWolkeKompakt; window.epPwWolkeAusDiagnose = epPwWolkeAusDiagnose; window.epPwZuScan = epPwZuScan; window.epPwDiagnose = epPwDiagnose; window.epPwDiagnoseInWorld = epPwDiagnoseInWorld; window.epPwAusduennen = epPwAusduennen; window.epPwKonstruktion = epPwKonstruktion;
+// ---- Stufe 125: Scan-Ablage der World – Raumscans und Punktwolken ohne Objektbezug ----
+// Die App lädt Scans wahlweise ohne Objekt in die World (Tabelle scan_ablage, privater Bucket scan-dateien, Pfad <uid>/<art>/…).
+// Hier: Liste je Art mit Laden und Löschen (Speicherregeln: eigene Einträge, Chef alle), der Dialog „☁ Raumscan aus der
+// Ablage“ im Grundriss-Editor; die Punktwolken-Ablage erscheint im Dialog „☁ Punktwolke laden“ (Stufe 124).
+async function epScanAblageLaden(art) {
+  const { data, error } = await window._sb.from("scan_ablage").select("id, art, titel, dateiname, storage_path, dateien, size_bytes, punkte, info, immobilie_id, ersteller_id, created_at")
+    .eq("art", art).order("created_at", { ascending: false }).limit(60);
+  if (error) throw error;
+  const zeilen = data || [];
+  const ids = [...new Set(zeilen.map((z) => z.ersteller_id).filter(Boolean))];
+  const namen = {};
+  if (ids.length) {
+    const { data: p } = await window._sb.from("profiles").select("id, name").in("id", ids);
+    (p || []).forEach((x) => { namen[x.id] = x.name || ""; });
+  }
+  return zeilen.map((z) => Object.assign({}, z, { ersteller: namen[z.ersteller_id] || "" }));
+}
+async function epScanAblageDatei(pfad) {
+  const { data, error } = await window._sb.storage.from("scan-dateien").download(pfad);
+  if (error) throw error;
+  return data;
+}
+async function epScanAblageLoeschen(e) {
+  const pfade = [e.storage_path, ...Object.values(e.dateien || {})].filter(Boolean);
+  const { error } = await window._sb.storage.from("scan-dateien").remove(pfade);
+  if (error) throw error;
+  const { error: e2 } = await window._sb.from("scan_ablage").delete().eq("id", e.id);
+  if (e2) throw e2;
+}
+// Datei aus dem Browser in die Ablage laden (Bucket scan-dateien, Eintrag in scan_ablage) – z. B. die PLY vom Handy aus dem
+// Punktwolken-Dialog. Upload per XHR mit Fortschritt (im Test austauschbar über window.epScanAblageUploader). Liefert die Nummer.
+async function epScanAblageUploaderStandard(pfad, datei, fortschritt) {
+  const { data } = await window._sb.auth.getSession();
+  const token = data && data.session && data.session.access_token;
+  if (!token) throw new Error("Nicht angemeldet – bitte neu anmelden.");
+  const url = (window._sb.supabaseUrl || "") + "/storage/v1/object/scan-dateien/" + pfad.split("/").map(encodeURIComponent).join("/");
+  await new Promise((ok, nein) => {
+    const x = new XMLHttpRequest();
+    x.open("POST", url);
+    x.setRequestHeader("Authorization", "Bearer " + token);
+    if (window._sb.supabaseKey) x.setRequestHeader("apikey", window._sb.supabaseKey);
+    x.setRequestHeader("x-upsert", "false");
+    x.setRequestHeader("Content-Type", datei.type || "application/octet-stream");
+    x.upload.onprogress = (e) => { if (e.lengthComputable && fortschritt) fortschritt(e.loaded, e.total); };
+    x.onload = () => {
+      if (x.status < 300) { if (fortschritt) fortschritt(datei.size, datei.size); ok(); return; }
+      let m = ""; try { const j = JSON.parse(x.responseText); m = j.message || j.error || ""; } catch (e) { m = (x.responseText || "").slice(0, 160); }
+      nein(new Error(x.status === 413 || /maximum allowed size|too large/i.test(m) ? "Die Datei ist zu groß für den Speicher (Grenze je Datei im Supabase-Projekt)." : `Upload fehlgeschlagen (${x.status}${m ? ": " + m : ""}).`));
+    };
+    x.onerror = () => nein(new Error("Upload abgebrochen – Verbindung prüfen und erneut versuchen."));
+    x.send(datei);
+  });
+}
+async function epScanAblageHochladen(datei, { art, titel, punkte, info, fortschritt }) {
+  const { data: nutzer } = await window._sb.auth.getUser();
+  const uid = nutzer && nutzer.user && nutzer.user.id; if (!uid) throw new Error("Nicht angemeldet.");
+  const sicher = (datei.name || "Punktwolke.ply").replace(/[^a-zA-Z0-9._-]/g, "_");
+  const pfad = `${uid}/${art}/${Date.now()}_${sicher}`;
+  await (window.epScanAblageUploader || epScanAblageUploaderStandard)(pfad, datei, fortschritt);
+  const { data, error: e2 } = await window._sb.from("scan_ablage").insert({ art, titel: titel || sicher.replace(/\.[^.]+$/, ""), dateiname: sicher, storage_path: pfad, dateien: {}, mime_type: datei.type || "application/octet-stream",
+    size_bytes: datei.size, punkte: punkte || null, info: info || null, ersteller_id: uid, geraet: (navigator.userAgent || "").slice(0, 120) }).select("id").single();
+  if (e2) throw e2;
+  return data && data.id;
+}
+const epSaMB = (b) => (!b ? "" : b >= 1048576 ? (b / 1048576).toFixed(1).replace(".", ",") + " MB" : Math.max(1, Math.round(b / 1024)) + " KB");
+
+function EpScanAblageListe({ art, onWaehlen, leer }) {
+  const h = React.createElement;
+  const [liste, setListe] = React.useState(null);
+  const [fehler, setFehler] = React.useState("");
+  const laden = React.useCallback(() => {
+    setFehler("");
+    epScanAblageLaden(art).then(setListe, (e) => { setListe([]); setFehler("Ablage konnte nicht geladen werden: " + (e.message || e)); });
+  }, [art]);
+  React.useEffect(() => { laden(); }, [laden]);
+  const loeschen = async (e) => {
+    if (!window.confirm(`„${e.titel || e.dateiname}“ aus der Ablage der World löschen?`)) return;
+    try { await epScanAblageLoeschen(e); laden(); } catch (x) { setFehler("Löschen nicht möglich (nur eigene Einträge, Chef alle): " + (x.message || x)); }
+  };
+  const zeile = (e) => {
+    const info = e.info || {};
+    const details = [
+      e.art === "punktwolke" ? (e.punkte ? Number(e.punkte).toLocaleString("de-DE") + " Punkte" : "")
+        : [info.raeume ? `${info.raeume} Räume` : "", info.wohnflaeche ? Number(info.wohnflaeche).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²" : ""].filter(Boolean).join(", "),
+      epSaMB(e.size_bytes), e.created_at ? new Date(e.created_at).toLocaleDateString("de-DE") : "", e.ersteller].filter(Boolean).join(" · ");
+    return h("div", { key: e.id, "data-ep-sa-eintrag": e.id, style: { display: "flex", alignItems: "center", gap: 6 } },
+      h("button", { type: "button", "data-ep-sa-laden": e.id, onClick: () => onWaehlen(e), style: { flex: 1, textAlign: "left", background: "transparent", color: CI.blau, border: `1px solid ${CI.blau}`, padding: "5px 10px", fontSize: 12, cursor: "pointer", fontFamily: FONT } },
+        h("div", { style: { fontWeight: 600 } }, `☁ ${e.titel || e.dateiname}`),
+        h("div", { style: { fontSize: 11, color: CI.muted } }, details)),
+      h("button", { type: "button", "data-ep-sa-loeschen": e.id, title: "Aus der Ablage löschen", onClick: () => loeschen(e), style: { background: "transparent", border: "none", color: CI.muted, cursor: "pointer", fontSize: 16 } }, "✕"));
+  };
+  return h("div", { "data-ep-sa-liste": liste ? liste.length : -1 },
+    liste === null ? h("div", { style: { fontSize: 12, color: CI.muted } }, "⏳ Ablage wird geladen …")
+      : liste.length ? h("div", { style: { display: "flex", flexDirection: "column", gap: 6 } }, liste.map(zeile))
+      : h("div", { style: { fontSize: 12, color: CI.muted } }, leer || "Noch nichts in der Ablage der World."),
+    fehler ? h("div", { "data-ep-sa-fehler": "", style: { background: "#fde6e6", color: "#c83c3c", padding: "6px 8px", fontSize: 12, marginTop: 6 } }, fehler) : null);
+}
+
+function EpScanAblageDialog({ editorRef, titel, onStatus, onSchliessen }) {
+  const h = React.createElement;
+  const [fehler, setFehler] = React.useState("");
+  const [lade, setLade] = React.useState("");
+  const waehlen = async (e) => {
+    setFehler(""); setLade(`„${e.titel || e.dateiname}“ wird geladen …`);
+    try {
+      const blob = await epScanAblageDatei(e.storage_path);
+      const scan = JSON.parse(await blob.text());
+      if (!scan || (!scan.raeume && !scan.gesamt)) throw new Error("Das ist kein Raumscan der ImmoOffice-App.");
+      const ifr = editorRef && editorRef.current;
+      const ge = ifr && ifr.contentWindow && ifr.contentWindow.GrundrissEditor;
+      if (ge && ge.st && ge.st.elemente && ge.st.elemente.length && !window.confirm("Das aktuelle Zeichenblatt wird durch den Raumscan ersetzt. Fortfahren?")) { setLade(""); return; }
+      const r = EPScanEditor.inEditorLaden(ifr, scan, { titel: titel || scan.titel || e.titel || "" });
+      onStatus && onStatus({ art: "ok", text: "Scan aus der Ablage übernommen: " + r.text });
+      onSchliessen();
+    } catch (x) { setFehler(x.message || String(x)); setLade(""); }
+  };
+  return h("div", { "data-ep-sa-dialog": "", onClick: onSchliessen, style: { position: "fixed", inset: 0, background: "rgba(38,49,89,0.55)", zIndex: 9300, display: "flex", alignItems: "center", justifyContent: "center", padding: 12 } },
+    h("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", width: "100%", maxWidth: 560, maxHeight: "94vh", overflowY: "auto", padding: 18, fontFamily: FONT, boxSizing: "border-box" } },
+      h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 } },
+        h("div", { style: { fontSize: 16, fontWeight: 700, color: CI.blau } }, "☁ Raumscan aus der Ablage"),
+        h("button", { type: "button", onClick: onSchliessen, style: { background: "transparent", border: "none", fontSize: 20, color: CI.muted, cursor: "pointer" } }, "✕")),
+      h("div", { style: { fontSize: 12, color: CI.muted, lineHeight: 1.5, marginBottom: 10 } },
+        "Raumscans, die die App ohne Objektbezug in die World geladen hat (App: Reiter Scans → Scan antippen → „In die World-Ablage“). Ein Klick legt den Scan als Zeichenblatt an – Wände, Türen, Fenster, Räume."),
+      lade ? h("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 8 } }, "⏳ " + lade) : null,
+      h(EpScanAblageListe, { art: "raumscan", onWaehlen: waehlen, leer: "Noch kein Raumscan in der Ablage – in der App: Scans → Scan antippen → „In die World-Ablage (ohne Objekt)“." }),
+      fehler ? h("div", { "data-ep-sa-dialogfehler": "", style: { background: "#fde6e6", color: "#c83c3c", padding: "8px 10px", fontSize: 12, marginTop: 8 } }, fehler) : null,
+      h("div", { style: { display: "flex", justifyContent: "flex-end", marginTop: 12 } },
+        h("button", { type: "button", onClick: onSchliessen, style: { background: "transparent", border: `1px solid ${CI.blau}`, color: CI.blau, padding: "7px 14px", fontSize: 12, cursor: "pointer", fontFamily: FONT } }, "Schließen"))));
+}
+
+function EpScanAblageKnopf({ editorRef, titel, onStatus, gesperrt }) {
+  const [offen, setOffen] = React.useState(false);
+  return React.createElement(React.Fragment, null,
+    React.createElement(WzButton, { klein: !0, variante: "hell", disabled: gesperrt, onClick: () => setOffen(true) }, "☁ Raumscan aus der Ablage"),
+    offen ? React.createElement(EpScanAblageDialog, { editorRef, titel, onStatus, onSchliessen: () => setOffen(false) }) : null);
+}
+window.EpScanAblageKnopf = EpScanAblageKnopf; window.EpScanAblageListe = EpScanAblageListe;
+window.epScanAblageLaden = epScanAblageLaden; window.epScanAblageDatei = epScanAblageDatei; window.epScanAblageLoeschen = epScanAblageLoeschen; window.epScanAblageHochladen = epScanAblageHochladen;
+// ---- Stufe 126: Grundriss-Zeichner → Wohnflächenberechnung nach WoFlV ----
+// Anlass (01.10.2026): „Berücksichtige die Wohnflächenverordnung; aus dem Grundrisszeichner will ich direkt in die
+// Wohnflächenberechnung überführen können, wo die Regeln der WoFlV hinterlegt sind.“
+// Der Wohnflächenrechner (WF) rechnet nach WoFlV: Wohnräume 100 %, Balkone/Terrassen/Loggien i. d. R. ¼ (höchstens ½,
+// § 4 Nr. 4), unbeheizte Wintergärten ½ (§ 4 Nr. 3), Zubehörräume keine Wohnfläche (§ 2 Abs. 3), lichte Höhe ab 2 m voll,
+// 1–2 m halb, darunter nichts (§ 4 Nr. 1–2), Abzüge für Schornsteine/Pfeiler über 1,50 m und 0,1 m² (§ 3 Abs. 3 Nr. 1)
+// und Treppen mit mehr als drei Steigungen (§ 3 Abs. 3 Nr. 2). Hier werden die Räume des Zeichenblatts (Flächen mit
+// Raumname – gezeichnet, aus Raumscan, Punktwolke oder KI) gelesen, nach Namen den WoFlV-Arten zugeordnet, Schornstein-/
+// Pfeiler-/Treppen-Flächen zu Abzügen, Schrägenzonen der KI (Stufe 122) zu Teilflächen, und alles geht als Scan in den
+// Rechner (WF.ausScan) – dort bleibt jede Zuordnung änderbar.
+const IMMO_GW_ARTEN = [["wohn", "Wohnraum · 100 %"], ["balkon", "Balkon / Terrasse / Loggia · ¼ (§ 4 Nr. 4)"], ["wintergarten", "Wintergarten, unbeheizt · ½ (§ 4 Nr. 3)"], ["zubehoer", "Zubehörraum · keine Wohnfläche (§ 2 Abs. 3)"]];
+const IMMO_GW_HINWEISE = [
+  "§ 3 Abs. 1: lichte Maße ab Vorderkante der Wandbekleidung – die Raumflächen an den Innenkanten der Wände ziehen.",
+  "§ 3 Abs. 2: Türzargen, Fußleisten, Einbaumöbel, Heizkörper, Herde und Badewannen zählen zur Grundfläche – nicht abziehen.",
+  "§ 3 Abs. 3: Türnischen sowie Fensternischen (nicht bis zum Boden oder höchstens 13 cm tief) bleiben außen vor. Schornsteine, Pfeiler und Vormauerungen über 1,50 m Höhe und 0,1 m² sowie Treppen mit mehr als drei Steigungen werden abgezogen – dafür eine Fläche „Schornstein“, „Pfeiler“ oder „Treppe“ einzeichnen.",
+  "§ 4 Nr. 1–2: lichte Höhe ab 2 m voll, 1 bis 2 m zur Hälfte, unter 1 m nichts – Schrägen im Rechner über „⟋ Dachschräge“ oder als KI-Zonen („Schräge 1–2 m“, „unter 1 m“) im Plan.",
+  "§ 2 Abs. 3: Keller, Wasch- und Trockenräume, Boden- und Heizungsräume, Garagen sowie Abstellräume außerhalb der Wohnung sind Zubehör; Abstellräume innerhalb der Wohnung zählen voll.",
+];
+function epGwArt(name) {
+  const n = (name || "").toLowerCase();
+  if (/balkon|terrasse|loggia|dachgarten|freisitz|veranda/.test(n)) return "balkon";
+  if (/wintergarten/.test(n)) return "wintergarten";
+  if (/keller|wasch(k|kü|ku)|bodenraum|dachboden|spitzboden|speicher|trockenraum|heiz(ung|raum)|technik|hausanschluss|garage|carport|stellplatz|treppenhaus|hausflur|laden|praxis|gewerbe|gesch(ä|ae)ftsraum/.test(n)) return "zubehoer";
+  return "wohn";
+}
+// Flächen, die keine Räume sind: Abzüge nach § 3 Abs. 3 und Schrägenzonen der Grundriss-KI (Stufe 122)
+function epGwSonder(name) {
+  const n = (name || "").toLowerCase().trim();
+  if (/^schr(ä|ae)ge/.test(n) && !/unter/.test(n)) return "halb";
+  if (/^unter 1 m/.test(n)) return "keine";
+  if (/^gaube\b/.test(n)) return /1–2 m|1-2 m/.test(n) ? "halb" : /unter 1 m/.test(n) ? "keine" : "info";   // Stufe 145: Gaube mit eigener Höhe; ab 2 m nur Hinweis („Gaubenraum“ ist ein Raum)
+  if (/schornstein|^kamin$|kaminzug|pfeiler|st(ü|ue)tze|s(ä|ae)ule|vormauerung/.test(n)) return "pfeiler";
+  if (/^treppe/.test(n) && !/treppenhaus/.test(n)) return "treppe";
+  return null;
+}
+function epGwInhalt(p) { let a = 0; for (let i = 0; i < p.length; i++) { const q = p[(i + 1) % p.length]; a += p[i].x * q.y - q.x * p[i].y; } return Math.abs(a) / 2; }
+function epGwInnen(q, poly) { let d = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const a = poly[i], b = poly[j]; if ((a.y > q.y) !== (b.y > q.y) && q.x < (b.x - a.x) * (q.y - a.y) / (b.y - a.y) + a.x) d = !d; } return d; }
+function epGwSchwerpunkt(p) { return { x: p.reduce((s, q) => s + q.x, 0) / p.length, y: p.reduce((s, q) => s + q.y, 0) / p.length }; }
+// Räume aus dem Zeichenblatt (aktuelle Seite): Flächen mit mindestens drei Punkten; Sonderflächen dem Raum zugeordnet, in dem sie liegen
+function epGwRaeume(fenster) {
+  const ge = fenster && fenster.GrundrissEditor, st = ge && ge.st;
+  if (!st) throw new Error("Der Grundriss-Editor ist noch nicht geladen.");
+  const R = st.kalib && st.kalib.ptProM; if (!(R > 0)) throw new Error("Das Blatt hat keinen Maßstab.");
+  const flaechen = (st.elemente || []).filter((e) => e.typ === "flaeche" && e.punkte && e.punkte.length >= 3);
+  const raeume = [], sonder = [];
+  flaechen.forEach((e, i) => {
+    const name = String(e.text || "").replace(/\s*\d+[.,]\d+\s*(m²|m2|qm)\s*$/i, "").trim();
+    const eintrag = { id: "gw-" + (e.id || i), name, m2: epGwInhalt(e.punkte) / (R * R), polygon: e.punkte.map((q) => [q.x / R, -q.y / R]), punkte: e.punkte };
+    const art = epGwSonder(name);
+    if (art) sonder.push(Object.assign(eintrag, { sonder: art })); else raeume.push(Object.assign(eintrag, { art: epGwArt(name), abzuege: [], zonen: null, hinweise: [] }));
+  });
+  // Bauteile aus der Einrichtung (Schornstein, Pfeiler, Stütze – Katalogeintrag mit wofl): wie benannte Sonderflächen behandeln
+  { const MO = ge.GE && ge.GE.MOEBEL;
+    (st.elemente || []).forEach((e, i) => {
+      if (e.typ !== "moebel" || !MO || !e.p) return; const kat = MO.byKey[e.art]; if (!kat || !kat.wofl) return;
+      const B = (e.breite || kat.b) / 100 * R, T = (e.tiefe || kat.t) / 100 * R, rad = (e.winkel || 0) * Math.PI / 180, c = Math.cos(rad), si = Math.sin(rad);
+      const m = (x, y) => ({ x: e.p.x + x * c - y * si, y: e.p.y + x * si + y * c }), punkte = [m(-B / 2, -T / 2), m(B / 2, -T / 2), m(B / 2, T / 2), m(-B / 2, T / 2)];
+      const m2 = kat.rund ? Math.PI * (B / 2) * (T / 2) / (R * R) : B * T / (R * R);
+      sonder.push({ id: "gw-m" + (e.id || i), name: kat.name.replace(/\s+\d.*$/, "").replace(/\s+rund.*$/, ""), m2, polygon: punkte.map((q) => [q.x / R, -q.y / R]), punkte, sonder: kat.wofl });
+    }); }
+  // Treppen des Blatts (Stufe 148): Fläche unter dem Lauf nach lichter Höhe, Luftraum beim Austritt – wie benannte Sonderflächen
+  if (typeof epTwZonen === "function") (st.elemente || []).forEach((e, i) => { if (e.typ !== "treppe" || !e.p1 || !e.p2) return; let z = null; try { z = epTwZonen(e, R); } catch (x) { z = null; } if (!z) return; z.stuecke.forEach((q, k) => { if (q.art === "voll" || !(q.m2 > 0.005)) return; sonder.push({ id: "gw-t" + (e.id || i) + "-" + k, name: q.name, m2: q.m2, polygon: q.punkte.map((p) => [p.x / R, -p.y / R]), punkte: q.punkte, sonder: q.art }); }); });
+  sonder.forEach((s) => {
+    const c = epGwSchwerpunkt(s.punkte), r = raeume.find((r) => epGwInnen(c, r.punkte));
+    if (!r || s.sonder === "info") return;
+    if (s.sonder === "halb" || s.sonder === "keine") { r.zonen = r.zonen || { halb: 0, keine: 0 }; r.zonen[s.sonder] += s.m2; }
+    else if (s.m2 > 0.1 || s.sonder === "treppe") r.abzuege.push({ art: s.sonder, name: s.name, m2: s.m2 });
+    else r.hinweise.push(`${s.name} (${s.m2.toFixed(2).replace(".", ",")} m²) bleibt in der Grundfläche – ein Abzug gilt erst über 0,1 m² (§ 3 Abs. 3 Nr. 1).`);
+  });
+  raeume.forEach((r, i) => { if (!r.name) r.name = "Raum " + (i + 1); });
+  return raeume;
+}
+// Räume → Scan (docs/scan-format.md) für WF.ausScan: zuordnung (wohn/nutz/balkon), wf_arten (auch wintergarten), Abzüge als
+// Objekte fireplace/stairs (der Rechner macht daraus § 3-Abzüge), Schrägenzonen als hoehenzonen
+function epGwScan(raeume, titel) {
+  const r2 = (v) => Math.round(v * 100) / 100, r3 = (v) => Math.round(v * 1000) / 1000, zuordnung = {}, arten = {};
+  const liste = raeume.map((r) => {
+    zuordnung[r.id] = r.art === "zubehoer" ? "nutz" : r.art === "balkon" ? "balkon" : "wohn"; arten[r.id] = r.art;
+    const objekte = r.abzuege.map((a, k) => ({ id: r.id + "-a" + k, kategorie: a.art === "treppe" ? "stairs" : "fireplace", breite: r2(Math.sqrt(a.m2)), tiefe: r2(Math.sqrt(a.m2)), bezeichnung: a.name }));
+    const raum = { id: r.id, bezeichnung: null, name: r.name, geschoss: 0, waende: [], tueren: [], fenster: [], oeffnungen: [], boeden: [{ id: r.id + "-b", polygon: r.polygon.map((q) => [r3(q[0]), r3(q[1])]), flaeche: r2(r.m2), niveau: 0 }], objekte, abschnitte: [], flaeche: r2(r.m2) };
+    if (r.zonen) { const halb = r2(r.zonen.halb), keine = r2(r.zonen.keine); raum.hoehenzonen = { voll: r2(Math.max(0, r.m2 - halb - keine)), halb, keine, unbekannt: 0 }; }
+    return raum;
+  });
+  return { version: 1, quelle: "grundriss-zeichner", app: "ImmoOffice · Grundriss-Zeichner", erzeugt: new Date().toISOString(), einheit: "m", geraet: "", titel: titel || "", raeume: liste, zuordnung, wf_arten: arten,
+    messung: { methode: "Grundflächen aus dem Grundriss-Zeichner (Raumflächen in lichten Maßen, § 3 Abs. 1 WoFlV), Anrechnung nach § 4 WoFlV; Abzüge nach § 3 Abs. 3", herkunft: "zeichnung" } };
+}
+// Wohnflächenrechner: Zeichner-Scans erkennen – Wintergarten setzen, Schrägenzonen als Teilflächen, Texte und Methode
+(function () {
+  if (typeof WF === "undefined" || !WF || typeof WF.ausScan !== "function" || WF.__grundrissZeichner) return;
+  const orig = WF.ausScan;
+  WF.ausScan = function (scan, dok, ep) {
+    const g = orig.call(this, scan, dok, ep);
+    if (!g || !scan || scan.quelle !== "grundriss-zeichner") return g;
+    const gs = (g.geschosse || []).slice(-1)[0], liste = scan.raeume || [], f = (v) => String(Math.round(v * 100) / 100).replace(".", ",");
+    if (gs && gs.raeume && gs.raeume.length === liste.length) gs.raeume.forEach((r, i) => {
+      const q = liste[i], art = scan.wf_arten && scan.wf_arten[q.id];
+      if (art === "wintergarten") r.art = "wintergarten";
+      (r.teile || []).forEach((t) => { if (t.bez) t.bez = t.bez.replace(/Grundfläche lt\. Raumscan/, "Grundfläche lt. Grundriss-Zeichner (lichte Maße)").replace(/lt\. Raumscan/g, "lt. Grundriss-Zeichner"); });
+      // Rechteck-Figuren des Rechners nur behalten, wenn ihre Summe die Grundfläche des Blatts trifft – sonst die exakte Grundfläche
+      const abzuege = (r.teile || []).filter((t) => t.abzug), figuren = (r.teile || []).filter((t) => !t.abzug);
+      const summe = figuren.reduce((s, t) => s + WF.teilFlaeche(t), 0);
+      if (!q.hoehenzonen && Math.abs(summe - q.flaeche) > 0.015) r.teile = [WF.neuTeil({ bez: "Grundfläche lt. Grundriss-Zeichner (lichte Maße)", flaeche: f(q.flaeche), hoehe: "voll", quelle: "grundriss" }), ...abzuege];
+      if (q.hoehenzonen && r.art !== "zubehoer") {
+        const z = q.hoehenzonen, abz = abzuege;
+        r.teile = [];
+        if (z.voll > 0.005) r.teile.push(WF.neuTeil({ bez: "lt. Grundriss-Zeichner, lichte Höhe ab 2 m", flaeche: f(z.voll), hoehe: "voll", quelle: "grundriss" }));
+        if (z.halb > 0.005) r.teile.push(WF.neuTeil({ bez: "Dachschräge, lichte Höhe 1 bis 2 m (§ 4 Nr. 2 WoFlV)", flaeche: f(z.halb), hoehe: "halb", quelle: "grundriss" }));
+        if (z.keine > 0.005) r.teile.push(WF.neuTeil({ bez: "Dachschräge, lichte Höhe unter 1 m (§ 4 WoFlV – keine Anrechnung)", flaeche: f(z.keine), hoehe: "null", quelle: "grundriss" }));
+        r.teile.push(...abz);
+      }
+    });
+    g.messung = Object.assign({}, g.messung || {}, { methode: scan.messung && scan.messung.methode || "Grundriss-Zeichner", geraet: "", app: "ImmoOffice · Grundriss-Zeichner", qualitaet: "", hinweise: scan.wf_hinweise || [], kontrollmasse: [] });
+    return g;
+  };
+  WF.__grundrissZeichner = true;
+})();
+
+function EpGrundrissWohnflaecheDialog({ editorRef, titel, immobilie, onStatus, onWerkzeug, onSchliessen }) {
+  const h = React.createElement;
+  const [raeume, setRaeume] = React.useState(null);
+  const [fehler, setFehler] = React.useState("");
+  React.useEffect(() => { try { const ifr = editorRef && editorRef.current; setRaeume(epGwRaeume(ifr && ifr.contentWindow)); } catch (e) { setFehler(e.message || String(e)); setRaeume([]); } }, []);
+  const de = (x) => Number(x).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const faktor = (r) => r.art === "zubehoer" ? 0 : r.art === "balkon" ? 0.25 : r.art === "wintergarten" ? 0.5 : 1;
+  const grund = (r) => Math.max(0, r.m2 - r.abzuege.reduce((s, a) => s + a.m2, 0));
+  const wohn = (r) => { if (r.art === "zubehoer") return 0; const g = grund(r); if (r.zonen && r.art === "wohn") return Math.max(0, g - r.zonen.halb - r.zonen.keine) + 0.5 * r.zonen.halb; return g * faktor(r); };
+  const liste = raeume || [], summeWohn = liste.reduce((s, r) => s + wohn(r), 0), summeNutz = liste.filter((r) => r.art === "zubehoer").reduce((s, r) => s + grund(r), 0);
+  const setArt = (i, art) => setRaeume((l) => l.map((r, k) => (k === i ? Object.assign({}, r, { art }) : r)));
+  const uebernehmen = () => {
+    const scan = epGwScan(liste, titel); scan.wf_hinweise = IMMO_GW_HINWEISE.slice(0, 1).concat(liste.flatMap((r) => r.hinweise));
+    epWerkzeugOeffnen("wohnflaeche", { scan, immobilie: immobilie || null, titel: titel || "" });
+    onStatus && onStatus({ art: "ok", text: `${liste.length} Räume in die Wohnflächenberechnung übergeben (${de(summeWohn)} m² Wohnfläche nach WoFlV)` });
+    onSchliessen(); onWerkzeug && onWerkzeug("wohnflaeche");
+  };
+  const stilZelle = { padding: "5px 8px", borderBottom: `1px solid ${CI.border}`, fontSize: 12.5, verticalAlign: "top" };
+  return h("div", { "data-ep-gw-dialog": raeume ? liste.length : "lade", onClick: onSchliessen, style: { position: "fixed", inset: 0, background: "rgba(38,49,89,0.55)", zIndex: 9300, display: "flex", alignItems: "center", justifyContent: "center", padding: 12 } },
+    h("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", width: "100%", maxWidth: 760, maxHeight: "94vh", overflowY: "auto", padding: 18, fontFamily: FONT, boxSizing: "border-box" } },
+      h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 } },
+        h("div", { style: { fontSize: 16, fontWeight: 700, color: CI.blau } }, "📏 Wohnfläche nach WoFlV aus dem Zeichenblatt"),
+        h("button", { type: "button", onClick: onSchliessen, style: { background: "transparent", border: "none", fontSize: 20, color: CI.muted, cursor: "pointer" } }, "✕")),
+      h("div", { style: { fontSize: 12, color: CI.muted, lineHeight: 1.5, marginBottom: 10 } },
+        "Die Räume des Blatts (Flächen mit Raumname) werden nach der Wohnflächenverordnung zugeordnet und in die Wohnflächenberechnung übergeben – dort bleibt alles änderbar (Teilflächen, Höhen, Balkon-Anteil, PDF). Flächen namens „Schornstein“, „Pfeiler“ oder „Treppe“ werden Abzüge nach § 3 Abs. 3, KI-Schrägenzonen Teilflächen nach § 4."),
+      fehler ? h("div", { "data-ep-gw-fehler": "", style: { background: "#fde6e6", color: "#c83c3c", padding: "8px 10px", fontSize: 12, marginBottom: 8 } }, fehler) : null,
+      raeume && !liste.length && !fehler ? h("div", { style: { background: "#fff8e6", color: "#6b5200", padding: "8px 10px", fontSize: 12, marginBottom: 8 } }, "Auf dem Blatt sind keine Räume als Flächen eingezeichnet. Räume mit dem Werkzeug „Fläche“ umfahren und benennen – oder einen Raumscan, eine Punktwolke oder einen KI-Grundriss übernehmen.") : null,
+      liste.length ? h("table", { "data-ep-gw-tabelle": "", style: { width: "100%", borderCollapse: "collapse" } },
+        h("thead", null, h("tr", null, ["Raum", "Grundfläche", "WoFlV-Art", "anrechenbar"].map((t, i) => h("th", { key: i, style: Object.assign({}, stilZelle, { textAlign: i ? "right" : "left", fontSize: 10.5, color: CI.muted, textTransform: "uppercase" }) }, t)))),
+        h("tbody", null, liste.map((r, i) => h("tr", { key: r.id, "data-ep-gw-raum": r.name },
+          h("td", { style: stilZelle }, h("div", { style: { fontWeight: 600 } }, r.name),
+            r.abzuege.map((a, k) => h("div", { key: k, style: { fontSize: 11, color: CI.muted } }, `− ${a.name} ${de(a.m2)} m² (§ 3 Abs. 3)`)),
+            r.zonen ? h("div", { style: { fontSize: 11, color: CI.muted } }, `Schräge: 1–2 m ${de(r.zonen.halb)} m² zur Hälfte, unter 1 m ${de(r.zonen.keine)} m² nicht`) : null,
+            r.hinweise.map((t, k) => h("div", { key: "h" + k, style: { fontSize: 11, color: "#6b5200" } }, t))),
+          h("td", { style: Object.assign({}, stilZelle, { textAlign: "right" }) }, de(grund(r)) + " m²"),
+          h("td", { style: Object.assign({}, stilZelle, { textAlign: "right" }) }, h("select", { "data-ep-gw-art": i, value: r.art, onChange: (e) => setArt(i, e.target.value), style: { fontSize: 12, padding: "3px 4px", border: `1px solid ${CI.border}`, fontFamily: FONT, maxWidth: 260 } },
+            IMMO_GW_ARTEN.map(([k, t]) => h("option", { key: k, value: k }, t)))),
+          h("td", { "data-ep-gw-wohn": de(wohn(r)), style: Object.assign({}, stilZelle, { textAlign: "right", fontWeight: 600 }) }, r.art === "zubehoer" ? `Nutzfläche ${de(grund(r))} m²` : de(wohn(r)) + " m²")))),
+        h("tfoot", null, h("tr", null, h("td", { colSpan: 3, style: Object.assign({}, stilZelle, { textAlign: "right", fontWeight: 700 }) }, "Wohnfläche nach WoFlV"), h("td", { "data-ep-gw-summe": de(summeWohn), style: Object.assign({}, stilZelle, { textAlign: "right", fontWeight: 700, color: CI.blau }) }, de(summeWohn) + " m²")),
+          summeNutz > 0 ? h("tr", null, h("td", { colSpan: 3, style: Object.assign({}, stilZelle, { textAlign: "right" }) }, "Nutzfläche (Zubehör, keine Wohnfläche)"), h("td", { "data-ep-gw-nutz": de(summeNutz), style: Object.assign({}, stilZelle, { textAlign: "right" }) }, de(summeNutz) + " m²")) : null)) : null,
+      h("details", { style: { marginTop: 10, fontSize: 12, color: CI.muted } }, h("summary", { style: { cursor: "pointer", color: CI.blau } }, "Regeln der Wohnflächenverordnung, die hier angewendet werden"),
+        h("ul", { style: { margin: "6px 0 0 18px", lineHeight: 1.5 } }, IMMO_GW_HINWEISE.map((t, i) => h("li", { key: i }, t)))),
+      h("div", { style: { display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 12 } },
+        h("button", { type: "button", onClick: onSchliessen, style: { background: "transparent", border: `1px solid ${CI.blau}`, color: CI.blau, padding: "7px 14px", fontSize: 12, cursor: "pointer", fontFamily: FONT } }, "Abbrechen"),
+        h("button", { type: "button", "data-ep-gw-uebernehmen": "", disabled: !liste.length, onClick: uebernehmen, style: { background: CI.gold, color: "#fff", border: "none", padding: "9px 18px", fontSize: 13, fontWeight: 700, cursor: liste.length ? "pointer" : "default", opacity: liste.length ? 1 : 0.5, fontFamily: FONT } }, "In die Wohnflächenberechnung übernehmen →"))));
+}
+
+function EpGrundrissWohnflaecheKnopf({ editorRef, titel, immobilie, onStatus, gesperrt, onWerkzeug }) {
+  const [offen, setOffen] = React.useState(false);
+  return React.createElement(React.Fragment, null,
+    React.createElement(WzButton, { klein: !0, variante: "hell", disabled: gesperrt, onClick: () => setOffen(true) }, "📏 Wohnfläche (WoFlV) →"),
+    offen ? React.createElement(EpGrundrissWohnflaecheDialog, { editorRef, titel, immobilie, onStatus, onWerkzeug, onSchliessen: () => setOffen(false) }) : null);
+}
+window.EpGrundrissWohnflaecheKnopf = EpGrundrissWohnflaecheKnopf; window.epGwRaeume = epGwRaeume; window.epGwScan = epGwScan; window.epGwArt = epGwArt;
+// ---- Stufe 127: Werkzeuge aufgeräumt – Kacheln mit Unterkacheln ----
+// Anlass (01.10.2026): „Im Bereich Werkzeuge soll es Unterkacheln geben: die ganzen PDFs zusammengefasst, eine Kachel
+// ImmoOffice Scanner für alles rund ums Scannen – alles andere bleibt extra.“ Die Übersicht zeigt zuerst die Werkzeugkästen
+// (PDF-Werkzeuge, ImmoOffice Scanner), darunter wie bisher die übrigen Werkzeuge nach Gruppen. Ein Werkzeugkasten öffnet seine
+// Unterkacheln; aus einem Werkzeug führt „←“ zurück in den Kasten, aus dem es geöffnet wurde (auch nach einem Sprung aus
+// dem Grundriss-Editor in den Wohnflächenrechner).
+const IMMO_WK_KACHELN = [
+  { id: "pdf", icon: "📄", titel: "PDF-Werkzeuge", text: "Zusammenfügen, teilen, komprimieren, Seiten bearbeiten, Wasserzeichen, Unterschrift, Schwärzen – alle PDF-Werkzeuge an einem Ort. Dateien bleiben auf diesem Gerät.", gruppen: ["PDF-Werkzeuge"] },
+  { id: "scanner", icon: "📡", titel: "ImmoOffice Scanner", text: "Raumscan und Punktwolke aus der App, Grundriss-Editor und Wohnflächenrechner nach WoFlV – vom Scan bis zum fertigen Grundriss und zur Wohnfläche.", ids: ["raumscan", "grundriss", "wohnflaeche"] },
+];
+function epWkKachelVon(w) { return IMMO_WK_KACHELN.find((k) => (k.ids && k.ids.includes(w.id)) || (k.gruppen && k.gruppen.includes(w.gruppe))) || null; }
+// Kasten eines Werkzeugs (für den Rückweg aus der Werkzeugansicht) – liste = alle Werkzeuge der Seite
+function epWkKachelFuer(liste, id) { const w = (liste || []).find((x) => x.id === id); const k = w ? epWkKachelVon(w) : null; return k ? k.id : null; }
+function epWkZurueckText(liste, id) { const k = IMMO_WK_KACHELN.find((x) => x.id === epWkKachelFuer(liste, id)); return k ? "← " + k.titel : "← Alle Werkzeuge"; }
+
+function EpWerkzeugKacheln({ gruppen, waehle }) {
+  const h = React.createElement;
+  const [offen, setOffen] = React.useState(() => window.__epWkOffen || null);
+  const alle = gruppen.flatMap((g) => g.werkzeuge);
+  const inhalt = (k) => alle.filter((w) => epWkKachelVon(w) === k);
+  const kaesten = IMMO_WK_KACHELN.filter((k) => inhalt(k).length);
+  const rest = gruppen.map((g) => ({ name: g.name, werkzeuge: g.werkzeuge.filter((w) => !epWkKachelVon(w)) })).filter((g) => g.werkzeuge.length);
+  const kachelStil = (hervor) => ({ border: `1px solid ${hervor ? CI.gold : CI.border}`, background: "#fff", padding: 20, cursor: "pointer", boxShadow: hervor ? "0 2px 10px rgba(212,165,103,0.18)" : "none" });
+  const raster = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(260px, 100%), 1fr))", gap: 14 };
+  const kachel = (w, onClick, hervor, zusatz, attr) => h("div", Object.assign({ key: w.id, onClick, style: kachelStil(hervor) }, attr || {}),
+    h("div", { style: { fontSize: 28, marginBottom: 10 } }, w.icon),
+    h("div", { style: { fontSize: 15, fontWeight: 600, color: CI.blau, marginBottom: 6 } }, w.titel),
+    h("div", { style: { fontSize: 12.5, color: CI.muted, lineHeight: 1.55 } }, w.text),
+    zusatz ? h("div", { style: { fontSize: 11.5, color: CI.gold, fontWeight: 600, marginTop: 10 } }, zusatz) : null);
+  const kopf = (titel, anzahl, zurueck) => h("div", { style: { display: "flex", alignItems: "baseline", gap: 10, marginBottom: 12, paddingBottom: 8, borderBottom: `1px solid ${CI.border}` } },
+    zurueck ? h(WzButton, { klein: !0, variante: "hell", onClick: zurueck }, "← Alle Werkzeuge") : null,
+    h("div", { style: { fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: CI.blau } }, titel),
+    h("div", { style: { fontSize: 11.5, color: CI.muted } }, anzahl + (anzahl === 1 ? " Werkzeug" : " Werkzeuge")));
+  const oeffne = (k) => { window.__epWkOffen = k.id; setOffen(k.id); };
+  const zurueck = () => { window.__epWkOffen = null; setOffen(null); };
+  const waehleWerkzeug = (w) => { const k = epWkKachelVon(w); window.__epWkOffen = k ? k.id : null; waehle(w.id); };
+  const kasten = offen ? kaesten.find((k) => k.id === offen) : null;
+  if (offen && !kasten) { window.__epWkOffen = null; }
+  if (kasten) {
+    const liste = inhalt(kasten);
+    return h("div", { "data-ep-wk": kasten.id },
+      kopf(kasten.icon + " " + kasten.titel, liste.length, zurueck),
+      h("div", { style: { fontSize: 12.5, color: CI.muted, lineHeight: 1.55, marginBottom: 14 } }, kasten.text),
+      h("div", { style: raster }, liste.map((w) => kachel(w, () => waehleWerkzeug(w), false, null, { "data-ep-wk-werkzeug": w.id }))));
+  }
+  return h("div", { "data-ep-wk": "uebersicht" },
+    kaesten.length ? h("div", { style: { marginBottom: 26 } }, kopf("Werkzeugkästen", kaesten.reduce((s, k) => s + inhalt(k).length, 0), null),
+      h("div", { style: raster }, kaesten.map((k) => kachel(k, () => oeffne(k), true, `${inhalt(k).length} Werkzeuge · ${inhalt(k).slice(0, 4).map((w) => w.titel).join(", ")}${inhalt(k).length > 4 ? " …" : ""}`, { "data-ep-wk-kasten": k.id })))) : null,
+    rest.map((g) => h("div", { key: g.name, style: { marginBottom: 26 } }, kopf(g.name, g.werkzeuge.length, null),
+      h("div", { style: raster }, g.werkzeuge.map((w) => kachel(w, () => waehleWerkzeug(w), false, null, { "data-ep-wk-werkzeug": w.id }))))));
+}
+window.EpWerkzeugKacheln = EpWerkzeugKacheln; window.epWkKachelFuer = epWkKachelFuer; window.epWkZurueckText = epWkZurueckText;
+// ===== Stufe 128: Grundriss-Editor füllt den Bildschirm bis unten (02.10.2026) =====
+// Der Editor-Rahmen hatte eine feste Höhe „100vh − 264 px“. Seit der Werkzeugkästen-Übersicht und der zweizeiligen
+// Raumscan-Leiste steht oberhalb mehr Inhalt – der Rahmen ragte unten aus dem Fenster, Werkzeugleiste und Blatt waren
+// abgeschnitten. Jetzt: Höhe = Fensterhöhe − Oberkante des Rahmens − 12 px, mindestens 520 px; nachgeführt bei
+// Größenänderung des Fensters und wenn sich die Leiste darüber ändert (ResizeObserver auf body, dazu ein 1-s-Takt).
+function epGeHoeheAnpassen() {
+  const ifr = document.querySelector('iframe[data-ep-ge-iframe]');
+  if (!ifr) return null;
+  const rect = ifr.getBoundingClientRect(), oben = rect.top + (window.scrollY || window.pageYOffset || 0);
+  const hoehe = Math.max(520, Math.round(window.innerHeight - oben - 12));
+  if (ifr.style.height !== hoehe + "px") ifr.style.height = hoehe + "px";
+  return hoehe;
+}
+(function epGeHoeheStart() {
+  if (typeof window === "undefined" || window.__epGeHoeheAktiv) return;
+  window.__epGeHoeheAktiv = true;
+  let beobachter = null, beobachtet = null;
+  const pruefen = () => {
+    const ifr = document.querySelector('iframe[data-ep-ge-iframe]');
+    if (!ifr) { if (beobachter) { beobachter.disconnect(); beobachter = null; beobachtet = null; } return; }
+    epGeHoeheAnpassen();
+    // Leiste darüber ändert sich → die Seite (body) ändert ihre Höhe; dazu ein Takt als Rückfall
+    if (document.body !== beobachtet && typeof ResizeObserver !== "undefined") {
+      if (beobachter) beobachter.disconnect();
+      beobachter = new ResizeObserver(() => epGeHoeheAnpassen()); beobachter.observe(document.body); beobachtet = document.body;
+    }
+  };
+  setInterval(() => { if (document.querySelector('iframe[data-ep-ge-iframe]')) epGeHoeheAnpassen(); }, 1000);
+  window.addEventListener("resize", () => epGeHoeheAnpassen());
+  window.addEventListener("orientationchange", () => setTimeout(epGeHoeheAnpassen, 50));
+  const starten = () => { pruefen(); if (typeof MutationObserver !== "undefined") new MutationObserver(() => pruefen()).observe(document.body, { childList: true, subtree: true }); };
+  if (document.body) starten(); else document.addEventListener("DOMContentLoaded", starten);
+})();
+window.epGeHoeheAnpassen = epGeHoeheAnpassen;
+// ===== Stufe 130: Zeichnen an der Punktwolke – Wolke als Hintergrund im Editor, Fangen an Wandlinien, Türen, Fenstern (02.10.2026) =====
+// „Können wir die Punktwolke detailreicher darstellen und dann anhand der Punktwolke die Wände/Fenster zeichnen?“ – Ja:
+// 1. Die ganze Wolke (nicht nur Wandzellen) kommt als Draufsicht aufs Blatt: Wände dunkel, Türen gold, Fenster blau, Möbel
+//    hellbraun, ohne ARKit-Klassen nach Höhe (Wandband dunkel, darunter hell). Gezeichnet aus den Punkten in 3-facher
+//    Blattauflösung – nur Anzeige, nicht im Export.
+// 2. Fangen an der Wolke: beim Zeichnen rastet der Cursor auf die nächste dichte Wandlinie (Ausgleichsgerade der Wandzellen
+//    im Umkreis), an Ecken auf den Schnittpunkt zweier Linien; Tür- und Fenster-Werkzeug fangen zusätzlich die Enden der
+//    erkannten Öffnungen und die Mitte von Tür-/Fenster-Zellhäufungen.
+// 3. Die automatische Erkennung bleibt als Entwurf im Blatt (löschen/verschieben wie bisher).
+
+// Abbildung Plan (m, gedrehte Draufsicht der Auswertung) → Blatt (pt): aus den vorhandenen Elementen wie epPwHintergrund,
+// ohne Elemente zentriert auf dem Blatt.
+function epPzAbbildung(st, scan, erg) {
+  const R = st.kalib && st.kalib.ptProM; if (!R) return null;
+  const bbox = (pts) => pts.reduce((b, q) => ({ minX: Math.min(b.minX, q[0]), maxX: Math.max(b.maxX, q[0]), minY: Math.min(b.minY, q[1]), maxY: Math.max(b.maxY, q[1]) }), { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity });
+  const fl = st.elemente.filter((e) => e.typ === "flaeche" && e.punkte && e.punkte.length);
+  const polys = scan && scan.raeume ? scan.raeume.flatMap((r) => (r.boeden && r.boeden[0] ? r.boeden[0].polygon : [])) : [];
+  if (fl.length && polys.length) { const blatt = bbox(fl.flatMap((e) => e.punkte.map((q) => [q.x, q.y]))), plan = bbox(polys); return { R, ax: blatt.minX - plan.minX * R, by: blatt.minY + plan.maxY * R, quelle: "flaechen" }; }
+  const wa = st.elemente.filter((e) => e.typ === "wand");
+  const planW = scan && scan.raeume ? scan.raeume.flatMap((r) => r.waende.flatMap((w) => [[w.x1, w.y1], [w.x2, w.y2]])) : [];
+  if (wa.length && planW.length) { const blatt = bbox(wa.flatMap((e) => [[e.p1.x, e.p1.y], [e.p2.x, e.p2.y]])), plan = bbox(planW); return { R, ax: blatt.minX - plan.minX * R, by: blatt.minY + plan.maxY * R, quelle: "waende" }; }
+  // Rückfall: Wandzellen (oder alle Punkte) mittig aufs Blatt
+  const z = erg && erg.zellenDaten; if (!z || !z.x.length) return null;
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (let i = 0; i < z.x.length; i++) { if (z.klasse[i] !== 1) continue; x0 = Math.min(x0, z.x[i]); x1 = Math.max(x1, z.x[i]); y0 = Math.min(y0, z.y[i]); y1 = Math.max(y1, z.y[i]); }
+  if (!(x1 > x0)) { for (let i = 0; i < z.x.length; i++) { x0 = Math.min(x0, z.x[i]); x1 = Math.max(x1, z.x[i]); y0 = Math.min(y0, z.y[i]); y1 = Math.max(y1, z.y[i]); } }
+  return { R, ax: st.breite / 2 - (x0 + x1) / 2 * R, by: st.hoehe / 2 + (y0 + y1) / 2 * R, quelle: "zentriert" };
+}
+
+// Punkt der Wolke (Original-Koordinaten) → gedrehte Draufsicht der Auswertung (wie die Zellen) → Blatt (pt)
+function epPzWolkeAufBlatt(wolke, erg, abb, hoehen) {
+  const dreh = erg.dreh || 0, c = Math.cos(dreh), si = Math.sin(dreh), achse = hoehen.achse, boden = hoehen.boden;
+  const auf = achse === "z" ? wolke.z : wolke.y;
+  const n = wolke.n, st = Math.max(1, Math.ceil(n / 1200000)), out = new Float32Array(Math.ceil(n / st) * 3); let k = 0;
+  for (let i = 0; i < n; i += st) {
+    const px = wolke.x[i], py = achse === "z" ? wolke.y[i] : -wolke.z[i];
+    const x = px * c + py * si, y = -px * si + py * c;
+    out[k++] = abb.ax + x * abb.R; out[k++] = abb.by - y * abb.R; out[k++] = auf[i] - boden;
+  }
+  return { pt: out.subarray(0, k), schritt: st };
+}
+
+// Draufsicht der Wolke auf den Blatt-Canvas (4-fache Blattauflösung, Punkte 1,2 cm, bis 1,2 Mio Punkte; nur Anzeige)
+function epPzHintergrund(fenster, scan, erg, wolke, abb) {
+  const ge = fenster && fenster.GrundrissEditor; if (!ge || !ge.st || !wolke || !abb) return false;
+  const st = ge.st, cv = fenster.document.getElementById("seite"); if (!cv) return false;
+  const F = 4; cv.width = Math.ceil(st.breite * F); cv.height = Math.ceil(st.hoehe * F);
+  const g = cv.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, cv.width, cv.height);
+  const { pt, schritt } = epPzWolkeAufBlatt(wolke, erg, abb, erg.hoehen);
+  const K = wolke.klassen, s = Math.max(1, 0.012 * abb.R * F), H = erg.hoehen.hoehe || 2.5;
+  const farbe = (kl, hh) => {
+    if (K) {
+      if (kl === 1) return hh > 0.25 ? "rgba(32,42,78,0.45)" : null;   // Rohpunkte der Wände halbtransparent – die Kante zeichnen die Wandzellen darunter
+      if (kl === 7) return "rgba(212,165,103,0.9)";
+      if (kl === 6) return "rgba(60,150,230,0.9)";
+      if (kl === 4 || kl === 5) return "rgba(150,110,70,0.3)";
+      if (kl === 2 || kl === 3) return null;
+      return hh >= 0.9 && hh <= 1.9 ? "rgba(90,96,120,0.45)" : null;   // ohne Klasse: nur das Wandband, hell
+    }
+    if (hh >= 0.9 && hh <= 1.9) return "rgba(32,42,78,0.75)";
+    if (hh >= 0.3 && hh < 0.9) return "rgba(120,126,150,0.35)";
+    if (hh > 1.9 && hh < H - 0.15) return "rgba(90,96,120,0.4)";
+    return null;
+  };
+  // Reihenfolge: helle Klassen zuerst, Wände/Türen/Fenster zuletzt obenauf
+  const reihen = K ? [[4, 5, 0], [1], [7, 6]] : [[-1]];
+  for (const gruppe of reihen) {
+    for (let j = 0, i = 0; j < pt.length; j += 3, i += schritt) {
+      const kl = K ? K[i] : -1; if (K && !gruppe.includes(kl)) continue;
+      const f = farbe(kl, pt[j + 2]); if (!f) continue;
+      g.fillStyle = f; g.fillRect(pt[j] * F - s / 2, pt[j + 1] * F - s / 2, s, s);
+    }
+  }
+  // Scharfe Kanten: die Wandzellen der Auswertung (2-cm-Raster, Wandflächen) deckend darüber – so ist klar, wo die Außenwände stehen
+  const z = erg.zellenDaten;
+  if (z && z.x && z.x.length) {
+    const s2 = Math.max(1, 0.02 * abb.R * F);
+    for (const [klasse, fill] of [[4, "rgba(32,42,78,0.55)"], [1, "#1d2744"]]) {
+      g.fillStyle = fill;
+      for (let i = 0; i < z.x.length; i++) { if (z.klasse[i] !== klasse) continue; g.fillRect((abb.ax + z.x[i] * abb.R) * F - s2 / 2, (abb.by - z.y[i] * abb.R) * F - s2 / 2, s2, s2); }
+    }
+  }
+  ge.render();
+  return true;
+}
+
+// Bodengitter: 10-cm-Zellen (Blatt-pt) mit Bodenpunkten (−12 … +35 cm über dem Boden). Boden gibt es nur im Raum – damit ist die
+// Innenseite einer Wandfläche eindeutig (Möbel-, Fenster- oder Außenpunkte täuschen nicht).
+function epPzBodenGitter(wolke, erg, abb) {
+  if (!wolke || !erg || !erg.hoehen || !abb) return null;
+  const { pt } = epPzWolkeAufBlatt(wolke, erg, abb, erg.hoehen), G = 0.1 * abb.R, zellen = new Set();
+  for (let j = 0; j < pt.length; j += 3) { const z = pt[j + 2]; if (z > -0.12 && z < 0.35) zellen.add(Math.floor(pt[j] / G) * 100003 + Math.floor(pt[j + 1] / G)); }
+  return { zellen, G, anzahl: (p, r) => { let n = 0; for (let gx = Math.floor((p.x - r) / G); gx <= Math.floor((p.x + r) / G); gx++) for (let gy = Math.floor((p.y - r) / G); gy <= Math.floor((p.y + r) / G); gy++) if (zellen.has(gx * 100003 + gy)) n++; return n; } };
+}
+
+// Fangquellen aus der Wolke: Wandzellen (Klasse 1 und 4) in Blatt-pt mit 20-pt-Gitter; Öffnungsenden; Tür-/Fenster-Zellen
+function epPzFangAufbauen(st, erg, abb, boden) {
+  const z = erg.zellenDaten; if (!z) return null;
+  const R = abb.R, xs = [], ys = [], gitter = new Map(), G = 20, alleX = [], alleY = [], alleGitter = new Map();
+  const key = (x, y) => Math.floor(x / G) * 100003 + Math.floor(y / G);
+  for (let i = 0; i < z.x.length; i++) {
+    const x = abb.ax + z.x[i] * R, y = abb.by - z.y[i] * R, k = key(x, y);
+    let b = alleGitter.get(k); if (!b) alleGitter.set(k, b = []); b.push(alleX.length); alleX.push(x); alleY.push(y);   // alle Zellen: Innenseite hat Möbel, Brüstungen, Stürze
+    if (z.klasse[i] !== 1 && z.klasse[i] !== 4) continue;
+    let a = gitter.get(k); if (!a) gitter.set(k, a = []); a.push(xs.length); xs.push(x); ys.push(y);
+  }
+  const alleImUmkreis = (p, r) => { let n = 0; const r2 = r * r; for (let gx = Math.floor((p.x - r) / G); gx <= Math.floor((p.x + r) / G); gx++) for (let gy = Math.floor((p.y - r) / G); gy <= Math.floor((p.y + r) / G); gy++) { const b = alleGitter.get(gx * 100003 + gy); if (!b) continue; for (const i of b) { const dx = alleX[i] - p.x, dy = alleY[i] - p.y; if (dx * dx + dy * dy <= r2) n++; } } return n; };
+  const oeffnung = [];   // Tür-/Fenster-Zellen (ARKit) in pt
+  if (z.oeffnung) for (let i = 0; i < z.x.length; i++) if (z.oeffnung[i]) oeffnung.push({ x: abb.ax + z.x[i] * R, y: abb.by - z.y[i] * R, art: z.oeffnung[i] });
+  const enden = [];      // Enden der erkannten Öffnungen
+  (erg.oeffnungen || []).forEach((o) => { const w = erg.waende[o.wand]; if (!w) return; for (const t of [o.u, o.v]) enden.push({ x: abb.ax + (w.p.x + w.d.x * t) * R, y: abb.by - (w.p.y + w.d.y * t) * R, art: o.art }); });
+  const umkreis = (p, r) => { const out = []; const r2 = r * r; for (let gx = Math.floor((p.x - r) / G); gx <= Math.floor((p.x + r) / G); gx++) for (let gy = Math.floor((p.y - r) / G); gy <= Math.floor((p.y + r) / G); gy++) { const a = gitter.get(gx * 100003 + gy); if (!a) continue; for (const i of a) { const dx = xs[i] - p.x, dy = ys[i] - p.y; if (dx * dx + dy * dy <= r2) out.push(i); } } return out; };
+  const linie = (idx) => { let mx = 0, my = 0; for (const i of idx) { mx += xs[i]; my += ys[i]; } mx /= idx.length; my /= idx.length; let sxx = 0, syy = 0, sxy = 0; for (const i of idx) { const dx = xs[i] - mx, dy = ys[i] - my; sxx += dx * dx; syy += dy * dy; sxy += dx * dy; } const w = 0.5 * Math.atan2(2 * sxy, sxx - syy), d = { x: Math.cos(w), y: Math.sin(w) }; let s = 0; for (const i of idx) { const r = (xs[i] - mx) * -d.y + (ys[i] - my) * d.x; s += r * r; } return { p: { x: mx, y: my }, d, rms: Math.sqrt(s / idx.length) }; };
+  // Beste Linie durch zwei Stützzellen (feste Zufallsfolge, dadurch reproduzierbar): die Linie mit den meisten Zellen
+  // innerhalb tol gewinnt; Rückgabe als Ausgleichsgerade der Zellen nahe dieser Linie samt deren Indizes.
+  const stuetzlinie = (idx, tol) => {
+    const n = idx.length; if (n < 6) return null;
+    let saat = 12345; const zufall = () => { saat = (saat * 1103515245 + 12345) & 0x7fffffff; return saat / 0x7fffffff; };
+    let best = null, bestN = 0;
+    for (let k = 0, proben = Math.min(120, n * (n - 1)); k < proben; k++) {
+      const a = idx[Math.floor(zufall() * n)], b = idx[Math.floor(zufall() * n)]; if (a === b) continue;
+      const dx = xs[b] - xs[a], dy = ys[b] - ys[a], L = Math.hypot(dx, dy); if (L < 0.04 * R) continue;
+      const d = { x: dx / L, y: dy / L }; let cnt = 0;
+      for (const i of idx) if (Math.abs((xs[i] - xs[a]) * -d.y + (ys[i] - ys[a]) * d.x) <= tol) cnt++;
+      if (cnt > bestN) { bestN = cnt; best = { p: { x: xs[a], y: ys[a] }, d }; }
+    }
+    if (!best || bestN < 6) return null;
+    const inl = idx.filter((i) => Math.abs((xs[i] - best.p.x) * -best.d.y + (ys[i] - best.p.y) * best.d.x) <= tol);
+    return { l: linie(inl), inl };
+  };
+  // Wandzellen liegen auf der Wand-OBERFLÄCHE; der Editor zeichnet Wände über ihre Mittellinie. Deshalb wird die gefundene
+  // Fläche auf die Mittellinie umgerechnet: gibt es 6–45 cm daneben eine parallele zweite Fläche (Innenwand, beide Seiten
+  // gescannt), ist die Mitte zwischen beiden die Mittellinie; sonst (Außenwand) um die halbe eingestellte Wanddicke zur
+  // Außenseite versetzt – die Seite, auf der im Umkreis von 60 cm weniger Zellen liegen (innen stehen Möbel, Brüstungen, Stürze).
+  const mittellinie = (l, umkreisIdx) => {
+    const abst = (i) => (xs[i] - l.p.x) * -l.d.y + (ys[i] - l.p.y) * l.d.x;
+    const band = (v, w) => umkreisIdx.filter((i) => { const a = abst(i); return a >= v && a <= w; });
+    for (const seite of [1, -1]) {
+      const kand = seite > 0 ? band(0.06 * R, 0.45 * R) : band(-0.45 * R, -0.06 * R);
+      if (kand.length < 6) continue;
+      const l2 = linie(kand); if (l2.rms > 0.03 * R || Math.abs(l.d.x * l2.d.y - l.d.y * l2.d.x) > Math.sin(5 * Math.PI / 180)) continue;
+      const d2 = (l2.p.x - l.p.x) * -l.d.y + (l2.p.y - l.p.y) * l.d.x;   // Abstand der zweiten Fläche
+      return { p: { x: l.p.x - l.d.y * d2 / 2, y: l.p.y + l.d.x * d2 / 2 }, d: l.d, dicke: Math.abs(d2) };
+    }
+    const dicke = ((st.einstellungen && st.einstellungen.wand && st.einstellungen.wand.dicke) || 24) / 100 * R;
+    const q = (s) => ({ x: l.p.x - l.d.y * s * 0.35 * R, y: l.p.y + l.d.x * s * 0.35 * R });
+    // Außenseite = Seite ohne Boden (Bodenpunkte gibt es nur im Raum); ohne Bodeninformation: Seite mit weniger Zellen
+    let aussen;
+    if (boden) { const b1 = boden.anzahl(q(1), 0.4 * R), b2 = boden.anzahl(q(-1), 0.4 * R); if (b1 !== b2) aussen = b1 < b2 ? 1 : -1; }
+    if (!aussen) aussen = alleImUmkreis(q(1), 0.3 * R) <= alleImUmkreis(q(-1), 0.3 * R) ? 1 : -1;
+    return { p: { x: l.p.x - l.d.y * aussen * dicke / 2, y: l.p.y + l.d.x * aussen * dicke / 2 }, d: l.d, dicke: null };
+  };
+  const quellen = (p, r, werkzeug) => {
+    const rr = Math.max(r, 0.25 * R), nah = umkreis(p, rr), segmente = [], punkte = [];
+    const tol = 0.03 * R, halb = 0.6 * R, weit = umkreis(p, 0.6 * R);
+    const seg = (l) => { const m = werkzeug === "wand" ? mittellinie(l, weit) : l; return [m.p.x - m.d.x * halb, m.p.y - m.d.y * halb, m.p.x + m.d.x * halb, m.p.y + m.d.y * halb]; };
+    // Linien im Umkreis: bis zu zwei (Ecke, T-Stoß). Jede Linie wird mit festen Stichproben aus zwei Stützzellen gesucht
+    // (meiste Zellen innerhalb 4,5 cm), dann über die Zellen nahe der Linie ausgeglichen; ihre Zellen werden entfernt und
+    // die nächste Linie gesucht. So trennen sich die beiden Flächen einer Ecke sauber, ohne dass die Hauptachse des
+    // ganzen Umkreises (bei einer Ecke die Diagonale) stört. Mindestausdehnung 10 cm entlang der Linie.
+    let rest = nah;
+    for (let k = 0; k < 2 && rest.length >= 6; k++) {
+      const f = stuetzlinie(rest, tol * 1.5); if (!f || f.l.rms > tol * 1.5) break;
+      let tMin = Infinity, tMax = -Infinity; for (const i of f.inl) { const t = (xs[i] - f.l.p.x) * f.l.d.x + (ys[i] - f.l.p.y) * f.l.d.y; if (t < tMin) tMin = t; if (t > tMax) tMax = t; }
+      if (tMax - tMin < 0.1 * R) break;
+      segmente.push(seg(f.l));
+      rest = rest.filter((i) => Math.abs((xs[i] - f.l.p.x) * -f.l.d.y + (ys[i] - f.l.p.y) * f.l.d.x) > 0.08 * R);
+    }
+    if (werkzeug === "tuer" || werkzeug === "fenster") {
+      const art = werkzeug === "tuer" ? "tuer" : "fenster", code = werkzeug === "tuer" ? 7 : 6;
+      // Öffnungsenden auf die nächste gezeichnete Wand (Mittellinie) legen, wenn eine bis 30 cm daneben liegt
+      const aufWand = (e) => { let best = null, bd = 0.3 * R; for (const el of st.elemente) { if (el.typ !== "wand") continue; const vx = el.p2.x - el.p1.x, vy = el.p2.y - el.p1.y, L2 = vx * vx + vy * vy || 1e-9; const t = Math.max(0, Math.min(1, ((e.x - el.p1.x) * vx + (e.y - el.p1.y) * vy) / L2)), f = { x: el.p1.x + vx * t, y: el.p1.y + vy * t }, d = Math.hypot(f.x - e.x, f.y - e.y); if (d < bd) { bd = d; best = f; } } return best || { x: e.x, y: e.y }; };
+      enden.forEach((e) => { if (e.art === art && Math.hypot(e.x - p.x, e.y - p.y) <= rr * 1.5) punkte.push(aufWand(e)); });
+      // Tür-/Fenster-Zellhäufung im Umkreis: Mitte als Fangpunkt
+      const oz = oeffnung.filter((o) => o.art === code && Math.hypot(o.x - p.x, o.y - p.y) <= rr); if (oz.length >= 5) { let mx = 0, my = 0; oz.forEach((o) => { mx += o.x; my += o.y; }); punkte.push({ x: mx / oz.length, y: my / oz.length }); }
+    }
+    return segmente.length || punkte.length ? { punkte, segmente } : null;
+  };
+  return { quellen, zellen: xs.length, oeffnungen: enden.length };
+}
+
+// Einrichten nach dem Übernehmen: Abbildung, Hintergrund, Fang. Liefert Kennzahlen für den Status.
+function epPzEinrichten(fenster, scan, erg, wolke, opt) {
+  const ge = fenster && fenster.GrundrissEditor; if (!ge || !ge.st) return null;
+  const abb = (opt && opt.abbildung && opt.abbildung.R && Math.abs(opt.abbildung.R - ge.st.kalib.ptProM) < 1e-6) ? { R: opt.abbildung.R, ax: opt.abbildung.ax, by: opt.abbildung.by, quelle: "stand" } : epPzAbbildung(ge.st, scan, erg); if (!abb) { ge.render(); return null; }
+  let boden = null; try { boden = epPzBodenGitter(wolke, erg, abb); } catch (e) { boden = null; }
+  const fang = epPzFangAufbauen(ge.st, erg, abb, boden);
+  ge.st.wolke = fang ? { quellen: fang.quellen, abbildung: abb, zellen: fang.zellen } : null;
+  let hintergrund = false;
+  if (opt && opt.hintergrund && wolke) hintergrund = epPzHintergrund(fenster, scan, erg, wolke, abb); else ge.render();
+  let dreiD = null;
+  if (typeof epP3Einrichten === "function") { try { dreiD = epP3Einrichten(fenster, erg, wolke, abb, erg.hoehen); } catch (e) { console.warn("3D-Ansicht der Wolke", e); } }
+  return { abbildung: abb.quelle, zellen: fang ? fang.zellen : 0, oeffnungen: fang ? fang.oeffnungen : 0, hintergrund, dreiD };
+}
+window.epPzEinrichten = epPzEinrichten; window.epPzBodenGitter = epPzBodenGitter; window.epPzAbbildung = epPzAbbildung; window.epPzFangAufbauen = epPzFangAufbauen; window.epPzHintergrund = epPzHintergrund;
+// Stufe 132 – 3D-Ansicht der Punktwolke im Grundriss-Editor (02.10.2026)
+// Nach dem Übernehmen erscheint rechts neben dem Blatt ein Fenster (auch als eigenes Browserfenster für einen zweiten Bildschirm) mit der Wolke als drehbarem 3D-Modell (WebGL, ohne
+// Bibliothek). Drehen mit der Maus/einem Finger, Zoom mit Rad/zwei Fingern, Verschieben mit Shift/rechter Taste/zwei Fingern.
+// Decke ausblendbar (Höhenregler), Farben Foto/Klasse/Höhe, die auf dem Blatt gezeichneten Wände werden als goldene Linien
+// eingeblendet, um die Zeichnung an der Wolke zu prüfen. Zusätzlich: Grundfläche aus der Wolke (5-cm-Zellen mit Punkten
+// bis 1,9 m über dem Boden, ungefähr).
+
+function epP3Matrizen() {
+  const mul = (a, b) => { const o = new Float32Array(16); for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) { let s = 0; for (let k = 0; k < 4; k++) s += a[k * 4 + i] * b[j * 4 + k]; o[j * 4 + i] = s; } return o; };
+  const perspektive = (fov, aspekt, nah, fern) => { const f = 1 / Math.tan(fov / 2), o = new Float32Array(16); o[0] = f / aspekt; o[5] = f; o[10] = (fern + nah) / (nah - fern); o[11] = -1; o[14] = 2 * fern * nah / (nah - fern); return o; };
+  const norm = (v) => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
+  const kreuz = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const blick = (auge, ziel, oben) => { const z = norm([auge[0] - ziel[0], auge[1] - ziel[1], auge[2] - ziel[2]]), x = norm(kreuz(oben, z)), y = kreuz(z, x); const o = new Float32Array(16); o[0] = x[0]; o[4] = x[1]; o[8] = x[2]; o[1] = y[0]; o[5] = y[1]; o[9] = y[2]; o[2] = z[0]; o[6] = z[1]; o[10] = z[2]; o[12] = -(x[0] * auge[0] + x[1] * auge[1] + x[2] * auge[2]); o[13] = -(y[0] * auge[0] + y[1] * auge[1] + y[2] * auge[2]); o[14] = -(z[0] * auge[0] + z[1] * auge[1] + z[2] * auge[2]); o[15] = 1; return o; };
+  return { mul, perspektive, blick, norm, kreuz };
+}
+
+// Wolke in Plan-Meter (gedreht wie die Auswertung, Höhe über dem Boden), Farben je Modus, Grundfläche
+function epP3Daten(erg, wolke, hoehen) {
+  const dreh = erg.dreh || 0, c = Math.cos(dreh), si = Math.sin(dreh), achse = hoehen.achse, boden = hoehen.boden || 0;
+  const auf = achse === "z" ? wolke.z : wolke.y, n = wolke.n, st = Math.max(1, Math.ceil(n / 1500000)), m = Math.ceil(n / st);
+  const pos = new Float32Array(3 * m), K = wolke.klassen, F = wolke.farben, kl = K ? new Uint8Array(m) : null, foto = F ? new Uint8Array(3 * m) : null;
+  let k = 0, minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, minZ = Infinity, maxZ = -Infinity;
+  const belegt = new Set();
+  for (let i = 0; i < n; i += st) {
+    const px = wolke.x[i], py = achse === "z" ? wolke.y[i] : -wolke.z[i];
+    const x = px * c + py * si, y = -px * si + py * c, z = auf[i] - boden;
+    pos[3 * k] = x; pos[3 * k + 1] = y; pos[3 * k + 2] = z;
+    if (kl) kl[k] = K[i]; if (foto) { foto[3 * k] = F[3 * i]; foto[3 * k + 1] = F[3 * i + 1]; foto[3 * k + 2] = F[3 * i + 2]; }
+    if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y; if (z < minZ) minZ = z; if (z > maxZ) maxZ = z;
+    if (z > -0.15 && z < 1.9) belegt.add(Math.floor(x / 0.05) * 100003 + Math.floor(y / 0.05));
+    k++;
+  }
+  const H = (erg.hoehen && erg.hoehen.hoehe) || Math.min(3.5, Math.max(2.2, maxZ));
+  return { pos, kl, foto, n: m, schritt: st, bbox: { minX, maxX, minY, maxY, minZ, maxZ }, H, grundflaecheM2: Math.round(belegt.size * 0.0025 * 10) / 10 };
+}
+
+function epP3Farben(d, modus) {
+  const out = new Uint8Array(3 * d.n);
+  const pal = { 0: [150, 150, 158], 1: [40, 52, 96], 2: [196, 176, 150], 3: [205, 205, 212], 4: [160, 120, 80], 5: [170, 130, 95], 6: [60, 140, 230], 7: [212, 165, 103] };
+  if (modus === "foto" && d.foto) { out.set(d.foto); return out; }
+  if (modus === "klasse" && d.kl) { for (let i = 0; i < d.n; i++) { const f = pal[d.kl[i]] || pal[0]; out[3 * i] = f[0]; out[3 * i + 1] = f[1]; out[3 * i + 2] = f[2]; } return out; }
+  // Höhe: Boden braun → Wandband dunkelblau → Decke hellgrau
+  const H = d.H;
+  for (let i = 0; i < d.n; i++) {
+    const t = Math.max(0, Math.min(1, d.pos[3 * i + 2] / H)); let r, g, b;
+    if (t < 0.12) { r = 196; g = 176; b = 150; } else if (t < 0.75) { const u = (t - 0.12) / 0.63; r = 40 + 30 * u; g = 52 + 40 * u; b = 96 + 60 * u; } else { r = 190; g = 192; b = 200; }
+    out[3 * i] = r; out[3 * i + 1] = g; out[3 * i + 2] = b;
+  }
+  return out;
+}
+
+// Gezeichnete Elemente des Blattes als Linien in Plan-Metern: Wände (Boden- und Oberkante, Pfosten), Flächen (Umriss am Boden)
+function epP3Blattlinien(st, abb, H) {
+  const R = abb.R, X = (p) => (p.x - abb.ax) / R, Y = (p) => (abb.by - p.y) / R, out = [];
+  const hw = Math.min(H, 2.2);
+  for (const el of st.elemente || []) {
+    if (el.typ === "wand") { const a = [X(el.p1), Y(el.p1)], b = [X(el.p2), Y(el.p2)]; out.push(a[0], a[1], 0.02, b[0], b[1], 0.02, a[0], a[1], hw, b[0], b[1], hw, a[0], a[1], 0.02, a[0], a[1], hw, b[0], b[1], 0.02, b[0], b[1], hw); }
+    else if (el.typ === "flaeche" && el.punkte && el.punkte.length > 2) { const q = el.punkte; for (let i = 0; i < q.length; i++) { const a = q[i], b = q[(i + 1) % q.length]; out.push(X(a), Y(a), 0.03, X(b), Y(b), 0.03); } }
+  }
+  return new Float32Array(out);
+}
+
+// Eine 3D-Ansicht (Steuerzeile, Canvas, Fußzeile) in ein Element eines beliebigen Dokuments bauen – im Editor-Fenster
+// oder in einem eigenen Browserfenster (zweiter Bildschirm). st/abb liefern die Blatt-Linien live.
+function epP3Ansicht(doc, wurzel, d, st, abb, opt) {
+  const win = doc.defaultView, M = epP3Matrizen(), o = opt || {};
+  const mitte = [(d.bbox.minX + d.bbox.maxX) / 2, (d.bbox.minY + d.bbox.maxY) / 2, Math.min(d.H, Math.max(0, d.bbox.maxZ)) / 2];
+  const weite = Math.max(d.bbox.maxX - d.bbox.minX, d.bbox.maxY - d.bbox.minY, 2);
+  const kam = { yaw: 0.6, pitch: 0.75, dist: weite * 1.35, ziel: mitte.slice(), zMax: d.H + 0.4, modus: d.foto ? "foto" : (d.kl ? "klasse" : "hoehe"), linien: true };
+  const knopf = (text, titel) => { const b = doc.createElement("button"); b.type = "button"; b.textContent = text; b.title = titel || ""; b.style.cssText = "background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;white-space:nowrap"; return b; };
+  const zeile1 = doc.createElement("div"); zeile1.style.cssText = "display:flex;align-items:center;gap:6px;padding:6px 8px;user-select:none;flex-wrap:wrap;flex:none";
+  const titel = doc.createElement("strong"); titel.style.cssText = "font-size:12px;margin-right:auto"; titel.textContent = (o.titel || "3D-Wolke") + " · " + d.n.toLocaleString("de-DE") + " Punkte" + (d.schritt > 1 ? " (jeder " + d.schritt + ".)" : ""); titel.setAttribute("data-ep-pw-3d-titel", "");
+  const bOben = knopf("Oben", "Draufsicht"), bSchraeg = knopf("Schräg", "Schrägansicht"), bSeite = knopf("Seite", "Seitenansicht in Augenhöhe");
+  bOben.setAttribute("data-ep-pw-3d-oben", "");
+  zeile1.append(titel, bOben, bSchraeg, bSeite); (o.knoepfe || []).forEach((b) => zeile1.appendChild(b));
+  const cv = doc.createElement("canvas"); cv.style.cssText = "flex:1;min-height:0;width:100%;display:block;cursor:grab;touch-action:none;background:#0f1529"; cv.setAttribute("data-ep-pw-3d-canvas", "");
+  const zeile2 = doc.createElement("div"); zeile2.style.cssText = "display:flex;align-items:center;gap:8px;padding:6px 8px;flex-wrap:wrap;flex:none";
+  const lblDecke = doc.createElement("label"); lblDecke.style.cssText = "display:flex;align-items:center;gap:6px;flex:1;min-width:160px";
+  const decke = doc.createElement("input"); decke.type = "range"; decke.min = "0.3"; decke.max = String(Math.round((d.H + 0.4) * 20) / 20); decke.step = "0.05"; decke.value = decke.max; decke.style.flex = "1"; decke.setAttribute("data-ep-pw-3d-decke", "");
+  const deckeText = doc.createElement("span"); deckeText.style.cssText = "min-width:92px;font-size:11px";
+  lblDecke.append(doc.createTextNode("Höhe bis"), decke, deckeText);
+  const farbe = doc.createElement("select"); farbe.style.cssText = "background:#2a3457;color:#fff;border:1px solid rgba(255,255,255,.22);border-radius:6px;font-size:11px;padding:2px 4px"; farbe.setAttribute("data-ep-pw-3d-farbe", "");
+  [["foto", "Foto", !!d.foto], ["klasse", "Klasse", !!d.kl], ["hoehe", "Höhe", true]].forEach(([v, t, ok]) => { if (!ok) return; const e = doc.createElement("option"); e.value = v; e.textContent = t; if (v === kam.modus) e.selected = true; farbe.appendChild(e); });
+  const lblPunkt = doc.createElement("label"); lblPunkt.style.cssText = "display:flex;align-items:center;gap:4px;font-size:11px"; const punkt = doc.createElement("select"); punkt.style.cssText = farbe.style.cssText; punkt.setAttribute("data-ep-pw-3d-punkt", "");
+  [["0.6", "fein"], ["1", "normal"], ["1.6", "grob"]].forEach(([v, t]) => { const e = doc.createElement("option"); e.value = v; e.textContent = t; if (v === "1") e.selected = true; punkt.appendChild(e); }); lblPunkt.append(doc.createTextNode("Punkte"), punkt);
+  const lblLinien = doc.createElement("label"); lblLinien.style.cssText = "display:flex;align-items:center;gap:4px;font-size:11px"; const cbLinien = doc.createElement("input"); cbLinien.type = "checkbox"; cbLinien.checked = true; cbLinien.setAttribute("data-ep-pw-3d-linien", ""); lblLinien.append(cbLinien, doc.createTextNode("Blatt-Wände"));
+  const fl = doc.createElement("span"); fl.style.cssText = "font-size:11px;color:#f3d9a8;white-space:nowrap"; fl.textContent = "Grundfläche aus der Wolke ≈ " + d.grundflaecheM2.toLocaleString("de-DE") + " m²"; fl.title = "Belegte 5-cm-Zellen mit Punkten vom Boden bis 1,90 m darüber – ungefähr, inklusive Wandflächen und Möbel"; fl.setAttribute("data-ep-pw-3d-flaeche", String(d.grundflaecheM2));
+  zeile2.append(lblDecke, farbe, lblPunkt, lblLinien, fl);
+  wurzel.append(zeile1, cv, zeile2);
+  const api = { kam, zeile1, cv, daten: d, mitte, weite, render: () => {}, anfordern: () => {}, ansicht: () => {}, weg: () => {}, hinweis: (t) => { fl.textContent = t; fl.title = t; fl.style.whiteSpace = "normal"; } };
+  const gl = cv.getContext("webgl", { preserveDrawingBuffer: true, antialias: false, alpha: false });
+  if (!gl) { cv.replaceWith(Object.assign(doc.createElement("div"), { textContent: "3D-Ansicht nicht verfügbar (kein WebGL in diesem Browser).", style: "padding:20px;color:#f3d9a8" })); api.webgl = false; return api; }
+  api.webgl = true;
+  const sh = (typ, src) => { const x = gl.createShader(typ); gl.shaderSource(x, src); gl.compileShader(x); if (!gl.getShaderParameter(x, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(x)); return x; };
+  const prog = (vs, fs) => { const p = gl.createProgram(); gl.attachShader(p, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(p, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p)); return p; };
+  const pPunkte = prog(
+    "attribute vec3 aPos; attribute vec3 aFarbe; uniform mat4 uMVP; uniform float uGroesse; varying vec3 vFarbe; varying float vZ; void main(){ gl_Position = uMVP * vec4(aPos, 1.0); float w = max(gl_Position.w, 0.2); gl_PointSize = clamp(uGroesse / w, 1.0, 9.0); vFarbe = aFarbe / 255.0; vZ = aPos.z; }",
+    "precision mediump float; varying vec3 vFarbe; varying float vZ; uniform float uZMax; void main(){ if (vZ > uZMax) discard; gl_FragColor = vec4(vFarbe, 1.0); }");
+  const pLinien = prog(
+    "attribute vec3 aPos; uniform mat4 uMVP; void main(){ gl_Position = uMVP * vec4(aPos, 1.0); }",
+    "precision mediump float; uniform vec4 uFarbe; void main(){ gl_FragColor = uFarbe; }");
+  const bufPos = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, bufPos); gl.bufferData(gl.ARRAY_BUFFER, d.pos, gl.STATIC_DRAW);
+  const bufFarbe = gl.createBuffer(); let farbenModus = null;
+  const farbenSetzen = () => { if (farbenModus === kam.modus) return; farbenModus = kam.modus; gl.bindBuffer(gl.ARRAY_BUFFER, bufFarbe); gl.bufferData(gl.ARRAY_BUFFER, epP3Farben(d, kam.modus), gl.STATIC_DRAW); };
+  const bufLinien = gl.createBuffer(); let linienN = 0, linienStand = "";
+  const linienSetzen = () => { const stand = JSON.stringify((st.elemente || []).filter((e) => e.typ === "wand" || e.typ === "flaeche").map((e) => [e.typ, e.p1, e.p2, e.punkte])); if (stand === linienStand) return; linienStand = stand; const L = epP3Blattlinien(st, abb, d.H); linienN = L.length / 3; gl.bindBuffer(gl.ARRAY_BUFFER, bufLinien); gl.bufferData(gl.ARRAY_BUFFER, L, gl.STATIC_DRAW); };
+  const aPos = gl.getAttribLocation(pPunkte, "aPos"), aFarbe = gl.getAttribLocation(pPunkte, "aFarbe"), uMVP = gl.getUniformLocation(pPunkte, "uMVP"), uGroesse = gl.getUniformLocation(pPunkte, "uGroesse"), uZMax = gl.getUniformLocation(pPunkte, "uZMax");
+  const aPosL = gl.getAttribLocation(pLinien, "aPos"), uMVPL = gl.getUniformLocation(pLinien, "uMVP"), uFarbeL = gl.getUniformLocation(pLinien, "uFarbe");
+  let angefordert = false, punktFaktor = 1;
+  // Punktgröße: dichtere Wolken bekommen kleinere Punkte (mehr Detail), grobe Wolken größere, damit keine Löcher entstehen
+  const dichte = Math.max(0.45, Math.min(1.6, Math.sqrt(250000 / Math.max(1, d.n)) * Math.max(0.6, Math.min(2.5, 6 / weite))));
+  const mvp = () => { const cp = Math.cos(kam.pitch), auge = [kam.ziel[0] + kam.dist * cp * Math.sin(kam.yaw), kam.ziel[1] - kam.dist * cp * Math.cos(kam.yaw), kam.ziel[2] + kam.dist * Math.sin(kam.pitch)]; const V = M.blick(auge, kam.ziel, [0, 0, 1]); const P = M.perspektive(0.9, cv.width / Math.max(1, cv.height), 0.05, kam.dist * 6 + 20); return M.mul(P, V); };
+  const render = () => {
+    angefordert = false; if (!cv.isConnected) return;
+    const dpr = Math.min(2, win.devicePixelRatio || 1), w = Math.max(1, Math.round(cv.clientWidth * dpr)), h = Math.max(1, Math.round(cv.clientHeight * dpr));
+    if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+    gl.viewport(0, 0, w, h); gl.clearColor(0.06, 0.08, 0.16, 1); gl.enable(gl.DEPTH_TEST); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    const m = mvp(); farbenSetzen();
+    gl.useProgram(pPunkte); gl.uniformMatrix4fv(uMVP, false, m); gl.uniform1f(uGroesse, 9 * dpr * dichte * punktFaktor); gl.uniform1f(uZMax, kam.zMax);
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufPos); gl.enableVertexAttribArray(aPos); gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufFarbe); gl.enableVertexAttribArray(aFarbe); gl.vertexAttribPointer(aFarbe, 3, gl.UNSIGNED_BYTE, false, 0, 0);
+    gl.drawArrays(gl.POINTS, 0, d.n);
+    gl.disableVertexAttribArray(aFarbe);
+    if (kam.linien) { linienSetzen(); if (linienN) { gl.useProgram(pLinien); gl.uniformMatrix4fv(uMVPL, false, m); gl.uniform4f(uFarbeL, 0.83, 0.65, 0.4, 1); gl.disable(gl.DEPTH_TEST); gl.bindBuffer(gl.ARRAY_BUFFER, bufLinien); gl.enableVertexAttribArray(aPosL); gl.vertexAttribPointer(aPosL, 3, gl.FLOAT, false, 0, 0); gl.drawArrays(gl.LINES, 0, linienN); } }
+    deckeText.textContent = kam.zMax >= d.H + 0.35 ? "alles (" + d.H.toLocaleString("de-DE", { maximumFractionDigits: 2 }) + " m Raum)" : kam.zMax.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m über Boden";
+  };
+  const anfordern = () => { if (angefordert || !cv.isConnected) return; angefordert = true; win.requestAnimationFrame(render); };
+  const ansicht = (name) => { if (name === "oben") { kam.pitch = 1.55; kam.yaw = 0; kam.dist = weite * 1.15; } else if (name === "seite") { kam.pitch = 0.08; kam.yaw = 0.0; kam.dist = weite * 1.4; } else { kam.pitch = 0.75; kam.yaw = 0.6; kam.dist = weite * 1.35; } kam.ziel = name === "seite" ? [mitte[0], mitte[1], 1.2] : mitte.slice(); anfordern(); };
+  bOben.addEventListener("click", () => ansicht("oben")); bSchraeg.addEventListener("click", () => ansicht("schraeg")); bSeite.addEventListener("click", () => ansicht("seite"));
+  decke.addEventListener("input", () => { kam.zMax = parseFloat(decke.value); anfordern(); });
+  farbe.addEventListener("change", () => { kam.modus = farbe.value; anfordern(); });
+  punkt.addEventListener("change", () => { punktFaktor = parseFloat(punkt.value) || 1; anfordern(); });
+  cbLinien.addEventListener("change", () => { kam.linien = cbLinien.checked; anfordern(); });
+  // Drehen / Zoomen / Verschieben
+  const zeiger = new Map(); let letzteSpanne = 0;
+  const schwenken = (dx, dy) => { const cp = Math.cos(kam.pitch), blick = M.norm([-cp * Math.sin(kam.yaw), cp * Math.cos(kam.yaw), -Math.sin(kam.pitch)]), rechts = M.norm(M.kreuz(blick, [0, 0, 1])), hoch = M.kreuz(rechts, blick), f = kam.dist * 0.0022; for (let i = 0; i < 3; i++) kam.ziel[i] += (-rechts[i] * dx + hoch[i] * dy) * f; };
+  cv.addEventListener("pointerdown", (e) => { e.preventDefault(); e.stopPropagation(); try { cv.setPointerCapture(e.pointerId); } catch (x) { /* synthetisch */ } zeiger.set(e.pointerId, { x: e.clientX, y: e.clientY, taste: e.button, shift: e.shiftKey }); if (zeiger.size === 2) { const z = [...zeiger.values()]; letzteSpanne = Math.hypot(z[0].x - z[1].x, z[0].y - z[1].y); } cv.style.cursor = "grabbing"; });
+  cv.addEventListener("pointermove", (e) => {
+    const z = zeiger.get(e.pointerId); if (!z) return; e.preventDefault(); e.stopPropagation();
+    const dx = e.clientX - z.x, dy = e.clientY - z.y; z.x = e.clientX; z.y = e.clientY;
+    if (zeiger.size === 2) { const a = [...zeiger.values()], sp = Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y); if (letzteSpanne > 0) kam.dist *= Math.max(0.5, Math.min(2, letzteSpanne / Math.max(1, sp))); letzteSpanne = sp; schwenken(dx / 2, dy / 2); }
+    else if (z.taste === 2 || z.taste === 1 || z.shift) schwenken(dx, dy);
+    else { kam.yaw += dx * 0.008; kam.pitch = Math.max(-0.2, Math.min(1.55, kam.pitch + dy * 0.008)); }
+    anfordern();
+  });
+  const los = (e) => { zeiger.delete(e.pointerId); if (zeiger.size < 2) letzteSpanne = 0; if (!zeiger.size) cv.style.cursor = "grab"; };
+  cv.addEventListener("pointerup", los); cv.addEventListener("pointercancel", los);
+  cv.addEventListener("wheel", (e) => { e.preventDefault(); e.stopPropagation(); kam.dist *= e.deltaY > 0 ? 1.12 : 0.89; kam.dist = Math.max(0.5, Math.min(weite * 8, kam.dist)); anfordern(); }, { passive: false });
+  cv.addEventListener("contextmenu", (e) => e.preventDefault());
+  const beobachter = typeof win.ResizeObserver === "function" ? new win.ResizeObserver(() => anfordern()) : null; if (beobachter) beobachter.observe(wurzel);
+  win.addEventListener("resize", anfordern);
+  api.render = render; api.anfordern = anfordern; api.ansicht = ansicht;
+  api.weg = () => { try { if (beobachter) beobachter.disconnect(); win.removeEventListener("resize", anfordern); const ext = gl.getExtension("WEBGL_lose_context"); if (ext) ext.loseContext(); } catch (e) { /* egal */ } };
+  anfordern();
+  return api;
+}
+
+function epP3Einrichten(fenster, erg, wolke, abb, hoehen) {
+  const ge = fenster && fenster.GrundrissEditor, doc = fenster && fenster.document; if (!ge || !ge.st || !doc || !wolke || !abb || !hoehen) return null;
+  if (fenster.epP3Weg) fenster.epP3Weg();
+  const d = epP3Daten(erg, wolke, hoehen), st = ge.st;
+  const ansichten = [];   // alle offenen Ansichten (Editor-Fenster, eigene Browserfenster) – Blattänderungen zeichnen überall nach
+  // --- schwebendes Fenster im Editor ---
+  const kopf = doc.querySelector("header"), aside = doc.getElementById("eigenschaften");
+  const pan = doc.createElement("div"); pan.setAttribute("data-ep-pw-3d", "offen");
+  const S = pan.style; S.position = "fixed"; S.zIndex = "40"; S.width = "440px"; S.height = "340px"; S.minWidth = "280px"; S.minHeight = "220px"; S.resize = "both"; S.overflow = "hidden";
+  S.background = "#1d2541"; S.color = "#fff"; S.borderRadius = "10px"; S.boxShadow = "0 10px 30px rgba(26,35,66,.35)"; S.display = "flex"; S.flexDirection = "column"; S.font = "12px system-ui, sans-serif";
+  const lage = () => { const ab = aside ? aside.getBoundingClientRect().width : 276, kh = kopf ? kopf.getBoundingClientRect().height : 56; S.right = (ab + 14) + "px"; S.top = (kh + 14) + "px"; };
+  lage();
+  const knopf = (text, titel) => { const b = doc.createElement("button"); b.type = "button"; b.textContent = text; b.title = titel || ""; b.style.cssText = "background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;white-space:nowrap"; return b; };
+  const bGross = knopf("Groß", "Fenster vergrößern / verkleinern"), bExtern = knopf("Fenster ↗", "3D-Ansicht in einem eigenen Browserfenster öffnen – lässt sich auf einen zweiten Bildschirm ziehen"), bZu = knopf("×", "3D-Fenster schließen (im Punktwolke-Dialog erneut übernehmen, um es wieder zu öffnen)");
+  const bHoehe = knopf("Fläche bis Höhe", "Fläche je Raum unter und über der am Regler eingestellten Höhe (aus der Wolke), mit den WoFlV-Stufen 1 m / 2 m"); bHoehe.setAttribute("data-ep-pw-3d-flaeche-hoehe", "");
+  bExtern.setAttribute("data-ep-pw-3d-extern", ""); bZu.setAttribute("data-ep-pw-3d-zu", "");
+  doc.body.appendChild(pan);
+  const haupt = epP3Ansicht(doc, pan, d, st, abb, { knoepfe: [bHoehe, bGross, bExtern, bZu] }); ansichten.push(haupt);
+  bHoehe.addEventListener("click", () => { let t; try { t = typeof epDsFlaecheBisHoehe === "function" ? epDsFlaecheBisHoehe(fenster, Math.min(haupt.kam.zMax, d.H + 0.4)) : "Dachschrägen-Stufe fehlt."; } catch (e) { t = "Fehler: " + (e.message || e); } haupt.hinweis(t); });
+  haupt.zeile1.style.cursor = "move";
+  pan.__ep3 = haupt;
+  if (typeof epPsEinrichten === "function") { try { epPsEinrichten(fenster, pan, haupt, d, st, abb); } catch (e) { console.warn("Schnitt/Messen", e); } }
+  let gross = false; bGross.addEventListener("click", () => { gross = !gross; if (gross) { S.width = "min(900px, calc(100vw - 420px))"; S.height = "min(640px, calc(100vh - 160px))"; bGross.textContent = "Klein"; } else { S.width = "440px"; S.height = "340px"; bGross.textContent = "Groß"; } haupt.anfordern(); });
+  // --- eigenes Browserfenster (zweiter Bildschirm) ---
+  let extern = null;
+  const externOeffnen = () => {
+    if (extern && !extern.closed) { extern.focus(); return; }
+    const w = fenster.open("", "epPw3d", "popup=yes,width=1000,height=760"); if (!w) { bExtern.textContent = "Popup blockiert"; bExtern.title = "Der Browser hat das Fenster blockiert – Popups für diese Seite erlauben."; return; }
+    extern = w;
+    const wd = w.document; wd.open(); wd.write("<!doctype html><html lang=\"de\"><head><meta charset=\"utf-8\"><title>3D-Wolke · ImmoOffice</title><style>html,body{margin:0;height:100%;background:#1d2541;color:#fff;font:12px system-ui,sans-serif;overflow:hidden}body{display:flex;flex-direction:column}</style></head><body></body></html>"); wd.close();
+    const bHoehe2 = knopf("Fläche bis Höhe", bHoehe.title); bHoehe2.setAttribute("data-ep-pw-3d-flaeche-hoehe", "");
+    const api = epP3Ansicht(wd, wd.body, d, st, abb, { titel: "3D-Wolke", knoepfe: [bHoehe2] }); api.kam.yaw = haupt.kam.yaw;
+    bHoehe2.addEventListener("click", () => { let t; try { t = typeof epDsFlaecheBisHoehe === "function" ? epDsFlaecheBisHoehe(fenster, Math.min(api.kam.zMax, d.H + 0.4)) : "Dachschrägen-Stufe fehlt."; } catch (e) { t = "Fehler: " + (e.message || e); } api.hinweis(t); });
+    if (typeof epPsEinrichten === "function") { try { epPsEinrichten(fenster, wd.body, api, d, st, abb); } catch (e) { console.warn("Schnitt/Messen (externes Fenster)", e); } } api.kam.pitch = haupt.kam.pitch; api.kam.dist = haupt.kam.dist; api.kam.ziel = haupt.kam.ziel.slice(); api.anfordern();
+    ansichten.push(api);
+    const raus = () => { api.weg(); const i = ansichten.indexOf(api); if (i >= 0) ansichten.splice(i, 1); if (extern === w) extern = null; };
+    w.addEventListener("beforeunload", raus); w.addEventListener("pagehide", raus);
+    fenster.setTimeout(() => api.anfordern(), 300);
+  };
+  bExtern.addEventListener("click", externOeffnen);
+  // Fenster verschieben (Kopfzeile ziehen)
+  let zieh = null; const zeile1 = haupt.zeile1;
+  zeile1.addEventListener("pointerdown", (e) => { if (e.target.tagName === "BUTTON") return; zieh = { x: e.clientX, y: e.clientY, r: pan.getBoundingClientRect() }; try { zeile1.setPointerCapture(e.pointerId); } catch (x) { /* egal */ } });
+  zeile1.addEventListener("pointermove", (e) => { if (!zieh) return; S.left = (zieh.r.left + e.clientX - zieh.x) + "px"; S.top = (zieh.r.top + e.clientY - zieh.y) + "px"; S.right = "auto"; });
+  zeile1.addEventListener("pointerup", () => { zieh = null; }); zeile1.addEventListener("pointercancel", () => { zieh = null; });
+  // Blattänderungen (neue Wände) → Linien in allen Ansichten nachziehen
+  const altRender = ge.render; let gehakt = false;
+  if (typeof altRender === "function") { ge.render = function () { const r = altRender.apply(this, arguments); ansichten.forEach((a) => { if (a.kam.linien) a.anfordern(); }); return r; }; gehakt = true; }
+  fenster.addEventListener("resize", lage);
+  const weg = () => { try { fenster.removeEventListener("resize", lage); if (gehakt) ge.render = altRender; ansichten.slice().forEach((a) => a.weg()); if (extern && !extern.closed) extern.close(); } catch (e) { /* egal */ } pan.remove(); fenster.epP3Weg = null; };
+  bZu.addEventListener("click", weg);
+  fenster.epP3Weg = weg; fenster.epP3Extern = externOeffnen;
+  return { punkte: d.n, grundflaecheM2: d.grundflaecheM2, webgl: haupt.webgl };
+}
+window.epP3Einrichten = epP3Einrichten; window.epP3Ansicht = epP3Ansicht; window.epP3Daten = epP3Daten; window.epP3Farben = epP3Farben;
+// Stufe 139 – Dachschrägen aus der Punktwolke (02.10.2026)
+// Je Raumfläche des Blatts wird aus der Wolke die lichte Höhe gemessen (Deckenhöhe über dem erkannten Boden, 10-cm-Karte).
+// Zusammenhängende Bereiche unter 2 m werden als geneigte Ebene ausgeglichen; daraus entstehen die 2-m- und 1-m-Linie
+// (Werkzeug „Schräge“) und die Teilflächen „Schräge 1–2 m“ (zur Hälfte) und „unter 1 m“ (nicht anrechenbar) nach § 4 WoFlV,
+// so wie sie die Wohnflächenrechnung aus dem Blatt liest. Kniestock und Neigung stehen in der Meldung.
+
+function epDsHoehenkarte(wolke, erg, abb) {
+  const { pt } = epPzWolkeAufBlatt(wolke, erg, abb, erg.hoehen), G = 0.1 * abb.R, H = Math.max(3.0, (erg.hoehen && erg.hoehen.hoehe) || 0), karte = new Map();
+  const bodenZaehler = new Map();
+  for (let j = 0; j < pt.length; j += 3) {
+    const z = pt[j + 2];
+    if (z > -0.15 && z < 0.2) { const kb = Math.floor(pt[j] / G) * 100003 + Math.floor(pt[j + 1] / G); bodenZaehler.set(kb, (bodenZaehler.get(kb) || 0) + 1); }
+    if (z < 0.3 || z > H + 1.0) continue;
+    const k = Math.floor(pt[j] / G) * 100003 + Math.floor(pt[j + 1] / G), e = karte.get(k);
+    if (!e) karte.set(k, { z, n: 1 }); else { if (z > e.z) e.z = z; e.n++; }
+  }
+  const boden = new Set(); bodenZaehler.forEach((n, k) => { if (n >= 3) boden.add(k); });   // begehbare Zellen (für Gauben/Erker über die Wandlinie hinaus)
+  // Deckenpunkte je Zelle (bis 8 cm unter dem Zellmaximum) für den Ebenenausgleich – Punkte statt Zellmaxima, sonst
+  // wandert die Ebene um eine halbe Zelle × Neigung nach oben (Kniestock zu hoch, 1-m-Linie zu nah an der Wand)
+  for (let j = 0; j < pt.length; j += 3) {
+    const z = pt[j + 2]; if (z < 0.3 || z > H + 1.0) continue;
+    const e = karte.get(Math.floor(pt[j] / G) * 100003 + Math.floor(pt[j + 1] / G)); if (!e || z < e.z - 0.08) continue;
+    if (!e.pts) e.pts = []; if (e.pts.length < 60) e.pts.push(pt[j], pt[j + 1], z);
+  }
+  // Deckenfläche glätten: Wo in einer Zelle die Decke fehlt (nur Möbel, Brüstung, Wandkrone erfasst), liegt ihr Maximum weit unter
+  // dem der Nachbarn. Dann gilt das 70-%-Quantil der Zellmaxima im 5×5-Umfeld als Deckenhöhe (e.d), die eigene Zelle zählt als
+  // „ergänzt“ und liefert keine Deckenpunkte für den Ebenenausgleich. Schrägen mit lückiger Erfassung bleiben so eine Fläche.
+  karte.forEach((e, k) => {
+    const gx = Math.floor(k / 100003), gy = k - gx * 100003, werte = [];
+    for (let dx = -2; dx <= 2; dx++) for (let dy = -2; dy <= 2; dy++) { const f = karte.get((gx + dx) * 100003 + (gy + dy)); if (f && f.n >= 2) werte.push(f.z); }
+    if (werte.length < 4) { e.d = e.n >= 2 ? e.z : null; return; }
+    werte.sort((a, b) => a - b); const q70 = werte[Math.min(werte.length - 1, Math.floor(werte.length * 0.7))];
+    if (e.n < 2 || e.z < q70 - 0.35) { e.d = q70; e.ergaenzt = true; e.pts = null; } else e.d = e.z;
+  });
+  const hoehe = (x, y) => { const gx = Math.floor(x / G), gy = Math.floor(y / G); const e = karte.get(gx * 100003 + gy); if (e && e.d != null) return e.d; let best = null; for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) { const f = karte.get((gx + dx) * 100003 + (gy + dy)); if (f && f.d != null && (best == null || f.d > best)) best = f.d; } return best; };
+  return { G, karte, hoehe, boden, R: abb.R };
+}
+
+function epDsInnen(p, poly) { let c = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const a = poly[i], b = poly[j]; if ((a.y > p.y) !== (b.y > p.y) && p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x) c = !c; } return c; }
+// Polygon auf die Seite f(p) <= 0 beschneiden (Sutherland–Hodgman für eine Halbebene)
+// Gauben/Erker an einer Traufwand: Zellen, deren Decke deutlich über der Dachebene liegt (flach, ≥ 1,6 m), zusammenhängend und an der
+// Wandlinie (Dachflächenfenster-Laibungen liegen mitten in der Schräge und fallen heraus); außerhalb des Raums nur mit Boden (begehbar).
+// Liefert Rechtecke in Wandkoordinaten: s0..s1 entlang der Wand, tInnen in den Raum, tAussen über die Wandlinie hinaus, lichte Höhe.
+function epDsGauben(poly, karte, R, cl) {
+  const k = cl && cl.kante; if (!k || !cl.hVon) return [];
+  const G = karte.G, A = k.A, d = k.d, n = k.n, L = k.L;
+  const sVon = (p) => (p.x - A.x) * d.x + (p.y - A.y) * d.y, tVon = (p) => (p.x - A.x) * n.x + (p.y - A.y) * n.y;
+  const ecken = [[0, -1.5 * R], [L, -1.5 * R], [L, 2.0 * R], [0, 2.0 * R]].map(([s, tt]) => ({ x: A.x + d.x * s + n.x * tt, y: A.y + d.y * s + n.y * tt }));
+  const x0 = Math.min(...ecken.map((q) => q.x)), x1 = Math.max(...ecken.map((q) => q.x)), y0 = Math.min(...ecken.map((q) => q.y)), y1 = Math.max(...ecken.map((q) => q.y));
+  const zellen = new Map();
+  for (let gx = Math.floor(x0 / G); gx <= Math.floor(x1 / G); gx++) for (let gy = Math.floor(y0 / G); gy <= Math.floor(y1 / G); gy++) {
+    const p = { x: (gx + 0.5) * G, y: (gy + 0.5) * G }, s = sVon(p), tt = tVon(p);
+    if (s < -G || s > L + G || tt < -1.5 * R || tt > 2.0 * R) continue;
+    const h = karte.hoehe(p.x, p.y); if (h == null || h < 1.6) continue;
+    const innen = epDsInnen(p, poly);
+    if (innen) { if (h < cl.hVon(p) + 0.2) continue; }   // deutlich über der Dachebene (die Gaubendecke läuft hinten in die Schräge)
+    else { if (tt > 0.05 * R || !karte.boden || !karte.boden.has(gx * 100003 + gy)) continue; }
+    zellen.set(gx * 100003 + gy, { gx, gy, s, t: tt, h, innen });
+  }
+  if (zellen.size < 4) return [];
+  const rest = new Set(zellen.keys()), aus = [];
+  for (const k0 of zellen.keys()) {
+    if (!rest.has(k0)) continue; rest.delete(k0); const stapel = [k0], grp = [];
+    while (stapel.length) { const kk = stapel.pop(), z = zellen.get(kk); grp.push(z); for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const kn = (z.gx + dx) * 100003 + (z.gy + dy); if (rest.has(kn)) { rest.delete(kn); stapel.push(kn); } } }
+    const sMin = Math.min(...grp.map((z) => z.s)), sMax = Math.max(...grp.map((z) => z.s)), tMinAbs = Math.min(...grp.map((z) => Math.abs(z.t)));
+    const breite = (sMax - sMin + G) / R, flaeche = grp.length * (G / R) * (G / R);
+    if (tMinAbs > 0.25 * R || breite < 0.5 || flaeche < 0.3) continue;
+    // Gaube oder Dachflächenfenster? Beide heben die Decke über die Dachebene – die Gaubendecke ist aber flach, die Laibung
+    // eines Dachflächenfensters läuft weiter mit dem Dach. Gerade h über dem Wandabstand t: Steigung über 0,35 (≈ 19°) → Fenster, keine Gaube.
+    { const n = grp.length; const mt = grp.reduce((a, z) => a + z.t, 0) / n / R, mh = grp.reduce((a, z) => a + z.h, 0) / n; let stt = 0, sth = 0; for (const z of grp) { const dt = z.t / R - mt; stt += dt * dt; sth += dt * (z.h - mh); } const steig = stt > 1e-6 ? Math.abs(sth / stt) : 0; if (steig > 0.35) continue; }
+    const inn = grp.filter((z) => z.innen), auss = grp.filter((z) => !z.innen);
+    const tInnen = inn.length ? Math.min(2.0 * R, Math.max(...inn.map((z) => z.t)) + G / 2) : 0;
+    let tAussen = auss.length ? Math.max(-1.5 * R, Math.min(...auss.map((z) => z.t)) - G / 2) : 0;
+    if (!(tAussen < -0.25 * R && auss.length * (G / R) * (G / R) >= 0.3)) tAussen = 0;
+    const hs = grp.map((z) => z.h).sort((a, b) => a - b), hoehe = hs[hs.length >> 1];
+    const s0 = Math.max(0, sMin - G / 2), s1 = Math.min(L, sMax + G / 2);
+    const rechteck = (ta, tb) => [[s0, ta], [s1, ta], [s1, tb], [s0, tb]].map(([s, tt]) => ({ x: A.x + d.x * s + n.x * tt, y: A.y + d.y * s + n.y * tt }));
+    aus.push({ s0, s1, tInnen, tAussen, hoehe: Math.round(hoehe * 100) / 100, breiteM: Math.round((s1 - s0) / R * 100) / 100, tiefeM: Math.round(tInnen / R * 100) / 100, aussenM: Math.round(-tAussen / R * 100) / 100, sVon, tVon, rechteck, winkel: k.d });
+  }
+  return aus;
+}
+// Polygone ohne die Gauben-Rechtecke: links/rechts der Gaube bleibt alles, in der Gaubenbreite nur der Teil hinter der Gaubentiefe
+function epDsOhneGauben(polys, gauben) {
+  let liste = polys.slice();
+  for (const gb of gauben) {
+    if (!(gb.tInnen > 0)) continue; const naechste = [];
+    for (const P of liste) {
+      const links = epDsClip(P, (p) => gb.sVon(p) - gb.s0), rechts = epDsClip(P, (p) => gb.s1 - gb.sVon(p));
+      let mitte = epDsClip(P, (p) => gb.s0 - gb.sVon(p)); mitte = epDsClip(mitte, (p) => gb.sVon(p) - gb.s1); mitte = epDsClip(mitte, (p) => gb.tInnen - gb.tVon(p));
+      for (const Q of [links, rechts, mitte]) if (Q.length >= 3 && epDsInhalt(Q) > 1e-6) naechste.push(Q);
+    }
+    liste = naechste;
+  }
+  return liste;
+}
+function epDsClip(poly, f) {
+  const out = [];
+  for (let i = 0; i < poly.length; i++) {
+    const A = poly[i], B = poly[(i + 1) % poly.length], fa = f(A), fb = f(B);
+    if (fa <= 0) out.push(A);
+    if ((fa <= 0) !== (fb <= 0)) { const t = fa / (fa - fb); out.push({ x: A.x + (B.x - A.x) * t, y: A.y + (B.y - A.y) * t }); }
+  }
+  return out;
+}
+function epDsInhalt(pts) { let a = 0; for (let i = 0; i < pts.length; i++) { const p = pts[i], q = pts[(i + 1) % pts.length]; a += p.x * q.y - q.x * p.y; } return Math.abs(a) / 2; }
+// Schnittstrecke einer Geraden f(p) = 0 mit dem Polygon (äußerste Schnittpunkte)
+function epDsSehne(poly, f) {
+  const pts = [];
+  for (let i = 0; i < poly.length; i++) { const A = poly[i], B = poly[(i + 1) % poly.length], fa = f(A), fb = f(B); if ((fa <= 0) !== (fb <= 0) || fa === 0) { const t = fa === fb ? 0 : fa / (fa - fb); pts.push({ x: A.x + (B.x - A.x) * t, y: A.y + (B.y - A.y) * t }); } }
+  if (pts.length < 2) return null;
+  let best = null, bd = 0; for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) { const d = Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y); if (d > bd) { bd = d; best = [pts[i], pts[j]]; } }
+  return best;
+}
+
+// Zonen eines Raums (Polygon in Blatt-pt) aus der Höhenkarte: Ebenen je zusammenhängendem Bereich unter 2 m
+function epDsRaumZonen(poly, karte, R) {
+  const G = karte.G; let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity; poly.forEach((p) => { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); });
+  const zellen = new Map(); let voll = 0, unbekannt = 0, gesamt = 0, halbZ = 0, keineZ = 0, minH = Infinity, maxH = -Infinity;
+  const alle = [];   // alle Zellen mit bekannter Höhe (für die Gegenprobe je Dachseite)
+  for (let gx = Math.floor(x0 / G); gx <= Math.floor(x1 / G); gx++) for (let gy = Math.floor(y0 / G); gy <= Math.floor(y1 / G); gy++) {
+    const cx = (gx + 0.5) * G, cy = (gy + 0.5) * G; if (!epDsInnen({ x: cx, y: cy }, poly)) continue;
+    gesamt++; const h = karte.hoehe(cx, cy);
+    if (h == null) { unbekannt++; continue; }
+    if (h < minH) minH = h; if (h > maxH) maxH = h;
+    alle.push({ x: cx, y: cy, h });
+    if (h >= 2) { voll++; continue; }
+    if (h >= 1) halbZ++; else keineZ++;
+    zellen.set(gx * 100003 + gy, { gx, gy, x: cx, y: cy, h });
+  }
+  // Lichte Höhe als 3-%- und 95-%-Quantil der Zellhöhen: das Maximum wäre eine Leuchte, eine Fensterlaibung oder eine Lücke, nicht die Decke
+  { const hs = alle.map((c) => c.h).sort((a, b) => a - b); if (hs.length >= 20) { minH = hs[Math.floor(0.03 * (hs.length - 1))]; maxH = hs[Math.floor(0.95 * (hs.length - 1))]; } }
+  const f = (G / R) * (G / R), aus = { voll: voll * f, unbekannt: unbekannt * f, gesamt: gesamt * f, niedrig: zellen.size * f, halbZellen: halbZ * f, keineZellen: keineZ * f, cluster: [], minH: isFinite(minH) ? Math.round(minH * 100) / 100 : null, maxH: isFinite(maxH) ? Math.round(maxH * 100) / 100 : null };
+  if (zellen.size < 8) return aus;
+  // Dachseiten: jede niedrige Zelle gehört zur nächstgelegenen Raumwand (Polygonkante ab 0,8 m). Die Decke einer Dachseite fällt
+  // senkrecht zur Traufwand ab, deshalb wird je Wand die Höhe als Gerade über dem Wandabstand ausgeglichen (h = Kniestock + s·tan α).
+  // So laufen 2-m- und 1-m-Linie parallel zur Wand, auch bei Walmdächern (jede Seite ihre Wand) und schrägen Wänden.
+  const kanten = [];
+  for (let i = 0; i < poly.length; i++) {
+    const A = poly[i], B = poly[(i + 1) % poly.length], L = Math.hypot(B.x - A.x, B.y - A.y); if (L / R < 0.8) continue;
+    const d = { x: (B.x - A.x) / L, y: (B.y - A.y) / L }; let n = { x: -d.y, y: d.x };
+    const m = { x: (A.x + B.x) / 2 + n.x * 2, y: (A.y + B.y) / 2 + n.y * 2 }; if (!epDsInnen(m, poly)) n = { x: -n.x, y: -n.y };   // Normale zeigt in den Raum
+    // Außenkante? Der Raum liegt ganz auf der Innenseite ihrer Geraden (Nischen- und Vorsprungkanten nicht); lange Kanten (≥ 2,5 m) gelten immer (Traufwand mit Gaube)
+    const aussen = L / R >= 2.5 || poly.every((q) => (q.x - A.x) * n.x + (q.y - A.y) * n.y >= -0.4 * R);
+    if (!aussen) continue;
+    kanten.push({ A, B, d, n, L, idx: i });
+  }
+  const abstand = (z, k) => { const t = Math.max(0, Math.min(k.L, (z.x - k.A.x) * k.d.x + (z.y - k.A.y) * k.d.y)); const fx = k.A.x + k.d.x * t, fy = k.A.y + k.d.y * t; return Math.hypot(z.x - fx, z.y - fy); };
+  // Örtliche Steigrichtung je Zelle (Ebene durch die Höhen im 5×5-Umfeld) – die Decke steigt von der Traufwand weg in den Raum
+  for (const z of zellen.values()) {
+    let sxx = 0, syy = 0, sxy = 0, sx = 0, sy = 0, sh = 0, sxh = 0, syh = 0, n = 0;
+    for (let dx = -2; dx <= 2; dx++) for (let dy = -2; dy <= 2; dy++) { const hh = karte.hoehe((z.gx + dx + 0.5) * G, (z.gy + dy + 0.5) * G); if (hh == null) continue; const x = dx * G / R, y = dy * G / R; sxx += x * x; syy += y * y; sxy += x * y; sx += x; sy += y; sh += hh; sxh += x * hh; syh += y * hh; n++; }
+    z.gr = null; if (n < 6) continue;
+    const M = [[sxx, sxy, sx], [sxy, syy, sy], [sx, sy, n]], v = [sxh, syh, sh];
+    const det = (m) => m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+    const D = det(M); if (Math.abs(D) < 1e-9) continue;
+    const ers = (i) => M.map((row, r) => row.map((val, c) => c === i ? v[r] : val));
+    const a = det(ers(0)) / D, b = det(ers(1)) / D, gg = Math.hypot(a, b); if (gg >= 0.15) z.gr = { a: a / gg, b: b / gg };
+  }
+  // Wand je Zelle: die Wand, von der die Decke wegsteigt (Steigrichtung ≈ Wandnormale, bis 60°), unter diesen die nächste;
+  // ohne Steigrichtung einfach die nächste Wand. So landen Zellen am Giebel nicht bei der Giebelwand.
+  const zuordnen = (z) => {
+    let best = -1, bd = Infinity; const verboten = z.verboten || new Set();
+    kanten.forEach((k, i) => { if (verboten.has(i)) return; const dd = abstand(z, k); if (dd > 4 * R) return; if (z.gr && (z.gr.a * k.n.x + z.gr.b * k.n.y) < 0.5) return; if (dd < bd) { bd = dd; best = i; } });
+    z.kante = best;   // keine Ersatzwand: Zellen, deren Decke zu keiner Außenwand passt (Gaubenwangen, Kamin), bleiben ohne Wand
+  };
+  // Gegenprobe einer Dachseite an der Höhenkarte: wo ihre Gerade „unter 1,95 m“ sagt, muss die Wolke überwiegend auch unter 2,05 m messen.
+  // Sonst ist es eine Scheinseite (z. B. Gaubenzellen auf die Giebelwand bezogen – flache Gerade, die den halben Raum als Schräge ausweist).
+  const gegenprobe = (hVon) => {
+    let vorher = 0, passt = 0;
+    for (const c of alle) { if (hVon(c) >= 1.95) continue; vorher++; if (c.h < 2.05) passt++; }
+    return { vorher, passt, ok: vorher < 5 || passt / vorher >= 0.6 };
+  };
+  for (const z of zellen.values()) zuordnen(z);
+  // Bis zu drei Durchgänge: Gruppen, deren Gerade unplausibel ist (Kniestock unter 0 oder über 1,95 m, Neigung außerhalb 8,5–70°,
+  // Streuung über 10 cm), verbieten ihren Zellen diese Wand – dann wird die nächste Wand probiert (z. B. Nischenkante → echte Außenwand)
+  for (let durchgang = 0; durchgang < 3; durchgang++) {
+  aus.cluster = []; let neuZuordnen = false;
+  // Gruppen: je Wand zunächst alle ihre Zellen gemeinsam (eine Traufwand = eine Gerade); zerfällt die Streuung (> 10 cm), dann je
+  // zusammenhängendem Bereich. Zellen ohne Wand: zusammenhängende Bereiche.
+  const gruppen = [], proWand = new Map(), ohne = [];
+  for (const z of zellen.values()) { if (z.kante >= 0 && z.gr) { if (!proWand.has(z.kante)) proWand.set(z.kante, []); proWand.get(z.kante).push(z); } else ohne.push(z); }   // ohne Steigrichtung (Gaubendecke, abgehängte Decke) nie an eine Traufwand
+  const komponenten = (liste) => { const out = [], rest = new Set(liste.map((z) => z.gx * 100003 + z.gy)), byKey = new Map(liste.map((z) => [z.gx * 100003 + z.gy, z])); for (const z0 of liste) { const k0 = z0.gx * 100003 + z0.gy; if (!rest.has(k0)) continue; const stapel = [k0], grp = []; rest.delete(k0); while (stapel.length) { const k = stapel.pop(), z = byKey.get(k); grp.push(z); for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const kk = (z.gx + dx) * 100003 + (z.gy + dy); if (rest.has(kk)) { rest.delete(kk); stapel.push(kk); } } } out.push(grp); } return out; };
+  proWand.forEach((liste, ki) => gruppen.push({ grp: liste, kante: kanten[ki], gesamt: true }));
+  komponenten(ohne).forEach((grp) => gruppen.push({ grp, kante: null }));
+  const f = (G / R) * (G / R);
+  for (let gi = 0; gi < gruppen.length; gi++) {
+    const { grp, kante, gesamt } = gruppen[gi];
+    if (grp.length * f < 0.5) continue;
+    if (!kante && grp.length * f < 1.0) continue;   // ohne Wandbezug erst ab 1 m² (sonst Rechenartefakte an Gaubenwangen, Kaminen)
+    const start0 = grp[0];
+    // Deckenpunkte der Zellen (sonst Zellhöhen)
+    let pts = [];
+    for (const z of grp) { const e = karte.karte.get(z.gx * 100003 + z.gy); if (e && e.pts) for (let i = 0; i < e.pts.length; i += 3) pts.push({ x: e.pts[i], y: e.pts[i + 1], h: e.pts[i + 2] }); }
+    if (pts.length < 8) pts = grp.map((z) => ({ x: z.x, y: z.y, h: z.h }));
+    if (pts.length > 6000) { const schritt = Math.ceil(pts.length / 6000); pts = pts.filter((_, i) => i % schritt === 0); }
+    let hVon = null, g = 0, rms = 0, kniestock = null, richtung = null;
+    if (kante) {
+      // Gerade h = c + g·s über dem Wandabstand s (m), zwei Runden robust
+      const sVon = (p) => ((p.x - kante.A.x) * kante.n.x + (p.y - kante.A.y) * kante.n.y) / R;
+      let q = pts.map((p) => ({ s: sVon(p), h: p.h })), c = 0;
+      // Startwert robust (Theil–Sen): Median der Paarsteigungen, Achsabschnitt als Median der Reste – so ziehen Eckzellen der
+      // Nachbarseite (Walm) oder eine Gaubendecke die Gerade nicht flach; danach zwei Runden Ausgleich auf den Nahpunkten
+      { const nP = q.length, steig = []; let seed = 12345; const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+        for (let i = 0; i < Math.min(4000, nP * 4); i++) { const a = q[Math.floor(rnd() * nP)], b = q[Math.floor(rnd() * nP)]; if (Math.abs(a.s - b.s) < 0.15) continue; steig.push((a.h - b.h) / (a.s - b.s)); }
+        if (steig.length >= 10) { steig.sort((u, v) => u - v); const g0 = steig[steig.length >> 1]; const cs = q.map((p) => p.h - g0 * p.s).sort((u, v) => u - v), c0 = cs[cs.length >> 1]; const nah = q.filter((p) => Math.abs(c0 + g0 * p.s - p.h) <= 0.15); if (nah.length >= 8) { q = nah; g = g0; c = c0; } } }
+      for (let runde = 0; runde < 2; runde++) {
+        const n = q.length, ms = q.reduce((a, p) => a + p.s, 0) / n, mh = q.reduce((a, p) => a + p.h, 0) / n;
+        let sxx = 0, sxh = 0; for (const p of q) { sxx += (p.s - ms) * (p.s - ms); sxh += (p.s - ms) * (p.h - mh); }
+        if (sxx < 1e-9) break; g = sxh / sxx; c = mh - g * ms;
+        const gut = q.filter((p) => Math.abs(c + g * p.s - p.h) <= 0.1); if (gut.length >= 8 && gut.length < q.length) q = gut; else break;
+      }
+      rms = Math.sqrt(q.reduce((a, p) => a + Math.pow(c + g * p.s - p.h, 2), 0) / Math.max(1, q.length));
+      hVon = (p) => c + g * sVon(p); kniestock = c; richtung = { a: g * kante.n.x, b: g * kante.n.y };
+    } else {
+      // ohne Wandbezug: freie Ebene (Schwerpunktkoordinaten in m)
+      const mx = grp.reduce((a, z) => a + z.x, 0) / grp.length, my = grp.reduce((a, z) => a + z.y, 0) / grp.length;
+      let q = pts.map((p) => ({ x: (p.x - mx) / R, y: (p.y - my) / R, h: p.h })), eb = null;
+      for (let runde = 0; runde < 2; runde++) {
+        let sxx = 0, sxy = 0, syy = 0, sx = 0, sy = 0, sh = 0, sxh = 0, syh = 0, n = q.length;
+        for (const p of q) { sxx += p.x * p.x; sxy += p.x * p.y; syy += p.y * p.y; sx += p.x; sy += p.y; sh += p.h; sxh += p.x * p.h; syh += p.y * p.h; }
+        const M = [[sxx, sxy, sx], [sxy, syy, sy], [sx, sy, n]], v = [sxh, syh, sh];
+        const det = (m) => m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+        const D = det(M); if (Math.abs(D) < 1e-9) { eb = null; break; }
+        const ers = (i) => M.map((row, r) => row.map((val, cc) => cc === i ? v[r] : val));
+        eb = { a: det(ers(0)) / D, b: det(ers(1)) / D, c: det(ers(2)) / D };
+        const gut = q.filter((p) => Math.abs(eb.a * p.x + eb.b * p.y + eb.c - p.h) <= 0.1); if (gut.length >= 8 && gut.length < q.length) q = gut; else break;
+      }
+      if (!eb) continue;
+      g = Math.hypot(eb.a, eb.b); rms = Math.sqrt(q.reduce((a, p) => a + Math.pow(eb.a * p.x + eb.b * p.y + eb.c - p.h, 2), 0) / Math.max(1, q.length));
+      hVon = (p) => eb.a * (p.x - mx) / R + eb.b * (p.y - my) / R + eb.c; richtung = { a: eb.a, b: eb.b };
+      let klein = Infinity; for (const z of grp) { const hz = hVon({ x: z.x, y: z.y }); if (hz < klein) klein = hz; } kniestock = klein;
+    }
+    const neig = Math.atan(g) * 180 / Math.PI, flach = g < 0.15;
+    if (gesamt && rms > 0.1 && grp.length * f >= 1.0) { komponenten(grp).forEach((teil) => gruppen.push({ grp: teil, kante })); continue; }   // Wand zerfällt in Abschnitte (z. B. Versatz in der Wolke)
+    if (kante && (g < -0.05 || (!flach && (kniestock < -0.05 || kniestock > 1.95 || neig > 70 || rms > 0.1)))) {   // falsche Wand (Decke fällt zur Wand hin ab oder Nischenkante): verbieten, neu zuordnen
+      for (const z of grp) { z.verboten = z.verboten || new Set(); z.verboten.add(kante.idx); }
+      neuZuordnen = true; continue;
+    }
+    if (rms > 0.12) continue;   // zu unruhig (Leuchten, Balken, Möbelkanten)
+    if (g < 0 || kniestock == null || kniestock < -0.05 || kniestock > 2.6) continue;
+    const probe = gegenprobe(hVon);
+    if (!probe.ok) {   // Scheinseite: die Wolke ist dort gar nicht niedrig
+      if (kante) { for (const z of grp) { z.verboten = z.verboten || new Set(); z.verboten.add(kante.idx); } neuZuordnen = true; }
+      continue;
+    }   // Rechenartefakt (negative Neigung, Kniestock außerhalb jeder Plausibilität)
+    aus.cluster.push({ zellen: grp.length, flaeche: grp.length * f, eb: richtung, g, rms, hVon, kniestock, neigungGrad: neig, flach, wand: kante ? kante.idx : null, kante: kante ? { A: kante.A, B: kante.B, d: kante.d, n: kante.n, L: kante.L } : null, probe: { vorherM2: Math.round(probe.vorher * f * 100) / 100, anteil: probe.vorher ? Math.round(probe.passt / probe.vorher * 100) / 100 : null } });
+  }
+  if (!neuZuordnen) break;
+  for (const z of zellen.values()) if (z.verboten && z.verboten.has(z.kante)) zuordnen(z);
+  }
+  return aus;
+}
+
+// Alles für ein Editor-Fenster: Teilflächen + Schrägenlinien je Raum anlegen
+function epDsBerechnen(fenster, erg, wolke, abb) {
+  const ge = fenster && fenster.GrundrissEditor, st = ge && ge.st; if (!st || !erg || !wolke || !abb) return null;
+  const GE = ge.GE, R = st.kalib.ptProM, karte = epDsHoehenkarte(wolke, erg, abb);
+  st.elemente = st.elemente.filter((e) => e.herkunft !== 'dachautomatik');
+  const sonder = (name) => { const n = String(name || "").toLowerCase().trim(); return /^schr(ä|ae)ge/.test(n) || /^unter 1 m/.test(n) || /^gaube\b/.test(n) || /schornstein|^kamin$|pfeiler|st(ü|ue)tze|s(ä|ae)ule|^treppe/.test(n); };
+  const raeume = st.elemente.filter((e) => e.typ === "flaeche" && e.punkte && e.punkte.length >= 3 && !sonder(e.text));
+  const bericht = [], diagnosen = []; let zonen = 0, linien = 0;
+  const de = (v) => (Math.round(v * 100) / 100).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const neu = (basis, extra) => { const el = Object.assign(JSON.parse(JSON.stringify(basis)), extra, { id: st.naechsteId++ }); st.elemente.push(el); return el; };
+  raeume.forEach((raum, idx) => {
+    const name = String(raum.text || "").replace(/\s*\d+[.,]\d+\s*(m²|m2|qm)\s*$/i, "").trim() || ("Raum " + (idx + 1));
+    const z = epDsRaumZonen(raum.punkte, karte, R);
+    const eintrag = { raum: name, m2: Math.round(epDsInhalt(raum.punkte) / (R * R) * 100) / 100, halb: 0, keine: 0, unbekannt: Math.round(z.unbekannt * 100) / 100, seiten: [] };
+    eintrag.diagnose = { gesamtM2: Math.round(z.gesamt * 100) / 100, niedrigM2: Math.round(z.niedrig * 100) / 100, unbekanntM2: Math.round(z.unbekannt * 100) / 100, bereiche: z.cluster.length, flach: z.cluster.filter((c) => c.flach).length, minH: z.minH, maxH: z.maxH };
+    diagnosen.push(eintrag.diagnose);
+    const geneigte = z.cluster.filter((c) => !c.flach);
+    for (const cl of z.cluster) {
+      if (cl.flach) { eintrag.seiten.push({ hinweis: "niedriger Bereich ohne klare Neigung (" + cl.flaeche.toFixed(1) + " m²) – bitte von Hand prüfen" }); continue; }
+      const f2 = (p) => cl.hVon(p) - 2, f1 = (p) => cl.hVon(p) - 1;
+      // Zuständigkeitsbereich dieser Seite: dort, wo ihre Ebene niedriger liegt als die der anderen Seiten
+      let bereich = raum.punkte; for (const o of geneigte) { if (o === cl) continue; bereich = epDsClip(bereich, (p) => cl.hVon(p) - o.hVon(p)); if (bereich.length < 3) break; }
+      if (bereich.length < 3) continue;
+      const unter2 = epDsClip(bereich, f2); if (unter2.length < 3) continue;
+      const unter1 = epDsClip(unter2, f1), zwischen = epDsClip(unter2, (p) => -f1(p));   // 1 ≤ h < 2
+      // Gauben/Erker an dieser Traufwand: dort gilt nicht die Dachebene, sondern die eigene (flache) Decke – aus den Zonen herausschneiden
+      let gauben = []; try { gauben = epDsGauben(raum.punkte, karte, R, cl); } catch (e) { gauben = []; }
+      // Dachflächenfenster auf dem Blatt (Fensterart „dach“): dort ist die flache Decke die waagerechte obere Laibung des Fensters, keine Gaube
+      let dachfensterWeg = 0;
+      if (gauben.length) {
+        const dff = st.elemente.filter((e) => e.typ === "fenster" && e.variante === "dach" && e.p1 && e.p2).map((e) => { const L = Math.hypot(e.p2.x - e.p1.x, e.p2.y - e.p1.y) || 1, d = { x: (e.p2.x - e.p1.x) / L, y: (e.p2.y - e.p1.y) / L }, q = e.spiegeln ? { x: -d.y, y: d.x } : { x: d.y, y: -d.x }, T = (e.tiefeCm || 118) / 100 * R; return [e.p1, e.p2, { x: e.p2.x + q.x * T, y: e.p2.y + q.y * T }, { x: e.p1.x + q.x * T, y: e.p1.y + q.y * T }]; });
+        if (dff.length) {
+          const mitte = (poly) => ({ x: poly.reduce((a, p) => a + p.x, 0) / poly.length, y: poly.reduce((a, p) => a + p.y, 0) / poly.length });
+          const ueberlappt = (A, B) => epDsInnen(mitte(A), B) || epDsInnen(mitte(B), A) || A.some((p) => epDsInnen(p, B)) || B.some((p) => epDsInnen(p, A));
+          gauben = gauben.filter((gb) => { const rect = gb.rechteck(Math.min(0, gb.tAussen), Math.max(gb.tInnen, 0.3 * R)); const treffer = dff.some((f) => ueberlappt(rect, f)); if (treffer) dachfensterWeg++; return !treffer; });
+        }
+      }
+      const stueckeHalb = gauben.length ? epDsOhneGauben([zwischen], gauben) : (zwischen.length >= 3 ? [zwischen] : []);
+      const stueckeKeine = gauben.length ? epDsOhneGauben([unter1], gauben) : (unter1.length >= 3 ? [unter1] : []);
+      const qmHalb = stueckeHalb.reduce((a, q) => a + epDsInhalt(q), 0) / (R * R), qmKeine = stueckeKeine.reduce((a, q) => a + epDsInhalt(q), 0) / (R * R);
+      // Beschriftungen entlang der Traufwand drehen (Wandrichtung ⟂ Steigrichtung), damit sie in den schmalen Streifen passen
+      let wandWinkel = 0, wandRichtung = { x: 1, y: 0 };
+      if (cl.eb && (Math.abs(cl.eb.a) > 1e-9 || Math.abs(cl.eb.b) > 1e-9)) { const L = Math.hypot(cl.eb.a, cl.eb.b); wandRichtung = { x: -cl.eb.b / L, y: cl.eb.a / L }; wandWinkel = Math.atan2(wandRichtung.y, wandRichtung.x) * 180 / Math.PI; while (wandWinkel > 90) wandWinkel -= 180; while (wandWinkel <= -90) wandWinkel += 180; wandWinkel = Math.round(wandWinkel * 10) / 10; if (Object.is(wandWinkel, -0)) wandWinkel = 0; }
+      const laengs = (poly) => { let a = Infinity, b = -Infinity; for (const p of poly) { const t = p.x * wandRichtung.x + p.y * wandRichtung.y; if (t < a) a = t; if (t > b) b = t; } return b - a; };
+      let zoneHalb = null;
+      if (qmHalb > 0.05) { let groesste = 0; for (const q of stueckeHalb) { const a = epDsInhalt(q) / (R * R); if (a < 0.03) continue; const el = neu(st.einstellungen.flaeche, { punkte: q, text: "Schräge 1–2 m", farbe: "#D4A567", groesse: 6, fuellen: true, textWinkel: wandWinkel, herkunft: "dachautomatik" }); zonen++; if (a > groesste) { groesste = a; zoneHalb = el; } } eintrag.halb += qmHalb; }
+      // „unter 1 m“: schmaler Streifen an der Wand – Beschriftung um ein Viertel der Länge versetzt, weg von Maßzahl und 1-m-Linie
+      if (qmKeine > 0.05) { for (const q of stueckeKeine) { if (epDsInhalt(q) / (R * R) < 0.03) continue; const v = laengs(q) * 0.25; neu(st.einstellungen.flaeche, { punkte: q, text: "unter 1 m", farbe: "#c83c3c", groesse: 6, fuellen: true, textWinkel: wandWinkel, textVersatz: { x: wandRichtung.x * v, y: wandRichtung.y * v }, herkunft: "dachautomatik" }); zonen++; } eintrag.keine += qmKeine; }
+      // Höhenlinien: 2-m-Linie mittig beschriftet, 1-m-Linie bei einem Viertel (die Mitte gehört der Maßzahl der Wand)
+      for (const [hm, f] of [[2, f2], [1, f1]]) {
+        const s = epDsSehne(bereich, f); if (!s || Math.hypot(s[0].x - s[1].x, s[0].y - s[1].y) / R <= 0.3) continue;
+        // Linie an Gauben unterbrechen, deren Tiefe über die Linie hinausreicht
+        let teile = [s];
+        for (const gb of gauben) {
+          if (!(gb.tInnen > 0)) continue; const tLinie = gb.tVon({ x: (s[0].x + s[1].x) / 2, y: (s[0].y + s[1].y) / 2 }); if (gb.tInnen < tLinie - 0.05 * R) continue;
+          const naechste = [];
+          for (const [P, Q] of teile) {
+            const sP = gb.sVon(P), sQ = gb.sVon(Q), lo = Math.min(sP, sQ), hi = Math.max(sP, sQ), von = sP <= sQ ? P : Q, bis = sP <= sQ ? Q : P;
+            const punkt = (sw) => { const u = (sw - lo) / Math.max(1e-9, hi - lo); return { x: von.x + (bis.x - von.x) * u, y: von.y + (bis.y - von.y) * u }; };
+            if (gb.s1 <= lo || gb.s0 >= hi) { naechste.push([P, Q]); continue; }
+            if (gb.s0 > lo) naechste.push([von, punkt(gb.s0)]); if (gb.s1 < hi) naechste.push([punkt(gb.s1), bis]);
+          }
+          teile = naechste;
+        }
+        for (const [P, Q] of teile) { if (Math.hypot(P.x - Q.x, P.y - Q.y) / R < 0.3) continue; neu(st.einstellungen.schraege || { typ: "schraege", hoeheM: 2, farbe: "#d2232a", groesse: 6, text: "" }, { p1: P, p2: Q, hoeheM: hm, text: "", textLage: hm === 1 ? 0.25 : 0.5, herkunft: "dachautomatik" }); linien++; }
+      }
+      // Abstand der 2-m-Linie von der niedrigen Wand = (2 − Kniestock) / tan(Neigung)
+      // Kniestock = lichte Höhe nach der Ebene am Wandfuß (tiefster Eckpunkt des Bereichs unter 2 m)
+      const kniestock = Math.max(0, Math.min(...unter2.map((p) => cl.hVon(p))));
+      const tanN = Math.tan(cl.neigungGrad * Math.PI / 180), a2 = tanN > 0.01 ? (2 - kniestock) / tanN : null, a1 = tanN > 0.01 ? Math.max(0, (1 - kniestock) / tanN) : null;
+      // Beschriftung der Seite steht in der Zone „Schräge 1–2 m“ (eine Beschriftung je Seite, nichts überlappt); ohne Zone als eigener Text
+      if (zoneHalb) zoneHalb.text = "Schräge 1–2 m · Kniestock " + de(kniestock) + " m · " + Math.round(cl.neigungGrad) + "°";
+      else { const cx = unter2.reduce((a, p) => a + p.x, 0) / unter2.length, cy = unter2.reduce((a, p) => a + p.y, 0) / unter2.length;
+        neu(st.einstellungen.text || { typ: "text", farbe: "#d2232a", groesse: 8, text: "" }, { p: { x: cx, y: cy }, text: "Kniestock " + de(kniestock) + " m · " + Math.round(cl.neigungGrad) + "°", groesse: 5, farbe: "#263159", winkel: wandWinkel, herkunft: "dachautomatik" }); }
+      // Gauben als eigene Flächen: innen Zone mit eigener Höhe (1–2 m → zur Hälfte, ab 2 m voll), außen über die Wandlinie hinaus als „Gaubenraum“
+      const gaubenInfo = [];
+      for (const gb of gauben) {
+        const klasse = gb.hoehe < 1 ? "unter 1 m" : gb.hoehe < 2 ? "1–2 m" : "voll";
+        const name = gb.hoehe < 1 ? "Gaube unter 1 m · lichte Höhe " + de(gb.hoehe) + " m" : gb.hoehe < 2 ? "Gaube 1–2 m · lichte Höhe " + de(gb.hoehe) + " m" : "Gaube · lichte Höhe " + de(gb.hoehe) + " m";
+        const farbe = gb.hoehe < 1 ? "#c83c3c" : gb.hoehe < 2 ? "#D4A567" : "#2b6cb0";
+        if (gb.tInnen > 0) { const q = gb.rechteck(0, gb.tInnen); neu(st.einstellungen.flaeche, { punkte: q, text: name, farbe, groesse: 5.5, fuellen: true, textWinkel: wandWinkel, herkunft: "dachautomatik" }); zonen++; const a = epDsInhalt(q) / (R * R); if (klasse === "1–2 m") eintrag.halb += a; else if (klasse === "unter 1 m") eintrag.keine += a; }
+        if (gb.tAussen < 0) { const q = gb.rechteck(gb.tAussen, 0); neu(st.einstellungen.flaeche, { punkte: q, text: "Gaubenraum", farbe: "#263159", groesse: 6, fuellen: true, textWinkel: wandWinkel, herkunft: "dachautomatik" }); zonen++;
+          if (klasse !== "voll") { const v = laengs(q) * 0.3; neu(st.einstellungen.flaeche, { punkte: q, text: name, farbe, groesse: 5, fuellen: false, textWinkel: wandWinkel, textVersatz: { x: wandRichtung.x * v, y: wandRichtung.y * v }, herkunft: "dachautomatik" }); zonen++; } }
+        gaubenInfo.push({ breiteM: gb.breiteM, tiefeM: gb.tiefeM, aussenM: gb.aussenM, hoehe: gb.hoehe, klasse });
+      }
+      if (dachfensterWeg) eintrag.seiten.push({ hinweis: dachfensterWeg + (dachfensterWeg === 1 ? " Dachflächenfenster erkannt – dort keine Gaube" : " Dachflächenfenster erkannt – dort keine Gauben") });
+      eintrag.seiten.push({ gauben: gaubenInfo, kniestock: Math.round(kniestock * 100) / 100, neigungGrad: Math.round(cl.neigungGrad), a1: a1 == null ? null : Math.round(a1 * 100) / 100, a2: a2 == null ? null : Math.round(a2 * 100) / 100, rmsCm: Math.round(cl.rms * 100), halb: Math.round(qmHalb * 100) / 100, keine: Math.round(qmKeine * 100) / 100 });
+    }
+    eintrag.halb = Math.round(eintrag.halb * 100) / 100; eintrag.keine = Math.round(eintrag.keine * 100) / 100; eintrag.voll = Math.round(Math.max(0, eintrag.m2 - eintrag.halb - eintrag.keine) * 100) / 100;
+    if (eintrag.seiten.length) {
+      // Raumhöhe (größte lichte Höhe im Raum) als Text unter dem Raumnamen
+      if (z.maxH) { const c = GE.schwerpunkt(raum.punkte), g = raum.groesse || 8; neu(st.einstellungen.text || { typ: "text", farbe: "#d2232a", groesse: 8, text: "" }, { p: { x: c.x, y: c.y + g * 2.1 }, text: "lichte Höhe bis " + de(z.maxH) + " m", groesse: 5.5, farbe: "#263159", winkel: 0, anker: "mitte", herkunft: "dachautomatik" }); }
+      eintrag.zellen = { halb: Math.round(z.halbZellen * 100) / 100, keine: Math.round(z.keineZellen * 100) / 100 };
+      bericht.push(eintrag);
+    }
+  });
+  const text = bericht.length ? bericht.map((b) => `${b.raum}: ${de(b.m2)} m² Grundfläche → ab 2 m ${de(b.voll)}, 1–2 m ${de(b.halb)} (zur Hälfte), unter 1 m ${de(b.keine)} m²` + (b.zellen ? ` (Gegenprobe aus den Höhenzellen: 1–2 m ${de(b.zellen.halb)}, unter 1 m ${de(b.zellen.keine)} m²)` : "") + b.seiten.map((s) => s.hinweis ? ` · ${s.hinweis}` : ` · Schräge: Kniestock ${de(s.kniestock)} m, Neigung ${s.neigungGrad}°, 1-m-Linie ${s.a1 == null ? "–" : de(s.a1) + " m"}, 2-m-Linie ${s.a2 == null ? "–" : de(s.a2) + " m"} von der Wand` + (s.gauben || []).map((g) => ` · Gaube ${de(g.breiteM)} × ${de(g.tiefeM)} m${g.aussenM ? ` (+ ${de(g.aussenM)} m über die Wand hinaus)` : ""}, lichte Höhe ${de(g.hoehe)} m → ${g.klasse === "voll" ? "voll" : g.klasse === "1–2 m" ? "zur Hälfte" : "nicht anrechenbar"}`).join("")).join("")).join(" | ") : (raeume.length ? "Keine Dachschrägen gefunden. " + diagnosen.map((g, i) => `Raum ${i + 1}: ${de(g.gesamtM2)} m² geprüft, lichte Höhe ${g.minH == null ? "–" : de(g.minH)}–${g.maxH == null ? "–" : de(g.maxH)} m, unter 2 m ${de(g.niedrigM2)} m², ohne Deckenpunkte ${de(g.unbekanntM2)} m², ${g.bereiche} ${g.bereiche === 1 ? "Bereich" : "Bereiche"}${g.flach ? ` (${g.flach} ohne klare Neigung)` : ""}`).join("; ") + ". Boden der Auswertung: " + de(erg.hoehen.boden || 0) + " m, Raumhöhe " + (erg.hoehen.hoehe ? de(erg.hoehen.hoehe) + " m" : "unbekannt") + "." : "Keine Raumfläche auf dem Blatt – zuerst „Räume + Maße“ oder eine Fläche zeichnen.");
+  // Raumetiketten: Wohnfläche nach WoFlV direkt am Raum (Grundfläche − ½ der 1–2-m-Zone − unter 1 m − § 3-Abzüge); der Abzug wird
+  // gespeichert und die Fläche live aus dem Polygon gerechnet, damit Verschieben einer Ecke das Etikett nicht veraltet
+  try {
+    if (typeof epGwRaeume === "function") {
+      const liste = epGwRaeume(fenster);
+      for (const raum of raeume) {
+        const name = String(raum.text || "").replace(/\s*\d+[.,]\d+\s*(m²|m2|qm)\s*$/i, "").trim();
+        const r = liste.find((q) => q.name === name || (q.name || "").replace(/\s*\d+[.,]\d+\s*(m²|m2|qm)\s*$/i, "").trim() === name);
+        if (!r || r.art === "zubehoer") { delete raum.wohnAbzugM2; continue; }
+        const abz = (r.abzuege || []).reduce((s, a) => s + (a.m2 || 0), 0), zo = r.zonen || { halb: 0, keine: 0 };
+        const faktor = r.art === "balkon" ? 0.25 : r.art === "wintergarten" ? 0.5 : 1;
+        const grund = Math.max(0, r.m2 - abz), wohn = r.art === "wohn" ? Math.max(0, grund - zo.halb - zo.keine) + 0.5 * zo.halb : grund * faktor;
+        raum.wohnAbzugM2 = Math.round(Math.max(0, r.m2 - wohn) * 100) / 100;
+      }
+    }
+  } catch (e) { /* Wohnflächen-Stufe fehlt oder Blatt ohne Maßstab – Etikett bleibt Grundfläche */ }
+  if (zonen || linien) { ge.commit(); ge.render(); }
+  return { raeume: raeume.length, mitSchraege: bericht.length, zonen, linien, bericht, diagnosen, text };
+}
+// Knopf im 3D-Fenster: Fläche unter/über der am Regler eingestellten Höhe je Raumfläche, dazu die WoFlV-Stufen
+function epDsFlaecheBisHoehe(fenster, hoehe) {
+  const l = window.__epDsLetzte; if (!l || l.fenster !== fenster) return "Zuerst eine Punktwolke übernehmen.";
+  const ge = fenster.GrundrissEditor, st = ge.st, abb = st.wolke && st.wolke.abbildung; if (!abb) return "Keine Wolken-Abbildung auf dem Blatt – Punktwolke erneut übernehmen.";
+  const R = st.kalib.ptProM, karte = epDsHoehenkarte(l.wolke, l.erg, abb), G = karte.G, f = (G / R) * (G / R);
+  const sonder = (name) => /^schr(ä|ae)ge|^unter 1 m|schornstein|^kamin$|pfeiler|st(ü|ue)tze|s(ä|ae)ule|^treppe/.test(String(name || "").toLowerCase().trim());
+  const raeume = st.elemente.filter((e) => e.typ === "flaeche" && e.punkte && e.punkte.length >= 3 && !sonder(e.text));
+  const de = (v) => (Math.round(v * 100) / 100).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (!raeume.length) return "Keine Raumfläche auf dem Blatt – zuerst „Räume + Maße“ oder eine Fläche zeichnen.";
+  const teile = raeume.map((raum, i) => {
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity; raum.punkte.forEach((p) => { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); });
+    let unter = 0, ueber = 0, u1 = 0, z12 = 0, unbekannt = 0;
+    for (let gx = Math.floor(x0 / G); gx <= Math.floor(x1 / G); gx++) for (let gy = Math.floor(y0 / G); gy <= Math.floor(y1 / G); gy++) { const cx = (gx + 0.5) * G, cy = (gy + 0.5) * G; if (!epDsInnen({ x: cx, y: cy }, raum.punkte)) continue; const h = karte.hoehe(cx, cy); if (h == null) { unbekannt++; continue; } if (h < hoehe) unter++; else ueber++; if (h < 1) u1++; else if (h < 2) z12++; }
+    const name = String(raum.text || "").replace(/\s*\d+[.,]\d+\s*(m²|m2|qm)\s*$/i, "").trim() || ("Raum " + (i + 1));
+    return `${name}: unter ${de(hoehe)} m ${de(unter * f)} m², darüber ${de(ueber * f)} m²` + (unbekannt ? `, ohne Deckenpunkte ${de(unbekannt * f)} m²` : "") + ` · WoFlV: 1–2 m ${de(z12 * f)} m², unter 1 m ${de(u1 * f)} m²`;
+  });
+  return teile.join(" | ");
+}
+window.epDsFlaecheBisHoehe = epDsFlaecheBisHoehe;
+// Für den Knopf im Editor: letzte Übernahme merken
+window.__epDsLetzte = null;
+function epDsKnopf(fenster) {
+  const l = window.__epDsLetzte; if (!l || l.fenster !== fenster) return { fehler: "Zuerst eine Punktwolke übernehmen – die Höhen kommen aus der Wolke." };
+  const abb = fenster.GrundrissEditor.st.wolke && fenster.GrundrissEditor.st.wolke.abbildung; if (!abb) return { fehler: "Keine Wolken-Abbildung auf dem Blatt (neues Blatt?). Punktwolke erneut übernehmen." };
+  return epDsBerechnen(fenster, l.erg, l.wolke, abb);
+}
+window.epDsBerechnen = epDsBerechnen; window.epDsKnopf = epDsKnopf; window.epDsHoehenkarte = epDsHoehenkarte; window.epDsRaumZonen = epDsRaumZonen;
+// Stufe 142 – Schnittansicht und Messen im 3D-Fenster der Punktwolke (02.10.2026)
+// Anlass: „könnten wir die Punktwolken so weit optimieren, dass wir quasi im 3D-Modell stehen und dort Wände, Türen,
+// Schrägen einzeichnen?“ – Entscheidung: das Blatt bleibt der Ort zum Zeichnen, das 3D-Fenster wird das Instrument zum
+// Messen und Prüfen. Zwei Werkzeuge:
+//  • Schnitt: Werkzeug „Schnitt“ im Editor (Taste Q) zieht eine Schnittlinie über das Blatt; das 3D-Fenster zeigt den
+//    senkrechten Schnitt durch die Wolke (Punkte ±10 cm um die Linie) mit Höhenraster, 1-m- und 2-m-Linie, den Blatt-Wänden
+//    als goldene Bänder (mit der dort gemessenen Deckenhöhe) und den Stellen, an denen die Decke 2,00 m / 1,00 m
+//    unterschreitet. Linie verschieben → Schnitt folgt.
+//  • Messen: Klick auf einen Wolkenpunkt im 3D-Fenster → Höhe über dem Boden; zweiter Klick → Abstand (räumlich,
+//    waagerecht, Höhenunterschied). Gefangen wird der dem Cursor nächste Punkt, bei gleichem Abstand der vordere.
+// Die Genauigkeit begrenzt die Wolke (1–2 cm Rauschen, einige Zentimeter Drift über den Raum), nicht die Ansicht.
+
+// Projektion wie im 3D-Viewer (gleiche Kamera, gleiche Matrizen) – liefert Bildpunkt (Gerätepixel) und Tiefe
+function epPsProjektion(kam, cv) {
+  const M = epP3Matrizen(), cp = Math.cos(kam.pitch);
+  const auge = [kam.ziel[0] + kam.dist * cp * Math.sin(kam.yaw), kam.ziel[1] - kam.dist * cp * Math.cos(kam.yaw), kam.ziel[2] + kam.dist * Math.sin(kam.pitch)];
+  const V = M.blick(auge, kam.ziel, [0, 0, 1]), P = M.perspektive(0.9, cv.width / Math.max(1, cv.height), 0.05, kam.dist * 6 + 20), m = M.mul(P, V);
+  const W = cv.width, H = cv.height;
+  return (x, y, z) => {
+    const cx = m[0] * x + m[4] * y + m[8] * z + m[12], cy = m[1] * x + m[5] * y + m[9] * z + m[13], cw = m[3] * x + m[7] * y + m[11] * z + m[15];
+    if (cw <= 0.01) return null;
+    return { sx: (cx / cw + 1) / 2 * W, sy: (1 - cy / cw) / 2 * H, w: cw };
+  };
+}
+
+// Nächster Wolkenpunkt zum Bildpunkt (px, py in Gerätepixeln): innerhalb von `radius` Pixeln, bei mehreren der vordere.
+// Punkte über der eingestellten Decke (kam.zMax) werden nicht gefangen – sie sind ja ausgeblendet.
+function epPsPunktFangen(d, kam, cv, px, py, radius) {
+  const proj = epPsProjektion(kam, cv), r2 = (radius || 10) * (radius || 10), pos = d.pos;
+  let best = -1, bestScore = Infinity;
+  for (let i = 0; i < d.n; i++) {
+    const z = pos[3 * i + 2]; if (z > kam.zMax) continue;
+    const p = proj(pos[3 * i], pos[3 * i + 1], z); if (!p) continue;
+    const dx = p.sx - px, dy = p.sy - py, q = dx * dx + dy * dy; if (q > r2) continue;
+    const score = q + p.w * 4;   // Bildabstand zählt, Tiefe entscheidet bei fast gleichem Abstand (vorderer Punkt gewinnt)
+    if (score < bestScore) { bestScore = score; best = i; }
+  }
+  if (best < 0) return null;
+  return { i: best, x: pos[3 * best], y: pos[3 * best + 1], z: pos[3 * best + 2] };
+}
+
+// Schnitt: Punkte ±halbBreite um die Strecke A→B (Plan-Meter), s = Lage entlang der Strecke, z = Höhe über dem Boden.
+// Dazu ein Deckenprofil (höchster Punkt je 5 cm) und die Stellen, an denen es 2,00 m und 1,00 m kreuzt.
+function epPsSchnitt(d, A, B, halbBreite) {
+  const hb = halbBreite || 0.10, L = Math.hypot(B.x - A.x, B.y - A.y); if (L < 0.2) return null;
+  const ux = (B.x - A.x) / L, uy = (B.y - A.y) / L, nx = -uy, ny = ux, pos = d.pos, n = d.n;
+  const sArr = [], zArr = [], idx = [];
+  for (let i = 0; i < n; i++) {
+    const dx = pos[3 * i] - A.x, dy = pos[3 * i + 1] - A.y, q = dx * nx + dy * ny; if (q > hb || q < -hb) continue;
+    const t = dx * ux + dy * uy; if (t < -0.15 || t > L + 0.15) continue;
+    sArr.push(t); zArr.push(pos[3 * i + 2]); idx.push(i);
+  }
+  const G = 0.05, nB = Math.ceil(L / G) + 1, decke = new Float32Array(nB).fill(NaN), boden = new Float32Array(nB).fill(NaN), anzahl = new Uint16Array(nB);
+  for (let k = 0; k < sArr.length; k++) {
+    const b = Math.floor(sArr[k] / G); if (b < 0 || b >= nB) continue; const z = zArr[k]; anzahl[b]++;
+    if (z >= 0.3 && (isNaN(decke[b]) || z > decke[b])) decke[b] = z;
+    if (isNaN(boden[b]) || z < boden[b]) boden[b] = z;
+  }
+  // Decke glätten (Median über 3 Nachbarzellen) – einzelne Leuchten oder Lücken springen sonst
+  const glatt = new Float32Array(nB).fill(NaN);
+  for (let b = 0; b < nB; b++) { const v = []; for (let j = -1; j <= 1; j++) { const w = decke[b + j]; if (!isNaN(w)) v.push(w); } if (v.length) { v.sort((p, q) => p - q); glatt[b] = v[v.length >> 1]; } }
+  const kreuzungen = [];
+  for (const h of [2.0, 1.0]) {
+    for (let b = 1; b < nB; b++) {
+      const a = glatt[b - 1], c = glatt[b]; if (isNaN(a) || isNaN(c) || a === c) continue;
+      if ((a - h) * (c - h) < 0) { const f = (h - a) / (c - a); kreuzungen.push({ h, s: Math.round(((b - 1 + f) * G + G / 2) * 100) / 100, richtung: c > a ? "steigt" : "faellt" }); }
+    }
+  }
+  const hoeheBei = (s) => { const b = Math.max(0, Math.min(nB - 1, Math.floor(s / G))); const v = []; for (let j = -2; j <= 2; j++) { const w = glatt[b + j]; if (!isNaN(w)) v.push(w); } if (!v.length) return null; v.sort((p, q) => p - q); return v[v.length >> 1]; };
+  let zMax = 0; for (let b = 0; b < nB; b++) if (!isNaN(decke[b]) && decke[b] > zMax) zMax = decke[b];
+  return { A, B, L, u: { x: ux, y: uy }, n: { x: nx, y: ny }, halbBreite: hb, s: Float32Array.from(sArr), z: Float32Array.from(zArr), idx, anzahl: sArr.length, G, decke: glatt, boden, kreuzungen, hoeheBei, zMax };
+}
+
+// Blatt-Wände, die die Schnittlinie kreuzen: Lage s (m) und Breite im Schnitt (Wanddicke, schräg geschnitten breiter)
+function epPsWaendeImSchnitt(st, abb, sch) {
+  const R = abb.R, X = (p) => (p.x - abb.ax) / R, Y = (p) => (abb.by - p.y) / R, out = [];
+  for (const el of st.elemente || []) {
+    if (el.typ !== "wand" || !el.p1 || !el.p2) continue;
+    const a = { x: X(el.p1), y: Y(el.p1) }, b = { x: X(el.p2), y: Y(el.p2) };
+    const rx = b.x - a.x, ry = b.y - a.y, qx = sch.B.x - sch.A.x, qy = sch.B.y - sch.A.y, den = rx * qy - ry * qx; if (Math.abs(den) < 1e-9) continue;
+    const t = ((sch.A.x - a.x) * qy - (sch.A.y - a.y) * qx) / den, u = ((sch.A.x - a.x) * ry - (sch.A.y - a.y) * rx) / den;
+    if (t < -0.02 || t > 1.02 || u < 0 || u > 1) continue;
+    const dicke = (el.dicke || 12.5) / 100, wl = Math.hypot(rx, ry) || 1, cosW = Math.abs((rx * sch.n.x + ry * sch.n.y) / wl);   // Wandrichtung ⟂ Schnitt → cos ≈ 1
+    out.push({ s: u * sch.L, breite: Math.min(dicke * 3, dicke / Math.max(0.33, cosW)), id: el.id });
+  }
+  return out;
+}
+
+const IMMO_PS_DE = (v, n) => (v == null || isNaN(v)) ? "–" : v.toLocaleString("de-DE", { minimumFractionDigits: n == null ? 2 : n, maximumFractionDigits: n == null ? 2 : n });
+
+// Schnitt zeichnen (2D-Canvas): Höhenraster, 1-m- und 2-m-Linie, Punkte in Foto- oder Höhenfarbe, Blatt-Wände, Kreuzungen
+// Wandstärke im Schnitt (02.10.2026, „so kann ich die Innenwandstärken nicht messen“): Klick auf eine Wand im Schnitt. Punkte
+// 0,25 m über dem Boden bis 0,3 m unter der Decke, ±0,5 m um die Klicklage, Histogramm über s (1 cm, geglättet): die beiden
+// Wandflächen sind zwei Spitzen 5–60 cm auseinander. Die Lage jeder Fläche ist der Mittelwert ihrer Punkte (±2 cm um die
+// Spitze) – aus vielen Punkten genauer als ein einzelner Punkt es sein kann. Eine Spitze allein: nur eine Fläche erfasst
+// (Außenwand oder Nachbarraum nicht gescannt) → Lage der Fläche, keine Stärke.
+function epPsWandstaerke(sch, s0) {
+  if (!sch || !(sch.anzahl > 0) || !(s0 >= -0.2 && s0 <= sch.L + 0.2)) return null;
+  const lo = 0.25, hi = Math.max(lo + 0.5, (sch.zMax || 2.5) - 0.3), B = 0.01, R = 0.5, nB = Math.round(2 * R / B) + 1, hist = new Float32Array(nB);
+  const sIdx = [];
+  for (let k = 0; k < sch.anzahl; k++) { const sv = sch.s[k], z = sch.z[k]; if (Math.abs(sv - s0) > R || z < lo || z > hi) continue; const b = Math.round((sv - s0 + R) / B); if (b >= 0 && b < nB) { hist[b]++; sIdx.push(k); } }
+  if (sIdx.length < 12) return { fehler: "Zu wenige Punkte in Wandhöhe an dieser Stelle – näher an eine Wand klicken.", punkte: sIdx.length };
+  const glatt = new Float32Array(nB); for (let b = 0; b < nB; b++) glatt[b] = (hist[b - 1] || 0) + hist[b] + (hist[b + 1] || 0);
+  let max = 0; for (let b = 0; b < nB; b++) if (glatt[b] > max) max = glatt[b];
+  const schwelle = Math.max(6, 0.2 * max), spitzen = [];
+  for (let b = 1; b < nB - 1; b++) { if (glatt[b] < schwelle || glatt[b] < glatt[b - 1] || glatt[b] < glatt[b + 1]) continue; if (spitzen.length && b - spitzen[spitzen.length - 1].b <= 3) { if (glatt[b] > spitzen[spitzen.length - 1].g) spitzen[spitzen.length - 1] = { b, g: glatt[b] }; continue; } spitzen.push({ b, g: glatt[b] }); }
+  if (!spitzen.length) return { fehler: "Keine Wandfläche im Schnitt an dieser Stelle.", punkte: sIdx.length };
+  spitzen.sort((a, c) => c.g - a.g);
+  const erste = spitzen[0], sVon = (b) => s0 - R + b * B;
+  const flaeche = (b) => { const m = sVon(b); let sum = 0, n = 0; for (const k of sIdx) { const sv = sch.s[k]; if (Math.abs(sv - m) <= 0.02) { sum += sv; n++; } } return n ? { s: Math.round(sum / n * 1000) / 1000, n } : null; };
+  const f1 = flaeche(erste.b);
+  // zweite Fläche: stärkste Spitze 5–60 cm neben der ersten (die nächste Wand ist weiter weg)
+  const zweite = spitzen.slice(1).find((p) => { const d = Math.abs(sVon(p.b) - sVon(erste.b)); return d >= 0.05 && d <= 0.6; });
+  const f2 = zweite ? flaeche(zweite.b) : null;
+  if (!f1) return { fehler: "Keine Wandfläche im Schnitt an dieser Stelle.", punkte: sIdx.length };
+  if (!f2) return { ok: true, einseitig: true, s1: f1.s, n1: f1.n, text: "Nur eine Wandfläche bei " + IMMO_PS_DE(f1.s) + " m erfasst (" + f1.n + " Punkte) – die andere Seite der Wand ist nicht gescannt, Stärke nicht messbar." };
+  const a = Math.min(f1.s, f2.s), b = Math.max(f1.s, f2.s), dicke = Math.round((b - a) * 1000) / 1000;
+  return { ok: true, s1: a, s2: b, dicke, n1: f1.n, n2: f2.n, text: "Wandstärke " + IMMO_PS_DE(dicke * 100, 1) + " cm (Flächen bei " + IMMO_PS_DE(a) + " und " + IMMO_PS_DE(b) + " m, aus " + f1.n + " / " + f2.n + " Punkten)" };
+}
+
+function epPsZeichnen(cv, sch, waende, d, opt) {
+  const o = opt || {}, ctx = cv.getContext("2d"); if (!ctx) return;
+  const dpr = Math.min(2, o.dpr || 1), W = Math.max(1, Math.round(cv.clientWidth * dpr)), H = Math.max(1, Math.round(cv.clientHeight * dpr));
+  if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
+  ctx.save(); ctx.scale(dpr, dpr); const w = W / dpr, h = H / dpr;
+  ctx.fillStyle = "#0f1529"; ctx.fillRect(0, 0, w, h);
+  const ml = 44, mr = 14, mt = 26, mb = 30, zTop = Math.max(2.6, Math.ceil((Math.max(sch.zMax, d.H) + 0.3) * 2) / 2), zBot = -0.2;
+  const sx = (w - ml - mr) / Math.max(0.5, sch.L), sz = (h - mt - mb) / (zTop - zBot), X = (s) => ml + s * sx, Y = (z) => mt + (zTop - z) * sz;
+  cv.__epPsAbb = { ml, mt, sx, sz, zTop };   // für Klicks im Schnitt (Wandstärke): Bildschirm → s
+  ctx.font = "11px system-ui, sans-serif"; ctx.textBaseline = "middle";
+  // Raster
+  ctx.lineWidth = 1;
+  for (let z = 0; z <= zTop + 1e-6; z += 0.5) { ctx.strokeStyle = z === 0 ? "rgba(255,255,255,.55)" : "rgba(255,255,255,.10)"; ctx.beginPath(); ctx.moveTo(ml, Y(z)); ctx.lineTo(w - mr, Y(z)); ctx.stroke(); ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.textAlign = "right"; ctx.fillText(IMMO_PS_DE(z, 1), ml - 5, Y(z)); }
+  for (let s = 0; s <= sch.L + 1e-6; s += 0.5) { ctx.strokeStyle = Number.isInteger(Math.round(s * 2) / 2) ? "rgba(255,255,255,.14)" : "rgba(255,255,255,.07)"; ctx.beginPath(); ctx.moveTo(X(s), mt); ctx.lineTo(X(s), Y(zBot)); ctx.stroke(); if (Math.abs(s - Math.round(s)) < 1e-6) { ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.textAlign = "center"; ctx.fillText(IMMO_PS_DE(s, 1) + " m", X(s), h - mb / 2); } }
+  // Blatt-Wände als goldene Bänder mit Deckenhöhe
+  for (const wd of waende || []) {
+    const x0 = X(Math.max(0, wd.s - wd.breite / 2)), x1 = X(Math.min(sch.L, wd.s + wd.breite / 2));
+    ctx.fillStyle = "rgba(212,165,103,.28)"; ctx.fillRect(x0, mt, Math.max(2, x1 - x0), Y(zBot) - mt);
+    ctx.strokeStyle = "rgba(212,165,103,.9)"; ctx.beginPath(); ctx.moveTo(X(wd.s), mt); ctx.lineTo(X(wd.s), Y(zBot)); ctx.stroke();
+    const hz = sch.hoeheBei(wd.s); if (hz != null) { ctx.fillStyle = "#f3d9a8"; ctx.textAlign = "center"; ctx.fillText("Decke " + IMMO_PS_DE(hz) + " m", X(wd.s), Y(hz) - 10); }
+  }
+  // 1-m- und 2-m-Linie
+  for (const hz of [1, 2]) { ctx.setLineDash([6, 4]); ctx.strokeStyle = hz === 2 ? "rgba(243,217,168,.9)" : "rgba(239,106,106,.9)"; ctx.beginPath(); ctx.moveTo(ml, Y(hz)); ctx.lineTo(w - mr, Y(hz)); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = hz === 2 ? "#f3d9a8" : "#ef6a6a"; ctx.textAlign = "left"; ctx.fillText(hz === 2 ? "2,00 m (voll)" : "1,00 m (WoFlV)", ml + 4, Y(hz) - 8); }
+  // Punkte
+  const foto = d.foto, idx = sch.idx, groesse = Math.max(1, Math.min(2.5, 1.5 * dpr / dpr));
+  for (let k = 0; k < sch.anzahl; k++) {
+    const z = sch.z[k], i = idx[k];
+    if (foto) { const r = foto[3 * i], g = foto[3 * i + 1], b = foto[3 * i + 2]; ctx.fillStyle = "rgb(" + (r * 0.85 + 30 | 0) + "," + (g * 0.85 + 30 | 0) + "," + (b * 0.85 + 30 | 0) + ")"; }
+    else { const t = Math.max(0, Math.min(1, z / Math.max(1, d.H))); ctx.fillStyle = "rgb(" + (60 + 180 * t | 0) + "," + (120 + 90 * t | 0) + "," + (230 - 150 * t | 0) + ")"; }
+    ctx.fillRect(X(sch.s[k]) - groesse / 2, Y(z) - groesse / 2, groesse, groesse);
+  }
+  // Deckenprofil (dünne Linie) und Kreuzungen
+  ctx.strokeStyle = "rgba(255,255,255,.55)"; ctx.lineWidth = 1; ctx.beginPath(); let offen = false;
+  for (let b = 0; b < sch.decke.length; b++) { const z = sch.decke[b]; if (isNaN(z)) { offen = false; continue; } const x = X(Math.min(sch.L, (b + 0.5) * sch.G)); if (!offen) { ctx.moveTo(x, Y(z)); offen = true; } else ctx.lineTo(x, Y(z)); }
+  ctx.stroke();
+  for (const k of sch.kreuzungen) { ctx.fillStyle = k.h === 2 ? "#f3d9a8" : "#ef6a6a"; ctx.beginPath(); ctx.arc(X(k.s), Y(k.h), 4, 0, Math.PI * 2); ctx.fill(); ctx.textAlign = "center"; ctx.fillText(IMMO_PS_DE(k.s) + " m", X(k.s), Y(k.h) + (k.h === 2 ? 12 : -12)); }
+  // Wandstärke (Messen im Schnitt): beide Flächen als Linien, Maß dazwischen
+  const ws = o.wandstaerke;
+  if (ws && ws.ok) {
+    ctx.strokeStyle = "#5ec8ff"; ctx.lineWidth = 1.5; for (const sv of [ws.s1, ws.s2]) { if (sv == null) continue; ctx.beginPath(); ctx.moveTo(X(sv), mt); ctx.lineTo(X(sv), Y(zBot)); ctx.stroke(); }
+    const yM = Y(1.5); ctx.fillStyle = "#5ec8ff"; ctx.textAlign = "center"; ctx.font = "bold 12px system-ui, sans-serif";
+    if (ws.s2 != null) { ctx.beginPath(); ctx.moveTo(X(ws.s1), yM); ctx.lineTo(X(ws.s2), yM); ctx.stroke(); const tx = (X(ws.s1) + X(ws.s2)) / 2, txt = IMMO_PS_DE(ws.dicke * 100, 1) + " cm"; const tw = ctx.measureText(txt).width; ctx.fillStyle = "rgba(15,21,41,.85)"; ctx.fillRect(tx - tw / 2 - 4, yM - 20, tw + 8, 16); ctx.fillStyle = "#5ec8ff"; ctx.fillText(txt, tx, yM - 12); }
+    else ctx.fillText("Fläche " + IMMO_PS_DE(ws.s1) + " m", X(ws.s1), yM - 12);
+    ctx.font = "11px system-ui, sans-serif";
+  }
+  // Titel
+  ctx.fillStyle = "#fff"; ctx.textAlign = "left"; ctx.font = "bold 12px system-ui, sans-serif";
+  ctx.fillText((o.titel || "Schnitt") + " · Länge " + IMMO_PS_DE(sch.L) + " m · " + sch.anzahl.toLocaleString("de-DE") + " Punkte ±" + Math.round(sch.halbBreite * 100) + " cm" + (o.zusatz ? " · " + o.zusatz : ""), ml, mt / 2);
+  ctx.restore();
+}
+
+// Fenster-Einrichtung: Knöpfe „Schnitt“ und „Messen“ im 3D-Fenster, 2D-Canvas für den Schnitt, Overlay für Messmarken
+function epPsEinrichten(fenster, pan, haupt, d, st, abb) {
+  const doc = pan.ownerDocument, win = doc.defaultView, ge = fenster.GrundrissEditor, cv = haupt.cv; if (!cv || !haupt.webgl) return null;
+  const knopf = (text, titel) => { const b = doc.createElement("button"); b.type = "button"; b.textContent = text; b.title = titel || ""; b.style.cssText = "background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;white-space:nowrap"; return b; };
+  const bSchnitt = knopf("Schnitt", "Senkrechter Schnitt durch die Wolke entlang der Schnittlinie vom Blatt (Werkzeug „Schnitt“, Taste Q). Erneut klicken: zurück zur 3D-Ansicht.");
+  const bMessen = knopf("Messen", "3D: Klick auf einen Wolkenpunkt: Höhe über dem Boden, zweiter Klick: Abstand. Im Schnitt: Klick auf eine Wand misst die Wandstärke aus beiden Wandflächen.");
+  bSchnitt.setAttribute("data-ep-ps-schnitt", ""); bMessen.setAttribute("data-ep-ps-messen", "");
+  const anker = haupt.zeile1.querySelector("[data-ep-pw-3d-flaeche-hoehe]");
+  if (anker) { haupt.zeile1.insertBefore(bSchnitt, anker); haupt.zeile1.insertBefore(bMessen, anker); } else haupt.zeile1.append(bSchnitt, bMessen);
+  const cv2 = doc.createElement("canvas"); cv2.style.cssText = "flex:1;min-height:0;width:100%;display:none;background:#0f1529"; cv2.setAttribute("data-ep-ps-canvas", ""); cv.after(cv2);
+  const ov = doc.createElement("canvas"); ov.style.cssText = "position:absolute;left:0;top:0;pointer-events:none;display:none"; ov.setAttribute("data-ep-ps-overlay", ""); pan.appendChild(ov);
+  const zustand = { modus: "3d", messen: false, punkte: [], letzter: null, schnittId: null, schnittStand: "", wandstaerke: null };
+  const aktiv = (b, an) => { b.style.background = an ? "rgba(212,165,103,.35)" : "rgba(255,255,255,.08)"; b.style.borderColor = an ? "#D4A567" : "rgba(255,255,255,.22)"; };
+  const R = abb.R, X = (p) => (p.x - abb.ax) / R, Y = (p) => (abb.by - p.y) / R;
+  const schnittZeichnen = () => { if (zustand.modus !== "schnitt" || !zustand.letzter) return; epPsZeichnen(cv2, zustand.letzter, epPsWaendeImSchnitt(st, abb, zustand.letzter), d, { dpr: win.devicePixelRatio || 1, titel: zustand.titel || "Schnitt", wandstaerke: zustand.wandstaerke }); };
+  const modusSetzen = (m) => { zustand.modus = m; cv.style.display = m === "3d" ? "block" : "none"; cv2.style.display = m === "schnitt" ? "block" : "none"; aktiv(bSchnitt, m === "schnitt"); if (m === "3d") haupt.anfordern(); else schnittZeichnen(); overlayZeichnen(); };
+  const zeigeSchnitt = (el) => {
+    if (!pan.isConnected) { fenster.epPsZeigen = null; fenster.epPsApi = null; return null; }   // 3D-Fenster ist zu
+    if (!el || !el.p1 || !el.p2) return { fehler: "Keine Schnittlinie." };
+    const A = { x: X(el.p1), y: Y(el.p1) }, B = { x: X(el.p2), y: Y(el.p2) };
+    const sch = epPsSchnitt(d, A, B, 0.10); if (!sch) return { fehler: "Schnittlinie zu kurz (mindestens 20 cm)." };
+    zustand.letzter = sch; zustand.schnittId = el.id; zustand.schnittStand = JSON.stringify([el.p1, el.p2]); zustand.titel = (el.text || "").trim() || "Schnitt"; zustand.wandstaerke = null;
+    modusSetzen("schnitt");
+    const waende = epPsWaendeImSchnitt(st, abb, sch);
+    const text = "Schnitt " + IMMO_PS_DE(sch.L) + " m, " + sch.anzahl.toLocaleString("de-DE") + " Punkte" + (sch.kreuzungen.length ? " · Decke unter 2 m ab " + sch.kreuzungen.filter((k) => k.h === 2).map((k) => IMMO_PS_DE(k.s) + " m").join(" / ") : " · Decke überall über 2 m") + (sch.kreuzungen.some((k) => k.h === 1) ? ", unter 1 m ab " + sch.kreuzungen.filter((k) => k.h === 1).map((k) => IMMO_PS_DE(k.s) + " m").join(" / ") : "") + (waende.length ? " · Wände bei " + waende.map((w) => IMMO_PS_DE(w.s) + " m (Decke " + IMMO_PS_DE(sch.hoeheBei(w.s)) + " m)").join(", ") : "");
+    haupt.hinweis(text);
+    return { ok: true, text, L: sch.L, anzahl: sch.anzahl, kreuzungen: sch.kreuzungen, waende };
+  };
+  bSchnitt.addEventListener("click", () => {
+    if (zustand.modus === "schnitt") { modusSetzen("3d"); return; }
+    const el = (st.elemente || []).filter((e) => e.typ === "schnitt").slice(-1)[0];
+    if (!el) { haupt.hinweis("Keine Schnittlinie auf dem Blatt – Werkzeug „Schnitt“ (Taste Q) wählen und zwei Punkte anklicken."); return; }
+    zeigeSchnitt(el);
+  });
+  // Blatt geändert (Schnittlinie verschoben, Wände gezeichnet) → Schnitt nachziehen
+  const altRender = ge.render;
+  if (typeof altRender === "function") {
+    ge.render = function () {
+      const r = altRender.apply(this, arguments);
+      try {
+        if (zustand.modus === "schnitt" && zustand.schnittId != null) {
+          const el = (st.elemente || []).find((e) => e.id === zustand.schnittId);
+          if (!el) { modusSetzen("3d"); zustand.schnittId = null; }
+          else { const stand = JSON.stringify([el.p1, el.p2]); if (stand !== zustand.schnittStand) zeigeSchnitt(el); else schnittZeichnen(); }
+        }
+      } catch (e) { /* Zeichnen darf das Blatt nie stören */ }
+      return r;
+    };
+  }
+  // --- Messen ---
+  const overlayZeichnen = () => {
+    const sichtbar = zustand.modus === "3d" && zustand.messen;
+    ov.style.display = sichtbar ? "block" : "none"; if (!sichtbar) return;
+    const dpr = Math.min(2, win.devicePixelRatio || 1), w = cv.clientWidth, h = cv.clientHeight;
+    ov.style.left = cv.offsetLeft + "px"; ov.style.top = cv.offsetTop + "px"; ov.style.width = w + "px"; ov.style.height = h + "px";
+    const W = Math.round(w * dpr), H = Math.round(h * dpr); if (ov.width !== W || ov.height !== H) { ov.width = W; ov.height = H; }
+    const g = ov.getContext("2d"); g.clearRect(0, 0, W, H);
+    const proj = epPsProjektion(haupt.kam, cv), bild = zustand.punkte.map((p) => proj(p.x, p.y, p.z));
+    g.lineWidth = 2 * dpr; g.font = (11 * dpr) + "px system-ui, sans-serif"; g.textBaseline = "bottom";
+    bild.forEach((b, i) => { if (!b) return; g.strokeStyle = "#D4A567"; g.beginPath(); g.arc(b.sx, b.sy, 7 * dpr, 0, Math.PI * 2); g.stroke(); g.beginPath(); g.moveTo(b.sx - 11 * dpr, b.sy); g.lineTo(b.sx + 11 * dpr, b.sy); g.moveTo(b.sx, b.sy - 11 * dpr); g.lineTo(b.sx, b.sy + 11 * dpr); g.stroke(); g.fillStyle = "#fff"; g.fillText(IMMO_PS_DE(zustand.punkte[i].z) + " m", b.sx + 10 * dpr, b.sy - 6 * dpr); });
+    { const txt = messenText(); g.font = "bold " + (12 * dpr) + "px system-ui, sans-serif"; const tw = g.measureText(txt).width; g.fillStyle = "rgba(15,21,41,.85)"; g.fillRect(8 * dpr, 8 * dpr, tw + 16 * dpr, 24 * dpr); g.fillStyle = "#f3d9a8"; g.textBaseline = "middle"; g.fillText(txt, 16 * dpr, 20 * dpr); g.textBaseline = "bottom"; g.font = (11 * dpr) + "px system-ui, sans-serif"; }
+    if (bild.length === 2 && bild[0] && bild[1]) { g.strokeStyle = "#f3d9a8"; g.setLineDash([6 * dpr, 4 * dpr]); g.beginPath(); g.moveTo(bild[0].sx, bild[0].sy); g.lineTo(bild[1].sx, bild[1].sy); g.stroke(); g.setLineDash([]); const p = zustand.punkte, dist = Math.hypot(p[1].x - p[0].x, p[1].y - p[0].y, p[1].z - p[0].z); g.fillStyle = "#f3d9a8"; g.fillText(IMMO_PS_DE(dist) + " m", (bild[0].sx + bild[1].sx) / 2 + 8 * dpr, (bild[0].sy + bild[1].sy) / 2 - 4 * dpr); }
+  };
+  let tickLaeuft = false;
+  const tick = () => { if (!zustand.messen || !pan.isConnected) { tickLaeuft = false; ov.style.display = "none"; return; } overlayZeichnen(); win.requestAnimationFrame(tick); };
+  function messenText() {
+    const p = zustand.punkte; if (!p.length) return "Messen: Punkt in der Wolke anklicken (Höhe), zweiter Klick für den Abstand.";
+    if (p.length === 1) return "Punkt: " + IMMO_PS_DE(p[0].z) + " m über dem Boden · zweiter Klick für den Abstand";
+    const dx = p[1].x - p[0].x, dy = p[1].y - p[0].y, dz = p[1].z - p[0].z;
+    return "Abstand " + IMMO_PS_DE(Math.hypot(dx, dy, dz)) + " m · waagerecht " + IMMO_PS_DE(Math.hypot(dx, dy)) + " m · Höhenunterschied " + IMMO_PS_DE(Math.abs(dz)) + " m · Höhen " + IMMO_PS_DE(p[0].z) + " / " + IMMO_PS_DE(p[1].z) + " m";
+  }
+  const pick = (clientX, clientY) => {
+    const r = cv.getBoundingClientRect(), dpr = cv.width / Math.max(1, r.width);
+    const p = epPsPunktFangen(d, haupt.kam, cv, (clientX - r.left) * dpr, (clientY - r.top) * dpr, 12 * dpr);
+    if (!p) { haupt.hinweis("Kein Wolkenpunkt unter dem Cursor – näher an die Punkte klicken."); return null; }
+    if (zustand.punkte.length >= 2) zustand.punkte = [];
+    zustand.punkte.push(p); haupt.hinweis(messenText()); overlayZeichnen(); return p;
+  };
+  const messenSetzen = (an) => { zustand.messen = !!an; aktiv(bMessen, zustand.messen); cv.style.cursor = zustand.messen ? "crosshair" : "grab"; cv2.style.cursor = zustand.messen ? "crosshair" : "default"; if (!an) { zustand.wandstaerke = null; schnittZeichnen(); } else if (zustand.modus === "schnitt") haupt.hinweis("Wandstärke: im Schnitt auf eine Wand klicken – beide Wandflächen werden aus den Punkten bestimmt."); if (zustand.messen) { haupt.hinweis(messenText()); if (!tickLaeuft) { tickLaeuft = true; win.requestAnimationFrame(tick); } } else { zustand.punkte = []; ov.style.display = "none"; } };
+  bMessen.addEventListener("click", () => messenSetzen(!zustand.messen));
+  let down = null;
+  cv.addEventListener("pointerdown", (e) => { down = { x: e.clientX, y: e.clientY, t: Date.now() }; }, true);
+  let zuletztGemessen = 0;
+  const klick = (e) => { if (!zustand.messen || zustand.modus !== "3d" || e.button === 2) return; if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 4) return; if (Date.now() - zuletztGemessen < 150) return; zuletztGemessen = Date.now(); pick(e.clientX, e.clientY); };
+  cv.addEventListener("pointerup", (e) => { try { klick(e); } finally { down = null; } }, true);
+  cv.addEventListener("click", (e) => { if (Date.now() - zuletztGemessen >= 150) klick(e); }, true);
+  cv.addEventListener("touchend", () => { down = null; }, true);
+  // Wandstärke: Klick im Schnitt (Messen an) → Flächen beidseits der Klicklage
+  const wandstaerke = (s0) => { const sch = zustand.letzter; if (!sch) return null; const r = epPsWandstaerke(sch, s0); zustand.wandstaerke = r && r.ok ? r : null; schnittZeichnen(); haupt.hinweis(r ? (r.text || r.fehler) : "Kein Schnitt."); return r; };
+  let down2 = null;
+  cv2.addEventListener("pointerdown", (e) => { down2 = { x: e.clientX, y: e.clientY }; }, true);
+  cv2.addEventListener("pointerup", (e) => { try { if (!zustand.messen || zustand.modus !== "schnitt" || e.button === 2) return; if (down2 && Math.hypot(e.clientX - down2.x, e.clientY - down2.y) > 4) return; const ab = cv2.__epPsAbb; if (!ab) return; const r = cv2.getBoundingClientRect(); wandstaerke((e.clientX - r.left - ab.ml) / ab.sx); } finally { down2 = null; } }, true);
+  // Größenänderung des Fensters → Schnitt neu zeichnen
+  const beobachter = typeof win.ResizeObserver === "function" ? new win.ResizeObserver(() => { if (zustand.modus === "schnitt") schnittZeichnen(); }) : null; if (beobachter) beobachter.observe(pan);
+  const api = { zeigeSchnitt, messenSetzen, pick, zustand, modusSetzen, letzter: () => zustand.letzter, text: messenText, pan, wandstaerke };
+  pan.__epPs = api; fenster.epPsApi = api;
+  const liste = (fenster.__epPsAnsichten = (fenster.__epPsAnsichten || []).filter((a) => a.pan.isConnected)); liste.push(api);
+  fenster.epPsZeigen = (el) => { let erg = null; for (const a of (fenster.__epPsAnsichten || []).slice()) { if (!a.pan.isConnected) continue; const x = a.zeigeSchnitt(el); if (!erg || (x && x.ok && !erg.ok)) erg = x; } return erg; };
+  return api;
+}
+window.epPsSchnitt = epPsSchnitt; window.epPsWandstaerke = epPsWandstaerke; window.epPsZeichnen = epPsZeichnen; window.epPsEinrichten = epPsEinrichten; window.epPsPunktFangen = epPsPunktFangen; window.epPsWaendeImSchnitt = epPsWaendeImSchnitt;
+// Stufe 144 – Punktwolke im gesicherten Stand (02.10.2026)
+// Anlass: „wenn ich den Stand sichere, dann sichert er nur den Grundriss und nicht die Punktwolke.“ – „Stand sichern“ legt
+// jetzt die Wolke mit in die .json: kompakt (3-cm-Raster, bis 400.000 Punkte, Klassen; wie die Diagnose), dazu Drehung,
+// Boden/Raumhöhe, Wandband, Hintergrund-Schalter und die Abbildung Wolke → Blatt. Beim Laden des Stands wird die Wolke
+// wieder ausgewertet (mit derselben Drehung und demselben Boden, damit alles exakt auf den gezeichneten Elementen liegt),
+// und Hintergrund, Fang, 3D-Fenster, „Schrägen“ und „Schnitt“ stehen wieder zur Verfügung – ohne das Blatt neu zu zeichnen.
+// Farben der Wolke sind nicht enthalten (3D-Fenster dann in Klassen-/Höhenfarben).
+
+function epPwStandPaket(fenster, erg, wolke, name, opt) {
+  const ge = fenster && fenster.GrundrissEditor, st = ge && ge.st; if (!st || !erg || !wolke) return null;
+  const o = opt || {}, h = erg.hoehen || {};
+  const diag = epPwDiagnose(erg, name || "", wolke);
+  return { art: "punktwolke-stand", version: 1, name: name || "", gesichert: new Date().toISOString(), punkte: diag.wolke ? diag.wolke.punkte : 0, raster: diag.wolke ? diag.wolke.raster : null,
+    dreh: erg.dreh || 0, hoehen: { achse: h.achse, boden: h.boden, hoehe: h.hoehe }, von: o.von || 0.9, bis: o.bis || 1.9, hintergrund: o.hintergrund !== false,
+    abbildung: st.wolke && st.wolke.abbildung ? { R: st.wolke.abbildung.R, ax: st.wolke.abbildung.ax, by: st.wolke.abbildung.by } : null, diagnose: diag };
+}
+
+// Stand geladen → Wolke wieder einrichten (Hintergrund, Fang, 3D-Fenster, Schrägen/Schnitt), ohne Elemente zu zeichnen
+function epPwWolkeAusStand(fenster, stand) {
+  const ge = fenster && fenster.GrundrissEditor, st = ge && ge.st; if (!st || !stand || !stand.diagnose) return null;
+  const wolke = epPwWolkeAusDiagnose(stand.diagnose); if (!wolke || !wolke.n) return { fehler: "Die Punktwolke im Stand ist leer oder unlesbar." };
+  const h = epPwHoehen(wolke);
+  if (stand.hoehen) { if (typeof stand.hoehen.boden === "number") h.boden = stand.hoehen.boden; if (stand.hoehen.achse) h.achse = stand.hoehen.achse; if (typeof stand.hoehen.hoehe === "number" && stand.hoehen.hoehe > 0) h.hoehe = stand.hoehen.hoehe; }
+  const von = stand.von || 0.9, bis = stand.bis || 1.9;
+  const erg = epPwAuswerten(wolke, { von, bis, hoehen: h, dreh: typeof stand.dreh === "number" ? stand.dreh : undefined });
+  const scan = epPwZuScan(erg, stand.name || "");
+  if (fenster.epP3Weg) fenster.epP3Weg();
+  const r = epPzEinrichten(fenster, scan, erg, wolke, { hintergrund: stand.hintergrund !== false, abbildung: stand.abbildung });
+  if (typeof epWkEinrichten === "function") { try { epWkEinrichten(fenster, erg, wolke); } catch (e) { console.warn("Schnittkanten (Stand)", e); } }   // Stufe 147
+  window.__epDsLetzte = { fenster, erg, wolke };
+  fenster.epPwStandSichern = () => epPwStandPaket(fenster, erg, wolke, stand.name, { von, bis, hintergrund: stand.hintergrund !== false });
+  const text = "Punktwolke aus dem Stand geladen: " + wolke.n.toLocaleString("de-DE") + " Punkte" + (r ? ", Fang an " + (r.zellen || 0).toLocaleString("de-DE") + " Wandzellen" + (r.hintergrund ? ", Hintergrund" : "") + (r.dreiD ? ", 3D-Fenster" : "") : "") + " – „Schrägen“ und „Schnitt“ stehen wieder zur Verfügung.";
+  return { ok: true, text, punkte: wolke.n, abbildung: r && r.abbildung, zellen: r ? r.zellen : 0 };
+}
+window.epPwStandPaket = epPwStandPaket; window.epPwWolkeAusStand = epPwWolkeAusStand;
+// Stufe 146 – Grundriss und Wohnflächenberechnung in einem Dokument (02.10.2026)
+// Anlass: „ich will aus der vermaßten Punktwolke ja gleich Wohnflächenberechnung und Grundrisse in einem Dokument übernehmen
+// können.“ – Knopf „Plan + Wohnfläche“ im Editor: der Grundriss (wie „PDF exportieren“) und dahinter die Wohnflächenberechnung
+// nach WoFlV aus den Räumen des Blatts (Zonen der Dachschrägen, Gauben, Abzüge) als Seiten des Wohnflächenrechners (WF.pdf),
+// zusammengeführt mit pdf-lib. Dieselben Zahlen wie im Rechner („Wohnfläche“ im Werkzeugmenü), nur ohne Umweg.
+
+async function epDokErzeugen(fenster, opt) {
+  const o = opt || {}, ge = fenster && fenster.GrundrissEditor, st = ge && ge.st;
+  if (!st || !st.breite) return { fehler: "Kein Blatt geladen." };
+  if (typeof ge.exportPdf !== "function") return { fehler: "PDF-Export des Editors fehlt." };
+  if (typeof epGwRaeume !== "function" || typeof epGwScan !== "function") return { fehler: "Wohnflächen-Stufe (126) fehlt." };
+  if (typeof WF === "undefined" || !WF || typeof WF.pdf !== "function" || typeof WF.ausScan !== "function") return { fehler: "Wohnflächenrechner nicht geladen." };
+  const jsPDF = window.jspdf && window.jspdf.jsPDF; if (!jsPDF) return { fehler: "jsPDF nicht geladen." };
+  const PDFLib = window.PDFLib || fenster.PDFLib; if (!PDFLib) return { fehler: "pdf-lib nicht geladen." };
+  // 1) Räume des Blatts → Wohnflächen-Dokument des Rechners
+  const raeume = epGwRaeume(fenster);
+  if (!raeume.length) return { fehler: "Keine Räume auf dem Blatt – zuerst „Räume + Maße“ oder Flächen mit Raumnamen anlegen." };
+  const start = window.__epWerkzeugStart || {}, imm = o.immobilie || start.immobilie || null;
+  const titel = o.titel || (imm && (imm.bezeichnung || imm.titel)) || st.dateiName || "Grundriss";
+  const scan = epGwScan(raeume, titel);
+  let dok = WF.neuDok({ bearbeiter: o.bearbeiter || window._currentUserName || "" });
+  if (imm) { dok.titel = imm.bezeichnung || imm.titel || dok.titel || ""; dok.adresse = imm.adresse || dok.adresse || ""; } else if (!dok.titel) dok.titel = titel;
+  dok = WF.ausScan(scan, dok, typeof EPScan !== "undefined" ? EPScan : window.EPScan);
+  const erg = typeof WF.ergebnis === "function" ? WF.ergebnis(dok) : null;
+  const wfDoc = WF.pdf(dok, erg, jsPDF, { ort: o.ort || "Musterstadt" });
+  const wfBytes = wfDoc.output("arraybuffer");
+  // 2) Grundriss-PDF des Editors (Bytes statt Download)
+  const planRoh = await ge.exportPdf({ nurBytes: true });
+  if (!planRoh || !planRoh.length) return { fehler: "Grundriss-PDF konnte nicht erzeugt werden." };
+  const planBytes = new Uint8Array(planRoh);   // Kopie in diesem Fenster: Typprüfung von pdf-lib kennt Uint8Array aus dem Editor-Fenster nicht
+  // 3) Zusammenführen: Grundriss vorn, Wohnflächenberechnung dahinter
+  const aus = await PDFLib.PDFDocument.load(planBytes), wf = await PDFLib.PDFDocument.load(wfBytes);
+  const seiten = await aus.copyPages(wf, wf.getPageIndices()); seiten.forEach((p) => aus.addPage(p));
+  aus.setTitle(titel + " – Grundriss und Wohnflächenberechnung"); aus.setSubject("Grundriss aus LiDAR-Punktwolke mit Wohnflächenberechnung nach WoFlV");
+  const bytes = await aus.save();
+  const name = (o.dateiName || (titel + "_Grundriss_Wohnflaeche")).replace(/[^\wäöüÄÖÜß.-]+/g, "_").slice(0, 80) + ".pdf";
+  if (!o.nurBytes) {
+    const url = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" })); const a = document.createElement("a"); a.href = url; a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 1500);
+  }
+  const summe = raeume.reduce((s, r) => { if (r.art === "zubehoer") return s; const grund = Math.max(0, r.m2 - (r.abzuege || []).reduce((a, x) => a + x.m2, 0)); const z = r.zonen; const f = r.art === "balkon" ? 0.25 : r.art === "wintergarten" ? 0.5 : 1; return s + (z && r.art === "wohn" ? Math.max(0, grund - z.halb - z.keine) + 0.5 * z.halb : grund * f); }, 0);
+  return { ok: true, name, seitenPlan: aus.getPageCount() - seiten.length, seitenWohnflaeche: seiten.length, bytes: o.nurBytes ? bytes : null, groesse: bytes.length, raeume: raeume.length, wohnflaecheM2: Math.round(summe * 100) / 100,
+    text: `Dokument „${name}“: ${aus.getPageCount() - seiten.length} Seite(n) Grundriss + ${seiten.length} Seite(n) Wohnflächenberechnung, ${raeume.length} ${raeume.length === 1 ? "Raum" : "Räume"}, Wohnfläche ${summe.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m².` };
+}
+window.epDokErzeugen = epDokErzeugen;
+// Stufe 147 – Schnittkanten: verbindliche Wandlage aus der Punktwolke (02.10.2026)
+// Anlass: „Wir brauchen eine klarere Schnittkante bei der Punktwolke, was die Außenwände angeht … die Wohnflächen variieren
+// teilweise um zwei, drei Quadratmeter … eine klare Schnittkante, die direkt festgelegt wird, an der die Außenwände zwingend
+// platziert werden müssen.“
+// Die Schnittkante einer Wand ist die aus der Wolke ausgeglichene Wandfläche (Wandband 0,9–1,9 m, Streuung wenige mm) –
+// genau die Fläche, die der Scanner gesehen hat, also die Innenseite der Wand. Sie wird nach dem Übernehmen (und nach dem
+// Laden eines Stands) als rote Strichpunktlinie aufs Blatt gelegt (nur Anzeige, nicht im Export). Wände rasten zwingend ein:
+// Anfang und Ende einer gezeichneten oder verschobenen Wand im Umkreis von 30 cm werden so gesetzt, dass die Innenseite der
+// Wand exakt auf der Kante liegt (Achse um die halbe Wanddicke nach außen); an Ecken auf den Schnittpunkt zweier Kanten.
+// Dadurch ist die Innenfläche eines Raums nicht mehr davon abhängig, wo jemand klickt – sie kommt aus der Wolke.
+
+// Kanten in Blattkoordinaten: p1/p2 (pt), n = Normale zur Raumseite (Innenseite), Länge (m)
+function epWkKanten(erg, wolke, abb) {
+  if (!erg || !erg.waende || !abb) return [];
+  const R = abb.R, S = (x, y) => ({ x: abb.ax + x * R, y: abb.by - y * R });
+  let seite = null; try { seite = typeof epPwBodenSeite === "function" && wolke ? epPwBodenSeite(wolke, erg) : null; } catch (e) { seite = null; }
+  const aus = [];
+  erg.waende.forEach((w, i) => {
+    const L = w.t1 - w.t0; if (!(L >= 0.8)) return;
+    const a = { x: w.p.x + w.d.x * w.t0, y: w.p.y + w.d.y * w.t0 }, b = { x: w.p.x + w.d.x * w.t1, y: w.p.y + w.d.y * w.t1 };
+    const nPlan = { x: -w.d.y, y: w.d.x };
+    let sf = 0; if (seite) { try { sf = seite({ p1: a, p2: b, n: nPlan }) || 0; } catch (e) { sf = 0; } }
+    // Blatt: y ist gespiegelt – Normale mitdrehen; sf = Seite des Raums (±1), ohne Boden-Hinweis: unbekannt (0)
+    const p1 = S(a.x, a.y), p2 = S(b.x, b.y), dx = p2.x - p1.x, dy = p2.y - p1.y, l = Math.hypot(dx, dy) || 1;
+    const nBlatt = { x: -dy / l, y: dx / l };   // eine der beiden Normalen; Vorzeichen über sf aus der Planebene
+    const nPlanBlatt = { x: nPlan.x, y: -nPlan.y }; const vz = nBlatt.x * nPlanBlatt.x + nBlatt.y * nPlanBlatt.y >= 0 ? 1 : -1;
+    const n = sf ? { x: nBlatt.x * vz * sf, y: nBlatt.y * vz * sf } : null;
+    // aussen = Boden nur auf einer Seite (Außen- oder Raumwand); ohne klare Seite (Boden beidseits oder gar nicht): Kamin, Treppe,
+    // Schrank, Brüstung – solche „Wände“ sind keine Schnittkanten, es sei denn, der Schalter „auch Innenwände“ ist an
+    aus.push({ idx: i, p1, p2, d: { x: dx / l, y: dy / l }, n, aussen: !!sf, laengeM: Math.round(L * 100) / 100, rmsMm: Math.round((w.rms || 0) * 1000) });
+  });
+  return aus;
+}
+
+// Einrichten: Kanten ans Blatt hängen (st.wolke.kanten), Anzeige über einen Render-Haken (Overlay-SVG), Zähler zurückgeben
+function epWkEinrichten(fenster, erg, wolke) {
+  const ge = fenster && fenster.GrundrissEditor, st = ge && ge.st; if (!st || !st.wolke || !st.wolke.abbildung) return null;
+  const alle = epWkKanten(erg, wolke, st.wolke.abbildung), aussen = alle.filter((k) => k.aussen);
+  st.wolke.kantenAlle = alle; st.wolke.kantenAussen = aussen;
+  st.wolke.kanten = st.kantenInnen ? alle : aussen;   // Vorgabe: nur Wände mit Boden auf einer Seite (Außen-/Raumwände)
+  if (st.kantenFang == null) st.kantenFang = true; if (st.kantenZeigen == null) st.kantenZeigen = true;
+  // Die Anzeige ruft der Editor selbst am Ende von render() auf (window.parent.epWkZeichnen) – robuster als ein Haken,
+  // den andere Stufen (3D-Fenster schließen) wieder aushängen
+  try { ge.render(); } catch (e) { /* egal */ }
+  return { kanten: st.wolke.kanten.length, alle: alle.length, innen: alle.length - aussen.length };
+}
+
+// Kanten als rote Strichpunktlinien mit kurzen Strichen zur Raumseite ins Overlay zeichnen (nach jedem render)
+function epWkZeichnen(fenster) {
+  const ge = fenster.GrundrissEditor, st = ge && ge.st, doc = fenster.document, overlay = doc && doc.getElementById("overlay"); if (!st || !overlay) return;
+  const alt = overlay.querySelector("g.schnittkanten"); if (alt) alt.remove();
+  const kanten = st.wolke && st.wolke.kanten; if (!kanten || !kanten.length || st.kantenZeigen === false || !st.breite) return;
+  const z = st.zoom || 1, w = 1.3 / z, dash = `${8 / z} ${3 / z} ${1.5 / z} ${3 / z}`, n2 = (v) => Math.round(v * 100) / 100;
+  let s = "";
+  for (const k of kanten) {
+    s += `<line x1="${n2(k.p1.x)}" y1="${n2(k.p1.y)}" x2="${n2(k.p2.x)}" y2="${n2(k.p2.y)}" stroke="#c81e1e" stroke-width="${n2(w)}" stroke-dasharray="${dash}" stroke-linecap="round"/>`;
+    if (k.n) { const t = 5 / z, L = Math.hypot(k.p2.x - k.p1.x, k.p2.y - k.p1.y), schritt = Math.max(30, L / 6); for (let a = schritt / 2; a < L; a += schritt) { const px = k.p1.x + k.d.x * a, py = k.p1.y + k.d.y * a; s += `<line x1="${n2(px)}" y1="${n2(py)}" x2="${n2(px + k.n.x * t)}" y2="${n2(py + k.n.y * t)}" stroke="#c81e1e" stroke-width="${n2(w)}"/>`; } }
+  }
+  const g = doc.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("class", "schnittkanten"); g.setAttribute("pointer-events", "none"); g.setAttribute("data-ep-wk", String(kanten.length)); g.innerHTML = s;
+  overlay.appendChild(g);
+}
+window.epWkKanten = epWkKanten; window.epWkEinrichten = epWkEinrichten; window.epWkZeichnen = epWkZeichnen;
+// Stufe 148 – Treppen in der Wohnflächenrechnung (02.10.2026)
+// Anlass: „unter der Treppe ist keine Wohnfläche … das muss man bei Schrägen quasi dann auch berechnen. Beziehungsweise der
+// Luftraum einer Treppe ist auch keine Wohnfläche.“
+// Regel (WoFlV § 3 Abs. 3 Nr. 2, § 4 Nr. 1–2): Die Grundfläche unter einer Treppe zählt nach ihrer lichten Höhe wie unter einer
+// Dachschräge – unter 1 m nicht, 1–2 m zur Hälfte, ab 2 m voll. Die Unterkante des Laufs steigt mit der Treppe: lichte Höhe an
+// der Stelle s ab Antritt = s · Steigung/Auftritt − Laufplattendicke. Wo die Treppe von unten in dieses Geschoss kommt
+// (Austritt hier), ist ihre Grundfläche Luftraum/Deckenöffnung und zählt nicht. Spindeltreppen: ihre Grundfläche zählt nicht
+// (unter der Spindel keine nutzbare Höhe, oben Luftraum).
+
+function epTwZonen(el, R) {
+  if (!el || el.typ !== "treppe" || !el.p1 || !el.p2 || !(R > 0)) return null;
+  const L = Math.hypot(el.p2.x - el.p1.x, el.p2.y - el.p1.y); if (L < 1e-6) return null;
+  const lage = el.lage === "austritt" ? "austritt" : "antritt", stuecke = [];
+  const flaeche = (pts) => { let a = 0; for (let i = 0; i < pts.length; i++) { const p = pts[i], q = pts[(i + 1) % pts.length]; a += p.x * q.y - q.x * p.y; } return Math.abs(a) / 2 / (R * R); };
+  if (el.variante === "spindel") {
+    const r = L, n = 24, pts = []; for (let i = 0; i < n; i++) { const a = i / n * 2 * Math.PI; pts.push({ x: el.p1.x + r * Math.cos(a), y: el.p1.y + r * Math.sin(a) }); }
+    stuecke.push({ art: "keine", punkte: pts, m2: flaeche(pts), name: lage === "austritt" ? "Spindeltreppe · Luftraum" : "unter der Spindeltreppe" });
+    return { lage, variante: "spindel", stuecke, s1: 0, s2: 0, hinweis: "Spindeltreppe: Grundfläche zählt nicht (keine nutzbare Höhe darunter)." };
+  }
+  const d = { x: (el.p2.x - el.p1.x) / L, y: (el.p2.y - el.p1.y) / L }, n = { x: -d.y, y: d.x }, hb = (el.breite || 100) / 200 * R;
+  const rechteck = (sa, sb) => [{ x: el.p1.x + d.x * sa + n.x * hb, y: el.p1.y + d.y * sa + n.y * hb }, { x: el.p1.x + d.x * sb + n.x * hb, y: el.p1.y + d.y * sb + n.y * hb }, { x: el.p1.x + d.x * sb - n.x * hb, y: el.p1.y + d.y * sb - n.y * hb }, { x: el.p1.x + d.x * sa - n.x * hb, y: el.p1.y + d.y * sa - n.y * hb }];
+  if (lage === "austritt") { const q = rechteck(0, L); stuecke.push({ art: "keine", punkte: q, m2: flaeche(q), name: "Treppe · Luftraum (Deckenöffnung)" }); return { lage, variante: "gerade", stuecke, s1: 0, s2: 0 }; }
+  const Lm = L / R, nSt = el.stufen > 0 ? el.stufen : Math.max(2, Math.round(Lm / 0.28)), auftritt = Lm / nSt, steigung = (el.steigung > 0 ? el.steigung : 18) / 100, platte = (el.platte >= 0 ? el.platte : 20) / 100;
+  const hVon = (sM) => sM * steigung / auftritt - platte;                       // lichte Höhe unter dem Lauf (m) an der Stelle s (m) ab Antritt
+  const sFuer = (h) => (h + platte) * auftritt / steigung;                      // Stelle, an der die Unterkante die Höhe h erreicht
+  const s1 = Math.max(0, Math.min(L, sFuer(1) * R)), s2 = Math.max(0, Math.min(L, sFuer(2) * R));
+  if (s1 > 0.5) { const q = rechteck(0, s1); stuecke.push({ art: "keine", punkte: q, m2: flaeche(q), name: "unter der Treppe bis 1 m" }); }
+  if (s2 - s1 > 0.5) { const q = rechteck(s1, s2); stuecke.push({ art: "halb", punkte: q, m2: flaeche(q), name: "unter der Treppe 1–2 m" }); }
+  if (L - s2 > 0.5) { const q = rechteck(s2, L); stuecke.push({ art: "voll", punkte: q, m2: flaeche(q), name: "unter der Treppe ab 2 m" }); }
+  return { lage, variante: "gerade", stuecke, s1: Math.round(s1 / R * 100) / 100, s2: Math.round(s2 / R * 100) / 100, hVon, steigung, auftritt: Math.round(auftritt * 1000) / 1000, platte };
+}
+window.epTwZonen = epTwZonen;
+// ---- Aufmaß: Abgleich Einzelscan gegen Gesamtscan (02.10.2026) ----
+// Ein Einzelscan (ein Raum, eigenes Koordinatensystem) wird in den Gesamtscan des Geschosses eingepasst: Beide Umrisse sind
+// nach der Hauptrichtung ausgerichtet, also bleibt eine Drehung um ein Vielfaches von 90° und eine Verschiebung. Je Raum des
+// Gesamtscans und je Drehung wird der Einzel-Umriss über den Raum gelegt (Schwerpunkt auf Schwerpunkt, dann Feinsuche ±30 cm)
+// und die Überdeckung (Schnitt/Vereinigung, 5-cm-Raster) berechnet. Der beste Treffer liefert Raum, Drehung, Verschiebung,
+// Überdeckung und die Flächenabweichung. Reine Rechenfunktionen, ohne DOM – im Browser und in Node prüfbar.
+function epAbFlaeche(poly) { let s = 0; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) s += (poly[j][0] + poly[i][0]) * (poly[j][1] - poly[i][1]); return Math.abs(s) / 2; }
+function epAbSchwerpunkt(poly) { let a = 0, cx = 0, cy = 0; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const f = poly[j][0] * poly[i][1] - poly[i][0] * poly[j][1]; a += f; cx += (poly[j][0] + poly[i][0]) * f; cy += (poly[j][1] + poly[i][1]) * f; } if (Math.abs(a) < 1e-9) { const n = poly.length; return [poly.reduce((s, p) => s + p[0], 0) / n, poly.reduce((s, p) => s + p[1], 0) / n]; } a *= 0.5; return [cx / (6 * a), cy / (6 * a)]; }
+function epAbInnen(q, poly) { let d = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const a = poly[i], b = poly[j]; if ((a[1] > q[1]) !== (b[1] > q[1]) && q[0] < (b[0] - a[0]) * (q[1] - a[1]) / (b[1] - a[1]) + a[0]) d = !d; } return d; }
+// Umriss drehen (k · 90°) um den Ursprung und verschieben
+function epAbTransform(poly, k, dx, dy) { const c = [1, 0, -1, 0][k & 3], s = [0, 1, 0, -1][k & 3]; return poly.map(([x, y]) => [x * c - y * s + dx, x * s + y * c + dy]); }
+// Überdeckung zweier Umrisse: Schnitt / Vereinigung über ein 5-cm-Raster der gemeinsamen Hülle
+function epAbUeberdeckung(a, b, G) {
+  G = G || 0.05;
+  const xs = a.concat(b).map((p) => p[0]), ys = a.concat(b).map((p) => p[1]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  let schnitt = 0, vereinigung = 0;
+  for (let x = x0 + G / 2; x < x1; x += G) for (let y = y0 + G / 2; y < y1; y += G) { const q = [x, y], ia = epAbInnen(q, a), ib = epAbInnen(q, b); if (ia && ib) schnitt++; if (ia || ib) vereinigung++; }
+  return vereinigung ? schnitt / vereinigung : 0;
+}
+// Einzel-Umriss (m) in die Räume des Gesamtscans einpassen. raeume: [{ polygon: [[x,y],…], flaeche }]. Liefert den besten Treffer.
+function epAbEinpassen(einzel, raeume, opt) {
+  const o = Object.assign({ feinsuche: 0.3, schritt: 0.05, raster: 0.05 }, opt || {});
+  if (!einzel || einzel.length < 3 || !raeume || !raeume.length) return null;
+  const fE = epAbFlaeche(einzel), sE = epAbSchwerpunkt(einzel);
+  let best = null;
+  raeume.forEach((r, idx) => {
+    const poly = r.polygon; if (!poly || poly.length < 3) return;
+    const fG = r.flaeche || epAbFlaeche(poly), sG = epAbSchwerpunkt(poly);
+    const verhaeltnis = fE / Math.max(0.01, fG); if (verhaeltnis < 0.5 || verhaeltnis > 2) return;   // ganz andere Größe: kein Kandidat
+    for (let k = 0; k < 4; k++) {
+      // Schwerpunkt des gedrehten Einzel-Umrisses auf den Raumschwerpunkt
+      const gedreht = epAbTransform(einzel, k, 0, 0), sD = epAbSchwerpunkt(gedreht);
+      let dx = sG[0] - sD[0], dy = sG[1] - sD[1], u = epAbUeberdeckung(epAbTransform(einzel, k, dx, dy), poly, 0.1);
+      if (u < 0.3) continue;
+      // Feinsuche: grob (10 cm) in ±feinsuche, dann fein (5 cm) um das Beste
+      for (const [weite, st] of [[o.feinsuche, 0.1], [0.1, o.schritt]]) {
+        let bx = dx, by = dy, bu = u;
+        for (let ax = -weite; ax <= weite + 1e-9; ax += st) for (let ay = -weite; ay <= weite + 1e-9; ay += st) { const v = epAbUeberdeckung(epAbTransform(einzel, k, dx + ax, dy + ay), poly, o.raster); if (v > bu) { bu = v; bx = dx + ax; by = dy + ay; } }
+        dx = bx; dy = by; u = bu;
+      }
+      if (!best || u > best.ueberdeckung) best = { raum: idx, dreh: k * 90, dx: Math.round(dx * 1000) / 1000, dy: Math.round(dy * 1000) / 1000, ueberdeckung: Math.round(u * 1000) / 1000, flaecheEinzel: Math.round(fE * 100) / 100, flaecheGesamt: Math.round(fG * 100) / 100 };
+    }
+  });
+  if (!best) return null;
+  const abw = best.flaecheEinzel - best.flaecheGesamt, proz = Math.abs(abw) / Math.max(0.01, best.flaecheGesamt) * 100;
+  best.abweichungM2 = Math.round(abw * 100) / 100; best.abweichungProzent = Math.round(proz * 10) / 10;
+  best.bewertung = best.ueberdeckung < 0.8 ? "umriss" : proz <= 3 ? "ok" : "pruefen";
+  best.hinweis = best.bewertung === "umriss" ? `Umriss passt nur zu ${Math.round(best.ueberdeckung * 100)} % – anderer Raum, Anbau oder unvollständiger Scan?`
+    : best.bewertung === "ok" ? `stimmt überein (${best.abweichungProzent.toLocaleString("de-DE")} %)`
+    : `Abweichung ${Math.abs(best.abweichungM2).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m² (${best.abweichungProzent.toLocaleString("de-DE")} %) – Wandlage prüfen`;
+  return best;
+}
+// Alle Einzelscans eines Geschosses gegen den Gesamtscan: jeder Gesamt-Raum höchstens einmal (bester Treffer zuerst)
+function epAbGeschoss(einzelScans, gesamtRaeume) {
+  const treffer = einzelScans.map((e) => ({ scan: e, t: e && e.umriss ? epAbEinpassen(e.umriss, gesamtRaeume) : null }));
+  treffer.sort((a, b) => (b.t ? b.t.ueberdeckung : -1) - (a.t ? a.t.ueberdeckung : -1));
+  const belegt = new Set(), zeilen = [];
+  for (const { scan, t } of treffer) {
+    if (t && belegt.has(t.raum)) {   // Raum schon vergeben → nächstbesten Raum suchen
+      const rest = gesamtRaeume.map((r, i) => ({ r, i })).filter((x) => !belegt.has(x.i));
+      const t2 = rest.length ? epAbEinpassen(scan.umriss, rest.map((x) => x.r)) : null;
+      if (t2) { t2.raum = rest[t2.raum].i; zeilen.push({ scan, treffer: t2 }); belegt.add(t2.raum); continue; }
+      zeilen.push({ scan, treffer: null, hinweis: "kein freier Raum im Gesamtscan" }); continue;
+    }
+    if (t) belegt.add(t.raum);
+    zeilen.push({ scan, treffer: t, hinweis: t ? t.hinweis : "kein passender Raum im Gesamtscan (Größe oder Umriss)" });
+  }
+  const summeEinzel = einzelScans.reduce((s, e) => s + (e.flaeche || 0), 0), summeGesamt = gesamtRaeume.reduce((s, r) => s + (r.flaeche || epAbFlaeche(r.polygon)), 0);
+  return { zeilen, summeEinzel: Math.round(summeEinzel * 100) / 100, summeGesamt: Math.round(summeGesamt * 100) / 100, ohneEinzel: gesamtRaeume.map((_, i) => i).filter((i) => !belegt.has(i)) };
+}
+if (typeof window !== "undefined") { window.epAbEinpassen = epAbEinpassen; window.epAbGeschoss = epAbGeschoss; window.epAbFlaeche = epAbFlaeche; window.epAbUeberdeckung = epAbUeberdeckung; }
+// ---- Aufmaß-Dokument: Wohnflächenberechnung aller Einzelräume + Abgleichtabelle als Anlage (02.10.2026) ----
+// Je Geschoss oder für das ganze Objekt: die Räume kommen aus den ausgewerteten Einzelscans (Fläche, Umriss, Schrägenzonen),
+// die Berechnung macht der Wohnflächenrechner (WF.ausScan/ergebnis/pdf, wie Stufe 146), dahinter als Anlage die Abgleichtabelle
+// (Einzelscan gegen Gesamtscan je Raum, Summen, Räume ohne Einzelscan). Zusammengeführt mit pdf-lib.
+const epAmDokDe = (x, n) => (x == null || isNaN(x)) ? "–" : Number(x).toLocaleString("de-DE", { minimumFractionDigits: n == null ? 2 : n, maximumFractionDigits: n == null ? 2 : n });
+// Einzelräume → Räume im Format von epGwRaeume (für epGwScan): Fläche, Umriss (m), Schrägenzonen aus der Auswertung
+function epAmDokRaeume(zuordnungen, geschoss) {
+  const einzel = (zuordnungen || []).filter((z) => z.umfang === "einzel" && z.ergebnis && z.ergebnis.flaeche_m2 > 0 && (!geschoss || z.geschoss === geschoss));
+  const mehrere = !geschoss && new Set(einzel.map((z) => z.geschoss)).size > 1;
+  return einzel.sort((a, b) => (a.geschoss + a.raum).localeCompare(b.geschoss + b.raum, "de")).map((z) => {
+    const e = z.ergebnis, r0 = e.raeume && e.raeume[0], name = (mehrere ? z.geschoss + " · " : "") + (z.raum || "Raum");
+    const poly = e.umriss && e.umriss.length >= 3 ? e.umriss : [[0, 0], [Math.sqrt(e.flaeche_m2), 0], [Math.sqrt(e.flaeche_m2), Math.sqrt(e.flaeche_m2)], [0, Math.sqrt(e.flaeche_m2)]];
+    const zonen = r0 && r0.zonen && (r0.zonen.halb > 0 || r0.zonen.keine > 0) ? { halb: r0.zonen.halb || 0, keine: r0.zonen.keine || 0 } : null;
+    return { id: "am-" + z.id, name, m2: e.flaeche_m2, polygon: poly, punkte: poly.map((q) => ({ x: q[0], y: -q[1] })), art: typeof epGwArt === "function" ? epGwArt(z.raum || "") : "wohn", abzuege: [], zonen, hinweise: [], geschoss: z.geschoss, zuordnung: z };
+  });
+}
+// Anlage: Abgleichtabelle als jsPDF-Seiten
+function epAmDokAnlage(jsPDF, zuordnungen, geschosse, titel) {
+  const doc = new jsPDF({ unit: "mm", format: "a4" }), W = 210, L = 15, R = 195; let y = 20;
+  const neueSeite = () => { doc.addPage(); y = 20; };
+  const zeile = (h) => { if (y + h > 282) neueSeite(); };
+  doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.text("Anlage: Abgleich Einzelscan gegen Gesamtscan", L, y); y += 7;
+  doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.text(titel, L, y); y += 5;
+  doc.setFontSize(8.5); doc.setTextColor(90);
+  const erkl = doc.splitTextToSize("Je Geschoss wurde die ganze Etage als Punktwolke aufgenommen (Gesamtscan) und jeder Raum einzeln (Einzelscan). Der Umriss des Einzelscans wird in den Gesamtscan eingepasst; die Fläche des Einzelscans ist die Grundfläche der Wohnflächenberechnung, der Gesamtscan prüft. Abweichungen bis 3 % gelten als übereinstimmend.", R - L);
+  doc.text(erkl, L, y); y += erkl.length * 3.6 + 4; doc.setTextColor(0);
+  const sp = [L, L + 48, L + 80, L + 112, L + 142, L + 160];   // Raum | Einzel | Gesamt | Abw. m² | % | Bewertung
+  for (const g of geschosse) {
+    const im = zuordnungen.filter((z) => z.geschoss === g), gesamt = im.find((z) => z.umfang === "gesamt" && z.ergebnis), einzel = im.filter((z) => z.umfang === "einzel" && z.ergebnis).sort((a, b) => (a.raum || "").localeCompare(b.raum || "", "de"));
+    zeile(22); doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.text(g, L, y); y += 6;
+    doc.setFontSize(8.5); ["Raum", "Einzelscan m²", "Gesamtscan m²", "Abweichung m²", "%", "Bewertung"].forEach((t, i) => doc.text(t, sp[i], y)); y += 1.5; doc.setDrawColor(120); doc.line(L, y, R, y); y += 4;
+    doc.setFont("helvetica", "normal");
+    let sE = 0, sG = 0;
+    for (const z of einzel) {
+      zeile(6); const a = z.ergebnis.abgleich, fE = z.ergebnis.flaeche_m2 || 0; sE += fE;
+      doc.text(String(z.raum || "Raum").slice(0, 28), sp[0], y); doc.text(epAmDokDe(fE), sp[1], y);
+      if (a && !a.fehlt) { sG += a.flaecheGesamt || 0; doc.text(epAmDokDe(a.flaecheGesamt), sp[2], y); doc.text((a.abweichungM2 >= 0 ? "+" : "−") + epAmDokDe(Math.abs(a.abweichungM2)), sp[3], y); doc.text(epAmDokDe(a.abweichungProzent, 1), sp[4], y); doc.text(a.bewertung === "ok" ? "stimmt überein" : a.bewertung === "pruefen" ? "prüfen" : "Umriss passt nicht", sp[5], y); }
+      else doc.text(a && a.fehlt ? "kein passender Raum im Gesamtscan" : (gesamt ? "noch kein Abgleich" : "kein Gesamtscan"), sp[2], y);
+      y += 5.2;
+    }
+    if (!einzel.length) { zeile(6); doc.setTextColor(120); doc.text("keine ausgewerteten Einzelräume", sp[0], y); doc.setTextColor(0); y += 5.2; }
+    doc.setDrawColor(160); doc.line(L, y - 3.2, R, y - 3.2);
+    doc.setFont("helvetica", "bold"); zeile(6); doc.text("Summe Einzelscans", sp[0], y); doc.text(epAmDokDe(sE), sp[1], y); if (sG) doc.text(epAmDokDe(sG), sp[2], y); y += 5.2; doc.setFont("helvetica", "normal");
+    if (gesamt && gesamt.ergebnis) {
+      const ab = gesamt.ergebnis.abgleich, ohne = ab && ab.ohneEinzel ? ab.ohneEinzel : [];
+      zeile(6); doc.text(`Gesamtscan: ${gesamt.ergebnis.anzahlRaeume || 0} Räume, zusammen ${epAmDokDe(gesamt.ergebnis.flaeche_m2)} m²` + (gesamt.ergebnis.hoehe_m ? `, lichte Höhe ${epAmDokDe(gesamt.ergebnis.hoehe_m)} m` : ""), sp[0], y); y += 5.2;
+      if (ohne.length) { zeile(6); doc.setTextColor(150, 90, 0); doc.text(`${ohne.length} Raum/Räume des Gesamtscans ohne Einzelscan (${ohne.map((r) => epAmDokDe(r.flaeche)).join(" / ")} m²) – nicht in der Wohnflächenberechnung enthalten.`, sp[0], y); doc.setTextColor(0); y += 5.2; }
+    }
+    y += 6;
+  }
+  const n = doc.getNumberOfPages(); for (let i = 1; i <= n; i++) { doc.setPage(i); doc.setFontSize(8); doc.setTextColor(120); doc.text(`Anlage Abgleich · Seite ${i} von ${n}`, R, 290, { align: "right" }); doc.setTextColor(0); }
+  return doc;
+}
+async function epAmDokument(zuordnungen, opt) {
+  const o = opt || {};
+  if (typeof epGwScan !== "function") return { fehler: "Wohnflächen-Stufe (126) fehlt." };
+  if (typeof WF === "undefined" || !WF || typeof WF.pdf !== "function" || typeof WF.ausScan !== "function") return { fehler: "Wohnflächenrechner nicht geladen." };
+  const jsPDF = window.jspdf && window.jspdf.jsPDF; if (!jsPDF) return { fehler: "jsPDF nicht geladen." };
+  const PDFLib = window.PDFLib; if (!PDFLib) return { fehler: "pdf-lib nicht geladen." };
+  const raeume = epAmDokRaeume(zuordnungen, o.geschoss || null);
+  if (!raeume.length) return { fehler: o.geschoss ? `Geschoss ${o.geschoss}: noch kein ausgewerteter Einzelraum.` : "Noch kein ausgewerteter Einzelraum." };
+  const imm = o.immobilie || null, objektName = (imm && (imm.bezeichnung || imm.titel)) || "Objekt";
+  const titel = objektName + (o.geschoss ? " – " + o.geschoss : " – alle Geschosse");
+  const scan = epGwScan(raeume, titel);
+  scan.quelle = "grundriss-zeichner"; scan.app = "ImmoOffice · Aufmaß"; scan.messung = { methode: "Raumflächen aus Einzelscans (LiDAR-Punktwolke je Raum, lichte Maße, § 3 Abs. 1 WoFlV), Anrechnung nach § 4 WoFlV; Gesamtscan der Etage als Gegenprobe (Anlage)", herkunft: "punktwolke" };
+  let dok = WF.neuDok({ bearbeiter: o.bearbeiter || window._currentUserName || "" });
+  if (imm) { dok.titel = imm.bezeichnung || imm.titel || dok.titel || ""; dok.adresse = imm.adresse || dok.adresse || ""; } else if (!dok.titel) dok.titel = titel;
+  dok = WF.ausScan(scan, dok, typeof EPScan !== "undefined" ? EPScan : window.EPScan);
+  const erg = typeof WF.ergebnis === "function" ? WF.ergebnis(dok) : null;
+  const wfBytes = WF.pdf(dok, erg, jsPDF, { ort: o.ort || "Musterstadt" }).output("arraybuffer");
+  const geschosse = o.geschoss ? [o.geschoss] : [...new Set((zuordnungen || []).map((z) => z.geschoss))].sort((a, b) => (typeof IMMO_AM_GESCHOSSE !== "undefined" ? IMMO_AM_GESCHOSSE.indexOf(a) - IMMO_AM_GESCHOSSE.indexOf(b) : 0) || a.localeCompare(b, "de"));
+  const anlageBytes = epAmDokAnlage(jsPDF, zuordnungen || [], geschosse, titel).output("arraybuffer");
+  const aus = await PDFLib.PDFDocument.load(wfBytes), anlage = await PDFLib.PDFDocument.load(anlageBytes);
+  const seiten = await aus.copyPages(anlage, anlage.getPageIndices()); seiten.forEach((p) => aus.addPage(p));
+  aus.setTitle(titel + " – Wohnflächenberechnung aus dem Aufmaß"); aus.setSubject("Wohnflächenberechnung nach WoFlV aus Einzelscans, Abgleich mit dem Gesamtscan als Anlage");
+  const bytes = await aus.save();
+  const name = (titel + "_Wohnflaeche_Aufmass").replace(/[^\wäöüÄÖÜß.-]+/g, "_").slice(0, 80) + ".pdf";
+  if (!o.nurBytes) { const url = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" })); const a = document.createElement("a"); a.href = url; a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 15000); }
+  const summe = raeume.reduce((s, r) => { if (r.art === "zubehoer") return s; const z = r.zonen, f = r.art === "balkon" ? 0.25 : r.art === "wintergarten" ? 0.5 : 1; return s + f * (z ? Math.max(0, r.m2 - z.halb - z.keine) + 0.5 * z.halb : r.m2); }, 0);
+  return { ok: true, name, seitenWohnflaeche: aus.getPageCount() - seiten.length, seitenAnlage: seiten.length, bytes: o.nurBytes ? bytes : null, groesse: bytes.length, raeume: raeume.length, wohnflaecheM2: Math.round(summe * 100) / 100,
+    text: `Dokument „${name}“: ${aus.getPageCount() - seiten.length} Seite(n) Wohnflächenberechnung + ${seiten.length} Seite(n) Anlage Abgleich, ${raeume.length} ${raeume.length === 1 ? "Raum" : "Räume"}, Wohnfläche ${epAmDokDe(summe)} m²` };
+}
+window.epAmDokument = epAmDokument; window.epAmDokRaeume = epAmDokRaeume;
+// ---- Aufmaß: Geschosse, Gesamtscan, Einzelräume, Abgleich (02.10.2026) ----
+// „Wir brauchen einmal einen Gesamtscan der Etage … und dann die Einzelscans je Raum, benennbar, mit automatischem Abgleich.“
+// Ordnet die Punktwolken eines Objekts (Objektdateien doktyp „Punktwolke“ und World-Ablage) nach Geschoss, Art (Gesamtscan /
+// Einzelraum) und Raumname (Tabelle aufmass_scan), wertet sie aus (Wände, Räume, Fläche, Höhe) und gleicht je Geschoss die
+// Einzelräume gegen den Gesamtscan ab (aufmass-abgleich.js). „Im Editor öffnen“ lädt die Wolke in den Punktwolken-Dialog.
+const IMMO_AM_GESCHOSSE = ["Keller", "EG", "1. OG", "2. OG", "3. OG", "DG", "Spitzboden"];
+const epAmDe = (x, n) => (x == null || isNaN(x)) ? "–" : Number(x).toLocaleString("de-DE", { minimumFractionDigits: n == null ? 2 : n, maximumFractionDigits: n == null ? 2 : n });
+const epAmMB = (b) => (!b ? "" : b >= 1048576 ? (b / 1048576).toFixed(1).replace(".", ",") + " MB" : Math.max(1, Math.round(b / 1024)) + " KB");
+const epAmSchluessel = (quelle, id) => quelle + ":" + id;
+
+// Kandidaten: alle Punktwolken des Objekts (Objektdateien, Ablage am Objekt, Ablage ohne Objekt) mit vorhandener Zuordnung
+async function epAmKandidaten(immobilieId) {
+  const sb = window._sb;
+  const [od, abO, abF, zu] = await Promise.all([
+    sb.from("immobilie_datei").select("id, name, titel, storage_path, size_bytes, created_at").eq("immobilie_id", immobilieId).eq("doktyp", "Punktwolke").not("storage_path", "is", null).order("created_at", { ascending: false }).limit(50),
+    sb.from("scan_ablage").select("id, titel, dateiname, storage_path, size_bytes, punkte, info, immobilie_id, created_at").eq("art", "punktwolke").eq("immobilie_id", immobilieId).order("created_at", { ascending: false }).limit(60),
+    sb.from("scan_ablage").select("id, titel, dateiname, storage_path, size_bytes, punkte, info, immobilie_id, created_at").eq("art", "punktwolke").is("immobilie_id", null).order("created_at", { ascending: false }).limit(60),
+    sb.from("aufmass_scan").select("*").eq("immobilie_id", immobilieId),
+  ]);
+  for (const r of [od, abO, abF, zu]) if (r.error) throw r.error;
+  const zuordnungen = zu.data || [];
+  const zuFuer = (quelle, id) => zuordnungen.find((z) => z.quelle === quelle && String(quelle === "ablage" ? z.scan_ablage_id : z.datei_id) === String(id)) || null;
+  const liste = [];
+  (od.data || []).forEach((d) => liste.push({ schluessel: epAmSchluessel("objekt", d.id), quelle: "objekt", id: d.id, titel: d.titel || d.name, dateiname: d.name || "Punktwolke.ply", bucket: "immobilie-dateien", pfad: d.storage_path, groesse: d.size_bytes, punkte: null, datum: d.created_at, fremd: false, zuordnung: zuFuer("objekt", d.id) }));
+  (abO.data || []).concat(abF.data || []).forEach((e) => liste.push({ schluessel: epAmSchluessel("ablage", e.id), quelle: "ablage", id: e.id, titel: e.titel || e.dateiname, dateiname: e.dateiname || "Punktwolke.ply", bucket: "scan-dateien", pfad: e.storage_path, groesse: e.size_bytes, punkte: e.punkte, info: e.info, datum: e.created_at, fremd: e.immobilie_id == null, zuordnung: zuFuer("ablage", e.id) }));
+  // Zuordnungen, deren Datei nicht mehr in den Listen auftaucht (gelöscht, Limit) – trotzdem zeigen
+  zuordnungen.forEach((z) => { if (!liste.some((k) => k.zuordnung && k.zuordnung.id === z.id)) liste.push({ schluessel: epAmSchluessel(z.quelle, z.quelle === "ablage" ? z.scan_ablage_id : z.datei_id), quelle: z.quelle, id: z.quelle === "ablage" ? z.scan_ablage_id : z.datei_id, titel: z.titel || "Punktwolke", dateiname: "Punktwolke.ply", bucket: null, pfad: null, verwaist: true, zuordnung: z }); });
+  return { kandidaten: liste, zuordnungen };
+}
+
+// Zuordnung speichern (anlegen oder ändern); Ablage-Eintrag ohne Objekt wird dem Objekt zugeordnet
+async function epAmZuordnen(immobilieId, k, w) {
+  const sb = window._sb, umfang = w.umfang === "gesamt" ? "gesamt" : "einzel";
+  const zeile = { immobilie_id: immobilieId, geschoss: (w.geschoss || "EG").trim() || "EG", raum: umfang === "gesamt" ? null : ((w.raum || "").trim() || null), umfang, titel: k.titel || null };
+  if (umfang === "einzel" && !zeile.raum) throw new Error("Bitte den Raum benennen (z. B. Küche, Schlafen 1).");
+  if (k.zuordnung) {
+    const { data, error } = await sb.from("aufmass_scan").update(zeile).eq("id", k.zuordnung.id).select("*").single(); if (error) throw error; return data;
+  }
+  const { data: nutzer } = await sb.auth.getUser(); const uid = nutzer && nutzer.user && nutzer.user.id;
+  Object.assign(zeile, { quelle: k.quelle, scan_ablage_id: k.quelle === "ablage" ? k.id : null, datei_id: k.quelle === "objekt" ? k.id : null, ersteller_id: uid || null });
+  const { data, error } = await sb.from("aufmass_scan").insert(zeile).select("*").single(); if (error) throw error;
+  if (k.quelle === "ablage" && k.fremd) { try { await sb.from("scan_ablage").update({ immobilie_id: immobilieId }).eq("id", k.id); } catch (e) { /* Zuordnung steht trotzdem */ } }
+  return data;
+}
+async function epAmLoesen(zuordnung) { const { error } = await window._sb.from("aufmass_scan").delete().eq("id", zuordnung.id); if (error) throw error; }
+
+// Auswerten: Wolke laden, Wände/Räume erkennen, Ergebnis am Eintrag speichern. Einzelraum: größter geschlossener Raum = der Raum.
+async function epAmAuswerten(k, fortschritt) {
+  if (!k.zuordnung) throw new Error("Erst zuordnen (Geschoss, Art, Raum).");
+  if (!k.bucket || !k.pfad) throw new Error("Die Datei zu dieser Zuordnung ist nicht mehr da.");
+  const blob = await epPwHerunterladen(k.bucket, k.pfad, fortschritt);
+  const w = epPwLesen(await blob.arrayBuffer(), k.dateiname); w.hoehen = epPwHoehen(w);
+  const erg = epPwAuswerten(w, { hoehen: w.hoehen });
+  const raeume = (erg.raeume || []).map((r) => ({ flaeche: r.flaeche, polygon: r.polygon, zonen: r.zonen || null })).sort((a, b) => b.flaeche - a.flaeche);
+  const einzel = k.zuordnung.umfang === "einzel", groesster = raeume[0] || null;
+  const ergebnis = { ausgewertet_am: new Date().toISOString(), punkte: w.n, hoehe_m: erg.hoehen.hoehe || null, schraeg: !!erg.hoehen.schraeg, dreh_grad: Math.round((erg.dreh || 0) * 180 / Math.PI * 10) / 10, waende: erg.waende.length,
+    raeume, anzahlRaeume: raeume.length, flaeche_m2: einzel ? (groesster ? groesster.flaeche : null) : Math.round(raeume.reduce((s, r) => s + r.flaeche, 0) * 100) / 100,
+    umriss: einzel && groesster ? groesster.polygon : null, moebelfronten: erg.abgleich ? erg.abgleich.moebel : 0, hinweis: erg.hinweis || "",
+    abgleich: k.zuordnung.ergebnis && k.zuordnung.ergebnis.abgleich ? null : null };
+  if (einzel && !groesster) ergebnis.hinweis = "Kein geschlossener Raum erkannt – Wände im Editor an den Schnittkanten setzen, dann Fläche von Hand übernehmen. " + ergebnis.hinweis;
+  const { data, error } = await window._sb.from("aufmass_scan").update({ ergebnis }).eq("id", k.zuordnung.id).select("*").single(); if (error) throw error;
+  return data || Object.assign({}, k.zuordnung, { ergebnis });
+}
+
+// Abgleich je Geschoss: Einzelräume (mit Umriss) gegen die Räume des Gesamtscans; Ergebnis an den Einzel-Einträgen speichern
+async function epAmAbgleich(zuordnungen, geschoss) {
+  const im = zuordnungen.filter((z) => z.geschoss === geschoss);
+  const gesamt = im.find((z) => z.umfang === "gesamt" && z.ergebnis && z.ergebnis.raeume && z.ergebnis.raeume.length);
+  if (!gesamt) throw new Error(`Geschoss ${geschoss}: erst den Gesamtscan auswerten (mit mindestens einem geschlossenen Raum).`);
+  const einzel = im.filter((z) => z.umfang === "einzel" && z.ergebnis && z.ergebnis.umriss);
+  if (!einzel.length) throw new Error(`Geschoss ${geschoss}: erst mindestens einen Einzelraum auswerten.`);
+  const g = epAbGeschoss(einzel.map((z) => ({ id: z.id, name: z.raum, umriss: z.ergebnis.umriss, flaeche: z.ergebnis.flaeche_m2 })), gesamt.ergebnis.raeume);
+  for (const zl of g.zeilen) {
+    const z = einzel.find((x) => x.id === zl.scan.id); if (!z) continue;
+    const ab = zl.treffer ? Object.assign({}, zl.treffer, { gesamtId: gesamt.id, am: new Date().toISOString() }) : { fehlt: true, hinweis: zl.hinweis, gesamtId: gesamt.id, am: new Date().toISOString() };
+    const ergebnis = Object.assign({}, z.ergebnis, { abgleich: ab });
+    const { error } = await window._sb.from("aufmass_scan").update({ ergebnis }).eq("id", z.id); if (error) throw error;
+    z.ergebnis = ergebnis;
+  }
+  const zusammen = { geschoss, am: new Date().toISOString(), summeEinzel: g.summeEinzel, summeGesamt: g.summeGesamt, ohneEinzel: g.ohneEinzel.map((i) => ({ raum: i, flaeche: gesamt.ergebnis.raeume[i].flaeche })), einzel: g.zeilen.length };
+  const ergebnisG = Object.assign({}, gesamt.ergebnis, { abgleich: zusammen });
+  const { error: e2 } = await window._sb.from("aufmass_scan").update({ ergebnis: ergebnisG }).eq("id", gesamt.id); if (e2) throw e2;
+  gesamt.ergebnis = ergebnisG;
+  return zusammen;
+}
+
+// Einzelräume ins Blatt des Gesamtscans zeichnen: jeder eingepasste Umriss (Abgleich: Drehung, Verschiebung) wird als Fläche mit
+// Raumnamen auf das Blatt gelegt, auf dem der Gesamtscan als Hintergrund liegt – so sieht man, wo Gesamtscan und Einzelscan
+// auseinanderlaufen, und die Räume lassen sich direkt weiterverwenden (Wohnfläche, Schrägen, Dokument).
+function epAmRaeumeInsBlatt(fenster, zuordnungen, geschoss) {
+  const ge = fenster && fenster.GrundrissEditor, st = ge && ge.st;
+  if (!st || !st.wolke || !st.wolke.abbildung) return { fehler: "Erst den Gesamtscan dieses Geschosses im Editor öffnen und übernehmen („Im Editor öffnen“ am Gesamtscan) – die Räume werden auf dieses Blatt gelegt." };
+  const abb = st.wolke.abbildung, R = abb.R, im = (zuordnungen || []).filter((z) => z.geschoss === geschoss);
+  const gesamt = im.find((z) => z.umfang === "gesamt" && z.ergebnis);
+  const einzel = im.filter((z) => z.umfang === "einzel" && z.ergebnis && z.ergebnis.umriss && z.ergebnis.abgleich && !z.ergebnis.abgleich.fehlt);
+  if (!einzel.length) return { fehler: `Geschoss ${geschoss}: keine Einzelräume mit Abgleich – erst „Abgleich rechnen“.` };
+  const letzte = window.__epPwLetzte, fremd = letzte && gesamt && letzte.name && gesamt.titel && !String(letzte.name).includes(String(gesamt.titel).replace(/\s*\(.*$/, "").slice(0, 12));
+  st.elemente = (st.elemente || []).filter((e) => e.herkunft !== "aufmass-einzel");
+  let n = 0;
+  for (const z of einzel) {
+    const a = z.ergebnis.abgleich, poly = epAbTransform(z.ergebnis.umriss, Math.round((a.dreh || 0) / 90), a.dx || 0, a.dy || 0);
+    const punkte = poly.map(([X, Y]) => ({ x: Math.round((abb.ax + X * R) * 100) / 100, y: Math.round((abb.by - Y * R) * 100) / 100 }));
+    const el = Object.assign(ge.GE && ge.GE.NEU && ge.GE.NEU.flaeche ? ge.GE.NEU.flaeche() : { typ: "flaeche", farbe: "#263159", groesse: 8, text: "", fuellen: true }, { id: st.naechsteId++, punkte, text: z.raum || "Raum", farbe: a.bewertung === "ok" ? "#1f6b3a" : "#9a6b00", fuellen: false, herkunft: "aufmass-einzel" });
+    st.elemente.push(el); n++;
+  }
+  try { ge.commit(); } catch (e) { /* ohne Verlauf weiter */ }
+  ge.render();
+  return { ok: true, raeume: n, hinweis: fremd ? "Achtung: Im Editor liegt eine andere Wolke als der Gesamtscan dieses Geschosses – die Lage der Räume passt dann nicht." : "", text: `${n} Einzelraum/-räume aus ${geschoss} ins Blatt gelegt (grün = Abgleich ok, gelb = prüfen).` + (fremd ? " Achtung: Im Editor liegt eine andere Wolke als der Gesamtscan." : "") };
+}
+
+// Im Punktwolken-Dialog öffnen (Stufe 124 holt die Vorwahl beim Öffnen ab)
+function epAmImEditorOeffnen(k) {
+  window.__epPwVorwahl = { bucket: k.bucket, pfad: k.pfad, name: k.dateiname, info: k.info || null, titel: k.titel };
+  window.dispatchEvent(new CustomEvent("ep-pw-oeffnen"));
+}
+
+function EpAufmassDialog({ immobilie, onStatus, onSchliessen, editorRef }) {
+  const h = React.createElement;
+  const [daten, setDaten] = React.useState(null);
+  const [fehler, setFehler] = React.useState("");
+  const [lade, setLade] = React.useState("");
+  const [bearbeitung, setBearbeitung] = React.useState({});   // schluessel → { geschoss, umfang, raum }
+  const laden = React.useCallback(() => {
+    if (!immobilie || !immobilie.id) return;
+    setFehler("");
+    epAmKandidaten(immobilie.id).then((d) => {
+      setDaten(d);
+      setBearbeitung((alt) => { const b = Object.assign({}, alt); d.kandidaten.forEach((k) => { if (!b[k.schluessel]) b[k.schluessel] = k.zuordnung ? { geschoss: k.zuordnung.geschoss, umfang: k.zuordnung.umfang, raum: k.zuordnung.raum || "" } : { geschoss: "EG", umfang: "gesamt", raum: "" }; }); return b; });
+    }, (e) => { setDaten({ kandidaten: [], zuordnungen: [] }); setFehler("Aufmaß konnte nicht geladen werden: " + (e.message || e)); });
+  }, [immobilie && immobilie.id]);
+  React.useEffect(() => { laden(); }, [laden]);
+  const feld = (k, name, wert) => setBearbeitung((b) => Object.assign({}, b, { [k.schluessel]: Object.assign({}, b[k.schluessel], { [name]: wert }) }));
+  const speichern = async (k) => { setFehler(""); try { await epAmZuordnen(immobilie.id, k, bearbeitung[k.schluessel] || {}); laden(); onStatus && onStatus({ art: "ok", text: `„${k.titel}“ zugeordnet.` }); } catch (e) { setFehler(e.message || String(e)); } };
+  const loesen = async (k) => { if (!window.confirm(`Zuordnung von „${k.titel}“ aufheben? Auswertung und Abgleich gehen verloren.`)) return; try { await epAmLoesen(k.zuordnung); laden(); } catch (e) { setFehler(e.message || String(e)); } };
+  const auswerten = async (k) => {
+    setFehler(""); setLade(`„${k.titel}“ wird ausgewertet …`);
+    try { await epAmAuswerten(k, (g, t) => setLade(`„${k.titel}“ wird geladen … ${t ? Math.round(g / t * 100) + " %" : epAmMB(g)}`)); setLade(""); laden(); }
+    catch (e) { setLade(""); setFehler(`Auswertung „${k.titel}“: ` + (e.message || e)); }
+  };
+  const abgleich = async (geschoss) => { setFehler(""); setLade(`Abgleich ${geschoss} …`); try { await epAmAbgleich(daten.zuordnungen, geschoss); setLade(""); laden(); } catch (e) { setLade(""); setFehler(e.message || String(e)); } };
+  const oeffnen = (k) => { if (!k.bucket) { setFehler("Die Datei zu dieser Zuordnung ist nicht mehr da."); return; } epAmImEditorOeffnen(k); onSchliessen(); };
+  const dokument = async (geschoss) => { setFehler(""); setLade(geschoss ? `Dokument ${geschoss} wird erzeugt …` : "Dokument für das ganze Objekt wird erzeugt …");
+    try { const r = await epAmDokument(daten.zuordnungen, { geschoss: geschoss || null, immobilie }); setLade(""); if (!r || !r.ok) setFehler(r && r.fehler || "Dokument konnte nicht erzeugt werden."); else onStatus && onStatus({ art: "ok", text: r.text }); }
+    catch (e) { setLade(""); setFehler("Dokument: " + (e.message || e)); } };
+  const insBlatt = (g) => { setFehler(""); const ifr = editorRef && editorRef.current, fenster = ifr && ifr.contentWindow; if (!fenster) { setFehler("Der Grundriss-Editor ist nicht geladen."); return; }
+    const r = epAmRaeumeInsBlatt(fenster, daten.zuordnungen, g); if (!r.ok) { setFehler(r.fehler); return; } onStatus && onStatus({ art: "ok", text: r.text }); onSchliessen(); };
+  const hatAbgleich = (g) => (daten ? daten.zuordnungen : []).some((z) => z.geschoss === g && z.umfang === "einzel" && z.ergebnis && z.ergebnis.abgleich && !z.ergebnis.abgleich.fehlt);
+  const hatEinzel = (g) => zuordnungenFuerDok(g).length > 0;
+  const zuordnungenFuerDok = (g) => (daten ? daten.zuordnungen : []).filter((z) => z.umfang === "einzel" && z.ergebnis && z.ergebnis.flaeche_m2 > 0 && (!g || z.geschoss === g));
+  const st = { eingabe: { fontFamily: FONT, fontSize: 12, padding: "4px 6px", border: "1px solid #c9cfdd", background: "#fff" }, knopf: { background: "transparent", color: CI.blau, border: `1px solid ${CI.blau}`, padding: "4px 9px", fontSize: 12, cursor: "pointer", fontFamily: FONT, whiteSpace: "nowrap" }, klein: { fontSize: 11, color: CI.muted } };
+  const knopf = (text, props) => h("button", Object.assign({ type: "button", style: st.knopf }, props), text);
+  if (!immobilie || !immobilie.id) return h("div", { "data-ep-am-dialog": "ohne-objekt", onClick: onSchliessen, style: { position: "fixed", inset: 0, background: "rgba(38,49,89,0.55)", zIndex: 9300, display: "flex", alignItems: "center", justifyContent: "center", padding: 12 } },
+    h("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", maxWidth: 480, padding: 18, fontFamily: FONT, fontSize: 13, lineHeight: 1.5 } }, "Das Aufmaß gehört zu einem Objekt. Bitte das Grundriss-Werkzeug mit einem Objekt öffnen (Objekt → Werkzeuge → Grundriss).", h("div", { style: { marginTop: 10, textAlign: "right" } }, knopf("Schließen", { onClick: onSchliessen }))));
+  const kandidaten = daten ? daten.kandidaten : [], zuordnungen = daten ? daten.zuordnungen : [];
+  const geschosse = [...new Set(zuordnungen.map((z) => z.geschoss))].sort((a, b) => IMMO_AM_GESCHOSSE.indexOf(a) - IMMO_AM_GESCHOSSE.indexOf(b) || a.localeCompare(b, "de"));
+  const kandidatFuer = (z) => kandidaten.find((k) => k.zuordnung && k.zuordnung.id === z.id);
+  const ergText = (z) => { const e = z.ergebnis; if (!e) return "noch nicht ausgewertet"; return (z.umfang === "gesamt" ? `${e.anzahlRaeume} Räume, zusammen ${epAmDe(e.flaeche_m2)} m²` : (e.flaeche_m2 != null ? `${epAmDe(e.flaeche_m2)} m²` : "kein Raum erkannt")) + (e.hoehe_m ? ` · Höhe ${epAmDe(e.hoehe_m)} m` : "") + (e.schraeg ? " · Dachschrägen" : "") + (e.moebelfronten ? ` · ${e.moebelfronten} Möbelfronten erkannt` : ""); };
+  const zeileZuordnung = (k) => {
+    const b = bearbeitung[k.schluessel] || { geschoss: "EG", umfang: "gesamt", raum: "" };
+    return h("div", { key: k.schluessel, "data-ep-am-kandidat": k.schluessel, style: { display: "grid", gridTemplateColumns: "minmax(140px, 1.4fr) 110px 120px minmax(100px, 1fr) auto", gap: 6, alignItems: "center", padding: "6px 0", borderBottom: "1px solid #eef0f5" } },
+      h("div", null, h("div", { style: { fontSize: 12.5, fontWeight: 600, color: CI.blau } }, (k.quelle === "ablage" ? "☁ " : "📎 ") + k.titel), h("div", st.klein, [k.datum ? new Date(k.datum).toLocaleDateString("de-DE") : "", epAmMB(k.groesse), k.punkte ? Number(k.punkte).toLocaleString("de-DE") + " Punkte" : "", k.quelle === "ablage" ? (k.fremd ? "Ablage ohne Objekt" : "Ablage am Objekt") : "Objektdatei", k.verwaist ? "Datei fehlt" : ""].filter(Boolean).join(" · "))),
+      h("input", { list: "ep-am-geschosse", "data-ep-am-geschoss": "", value: b.geschoss, placeholder: "Geschoss", onChange: (e) => feld(k, "geschoss", e.target.value), style: st.eingabe }),
+      h("select", { "data-ep-am-umfang": "", value: b.umfang, onChange: (e) => feld(k, "umfang", e.target.value), style: st.eingabe }, h("option", { value: "gesamt" }, "Gesamtscan"), h("option", { value: "einzel" }, "Einzelraum")),
+      h("input", { "data-ep-am-raum": "", value: b.raum, disabled: b.umfang === "gesamt", placeholder: b.umfang === "gesamt" ? "– ganzes Geschoss –" : "Raumname", onChange: (e) => feld(k, "raum", e.target.value), style: st.eingabe }),
+      h("div", { style: { display: "flex", gap: 4 } }, knopf(k.zuordnung ? "Ändern" : "Zuordnen", { "data-ep-am-speichern": "", onClick: () => speichern(k) }), k.zuordnung ? knopf("✕", { "data-ep-am-loesen": "", title: "Zuordnung aufheben", onClick: () => loesen(k) }) : null));
+  };
+  const abgleichZeile = (z) => { const a = z.ergebnis && z.ergebnis.abgleich; if (!a) return h("span", st.klein, "–"); if (a.fehlt) return h("span", { style: { color: "#c83c3c", fontSize: 12 } }, a.hinweis); const farbe = a.bewertung === "ok" ? "#1f6b3a" : a.bewertung === "pruefen" ? "#9a6b00" : "#c83c3c"; return h("span", { "data-ep-am-bewertung": a.bewertung, style: { color: farbe, fontSize: 12 } }, `Gesamtscan ${epAmDe(a.flaecheGesamt)} m² · ${a.abweichungM2 >= 0 ? "+" : "−"}${epAmDe(Math.abs(a.abweichungM2))} m² (${epAmDe(a.abweichungProzent, 1)} %) · ${a.hinweis}`); };
+  const geschossBlock = (g) => {
+    const im = zuordnungen.filter((z) => z.geschoss === g), gesamt = im.filter((z) => z.umfang === "gesamt"), einzel = im.filter((z) => z.umfang === "einzel").sort((a, b) => (a.raum || "").localeCompare(b.raum || "", "de"));
+    const ab = gesamt[0] && gesamt[0].ergebnis && gesamt[0].ergebnis.abgleich;
+    const zeile = (z, einzelraum) => { const k = kandidatFuer(z); return h("div", { key: z.id, "data-ep-am-zeile": z.id, "data-ep-am-umfang-zeile": z.umfang, style: { display: "grid", gridTemplateColumns: "minmax(120px, 1fr) minmax(160px, 1.3fr) minmax(160px, 1.6fr) auto", gap: 6, alignItems: "center", padding: "5px 0", borderBottom: "1px solid #eef0f5", fontSize: 12.5 } },
+      h("div", { style: { fontWeight: 600 } }, einzelraum ? z.raum : "Gesamtscan", h("div", st.klein, z.titel || "")),
+      h("div", { "data-ep-am-ergebnis": z.ergebnis ? JSON.stringify({ f: z.ergebnis.flaeche_m2, n: z.ergebnis.anzahlRaeume, h: z.ergebnis.hoehe_m }) : "" }, ergText(z)),
+      h("div", null, einzelraum ? abgleichZeile(z) : (ab ? h("span", { "data-ep-am-zusammen": "", style: st.klein }, `Abgleich: ${ab.einzel} Einzelräume (${epAmDe(ab.summeEinzel)} m²) gegen ${epAmDe(ab.summeGesamt)} m² gesamt` + (ab.ohneEinzel.length ? ` · ${ab.ohneEinzel.length} Räume ohne Einzelscan (${ab.ohneEinzel.map((r) => epAmDe(r.flaeche)).join(" / ")} m²)` : " · alle Räume haben einen Einzelscan")) : h("span", st.klein, "noch kein Abgleich"))),
+      h("div", { style: { display: "flex", gap: 4 } }, k ? knopf(z.ergebnis ? "Neu auswerten" : "Auswerten", { "data-ep-am-auswerten": z.id, onClick: () => auswerten(k) }) : null, k ? knopf("Im Editor öffnen", { "data-ep-am-oeffnen": z.id, onClick: () => oeffnen(k) }) : null)); };
+    return h("div", { key: g, "data-ep-am-geschoss-block": g, style: { marginTop: 14 } },
+      h("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 4 } }, h("div", { style: { fontSize: 14, fontWeight: 700, color: CI.blau } }, g),
+        h("span", st.klein, `${gesamt.length ? "Gesamtscan vorhanden" : "kein Gesamtscan"} · ${einzel.length} Einzelräume`),
+        gesamt.length && einzel.length ? knopf("Abgleich rechnen", { "data-ep-am-abgleich": g, onClick: () => abgleich(g) }) : null,
+        hatAbgleich(g) ? knopf("Einzelräume ins Blatt", { "data-ep-am-ins-blatt": g, title: "Die eingepassten Räume der Einzelscans als Flächen auf das Blatt mit dem Gesamtscan legen", onClick: () => insBlatt(g) }) : null,
+        hatEinzel(g) ? knopf("Dokument (Wohnfläche + Abgleich)", { "data-ep-am-dokument": g, onClick: () => dokument(g) }) : null),
+      gesamt.length > 1 ? h("div", { style: { color: "#9a6b00", fontSize: 12 } }, "Mehrere Gesamtscans in diesem Geschoss – der erste ausgewertete wird für den Abgleich genommen.") : null,
+      gesamt.map((z) => zeile(z, false)), einzel.map((z) => zeile(z, true)));
+  };
+  return h("div", { "data-ep-am-dialog": daten ? kandidaten.length : -1, onClick: onSchliessen, style: { position: "fixed", inset: 0, background: "rgba(38,49,89,0.55)", zIndex: 9300, display: "flex", alignItems: "center", justifyContent: "center", padding: 12 } },
+    h("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", width: "100%", maxWidth: 980, maxHeight: "94vh", overflowY: "auto", padding: 18, fontFamily: FONT, boxSizing: "border-box" } },
+      h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 } },
+        h("div", { style: { fontSize: 16, fontWeight: 700, color: CI.blau } }, "📐 Aufmaß · " + (immobilie.bezeichnung || immobilie.adresse || "Objekt")),
+        h("button", { type: "button", onClick: onSchliessen, style: { background: "transparent", border: "none", fontSize: 20, color: CI.muted, cursor: "pointer" } }, "✕")),
+      h("div", { style: { fontSize: 12, color: CI.muted, lineHeight: 1.5, marginBottom: 10 } },
+        "Je Geschoss ein Gesamtscan (die ganze Etage in einer Punktwolke) und je Raum ein Einzelscan. Punktwolken zuordnen, auswerten, dann je Geschoss den Abgleich rechnen: Fläche aus dem Einzelscan gegen den passenden Raum im Gesamtscan (Umriss wird eingepasst, Abweichung über 3 % wird markiert). „Im Editor öffnen“ lädt die Wolke ins Grundriss-Werkzeug (Schnittkanten, Schnitt, Wandstärke, Wohnfläche); „Einzelräume ins Blatt“ legt danach die eingepassten Räume der Einzelscans auf dieses Blatt."),
+      h("datalist", { id: "ep-am-geschosse" }, IMMO_AM_GESCHOSSE.map((g) => h("option", { key: g, value: g }))),
+      window.EPApp && typeof window.EPApp.aufmassOeffnen === "function" ? h("div", { style: { marginBottom: 10 } },
+        knopf("📱 In der App aufnehmen (Gesamtscan, Räume)", { "data-ep-am-app": "", onClick: () => { try { window.EPApp.aufmassOeffnen({ objekt: { id: immobilie.id, bezeichnung: immobilie.bezeichnung || "", adresse: immobilie.adresse || "" } }); } catch (e) { setFehler("App-Aufnahme konnte nicht geöffnet werden: " + (e.message || e)); } } }),
+        h("span", { style: Object.assign({}, st.klein, { marginLeft: 8 }) }, "Geschoss wählen, Gesamtscan oder Raum aufnehmen – beim Hochladen wird die Zuordnung gleich eingetragen.")) : null,
+      lade ? h("div", { "data-ep-am-lade": "", style: { fontSize: 12, color: CI.muted, marginBottom: 8 } }, "⏳ " + lade) : null,
+      fehler ? h("div", { "data-ep-am-fehler": "", style: { background: "#fde6e6", color: "#c83c3c", padding: "8px 10px", fontSize: 12, marginBottom: 8 } }, fehler) : null,
+      daten === null ? h("div", { style: { fontSize: 12, color: CI.muted } }, "⏳ Punktwolken und Zuordnungen werden geladen …")
+        : h(React.Fragment, null,
+          h("div", { style: { fontSize: 13, fontWeight: 700, color: CI.blau, marginTop: 4 } }, "Punktwolken zuordnen"),
+          kandidaten.length ? kandidaten.map(zeileZuordnung) : h("div", { style: { fontSize: 12, color: CI.muted, padding: "6px 0" } }, "Keine Punktwolke am Objekt und keine in der World-Ablage. In der App: Punktwolke aufnehmen → „Am Objekt ablegen“ oder „In die World hochladen“."),
+          geschosse.length ? geschosse.map(geschossBlock) : h("div", { style: { fontSize: 12, color: CI.muted, marginTop: 10 } }, "Noch keine Zuordnung – oben Geschoss, Art und Raum wählen und „Zuordnen“ drücken.")),
+      h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14, gap: 8 } },
+        daten && hatEinzel(null) ? knopf("Dokument für das ganze Objekt (alle Geschosse)", { "data-ep-am-dokument-objekt": "", onClick: () => dokument(null) }) : h("span"),
+        knopf("Schließen", { onClick: onSchliessen }))));
+}
+function EpAufmassKnopf({ immobilie, onStatus, gesperrt, editorRef }) {
+  const [offen, setOffen] = React.useState(false);
+  return React.createElement(React.Fragment, null,
+    React.createElement(WzButton, { klein: !0, variante: "hell", disabled: gesperrt, onClick: () => setOffen(true), title: "Aufmaß: Gesamtscan je Geschoss, Einzelscans je Raum, Abgleich" }, "📐 Aufmaß"),
+    offen ? React.createElement(EpAufmassDialog, { immobilie, onStatus, editorRef, onSchliessen: () => setOffen(false) }) : null);
+}
+window.epAmRaeumeInsBlatt = epAmRaeumeInsBlatt; window.epAmKandidaten = epAmKandidaten; window.epAmZuordnen = epAmZuordnen; window.epAmAuswerten = epAmAuswerten; window.epAmAbgleich = epAmAbgleich; window.EpAufmassKnopf = EpAufmassKnopf; window.EpAufmassDialog = EpAufmassDialog;
 
 
 

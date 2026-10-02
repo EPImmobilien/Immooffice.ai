@@ -3473,3 +3473,87 @@ die Prüfung gezeigt, nicht das Lesen. Der Name war mir in
 eigentlich?" hat die Größenordnung sichtbar gemacht. Bei einem Fund, der wie
 ein Einzelfall aussieht, lohnt sich diese Frage immer.
 
+---
+
+## Abgleich mit der Vorlage: 40 neue Stufen (02.10.2026)
+
+Der Auftraggeber hat einen neuen Netlify-Export der Vorlage geliefert
+(`epworld-portal-netlify_37.zip`). Der Abgleich ergibt:
+
+| Datei | vorher | jetzt |
+|---|---|---|
+| `index.html` | 5.253.813 B | **5.829.732 B** (+576 KB) |
+| `objekt.html` | 62.717 B | 63.700 B |
+| `unterlagen.html` | — | **neu**, 11.412 B |
+| `sonnenverlauf.html`, `freigabe.html`, `sw.js`, `_redirects` | unverändert | unverändert |
+
+**268 neue Deklarationen, keine entfernte.** Der Änderungsvermerk im Kopf der
+Datei war *nicht* aktualisiert — er listet dieselben 84 Punkte wie vorher. Die
+Wahrheit stand in den `Stufe N`-Kommentaren im Quelltext: **Stufe 98 bis 150,
+davon 40 neu.**
+
+### Was dazugekommen ist, nach Umfang
+
+| Umfang | Block | Stufen |
+|---|---|---|
+| 54 Funktionen | **Punktwolke** — PLY laden, Wände erkennen, Räume aus Wandachsen, 3D-Ansicht, Schnitt, Messen | 124, 125, 130–132, 137–139, 142, 144, 147 |
+| 19 | **Aufmaß** — Feinvermessung aus der App, Abgleich mit Dokumenten | 123 |
+| 15 | **Dachschrägen** — Höhenzonen je Raum (≥2 m / 1–2 m / <1 m), Gauben | 119, 122, 145 |
+| 11 | **Grundriss-KI** — alten Plan auslesen und neu zeichnen | 118 |
+| 10 | **Wohnfläche nach WoFlV** aus dem Zeichner, Treppen | 126, 146, 148 |
+| 10 | **Unterlagen-Link** — Download-Links wie WeTransfer, eigene öffentliche Seite | 114, 117 |
+| 9 | **Distanzen** im Browser, Ersatzweg bei Overpass-Ausfall | 107 |
+| 8 | **WYSIWYG-Editor** für Freitexte | 102 |
+| 8 | **Scan-Ablage** | 125 |
+| 7 | **Privat-Details** — KI prüft Fotos, Retusche als Vorschlag | 112 |
+| 7 | **Werkzeug-Kacheln** mit Unterkacheln | 127 |
+| 6 | **Standard-Anhänge** an Mail-Vorlagen | 113 |
+| 5 | **Admin → Portale** | 120, 121 |
+| je 2–4 | Versand, Mail-Suche, Transfer, Admin-Kosten, Miete/Provision, Widerruf § 356 BGB | 98, 101, 104, 106, 108, 109, 111, 115 |
+
+`objekt.html` zeigt jetzt die Auszeichnung aus dem Reiter „Texte"
+(`**fett**`, `## Zwischenüberschrift`, `- Aufzählung`) wie das Exposé-PDF.
+
+### Der Zuschnitt der Vorlage wird nicht mehr abgezählt
+
+`scripts/oberflaeche-zerlegen.py` trug die Grenzen der 15 Stücke als **feste
+Zeilennummern**. Die Anwendung ist um 5.901 Zeilen gewachsen, und das Skript
+brach ab:
+
+> ABBRUCH: app/anwendung.js soll von `<script>`/`</script>` umschlossen sein,
+> Zeile 376 ist '`<script>`' und Zeile 15756 ist 'try { window.dispatchEvent…'
+
+Die Meldung war richtig, die Ursache harmlos. Jetzt steht dort der **Aufbau**
+statt der Zahlen: eine Folge von Abschnitten, jeder ein Skript, ein Stil oder
+HTML; die Grenzen sucht `zuschnitt()` anhand der Tags. Die Sicherung bleibt —
+stimmt die *Folge* nicht, bricht es weiter ab.
+
+Zwei Feinheiten, die der Byte-Vergleich erzwungen hat:
+
+- **Körper und Bibliotheken stoßen ohne Tag aneinander.** Geteilt wird an der
+  ersten Bibliothekszeile (`<script src=…>` oder `<link rel="stylesheet">`).
+- **Zwei Trenn-Leerzeilen** gehören zu keinem Stück. `scripts/bauen.py` kannte
+  sie längst (`LEERZEILE_NACH`); der Zerleger musste dieselbe Liste bekommen,
+  sonst war der Rückbau um genau zwei Bytes daneben.
+
+Der Nachweis steht: `src/` lässt sich **byte-genau** zur neuen Vorlage
+zurückbauen. Der nächste Export verschiebt nichts mehr.
+
+### Was die Schranken am neuen Code gefunden haben
+
+Beide Gates, die in den Tagen davor entstanden sind, haben beim ersten Lauf
+angeschlagen — und beide zu Recht:
+
+- **Neutralitäts-Gate:** die neuen Portal-Listen aus Stufe 120/121
+  (`EP_PS_RESERVIERT`, `EP_PORTALE_FEST`) führen `shoptv` als Portalkanal.
+  Shop-TV ist in Phase 1.4 ersatzlos gestrichen. Ein reservierter Kurzname,
+  den es nicht mehr gibt, sperrt sonst ein Kürzel, das ein Mandant für ein
+  echtes Portal bräuchte.
+- **Rauchtest (Fremd-CRM):** drei neue sichtbare Texte nennen das fremde CRM
+  — in der Retusche-Meldung (Stufe 112), im Statushinweis von Admin → Portale
+  (120) und in der Kostenaufstellung (121).
+
+Der Vorsatz `EP_` in den 23 neuen Konstanten lief ohne Zutun durch: die Regel
+`EP_` → `IMMO_` steht seit dem 28.09. und greift auch auf das, was danach
+dazukommt. Das ist der Unterschied zwischen einer Regel und einer Liste.
+

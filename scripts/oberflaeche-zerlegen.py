@@ -42,26 +42,118 @@ BS = chr(92)
 # die Tags wieder. Die Zeilennummern gelten fuer den Stand vom 26.09.2026; sie
 # werden beim Lauf gegen die Tags geprueft, damit eine neue Vorlage nicht still
 # falsch zerlegt wird.
-STUECKE = {
-    'huelle/01-kopf.html':              (1, 6),
-    'start/01-fruehstart.js':           (8, 103),
-    'huelle/02-pwa-und-schriften.html': (105, 133),
-    'huelle/03-stil.css':               (135, 268),
-    'huelle/04-koerper.html':           (270, 284),
-    'huelle/05-bibliotheken.html':      (285, 297),
-    'start/02-nach-bibliotheken.js':    (299, 313),
-    'huelle/06-msal.html':              (315, 315),
-    'start/03-msal.js':                 (317, 322),
-    'huelle/07-babel-hinweis.html':     (324, 336),
-    'start/04-vorbereitung.js':         (338, 373),
-    'app/anwendung.js':                 (377, 15755),
-    'huelle/08-sw-hinweis.html':        (15758, 15761),
-    'start/05-abschluss.js':            (15763, 15774),
-    'huelle/09-fuss.html':              (15776, 15778),
-}
+# Der Zuschnitt der Vorlage. Bis zum 02.10.2026 standen hier feste
+# Zeilennummern — und der naechste Export der Vorlage hat sie alle verschoben:
+# die Anwendung war um 5.901 Zeilen gewachsen, und das Skript brach mit
+# "Die Vorlage hat einen anderen Aufbau als STUECKE beschreibt" ab. Richtig
+# war die Meldung, nur die Ursache war harmlos.
+#
+# Darum steht hier jetzt der AUFBAU, nicht die Zahlen: eine Folge von
+# Abschnitten, jeder entweder ein Skript, ein Stil oder reines HTML. Die
+# Grenzen sucht ZUSCHNITT() anhand der Tags. Die Sicherung bleibt: stimmt die
+# Folge nicht, bricht es weiter ab — nur verschiebt eine laengere Anwendung
+# sie nicht mehr.
+AUFBAU = [
+    ('huelle/01-kopf.html',              'html'),
+    ('start/01-fruehstart.js',           'script'),
+    ('huelle/02-pwa-und-schriften.html', 'html'),
+    ('huelle/03-stil.css',               'style'),
+    ('huelle/04-koerper.html',           'html'),
+    ('huelle/05-bibliotheken.html',      'html-bibliotheken'),
+    ('start/02-nach-bibliotheken.js',    'script'),
+    ('huelle/06-msal.html',              'html'),
+    ('start/03-msal.js',                 'script'),
+    ('huelle/07-babel-hinweis.html',     'html'),
+    ('start/04-vorbereitung.js',         'script'),
+    ('app/anwendung.js',                 'script'),
+    ('huelle/08-sw-hinweis.html',        'html'),
+    ('start/05-abschluss.js',            'script'),
+    ('huelle/09-fuss.html',              'html'),
+]
+
+
+# Leerzeilen, die in der Vorlage NACH einem Stueck stehen und zu keinem
+# Stueck gehoeren. scripts/bauen.py setzt sie beim Rueckbau aus derselben
+# Liste wieder ein (dort LEERZEILE_NACH) — beide muessen uebereinstimmen,
+# sonst scheitert der Byte-Vergleich mit der Vorlage um genau diese Zeilen.
+LEERZEILE_NACH = {'start/04-vorbereitung.js', 'app/anwendung.js'}
+
+
+def zuschnitt(zeilen):
+    """Grenzen je Abschnitt (1-basiert, beide Enden einschliesslich).
+
+    Ein eigenes <script>…</script> beziehungsweise <style>…</style> ist ein
+    Abschnitt fuer sich; alles dazwischen ist HTML. Eine Zeile wie
+    <script src="…"></script> zaehlt NICHT als Blockanfang — sie laedt eine
+    Bibliothek und gehoert zum HTML.
+    """
+    bloecke = []           # (art, erste_zeile_innen, letzte_zeile_innen)
+    offen = None
+    for i, l in enumerate(zeilen, 1):
+        s = l.strip()
+        if offen is None:
+            if s == '<script>':
+                offen = ('script', i + 1)
+            elif s == '<style>':
+                offen = ('style', i + 1)
+        else:
+            art, von = offen
+            if s == '</script>' and art == 'script' or s == '</style>' and art == 'style':
+                bloecke.append((art, von, i - 1))
+                offen = None
+    if offen:
+        raise SystemExit(f'ABBRUCH: {offen[0]} ab Zeile {offen[1] - 1} wird nicht geschlossen.')
+
+    erwartet = [a for _, a in AUFBAU if a in ('script', 'style')]
+    gefunden = [b[0] for b in bloecke]
+    if gefunden != erwartet:
+        raise SystemExit(
+            'ABBRUCH: Die Vorlage hat einen anderen Aufbau als AUFBAU beschreibt.\n'
+            f'  erwartet: {" ".join(erwartet)}\n'
+            f'  gefunden: {" ".join(gefunden)}')
+
+    stuecke, blockindex, zeiger = {}, 0, 1
+    for i, (name, art) in enumerate(AUFBAU):
+        if art in ('html', 'html-bibliotheken'):
+            # HTML laeuft bis zur Tag-Zeile des naechsten Blocks, oder bis zum
+            # Dateiende, wenn keiner mehr folgt.
+            if blockindex < len(bloecke):
+                ende = bloecke[blockindex][1] - 2
+            else:
+                # Letztes Stueck: die Vorlage endet mit genau einem
+                # Zeilenumbruch, split() liefert dafuer ein leeres Element.
+                ende = len(zeilen) - 1 if zeilen[-1] == '' else len(zeilen)
+            # Zwei HTML-Abschnitte stossen an genau einer Stelle aneinander:
+            # der Koerper der Seite und darunter die Reihe der Bibliotheken.
+            # Dort trennt kein Tag, also wird an der ersten Bibliothekszeile
+            # geteilt — <script src=…> oder <link rel="stylesheet" …>.
+            if i + 1 < len(AUFBAU) and AUFBAU[i + 1][1] == 'html-bibliotheken':
+                trenn = next((n for n in range(zeiger, ende + 1)
+                              if re.match(r'<(script[^>]*\ssrc=|link\b)', zeilen[n - 1].strip())), None)
+                if trenn is None:
+                    raise SystemExit('ABBRUCH: Die Reihe der Bibliotheken ist nicht zu finden '
+                                     f'(gesucht zwischen Zeile {zeiger} und {ende}).')
+                stuecke[name] = (zeiger, trenn - 1)
+                zeiger = trenn
+                continue
+            stuecke[name] = (zeiger, ende)
+            zeiger = ende + 1
+        else:
+            _, von, bis = bloecke[blockindex]
+            stuecke[name] = (von, bis)
+            blockindex += 1
+            # bis + 1 ist die schliessende Tag-Zeile; danach beginnt das
+            # naechste Stueck — ausser es folgt eine Trenn-Leerzeile.
+            zeiger = bis + 2
+            if name in LEERZEILE_NACH:
+                if zeilen[zeiger - 1].strip() != '':
+                    raise SystemExit(f'ABBRUCH: nach {name} wird eine Leerzeile '
+                                     f'erwartet, Zeile {zeiger} ist nicht leer.')
+                zeiger += 1
+    return stuecke
 
 # Zeilen, die vor bzw. nach einem Stueck ein Tag tragen muessen. Stimmt das
-# nicht, ist die Vorlage eine andere als die, fuer die STUECKE geschrieben ist.
+# nicht, ist die Vorlage eine andere als die, fuer die AUFBAU geschrieben ist.
 TAGS = {
     'start/01-fruehstart.js':        ('<script>', '</script>'),
     'huelle/03-stil.css':            ('<style>', '</style>'),
@@ -1610,8 +1702,8 @@ ERSETZUNGEN = [
     # =====================================================================
     ('FORK',
      r'  !e \|\| "chef" !== e\.role && "mitarbeiter" !== e\.role \|\| a\.push\(\{\n    id: "onoffice",\n    gruppe: "Verbindungen",\n    icon: "🔌",\n    titel: "onOffice-Verbindung",\n    text: "API-Zugang testen und erste Objekte abrufen\."\n  \}\);',
-     '  // Die Kachel "onOffice-Verbindung" ist am 28.09.2026 entfallen: onOffice\n'
-     '  // war in der Vorlage DIE Anbindung, nicht EINE, und welche Software ein\n'
+     '  // Die Kachel "Fremdsystem-Verbindung" ist am 28.09.2026 entfallen: das\n'
+     '  // CRM der Vorlage war DIE Anbindung, nicht EINE, und welche Software ein\n'
      '  // neuer Mandant benutzt, weiss niemand. Die Edge Functions sind\n'
      '  // gestrichen, die Cron-Jobs abbestellt (fork_20).',
      'onOffice: die Kachel im Werkzeugkasten entfaellt.'),
@@ -3320,6 +3412,22 @@ ERSETZUNGEN = [
      '"Zu diesem Eintrag gibt es kein Objekt – Exposé-Link kann nicht erzeugt werden."',
      'onOffice aus einem sichtbaren Text entfernt: Expose-Link ohne Objekt'),
 
+    # --- Vorlage vom 02.10.2026: drei neue Fundstellen aus den Stufen 112,
+    # 120 und 121. Der Rauchtest hat sie beim ersten Lauf gemeldet — die
+    # Schranke vom 29.09. tut also, was sie soll.
+    ('MARKE',
+     '"Retusche\\ übernommen\\.\\ Hinweis:\\ In\\ onOffice\\ liegt\\ noch\\ das\\ bisherige\\ Bild\\ –\\ bitte\\ dort\\ austauschen\\."',
+     '"Retusche übernommen. Hinweis: Im Fremdsystem liegt noch das bisherige Bild – bitte dort austauschen."',
+     'Private-Details-Retusche: Hinweis ohne Fremdmarke (Stufe 112).'),
+    ('MARKE',
+     '"\\ –\\ nicht\\ direkt\\ an\\ World\\ angebunden\\.\\ Inserate\\ laufen\\ über\\ onOffice;\\ der\\ Status\\ kommt\\ über\\ die\\ Importberichte\\."',
+     '" – nicht direkt angebunden. Inserate laufen über das Fremdsystem; der Status kommt über die Importberichte."',
+     'Admin/Portale: Statushinweis ohne Fremdmarke (Stufe 120).'),
+    ('MARKE',
+     '"Nicht\\ enthalten:\\ onOffice\\-Lizenz,\\ Microsoft\\ 365,\\ Mail\\-Hosting\\.',
+     '"Nicht enthalten: CRM-Lizenz, Microsoft 365, Mail-Hosting.',
+     'Admin/Kosten: die Aufzaehlung nennt kein Fremdprodukt beim Namen (Stufe 121).'),
+
     # Zweiter Durchgang (29.09.2026). Die Annahme vom 28.09., die restlichen
     # Fundstellen seien "ohne Einstieg nicht erreichbar", war falsch — der
     # Auftraggeber hat sie in der Oberflaeche gesehen. Deshalb hier jeder
@@ -3773,6 +3881,21 @@ def shoptv_entfernen(inhalt):
     """
     schritte = []
 
+    # --- Stufe 120/121 (Vorlage vom 02.10.2026): der neue Admin-Bereich
+    # "Portale" fuehrt zwei feste Listen, und in beiden steht shoptv als
+    # Portalkanal. Das Neutralitaets-Gate hat sie beim ersten Lauf gegen die
+    # neue Vorlage gemeldet — genau dafuer ist es da. Ein reservierter
+    # Kurzname, den es nicht mehr gibt, sperrt sonst ein Kuerzel, das ein
+    # Mandant fuer ein echtes Portal braeuchte.
+    inhalt = inhalt.replace(
+        'const EP_PS_RESERVIERT = ["homepage", "website", "shoptv", "immoscout24"];',
+        'const EP_PS_RESERVIERT = ["homepage", "website", "immoscout24"];')
+    schritte.append('shoptv aus den reservierten Portal-Kurznamen')
+    inhalt = inhalt.replace(
+        'const EP_PORTALE_FEST = ["homepage", "website", "shoptv", "immowelt", "kleinanzeigen", "immoscout24"];',
+        'const EP_PORTALE_FEST = ["homepage", "website", "immowelt", "kleinanzeigen", "immoscout24"];')
+    schritte.append('shoptv aus der festen Portalliste des Admin-Bereichs')
+
     # --- Oberflaeche: Kacheln, Listen, Routen
     inhalt = zeilen_weg(inhalt, '    shoptv: "Schaufenster-TV"')
     schritte.append('Beschriftung in der Portalstatus-Anzeige')
@@ -4094,6 +4217,9 @@ def main():
 
     z = VORLAGE.read_text(encoding='utf-8').split('\n')
 
+    # Der Zuschnitt kommt aus der Vorlage selbst (siehe AUFBAU oben).
+    STUECKE = zuschnitt(z)
+
     # Zuschnitt gegen die Vorlage pruefen, bevor irgendetwas geschrieben wird.
     for datei, (auf, zu) in TAGS.items():
         a, b = STUECKE[datei]
@@ -4101,7 +4227,7 @@ def main():
             sys.exit(f'ABBRUCH: {datei} soll von {auf}/{zu} umschlossen sein, '
                      f'Zeile {a-1} ist {z[a-2].strip()[:40]!r} und '
                      f'Zeile {b+1} ist {z[b].strip()[:40]!r}.\n'
-                     'Die Vorlage hat einen anderen Aufbau als STUECKE beschreibt.')
+                     'Die Vorlage hat einen anderen Aufbau als AUFBAU beschreibt.')
 
     # src/ wird geleert, damit ein entferntes Stueck nicht liegen bleibt —
     # ABER src/seiten/ gehoert nicht diesem Skript. Die Nebenseiten (sw.js,
