@@ -3691,3 +3691,35 @@ Quelltext. Er ist kein Geheimnis, aber überflüssig: die Funktion läuft ohne
 JWT-Prüfung, und `freigabe.html` ruft ihre Funktion seit immer ohne
 `apikey`-Kopf auf. Ein Schlüssel im Quelltext bindet die Seite außerdem an
 genau ein Projekt — und `scripts/neutral.sh` verbietet ihn. Entfallen.
+
+## Supabase: eigenständiger Zugriff ist freigegeben (03.10.2026)
+
+Anweisung des Auftraggebers, wörtlich:
+
+> ich erlaube dir immer eigenständig auf supabase zuzugreifen und änderungen
+> vorzunehmen
+
+Damit entfällt die Rückfrage vor jeder Migration und vor jedem Lesezugriff auf
+das eigene Projekt `usguiggfciavwzkdfjgt`. Was bisher einzeln freigegeben
+wurde — `apply_migration`, `execute_sql`, Eimer anlegen, Cron-Jobs einrichten,
+Advisors lesen — läuft ab jetzt ohne Zwischenstopp.
+
+**Drei Grenzen bleiben, und zwar nicht aus Vorsicht, sondern weil sie aus
+CLAUDE.md und dem Auftrag selbst kommen:**
+
+1. **Das Projekt der Vorlage wird nicht angefasst.** Es ist seit Phase 0
+   nur-lesend und auch das nur für den Schema-Export. Eine Freigabe „für
+   Supabase" ist keine Freigabe dafür — sie bezieht sich auf das eigene
+   Projekt.
+2. **Nichts wird gelöscht, was Inhalt hat.** CLAUDE.md: das Schema ist *nicht
+   verwerfbar* — 110 Tabellen mit Daten, 33 Migrationen liegen nur in der
+   Datenbank. Ein `drop` auf eine gefüllte Tabelle, ein `delete` auf
+   Fachdaten, ein `cron.unschedule` eines laufenden Jobs: davor wird gefragt.
+   Verschieben statt löschen bleibt die Regel.
+3. **Jede angewendete Änderung liegt auch als Datei im Repository.** Eine
+   Migration, die nur in der Datenbank steht, ist genau der Zustand, der den
+   Fork überhaupt nötig gemacht hat (`docs/STATUS.md`, Abschnitt 3). Reihenfolge
+   bleibt: Datei schreiben, anwenden, `npm run check`, committen.
+
+Keine Zugangsdaten kommen dadurch ins Repository. Der Zugriff läuft über die
+Werkzeuge der Arbeitsumgebung, nicht über einen hinterlegten Schlüssel.
