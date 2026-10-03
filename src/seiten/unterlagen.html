@@ -1,0 +1,136 @@
+<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unterlagen</title><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Montserrat,Arial,sans-serif;background:#f3f4f8;color:#1a1a1a;font-size:15px;line-height:1.55}
+.kopf{background:#263159;color:#fff;padding:22px 20px;text-align:center}.kopf .n{font-weight:700;letter-spacing:.04em;font-size:18px}.kopf .n span{color:#D4A567}.kopf .u{color:#D4A567;font-size:10px;letter-spacing:.35em;margin-top:2px}
+.box{max-width:760px;margin:24px auto;background:#fff;border:1px solid #dfe2ea;padding:26px 28px}
+@media(max-width:640px){.box{margin:0;border:none;padding:18px 16px}}
+h1{font-size:22px;color:#263159;margin:0 0 6px;overflow-wrap:anywhere}.muted{color:#6b7280;font-size:13px}
+.nachricht{background:#fafbfd;border-left:4px solid #D4A567;padding:12px 14px;margin:14px 0;white-space:pre-wrap;font-size:14px}
+.von{font-size:13px;color:#374151;margin:8px 0 2px}.von a{color:#263159}
+.liste{border:1px solid #dfe2ea;margin:16px 0 8px}.zeile{display:flex;align-items:center;gap:12px;padding:10px 12px;border-top:1px solid #eef0f5}.zeile:first-child{border-top:none}
+.zeile .i{font-size:20px;flex-shrink:0}.zeile .nm{flex:1;min-width:0;overflow-wrap:anywhere;font-size:14px;color:#263159;font-weight:600}.zeile .gr{color:#6b7280;font-size:12px;font-weight:400}
+.btn{display:inline-block;background:#D4A567;color:#fff;border:none;padding:13px 24px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;text-decoration:none}.btn[disabled]{opacity:.5;cursor:wait}
+.btn.klein{background:#263159;padding:8px 14px;font-size:13px;flex-shrink:0}.alle{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:6px}
+label.f{display:block;margin:14px 0 8px;font-size:13px;color:#374151}label.f input{display:block;width:100%;margin-top:4px;padding:11px 12px;border:1px solid #c9cdd8;font:inherit;font-size:16px;background:#fff}
+.ok{background:#e6f4ea;border-left:4px solid #1e7e34;padding:12px 14px;margin:12px 0}.err{background:#fde6e6;border-left:4px solid #c83c3c;padding:12px 14px;margin:12px 0}
+.gueltig{display:inline-block;background:#eef2fb;color:#263159;font-size:12px;font-weight:600;padding:4px 10px;margin-top:8px}
+.fuss{max-width:760px;margin:0 auto 30px;padding:0 20px;font-size:11.5px;color:#6b7280;text-align:center}
+</style></head><body>
+<div class="kopf" id="kopf" style="display:none"><div class="n" id="kopfname"></div></div>
+<script>
+// Der Briefkopf kommt aus den Stammdaten DES MANDANTEN, nicht aus dem
+// Quelltext: diese Seite bedient jeden Makler der Plattform. Die Vorlage
+// hatte hier ihren eigenen Namen in Versalien stehen; die Neutralisierung
+// hat daraus den des Demo-Mandanten gemacht, und der ist bei jedem anderen
+// falsch - auf einer Seite, die der Kunde des Maklers liest.
+// Bis die Daten da sind, bleibt das Band AUS. Ein leeres blaues Band waere
+// schlechter als keines, und ein Beispielname waere falsch.
+function kopfSetzen(f){
+  var k=document.getElementById("kopf"),n=document.getElementById("kopfname");
+  var t=(f&&(f.marken_name||f.firma_name))||"";
+  if(n)n.textContent=t;
+  if(k)k.style.display=t?"":"none";
+  if(t&&document.title.indexOf(t)<0)document.title=document.title+" – "+t;
+}
+</script>
+<div class="box" id="box"><div class="muted">Lädt …</div></div>
+<div class="fuss" id="fuss"></div>
+<script>
+// Stufe 114: öffentliche Download-Seite für Objektunterlagen (unterlagen.html?t=<token>)
+// Stufe 117: auch für Transfers ohne Objekt; Downloads über kurzlebige signierte URLs (große Dateien), ZIP bis 1 GB
+const API="__IMMO_SUPABASE_URL__/functions/v1/unterlagen-link";
+const T=new URLSearchParams(location.search).get("t")||"";
+const box=document.getElementById("box"),fuss=document.getElementById("fuss");
+let PASSWORT="", DATEN=null;
+const esc=s=>String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const dt=s=>new Date(s).toLocaleString("de-DE",{timeZone:"Europe/Berlin",day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
+const gr=n=>!n?"":n>=1048576?(n/1048576).toLocaleString("de-DE",{maximumFractionDigits:1})+" MB":Math.max(1,Math.round(n/1024))+" KB";
+const ZIP_MAX=1024*1048576;
+const icon=d=>/^image\//.test(d.typ)||d.kategorie==="foto"?"🖼️":/^video\//.test(d.typ)?"🎬":/zip|compressed/i.test(d.typ)||/\.zip$/i.test(d.name)?"🗜️":d.kategorie==="grundriss"?"📐":d.kategorie==="lageplan"?"🗺️":/pdf/i.test(d.typ)||/\.pdf$/i.test(d.name)?"📄":"📎";
+async function api(body){
+  const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:T,...body})});
+  let j=null;try{j=await r.json()}catch(e){j={ok:false,fehler:"Antwort nicht lesbar ("+r.status+")"}}
+  return j;
+}
+function fussSetzen(f,a){
+  kopfSetzen(f);
+  if(!f)return;fuss.innerHTML=esc(f.firma_name||"")+(f.strasse?" · "+esc(f.strasse)+", "+esc(f.plz||"")+" "+esc(f.ort||""):"")+(f.telefon?" · "+esc(f.telefon):"")+(f.email?' · <a href="mailto:'+esc(f.email)+'">'+esc(f.email)+"</a>":"");
+}
+function kontakt(d){const a=d.absender,f=d.firma||{};const m=(a&&a.email)||f.email;return m?' Bitte wenden Sie sich an <a href="mailto:'+esc(m)+'">'+esc(m)+"</a>"+(a&&a.telefon?" oder "+esc(a.telefon):"")+".":""}
+function fehlerSeite(d){
+  const g=d&&d.grund;
+  const t=g==="abgelaufen"?"Link abgelaufen":g==="widerrufen"?"Link nicht mehr verfügbar":g==="ungueltig"?"Link ungültig":"Seite konnte nicht geladen werden";
+  const m=g==="abgelaufen"?"Dieser Download-Link war bis "+dt(d.gueltig_bis)+" Uhr gültig.":g==="widerrufen"?"Dieser Download-Link wurde zurückgezogen.":g==="ungueltig"?"Dieser Download-Link ist nicht gültig. Bitte prüfen Sie, ob er vollständig kopiert wurde.":(d&&d.fehler)||"Die Verbindung ist fehlgeschlagen. Bitte versuchen Sie es gleich noch einmal.";
+  box.innerHTML="<h1>"+esc(t)+'</h1><div class="err">'+esc(m)+(d?kontakt(d):"")+"</div>"+(!g||g==="fehler"?'<button class="btn" onclick="location.reload()">Erneut versuchen</button>':"");
+  fussSetzen(d&&d.firma);
+}
+function passwortSeite(d){
+  box.innerHTML="<h1>"+esc(d.titel||"Unterlagen")+"</h1>"+(d.absender&&d.absender.name?'<div class="von">Bereitgestellt von '+esc(d.absender.name)+" – "+esc((d.firma&&d.firma.firma_name)||"")+"</div>":"")+
+    '<div class="muted" style="margin-top:10px">Diese Unterlagen sind mit einem Passwort geschützt. Das Passwort haben Sie separat von uns erhalten.</div>'+
+    (d.falsch||d.grund==="gesperrt"?'<div class="err">'+esc(d.fehler||"Das Passwort ist nicht richtig.")+"</div>":"")+
+    '<form id="pwf"><label class="f">Passwort<input id="pw" type="password" autocomplete="current-password" required autofocus></label><button class="btn" id="pwb">Unterlagen öffnen</button></form>';
+  fussSetzen(d.firma);
+  document.getElementById("pwf").onsubmit=async e=>{e.preventDefault();const b=document.getElementById("pwb");b.disabled=!0;b.textContent="Prüfe …";PASSWORT=document.getElementById("pw").value;await laden()};
+}
+function listeSeite(d){
+  DATEN=d;const summe=d.dateien.reduce((s,x)=>s+(x.groesse||0),0);
+  let h="<h1>"+esc(d.titel||"Unterlagen")+"</h1>";
+  if(d.objekt&&(d.objekt.titel||d.objekt.ort))h+='<div class="muted">'+esc([d.objekt.titel,d.objekt.ort].filter(Boolean).join(" · "))+(d.objekt.nr?" · Objekt-Nr. "+esc(d.objekt.nr):"")+"</div>";
+  if(d.absender&&d.absender.name)h+='<div class="von">Bereitgestellt von <strong>'+esc(d.absender.name)+"</strong>"+(d.absender.telefon?" · "+esc(d.absender.telefon):"")+(d.absender.email?' · <a href="mailto:'+esc(d.absender.email)+'">'+esc(d.absender.email)+"</a>":"")+"</div>";
+  if(d.nachricht)h+='<div class="nachricht">'+esc(d.nachricht)+"</div>";
+  h+='<div class="gueltig">⏱ Abrufbar bis '+dt(d.gueltig_bis)+" Uhr</div>";
+  if(!d.dateien.length){h+='<div class="err">Zu diesem Link sind keine Dateien mehr hinterlegt.'+kontakt(d)+"</div>";box.innerHTML=h;fussSetzen(d.firma);return}
+  h+='<div class="liste">'+d.dateien.map(x=>'<div class="zeile"><span class="i">'+icon(x)+'</span><span class="nm">'+esc(x.name)+' <span class="gr">'+gr(x.groesse)+'</span></span><button class="btn klein" data-id="'+esc(x.id)+'">⬇ Laden</button></div>').join("")+"</div>";
+  const zipOk=d.dateien.length>1&&summe<=ZIP_MAX;
+  h+='<div class="alle">'+(zipOk?'<button class="btn" id="alle">⬇ Alle herunterladen (ZIP'+(summe?", "+gr(summe):"")+")</button>":"")+'<span class="muted" id="stand">'+(d.dateien.length>1&&!zipOk?"Zusammen "+gr(summe)+" – bitte die Dateien einzeln laden.":"")+'</span></div><div id="meldung"></div>';
+  box.innerHTML=h;fussSetzen(d.firma);
+  box.querySelectorAll("button[data-id]").forEach(b=>b.onclick=()=>einzeln(b));
+  const a=document.getElementById("alle");if(a)a.onclick=()=>alleZip(a);
+}
+function speichern(blob,name){const u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)}
+async function adresse(x){
+  const j=await api({aktion:"datei",passwort:PASSWORT,datei_id:x.id,als_url:true});
+  if(!j||!j.ok||!j.url)throw new Error((j&&j.fehler)||"Download fehlgeschlagen.");
+  return j.url;
+}
+async function holen(x){
+  const r=await fetch(await adresse(x));
+  if(!r.ok)throw new Error("Download von „"+x.name+"“ fehlgeschlagen ("+r.status+")");
+  return await r.blob();
+}
+function meldung(t,art){const m=document.getElementById("meldung");if(m)m.innerHTML=t?'<div class="'+(art||"ok")+'">'+esc(t)+"</div>":""}
+async function einzeln(b){
+  const x=DATEN.dateien.find(d=>d.id===b.getAttribute("data-id"));if(!x)return;
+  const alt=b.textContent;b.disabled=!0;b.textContent="Lädt …";meldung("");
+  try{const a=document.createElement("a");a.href=await adresse(x);a.rel="noopener";document.body.appendChild(a);a.click();a.remove();b.textContent="✓ Gestartet"}catch(e){meldung(e.message,"err");b.textContent=alt}
+  b.disabled=!1;
+}
+function zipLaden(){return window.JSZip?Promise.resolve(window.JSZip):new Promise((ok,nein)=>{const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";s.onload=()=>ok(window.JSZip);s.onerror=()=>nein(new Error("ZIP-Funktion konnte nicht geladen werden – bitte die Dateien einzeln laden."));document.head.appendChild(s)})}
+async function alleZip(b){
+  const stand=document.getElementById("stand");b.disabled=!0;meldung("");
+  try{
+    const JSZip=await zipLaden(),zip=new JSZip(),namen=new Set();
+    for(let i=0;i<DATEN.dateien.length;i++){
+      const x=DATEN.dateien[i];stand.textContent="Lade "+(i+1)+" von "+DATEN.dateien.length+" …";
+      let n=x.name||"Datei",k=2;while(namen.has(n)){n=x.name.replace(/(\.[^.]+)?$/,m=>" ("+k+")"+m);k++}namen.add(n);
+      zip.file(n,await holen(x));
+    }
+    stand.textContent="ZIP wird erstellt …";
+    const blob=await zip.generateAsync({type:"blob"});
+    speichern(blob,(DATEN.titel||"Unterlagen").replace(/[\\/:*?"<>|]+/g,"_").slice(0,80)+".zip");
+    stand.textContent="";meldung("✓ Alle "+DATEN.dateien.length+" Dateien heruntergeladen.");
+  }catch(e){stand.textContent="";meldung(e.message,"err")}
+  b.disabled=!1;
+}
+async function laden(){
+  if(!T){fehlerSeite({grund:"ungueltig"});return}
+  let d;try{d=await api({aktion:"info",passwort:PASSWORT})}catch(e){fehlerSeite({grund:"fehler",fehler:"Die Verbindung ist fehlgeschlagen. Bitte versuchen Sie es gleich noch einmal."});return}
+  if(d.ok){listeSeite(d);return}
+  if(d.passwort_noetig){passwortSeite(d);return}
+  fehlerSeite(d);
+}
+laden();
+</script>
+</body></html>

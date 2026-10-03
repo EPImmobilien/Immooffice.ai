@@ -143,9 +143,13 @@ async function merken(db: any, link: any, art: string, dateiName?: string, req?:
 // Liefert entweder den Link oder einen Grund, warum nicht. Der Grund ist
 // bewusst grob: "ungueltig" sagt nicht, ob es das Token nie gab oder ob es
 // geloescht wurde. Wer rateт, soll daraus nichts lernen.
+// Die Gruende sind nicht frei gewaehlt: unterlagen.html verzweigt in
+// fehlerSeite() namentlich auf sie und setzt je Grund eine andere
+// Ueberschrift. Ein Grund, den die Seite nicht kennt, landet unter
+// "Seite konnte nicht geladen werden" — richtig, aber nicht hilfreich.
 type Befund =
   | { ok: true; link: any }
-  | { ok: false; grund: "ungueltig" | "abgelaufen" | "gesperrt"; fehler?: string };
+  | { ok: false; grund: "ungueltig" | "abgelaufen" | "widerrufen"; fehler?: string };
 
 async function linkHolen(db: any, token: unknown): Promise<Befund> {
   if (typeof token !== "string" || token.length < 20) {
@@ -154,7 +158,7 @@ async function linkHolen(db: any, token: unknown): Promise<Befund> {
   const { data: link } = await db.from("unterlagen_links").select("*").eq("token", token).maybeSingle();
   if (!link) return { ok: false, grund: "ungueltig" };
   if (link.widerrufen_am) {
-    return { ok: false, grund: "gesperrt", fehler: "Dieser Link wurde zurueckgezogen." };
+    return { ok: false, grund: "widerrufen" };
   }
   if (new Date(link.gueltig_bis).getTime() < Date.now()) {
     return { ok: false, grund: "abgelaufen" };
@@ -175,15 +179,18 @@ async function gesperrtWegenFehlversuchen(db: any, link: any): Promise<boolean> 
 // Zwei Quellen, je nachdem wie der Link entstanden ist: Dateien AM OBJEKT
 // (datei_ids -> immobilie_datei) oder ein TRANSFER ohne Objekt
 // (transfer_dateien). Die Oberflaeche unterscheidet sie nicht; die
-// oeffentliche Seite sieht in beiden Faellen {id, name, groesse}.
+// oeffentliche Seite sieht in beiden Faellen {id, name, groesse, typ,
+// kategorie} — typ und kategorie waehlen in unterlagen.html das Symbol vor
+// dem Dateinamen.
 async function dateienVon(db: any, link: any) {
   if (Array.isArray(link.datei_ids) && link.datei_ids.length) {
     const { data } = await db.from("immobilie_datei")
-      .select("id, name, size_bytes, storage_path, mime_type")
+      .select("id, name, size_bytes, storage_path, mime_type, kategorie")
       .eq("mandant_id", link.mandant_id).in("id", link.datei_ids);
     return (data || []).map((d: any) => ({
       id: d.id, name: d.name, groesse: Number(d.size_bytes) || 0,
-      eimer: "immobilie-dateien", pfad: d.storage_path, mime: d.mime_type,
+      eimer: "immobilie-dateien", pfad: d.storage_path,
+      mime: d.mime_type || "", kategorie: d.kategorie || "",
     }));
   }
   const { data } = await db.from("transfer_dateien")
@@ -192,8 +199,47 @@ async function dateienVon(db: any, link: any) {
     .order("created_at");
   return (data || []).map((d: any) => ({
     id: d.id, name: d.name, groesse: Number(d.groesse) || 0,
-    eimer: EIMER_TRANSFER, pfad: d.pfad, mime: d.mime_type,
+    eimer: EIMER_TRANSFER, pfad: d.pfad,
+    mime: d.mime_type || "", kategorie: "",
   }));
+}
+
+// ------------------------------------------------------------- Kopfdaten
+//
+// Briefkopf, Absender und Objekt — alles aus dem Mandanten DES LINKS, nicht
+// aus einer Umgebungsvariablen: sonst stuende bei jedem Makler derselbe Name
+// (Phase 2.4).
+//
+// Diese Daten stehen auch schon auf der PASSWORTSEITE, nicht erst hinter dem
+// Passwort. Das ist Absicht und kein Leck: wer das Token hat, hat die Mail
+// bekommen, und er muss sehen, von wem die Unterlagen kommen — sonst kann er
+// niemanden fragen, wenn das Passwort nicht ankommt. Die Daten sind die
+// oeffentlichen Kontaktdaten des Maklers, nicht die des Objekts. Titel,
+// Nachricht und Dateiliste bleiben hinter dem Passwort.
+async function kopfdaten(db: any, link: any) {
+  const { data: firma } = await db.from("firma_stammdaten")
+    .select("firma_name, marken_name, strasse, plz, ort, telefon, email")
+    .eq("mandant_id", link.mandant_id).eq("aktiv", true)
+    .order("sortierung", { ascending: true }).limit(1).maybeSingle();
+
+  let absender: any = null;
+  if (link.erstellt_von) {
+    const { data: p } = await db.from("profiles")
+      .select("name, telefon, email").eq("id", link.erstellt_von)
+      .eq("mandant_id", link.mandant_id).maybeSingle();
+    if (p) absender = { name: p.name || "", telefon: p.telefon || "", email: p.email || "" };
+  }
+
+  return {
+    absender,
+    firma: firma
+      ? {
+          firma_name: firma.marken_name || firma.firma_name || "",
+          strasse: firma.strasse || "", plz: firma.plz || "", ort: firma.ort || "",
+          telefon: firma.telefon || "", email: firma.email || "",
+        }
+      : null,
+  };
 }
 
 // ============================================================ Deno.serve
@@ -218,21 +264,30 @@ Deno.serve(async (req) => {
 
       if (link.hat_passwort) {
         const klar = String(koerper.passwort || "");
-        if (!klar) {
-          return antwort({ ok: false, passwort_noetig: true, titel: link.titel || null });
-        }
-        if (await gesperrtWegenFehlversuchen(db, link)) {
-          return antwort({
-            ok: false, grund: "gesperrt",
-            fehler: "Zu viele Fehlversuche. Bitte wenden Sie sich an Ihren Ansprechpartner.",
-          });
-        }
-        if (!await passwortStimmt(klar, link.passwort_hash)) {
+        // Die Sperre wird VOR dem Vergleich geprueft: wer zehnmal daneben
+        // geraten hat, kommt auch mit dem elften, richtigen Versuch nicht
+        // durch. Sonst waere die Sperre nur eine Verzoegerung.
+        const gesperrt = klar ? await gesperrtWegenFehlversuchen(db, link) : false;
+        const stimmt = klar && !gesperrt
+          ? await passwortStimmt(klar, link.passwort_hash) : false;
+        if (!stimmt) {
+          // Die Passwortseite zeigt Titel, Absender und Briefkopf. Ohne sie
+          // steht der Empfaenger vor einem Eingabefeld ohne Absender und
+          // weiss nicht, wen er nach dem Passwort fragen soll.
+          const basis = {
+            ok: false, passwort_noetig: true,
+            titel: link.titel || "Unterlagen",
+            ...(await kopfdaten(db, link)),
+          };
+          if (!klar) return antwort(basis);
+          if (gesperrt) {
+            return antwort({
+              ...basis, grund: "gesperrt",
+              fehler: "Zu viele Fehlversuche. Bitte wenden Sie sich an Ihren Ansprechpartner.",
+            });
+          }
           await merken(db, link, "passwort_falsch", undefined, req);
-          return antwort({
-            ok: false, passwort_noetig: true, falsch: true,
-            fehler: "Das Passwort ist nicht richtig.",
-          });
+          return antwort({ ...basis, falsch: true, fehler: "Das Passwort ist nicht richtig." });
         }
       }
 
@@ -264,21 +319,7 @@ Deno.serve(async (req) => {
         zuletzt_geoeffnet_am: new Date().toISOString(),
       }).eq("id", link.id);
 
-      // Absender und Briefkopf kommen aus dem Mandanten des Links, nicht aus
-      // einer Umgebungsvariablen — sonst stuende bei jedem Makler derselbe
-      // Name (Phase 2.4).
-      const { data: firma } = await db.from("firma_stammdaten")
-        .select("firma_name, marken_name, strasse, plz, ort, telefon, email")
-        .eq("mandant_id", link.mandant_id).eq("aktiv", true)
-        .order("sortierung", { ascending: true }).limit(1).maybeSingle();
-
-      let absender: any = null;
-      if (link.erstellt_von) {
-        const { data: p } = await db.from("profiles")
-          .select("name, telefon, email").eq("id", link.erstellt_von)
-          .eq("mandant_id", link.mandant_id).maybeSingle();
-        if (p) absender = { name: p.name || "", telefon: p.telefon || "", email: p.email || "" };
-      }
+      const kopf = await kopfdaten(db, link);
 
       let objekt: any = null;
       if (link.immobilie_id) {
@@ -300,18 +341,15 @@ Deno.serve(async (req) => {
         titel: link.titel || "Unterlagen",
         nachricht: link.nachricht || "",
         gueltig_bis: link.gueltig_bis,
-        typ: link.immobilie_id ? "objekt" : "transfer",
-        kategorie: link.immobilie_id ? "unterlagen" : "transfer",
         objekt,
-        absender,
-        firma: firma
-          ? {
-              firma_name: firma.marken_name || firma.firma_name || "",
-              strasse: firma.strasse || "", plz: firma.plz || "", ort: firma.ort || "",
-              telefon: firma.telefon || "", email: firma.email || "",
-            }
-          : null,
-        dateien: dateien.map((d: any) => ({ id: d.id, name: d.name, groesse: d.groesse })),
+        ...kopf,
+        // Eimer und Pfad bleiben hier: die oeffentliche Seite braucht sie
+        // nicht, und ein Speicherpfad in einer oeffentlichen Antwort ist
+        // eine Einladung zum Ausprobieren.
+        dateien: dateien.map((d: any) => ({
+          id: d.id, name: d.name, groesse: d.groesse,
+          typ: d.mime, kategorie: d.kategorie,
+        })),
       });
     }
 

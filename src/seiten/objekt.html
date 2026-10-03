@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ihre Objektseite – Musterhaus Immobilien GmbH</title><meta name="robots" content="noindex,nofollow">
+<title>Ihre Objektseite</title><meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--blau:#263159;--gold:#D4A567;--grau:#f4f5f9;--linie:#e6e8ef;--text:#1a1f36;--muted:#6b7280;--r:16px;--schatten:0 6px 24px rgba(38,49,89,.08)}
@@ -37,7 +37,7 @@ label.h{display:flex;gap:10px;align-items:flex-start;margin:12px 0;font-size:14p
 .galerie{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}.galerie figure{margin:0;cursor:zoom-in;position:relative}.galerie img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#e5e7eb}
 .galerie figcaption{position:absolute;left:0;right:0;bottom:0;font-size:11px;padding:4px 8px;background:rgba(20,26,50,.72);color:#fff}
 .tabs{display:flex;gap:4px;border-bottom:2px solid var(--linie);margin-bottom:12px;flex-wrap:wrap}.tabs button{border:none;background:none;font:inherit;font-weight:600;font-size:13.5px;padding:10px 14px;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px}.tabs button.aktiv{color:var(--blau);border-bottom-color:var(--gold)}
-.beschr{white-space:pre-line;font-size:14.5px}.beschr ul{padding-left:18px;margin:0}.beschr li{margin:3px 0}
+.beschr{white-space:pre-line;font-size:14.5px}.beschr ul{padding-left:18px;margin:0}.beschr li{margin:3px 0}.beschr .zw{color:var(--blau);font-weight:700}.beschr li.zw{list-style:none;margin:10px 0 2px -18px}
 .makler{display:flex;gap:16px;align-items:center}.makler img,.makler .ini{box-shadow:0 4px 14px rgba(38,49,89,.15);width:96px;height:96px;border-radius:50%;object-fit:cover;background:var(--gold);border:3px solid var(--gold);flex-shrink:0;color:#fff;font-weight:700;font-size:30px;display:flex;align-items:center;justify-content:center}.makler .nm{font-weight:700;color:var(--blau);font-size:16px}.makler .fk{font-size:12.5px;color:var(--muted);margin-bottom:6px}.makler a{display:block;font-size:13.5px;text-decoration:none;margin:2px 0}
 .dok{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--linie);border-radius:12px;padding:12px 14px;margin:8px 0;background:#fafbfd;font-size:14px}.dok .ic{width:36px;height:36px;border-radius:10px;background:#eef1f8;color:var(--blau);display:flex;align-items:center;justify-content:center;flex-shrink:0}.dok .ic svg{width:20px;height:20px}.dok>div{display:flex;gap:10px;align-items:center;min-width:0}.dok small{display:block;color:var(--muted);font-size:12px}.dok a{white-space:nowrap}
 .slots{display:grid;grid-template-columns:1fr 1fr;gap:8px}@media(max-width:480px){.slots{grid-template-columns:1fr}}
@@ -64,7 +64,23 @@ iframe.sonne{width:100%;height:560px;border:0;background:#e5e7eb;border-radius:1
 .vorschau{position:sticky;top:0;z-index:60;background:#fff3cd;color:#5a4300;border-bottom:2px solid #d4a017;padding:10px 16px;font-size:13px;text-align:center;line-height:1.45}
 .vorschau a{color:#5a4300;font-weight:700;margin-left:8px}
 </style></head><body>
-<div class="kopf"><div class="n">MUSTERHAUS <span>&amp;</span> PARTNER</div><div class="u">IMMOBILIEN</div></div>
+<div class="kopf" id="kopf" style="display:none"><div class="n" id="kopfname"></div></div>
+<script>
+// Der Briefkopf kommt aus den Stammdaten DES MANDANTEN, nicht aus dem
+// Quelltext: diese Seite bedient jeden Makler der Plattform. Die Vorlage
+// hatte hier ihren eigenen Namen in Versalien stehen; die Neutralisierung
+// hat daraus den des Demo-Mandanten gemacht, und der ist bei jedem anderen
+// falsch - auf einer Seite, die der Kunde des Maklers liest.
+// Bis die Daten da sind, bleibt das Band AUS. Ein leeres blaues Band waere
+// schlechter als keines, und ein Beispielname waere falsch.
+function kopfSetzen(f){
+  var k=document.getElementById("kopf"),n=document.getElementById("kopfname");
+  var t=(f&&(f.marken_name||f.firma_name))||"";
+  if(n)n.textContent=t;
+  if(k)k.style.display=t?"":"none";
+  if(t&&document.title.indexOf(t)<0)document.title=document.title+" – "+t;
+}
+</script>
 <div id="wurzel"><div class="box"><div class="muted">Lädt …</div></div></div>
 <div class="fuss" id="fuss"></div>
 <div class="pdfv" id="pdfv"><div class="kopfz"><span class="t" id="pdfTitel"></span><a id="pdfDl" href="#" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><span class="lbl">Herunterladen</span></a><a id="pdfNeu" class="hell" href="#" target="_blank" rel="noopener" title="Im neuen Tab öffnen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg><span class="lbl">Im neuen Tab</span></a><button class="x" type="button" onclick="pdfZu()" title="Schließen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg><span class="lbl">Schließen</span></button></div><iframe id="pdfRahmen" title="Dokument"></iframe><div class="seiten" id="pdfSeiten"></div></div>
@@ -94,7 +110,7 @@ function fehlerSeite(m,art){
   else if(art==="widerrufen")wurzel.innerHTML='<div class="box"><h1>Zugang nicht mehr gültig</h1><div class="warn">'+esc(m||"Sie haben den Maklervertrag widerrufen – dieser Zugang ist nicht mehr gültig.")+'</div><div class="muted">Sollten Sie sich später erneut für die Immobilie interessieren, melden Sie sich gern: info@immooffice.example</div></div>';
   else wurzel.innerHTML='<div class="box"><h1>Seite konnte nicht geladen werden</h1><div class="err">Ihr Link ist in Ordnung, aber die Verbindung zu unserem Server ist gerade fehlgeschlagen'+(m?' ('+esc(m)+')':'')+'.</div><button class="btn" onclick="laden()">Erneut versuchen</button></div>';
 }
-function fussZeile(firma){if(!firma)return;fuss.innerHTML=esc(firma.firma_name)+' · '+esc(firma.strasse)+' · '+esc(firma.plz)+' '+esc(firma.ort)+(firma.geschaeftsfuehrer?' · Geschäftsführer: '+esc(firma.geschaeftsfuehrer):"")+(firma.hrb?' · '+esc(firma.registergericht||"")+' '+esc(firma.hrb):"")+' · <a href="https://immooffice.example/impressum">Impressum</a> · <a href="https://immooffice.example/datenschutz">Datenschutz</a> · <a href="https://immooffice.example/agb">AGB</a>';}
+function fussZeile(firma){kopfSetzen(firma);if(!firma)return;fuss.innerHTML=esc(firma.firma_name)+' · '+esc(firma.strasse)+' · '+esc(firma.plz)+' '+esc(firma.ort)+(firma.geschaeftsfuehrer?' · Geschäftsführer: '+esc(firma.geschaeftsfuehrer):"")+(firma.hrb?' · '+esc(firma.registergericht||"")+' '+esc(firma.hrb):"")+' · <a href="https://immooffice.example/impressum">Impressum</a> · <a href="https://immooffice.example/datenschutz">Datenschutz</a> · <a href="https://immooffice.example/agb">AGB</a>';}
 async function laden(){
   if(!T&&!V)return fehlerSeite("",'ungueltig');
   let d;try{d=await api("objekt-landing",{token:T,aktion:"laden"});}catch(e){return fehlerSeite(e.message);}
@@ -146,8 +162,13 @@ function gate(d){
 // ---------- Schritt 2: Objektseite ----------
 const ZEITFENSTER=["egal","vormittags (9–12)","mittags (12–15)","nachmittags (15–18)","abends (ab 18)"];
 const ARTEN=["Wohnung","Haus","Mehrfamilienhaus","Grundstück","Gewerbe","Sonstiges"];
-function absaetze(t){return esc(t||"").replace(/\n{2,}/g,"\n\n");}
-function liste(t){const z=String(t||"").split(/\n|(?:\s*[•\-–]\s+)/).map(x=>x.trim()).filter(x=>x.length>1);return z.length>1?'<ul>'+z.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul>':absaetze(t);}
+// Auszeichnung aus dem Reiter „Texte“ (wie im Exposé-PDF): **fett**, *kursiv*, „## Zwischenüberschrift“, „- Aufzählung“
+function fmt(t){let h=esc(t);
+  h=h.replace(/\*\*\*([^\s*](?:[^*]*?[^\s*])?)\*\*\*/g,"<strong><em>$1</em></strong>").replace(/\*\*([^\s*](?:[\s\S]*?[^\s*])?)\*\*/g,"<strong>$1</strong>")
+   .replace(/(^|[^\w])__([^\s_](?:[^_]*?[^\s_])?)__(?!\w)/g,"$1<strong>$2</strong>").replace(/\*([^\s*](?:[^*]*?[^\s*])?)\*/g,"<em>$1</em>")
+   .replace(/(^|[^\w])_([^\s_](?:[^_]*?[^\s_])?)_(?!\w)/g,"$1<em>$2</em>");return h;}
+function absaetze(t){return String(t||"").replace(/\r\n?/g,"\n").replace(/\n{2,}/g,"\n\n").split("\n").map(x=>{const ue=x.match(/^#{1,3}\s+(.*)$/);if(ue)return '<strong class="zw">'+fmt(ue[1])+'</strong>';const li=x.match(/^[-•*]\s+(.*)$/);return li?'• '+fmt(li[1]):fmt(x);}).join("\n");}
+function liste(t){const z=String(t||"").split(/\n|(?:\s*[•\-–]\s+)/).map(x=>x.replace(/^\*\s+/,"").trim()).filter(x=>x.length>1);return z.length>1?'<ul>'+z.map(x=>{const ue=x.match(/^#{1,3}\s+(.*)$/);return ue?'<li class="zw">'+fmt(ue[1])+'</li>':'<li>'+fmt(x)+'</li>';}).join("")+'</ul>':absaetze(t);}
 function seite(d){
   const {f,im,firma,makler,fotos,lage}=d;const istMiete=/miet/i.test(String(im.vertragsart||""));
   FOTOS=(fotos||[]).filter(x=>x.art==="foto");const grundrisse=(fotos||[]).filter(x=>x.art==="grundriss");

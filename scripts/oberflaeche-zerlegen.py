@@ -3581,6 +3581,96 @@ ERSETZUNGEN = [
 ]
 
 
+# ===========================================================================
+# Regeln NUR fuer die Nebenseiten (src/seiten/), angewendet nach
+# ERSETZUNGEN von scripts/nebenseiten.py.
+#
+# Warum eine zweite Liste: freigabe.html, objekt.html und unterlagen.html
+# sind eigene Dateien mit eigenem Aufbau. Eine Regel, die nur dort greift,
+# stuende in ERSETZUNGEN unter "Regeln ohne Treffer" — und eine Liste, in der
+# die Haelfte der Eintraege planmaessig nicht trifft, taugt nicht mehr als
+# Warnung.
+#
+# Alle Regeln hier drehen sich um dasselbe: diese Seiten liest der KUNDE DES
+# MAKLERS. Was dort steht, muss aus den Stammdaten seines Mandanten kommen —
+# nicht aus dem Quelltext und schon gar nicht vom Demo-Mandanten.
+# ===========================================================================
+# Der Briefkopf der Kundenseiten, als eigener Text statt als Einzeiler in
+# der Regel. Er steht in freigabe.html, objekt.html und unterlagen.html an
+# derselben Stelle und sieht dort gleich aus.
+KOPF_SCRIPT = """<div class="kopf" id="kopf" style="display:none"><div class="n" id="kopfname"></div></div>
+<script>
+// Der Briefkopf kommt aus den Stammdaten DES MANDANTEN, nicht aus dem
+// Quelltext: diese Seite bedient jeden Makler der Plattform. Die Vorlage
+// hatte hier ihren eigenen Namen in Versalien stehen; die Neutralisierung
+// hat daraus den des Demo-Mandanten gemacht, und der ist bei jedem anderen
+// falsch - auf einer Seite, die der Kunde des Maklers liest.
+// Bis die Daten da sind, bleibt das Band AUS. Ein leeres blaues Band waere
+// schlechter als keines, und ein Beispielname waere falsch.
+function kopfSetzen(f){
+  var k=document.getElementById("kopf"),n=document.getElementById("kopfname");
+  var t=(f&&(f.marken_name||f.firma_name))||"";
+  if(n)n.textContent=t;
+  if(k)k.style.display=t?"":"none";
+  if(t&&document.title.indexOf(t)<0)document.title=document.title+" \u2013 "+t;
+}
+</script>"""
+
+SEITEN_ERSETZUNGEN = [
+    ('MARKE', r' \u2013 Musterhaus Immobilien GmbH</title>', '</title>',
+     'Seitentitel der Kundenseiten. Der Firmenname wird jetzt aus den '
+     'Stammdaten nachgetragen (kopfSetzen), statt im Quelltext zu stehen.'),
+    ('FORK',
+     r'<div class="kopf"><div class="n">[^<]*<span>&amp;</span>[^<]*</div>'
+     r'<div class="u">IMMOBILIEN</div></div>',
+     KOPF_SCRIPT,
+     'Briefkopf der Kundenseiten: Firmenname aus dem Mandanten statt aus dem '
+     'Quelltext. Das Band bleibt aus, solange kein Name da ist.'),
+    ('FORK',
+     r'function fussSetzen\(f,a\)\{\n  if\(!f\)return;',
+     'function fussSetzen(f,a){\n  kopfSetzen(f);\n  if(!f)return;',
+     'unterlagen.html: der Briefkopf wird mit dem Fuss gesetzt.'),
+    ('FORK',
+     r'  box\.innerHTML=h;\n  fuss\.innerHTML=esc\(firma\.firma_name\)',
+     '  box.innerHTML=h;\n  kopfSetzen(firma);\n  fuss.innerHTML=esc(firma.firma_name)',
+     'freigabe.html: der Briefkopf wird mit dem Fuss gesetzt.'),
+    ('FORK',
+     r'function fussZeile\(firma\)\{if\(!firma\)return;',
+     'function fussZeile(firma){kopfSetzen(firma);if(!firma)return;',
+     'objekt.html: der Briefkopf wird mit dem Fuss gesetzt.'),
+    # --- sonnenverlauf.html -------------------------------------------------
+    ('FORK',
+     r"[ ]*'<div class=\"marke\">[^<]*<span>Immobilien</span></div>' \+\n",
+     '',
+     'sonnenverlauf.html: die Markenzeile entfaellt. Sie trug den Namen der '
+     'Vorlage, nach der Neutralisierung den des Demo-Mandanten — auf einer '
+     'Seite, die der Kunde des Maklers sieht. Ein Briefkopf aus den '
+     'Stammdaten ginge hier nicht: die Seite laeuft als Rahmen im Expose und '
+     'bekommt nur eine Adresse mitgegeben, keinen Mandanten. Also kein '
+     'Briefkopf — "Sonnenverlauf 3D" darunter bleibt stehen und benennt die '
+     'Seite ausreichend.'),
+    ('MARKE', r'z\. B\. Am  26, 12345 Musterstadt',
+     'z. B. Musterstrasse 26, 12345 Musterstadt',
+     'sonnenverlauf.html: der Platzhalter der Adresssuche. Die Strassen-Regel '
+     'hat den Namen der Referenz entfernt und "Am  26" stehen lassen — zwei '
+     'Leerzeichen und eine Hausnummer ohne Strasse. Das liest der Kunde.'),
+
+    # --- unterlagen.html: der anon-Schluessel gehoert nicht in die Seite ---
+    # Die Vorlage schreibt ihn als JSON-Web-Token in den Quelltext. Er ist
+    # kein Geheimnis, aber er ist auch nicht noetig: die Funktion laeuft ohne
+    # JWT-Pruefung (supabase/config.toml), und freigabe.html ruft ihre
+    # Funktion seit immer ohne apikey-Kopf auf. Ein Schluessel im Quelltext
+    # bindet die Seite ausserdem an genau ein Projekt — und scripts/neutral.sh
+    # verbietet ihn.
+    ('FORK', r'\nconst ANON="[^"]*";', '',
+     'unterlagen.html: der anon-Schluessel im Quelltext entfaellt.'),
+    ('FORK',
+     r'headers:\{"Content-Type":"application/json",apikey:ANON,'
+     r'Authorization:"Bearer "\+ANON\}',
+     'headers:{"Content-Type":"application/json"}',
+     'unterlagen.html: Aufruf ohne apikey-Kopf, wie in freigabe.html.'),
+]
+
 
 # Die Zugangsdaten stehen in der Vorlage im Auslieferungsstand. Im Fork setzt
 # sie die Auslieferung — beim Bauen aus Umgebungsvariablen, nicht im Quelltext.

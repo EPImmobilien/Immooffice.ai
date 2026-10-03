@@ -30,6 +30,10 @@ SEITEN = [
     ('epworld-freigabe.html', 'freigabe.html'),
     ('epworld-objekt.html', 'objekt.html'),
     ('epworld-sonnenverlauf.html', 'sonnenverlauf.html'),
+    # Stufe 114/117 der Vorlage: die oeffentliche Download-Seite. Sie ist der
+    # Gegenpart zur Edge Function unterlagen-link (supabase/eigene/) und wird
+    # aus der Mail verschickt, die der Makler dem Kunden schreibt.
+    ('epworld-unterlagen.html', 'unterlagen.html'),
     ('epworld-_redirects', '_redirects'),
 ]
 
@@ -45,13 +49,19 @@ EIGENES_PROJEKT = f'https://{EIGENE_REF}.supabase.co'
 
 
 def regeln():
-    """Laedt ERSETZUNGEN aus dem Zerleger. Der Bindestrich im Dateinamen
-    verhindert ein gewoehnliches import, deshalb der Umweg."""
+    """Laedt die Regeln aus dem Zerleger. Der Bindestrich im Dateinamen
+    verhindert ein gewoehnliches import, deshalb der Umweg.
+
+    Zwei Listen: ERSETZUNGEN gilt fuer die Oberflaeche UND die Nebenseiten,
+    SEITEN_ERSETZUNGEN nur hier. Die zweite laeuft danach — sie greift
+    teilweise auf das Ergebnis der ersten zu (etwa den Seitentitel, in dem
+    der Firmenname der Vorlage schon ersetzt ist)."""
     pfad = WURZEL / 'scripts' / 'oberflaeche-zerlegen.py'
     spec = importlib.util.spec_from_file_location('zerleger', pfad)
     modul = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(modul)
-    return modul.ERSETZUNGEN, modul.pruefe_haeufigkeit
+    return (modul.ERSETZUNGEN + modul.SEITEN_ERSETZUNGEN,
+            modul.pruefe_haeufigkeit)
 
 
 def main():

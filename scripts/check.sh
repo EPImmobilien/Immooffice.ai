@@ -184,14 +184,15 @@ abschnitt "Oberflaeche: die Nebenseiten sind da"
 # wurde. Ein Hinweis im Protokoll reicht dafuer nicht — hier faellt es auf.
 fehlend=""
 for f in src/seiten/sw.js src/seiten/freigabe.html src/seiten/objekt.html \
-         src/seiten/sonnenverlauf.html src/seiten/_redirects; do
+         src/seiten/sonnenverlauf.html src/seiten/unterlagen.html \
+         src/seiten/_redirects; do
   [[ -e "$f" ]] || fehlend="$fehlend $f"
 done
 if [[ -n "$fehlend" ]]; then
   echo "[FEHLER] Es fehlt:$fehlend — `npm run nebenseiten` ausfuehren."
   fehler=1
 else
-  echo "[ok] Alle fuenf Nebenseiten liegen in src/seiten/."
+  echo "[ok] Alle sechs Nebenseiten liegen in src/seiten/."
 fi
 
 abschnitt "Oberflaeche: Syntax"

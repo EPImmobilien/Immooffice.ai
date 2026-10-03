@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Exposé-Freigabe – Musterhaus Immobilien GmbH</title><meta name="robots" content="noindex,nofollow">
+<title>Exposé-Freigabe</title><meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Montserrat,Arial,sans-serif;background:#f3f4f8;color:#1a1a1a;font-size:15px;line-height:1.55}
@@ -20,7 +20,23 @@ label.h{display:flex;gap:10px;align-items:flex-start;margin:12px 0;font-size:14p
 .ok{background:#e6f4ea;border-left:4px solid #1e7e34;padding:14px;margin:12px 0}.err{background:#fde6e6;border-left:4px solid #c83c3c;padding:12px;margin:12px 0}
 .fuss{max-width:760px;margin:0 auto 30px;padding:0 20px;font-size:11.5px;color:#6b7280;text-align:center}a{color:#263159}
 </style></head><body>
-<div class="kopf"><div class="n">MUSTERHAUS <span>&amp;</span> PARTNER</div><div class="u">IMMOBILIEN</div></div>
+<div class="kopf" id="kopf" style="display:none"><div class="n" id="kopfname"></div></div>
+<script>
+// Der Briefkopf kommt aus den Stammdaten DES MANDANTEN, nicht aus dem
+// Quelltext: diese Seite bedient jeden Makler der Plattform. Die Vorlage
+// hatte hier ihren eigenen Namen in Versalien stehen; die Neutralisierung
+// hat daraus den des Demo-Mandanten gemacht, und der ist bei jedem anderen
+// falsch - auf einer Seite, die der Kunde des Maklers liest.
+// Bis die Daten da sind, bleibt das Band AUS. Ein leeres blaues Band waere
+// schlechter als keines, und ein Beispielname waere falsch.
+function kopfSetzen(f){
+  var k=document.getElementById("kopf"),n=document.getElementById("kopfname");
+  var t=(f&&(f.marken_name||f.firma_name))||"";
+  if(n)n.textContent=t;
+  if(k)k.style.display=t?"":"none";
+  if(t&&document.title.indexOf(t)<0)document.title=document.title+" – "+t;
+}
+</script>
 <div class="box" id="box"><div class="muted">Lädt …</div></div>
 <div class="fuss" id="fuss"></div>
 <script>
@@ -73,6 +89,7 @@ function render(d){
     h+='<button class="btn gross" id="go" disabled>'+knopf+'</button><div id="fehler"></div></form>';
   }
   box.innerHTML=h;
+  kopfSetzen(firma);
   fuss.innerHTML=esc(firma.firma_name)+' · '+esc(firma.strasse)+' · '+esc(firma.plz)+' '+esc(firma.ort)+(firma.geschaeftsfuehrer?' · Geschäftsführer: '+esc(firma.geschaeftsfuehrer):"")+(firma.hrb?' · '+esc(firma.registergericht||"")+' '+esc(firma.hrb):"")+(firma.ust_id?' · USt-IdNr. '+esc(firma.ust_id):"")+'<br>'+esc(firma.email)+(firma.web?' · '+esc(firma.web):"");
   const fe=document.getElementById("fehler");const zeig=m=>{fe.innerHTML='<div class="err">'+esc(m)+'</div>';};
   const frm=document.getElementById("frm"),go=document.getElementById("go");
