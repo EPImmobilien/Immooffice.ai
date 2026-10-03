@@ -3723,3 +3723,98 @@ CLAUDE.md und dem Auftrag selbst kommen:**
 
 Keine Zugangsdaten kommen dadurch ins Repository. Der Zugriff läuft über die
 Werkzeuge der Arbeitsumgebung, nicht über einen hinterlegten Schlüssel.
+
+## Der verdrahtete Firmenname in der Oberfläche: 99 → 29 (03.10.2026)
+
+Am 30.09. wurde diese Klasse für die Edge Functions geschlossen — null von
+107. `tests/firmenname-verdrahtet.py` sieht aber nur `supabase/functions/`.
+In `src/` stand derselbe Fehler **99-mal**, und nicht nur in Kommentaren.
+
+### Wo er stand
+
+Nach Wirkung sortiert, nicht nach Anzahl:
+
+- **Die Widerrufsbelehrung.** Die Erklärung zum vorzeitigen Tätigkeitsbeginn
+  nach § 356 BGB nannte das Unternehmen, auf dessen Widerrufsfrist der
+  Unterzeichner verzichtet — zweimal, einmal als angezeigter Text und einmal
+  als **gespeicherter Wortlaut**. Dazu der Datenschutzhinweis, der den
+  Verantwortlichen nach Art. 6 DSGVO nennt. Drei Rechtstexte, alle mit dem
+  Namen des Demo-Mandanten.
+- **Kalendereinladungen.** Jede ICS-Datei trug ihn im Betreff („Besichtigung
+  Ihrer Immobilie – …"), als `ORGANIZER` und in der `PRODID`. Der Betreff
+  steht im Kalender des Kunden, dauerhaft.
+- **Grußformeln** unter Terminmails, Rechnungsmails, Notarmails und der
+  Abwesenheitsnotiz, die an *jeden* Absender zurückgeht.
+- **PDF-Kopf- und Fußzeilen:** Übergabeprotokoll, Notar-Laufzettel,
+  Zins-und-Preis, Energieausweis, das Word-Dokument zum Kaufvertrag und ein
+  erzeugtes SVG-Vorschaubild.
+- **Das Eigentümerportal:** drei Hilfetexte („Wir bei … stellen Ihnen"), der
+  Herkunftsvermerk an jeder Datei, zwei Meldungstitel und eine Fehlermeldung.
+- **Die beiden öffentlichen Seiten** in `index.html`: der Bewerbertest
+  begrüßte jeden Kandidaten mit dem falschen Namen, dreimal.
+- **Der Platzhalter `{{absender_firma}}` selbst** stand auf dem Namen des
+  Demo-Mandanten — also setzte *jede* Mailvorlage ihn ein.
+- Und: **„Jörn Musterhaus"**. Das ist kein Firmenname, sondern eine *Person*
+  — der Energieberater, mit dem die Vorlage zusammenarbeitet. Die
+  Neutralisierung hat den Nachnamen ersetzt und den Vornamen stehen gelassen.
+  Vier Texte, die Eigentümer lesen, nannten namentlich den Dienstleister
+  *eines* Maklers.
+
+### Der Weg: immoMarke()
+
+Das Gegenstück zu `immoFirmenName` in den Edge Functions, mit derselben
+Regel: **ohne Eintrag liefert es LEER, nie einen Beispielnamen.** Dazu
+`immoMarkeMit(vorne, hinten)` — mit Trenner, oder gar nichts. Ein
+Gedankenstrich ohne Namen dahinter fällt auf, eine fehlende Zeile nicht.
+
+Die Quelle gab es schon: `immoCiAnwenden` setzt `window.IMMO_MARKE` beim
+Anmelden aus `firma_stammdaten` und leert es beim Abmelden. Es war nur
+nirgends gelesen worden.
+
+**Die beiden öffentlichen Seiten haben kein `window.IMMO_MARKE`** — dort ist
+niemand angemeldet. Für sie schicken die zugehörigen Edge Functions den
+Namen jetzt mit: `signatur-token-validieren` und `bewerbertest-abrufen`
+antworten mit `firma.name` (über `immoFirmenName`, also ebenfalls leer ohne
+Eintrag), und die Seiten lesen ihn über `immoSigFirma()` beziehungsweise
+`immoBwFirma()`.
+
+Der Rückfall in der Widerrufserklärung benennt **keine Firma, sondern die
+Rolle** („das Maklerunternehmen"). Das ist nur ein theoretischer Pfad: ohne
+Stammdaten entsteht der Maklervertrag gar nicht (Entscheidung vom 30.09.).
+
+### WOERTLICH — eine zweite Regelliste
+
+Die 67 Regeln stehen nicht in `ERSETZUNGEN`. Dort ist der Suchtext ein
+regulärer Ausdruck, und das hat in diesem Fork **zweimal** Schaden
+angerichtet: einmal hat eine Regel mitten in einem Wort getroffen, einmal
+stand ein `\n` im Ersatz und wurde als Rückverweis gelesen. `WOERTLICH`
+arbeitet mit `str.replace` — dort ist der Suchtext der Suchtext. Angewendet
+nach `ERSETZUNGEN`, mit derselben Notbremse gegen zu breite Regeln und
+derselben Meldung „Regeln ohne Treffer".
+
+Das Gegenstück dazu heißt in `scripts/neutralisieren-funktionen.py` seit
+langem `NACHBESSERN`. Zwei Erzeuger, dieselbe Bauart.
+
+### Nebenbefund: drei Adressen des eigenen Projekts im Quelltext
+
+Die Bewerbertest-Seite, das Newsletter-Logo und das Transfer-Werkzeug bauten
+die Projektadresse selbst zusammen, statt `window.IMMO_SUPABASE_URL` zu
+nehmen. Keinem Gate fällt das auf — die Neutralisierung hat sie auf das
+eigene Projekt gezogen, also ist nichts Fremdes daran. Derselbe Quellstand
+ließe sich damit aber nicht gegen ein zweites Projekt ausliefern. Behoben.
+
+### Was bleibt: 29, alle gebucht
+
+`tests/firmenname-verdrahtet.py` hat ein zweites Buch bekommen,
+`BUCH_OBERFLAECHE`. Es bucht jede verbleibende Stelle mit Suchtext, Anzahl
+und Grund; wer eine neue dazulegt, bekommt die Prüfung rot. Fünf Klassen:
+
+| Klasse | Anzahl | Warum sie bleiben darf |
+|---|---|---|
+| BEISPIELDATEN | 15 | Die drei Standorte des Demo-Mandanten als Datensatz. Er darf seinen eigenen Namen tragen. |
+| PLATZHALTER | 6 | `placeholder` eines leeren Feldes. Wird nie gesendet und nie gedruckt. |
+| ABLAGEPFAD | 4 | Ordnernamen im angebundenen Dateispeicher. Ein Pfad ist kein Text — ihn zu ändern verschiebt Dateien. Siehe `docs/OFFEN.md`. |
+| HEURISTIK | 2 | Wortlisten der Namenserkennung und der Rechtschreibhilfe. Der Name wird **gesucht**, nicht ausgegeben. |
+| ORTSNAME | 2 | „Musterhausen" ist ein **Ort** im Platzhalter der Ortssuche. Die Suche nach „Musterhaus" trifft ihn mit. |
+
+Die Klasse AUSGABE ist leer.

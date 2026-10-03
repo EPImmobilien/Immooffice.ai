@@ -8,8 +8,8 @@
       // Aliases setzen, damit der Parser beide Namen findet
       window.pdfjsLib = lib;
       window._pdfJsReady = true;
-      console.log('[Musterhaus] pdf.js geladen, Version:', lib.version);
+      console.log('[ImmoOffice] pdf.js geladen, Version:', lib.version);
     } else {
-      console.warn('[Musterhaus] pdf.js nicht gefunden im window-Objekt');
+      console.warn('[ImmoOffice] pdf.js nicht gefunden im window-Objekt');
     }
   })();

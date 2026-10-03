@@ -2951,6 +2951,40 @@ NACHBESSERN = [
      'Energieausweis: das Logo tragt den Namen des Mandanten als Alternativtext.',
      {'energieausweis-anfrage'}),
 
+    # --- Und die Bewerbertest-Seite auch --------------------------------
+    # Dieselbe Lage: oeffentliche Seite, kein angemeldeter Nutzer, drei
+    # Stellen mit dem Namen aus dem Quelltext. Ein Bewerber, der sich bei
+    # Makler A bewirbt, hat den Namen des Demo-Mandanten gelesen — in der
+    # Begruessung, im Briefkopf und in der Fusszeile.
+    ('FORK',
+     '      kandidat: { vorname: einladung.vorname, nachname: einladung.nachname },',
+     '      kandidat: { vorname: einladung.vorname, nachname: einladung.nachname },\n'
+     '      firma: { name: await immoFirmenName(admin, einladung.mandant_id) },',
+     'Bewerbertest: der Firmenname des Mandanten kommt mit der Antwort '
+     '(als Geschwister, damit die Zeile der Vorlage unberuehrt bleibt).',
+     {'bewerbertest-abrufen'}),
+
+    # --- Die Signaturseite muss sagen, WER unterschreiben laesst ---------
+    # SignaturPublicPage zeigt die Widerrufsbelehrung nach § 356 BGB, die
+    # Erklaerung zum vorzeitigen Taetigkeitsbeginn und den
+    # Datenschutzhinweis nach Art. 6 DSGVO. In allen drei stand der Name aus
+    # dem Quelltext — nach der Neutralisierung der des Demo-Mandanten.
+    #
+    # Das ist nicht Kosmetik: die Erklaerung zum vorzeitigen Beginn nennt
+    # das Unternehmen, auf das der Unterzeichner verzichtet, und der
+    # Datenschutzhinweis nennt den Verantwortlichen. Beides falsch
+    # benannt ist schlimmer als gar nicht benannt.
+    #
+    # Die Seite ist oeffentlich, hat also keinen angemeldeten Nutzer und
+    # kein window.IMMO_MARKE. Der Name muss deshalb aus der Antwort dieser
+    # Funktion kommen — sie kennt den Mandanten des Vorgangs.
+    ('FORK',
+     '      pdf_signed_url: pdfSignedUrl,',
+     '      firma: { name: await immoFirmenName(admin, vorgang.mandant_id) },\n'
+     '      pdf_signed_url: pdfSignedUrl,',
+     'Signaturseite: der Firmenname des Mandanten kommt mit der Antwort.',
+     {'signatur-token-validieren'}),
+
     # --- Das Neubauportal: Absendername und Grussformeln ------------------
     # Vier Funktionen schicken Mail an Kunden eines Bautraegers. Der
     # Absendername fiel auf den Namen des Demo-Mandanten zurueck, und unter
@@ -2959,7 +2993,7 @@ NACHBESSERN = [
      'import { createClient } from "jsr:@supabase/supabase-js@2";',
      'import { createClient } from "jsr:@supabase/supabase-js@2";\n\n// --- Firmenname des Mandanten (Phase 2.4) ---------------------------------\n// Die Neutralisierung hat den Namen der Referenz ueberall durch den des\n// Demo-Mandanten ersetzt. Fuer das Neutralitaets-Gate war das richtig; fuer\n// ein mandantenfaehiges Produkt ist ein verdrahteter Firmenname bei jedem\n// Mandanten ausser einem falsch — und er stand in Grussformeln, Briefkoepfen\n// und im OpenImmo-Feld <firma>, das jedes Portal anzeigt.\n//\n// Ohne Eintrag liefert diese Funktion einen LEEREN Text, keinen Beispielnamen.\n// Die aufrufende Stelle laesst die Zeile dann weg. Eine fehlende Grussformel\n// faellt auf; eine falsche nicht.\nasync function immoFirmenName(db: any, mandant: unknown): Promise<string> {\n  if (typeof mandant !== "string" || !mandant) return "";\n  const { data } = await db.from("firma_stammdaten")\n    .select("firma_name, marken_name")\n    .eq("mandant_id", mandant).eq("aktiv", true)\n    .order("sortierung", { ascending: true }).limit(1).maybeSingle();\n  return String(data?.marken_name || data?.firma_name || "").trim();\n}',
      'Helfer immoFirmenName eingezogen (Firmenname je Mandant).',
-     {'projekt-interaktion', 'projekt-datei-benachrichtigung', 'projekt-login', 'projekt-nachricht-antwort', 'objekt-landing', 'eigentuemer-nachricht-senden', 'newsletter-senden', 'besichtigung-nachfassen', 'eigentuemer-benachrichtigungen-versenden', 'signatur-unterschreiben', 'upload_benachrichtigung_planen', 'web-lead', 'expose-erinnerung', 'mail-ki-vorschlag', 'akq-ki-vorlage'}),
+     {'projekt-interaktion', 'projekt-datei-benachrichtigung', 'projekt-login', 'projekt-nachricht-antwort', 'objekt-landing', 'eigentuemer-nachricht-senden', 'newsletter-senden', 'besichtigung-nachfassen', 'eigentuemer-benachrichtigungen-versenden', 'signatur-unterschreiben', 'signatur-token-validieren', 'bewerbertest-abrufen', 'upload_benachrichtigung_planen', 'web-lead', 'expose-erinnerung', 'mail-ki-vorschlag', 'akq-ki-vorlage'}),
     ('FORK',
      '  const { data: alle } = await admin.from("mail_postfaecher")\n    .select("*").eq("mandant_id", mandant).eq("aktiv", true)\n    .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false }).limit(1);\n  return (alle || [])[0] || null;\n}',
      '  const { data: alle } = await admin.from("mail_postfaecher")\n    .select("*").eq("mandant_id", mandant).eq("aktiv", true)\n    .order("standard_zum_senden", { ascending: false }).order("ist_standard", { ascending: false }).limit(1);\n  const gewaehlt = (alle || [])[0] || null;\n  return gewaehlt ? { ...gewaehlt, firma_name: await immoFirmenName(admin, mandant) } : null;\n}',

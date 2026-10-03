@@ -809,7 +809,7 @@ Dazu kommt die Mailzustellung: Supabase verschickt die Bestätigungsmails
 Stunde). Für den echten Betrieb gehört dort ein eigener SMTP-Zugang
 hinterlegt — dieselbe Frage wie beim `RESEND_API_KEY`.
 
-## Der verdrahtete Firmenname steht noch in der Oberfläche
+## ~~Der verdrahtete Firmenname steht noch in der Oberfläche~~ — grösstenteils erledigt 03.10.2026
 
 `tests/firmenname-verdrahtet.py` hat die Klasse für `supabase/functions/`
 geschlossen: null von 107. Die Prüfung sieht aber nur dieses Verzeichnis.
@@ -822,10 +822,19 @@ ein Vorgabewert in einem Formular sind. Die drei Kundenseiten
 (`freigabe.html`, `objekt.html`, `unterlagen.html`) und `sonnenverlauf.html`
 sind behoben — dort war der Name ein Briefkopf.
 
-Der Weg ist derselbe wie bei den Funktionen: die Prüfung auf `src/` ausweiten,
-die Fundstellen einstufen (Kommentar / Heuristik / KI-Vorgabe / Ausgabe) und
-die Klasse „Ausgabe" auf null bringen. Vor einem echten zweiten Mandanten
-nötig; nicht vor Gate 2 zu schaffen.
+**Erledigt am 03.10.2026, am selben Tag.** 99 → 29, und keine der 29 ist ein
+Ausgabetext. Der Weg war `immoMarke()` beziehungsweise `immoMarkeMit()`, auf
+den beiden öffentlichen Seiten der Name aus der Antwort der Edge Function —
+siehe `docs/ENTSCHEIDUNGEN.md`. `tests/firmenname-verdrahtet.py` hat ein
+zweites Buch (`BUCH_OBERFLAECHE`) und meldet jede neue Stelle.
+
+**Was davon bewusst stehen bleibt und weiter offen ist:** vier Ordnernamen im
+angebundenen Dateispeicher (`001 | …` für die Vertragsvorlagen,
+`Musterhaus-Eigentuemer/…` für die Eigentümer-Unterlagen). Ein Pfad ist kein
+Text: ihn zu ändern verschiebt Dateien, die schon dort liegen. Das ist eine
+Umstellung mit Datenwanderung — sie gehört in die Arbeit am Dateispeicher
+(Abschnitt „Storage: die Buckets sind noch nicht getrennt"), nicht in eine
+Neutralisierung.
 
 Zwei Fallstricke für diesen Durchgang, beide am 03.10. gesehen:
 

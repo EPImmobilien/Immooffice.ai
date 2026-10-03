@@ -3578,6 +3578,87 @@ ERSETZUNGEN = [
      'Exposé\\-nicht\\-abgerufen\\-Karte\\ inkl\\.\\ onOffice\\-Agreementlinks',
      'Exposé-nicht-abgerufen-Karte inkl. Agreementlinks',
      'Kopfkommentar der Oberflaeche ohne Fremdmarke.'),
+
+    # --- Der Name des Mandanten in Ausgaben (Phase 2.4) ------------------
+    # Das Gegenstueck zu immoFirmenName in den Edge Functions, und mit
+    # derselben Regel: ohne Eintrag LEER, nie ein Beispielname.
+    # immoCiAnwenden setzt window.IMMO_MARKE beim Anmelden und leert es beim
+    # Abmelden — der Helfer steht deshalb direkt davor.
+    ('FORK',
+     r'async function immoCiAnwenden\(stamm\) \{',
+     '// Der Name des Mandanten, wie er nach aussen auftritt. Leer, wenn\n'
+     '// keine Stammdaten hinterlegt sind oder niemand angemeldet ist.\n'
+     '// Eine fehlende Grussformel faellt auf; eine falsche nicht.\n'
+     'function immoMarke() {\n'
+     '  const n = typeof window !== "undefined" ? window.IMMO_MARKE : null;\n'
+     '  return (typeof n === "string" && n.trim()) ? n.trim() : "";\n'
+     '}\n'
+     '// Mit Trenner davor und dahinter — oder gar nichts. Ein Gedankenstrich\n'
+     '// ohne Namen dahinter faellt auf, eine fehlende Zeile nicht.\n'
+     'function immoMarkeMit(vorne, hinten) {\n'
+     '  const n = immoMarke();\n'
+     '  return n ? (vorne || "") + n + (hinten || "") : "";\n'
+     '}\n'
+     'window.immoMarke = immoMarke; window.immoMarkeMit = immoMarkeMit;\n'
+     'async function immoCiAnwenden(stamm) {',
+     'Helfer immoMarke/immoMarkeMit eingezogen (Firmenname je Mandant).'),
+
+    # --- Die Bewerbertest-Seite ist oeffentlich ---------------------------
+    # Wie SignaturPublicPage: kein angemeldeter Nutzer, also kein
+    # window.IMMO_MARKE. Der Name kommt aus der Antwort von
+    # bewerbertest-abrufen, die seit heute firma.name mitschickt.
+    # Ein Bewerber, der sich bei Makler A bewirbt, hat auf der Testseite den
+    # Namen des Demo-Mandanten gelesen — dreimal, einmal als Begruessung.
+    ('FORK',
+     r'function BewerbertestPublicPage\(\{',
+     '// Bei wem bewirbt sich der Kandidat? Aus der Antwort von\n'
+     '// bewerbertest-abrufen, ohne Eintrag LEER.\n'
+     'function immoBwFirma(k) {\n'
+     '  const n = k && k.firma && k.firma.name;\n'
+     '  return (typeof n === "string" && n.trim()) ? n.trim() : "";\n'
+     '}\n'
+     'function BewerbertestPublicPage({',
+     'Bewerbertest: Helfer fuer den Firmennamen aus der Antwort.'),
+
+    # =====================================================================
+    # Die Signaturseite: drei Rechtstexte nannten den falschen Namen
+    # =====================================================================
+    # SignaturPublicPage ist OEFFENTLICH — kein angemeldeter Nutzer, also
+    # kein window.IMMO_MARKE. Der Name kommt aus der Antwort von
+    # signatur-token-validieren, die seit heute firma.name mitschickt
+    # (scripts/neutralisieren-funktionen.py).
+    #
+    # Betroffen waren: die Erklaerung zum vorzeitigen Taetigkeitsbeginn
+    # (sie nennt das Unternehmen, auf dessen Widerrufsfrist der
+    # Unterzeichner verzichtet — zweimal, einmal als angezeigter Text und
+    # einmal als gespeicherter Wortlaut) und der Datenschutzhinweis (er
+    # nennt den Verantwortlichen nach Art. 6 DSGVO). Ein falscher Name ist
+    # dort schlechter als keiner.
+    ('FORK',
+     r'function SignaturPublicPage\(\{',
+     '// Wer laesst hier unterschreiben? Der Name kommt mit der Antwort von\n'
+     '// signatur-token-validieren (firma.name) und ist ohne Eintrag in\n'
+     '// firma_stammdaten LEER — wie immoFirmenName in den Edge Functions.\n'
+     '// Der Rueckfall benennt keine Firma, sondern die Rolle: der\n'
+     '// Maklervertrag selbst nennt das Unternehmen, und ohne Stammdaten\n'
+     '// entsteht er ohnehin nicht (docs/ENTSCHEIDUNGEN.md).\n'
+     'function immoSigFirma(antwort) {\n'
+     '  const n = antwort && antwort.firma && antwort.firma.name;\n'
+     '  return (typeof n === "string" && n.trim()) ? n.trim() : "das Maklerunternehmen";\n'
+     '}\n'
+     'function SignaturPublicPage({',
+     'Signaturseite: Helfer fuer den Firmennamen aus der Antwort.'),
+    ('MARKE', r'onChange:\ e\ =>\ v\("taetigkeit_vorzeitig",\ "Ich\ verlange\ ausdrücklich,\ dass\ Musterhaus\ Immobilien\ GmbH\ bereits\ vor\ Ablauf\ der\ 14\-tägigen\ Widerrufsfrist\ mit\ der\ Maklertätigkeit\ beginnt\.",\ e\.target\.checked,\ g\),', 'onChange: e => v("taetigkeit_vorzeitig", `Ich verlange ausdrücklich, dass ${immoSigFirma(i)} bereits vor Ablauf der 14-tägigen Widerrufsfrist mit der Maklertätigkeit beginnt.`, e.target.checked, g),',
+     'Signaturseite: der gespeicherte Wortlaut der Erklaerung zum '
+     'vorzeitigen Taetigkeitsbeginn nennt den Mandanten.'),
+    ('MARKE', r'",\ dass\ Musterhaus\ Immobilien\ GmbH\ bereits\ vor\ Ablauf\ der\ 14\-tägigen\ Widerrufsfrist\ mit\ der\ Maklertätigkeit\ beginnt\."\)\)', '`, dass ${immoSigFirma(i)} bereits vor Ablauf der 14-tägigen Widerrufsfrist mit der Maklertätigkeit beginnt.`))',
+     'Signaturseite: der angezeigte Text derselben Erklaerung.'),
+    ('MARKE', r'"\ Zur\ rechtssicheren\ Dokumentation\ des\ Vertragsschlusses\ verarbeitet\ die\ Musterhaus\ Immobilien\ GmbH\ Ihren\ Namen', '` Zur rechtssicheren Dokumentation des Vertragsschlusses verarbeitet ${immoSigFirma(i)} Ihren Namen',
+     'Signaturseite: der Datenschutzhinweis nennt den Verantwortlichen. Die '
+     'ganze Zeichenkette wird zur Schablone — in einem Anfuehrungsstrich-'
+     'Literal stuende ${...} als Text da.'),
+    ('MARKE', r'Weitere\ Informationen:\ immooffice\.example/datenschutz"\)', 'Weitere Informationen: immooffice.example/datenschutz`)',
+     'Signaturseite: und ihr Ende, damit die Schablone geschlossen wird.'),
 ]
 
 
@@ -3669,6 +3750,285 @@ SEITEN_ERSETZUNGEN = [
      r'Authorization:"Bearer "\+ANON\}',
      'headers:{"Content-Type":"application/json"}',
      'unterlagen.html: Aufruf ohne apikey-Kopf, wie in freigabe.html.'),
+]
+
+
+# ===========================================================================
+# WOERTLICH — Suchtext ist Suchtext, Ersatz ist Ersatz
+#
+# Warum eine zweite Liste neben ERSETZUNGEN: dort ist der Suchtext ein
+# regulaerer Ausdruck. Das hat zweimal Schaden angerichtet — einmal hat eine
+# Regel mitten in einem Wort getroffen, einmal stand ein \n im Ersatz und
+# wurde als Rueckverweis gelesen. Beides kann hier nicht passieren:
+# str.replace kennt keine Sonderzeichen.
+#
+# Angewendet NACH ERSETZUNGEN, also auf das Ergebnis der regulaeren Regeln.
+# Die Notbremse gegen zu breite Regeln gilt genauso.
+#
+# Fast alles hier dreht sich um EINE Sache: den Firmennamen in einer Ausgabe.
+# Die Vorlage hatte ihren eigenen verdrahtet, die Neutralisierung hat daraus
+# den des Demo-Mandanten gemacht — und der ist bei jedem anderen Makler
+# falsch. In Kalendereinladungen, PDF-Fusszeilen, Grussformeln unter Mails
+# und Portaltexten, die seine Kunden lesen. Der Weg ist immoMarke(), und der
+# liefert ohne Eintrag LEER, nie einen Beispielnamen.
+# ===========================================================================
+WOERTLICH = [
+    # --- Kalendereinladungen (ICS) ---------------------------------------
+    ('MARKE', '"PRODID:-//Musterhaus Immobilien GmbH//ImmoOffice//DE"',
+     '"PRODID:-//ImmoOffice//DE"',
+     'ICS-Kennung des erzeugenden Programms. Sie ist technisch, nicht '
+     'fachlich — dort gehoert das Produkt hin, nicht der Mandant.'),
+    ('MARKE', 'l.organizerName||"Musterhaus Immobilien GmbH"',
+     'l.organizerName||immoMarke()',
+     'ICS: der Einladende, wenn kein Name mitkommt.'),
+    ('MARKE', 'o.organizerName || "Musterhaus Immobilien GmbH"',
+     'o.organizerName || immoMarke()',
+     'ICS der Termineinladung: derselbe Rueckfall.'),
+    ('MARKE', '`${s} – Musterhaus Immobilien GmbH`',
+     '`${s}${immoMarkeMit(" – ")}`',
+     'ICS-Betreff im Kalender des Kunden (Adressbuch).'),
+    ('MARKE', '`${o} – Musterhaus Immobilien GmbH`',
+     '`${o}${immoMarkeMit(" – ")}`',
+     'ICS-Betreff im Kalender des Kunden (Kontakt).'),
+    ('MARKE', '`${i} – Musterhaus Immobilien GmbH`',
+     '`${i}${immoMarkeMit(" – ")}`',
+     'ICS-Betreff im Kalender des Kunden (Termin).'),
+    ('MARKE',
+     '(termin.titel || termin.art || "Termin") + " – Musterhaus Immobilien GmbH"',
+     '(termin.titel || termin.art || "Termin") + immoMarkeMit(" – ")',
+     'ICS-Betreff der Einladung aus dem Kalender.'),
+    ('MARKE', '"Besichtigung Ihrer Immobilie – Musterhaus Immobilien GmbH"',
+     '"Besichtigung Ihrer Immobilie" + immoMarkeMit(" – ")',
+     'ICS-Betreff der Besichtigung beim Eigentuemer.'),
+    ('MARKE',
+     '"Mit freundlichen Grüßen", o.absender, "Musterhaus Immobilien GmbH",',
+     '"Mit freundlichen Grüßen", o.absender, immoMarke(),',
+     'Grussformel im Beschreibungstext der Einladung.'),
+
+    # --- Grussformeln unter Mails ----------------------------------------
+    ('MARKE', '\\nMusterhaus Immobilien GmbH`', '${immoMarkeMit("\\n")}`',
+     'Grussformel unter Mails an Kunden und Eigentuemer.'),
+    ('MARKE', '\\nMusterhaus Immobilien`', '${immoMarkeMit("\\n")}`',
+     'Dieselbe Grussformel ohne Rechtsform (Rechnungsmails).'),
+    ('MARKE', '${a||"Ihr Musterhaus Immobilien Team"}', '${a||immoMarke()}',
+     'Terminmails: der Absender, wenn kein Name mitkommt.'),
+    ('MARKE', '${r||"Ihr Musterhaus Immobilien Team"}', '${r||immoMarke()}',
+     'Terminverschiebung: derselbe Rueckfall.'),
+    ('MARKE', '${name || "Ihr Musterhaus Immobilien Team"}', '${name || immoMarke()}',
+     'Besichtigungsmails an den Eigentuemer: derselbe Rueckfall.'),
+    ('MARKE', 'makler && makler.name || "Ihr Musterhaus Immobilien Team"',
+     'makler && makler.name || immoMarke()',
+     'Platzhalter {{makler_name}} in den Mailvorlagen.'),
+    ('MARKE', 'p.push("Musterhaus Immobilien"), {', 'p.push(immoMarke()), {',
+     'Notarmail: die Grussformel.'),
+    ('MARKE', '"{{absender_firma}}": "Musterhaus Immobilien GmbH",',
+     '"{{absender_firma}}": immoMarke(),',
+     'Der Platzhalter {{absender_firma}} selbst — er stand auf dem '
+     'Demo-Mandanten, also setzte jede Vorlage dessen Namen ein.'),
+    ('MARKE',
+     'e.abwesend_betreff || "Abwesenheitsnotiz — Musterhaus Immobilien GmbH"',
+     'e.abwesend_betreff || ("Abwesenheitsnotiz" + immoMarkeMit(" — "))',
+     'Betreff der Abwesenheitsnotiz, die an jeden Absender zurueckgeht.'),
+    ('MARKE', 'f.firma_name || "Musterhaus Immobilien GmbH"',
+     'f.firma_name || immoMarke()',
+     'Newsletter: Briefkopf und Fusszeile, wenn die Stammdaten fehlen.'),
+
+    # --- PDF, Word, SVG ---------------------------------------------------
+    ('MARKE', 'n.text("Musterhaus Immobilien GmbH · immooffice.example", l, o)',
+     'n.text(immoMarkeMit("", " · immooffice.example"), l, o)',
+     'Fusszeile des Uebergabeprotokolls.'),
+    ('MARKE', 'n.text("Musterhaus Immobilien GmbH · immooffice.example", l, r - 9)',
+     'n.text(immoMarkeMit("", " · immooffice.example"), l, r - 9)',
+     'Fusszeile eines weiteren PDF.'),
+    ('MARKE', 'a("Musterhaus Immobilien GmbH — Notar-Laufzettel")',
+     'a(immoMarkeMit("", " — ") + "Notar-Laufzettel")',
+     'Fusszeile des Notar-Laufzettels.'),
+    ('MARKE', '  -  Musterhaus Immobilien GmbH`', '${immoMarkeMit("  -  ")}`',
+     'Kopfzeile des Notar-Laufzettels.'),
+    ('MARKE', '— Musterhaus Immobilien GmbH</w:t>', '${immoMarkeMit(" — ")}</w:t>',
+     'Kopfzeile des Word-Dokuments zum Kaufvertrag.'),
+    ('MARKE', 'text("Musterhaus Immobilien GmbH · Zins & Preis", rand, y)',
+     'text(immoMarkeMit("", " · ") + "Zins & Preis", rand, y)',
+     'Kopfzeile des Zins-und-Preis-PDF.'),
+    ('MARKE', 'text("Musterhaus Immobilien GmbH · Musterstadt · Berlin", rand, H - 12)',
+     'text(immoMarke(), rand, H - 12)',
+     'Dessen Fusszeile — sie trug dazu zwei Standorte des Demo-Mandanten.'),
+    ('MARKE', 'n("Musterhaus Immobilien GmbH · Energieberatung")',
+     'n(immoMarkeMit("", " · ") + "Energieberatung")',
+     'Kopfzeile des Energieausweis-PDF.'),
+    ('MARKE', 'p = r.firma || "Musterhaus Immobilien GmbH",',
+     'p = r.firma || immoMarke(),',
+     'Briefkopf eines PDF, wenn die Stammdaten fehlen.'),
+    ('MARKE', 'h = r.fusszeile || "Musterhaus Immobilien GmbH · Musterstadt · Berlin";',
+     'h = r.fusszeile || immoMarke();',
+     'Dessen Fusszeile, ebenfalls mit zwei Standorten.'),
+    ('MARKE', '>Musterhaus Immobilien GmbH</text></svg>`',
+     '>${immoMarke()}</text></svg>`',
+     'Erzeugtes Vorschaubild: der Name stand als Text im SVG.'),
+
+    # --- Eigentuemerportal und Meldungen ----------------------------------
+    ('MARKE', '"Bitte wenden Sie sich an Musterhaus Immobilien."',
+     '"Bitte wenden Sie sich an Ihren Ansprechpartner."',
+     'Fehlermeldung im Eigentuemerportal. Der Firmenname half dort nicht — '
+     'wer die Meldung liest, kennt seinen Makler.'),
+    ('MARKE', 'e.absender_name || "Musterhaus Immobilien"',
+     'e.absender_name || immoMarke()',
+     'Neubauportal: der Absender einer Nachricht an den Kunden.'),
+    ('MARKE', 'n.absender_name || "Musterhaus Immobilien"',
+     'n.absender_name || immoMarke()',
+     'Dieselbe Nachrichtenliste an anderer Stelle.'),
+    ('MARKE', 'Wir bei Musterhaus Immobilien stellen Ihnen',
+     'Wir stellen Ihnen',
+     'Hilfetext im Eigentuemerportal.'),
+    ('MARKE', 'Ansprechpartner bei Musterhaus Immobilien mit Telefon',
+     'Ansprechpartner mit Telefon',
+     'Zweiter Hilfetext im Eigentuemerportal.'),
+    ('MARKE', 'Ansprechpartner bei Musterhaus Immobilien GmbH."',
+     'Ansprechpartner."',
+     'Hinweis, wenn das Konto keinem Eigentuemer zugeordnet ist.'),
+    ('MARKE', '${d.vomMakler} von Musterhaus', '${d.vomMakler} vom Makler',
+     'Zaehler der hochgeladenen Unterlagen im Eigentuemerportal.'),
+    ('MARKE', '"Neues Dokument von Musterhaus Immobilien"',
+     '"Neues Dokument von " + (immoMarke() || "Ihrem Makler")',
+     'Titel einer Meldung an den Eigentuemer.'),
+    ('MARKE', '"Musterhaus hat auf Ihre Anmerkungen geantwortet"',
+     '(immoMarke() || "Ihr Makler") + " hat auf Ihre Anmerkungen geantwortet"',
+     'Titel der zweiten Meldung an den Eigentuemer.'),
+    ('MARKE', '"· Von Musterhaus hinterlegt"', '"· Vom Makler hinterlegt"',
+     'Herkunftsvermerk an einer Datei im Eigentuemerportal.'),
+
+    # --- Ein namentlich genannter Dritter ---------------------------------
+    # „Joern Musterhaus" ist kein Firmenname, sondern eine PERSON: der
+    # Energieberater, mit dem die Vorlage zusammenarbeitet. Die
+    # Neutralisierung hat den Nachnamen ersetzt und den Vornamen stehen
+    # gelassen. In einem mandantenfaehigen Produkt hat der Name des
+    # Dienstleisters EINES Maklers in den Texten aller anderen nichts zu
+    # suchen — und vier dieser Texte lesen Eigentuemer.
+    ('MARKE', 'unser Energieberater Jörn Musterhaus erstellt daraus',
+     'unser Energieberater erstellt daraus',
+     'Energieausweis: der namentlich genannte Energieberater.'),
+    ('MARKE', 'Unser Energieberater Jörn Musterhaus erstellt daraus',
+     'Unser Energieberater erstellt daraus',
+     'Derselbe Satz am Satzanfang.'),
+    ('MARKE', 'unseren Energieberater Jörn Musterhaus weiter',
+     'unseren Energieberater weiter',
+     'Derselbe Name im Hinweis zum Weiterleiten.'),
+
+    # --- Reste -------------------------------------------------------------
+    ('MARKE', '}, "Musterhaus Immobilien GmbH")))), React.createElement("nav", {',
+     '}, immoMarke())))), React.createElement("nav", {',
+     'Firmenname in der Kopfzeile der Anwendung.'),
+    ('MARKE', '}, "Musterhaus Immobilien GmbH"), React.createElement("h1",',
+     '}, immoMarke()), React.createElement("h1",',
+     'Firmenname ueber einer Ueberschrift.'),
+    ('MARKE', '}, "Musterhaus Immobilien GmbH"), t.email &&',
+     '}, immoMarke()), t.email &&',
+     'Firmenname im Kontaktblock des Energieausweis-Formulars.'),
+    ('MARKE', 'Texte für Exposes im Musterhaus-Stil',
+     'Texte für Exposes im Stil des Hauses',
+     'Beschreibung der Expose-Schmiede im Admin.'),
+    # In der Anwendung ist der Sonnenverlauf eine Zeichenkette, also sind
+    # ihre Anfuehrungszeichen und Zeilenumbrueche maskiert: \\' und \\n
+    # stehen woertlich im Quelltext.
+    ('MARKE',
+     "\\'<div class=\"marke\">Musterhaus Immobilien <span>Immobilien</span></div>\\' +\\n      ",
+     '',
+     'Die Markenzeile im eingebetteten Sonnenverlauf. Dieselbe Stelle wie '
+     'in src/seiten/sonnenverlauf.html, nur liegt sie hier als Zeichenkette '
+     'in der Anwendung.'),
+
+    # --- Die oeffentliche Bewerbertest-Seite ------------------------------
+    ('FORK', 'd(e.katalog), m(e.kandidat), r("start")',
+     'd(e.katalog), m(Object.assign({}, e.kandidat, { firma: e.firma })), r("start")',
+     'Bewerbertest: der Firmenname aus der Antwort haengt am Kandidaten, '
+     'damit immoBwFirma ihn findet.'),
+    ('MARKE', '}, "Musterhaus Immobilien"), React.createElement("div", {',
+     '}, immoBwFirma(u)), React.createElement("div", {',
+     'Bewerbertest: der Briefkopf der Seite.'),
+    ('MARKE', '}, "Musterhaus Immobilien GmbH ", React.createElement("span", {',
+     '}, immoBwFirma(u) + " ", React.createElement("span", {',
+     'Bewerbertest: der Firmenname in der Fusszeile.'),
+    ('MARKE', '}, "\u25c6"), " Musterstadt \u00b7 Beispielstadt \u00b7 Berlin");',
+     '}, ""), "");',
+     'Bewerbertest: drei Standorte des Demo-Mandanten in derselben '
+     'Fusszeile. Ohne Namen daneben hat auch das Trennzeichen keinen Sinn.'),
+    ('MARKE',
+     '" \u2014 sch\u00f6n, dass Sie sich f\u00fcr Musterhaus Immobilien interessieren.',
+     '" \u2014 sch\u00f6n, dass Sie sich f\u00fcr ", (immoBwFirma(u) || "uns"), " interessieren.',
+     'Bewerbertest: die Begruessung des Kandidaten.'),
+
+    # --- Logos: der Alternativtext ist Ausgabe ---------------------------
+    # Er steht im Vorlesewerkzeug, er steht da, wenn das Bild nicht laedt,
+    # und er landet in Exporten.
+    ('MARKE', 'alt: "Musterhaus Immobilien GmbH",', 'alt: immoMarke(),',
+     'Alternativtext der Logos.'),
+
+    # --- Die Vorgabe eines Feldes, das auf Visitenkarten gedruckt wird ---
+    # PRINT_FELDER steht auf Modulebene, also VOR dem Anmelden. Ein Aufruf
+    # von immoMarke() waere dort immer leer. Ein Getter wird erst beim Lesen
+    # ausgewertet — und gelesen wird nach dem Anmelden.
+    ('MARKE', 'value: "Musterhaus Immobilien GmbH"',
+     'get value() { return immoMarke(); }',
+     'Vorgabewert des Feldes "Firma (statisch)" in den Druckvorlagen.'),
+
+    # --- Die eigene Projektadresse gehoert in die Konfiguration -----------
+    # Drei Stellen bauen die Adresse selbst zusammen, statt
+    # window.IMMO_SUPABASE_URL zu nehmen, das huelle/01-kopf.html setzt. Die
+    # Neutralisierung hat sie auf das eigene Projekt gezogen, also faellt es
+    # keinem Gate auf — aber derselbe Quellstand liesse sich damit nicht
+    # gegen ein zweites Projekt ausliefern.
+    ('FREMD', '"https://usguiggfciavwzkdfjgt.supabase.co/functions/v1"',
+     '(window.IMMO_SUPABASE_URL + "/functions/v1")',
+     'Bewerbertest-Seite: Funktionsadresse aus der Konfiguration.'),
+    ('FREMD',
+     '"https://usguiggfciavwzkdfjgt.supabase.co/storage/v1/object/public/web-assets/logo-weiss.png"',
+     '(window.IMMO_SUPABASE_URL + "/storage/v1/object/public/web-assets/logo-weiss.png")',
+     'Newsletter-Logo: Adresse aus der Konfiguration.'),
+    ('FREMD', '"https://usguiggfciavwzkdfjgt.supabase.co"',
+     'window.IMMO_SUPABASE_URL',
+     'Transfer-Werkzeug: Projektadresse aus der Konfiguration.'),
+
+    # --- Huelle und Startskripte -----------------------------------------
+    # Hier stand der Name nicht in einer Komponente, sondern in der
+    # Verpackung: im Seitentitel des Browserfensters, im Ladebildschirm, in
+    # zwei eingebetteten Ersatzseiten und in zwei Protokollzeilen.
+    ('MARKE', '<title>ImmoOffice – Musterhaus Immobilien GmbH</title>',
+     '<title>ImmoOffice</title>',
+     'Seitentitel des Browserfensters. Den Namen des Mandanten traegt jetzt '
+     'immoCiAnwenden nach, sobald er bekannt ist.'),
+    ('MARKE', '<div class="text">Lade Musterhaus Immobilien Portal</div>',
+     '<div class="text">Lade ImmoOffice</div>',
+     'Ladebildschirm, bevor irgendetwas geladen ist — zu diesem Zeitpunkt '
+     'kann niemand wissen, welcher Mandant kommt.'),
+    ('MARKE', 'Expos\\u00e9-Freigabe \\u2013 Musterhaus Immobilien GmbH',
+     'Expos\\u00e9-Freigabe',
+     'Titel der eingebetteten Ersatzseite fuer die Expose-Freigabe.'),
+    ('MARKE', '360\\u00b0-Rundgang \\u2013 Musterhaus Immobilien GmbH',
+     '360\\u00b0-Rundgang',
+     'Titel der eingebetteten Rundgang-Seite.'),
+    ('MARKE',
+     '      <div class=\\"n\\">Musterhaus Immobilien <span>Immobilien</span></div>\\n',
+     '',
+     'Briefkopf der eingebetteten Rundgang-Seite. Sie ist oeffentlich und '
+     'bekommt nur eine Rundgang-Kennung mitgegeben, keinen Mandanten — ein '
+     'Briefkopf aus den Stammdaten geht hier nicht, also keiner.'),
+    ('MARKE', '\\" \\u2013 360\\u00b0-Rundgang | Musterhaus Immobilien GmbH\\"',
+     '\\" \\u2013 360\\u00b0-Rundgang\\"',
+     'Dessen Fenstertitel.'),
+    ("MARKE", "'[Musterhaus] pdf.js geladen", "'[ImmoOffice] pdf.js geladen",
+     'Protokollzeile in der Browserkonsole.'),
+    ("MARKE", "'[Musterhaus] pdf.js nicht", "'[ImmoOffice] pdf.js nicht",
+     'Dieselbe Zeile im Fehlerfall.'),
+    ('FORK',
+     'window.IMMO_MARKE = (stamm && (stamm.marken_name || stamm.firma_name)) || null;',
+     'window.IMMO_MARKE = (stamm && (stamm.marken_name || stamm.firma_name)) || null;\n'
+     '  // Der Fenstertitel traegt den Mandanten nach, sobald er bekannt ist.\n'
+     '  // Vorher steht dort nur "ImmoOffice" — der Titel entsteht, bevor\n'
+     '  // irgendetwas geladen ist.\n'
+     '  if (typeof document !== "undefined") {\n'
+     '    document.title = "ImmoOffice" + (window.IMMO_MARKE ? " – " + window.IMMO_MARKE : "");\n'
+     '  }',
+     'Fenstertitel mit dem Namen des Mandanten, nach dem Anmelden.'),
 ]
 
 
@@ -4371,6 +4731,14 @@ def main():
                 pruefe_haeufigkeit(n, bemerkung, datei)
                 if n:
                     zaehler[(grund, muster)] = zaehler.get((grund, muster), 0) + n
+            # Woertlich, nach den regulaeren Ausdruecken: hier ist der
+            # Suchtext der Suchtext, und der Ersatz ist der Ersatz.
+            for grund, suche, ersatz, bemerkung in WOERTLICH:
+                n = inhalt.count(suche)
+                pruefe_haeufigkeit(n, bemerkung, datei)
+                if n:
+                    inhalt = inhalt.replace(suche, ersatz)
+                    zaehler[(grund, suche)] = zaehler.get((grund, suche), 0) + n
             if datei == 'huelle/01-kopf.html':
                 inhalt += KONFIGURATION
         p = ziel / datei
@@ -4382,11 +4750,11 @@ def main():
         return 0
 
     print('Neutralisierung der Oberflaeche:')
-    for grund, muster, _, bemerkung in ERSETZUNGEN:
+    for grund, muster, _, bemerkung in ERSETZUNGEN + WOERTLICH:
         n = zaehler.get((grund, muster), 0)
         if n:
             print(f'  [{grund:5s}] {n:4d}x  {bemerkung}')
-    nie = [b for g, m, _, b in ERSETZUNGEN if not zaehler.get((g, m))]
+    nie = [b for g, m, _, b in ERSETZUNGEN + WOERTLICH if not zaehler.get((g, m))]
     if nie:
         print(f'\n  {len(nie)} Regel(n) ohne Treffer:')
         for b in nie:
