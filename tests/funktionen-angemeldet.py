@@ -175,6 +175,15 @@ ABGESICHERT = {
     'fahrt-ermitteln': ('aufruferMandant',
         'Der erste Fund dieser Art (29.09.2026). Prueft jetzt erst das '
         'Objekt und den Mandanten, dann den Zwischenspeicher.'),
+    'grundriss-ki-lesen': ('immoMandantDesAufrufers',
+        'Eigene Funktion des Forks (supabase/eigene/). Der Mandant kommt aus '
+        'dem Konto, nie aus dem Anfragekoerper. Die mitgeschickte '
+        'immobilie_id wird dagegen gehalten, bevor sie am Auftrag landet — '
+        'ohne das haette ein Angemeldeter seinen KI-Auftrag an ein Objekt '
+        'eines fremden Maklers haengen koennen, und dessen Chef haette '
+        'danach einen Grundriss in seinen Kosten gefunden, den er nie '
+        'bestellt hat. Die Auftragszeile selbst wird bei jedem Schreiben '
+        'zusaetzlich auf den Mandanten begrenzt.'),
 }
 
 # --- Gelesen und fuer unbedenklich befunden ---------------------------------

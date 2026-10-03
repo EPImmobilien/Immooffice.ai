@@ -2,7 +2,7 @@
 #
 # Einziger Zweck bisher: fuer JEDE Edge Function festhalten, ob die Plattform
 # vor dem Aufruf ein gueltiges JWT verlangt. Ohne diesen Eintrag setzt die
-# Supabase-CLI verify_jwt = true — und damit waeren die 39 oeffentlich
+# Supabase-CLI verify_jwt = true — und damit waeren die 29 oeffentlich
 # erreichbaren Funktionen tot: der Abmeldelink im Newsletter, die
 # Objekt-Landingpage, der Lead-Eingang, der Bewerbertest.
 #
@@ -14,13 +14,18 @@
 #   -  9 stillgelegte Funktionen stehen auf true, wie es ihr Kopfkommentar vom
 #     23.09.2026 ausdruecklich festhaelt.
 #
+# Die Zahlen oben sind der Stand der Uebernahme (139 Funktionen). Seither
+# sind onOffice, jotform und yodeck entfallen (CLAUDE.md, Phase 1.4), und
+# die eigenen Funktionen aus supabase/eigene/ sind dazugekommen; ihr
+# Eintrag steht dort, wo er alphabetisch hingehoert, mit Begruendung.
+#
 # Wer einen Wert aendert, oeffnet oder schliesst eine Tuer ins Projekt. Das
 # gehoert in den Diff und nicht in die Oberflaeche von Supabase.
 
 project_id = "usguiggfciavwzkdfjgt"
 
 
-# --- Ohne JWT-Pruefung (30) ------------------------------------------
+# --- Ohne JWT-Pruefung (29) ------------------------------------------
 # Jede dieser Funktionen ist aus dem offenen Netz erreichbar und muss
 # ihren Zugang selbst pruefen — ueber einen Token im Link, eine eigene
 # Kopfzeile oder ein Geheimnis aus dem Vault.
@@ -118,7 +123,7 @@ verify_jwt = false
 verify_jwt = false
 
 
-# --- Mit JWT-Pruefung (109) -------------------------------------------
+# --- Mit JWT-Pruefung (91) --------------------------------------------
 
 [functions.akq-automation-lauf]
 verify_jwt = true
@@ -229,6 +234,12 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.generate-text]
+verify_jwt = true
+
+[functions.grundriss-ki-lesen]
+# Eigene Funktion des Forks (supabase/eigene/). Wird nur aus der angemeldeten
+# Oberflaeche aufgerufen und nimmt den Mandanten aus dem Konto des Aufrufers,
+# also JWT-Pruefung durch die Plattform.
 verify_jwt = true
 
 [functions.mail-abwesenheit-verarbeiten]

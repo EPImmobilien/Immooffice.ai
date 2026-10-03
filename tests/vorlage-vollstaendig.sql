@@ -212,7 +212,9 @@ zuwachs(bereich, mehr, grund) as (values
                                   'Tabelle'),
   ('Funktionen', 2, 'fork_31: portale_liste(), admin_kosten_messwerte()'),
   ('Spalten', 3, 'fork_31i: immobilie_datei.privat_status, .privat_befund, .privat_vorschlag_pfad (Stufe 112)'),
-  ('Buckets', 2, 'fork_31j: scan-dateien (Stufe 124/125), transfer-dateien (Stufe 117)')
+  ('Buckets', 2, 'fork_31j: scan-dateien (Stufe 124/125), transfer-dateien (Stufe 117)'),
+  ('Funktionen', 1, 'fork_31l: grundriss_ki_waechter() — Waechter fuer den Hintergrundlauf von grundriss-ki-lesen'),
+  ('Cron-Jobs', 2, 'fork_31l: unterlagen-link-melden-5min, grundriss-ki-waechter-5min')
 ),
 soll(bereich, soll) as (
   select v.bereich,
