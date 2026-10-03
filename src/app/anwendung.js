@@ -136595,6 +136595,15 @@ function epTrSchluessel(name, i) {
 }
 // Upload mit Fortschritt (XHR auf die Storage-API); im Test austauschbar über window.epTransferHochladen
 async function epTrHochladenStandard(pfad, datei, fortschritt) {
+  // Dieser Upload geht als nackter XHR an die Storage-API und laeuft
+  // damit NEBEN der Storage-Huelle vorbei, die sonst jedem Pfad den
+  // Mandanten voranstellt. Ohne diese Zeilen fehlte das erste
+  // Pfadsegment, und die restriktive Richtlinie aus fork_09
+  // (foldername[1] = Mandant) wuerde den Upload abweisen — die
+  // Oberflaeche zeigte einen Fehler, den niemand einem Pfad zuordnet.
+  const immoM = window.IMMO_MANDANT_ID;
+  if (!immoM) throw new Error("Kein Mandant am Konto - bitte neu anmelden.");
+  if (!String(pfad).startsWith(immoM + "/")) pfad = immoM + "/" + pfad;
   const { data } = await window._sb.auth.getSession();
   const token = data && data.session && data.session.access_token;
   if (!token) throw new Error("Nicht angemeldet – bitte neu anmelden.");

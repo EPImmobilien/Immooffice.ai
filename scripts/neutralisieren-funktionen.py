@@ -26,6 +26,11 @@ import pathlib, re, shutil, sys
 WURZEL = pathlib.Path(__file__).resolve().parent.parent
 QUELLE = WURZEL / 'reference' / 'functions'
 ZIEL = WURZEL / 'supabase' / 'functions'
+# Funktionen, die es in der Vorlage nicht gibt. Sie koennen nicht aus
+# reference/functions entstehen und ueberleben den rmtree unten nur, weil
+# sie woanders liegen und danach hereinkopiert werden. Siehe
+# supabase/eigene/README.md.
+EIGENE = WURZEL / 'supabase' / 'eigene'
 
 # --------------------------------------------------------------- Phase 1.4
 # Vier Funktionen entfallen ersatzlos. jotform-* ist der Formular-Sync des
@@ -3760,7 +3765,29 @@ def main():
         for b in nie:
             print(f'    - {b}')
     print(f'\n[PHASE14] {len(gestrichen)} Funktionen gestrichen: {", ".join(gestrichen)}')
-    print(f'{uebernommen} Funktionen geschrieben nach {ZIEL}')
+    # --- Eigene Funktionen des Forks dazu -------------------------------
+    # Nach dem Neuaufbau, nicht davor: rmtree raeumt oben alles weg.
+    eigene = []
+    if EIGENE.is_dir():
+        for ordner in sorted(EIGENE.iterdir()):
+            if not ordner.is_dir():
+                continue
+            ziel_ordner = ZIEL / ordner.name
+            if ziel_ordner.exists():
+                sys.exit(f'ABBRUCH: {ordner.name} gibt es in supabase/eigene UND in '
+                         'der Vorlage. Eine geaenderte Fassung einer Funktion der '
+                         'Vorlage gehoert als Regel in dieses Skript, nicht nach '
+                         'supabase/eigene (siehe dortige README).')
+            shutil.copytree(ordner, ziel_ordner)
+            eigene.append(ordner.name)
+    if eigene:
+        print(f'\n[EIGEN] {len(eigene)} Funktion(en) aus supabase/eigene/ '
+              f'uebernommen: {", ".join(eigene)}')
+        print('        Sie haben keine Entsprechung in der Vorlage und werden '
+              'deshalb\n        nicht gegen sie verglichen.')
+
+    print(f'{uebernommen} Funktionen aus der Vorlage und {len(eigene)} eigene '
+          f'geschrieben nach {ZIEL}')
 
 
 if __name__ == '__main__':

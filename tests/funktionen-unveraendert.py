@@ -20,6 +20,7 @@ import base64, difflib, pathlib, re, sys
 WURZEL = pathlib.Path(__file__).resolve().parent.parent
 VORLAGE = WURZEL / 'reference' / 'functions'
 FORK = WURZEL / 'supabase' / 'functions'
+EIGENE = WURZEL / 'supabase' / 'eigene'
 
 # Was eine Zeile enthalten haben muss, damit ihre Aenderung erklaert ist.
 #
@@ -211,6 +212,7 @@ def main():
 
     beanstandet = []
     erweitert = []
+    eigen = set()
     geprueft = 0
     for ordner in sorted(FORK.iterdir()):
         if not ordner.is_dir():
@@ -220,6 +222,14 @@ def main():
                 continue
             alt = VORLAGE / ordner.name / neu.relative_to(ordner)
             if not alt.exists():
+                # Eigene Funktionen des Forks haben keine Entsprechung in der
+                # Vorlage — das ist ihr Wesen, kein Befund. Sie liegen
+                # versioniert in supabase/eigene/ und werden vom Erzeuger
+                # dazukopiert; dieser Test prueft die UEBERSETZUNG der Vorlage
+                # und hat zu ihnen nichts zu sagen.
+                if (EIGENE / ordner.name).is_dir():
+                    eigen.add(ordner.name)
+                    continue
                 beanstandet.append((str(neu), 0, 'hat keine Entsprechung in der Vorlage'))
                 continue
             if ordner.name in ERWEITERT:
@@ -260,6 +270,9 @@ def main():
 
     print(f'[ok] {geprueft} Dateien verglichen — jede Aenderung entfernt ein '
           f'Kennzeichen der Vorlage.')
+    if eigen:
+        print(f'     {len(eigen)} eigene Funktion(en) des Forks, ohne Entsprechung '
+              f'in der Vorlage: {", ".join(sorted(eigen))}')
     for name in sorted(set(erweitert)):
         print(f'     erweitert, deshalb nicht Zeile fuer Zeile geprueft: '
               f'{name} — {ERWEITERT[name]}')

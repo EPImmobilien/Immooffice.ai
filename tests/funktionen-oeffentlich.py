@@ -122,6 +122,18 @@ ABGESICHERT = {
         'des Mandantenordners und damit fuer die Anwendung unsichtbar und '
         'nicht mehr loeschbar. Jetzt mit Mandanten davor; ohne ihn wird '
         'nichts abgelegt.'),
+    'unterlagen-link': ('mandantDesAufrufers',
+        'Eigene Funktion des Forks, kein Erbstueck der Vorlage. Zwei Haelften '
+        'in einer Datei, und das ist der Grund fuer den Eintrag. Die '
+        'oeffentliche Haelfte (info, datei) hat als Ausweis allein den Token: '
+        '32 Zufallsbytes, die genau eine Zeile benennen; Titel, Absender, '
+        'Firma, Objekt und Dateiliste kommen aus dem Mandanten DIESER Zeile, '
+        'nie aus einem Vorgabewert. Die andere Haelfte (anlegen, loeschen) '
+        'ist nicht oeffentlich, obwohl die Funktion ohne JWT laeuft: sie '
+        'prueft den Authorization-Kopf selbst, nimmt den Mandanten aus dem '
+        'profiles-Satz des Kontos und begrenzt Objekt, Kontakt, Transferpfad '
+        'und beide inserts darauf. Transferpfade muessen mit dem eigenen '
+        'Mandanten beginnen. melden ist der Cron und laeuft je Mandant.'),
     'web-lead': ('immoMandantAusAnfrage',
         'Eingang fuer Bewertungsanfragen. Mandant aus der Anfrage, Chef und '
         'Empfaenger aus dem Mandanten; Kontaktsuche und beide inserts sind '

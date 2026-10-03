@@ -105,6 +105,12 @@ verify_jwt = false
 [functions.suchkriterien-newsletter]
 verify_jwt = false
 
+[functions.unterlagen-link]
+# Eigene Funktion des Forks (supabase/eigene/). Ohne JWT-Pruefung, weil der
+# oeffentliche Weg kein Konto hat: unterlagen.html kennt nur ein Token. Die
+# angemeldeten Aktionen (anlegen, loeschen) pruefen den Anmeldekopf selbst.
+verify_jwt = false
+
 [functions.upload-benachrichtigung-versenden]
 verify_jwt = false
 

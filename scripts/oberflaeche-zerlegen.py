@@ -3427,6 +3427,10 @@ ERSETZUNGEN = [
      '"Nicht\\ enthalten:\\ onOffice\\-Lizenz,\\ Microsoft\\ 365,\\ Mail\\-Hosting\\.',
      '"Nicht enthalten: CRM-Lizenz, Microsoft 365, Mail-Hosting.',
      'Admin/Kosten: die Aufzaehlung nennt kein Fremdprodukt beim Namen (Stufe 121).'),
+    ('FORK',
+     'async\\ function\\ epTrHochladenStandard\\(pfad,\\ datei,\\ fortschritt\\)\\ \\{\\\n\\ \\ const\\ \\{\\ data\\ \\}\\ =\\ await\\ window\\._sb\\.auth\\.getSession\\(\\);',
+     'async function epTrHochladenStandard(pfad, datei, fortschritt) {\n  // Dieser Upload geht als nackter XHR an die Storage-API und laeuft\n  // damit NEBEN der Storage-Huelle vorbei, die sonst jedem Pfad den\n  // Mandanten voranstellt. Ohne diese Zeilen fehlte das erste\n  // Pfadsegment, und die restriktive Richtlinie aus fork_09\n  // (foldername[1] = Mandant) wuerde den Upload abweisen — die\n  // Oberflaeche zeigte einen Fehler, den niemand einem Pfad zuordnet.\n  const immoM = window.IMMO_MANDANT_ID;\n  if (!immoM) throw new Error("Kein Mandant am Konto - bitte neu anmelden.");\n  if (!String(pfad).startsWith(immoM + "/")) pfad = immoM + "/" + pfad;\n  const { data } = await window._sb.auth.getSession();',
+     'Transfer: der XHR-Upload stellt den Mandanten voran (Stufe 117).'),
 
     # Zweiter Durchgang (29.09.2026). Die Annahme vom 28.09., die restlichen
     # Fundstellen seien "ohne Einstieg nicht erreichbar", war falsch — der
