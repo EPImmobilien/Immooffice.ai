@@ -186,7 +186,31 @@ zuwachs(bereich, mehr, grund) as (values
   ('Primaer- und Eindeutigkeitsschluessel', 1, 'fork_29: projekte_slug_key kehrt zurueck'),
   -- fork_30: die Selbstregistrierung. Zwei Funktionen, kein neues Schema —
   -- ein Mandant besteht aus Zeilen in Tabellen, die es alle schon gibt.
-  ('Funktionen', 2, 'fork_30: mandant_slug_vorschlag(), registrierung_abschliessen()')
+  ('Funktionen', 2, 'fork_30: mandant_slug_vorschlag(), registrierung_abschliessen()'),
+  -- fork_31: der Unterbau fuer die Stufen 98 bis 150 der Vorlage
+  -- (02.10.2026). Die Vorlage hat vierzig Stufen nachgelegt, ihr Export
+  -- enthaelt aber nur die Oberflaeche — acht Tabellen, zwei Funktionen und
+  -- zwei Spalten an portal_zugaenge standen nicht darin.
+  ('Tabellen', 8, 'fork_31: aufmass_scan, grundriss_ki_auftraege, '
+                  'kosten_posten, punktwolke_diagnose, scan_ablage, '
+                  'unterlagen_links, transfer_dateien, unterlagen_link_abrufe'),
+  ('Tabellen mit RLS', 8, 'dieselben acht'),
+  ('Richtlinien', 17, 'fork_31: je Tabelle eine erlaubende fuer das Team und '
+                      'eine restriktive Mandantengrenze (16), dazu '
+                      'kosten_posten_nur_chef'),
+  ('Spalten', 97, 'fork_31: 95 in den acht Tabellen, dazu '
+                  'portal_zugaenge.bezeichnung und .kosten_monat'),
+  ('Primaer- und Eindeutigkeitsschluessel', 9,
+     'fork_31: acht Primaerschluessel, dazu unterlagen_links.token eindeutig'),
+  ('Pruefbedingungen', 9, 'fork_31: umfang, gesamt-ohne-Raum, ki-status, '
+                          'kosten-art, -abrechnung, -kategorie, scan-art, '
+                          'Passwort-Stimmigkeit, Abruf-Art'),
+  ('Fremdschluessel', 19, 'fork_31: acht auf mandanten, vier auf immobilien, '
+                          'drei auf profiles, zwei auf unterlagen_links, '
+                          'eine auf kontakte, eine weitere auf profiles'),
+  ('Indizes ohne Constraint', 17, 'fork_31: Mandant und Fachschluessel je '
+                                  'Tabelle'),
+  ('Funktionen', 2, 'fork_31: portale_liste(), admin_kosten_messwerte()')
 ),
 soll(bereich, soll) as (
   select v.bereich,

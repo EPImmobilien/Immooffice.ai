@@ -170,6 +170,17 @@ select 'Ohne Anmeldung kein Objekt sichtbar', count(*) = 0,
 reset role;
 drop policy if exists "pruefeimer_offen" on storage.objects;
 
+-- Der Pruefeimer wird mit aufgeraeumt. Bis zum 03.10.2026 blieb er stehen:
+-- die Richtlinie fiel, der Eimer nicht. Im laufenden Projekt faellt das nicht
+-- auf, im lokalen Nachbau schon — er lebt ueber mehrere Laeufe hinweg, und
+-- tests/vorlage-vollstaendig.sql zaehlt die Eimer. Beim ERSTEN Lauf gegen
+-- eine frische Datenbank stimmte die Zahl, beim zweiten war sie um eins zu
+-- hoch, und die Meldung zeigte auf die Vollstaendigkeit der Vorlage statt auf
+-- diesen Test hier. Ein Test, der Spuren hinterlaesst, macht den naechsten
+-- zum Luegner.
+delete from storage.objects where bucket_id = 'pruefeimer';
+delete from storage.buckets where id = 'pruefeimer';
+
 select nr, case when bestanden is true then 'ok  ' else 'FEHL' end as ergebnis, pruefung, bemerkung
   from befund order by nr;
 
