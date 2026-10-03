@@ -72,8 +72,9 @@ async function immoFirmenName(db: any, mandant: unknown): Promise<string> {
 }
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-diagnose-secret", "Access-Control-Allow-Methods": "POST, OPTIONS" };
-const AGB_URL = "https://immooffice.example/agb";
-const DATENSCHUTZ_URL = "https://immooffice.example/datenschutz";
+// Die drei Rechtsadressen stehen in firma_stammdaten (fork_32), nicht
+// hier: sie gehoeren dem Mandanten, nicht der Plattform. Ohne Eintrag
+// bleibt der Wert leer und die Oberflaeche laesst den Link weg.
 const OBJEKT_BASIS = (Deno.env.get("PORTAL_URL") || "https://immooffice.example").replace(/\/?$/, "") + "/objekt.html?t=";
 const BUCKET = "immobilie-dateien";
 const OEFFENTLICH = `${Deno.env.get("SUPABASE_URL")}/storage/v1/object/public/${BUCKET}/`;
@@ -342,7 +343,7 @@ async function ladeAntwort(db: any, ctx: any, vorschau: boolean): Promise<{ stat
   const { ip: _ip, user_agent: _ua, bestaetigungen: _b, token: _t, ...fPub } = f;
   const bueroTel = firma.telefon || BUERO_TELEFON;
   const basis: any = { ok: true, vorschau, f: fPub, im: imPub, fotos, lage, firma: { ...firma, telefon: bueroTel }, makler: makler ? { name: makler.name, email: makler.email, telefon: bueroTel, funktion: makler.funktion, foto: await maklerFoto(db, makler.foto_url) } : null,
-    texte: { widerrufsbelehrung: widerrufsbelehrung(firma), beginn_text: BEGINN_TEXT, agb_url: AGB_URL, datenschutz_url: DATENSCHUTZ_URL } };
+    texte: { widerrufsbelehrung: widerrufsbelehrung(firma), beginn_text: BEGINN_TEXT, agb_url: firma?.url_agb || "", datenschutz_url: firma?.url_datenschutz || "" } };
   if (!bestaetigt) return { status: 200, body: basis };
   // Der Zweig immobilie_id.is.null holt die allgemeinen Fragen. Ohne
   // Mandantenfilter waren das die allgemeinen Fragen ALLER Makler — auf der

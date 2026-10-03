@@ -3884,3 +3884,76 @@ stehen — zwei ältere Regeln tun das auch. Für die neuen ist es trotzdem
 **Damit stehen zwei Schreibweisen in einer Datei.** Ob die beiden älteren
 Regeln nachziehen sollen, ist eine Entscheidung über bestehenden Code und
 steht in `docs/OFFEN.md`.
+
+## Zwei Prüfungen, die nie zutreffen konnten (03.10.2026)
+
+Beim Aufräumen der Platzhalter-Domain `immooffice.example` sind zwei Stellen
+aufgefallen, die seit der Übernahme **immer** falsch antworten. Beide sind
+syntaktisch in Ordnung — kein Gate sieht so etwas.
+
+### Die eigene Mail-Domain
+
+Fünf Funktionen fragten „kommt diese Adresse von uns?" so:
+
+```
+makler?.email && /@immooffice.example\.de$/i.test(makler.email)
+```
+
+Im Original stand dort die Domain der Referenz. Die Neutralisierung hat den
+Namen ersetzt und `.de` stehen gelassen — heraus kam eine Domain, die es
+nicht gibt. Die Prüfung konnte **nie** zutreffen. Folge: Exposé-Erinnerung,
+Eigentümer-Report, Exposé-Freigabe und die Einladungs-Nachfassmail haben
+seither immer als *Firma* gesendet statt als zuständiger Makler, und der
+Schleifenschutz von `mail-rechnung-weiterleiten` griff auf der
+Empfängerseite gar nicht.
+
+Jetzt vergleicht `immoEigeneAdresse(adresse, eigene)` die **Domain**, nicht
+die Zeichenkette. Welche die eigene ist, sagt der Mandant selbst: über die
+Absenderadresse des Versands oder die Mailadresse seiner Stammdaten. Ohne
+eine von beiden ist die Antwort `false` — es wird wie bisher als Firma
+gesendet, nur eben bewusst.
+
+Beim Schleifenschutz ist die Empfängerseite jetzt genauso gebaut wie die
+Absenderseite eine Zeile darüber (`/(^|\.)buchhaltung@/`). Ein
+Schleifenschutz darf lieber einmal zu viel greifen als einmal zu wenig.
+
+### Ein Recht an einer einzelnen Mailadresse
+
+`hatRecht()` in der Oberfläche ließ `posteingang` bei leeren Rechten für
+**genau eine Adresse** durch — die eines Mitarbeiters der Referenz. Im Fork
+gehört sie niemandem; die Ausnahme greift nie und stand nur noch als fremde
+Mailadresse im Quelltext.
+
+`fork_11` hat die Regel serverseitig schon ohne diese Ausnahme gebaut und im
+Kommentar festgehalten, sie sei „Zeile für Zeile dieselbe Regel wie
+`hatRecht()` in der Oberfläche". Das war erst ab heute wahr — vorher war die
+Oberfläche weiter als die Datenbank. Beide sagen jetzt dasselbe, und die
+Datenbank bleibt die, die es erzwingt.
+
+## Impressum, Datenschutz und AGB gehören dem Mandanten (fork_32)
+
+Drei Adressen standen im Quelltext: als Konstanten in `expose-freigabe` und
+`objekt-landing`, in den Fußzeilen der Kundenseiten, im Newsletter und in
+zwei Vertrags-PDF. Nach der Neutralisierung zeigen sie auf
+`immooffice.example` — für jeden Mandanten ein toter Link an einer Stelle,
+die rechtlich etwas leisten soll:
+
+- Die **Exposé-Freigabe** lässt den Interessenten die AGB *bestätigen* und
+  verlinkt sie dabei. Ein Haken auf nicht lesbare AGB ist nichts wert.
+- Die **Vertrags-PDF** schreiben „Weitere Informationen … abrufbar unter: …"
+  in die AGB des Maklervertrags.
+- Die **Fußzeile der Objektseite** führt Impressum und Datenschutz.
+
+`fork_32` legt sie dorthin, wo die übrigen Pflichtangaben schon stehen:
+`firma_stammdaten.url_impressum`, `.url_datenschutz`, `.url_agb` — neben
+Registergericht, HRB, USt-IdNr. und Geschäftsführer. **Ohne Vorgabewert:**
+aus `web + "/impressum"` zu raten wäre falsch, denn jede Seite legt ihre
+Rechtsseiten anders ab.
+
+Ohne Eintrag wird der Link **weggelassen**, nicht auf ein Nichts gesetzt —
+und der Satz in den Vertrags-AGB entfällt ganz. Ein Satz, der Auskunft an
+einer toten Adresse verspricht, ist schlechter als kein Satz. Dieselbe Regel
+wie bei `immoFirmenName` und `immoMarke`.
+
+Die Oberfläche und die Nebenseiten lesen die Felder noch nicht — das ist der
+nächste Schritt und steht in `docs/OFFEN.md`.

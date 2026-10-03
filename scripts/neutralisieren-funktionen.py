@@ -2996,6 +2996,84 @@ NACHBESSERN = [
      'Signaturseite: der Firmenname des Mandanten kommt mit der Antwort.',
      {'signatur-token-validieren'}),
 
+    # --- Eine Domain, die es nicht gibt, als Pruefung --------------------
+    # Fuenf Funktionen fragten "kommt diese Adresse von uns?" gegen eine
+    # verdrahtete Domain. Siehe den Kommentar des eingezogenen Helfers.
+    ('FORK',
+     'import { createClient } from "jsr:@supabase/supabase-js@2";',
+     'import { createClient } from "jsr:@supabase/supabase-js@2";\n\n// --- Gehoert diese Adresse zum Mandanten selbst? (Phase 2.4) ------------\n// Hier stand die Mail-Domain der Referenz im Quelltext. Die\n// Neutralisierung hat daraus eine Domain gemacht, die es nicht gibt\n// (die Platzhalter-Domain mit angehaengtem ".de") - die Pruefung konnte\n// seither NIE zutreffen, und jede dieser Funktionen hat immer als Firma\n// gesendet statt als zustaendiger Makler. Ein stiller Verhaltenswechsel,\n// den kein Gate sieht: die Zeile ist syntaktisch in Ordnung, sie ist nur\n// immer falsch.\n//\n// Verglichen wird jetzt die Domain, nicht die Zeichenkette. Welche die\n// eigene ist, sagt der Mandant selbst - ueber die Absenderadresse oder\n// die Mailadresse seiner Stammdaten. Ohne eine von beiden ist die\n// Antwort false, und es wird wie bisher als Firma gesendet.\nfunction immoEigeneAdresse(adresse: unknown, eigene: unknown): boolean {\n  const domain = (x: unknown) =>\n    String(x || "").trim().toLowerCase().split("@")[1] || "";\n  const a = domain(adresse), e = domain(eigene);\n  return !!a && !!e && a === e;\n}',
+     'Helfer immoEigeneAdresse eingezogen (eigene Mail-Domain je Mandant).',
+     {'expose-erinnerung', 'eigentuemer-report-pdf', 'expose-freigabe',
+      'eigentuemer-einladung-nachfassen'}),
+    ('FORK',
+     'makler?.email && /@immooffice.example\\.de$/i.test(makler.email)',
+     'makler?.email && immoEigeneAdresse(makler.email, firma?.email)',
+     'Absender: der Makler, wenn seine Adresse zum Mandanten gehoert.',
+     {'expose-erinnerung', 'eigentuemer-report-pdf'}),
+    ('FORK',
+     'const absender = makler?.email && /@immooffice.example\\.de$/i.test(makler.email) ? `${makler.name} <${makler.email}>` : `${firma.firma_name} <${firma.email}>`;',
+     'const absender = makler?.email && immoEigeneAdresse(makler.email, firma.email) ? `${makler.name} <${makler.email}>` : `${firma.firma_name} <${firma.email}>`;',
+     'Expose-Freigabe: derselbe Absender-Rueckfall.',
+     {'expose-freigabe'}),
+    ('FORK',
+     'reply_to: makler?.email && /@immooffice.example\\.de$/i.test(makler.email) ? makler.email : fromEmail',
+     'reply_to: makler?.email && immoEigeneAdresse(makler.email, fromEmail) ? makler.email : fromEmail',
+     'Einladung nachfassen: die Antwortadresse. Verglichen wird gegen die '
+     'Absenderadresse des Mandanten, denn die ist hier die eigene.',
+     {'eigentuemer-einladung-nachfassen'}),
+    ('FORK',
+     '/buchhaltung@immooffice.example\\.de/.test(empf)',
+     '/(^|\\.)buchhaltung@/.test(empf)',
+     'Schleifenschutz beim Weiterleiten an die Buchhaltung. Die Zeile '
+     'darueber prueft die Absenderseite genau so; die Empfaengerseite lief '
+     'gegen eine Domain, die es nicht gibt, und griff deshalb nie. Ein '
+     'Schleifenschutz darf lieber einmal zu viel greifen als einmal zu '
+     'wenig.',
+     {'mail-rechnung-weiterleiten'}),
+
+    # --- Impressum, Datenschutz und AGB je Mandant (fork_32) -------------
+    # Zwei Funktionen trugen die drei Adressen als Konstanten. Nach der
+    # Neutralisierung zeigen sie auf eine Domain, die niemandem gehoert -
+    # und die Expose-Freigabe laesst den Interessenten die AGB
+    # BESTAETIGEN und verlinkt sie dabei. Ein Haken auf nicht lesbare AGB
+    # ist nichts wert.
+    ('FORK',
+     'const AGB_URL = "https://immooffice.example/agb";\nconst DATENSCHUTZ_URL = "https://immooffice.example/datenschutz";',
+     '// Die drei Rechtsadressen stehen in firma_stammdaten (fork_32), nicht\n'
+     '// hier: sie gehoeren dem Mandanten, nicht der Plattform. Ohne Eintrag\n'
+     '// bleibt der Wert leer und die Oberflaeche laesst den Link weg.',
+     'Die Konstanten fuer AGB und Datenschutz entfallen.',
+     {'expose-freigabe', 'objekt-landing'}),
+    ('FORK',
+     'agb_url: AGB_URL, datenschutz_url: DATENSCHUTZ_URL',
+     'agb_url: firma?.url_agb || "", datenschutz_url: firma?.url_datenschutz || ""',
+     'AGB- und Datenschutzadresse aus den Stammdaten des Mandanten.',
+     {'expose-freigabe', 'objekt-landing'}),
+    ('FORK',
+     '.select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon")',
+     '.select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon, url_impressum, url_datenschutz, url_agb")',
+     'Die Stammdaten-Abfrage holt die drei Rechtsadressen mit.',
+     {'expose-freigabe', 'objekt-landing'}),
+
+    # --- Die Datenschutzadresse in den Vertrags-PDF (fork_32) ------------
+    # vertrag-pdf und signatur-vorgang-starten schreiben in die AGB des
+    # Maklervertrags: "Weitere Informationen ... abrufbar unter: <Adresse>".
+    # Die Adresse war verdrahtet und zeigt nach der Neutralisierung ins
+    # Nichts. Ein Satz, der Auskunft an einer toten Adresse verspricht, ist
+    # schlechter als kein Satz - deshalb entfaellt er ohne Eintrag ganz.
+    # Das Feld traegt immoStandort; erweitert wird er dort, wo er entsteht.
+    ('FORK',
+     'a.push({ text: "Weitere Informationen zur Datenverarbeitung sind in den Datenschutzhinweisen des Maklers abrufbar unter: https://immooffice.example/unternehmen/datenschutz/", spaceAfter: 8 });',
+     'if (standort.datenschutz) a.push({ text: `Weitere Informationen zur Datenverarbeitung sind in den Datenschutzhinweisen des Maklers abrufbar unter: ${standort.datenschutz}`, spaceAfter: 8 });',
+     'Maklervertrag-PDF: der Satz nennt die Adresse des Mandanten - oder '
+     'entfaellt.',
+     {'vertrag-pdf'}),
+    ('FORK',
+     'a.push({ text: "Weitere Informationen zur Datenverarbeitung sind in den Datenschutzhinweisen des Maklers abrufbar unter: https://immooffice.example/unternehmen/datenschutz/" });',
+     'if (standort.datenschutz) a.push({ text: `Weitere Informationen zur Datenverarbeitung sind in den Datenschutzhinweisen des Maklers abrufbar unter: ${standort.datenschutz}` });',
+     'Signaturvorgang: derselbe Satz in denselben AGB.',
+     {'signatur-vorgang-starten'}),
+
     # --- Das Neubauportal: Absendername und Grussformeln ------------------
     # Vier Funktionen schicken Mail an Kunden eines Bautraegers. Der
     # Absendername fiel auf den Namen des Demo-Mandanten zurueck, und unter
@@ -3129,7 +3207,7 @@ NACHBESSERN = [
     # Firmenname oder Geschaeftsfuehrer, wird deshalb keiner erzeugt.
     ('FORK',
      'const STANDORTE: Record<string, { name: string; firma: string; strasse: string; plzOrt: string; stadt: string }> = {\n  standard: { name: "", firma: "", strasse: "", plzOrt: "", stadt: "" },',
-     '// Die Vorlage trug die drei Standorte der Referenz hier als Tabelle. Sie ist\n// beim Neutralisieren geleert worden, und damit entstand der Maklervertrag\n// OHNE Briefkopf (docs/OFFEN.md, Punkt 3). Jetzt kommen die Werte aus\n// firma_stammdaten des Mandanten, dem der Vertrag gehoert.\n//\n// vertreter: der gesetzliche Vertreter, der den Vertrag zeichnet. Hier stand\n// ein ERFUNDENER Name — in einem Maklervertrag, in der Zustimmungsklausel\n// ("vertreten durch ...") und unter der Unterschrift. CLAUDE.md verbietet\n// erfundene Daten; ein erfundener Vertreter in einem Vertrag ist davon der\n// schwerste Fall.\ntype ImmoStandort = { name: string; firma: string; strasse: string; plzOrt: string; stadt: string; vertreter: string; email: string };\nconst STANDORT_LEER: ImmoStandort = { name: "", firma: "", strasse: "", plzOrt: "", stadt: "", vertreter: "", email: "" };\nasync function immoStandort(db: any, mandant: unknown, slug: unknown): Promise<ImmoStandort> {\n  if (typeof mandant !== "string" || !mandant) return STANDORT_LEER;\n  let frage = db.from("firma_stammdaten")\n    .select("firma_name, marken_name, strasse, plz, ort, email, geschaeftsfuehrer, slug")\n    .eq("mandant_id", mandant).eq("aktiv", true);\n  if (typeof slug === "string" && slug && slug !== "standard") frage = frage.eq("slug", slug);\n  const { data } = await frage.order("sortierung", { ascending: true }).limit(1).maybeSingle();\n  if (!data) return STANDORT_LEER;\n  return {\n    name: String(data.marken_name || data.firma_name || "").trim(),\n    firma: String(data.firma_name || "").trim(),\n    strasse: String(data.strasse || "").trim(),\n    plzOrt: `${data.plz || ""} ${data.ort || ""}`.trim(),\n    stadt: String(data.ort || "").trim(),\n    vertreter: String(data.geschaeftsfuehrer || "").trim(),\n    email: String(data.email || "").trim(),\n  };\n}\nconst STANDORTE: Record<string, ImmoStandort> = {\n  standard: STANDORT_LEER,',
+     '// Die Vorlage trug die drei Standorte der Referenz hier als Tabelle. Sie ist\n// beim Neutralisieren geleert worden, und damit entstand der Maklervertrag\n// OHNE Briefkopf (docs/OFFEN.md, Punkt 3). Jetzt kommen die Werte aus\n// firma_stammdaten des Mandanten, dem der Vertrag gehoert.\n//\n// vertreter: der gesetzliche Vertreter, der den Vertrag zeichnet. Hier stand\n// ein ERFUNDENER Name — in einem Maklervertrag, in der Zustimmungsklausel\n// ("vertreten durch ...") und unter der Unterschrift. CLAUDE.md verbietet\n// erfundene Daten; ein erfundener Vertreter in einem Vertrag ist davon der\n// schwerste Fall.\ntype ImmoStandort = { name: string; firma: string; strasse: string; plzOrt: string; stadt: string; vertreter: string; email: string; datenschutz: string };\nconst STANDORT_LEER: ImmoStandort = { name: "", firma: "", strasse: "", plzOrt: "", stadt: "", vertreter: "", email: "", datenschutz: "" };\nasync function immoStandort(db: any, mandant: unknown, slug: unknown): Promise<ImmoStandort> {\n  if (typeof mandant !== "string" || !mandant) return STANDORT_LEER;\n  let frage = db.from("firma_stammdaten")\n    .select("firma_name, marken_name, strasse, plz, ort, email, geschaeftsfuehrer, slug, url_datenschutz")\n    .eq("mandant_id", mandant).eq("aktiv", true);\n  if (typeof slug === "string" && slug && slug !== "standard") frage = frage.eq("slug", slug);\n  const { data } = await frage.order("sortierung", { ascending: true }).limit(1).maybeSingle();\n  if (!data) return STANDORT_LEER;\n  return {\n    name: String(data.marken_name || data.firma_name || "").trim(),\n    firma: String(data.firma_name || "").trim(),\n    strasse: String(data.strasse || "").trim(),\n    plzOrt: `${data.plz || ""} ${data.ort || ""}`.trim(),\n    stadt: String(data.ort || "").trim(),\n    vertreter: String(data.geschaeftsfuehrer || "").trim(),\n    email: String(data.email || "").trim(),\n    datenschutz: String(data.url_datenschutz || "").trim(),\n  };\n}\nconst STANDORTE: Record<string, ImmoStandort> = {\n  standard: STANDORT_LEER,',
      'Maklervertrag: der Briefkopf kommt aus den Stammdaten des Mandanten.',
      {'vertrag-pdf'}),
     ('FORK',
@@ -3190,7 +3268,7 @@ NACHBESSERN = [
 
     ('FORK',
      'const STANDORTE: Record<string, { name: string; firma: string; strasse: string; plzOrt: string; stadt: string }> = {\n  standard: { name: "", firma: "", strasse: "", plzOrt: "", stadt: "" },\n};',
-     '// Wie in vertrag-pdf: der Briefkopf kommt aus firma_stammdaten des\n// Mandanten, und vertreter ist der wirkliche Geschaeftsfuehrer statt eines\n// erfundenen Namens. Hier wiegt es doppelt: diese Funktion startet den\n// SIGNATURVORGANG — was hier steht, unterschreibt der Kunde.\ntype ImmoStandort = { name: string; firma: string; strasse: string; plzOrt: string; stadt: string; vertreter: string; email: string };\nconst STANDORT_LEER: ImmoStandort = { name: "", firma: "", strasse: "", plzOrt: "", stadt: "", vertreter: "", email: "" };\nasync function immoStandort(db: any, mandant: unknown, slug: unknown): Promise<ImmoStandort> {\n  if (typeof mandant !== "string" || !mandant) return STANDORT_LEER;\n  let frage = db.from("firma_stammdaten")\n    .select("firma_name, marken_name, strasse, plz, ort, email, geschaeftsfuehrer, slug")\n    .eq("mandant_id", mandant).eq("aktiv", true);\n  if (typeof slug === "string" && slug && slug !== "standard") frage = frage.eq("slug", slug);\n  const { data } = await frage.order("sortierung", { ascending: true }).limit(1).maybeSingle();\n  if (!data) return STANDORT_LEER;\n  return {\n    name: String(data.marken_name || data.firma_name || "").trim(),\n    firma: String(data.firma_name || "").trim(),\n    strasse: String(data.strasse || "").trim(),\n    plzOrt: `${data.plz || ""} ${data.ort || ""}`.trim(),\n    stadt: String(data.ort || "").trim(),\n    vertreter: String(data.geschaeftsfuehrer || "").trim(),\n    email: String(data.email || "").trim(),\n  };\n}\nconst STANDORTE: Record<string, ImmoStandort> = {\n  standard: STANDORT_LEER,\n};',
+     '// Wie in vertrag-pdf: der Briefkopf kommt aus firma_stammdaten des\n// Mandanten, und vertreter ist der wirkliche Geschaeftsfuehrer statt eines\n// erfundenen Namens. Hier wiegt es doppelt: diese Funktion startet den\n// SIGNATURVORGANG — was hier steht, unterschreibt der Kunde.\ntype ImmoStandort = { name: string; firma: string; strasse: string; plzOrt: string; stadt: string; vertreter: string; email: string; datenschutz: string };\nconst STANDORT_LEER: ImmoStandort = { name: "", firma: "", strasse: "", plzOrt: "", stadt: "", vertreter: "", email: "", datenschutz: "" };\nasync function immoStandort(db: any, mandant: unknown, slug: unknown): Promise<ImmoStandort> {\n  if (typeof mandant !== "string" || !mandant) return STANDORT_LEER;\n  let frage = db.from("firma_stammdaten")\n    .select("firma_name, marken_name, strasse, plz, ort, email, geschaeftsfuehrer, slug, url_datenschutz")\n    .eq("mandant_id", mandant).eq("aktiv", true);\n  if (typeof slug === "string" && slug && slug !== "standard") frage = frage.eq("slug", slug);\n  const { data } = await frage.order("sortierung", { ascending: true }).limit(1).maybeSingle();\n  if (!data) return STANDORT_LEER;\n  return {\n    name: String(data.marken_name || data.firma_name || "").trim(),\n    firma: String(data.firma_name || "").trim(),\n    strasse: String(data.strasse || "").trim(),\n    plzOrt: `${data.plz || ""} ${data.ort || ""}`.trim(),\n    stadt: String(data.ort || "").trim(),\n    vertreter: String(data.geschaeftsfuehrer || "").trim(),\n    email: String(data.email || "").trim(),\n    datenschutz: String(data.url_datenschutz || "").trim(),\n  };\n}\nconst STANDORTE: Record<string, ImmoStandort> = {\n  standard: STANDORT_LEER,\n};',
      'Signaturvorgang: der Briefkopf kommt aus den Stammdaten des Mandanten.',
      {'signatur-vorgang-starten'}),
     ('FORK',

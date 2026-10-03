@@ -214,7 +214,8 @@ zuwachs(bereich, mehr, grund) as (values
   ('Spalten', 3, 'fork_31i: immobilie_datei.privat_status, .privat_befund, .privat_vorschlag_pfad (Stufe 112)'),
   ('Buckets', 2, 'fork_31j: scan-dateien (Stufe 124/125), transfer-dateien (Stufe 117)'),
   ('Funktionen', 1, 'fork_31l: grundriss_ki_waechter() — Waechter fuer den Hintergrundlauf von grundriss-ki-lesen'),
-  ('Cron-Jobs', 2, 'fork_31l: unterlagen-link-melden-5min, grundriss-ki-waechter-5min')
+  ('Cron-Jobs', 2, 'fork_31l: unterlagen-link-melden-5min, grundriss-ki-waechter-5min'),
+  ('Spalten', 3, 'fork_32: firma_stammdaten.url_impressum, .url_datenschutz, .url_agb — die drei Rechtsadressen je Mandant')
 ),
 soll(bereich, soll) as (
   select v.bereich,

@@ -1031,7 +1031,7 @@ function hatRecht(e, t) {
   if ("chef" === e.role) return !0;
   if ("mitarbeiter" !== e.role) return !1;
   const n = e.rechte;
-  return n && "object" == typeof n && Object.keys(n).length > 0 ? !0 === n[t] : "finanzen" !== t && "admin" !== t && "rechnungen" !== t && ("posteingang" !== t || "ag@immooffice.example" === (e.email || "").toLowerCase())
+  return n && "object" == typeof n && Object.keys(n).length > 0 ? !0 === n[t] : "finanzen" !== t && "admin" !== t && "rechnungen" !== t && "posteingang" !== t
 }
 async function changePassword(e) {
   const {

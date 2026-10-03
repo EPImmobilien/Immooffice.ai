@@ -187,7 +187,7 @@ async function verarbeiten(db: any, mail: any, erzwingen: boolean) {
   const ziel = await zielFuer(db, mail.mandant_id || null, absender, mail.absender_name || "");
   // Schleifenschutz: Mails von oder an eine Buchhaltungsadresse und unsere eigenen Automatik-Weiterleitungen nie erneut weiterleiten.
   const buchhaltung = /(^|\.)buchhaltung@/.test(absender) || ziel.an.includes(absender);
-  const anBuchhaltung = /buchhaltung@immooffice.example\.de/.test(empf) || empf.includes(ZIEL_STANDARD) || ziel.an.some((z) => empf.includes(z));
+  const anBuchhaltung = /(^|\.)buchhaltung@/.test(empf) || empf.includes(ZIEL_STANDARD) || ziel.an.some((z) => empf.includes(z));
   const schleife = buchhaltung || anBuchhaltung || text.includes(MARKER);
   if (!erzwingen && (schleife || AUSSCHLUSS.test(mail.betreff || ""))) {
     await db.from("mail_eingang").update({ rechnung_status: "keine" }).eq("id", mail.id); return { status: "keine", grund: "ausgeschlossen" };

@@ -9,6 +9,26 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// --- Gehoert diese Adresse zum Mandanten selbst? (Phase 2.4) ------------
+// Hier stand die Mail-Domain der Referenz im Quelltext. Die
+// Neutralisierung hat daraus eine Domain gemacht, die es nicht gibt
+// (die Platzhalter-Domain mit angehaengtem ".de") - die Pruefung konnte
+// seither NIE zutreffen, und jede dieser Funktionen hat immer als Firma
+// gesendet statt als zustaendiger Makler. Ein stiller Verhaltenswechsel,
+// den kein Gate sieht: die Zeile ist syntaktisch in Ordnung, sie ist nur
+// immer falsch.
+//
+// Verglichen wird jetzt die Domain, nicht die Zeichenkette. Welche die
+// eigene ist, sagt der Mandant selbst - ueber die Absenderadresse oder
+// die Mailadresse seiner Stammdaten. Ohne eine von beiden ist die
+// Antwort false, und es wird wie bisher als Firma gesendet.
+function immoEigeneAdresse(adresse: unknown, eigene: unknown): boolean {
+  const domain = (x: unknown) =>
+    String(x || "").trim().toLowerCase().split("@")[1] || "";
+  const a = domain(adresse), e = domain(eigene);
+  return !!a && !!e && a === e;
+}
+
 // --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
 // Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
 // und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist
@@ -270,7 +290,7 @@ Deno.serve(async (req) => {
     const empfaenger: string[] = Array.isArray(body.empfaenger) && body.empfaenger.length ? body.empfaenger : eigentuemer.map((e: any) => e.email).filter(Boolean);
     if (body.senden && empfaenger.length) {
       const key = Deno.env.get("RESEND_API_KEY"); if (!key) throw new Error("RESEND_API_KEY fehlt");
-      const absender = makler?.email && /@immooffice.example\.de$/i.test(makler.email) ? `${makler.name} <${makler.email}>` : `${firma?.firma_name || "Ihr Makler"} <${firma?.email || "info@immooffice.example"}>`;
+      const absender = makler?.email && immoEigeneAdresse(makler.email, firma?.email) ? `${makler.name} <${makler.email}>` : `${firma?.firma_name || "Ihr Makler"} <${firma?.email || "info@immooffice.example"}>`;
       const text = `${eigNamen.length ? eigNamen.join(", ") : "Sehr geehrte Eigentümer"},\n\nanbei erhalten Sie den Vermarktungsbericht für Ihre Immobilie „${im.objekttitel || im.bezeichnung || adr}“ für den Zeitraum ${dDE(von)} bis ${dDE(bis)}.\n\nKurz zusammengefasst: ${kurz}.\n\n${body.kommentar ? String(body.kommentar).trim() + "\n\n" : ""}Bei Fragen erreichen Sie mich jederzeit.\n\nMit freundlichen Grüßen\n${makler?.name || prof.name || ""}\n${firma?.firma_name || ""}${makler?.telefon ? "\nTelefon " + makler.telefon : ""}`;
       let b64 = ""; for (let i = 0; i < bytes.length; i += 32768) b64 += String.fromCharCode.apply(null, Array.from(bytes.subarray(i, Math.min(i + 32768, bytes.length))) as any); b64 = btoa(b64);
       const r = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" }, body: JSON.stringify({ from: absender, to: empfaenger, reply_to: makler?.email || firma?.email, subject: `Vermarktungsbericht ${dDE(von)} – ${dDE(bis)}: ${im.objekttitel || im.bezeichnung || adr}`, text, attachments: [{ filename: dateiName, content: b64, content_type: "application/pdf" }] }) });

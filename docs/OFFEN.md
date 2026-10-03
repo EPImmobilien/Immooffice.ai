@@ -908,3 +908,54 @@ Was ohne diese Schlüssel nicht geprüft werden kann: ob das von der KI
 gelieferte JSON wirklich durch `epGrundrissKiZuScan` läuft und im Editor ein
 brauchbares Blatt ergibt. Das Format ist aus dem Leser abgeleitet, nicht aus
 einer Dokumentation — und abgeleitet heißt nicht erprobt.
+
+## Die Platzhalter-Domain steht noch an rund 100 Stellen
+
+`immooffice.example` gehört niemandem. Am 03.10.2026 ist die Klasse
+aufgeteilt und zum Teil erledigt worden; der Rest steht hier, nach Art
+getrennt, weil jede Art eine andere Quelle braucht.
+
+**Erledigt:** die drei Rechtsadressen in den Edge Functions (`fork_32`,
+`firma_stammdaten.url_impressum/.url_datenschutz/.url_agb`), die tote
+Domain-Prüfung in fünf Funktionen, das Recht an einer einzelnen Mailadresse
+und eine echte Anschrift als Beispiel in einer KI-Systemvorgabe.
+
+### 1. Die Rechtsadressen in der Oberfläche
+
+`fork_32` hat die Spalten, die Edge Functions liefern sie aus — aber vier
+Stellen lesen sie noch nicht:
+
+- der Fuß der Objektseite (`src/seiten/objekt.html`), der Impressum,
+  Datenschutz und AGB verlinkt,
+- der Newsletter-Fuß in `src/app/anwendung.js`,
+- die eingebettete Rundgang-Seite in `src/start/01-fruehstart.js` — sie hat
+  **keine** Stammdaten zur Hand, dort muss der Link entfallen oder die Seite
+  muss sie laden,
+- der Datenschutzhinweis der Signaturseite, der auf die Hinweise verweist.
+
+Dazu fehlt die **Oberfläche zum Pflegen**: die drei Felder stehen in der
+Datenbank, aber nicht im Formular der Firmenstammdaten.
+
+### 2. Mailadressen als Rückfall
+
+`info@immooffice.example` steht als Rückfall hinter `firma.email`,
+`SMTP_FROM_EMAIL` und `BUCHHALTUNG_EMAIL`, dazu in einigen kundenlesbaren
+Texten („schreiben Sie uns an …"). Ein Rückfall auf eine Adresse, die
+niemandem gehört, ist schlechter als keiner: die Mail geht raus und kommt
+nirgends an. Richtig wäre: ohne Absenderadresse **nicht senden** und das
+protokollieren.
+
+### 3. Die Adresse der Plattform selbst
+
+`PORTAL_URL`, `EXPOSE_FREIGABE_BASIS` und die `redirectTo`-Werte der
+Anmeldung sind **Auslieferungs-Konfiguration**, kein Mandantenwert — eine
+Adresse je Installation. Sie kommen schon aus der Umgebung; nur der Rückfall
+zeigt auf die Platzhalter-Domain. In der Oberfläche wäre
+`window.location.origin` der richtige Wert, denn die Seite weiß, woher sie
+geladen wurde.
+
+### 4. Platzhalter in Formularfeldern
+
+`placeholder: "anna@immooffice.example"` und ähnliche. Die bleiben: ein
+Platzhalter wird nie gesendet, und `example` ist genau die dafür
+reservierte Domain (RFC 2606).

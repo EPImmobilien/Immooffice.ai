@@ -115,12 +115,12 @@ function objektAdresseVon(vertrag: any): string {
 // ("vertreten durch ...") und unter der Unterschrift. CLAUDE.md verbietet
 // erfundene Daten; ein erfundener Vertreter in einem Vertrag ist davon der
 // schwerste Fall.
-type ImmoStandort = { name: string; firma: string; strasse: string; plzOrt: string; stadt: string; vertreter: string; email: string };
-const STANDORT_LEER: ImmoStandort = { name: "", firma: "", strasse: "", plzOrt: "", stadt: "", vertreter: "", email: "" };
+type ImmoStandort = { name: string; firma: string; strasse: string; plzOrt: string; stadt: string; vertreter: string; email: string; datenschutz: string };
+const STANDORT_LEER: ImmoStandort = { name: "", firma: "", strasse: "", plzOrt: "", stadt: "", vertreter: "", email: "", datenschutz: "" };
 async function immoStandort(db: any, mandant: unknown, slug: unknown): Promise<ImmoStandort> {
   if (typeof mandant !== "string" || !mandant) return STANDORT_LEER;
   let frage = db.from("firma_stammdaten")
-    .select("firma_name, marken_name, strasse, plz, ort, email, geschaeftsfuehrer, slug")
+    .select("firma_name, marken_name, strasse, plz, ort, email, geschaeftsfuehrer, slug, url_datenschutz")
     .eq("mandant_id", mandant).eq("aktiv", true);
   if (typeof slug === "string" && slug && slug !== "standard") frage = frage.eq("slug", slug);
   const { data } = await frage.order("sortierung", { ascending: true }).limit(1).maybeSingle();
@@ -133,6 +133,7 @@ async function immoStandort(db: any, mandant: unknown, slug: unknown): Promise<I
     stadt: String(data.ort || "").trim(),
     vertreter: String(data.geschaeftsfuehrer || "").trim(),
     email: String(data.email || "").trim(),
+    datenschutz: String(data.url_datenschutz || "").trim(),
   };
 }
 const STANDORTE: Record<string, ImmoStandort> = {
@@ -206,7 +207,7 @@ function buildAgbAbsaetze(standort: ImmoStandort, mitSalvatorischerKlausel: bool
   a.push({ text: "Gibt der Kunde die Informationen unberechtigt an Dritte weiter und kommt aufgrund dieser Weitergabe ein Kaufvertrag über das Objekt zustande, ist der Kunde verpflichtet, dem Makler den hierdurch entstehenden Provisionsschaden zu ersetzen.", spaceAfter: 8 });
   a.push({ text: "9. Datenschutz", bold: true, spaceAfter: 2 });
   a.push({ text: "Die Erhebung, Speicherung und Verarbeitung personenbezogener Daten erfolgt im Rahmen der gesetzlichen Datenschutzbestimmungen." });
-  a.push({ text: "Weitere Informationen zur Datenverarbeitung sind in den Datenschutzhinweisen des Maklers abrufbar unter: https://immooffice.example/unternehmen/datenschutz/", spaceAfter: 8 });
+  if (standort.datenschutz) a.push({ text: `Weitere Informationen zur Datenverarbeitung sind in den Datenschutzhinweisen des Maklers abrufbar unter: ${standort.datenschutz}`, spaceAfter: 8 });
   a.push({ text: "10. Haftungsbeschränkung", bold: true, spaceAfter: 2 });
   a.push({ text: "Der Makler haftet für Schäden des Kunden nur bei Vorsatz oder grober Fahrlässigkeit." });
   a.push({ text: "Bei einfacher Fahrlässigkeit haftet der Makler nur bei Verletzung wesentlicher Vertragspflichten (Kardinalpflichten) und beschränkt auf den vertragstypischen, vorhersehbaren Schaden." });

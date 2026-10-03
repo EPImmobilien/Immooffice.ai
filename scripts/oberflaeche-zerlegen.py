@@ -4115,6 +4115,23 @@ WOERTLICH = [
      'und zwar dieselbe, die die Regel oben schon als {telefon} ersetzt — '
      'nur mit anderen Trennzeichen geschrieben, weshalb sie durchfiel. Die '
      'Vorlage setzt {telefon} beim Speichern ein.'),
+
+    # --- Ein Recht an einer einzelnen Mailadresse ------------------------
+    # hatRecht() liess "posteingang" bei leeren Rechten fuer GENAU EINE
+    # Adresse durch — die eines Mitarbeiters der Referenz. Im Fork gehoert
+    # sie niemandem, die Ausnahme greift also nie; sie steht nur noch als
+    # fremde Mailadresse im Quelltext.
+    #
+    # fork_11 hat die Regel serverseitig schon ohne diese Ausnahme gebaut
+    # und im Kommentar festgehalten, sie sei "Zeile fuer Zeile dieselbe
+    # Regel wie hatRecht() in der Oberflaeche". Das war ab heute erst wahr:
+    # vorher war die Oberflaeche weiter als die Datenbank. Beide sagen jetzt
+    # dasselbe — und die Datenbank bleibt die, die es erzwingt.
+    ('MARKE',
+     '("posteingang" !== t || "ag@immooffice.example" === (e.email || "").toLowerCase())',
+     '"posteingang" !== t',
+     'hatRecht(): die Ausnahme fuer eine feste Mailadresse entfaellt, '
+     'Oberflaeche und hat_recht() in der Datenbank sagen dasselbe.'),
 ]
 
 

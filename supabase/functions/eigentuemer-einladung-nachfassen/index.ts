@@ -8,6 +8,26 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// --- Gehoert diese Adresse zum Mandanten selbst? (Phase 2.4) ------------
+// Hier stand die Mail-Domain der Referenz im Quelltext. Die
+// Neutralisierung hat daraus eine Domain gemacht, die es nicht gibt
+// (die Platzhalter-Domain mit angehaengtem ".de") - die Pruefung konnte
+// seither NIE zutreffen, und jede dieser Funktionen hat immer als Firma
+// gesendet statt als zustaendiger Makler. Ein stiller Verhaltenswechsel,
+// den kein Gate sieht: die Zeile ist syntaktisch in Ordnung, sie ist nur
+// immer falsch.
+//
+// Verglichen wird jetzt die Domain, nicht die Zeichenkette. Welche die
+// eigene ist, sagt der Mandant selbst - ueber die Absenderadresse oder
+// die Mailadresse seiner Stammdaten. Ohne eine von beiden ist die
+// Antwort false, und es wird wie bisher als Firma gesendet.
+function immoEigeneAdresse(adresse: unknown, eigene: unknown): boolean {
+  const domain = (x: unknown) =>
+    String(x || "").trim().toLowerCase().split("@")[1] || "";
+  const a = domain(adresse), e = domain(eigene);
+  return !!a && !!e && a === e;
+}
+
 // --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
 // Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
 // und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist
@@ -146,7 +166,7 @@ Deno.serve(async (req) => {
           if (!link) throw new Error("Kein Anmeldelink erzeugt.");
           const m = baueEinladungsMail({ anrede, link, makler: maklerName, telefon: makler?.telefon || "", firma, web: firmaRow?.web || "", erneut: true, zugangUrl: zugangUrlAus(portalUrl) });
           const r = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ from: `${firma} <${fromEmail}>`, to: [email], reply_to: makler?.email && /@immooffice.example\.de$/i.test(makler.email) ? makler.email : fromEmail, subject: m.betreff, text: m.text, html: m.html }) });
+            body: JSON.stringify({ from: `${firma} <${fromEmail}>`, to: [email], reply_to: makler?.email && immoEigeneAdresse(makler.email, fromEmail) ? makler.email : fromEmail, subject: m.betreff, text: m.text, html: m.html }) });
           const rTxt = await r.text();
           if (!r.ok) throw new Error(`Resend ${r.status}: ${rTxt.slice(0, 300)}`);
           let resendId = ""; try { resendId = JSON.parse(rTxt).id || ""; } catch (_) { /* egal */ }

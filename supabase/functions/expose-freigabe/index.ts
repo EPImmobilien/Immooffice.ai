@@ -27,9 +27,30 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// --- Gehoert diese Adresse zum Mandanten selbst? (Phase 2.4) ------------
+// Hier stand die Mail-Domain der Referenz im Quelltext. Die
+// Neutralisierung hat daraus eine Domain gemacht, die es nicht gibt
+// (die Platzhalter-Domain mit angehaengtem ".de") - die Pruefung konnte
+// seither NIE zutreffen, und jede dieser Funktionen hat immer als Firma
+// gesendet statt als zustaendiger Makler. Ein stiller Verhaltenswechsel,
+// den kein Gate sieht: die Zeile ist syntaktisch in Ordnung, sie ist nur
+// immer falsch.
+//
+// Verglichen wird jetzt die Domain, nicht die Zeichenkette. Welche die
+// eigene ist, sagt der Mandant selbst - ueber die Absenderadresse oder
+// die Mailadresse seiner Stammdaten. Ohne eine von beiden ist die
+// Antwort false, und es wird wie bisher als Firma gesendet.
+function immoEigeneAdresse(adresse: unknown, eigene: unknown): boolean {
+  const domain = (x: unknown) =>
+    String(x || "").trim().toLowerCase().split("@")[1] || "";
+  const a = domain(adresse), e = domain(eigene);
+  return !!a && !!e && a === e;
+}
+
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "GET, POST, OPTIONS" };
-const AGB_URL = "https://immooffice.example/agb";
-const DATENSCHUTZ_URL = "https://immooffice.example/datenschutz";
+// Die drei Rechtsadressen stehen in firma_stammdaten (fork_32), nicht
+// hier: sie gehoeren dem Mandanten, nicht der Plattform. Ohne Eintrag
+// bleibt der Wert leer und die Oberflaeche laesst den Link weg.
 const LINK_BASIS = (Deno.env.get("EXPOSE_FREIGABE_BASIS") || "https://immooffice.example/?expose=").replace(/\/\?expose=$/, "/freigabe.html?expose=");
 const OBJEKT_BASIS = LINK_BASIS.replace(/freigabe\.html\?expose=$/, "objekt.html?t=");
 async function landingStandard(db: any, mandant: string | null): Promise<boolean> {
@@ -47,7 +68,7 @@ async function lade(db: any, t: string) {
   const { data: f } = await db.from("expose_freigaben").select("*").eq("token", t).maybeSingle();
   if (!f) return null;
   const { data: im } = await db.from("immobilien").select("id, immo_nr, objekttitel, bezeichnung, strasse, hausnummer, plz, ort, vertragsart, angebotspreis, kaltmiete, wohnflaeche, zimmer, hauptbild_url, adresse_freigeben, zustaendig_id, mandant_id").eq("id", f.immobilie_id).maybeSingle();
-  const { data: firma } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").eq("slug", f.firma_slug || "standard").maybeSingle();
+  const { data: firma } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon, url_impressum, url_datenschutz, url_agb").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").eq("slug", f.firma_slug || "standard").maybeSingle();
   const { data: maklerRoh } = im?.zustaendig_id ? await db.from("profiles").select("id, name, email, telefon, titel").eq("id", im.zustaendig_id).maybeSingle() : { data: null };
   const firmaFertig = firma || { firma_name: "", strasse: "", plz: "", ort: "", email: "", telefon: null };
   // v16: Kunden bekommen die Büronummer, nie die Mobilnummer des Maklers
@@ -134,7 +155,7 @@ Deno.serve(async (req) => {
       const { data: makler } = im.zustaendig_id ? await db.from("profiles").select("id, name, email, telefon, firma_id").eq("id", im.zustaendig_id).maybeSingle() : { data: null as any };
       let firmaSlug = "standard";
       if (makler?.firma_id) { const { data: fs } = await db.from("firma_stammdaten").select("slug").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").eq("id", makler.firma_id).maybeSingle(); if (fs?.slug) firmaSlug = fs.slug; }
-      const { data: firmaRow } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").eq("slug", firmaSlug).maybeSingle();
+      const { data: firmaRow } = await db.from("firma_stammdaten").select("firma_name, strasse, plz, ort, email, web, hrb, registergericht, geschaeftsfuehrer, ust_id, telefon, url_impressum, url_datenschutz, url_agb").eq("mandant_id", im?.mandant_id ?? "00000000-0000-0000-0000-000000000000").eq("slug", firmaSlug).maybeSingle();
       const firma = firmaRow || { firma_name: "", strasse: "", plz: "", ort: "", email: "", telefon: null };
       if (!prov || !expose) return json({ ok: false, fehler: `Für dieses Objekt ist der sofortige Exposé-Download derzeit nicht möglich. Bitte fordern Sie das Exposé per E-Mail an: ${makler?.email || firma.email}` }, 409);
 
@@ -142,7 +163,7 @@ Deno.serve(async (req) => {
         const { provision_aussen: _pa, provisionsfrei: _pf, zustaendig_id: _z, status: _st, ...imPub } = im;
         return json({ ok: true, objekt: true, im: imPub, firma, makler: makler ? { name: makler.name, email: makler.email, telefon: firma.telefon || "" } : null,
           provisionsmodell: prov.modell, provision_text: prov.text, vorbelegt: anm ? { name: anm.name || "", email: anm.email || "" } : null, unterlagen_anzahl: dokumente.length,
-          texte: { widerrufsbelehrung: widerrufsbelehrung(firma), beginn_text: BEGINN_TEXT, agb_url: AGB_URL, datenschutz_url: DATENSCHUTZ_URL } });
+          texte: { widerrufsbelehrung: widerrufsbelehrung(firma), beginn_text: BEGINN_TEXT, agb_url: firma?.url_agb || "", datenschutz_url: firma?.url_datenschutz || "" } });
       }
 
       const email = String(body.email || "").replace(/^.*<([^>]+)>.*$/, "$1").trim().toLowerCase();
@@ -175,7 +196,7 @@ Deno.serve(async (req) => {
       const { ip: _ip, user_agent: _ua, bestaetigungen: _b, token: _t, ...fPub } = f;
       const { count } = await db.from("immobilie_datei").select("id", { count: "exact", head: true }).eq("immobilie_id", f.immobilie_id).eq("interessenten_freigabe", true);
       return json({ ok: true, f: fPub, im, firma, makler: makler ? { name: makler.name, email: makler.email, telefon: makler.telefon } : null, unterlagen_anzahl: count || 0,
-        texte: { widerrufsbelehrung: widerrufsbelehrung(firma), beginn_text: BEGINN_TEXT, agb_url: AGB_URL, datenschutz_url: DATENSCHUTZ_URL } });
+        texte: { widerrufsbelehrung: widerrufsbelehrung(firma), beginn_text: BEGINN_TEXT, agb_url: firma?.url_agb || "", datenschutz_url: firma?.url_datenschutz || "" } });
     }
 
     if (body.aktion === "download") {
@@ -201,7 +222,7 @@ Deno.serve(async (req) => {
         // v10: Fehler beim Protokollieren nicht mehr verschlucken — ohne Protokoll kein Download.
         const { error: upErr } = await db.from("expose_freigaben").update({
           bestaetigt_am: jetzt, ip, user_agent: req.headers.get("user-agent") || null, newsletter: !!body.newsletter,
-          bestaetigungen: { haken: h, provision_text: f.provision_text, provisionsmodell: f.provisionsmodell, widerrufsbelehrung: wb, beginn_text: BEGINN_TEXT, agb_url: AGB_URL, datenschutz_url: DATENSCHUTZ_URL, zeitpunkt: jetzt, ...(herkunft ? { herkunft } : {}) },
+          bestaetigungen: { haken: h, provision_text: f.provision_text, provisionsmodell: f.provisionsmodell, widerrufsbelehrung: wb, beginn_text: BEGINN_TEXT, agb_url: firma?.url_agb || "", datenschutz_url: firma?.url_datenschutz || "", zeitpunkt: jetzt, ...(herkunft ? { herkunft } : {}) },
           downloads: (f.downloads || 0) + 1, letzter_download_am: jetzt,
         }).eq("id", f.id);
         if (upErr) { console.error("expose-freigabe bestaetigen:", upErr); return json({ ok: false, fehler: "Die Bestätigung konnte nicht gespeichert werden (" + upErr.message + "). Bitte versuchen Sie es erneut oder melden Sie sich bei uns." }, 500); }
@@ -222,7 +243,7 @@ Deno.serve(async (req) => {
         }
         const resendKey = Deno.env.get("RESEND_API_KEY");
         if (resendKey) {
-          const absender = makler?.email && /@immooffice.example\.de$/i.test(makler.email) ? `${makler.name} <${makler.email}>` : `${firma.firma_name} <${firma.email}>`;
+          const absender = makler?.email && immoEigeneAdresse(makler.email, firma.email) ? `${makler.name} <${makler.email}>` : `${firma.firma_name} <${firma.email}>`;
           const text = `Guten Tag${f.name ? " " + f.name : ""},\n\nvielen Dank für Ihre Beauftragung vom ${zeit} Uhr zur Immobilie „${titel}“${im?.immo_nr ? ` (Objekt-Nr. ${im.immo_nr})` : ""}.\n\nSie können das Exposé und die freigegebenen Unterlagen jederzeit über Ihren persönlichen Link erneut herunterladen:\n${f.landing ? OBJEKT_BASIS : LINK_BASIS}${t}\n${f.landing ? "Dort finden Sie außerdem alle Bilder, Eckdaten und Unterlagen zum Objekt, können Besichtigungstermine vorschlagen und Fragen stellen.\n" : ""}\nWie gesetzlich vorgesehen erhalten Sie hiermit die von Ihnen bestätigten Texte in Textform:\n\nPROVISION\n${f.provision_text}\n\nVORZEITIGER BEGINN\n${BEGINN_TEXT}\n\nWIDERRUFSBELEHRUNG\n${wb}\n\nAGB: ${AGB_URL}\nDatenschutz: ${DATENSCHUTZ_URL}\n\nBei Fragen erreichen Sie uns jederzeit${makler?.telefon ? " unter " + makler.telefon : ""}.\n\nMit freundlichen Grüßen\n${makler?.name || firma.firma_name}\n${firma.firma_name}\n${firma.strasse}, ${firma.plz} ${firma.ort}`;
           const ok1 = await resend(resendKey, { from: absender, to: [f.email], reply_to: makler?.email || firma.email, subject: `Ihre Beauftragung und das Exposé „${titel}“`, text });
           if (ok1) await db.from("expose_freigaben").update({ bestaetigungsmail_am: jetzt }).eq("id", f.id);
