@@ -808,3 +808,64 @@ Dazu kommt die Mailzustellung: Supabase verschickt die Bestätigungsmails
 über seinen eingebauten Versand, der eng begrenzt ist (wenige Mails je
 Stunde). Für den echten Betrieb gehört dort ein eigener SMTP-Zugang
 hinterlegt — dieselbe Frage wie beim `RESEND_API_KEY`.
+
+## Der verdrahtete Firmenname steht noch in der Oberfläche
+
+`tests/firmenname-verdrahtet.py` hat die Klasse für `supabase/functions/`
+geschlossen: null von 107. Die Prüfung sieht aber nur dieses Verzeichnis.
+
+In `src/app/anwendung.js` stehen **98 Vorkommen** von `Musterhaus` — dem Namen
+des Demo-Mandanten, den die Neutralisierung überall dort eingesetzt hat, wo
+die Vorlage ihren eigenen Namen verdrahtet hatte. Stand 03.10.2026 ist nicht
+durchgesehen, welche davon ein Kunde liest und welche nur ein Kommentar oder
+ein Vorgabewert in einem Formular sind. Die drei Kundenseiten
+(`freigabe.html`, `objekt.html`, `unterlagen.html`) und `sonnenverlauf.html`
+sind behoben — dort war der Name ein Briefkopf.
+
+Der Weg ist derselbe wie bei den Funktionen: die Prüfung auf `src/` ausweiten,
+die Fundstellen einstufen (Kommentar / Heuristik / KI-Vorgabe / Ausgabe) und
+die Klasse „Ausgabe" auf null bringen. Vor einem echten zweiten Mandanten
+nötig; nicht vor Gate 2 zu schaffen.
+
+Zwei Fallstricke für diesen Durchgang, beide am 03.10. gesehen:
+
+- `Musterhausen` ist eine **Ortsangabe** in einem Platzhalter, kein
+  Firmenname. Eine Prüfung auf `Musterhaus` trifft sie mit.
+- Die Straßen-Regel hat an einer Stelle den Namen entfernt und die Hausnummer
+  stehen gelassen (`„Am  26, 12345 Musterstadt"`, zwei Leerzeichen). So etwas
+  fällt keinem Gate auf, nur beim Lesen.
+
+## Ein neuer Fremdanbieter für Adressen: photon.komoot.io
+
+Die neue Vorlage sucht Adressen im Browser zuerst bei Nominatim (OSM) und
+fällt dann auf **Photon** zurück (`epAdresseSuchen`, zwei Stellen). Das ist
+ein Dienst, den es im Fork vorher nicht gab.
+
+Was daran offen ist, ist nicht technisch — es gibt keine
+Content-Security-Policy im Projekt, der Aufruf geht durch, und die Antwort
+wird auf Deutschland, passende Postleitzahl und passenden Straßennamen
+geprüft, bevor sie verwendet wird. Offen ist die **datenschutzrechtliche
+Seite**: der Browser des Maklers schickt die Adresse des Objekts an einen
+weiteren Dritten. Das gehört in die Datenschutzhinweise, zusammen mit
+Nominatim und Overpass, und ist bisher nirgends genannt.
+
+## Die drei eigenen Funktionen sind geschrieben, aber nicht erprobt
+
+`unterlagen-link`, `grundriss-ki-lesen` und `bild-privat-retusche` sind
+vollständig und syntaktisch geprüft; `npm run check` ist grün. Gegen das
+eigene Projekt gelaufen ist keine von ihnen. Dazu fehlen:
+
+- **`ANTHROPIC_API_KEY`** und **`REPLICATE_API_TOKEN`** als Secrets im
+  Supabase-Projekt. Beide sind jetzt in `.env.example` dokumentiert; der
+  Schlüssel selbst gehört nicht ins Repository. Ohne den Replicate-Zugang
+  meldet die Privat-Prüfung ihren Befund, kann aber keinen
+  Retusche-Vorschlag erzeugen — das ist gewollt und steht so im Befund.
+- Ein **Objekt mit Fotos und einem alten Grundriss** im eigenen Projekt, um
+  die beiden KI-Wege einmal von Hand durchzuspielen.
+- Die **Zustellung der Meldemails** von `unterlagen-link` hängt am selben
+  `RESEND_API_KEY` wie der übrige Versand.
+
+Was ohne diese Schlüssel nicht geprüft werden kann: ob das von der KI
+gelieferte JSON wirklich durch `epGrundrissKiZuScan` läuft und im Editor ein
+brauchbares Blatt ergibt. Das Format ist aus dem Leser abgeleitet, nicht aus
+einer Dokumentation — und abgeleitet heißt nicht erprobt.

@@ -3557,3 +3557,137 @@ Der Vorsatz `EP_` in den 23 neuen Konstanten lief ohne Zutun durch: die Regel
 `EP_` → `IMMO_` steht seit dem 28.09. und greift auch auf das, was danach
 dazukommt. Das ist der Unterschied zwischen einer Regel und einer Liste.
 
+
+## Die drei Funktionen, die der Export nicht mitbrachte (03.10.2026)
+
+Die neue Vorlage ruft drei Edge Functions auf, die in ihrem
+Funktionsexport nicht enthalten sind: `unterlagen-link` (Stufe 114/117),
+`grundriss-ki-lesen` (118/119) und `bild-privat-retusche` (112). Auf die Frage
+hin war die Antwort des Auftraggebers eindeutig: **alle drei selbst
+schreiben.** Das ist geschehen.
+
+### Wo eine eigene Funktion liegt
+
+`supabase/eigene/`, nicht `supabase/functions/`. Der Grund steht im README
+dort: `scripts/neutralisieren-funktionen.py` löscht `supabase/functions/` vor
+jedem Lauf (`shutil.rmtree`), weil ein entferntes Stück der Vorlage sonst
+liegen bleibt. Eine Funktion ohne Vorlage kann dort also nicht wohnen; sie
+wird nach dem Löschen hereinkopiert. Liegt ein Name in beidem, **bricht der
+Erzeuger ab** — eine *geänderte* Funktion der Vorlage gehört als Regel in den
+Erzeuger, nicht hierher. Das ist der Unterschied, auf den es ankommt.
+
+`tests/funktionen-unveraendert.py` kennt die Ausnahme, sonst meldete jede
+eigene Funktion „hat keine Entsprechung in der Vorlage".
+
+### Alle drei ziehen die Mandantengrenze selbst
+
+Keine davon ist eine Ausnahme vom Befund des 29.09.: der `service_role`
+umgeht RLS, also ist eine Kennung aus dem Anfragekörper ungeprüft.
+
+| Funktion | Woher der Mandant kommt |
+|---|---|
+| `unterlagen-link` | öffentlich: allein aus dem Token, der genau eine Zeile benennt. Angemeldet (`anlegen`, `loeschen`): aus dem Konto, der Anmeldekopf wird selbst geprüft. |
+| `grundriss-ki-lesen` | aus dem Konto; die mitgeschickte `immobilie_id` wird dagegen gehalten |
+| `bild-privat-retusche` | aus dem Konto; `immobilie_id` und `datei_id` werden dagegen gehalten, jeder Speicherpfad trägt ihn als erstes Segment |
+
+Beide KI-Funktionen stehen im Buch `tests/funktionen-angemeldet.py`,
+`unterlagen-link` in `tests/funktionen-oeffentlich.py`.
+
+### Das Antwortformat ist nicht frei gewählt
+
+`grundriss-ki-lesen` liefert kein beliebiges JSON. Die Oberfläche rechnet es
+mit `epGrundrissKiZuScan` in das Raumscan-JSON des Editors um; `docs/scan-format.md`,
+auf das der Kommentar der Vorlage verweist, gibt es im Fork nicht. Die
+Feldnamen sind deshalb **aus diesem Leser abgeleitet** — Raum mit
+`polygon`/`art`/`schraegen`/`flaeche_plan_m2`/`lichte_hoehe_m`, Tür und
+Fenster als Strecke, Treppe als Mitte mit Breite und Tiefe, dazu `geschoss`,
+`geschoss_nr`, `einheiten`, `sicherheit`, `aussenwand_dicke_m`, `dach` und
+`hinweise`.
+
+Dasselbe gilt für `unterlagen.html`: die Seite ist die Schnittstelle, nicht
+die Funktion. Drei Stellen haben nicht gepasst und wurden nachgezogen — das
+Symbol je Datei braucht `typ` und `kategorie`, ein zurückgezogener Link heißt
+dort `widerrufen` und nicht `gesperrt`, und die Passwortseite zeigt Absender
+und Briefkopf, nicht nur den Titel.
+
+### Keine erfundenen Maße, keine stille Verschönerung
+
+CLAUDE.md, KI-Regeln. Beide Funktionen setzen das ausdrücklich um:
+
+- `grundriss-ki-lesen`: ohne Maßkette und ohne Maßstab kommt eine **leere**
+  Raumliste zurück, dazu ein Hinweis und `sicherheit: niedrig`. Ein leeres
+  Ergebnis ist richtig, geschätzte Zahlen sind falsch. Jedes Ergebnis trägt
+  seine Selbsteinschätzung und seine Hinweise, beides sichtbar im Dialog, und
+  übernommen wird erst auf Klick.
+- `bild-privat-retusche`: die Systemvorgabe grenzt ab, was *nicht* gemeint ist
+  — Unordnung, Geschmack, Dekoration, die Hausnummer des Objekts selbst. Die
+  Retusche-Anweisung endet auf „Change nothing else in the image".
+- Das Original bleibt. Der Vorschlag liegt als eigene Datei in einem eigenen
+  Ordner, nicht dort, wo die Exporte Dateien einsammeln. Beim Übernehmen
+  wechselt nur, worauf `storage_path` zeigt; der alte Pfad steht in
+  `privat_befund.original_pfad`, und `ki_bearbeitet = true` setzt die
+  Kennzeichnung, die Exposé und Portal mitnehmen.
+
+### Ein Hintergrundjob braucht einen Wächter
+
+`grundriss-ki-lesen` antwortet sofort mit der Auftragskennung und arbeitet
+weiter (`EdgeRuntime.waitUntil`); der Anthropic-Datenstrom wird mitgezählt und
+der Zähler alle 1,5 Sekunden in `fortschritt` geschrieben, damit im Dialog zu
+sehen ist, dass etwas passiert.
+
+Jeder Ausgang schreibt in die Auftragszeile, auch der Fehler. Wird die
+Laufzeitumgebung mitten darin beendet, kommt dieses Schreiben nicht mehr
+zustande: die Zeile bliebe auf `laeuft`, und in der Oberfläche dreht sich der
+Kreis, bis sie nach sieben Minuten aufgibt — ohne dass je ein Grund in der
+Datenbank stünde. Dagegen steht `fork_31l`: `public.grundriss_ki_waechter()`,
+alle fünf Minuten in `cron`, zwölf Minuten Toleranz. **Keine Edge Function** —
+eine einzige `update`-Anweisung reicht, und sie darf über alle Mandanten
+laufen, denn das ist ihre Aufgabe.
+
+### Zwei Spalten waren falsch geraten
+
+`fork_31a` und `fork_31i` sind entstanden, bevor es die Funktionen gab. Zwei
+Annahmen darin haben nicht gehalten:
+
+- `grundriss_ki_auftraege.fortschritt` war `text`. Die Oberfläche liest
+  `a.fortschritt.zeichen`, also ein Feld **in** einem Objekt (`fork_31k`:
+  jetzt `jsonb`). Mit `text` hätte der Nutzer ein bis drei Minuten lang keinen
+  Fortschritt gesehen.
+- Der Kommentar zu `immobilie_datei.privat_status` nannte eine geratene
+  Werteliste. Jetzt ist sie nachlesbar: `EpPrivatBadge` verzweigt namentlich
+  auf `offen`, `laeuft`, `ok`, `vorschlag`, `uebernommen`, `verworfen`,
+  `fehler` (`fork_31m`). Eine Prüfbedingung kommt bewusst **nicht** dazu — die
+  Werte stehen im Code, nicht in der Datenbank, und eine Bedingung hier würde
+  bei der nächsten Stufe der Vorlage einen Schreibfehler erzeugen, statt einen
+  Zustand zu verhindern.
+
+### Der Briefkopf der Kundenseiten kam aus dem Quelltext
+
+Beim Einhängen von `unterlagen.html` ist aufgefallen, was auf den drei
+Kundenseiten schon stand: der Firmenname **in Versalien im Quelltext**. Die
+Vorlage hatte dort ihren eigenen, die Neutralisierung hat daraus den des
+Demo-Mandanten gemacht — und der ist bei jedem anderen Makler falsch, auf
+einer Seite, die *sein* Kunde liest. Derselbe Fehler, den
+`tests/firmenname-verdrahtet.py` für die Edge Functions geschlossen hat, nur
+in einem Verzeichnis, das diese Prüfung nicht sieht.
+
+Behoben in `freigabe.html`, `objekt.html` und `unterlagen.html`: `kopfSetzen()`
+nimmt den Namen aus `firma_stammdaten` des Mandanten und trägt ihn auch im
+Seitentitel nach. **Ohne Eintrag bleibt das Band aus** — dieselbe Regel wie
+bei `immoFirmenName`: ein leeres blaues Band ist besser als ein fremder Name.
+In `sonnenverlauf.html` geht das nicht, die Seite läuft als Rahmen im Exposé
+und bekommt nur eine Adresse mitgegeben; dort entfällt die Markenzeile
+ersatzlos.
+
+Die Regeln dafür stehen in `SEITEN_ERSETZUNGEN`, einer zweiten Liste in
+`scripts/oberflaeche-zerlegen.py`, die nur `scripts/nebenseiten.py` anwendet.
+In `ERSETZUNGEN` würden sie unter „Regeln ohne Treffer" auftauchen — und eine
+Liste, in der die Hälfte planmäßig nicht trifft, taugt nicht mehr als Warnung.
+
+### Der anon-Schlüssel stand in der Seite
+
+`unterlagen.html` trug den anon-Schlüssel der Vorlage als JSON-Web-Token im
+Quelltext. Er ist kein Geheimnis, aber überflüssig: die Funktion läuft ohne
+JWT-Prüfung, und `freigabe.html` ruft ihre Funktion seit immer ohne
+`apikey`-Kopf auf. Ein Schlüssel im Quelltext bindet die Seite außerdem an
+genau ein Projekt — und `scripts/neutral.sh` verbietet ihn. Entfallen.

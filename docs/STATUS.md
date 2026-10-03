@@ -475,3 +475,37 @@ Zwei Prüflisten führen darüber Buch und sind Teil von `npm run check`:
 `tests/funktionen-oeffentlich.py` (28 ohne JWT) und
 `tests/funktionen-angemeldet.py` (63 mit JWT). Beide melden jeden neuen
 Endpunkt, der dazukommt, und jede Absicherung, die wieder verschwindet.
+
+## Nachtrag 03.10.2026 — die drei eigenen Edge Functions stehen
+
+Der Abgleich mit der neuen Vorlage (40 Stufen, 02.10.) hatte eine Lücke
+hinterlassen: drei Funktionen, die die Oberfläche aufruft und die ihr
+Funktionsexport nicht enthält. Alle drei sind geschrieben, mandantenfähig von
+der ersten Zeile an, und `npm run check` ist grün.
+
+| Funktion | Stufe | Was sie tut |
+|---|---|---|
+| `unterlagen-link` | 114, 117 | Download-Links für Objektunterlagen und Transfers: Token, Passwort (PBKDF2, 120.000 Runden), Ablaufdatum, signierte URLs, Abrufprotokoll, gebündelte Meldemails |
+| `grundriss-ki-lesen` | 118, 119 | Einen Bestandsgrundriss auslesen — Räume mit lichten Maßen, Türen, Fenster, Treppen, Dachschrägen |
+| `bild-privat-retusche` | 112 | Objektfotos auf private Details prüfen und einen Retusche-Vorschlag erzeugen |
+
+Sie liegen in `supabase/eigene/` und werden nach dem `rmtree` in
+`supabase/functions/` kopiert; der Grund steht in `supabase/eigene/README.md`.
+Damit sind es **121 Funktionen** — 118 aus der Vorlage und drei eigene.
+
+Dazu gehören fünf Migrationen: `fork_31k` (die Fortschrittsspalte wird `jsonb`),
+`fork_31j` (Eimer `transfer-dateien`, Spalte `meldeart`), `fork_31l`
+(zwei Cron-Jobs: die gebündelten Abrufmeldungen und der Wächter für den
+KI-Hintergrundlauf) und `fork_31m` (die Werte von `privat_status` richtig
+dokumentiert).
+
+Die sechste Nebenseite ist dazugekommen: `unterlagen.html`, die öffentliche
+Download-Seite. Beim Einhängen ist aufgefallen, dass alle Kundenseiten den
+Firmennamen im Quelltext trugen — behoben, der Briefkopf kommt jetzt aus
+`firma_stammdaten` des Mandanten.
+
+**Was fehlt, um es zu erproben:** `ANTHROPIC_API_KEY` und
+`REPLICATE_API_TOKEN` als Secrets im Supabase-Projekt. Beide sind in
+`.env.example` dokumentiert, keiner liegt im Repository. Siehe
+`docs/OFFEN.md`, Abschnitt „Die drei eigenen Funktionen sind geschrieben,
+aber nicht erprobt".
