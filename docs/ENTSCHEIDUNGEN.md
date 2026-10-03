@@ -3818,3 +3818,69 @@ und Grund; wer eine neue dazulegt, bekommt die Prüfung rot. Fünf Klassen:
 | ORTSNAME | 2 | „Musterhausen" ist ein **Ort** im Platzhalter der Ortssuche. Die Suche nach „Musterhaus" trifft ihn mit. |
 
 Die Klasse AUSGABE ist leer.
+
+## Das Neutralitäts-Gate hatte ein Loch: Trennzeichen (03.10.2026)
+
+Beim Aufräumen der Platzhalter-Domain sind **drei Fundstellen** aufgefallen,
+die das Gate durchgewinkt hat. Keine davon war neu — sie standen seit der
+Übernahme da.
+
+### Was durchfiel und warum
+
+| Fundstelle | Warum das Muster sie nicht fand |
+|---|---|
+| Telefonnummer der Referenz in `{{absender_telefon}}` | **Eine andere Nummer** desselben Ortes. Sie stand in keinem Muster. |
+| Dieselbe Nummer im Platzhaltertext der Abwesenheitsnotiz | Mit `" / "` geschrieben. Das Muster erlaubte **ein** Trennzeichen (`[ /.-]?`), hier standen drei: Leerzeichen, Schrägstrich, Leerzeichen. |
+| Telefon und Mail dreier Standorte in `WIDERRUF_356_KONTAKT` | Dasselbe Trennzeichen-Problem. |
+| Eine echte Straße mit Hausnummer, zweimal | Der Straßenname stand in keinem Muster — weder in `STAMM` noch in `ORTE`. Einmal als Beispiel in einer **KI-Systemvorgabe**, einmal in `{{absender_strasse}}`. |
+
+Das Muster war nicht falsch, es war **zu eng**. `[ /.-]?` trifft
+`0381/367…`, aber nicht `0381 / 367…`. Ein Mensch schreibt beides.
+
+### Was am Gate geändert wurde
+
+1. **Trennzeichen beliebig oft:** `[ /.-]?` → `[ /.-]*`, an beiden
+   Nummernmustern.
+2. **Die Vorwahl als eigene Alternative:** `\b0381[ /.-]*[0-9]` — jede
+   Nummer dieses Ortes im Produktcode, nicht nur die bekannte. Geprüft, dass
+   die Vorwahl *allein* nicht anschlägt, damit aus einer Jahreszahl kein
+   Fehlalarm wird.
+3. **Der Straßenname** steht jetzt bei den Orten.
+
+Die Muster bleiben base64-kodiert: ein Gate, das die Fundstelle im Klartext
+mitbringt, ist selbst eine Fundstelle.
+
+### Was am Produktcode geändert wurde
+
+Die Werte sind nicht ersetzt, sondern **durch ihre Quelle ersetzt**:
+
+- `{{absender_strasse}}`, `{{absender_plz_ort}}`, `{{absender_telefon}}`
+  kommen aus `firma_stammdaten` des Mandanten — über `immoFirma(feld)`,
+  dasselbe Muster wie `immoMarke()` und mit derselben Regel: ohne Eintrag
+  leer. Das sind Platzhalter der **Vertragsvorlagen**, also Werte, die in
+  Dokumenten landen, die der Eigentümer bekommt.
+  `getProfile` lädt dafür `strasse, plz, ort, telefon, email, web` mit, und
+  `immoCiAnwenden` legt sie in `window.IMMO_FIRMA` ab.
+- `WIDERRUF_356_KONTAKT` ist **weg**. Die Karte trug Telefon und Mail dreier
+  Standorte; ihr eigener Kommentar sagte, woher die Werte kommen sollten —
+  „je Standort (`firma_stammdaten`)". `widerrufKontaktSetzen(xml, kontakt)`
+  bekommt sie jetzt übergeben. Ohne Angabe bleibt der Platzhalter stehen:
+  eine Widerrufsbelehrung mit **fremder** Telefonnummer ist schlechter als
+  eine mit sichtbarer Lücke. Die Funktion wird in der Vorlage nirgends
+  aufgerufen; sie bleibt trotzdem stehen (Phase 9 verbietet das Entfernen),
+  nur ohne eigene Daten.
+- Der Platzhalter eines Telefonfeldes heißt jetzt „Telefonnummer". Ein
+  Platzhalter braucht kein Beispiel, das jemandem gehört.
+- Das Beispiel in der KI-Systemvorgabe von `mail-anhaenge-extrahieren`
+  nennt eine Musterstraße.
+
+### Die sieben Regeln stehen kodiert
+
+Ihre Suchtexte enthalten die Anschrift und die Nummern. `scripts/` steht in
+der Ausschlussliste des Gates, die Werte *dürften* dort also im Klartext
+stehen — zwei ältere Regeln tun das auch. Für die neuen ist es trotzdem
+`B64('…')`, aus demselben Grund wie bei `scripts/neutral.sh`.
+
+**Damit stehen zwei Schreibweisen in einer Datei.** Ob die beiden älteren
+Regeln nachziehen sollen, ist eine Entscheidung über bestehenden Code und
+steht in `docs/OFFEN.md`.

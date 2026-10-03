@@ -2951,6 +2951,17 @@ NACHBESSERN = [
      'Energieausweis: das Logo tragt den Namen des Mandanten als Alternativtext.',
      {'energieausweis-anfrage'}),
 
+    # --- Eine echte Anschrift als Beispiel in einer KI-Vorgabe -----------
+    # mail-anhaenge-extrahieren zeigt der KI, wie ein Dateiname aussehen
+    # soll — und nimmt dafuer eine Strasse mit Hausnummer, die es wirklich
+    # gibt. Das Neutralitaets-Gate hat sie nicht gefunden, weil der
+    # Strassenname in keinem seiner Muster steht (03.10.2026). Ein Beispiel
+    # braucht keine echte Adresse.
+    ('MARKE', 'Beispiel: 2026-05-26_Doberaner-Str-16_Energieausweis.',
+     'Beispiel: 2026-05-26_Musterstr-1_Energieausweis.',
+     'Beispieldateiname in der KI-Vorgabe ohne echte Anschrift.',
+     {'mail-anhaenge-extrahieren'}),
+
     # --- Und die Bewerbertest-Seite auch --------------------------------
     # Dieselbe Lage: oeffentliche Seite, kein angemeldeter Nutzer, drei
     # Stellen mit dem Namen aus dem Quelltext. Ein Bewerber, der sich bei

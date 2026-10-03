@@ -46,7 +46,7 @@ MARKEN='engfer|engferundpartner|\be ?& ?p\b|e ?& ?p ?[-_ ]?immobilien|e ?& ?p ?[
 # Die Muster fuehren auch die \uXXXX-Schreibweise der Umlaute mit. Der
 # Quelltext der Vorlage legt Umlaute stellenweise so ab, und genau dahinter
 # hatte sich die Bueroanschrift der Referenz bis zum 28.09.2026 versteckt.
-STAMM="$(printf %s 'dijDtnxcXHUwMGY2fG9lKWdlbnRlaWNofEhSQjE2NTk4fERFMzcwMTAwMDc4fERFNzQxMDAxMDEyMzYwODU5Njk0Mjl8UU5UT0RFQjJYWFh8MDc5LzEwOC8wMDkwMHwwMzgxWyAvLi1dPzM2WyAvLi1dPzc3WyAvLi1dPzk5WyAvLi1dPzg4fFwrPzQ5WyAtXT8zODFbIC1dPzM2Nzc5OTg=' | base64 -d)"
+STAMM="$(printf %s 'dijDtnxcXHUwMGY2fG9lKWdlbnRlaWNofEhSQjE2NTk4fERFMzcwMTAwMDc4fERFNzQxMDAxMDEyMzYwODU5Njk0Mjl8UU5UT0RFQjJYWFh8MDc5LzEwOC8wMDkwMHwwMzgxWyAvLi1dKjM2WyAvLi1dKjc3WyAvLi1dKjk5WyAvLi1dKjg4fFwrPzQ5WyAtXSozODFbIC1dKjM2Nzc5OTh8XGIwMzgxWyAvLi1dKlswLTld' | base64 -d)"
 # Standorte der Referenz. Getrennt gefuehrt, weil sie nur im Produktcode ein
 # Fehler sind: docs/ und die Neutralisierungsskripte muessen sie benennen
 # duerfen, und die stehen ohnehin in AUS.
@@ -55,7 +55,7 @@ STAMM="$(printf %s 'dijDtnxcXHUwMGY2fG9lKWdlbnRlaWNofEhSQjE2NTk4fERFMzcwMTAwMDc4
 # der Vertragsparteien und des Mietobjekts. Sie standen als Suchtexte in der
 # Dokumenterzeugung; die ist seither auf markierte Stellen umgestellt, und
 # damit duerfen sie hier stehen, ohne das Gate rot zu faerben.
-ORTE="$(printf %s 'XGJyb3N0b2NrfFxic2Nod2VyaW58d2FybmVtKMO8fFxcdTAwZmN8dWUpbmRlfFxiMTgwNTVcYnxcYjE4MDU3XGJ8XGIxOTA1NVxifHNhbmRkb3Jud2VnfGtyKMO2fG9lKXBlbGluZXJ8YmFkID9kb2JlcmFufFxiMTgyMDlcYnxcYjE5MzcwXGJ8XGIxOTM4NlxifFxicGFyY2hpbVxifFxicGFzc293XGJ8XGIxODM1NlxifFxiYmFydGhcYnxkb2JiZXJ0aW4=' | base64 -d)"
+ORTE="$(printf %s 'XGJyb3N0b2NrfFxic2Nod2VyaW58d2FybmVtKMO8fFxcdTAwZmN8dWUpbmRlfFxiMTgwNTVcYnxcYjE4MDU3XGJ8XGIxOTA1NVxifHNhbmRkb3Jud2VnfGtyKMO2fG9lKXBlbGluZXJ8YmFkID9kb2JlcmFufFxiMTgyMDlcYnxcYjE5MzcwXGJ8XGIxOTM4NlxifFxicGFyY2hpbVxifFxicGFzc293XGJ8XGIxODM1NlxifFxiYmFydGhcYnxkb2JiZXJ0aW58ZG9iZXJhbmVy' | base64 -d)"
 # Fremdes Supabase-Projekt.
 FREMD='yazwkzzjiquprtjpurur'
 # Dienste, die Phase 1.4 des Auftrags ersatzlos streicht. Geprueft wird nur

@@ -750,6 +750,34 @@ Damit sind alle 56 Anker weg.
 ihn bisher nur `{}` zu. Das ist eine fachliche Frage, die niemand gestellt
 hat; lieber keine Vorgabe als eine erfundene.
 
+## Zwei Schreibweisen für dasselbe im Erzeuger der Oberfläche
+
+`scripts/oberflaeche-zerlegen.py` steht in der Ausschlussliste von
+`scripts/neutral.sh` — Kennzeichen der Referenz dürfen dort im Klartext
+stehen, und zwei ältere Regeln machen das auch (eine Telefonnummer, eine
+Straße mit Hausnummer).
+
+Die sieben Regeln vom 03.10.2026 sind stattdessen base64-kodiert, wie die
+Muster in `scripts/neutral.sh`. Grund: sie bringen eine Anschrift und zwei
+Nummern mit, die vorher **nicht** in `scripts/` standen, und CLAUDE.md sagt
+„an keiner Stelle".
+
+Damit stehen zwei Schreibweisen in einer Datei, und die nächste Person muss
+raten, welche gilt. Zu entscheiden ist eine Richtung:
+
+1. **Alles kodieren** — die beiden älteren Regeln ziehen nach. Streng, aber
+   die Datei wird an sieben Stellen unleserlich für den, der sie prüft.
+2. **Alles im Klartext** — die sieben neuen Regeln werden lesbar, gedeckt
+   durch die Ausschlussliste. Lesbar, aber die Werte stehen dann dauerhaft
+   im Repository.
+
+Das ist eine Entscheidung über bestehenden Code und über die Auslegung von
+CLAUDE.md, deshalb liegt sie hier und nicht in `docs/ENTSCHEIDUNGEN.md`.
+Dazu gehört die Frage, ob `docs/NEUTRALITAET.md` noch stimmt: dort ist eine
+unversionierte `scripts/neutral-muster.txt` als Quelle der konkreten Werte
+beschrieben, die es nicht gibt — `scripts/neutral.sh` trägt sie selbst,
+kodiert.
+
 ## Die Blockliste steht an zwei Stellen
 
 `scripts/neutral.sh` und `tests/funktionen-unveraendert.py` führen je ein

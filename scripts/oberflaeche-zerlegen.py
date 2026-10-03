@@ -921,8 +921,10 @@ ERSETZUNGEN = [
     # Profil des Angemeldeten geladen wird.
     ('FORK',
      r'      \.select\("id, bundesland, gesellschaft_id"\)',
-     '      .select("id, bundesland, gesellschaft_id, ci_primaer, ci_akzent, ci_font, logo_pfad, marken_name, firma_name")',
-     'getProfile laedt auch die CI des Standorts.'),
+     '      .select("id, bundesland, gesellschaft_id, ci_primaer, ci_akzent, ci_font, logo_pfad, marken_name, firma_name, strasse, plz, ort, telefon, email, web")',
+     'getProfile laedt auch die CI des Standorts — und seit dem 03.10. die '
+     'Kontaktfelder: Anschrift, Telefon, Mail, Web standen an mehreren '
+     'Stellen im Quelltext.'),
     ('FORK',
      r'    window\.IMMO_BUNDESLAND = \(s && s\.bundesland\) \|\| null;\n  \} catch \(f\) \{',
      '    window.IMMO_BUNDESLAND = (s && s.bundesland) || null;\n'
@@ -3599,7 +3601,17 @@ ERSETZUNGEN = [
      '  const n = immoMarke();\n'
      '  return n ? (vorne || "") + n + (hinten || "") : "";\n'
      '}\n'
+     '// Ein einzelnes Feld der Stammdaten des Mandanten. Dieselbe Regel:\n'
+     '// ohne Eintrag LEER. Die Vorlage hatte Anschrift und Telefonnummer\n'
+     '// verdrahtet — in Platzhaltern, die in Vertragsvorlagen eingesetzt\n'
+     '// werden, also in Dokumenten, die der Eigentuemer bekommt.\n'
+     'function immoFirma(feld) {\n'
+     '  const f = typeof window !== "undefined" ? window.IMMO_FIRMA : null;\n'
+     '  const w = f && f[feld];\n'
+     '  return (typeof w === "string" && w.trim()) ? w.trim() : "";\n'
+     '}\n'
      'window.immoMarke = immoMarke; window.immoMarkeMit = immoMarkeMit;\n'
+     'window.immoFirma = immoFirma;\n'
      'async function immoCiAnwenden(stamm) {',
      'Helfer immoMarke/immoMarkeMit eingezogen (Firmenname je Mandant).'),
 
@@ -3772,6 +3784,14 @@ SEITEN_ERSETZUNGEN = [
 # und Portaltexten, die seine Kunden lesen. Der Weg ist immoMarke(), und der
 # liefert ohne Eintrag LEER, nie einen Beispielnamen.
 # ===========================================================================
+# Suchtexte, die selbst ein Kennzeichen enthalten, stehen kodiert da —
+# genauso wie die Muster in scripts/neutral.sh und aus demselben Grund: ein
+# Gate, das die Fundstelle im Klartext mitbringt, ist selbst eine Fundstelle.
+def B64(s):
+    import base64
+    return base64.b64decode(s).decode('utf-8')
+
+
 WOERTLICH = [
     # --- Kalendereinladungen (ICS) ---------------------------------------
     ('MARKE', '"PRODID:-//Musterhaus Immobilien GmbH//ImmoOffice//DE"',
@@ -4022,6 +4042,12 @@ WOERTLICH = [
     ('FORK',
      'window.IMMO_MARKE = (stamm && (stamm.marken_name || stamm.firma_name)) || null;',
      'window.IMMO_MARKE = (stamm && (stamm.marken_name || stamm.firma_name)) || null;\n'
+     '  // Die Kontaktfelder des Mandanten. Sie ersetzen verdrahtete\n'
+     '  // Anschriften und Telefonnummern; immoFirma(feld) liest sie.\n'
+     '  window.IMMO_FIRMA = stamm ? {\n'
+     '    strasse: stamm.strasse || "", plz: stamm.plz || "", ort: stamm.ort || "",\n'
+     '    telefon: stamm.telefon || "", email: stamm.email || "", web: stamm.web || "",\n'
+     '  } : null;\n'
      '  // Der Fenstertitel traegt den Mandanten nach, sobald er bekannt ist.\n'
      '  // Vorher steht dort nur "ImmoOffice" — der Titel entsteht, bevor\n'
      '  // irgendetwas geladen ist.\n'
@@ -4029,6 +4055,66 @@ WOERTLICH = [
      '    document.title = "ImmoOffice" + (window.IMMO_MARKE ? " – " + window.IMMO_MARKE : "");\n'
      '  }',
      'Fenstertitel mit dem Namen des Mandanten, nach dem Anmelden.'),
+
+    # =====================================================================
+    # Verdrahtete Kontaktdaten (03.10.2026)
+    #
+    # Die Suchtexte stehen hier NICHT im Klartext: sie enthalten eine echte
+    # Anschrift und echte Telefonnummern. Sie werden aus dem Ergebnis der
+    # vorigen Regeln gelesen — base64, wie scripts/neutral.sh es mit seinen
+    # Mustern tut: nichts lesbar im Repository, und die Regel greift
+    # trotzdem.
+    #
+    # Was sie waren: die Platzhalter {{absender_strasse}},
+    # {{absender_plz_ort}} und {{absender_telefon}} der Vertragsvorlagen —
+    # also Werte, die in Dokumenten landen, die der Eigentuemer bekommt.
+    # Dazu eine Karte mit Telefon und Mail dreier Standorte, die die
+    # Widerrufsbelehrung nach § 356 BGB fuellen sollte.
+    # =====================================================================
+    ('MARKE', B64('Int7YWJzZW5kZXJfc3RyYXNzZX19IjogIkRvYmVyYW5lciBTdHJhc3NlIDE2Ig=='),
+     '"{{absender_strasse}}": immoFirma("strasse")',
+     'Absenderanschrift der Vertragsvorlagen: Strasse aus den Stammdaten.'),
+    ('MARKE', B64('Int7YWJzZW5kZXJfcGx6X29ydH19IjogIjEyMzQ1IE11c3RlcnN0YWR0Ig=='),
+     '"{{absender_plz_ort}}": [immoFirma("plz"), immoFirma("ort")].filter(Boolean).join(" ")',
+     'Dieselbe Anschrift: Postleitzahl und Ort aus den Stammdaten.'),
+    ('MARKE', B64('Int7YWJzZW5kZXJfdGVsZWZvbn19IjogIjAzODEgLyA2NjYgMzggMzgi'),
+     '"{{absender_telefon}}": immoFirma("telefon")',
+     'Dieselbe Anschrift: Telefonnummer aus den Stammdaten. Sie war eine '
+     'echte Nummer und stand in keinem Muster des Neutralitaets-Gates.'),
+    ('MARKE', B64('cGxhY2Vob2xkZXI6ICJ6LiBCLiAwMzgxIDEyMzQ1NiI='),
+     'placeholder: "Telefonnummer"',
+     'Platzhalter eines Telefonfeldes. Er stand auf einer echten Nummer — '
+     'ein Platzhalter braucht kein Beispiel, das jemandem gehoert.'),
+    ('MARKE', B64('Y29uc3QgV0lERVJSVUZfMzU2X0tPTlRBS1Q9e211c3RlcnN0YWR0Ont0ZWxlZm9uOiIwMzgxIC8gMzY3Nzk5ODgiLGVtYWlsOiJpbmZvQGltbW9vZmZpY2UuZXhhbXBsZSJ9LGJlaXNwaWVsc3RhZHQ6e3RlbGVmb246IjAzODEgLyAzNjc3OTk4OCIsZW1haWw6ImJlaXNwaWVsc3RhZHRAaW1tb29mZmljZS5leGFtcGxlIn0sYmVybGluOnt0ZWxlZm9uOiIwMzAgNzUgNDMgNTYgNzEiLGVtYWlsOiJiZXJsaW5AaW1tb29mZmljZS5leGFtcGxlIn19Ow=='),
+     '',
+     'Die Karte WIDERRUF_356_KONTAKT: Telefon und Mail dreier Standorte, '
+     'verdrahtet. Ihr eigener Kommentar sagt, woher die Werte kommen '
+     'sollten — "je Standort (firma_stammdaten)". Sie entfaellt; die '
+     'Funktion darunter bekommt den Kontakt uebergeben.'),
+    ('MARKE', B64('ZnVuY3Rpb24gd2lkZXJydWZLb250YWt0U2V0emVuKHhtbCxzdGFuZG9ydCl7Y29uc3Qgaz1XSURFUlJVRl8zNTZfS09OVEFLVFtzdGFuZG9ydHx8Im11c3RlcnN0YWR0Il18fFdJREVSUlVGXzM1Nl9LT05UQUtULm11c3RlcnN0YWR0O3JldHVybiB4bWwuc3BsaXQoIjAzODEgLyAzNjc3OTk4OCIpLmpvaW4oZXNjYXBlWG1sKGsudGVsZWZvbikpLnNwbGl0KCJpbmZvQGltbW9vZmZpY2UuZXhhbXBsZSIpLmpvaW4oZXNjYXBlWG1sKGsuZW1haWwpKX0K'),
+     'function widerrufKontaktSetzen(xml, kontakt) {\n'
+     '  // Telefon und Mail der Widerrufsbelehrung nach § 356 BGB. Sie\n'
+     '  // kommen vom Aufrufer aus firma_stammdaten DES STANDORTS — vorher\n'
+     '  // stand hier eine Karte mit drei verdrahteten Nummern.\n'
+     '  // Ohne Angabe bleibt der Platzhalter stehen: eine Belehrung mit\n'
+     '  // fremder Telefonnummer ist schlechter als eine mit sichtbarer\n'
+     '  // Luecke.\n'
+     '  const tel = (kontakt && kontakt.telefon) || "";\n'
+     '  const mail = (kontakt && kontakt.email) || "";\n'
+     '  let raus = xml;\n'
+     '  if (tel) raus = raus.split("{{widerruf_telefon}}").join(escapeXml(tel));\n'
+     '  if (mail) raus = raus.split("{{widerruf_email}}").join(escapeXml(mail));\n'
+     '  return raus;\n'
+     '}\n',
+     'widerrufKontaktSetzen nimmt den Kontakt entgegen, statt ihn zu kennen. '
+     'Die Funktion wird in der Vorlage nirgends aufgerufen — sie bleibt '
+     'trotzdem stehen (Phase 9: nichts entfernen), nur ohne eigene Daten.'),
+    ('MARKE', B64('dW5zZXIgQsO8cm8gdW50ZXIgMDM4MSDigKY='),
+     'unser B\u00fcro unter {telefon}',
+     'Platzhaltertext der Abwesenheitsnotiz. Auch hier eine echte Nummer, '
+     'und zwar dieselbe, die die Regel oben schon als {telefon} ersetzt — '
+     'nur mit anderen Trennzeichen geschrieben, weshalb sie durchfiel. Die '
+     'Vorlage setzt {telefon} beim Speichern ein.'),
 ]
 
 

@@ -541,7 +541,17 @@ function immoMarkeMit(vorne, hinten) {
   const n = immoMarke();
   return n ? (vorne || "") + n + (hinten || "") : "";
 }
+// Ein einzelnes Feld der Stammdaten des Mandanten. Dieselbe Regel:
+// ohne Eintrag LEER. Die Vorlage hatte Anschrift und Telefonnummer
+// verdrahtet — in Platzhaltern, die in Vertragsvorlagen eingesetzt
+// werden, also in Dokumenten, die der Eigentuemer bekommt.
+function immoFirma(feld) {
+  const f = typeof window !== "undefined" ? window.IMMO_FIRMA : null;
+  const w = f && f[feld];
+  return (typeof w === "string" && w.trim()) ? w.trim() : "";
+}
 window.immoMarke = immoMarke; window.immoMarkeMit = immoMarkeMit;
+window.immoFirma = immoFirma;
 async function immoCiAnwenden(stamm) {
   const hex = (w) => (typeof w === "string" && /^#[0-9A-Fa-f]{6}$/.test(w)) ? w : null;
   const primaer = hex(stamm && stamm.ci_primaer);
@@ -576,6 +586,12 @@ async function immoCiAnwenden(stamm) {
   Object.assign(cardStyle, { background: CI.card, border: `1px solid ${CI.border}`, boxShadow: CI.shadow });
   window.IMMO_LOGO_URL = null;
   window.IMMO_MARKE = (stamm && (stamm.marken_name || stamm.firma_name)) || null;
+  // Die Kontaktfelder des Mandanten. Sie ersetzen verdrahtete
+  // Anschriften und Telefonnummern; immoFirma(feld) liest sie.
+  window.IMMO_FIRMA = stamm ? {
+    strasse: stamm.strasse || "", plz: stamm.plz || "", ort: stamm.ort || "",
+    telefon: stamm.telefon || "", email: stamm.email || "", web: stamm.web || "",
+  } : null;
   // Der Fenstertitel traegt den Mandanten nach, sobald er bekannt ist.
   // Vorher steht dort nur "ImmoOffice" — der Titel entsteht, bevor
   // irgendetwas geladen ist.
@@ -833,7 +849,7 @@ async function getProfile(e) {
     const {
       data: s
     } = await window._sb.from("firma_stammdaten")
-      .select("id, bundesland, gesellschaft_id, ci_primaer, ci_akzent, ci_font, logo_pfad, marken_name, firma_name")
+      .select("id, bundesland, gesellschaft_id, ci_primaer, ci_akzent, ci_font, logo_pfad, marken_name, firma_name, strasse, plz, ort, telefon, email, web")
       .order("sortierung")
       .limit(1)
       .maybeSingle();
@@ -77178,7 +77194,7 @@ function MailEinstellungenModal({
   }, "Standardtext einsetzen")), React.createElement("textarea", {
     value: e.abwesend_text || "",
     onChange: t => F(e.id, "abwesend_text", t.target.value),
-    placeholder: "Guten Tag,\n\nvielen Dank für Ihre Nachricht. Ich bin bis zum … nicht erreichbar und melde mich danach umgehend bei Ihnen.\n\nIn dringenden Fällen wenden Sie sich bitte an unser Büro unter 0381 …",
+    placeholder: "Guten Tag,\n\nvielen Dank für Ihre Nachricht. Ich bin bis zum … nicht erreichbar und melde mich danach umgehend bei Ihnen.\n\nIn dringenden Fällen wenden Sie sich bitte an unser Büro unter {telefon}",
     style: {
       ...O,
       minHeight: 110,
@@ -110407,10 +110423,10 @@ function BehoerdenAnfragenModal({
           "{{eigentuemer_anschrift}}": r,
           "{{absender_firma}}": immoMarke(),
           "{{absender_name}}": a?.absender_name || "",
-          "{{absender_strasse}}": "Doberaner Strasse 16",
-          "{{absender_plz_ort}}": "12345 Musterstadt",
+          "{{absender_strasse}}": immoFirma("strasse"),
+          "{{absender_plz_ort}}": [immoFirma("plz"), immoFirma("ort")].filter(Boolean).join(" "),
           "{{absender_email}}": a?.email_adresse || "",
-          "{{absender_telefon}}": "0381 / 666 38 38"
+          "{{absender_telefon}}": immoFirma("telefon")
         }),
         i = e => {
           let t = e || "";
@@ -130954,7 +130970,7 @@ function todoTelHref(nr) { return "tel:" + String(nr || "").replace(/[^\d+]/g, "
 function TodoKontaktFelder({ f, p, R, x }) {
   return React.createElement("div", { className: "mob-stack", style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 } },
     React.createElement("div", null, React.createElement("label", { style: x }, "Telefon"),
-      React.createElement("input", { type: "tel", value: f.kontakt_telefon || "", placeholder: "z. B. 0381 123456", "data-todo-telefon": "1", onChange: (e) => p({ ...f, kontakt_telefon: e.target.value }), style: R })),
+      React.createElement("input", { type: "tel", value: f.kontakt_telefon || "", placeholder: "Telefonnummer", "data-todo-telefon": "1", onChange: (e) => p({ ...f, kontakt_telefon: e.target.value }), style: R })),
     React.createElement("div", null, React.createElement("label", { style: x }, "E-Mail"),
       React.createElement("input", { type: "email", value: f.kontakt_email || "", placeholder: "name@beispiel.de", "data-todo-email": "1", onChange: (e) => p({ ...f, kontakt_email: e.target.value }), style: R })));
 }
@@ -135670,8 +135686,21 @@ function ZugangLinkAnfordern() {
 window.epZugangFehlerLesen = epZugangFehlerLesen; window.epZugangFehlerText = epZugangFehlerText; window.ZugangLinkAnfordern = ZugangLinkAnfordern;
 // Stufe 98: Objektnachweis (Word) mit Widerrufsbelehrung nach § 356 BGB – Telefon und E-Mail der Belehrung
 // je Standort (firma_stammdaten; Beispielstadt ohne eigene Nummer → Musterstadt wie in den Edge Functions).
-const WIDERRUF_356_KONTAKT={musterstadt:{telefon:"0381 / 36779988",email:"info@immooffice.example"},beispielstadt:{telefon:"0381 / 36779988",email:"beispielstadt@immooffice.example"},berlin:{telefon:"030 75 43 56 71",email:"berlin@immooffice.example"}};
-function widerrufKontaktSetzen(xml,standort){const k=WIDERRUF_356_KONTAKT[standort||"musterstadt"]||WIDERRUF_356_KONTAKT.musterstadt;return xml.split("0381 / 36779988").join(escapeXml(k.telefon)).split("info@immooffice.example").join(escapeXml(k.email))}
+
+function widerrufKontaktSetzen(xml, kontakt) {
+  // Telefon und Mail der Widerrufsbelehrung nach § 356 BGB. Sie
+  // kommen vom Aufrufer aus firma_stammdaten DES STANDORTS — vorher
+  // stand hier eine Karte mit drei verdrahteten Nummern.
+  // Ohne Angabe bleibt der Platzhalter stehen: eine Belehrung mit
+  // fremder Telefonnummer ist schlechter als eine mit sichtbarer
+  // Luecke.
+  const tel = (kontakt && kontakt.telefon) || "";
+  const mail = (kontakt && kontakt.email) || "";
+  let raus = xml;
+  if (tel) raus = raus.split("{{widerruf_telefon}}").join(escapeXml(tel));
+  if (mail) raus = raus.split("{{widerruf_email}}").join(escapeXml(mail));
+  return raus;
+}
 // Stufe 101 – Exposé aus dem Objekt: Adressbuch-Abgleich und sofort aktuelle Listen (29.09.2026)
 /** Sucht zu einer E-Mail-Adresse den Kontakt im Adressbuch (Haupt-Adresse in kontakte, sonst weitere Adressen in
  *  kontakt_emails). Groß-/Kleinschreibung egal, sonst exakt; aktive Kontakte zuerst. Liefert den Kontakt oder null. */

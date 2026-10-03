@@ -306,7 +306,7 @@ async function ki_naming(opts: {
   const systemPrompt = `Du bist ein Assistent fuer einen Immobilienmakler und benennst Mail-Anhaenge um.
 
 Schema: YYYY-MM-DD_Objektadresse_Doktyp.${ext}
-Beispiel: 2026-05-26_Doberaner-Str-16_Energieausweis.pdf
+Beispiel: 2026-05-26_Musterstr-1_Energieausweis.pdf
 
 WICHTIGE REGELN:
 - Das Datum ist IMMER das Datum der Mail (steht im Kontext), niemals das heutige.
