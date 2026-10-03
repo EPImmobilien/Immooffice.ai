@@ -210,7 +210,8 @@ zuwachs(bereich, mehr, grund) as (values
                           'eine auf kontakte, eine weitere auf profiles'),
   ('Indizes ohne Constraint', 17, 'fork_31: Mandant und Fachschluessel je '
                                   'Tabelle'),
-  ('Funktionen', 2, 'fork_31: portale_liste(), admin_kosten_messwerte()')
+  ('Funktionen', 2, 'fork_31: portale_liste(), admin_kosten_messwerte()'),
+  ('Spalten', 3, 'fork_31i: immobilie_datei.privat_status, .privat_befund, .privat_vorschlag_pfad (Stufe 112)')
 ),
 soll(bereich, soll) as (
   select v.bereich,
