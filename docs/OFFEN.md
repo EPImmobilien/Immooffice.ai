@@ -852,8 +852,10 @@ Nominatim und Overpass, und ist bisher nirgends genannt.
 ## Die drei eigenen Funktionen sind geschrieben, aber nicht erprobt
 
 `unterlagen-link`, `grundriss-ki-lesen` und `bild-privat-retusche` sind
-vollständig und syntaktisch geprüft; `npm run check` ist grün. Gegen das
-eigene Projekt gelaufen ist keine von ihnen. Dazu fehlen:
+vollständig und syntaktisch geprüft; `npm run check` ist grün. Ausgerollt
+sind sie auch — alle drei stehen auf dem eigenen Projekt auf `ACTIVE`, mit
+dem `verify_jwt` aus `supabase/config.toml` (121 Funktionen). **Aufgerufen hat
+sie noch niemand.** Dazu fehlen:
 
 - **`ANTHROPIC_API_KEY`** und **`REPLICATE_API_TOKEN`** als Secrets im
   Supabase-Projekt. Beide sind jetzt in `.env.example` dokumentiert; der
