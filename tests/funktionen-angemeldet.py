@@ -175,6 +175,15 @@ ABGESICHERT = {
     'fahrt-ermitteln': ('aufruferMandant',
         'Der erste Fund dieser Art (29.09.2026). Prueft jetzt erst das '
         'Objekt und den Mandanten, dann den Zwischenspeicher.'),
+    'bild-privat-retusche': ('immoMandantDesAufrufers',
+        'Eigene Funktion des Forks (supabase/eigene/). Schickt Objektfotos '
+        'an eine KI — eine ungepruefte immobilie_id haette die Fotos eines '
+        'fremden Maklers dorthin gegeben und seine Bilder ueberschreibbar '
+        'gemacht. Geprueft werden beide Wege: das Objekt bei "pruefen", die '
+        'Datei bei den drei Einzelaktionen, jeweils gegen den Mandanten des '
+        'Kontos. Jede Abfrage, jedes Update und jeder Speicherpfad tragen '
+        'ihn ebenfalls — der Pfad als erstes Segment (immoVorne), wie die '
+        'Storage-Huelle der Vorlage es tut.'),
     'grundriss-ki-lesen': ('immoMandantDesAufrufers',
         'Eigene Funktion des Forks (supabase/eigene/). Der Mandant kommt aus '
         'dem Konto, nie aus dem Anfragekoerper. Die mitgeschickte '

@@ -149,6 +149,12 @@ verify_jwt = true
 [functions.bild-beschriften]
 verify_jwt = true
 
+[functions.bild-privat-retusche]
+# Eigene Funktion des Forks (supabase/eigene/). Wird nur aus der angemeldeten
+# Oberflaeche aufgerufen und nimmt den Mandanten aus dem Konto des Aufrufers,
+# also JWT-Pruefung durch die Plattform.
+verify_jwt = true
+
 [functions.bild-web-variante]
 verify_jwt = true
 
