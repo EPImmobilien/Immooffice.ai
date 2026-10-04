@@ -41744,6 +41744,27 @@ function AdminGmbHStammdaten({
     value: e.kammer || "",
     onChange: t => c(e.id, "kammer", t.target.value),
     placeholder: "z. B. IHK zu Musterstadt"
+  })), React.createElement("div", null, React.createElement("label", {
+    style: u
+  }, "Impressum (vollstaendige Adresse)"), React.createElement("input", {
+    style: d,
+    value: e.url_impressum || "",
+    onChange: t => c(e.id, "url_impressum", t.target.value),
+    placeholder: "https://..."
+  })), React.createElement("div", null, React.createElement("label", {
+    style: u
+  }, "Datenschutzhinweise (vollstaendige Adresse)"), React.createElement("input", {
+    style: d,
+    value: e.url_datenschutz || "",
+    onChange: t => c(e.id, "url_datenschutz", t.target.value),
+    placeholder: "https://..."
+  })), React.createElement("div", null, React.createElement("label", {
+    style: u
+  }, "AGB (vollstaendige Adresse)"), React.createElement("input", {
+    style: d,
+    value: e.url_agb || "",
+    onChange: t => c(e.id, "url_agb", t.target.value),
+    placeholder: "https://..."
   })), React.createElement("div", {
     style: {
       gridColumn: "1/-1"
@@ -41785,6 +41806,9 @@ function AdminGmbHStammdaten({
         ci_font: e.ci_font || null,
         logo_pfad: e.logo_pfad || null,
         web: e.web,
+        url_impressum: e.url_impressum || null,
+        url_datenschutz: e.url_datenschutz || null,
+        url_agb: e.url_agb || null,
         fax: e.fax,
         aufsichtsbehoerde: e.aufsichtsbehoerde,
         kammer: e.kammer,
@@ -114129,7 +114153,7 @@ function SignaturPublicPage({
       color: "#8a8470",
       lineHeight: 1.6
     }
-  }, React.createElement("strong", null, "Datenschutzhinweis:"), ` Zur rechtssicheren Dokumentation des Vertragsschlusses verarbeitet ${immoSigFirma(i)} Ihren Namen, Ihre E-Mail-Adresse, Ihre Unterschrift sowie technische Daten (IP-Adresse, Geräte-/Browserinformationen, Zeitstempel) auf Grundlage von Art. 6 Abs. 1 lit. b und f DSGVO (Vertragsdurchführung und Nachweisführung). Weitere Informationen: immooffice.example/datenschutz`)))) : null
+  }, React.createElement("strong", null, "Datenschutzhinweis:"), ` Zur rechtssicheren Dokumentation des Vertragsschlusses verarbeitet ${immoSigFirma(i)} Ihren Namen, Ihre E-Mail-Adresse, Ihre Unterschrift sowie technische Daten (IP-Adresse, Geräte-/Browserinformationen, Zeitstempel) auf Grundlage von Art. 6 Abs. 1 lit. b und f DSGVO (Vertragsdurchführung und Nachweisführung).${(i && i.firma && i.firma.datenschutz) ? " Weitere Informationen: " + i.firma.datenschutz : ""}`)))) : null
 }
 
 function ClaudeChatWidget({

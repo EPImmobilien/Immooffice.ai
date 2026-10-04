@@ -2991,7 +2991,16 @@ NACHBESSERN = [
     # Funktion kommen — sie kennt den Mandanten des Vorgangs.
     ('FORK',
      '      pdf_signed_url: pdfSignedUrl,',
-     '      firma: { name: await immoFirmenName(admin, vorgang.mandant_id) },\n'
+     '      firma: {\n'
+     '        name: await immoFirmenName(admin, vorgang.mandant_id),\n'
+     '        // Der Datenschutzhinweis der Seite verweist auf die Hinweise des\n'
+     '        // Maklers. Ohne Eintrag entfaellt der Verweis — ein Hinweis auf\n'
+     '        // eine tote Adresse ist schlechter als keiner (fork_32).\n'
+     '        datenschutz: String((await admin.from("firma_stammdaten")\n'
+     '          .select("url_datenschutz").eq("mandant_id", vorgang.mandant_id)\n'
+     '          .eq("aktiv", true).order("sortierung", { ascending: true })\n'
+     '          .limit(1).maybeSingle()).data?.url_datenschutz || "").trim(),\n'
+     '      },\n'
      '      pdf_signed_url: pdfSignedUrl,',
      'Signaturseite: der Firmenname des Mandanten kommt mit der Antwort.',
      {'signatur-token-validieren'}),

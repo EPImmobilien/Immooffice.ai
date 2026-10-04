@@ -217,7 +217,16 @@ Deno.serve(async (req) => {
       vertrag: vertrag ? {
         objekt_adresse: vertrag.objekt_adresse, objekt_bezeichnung: vertrag.objekt_bezeichnung,
       } : null,
-      firma: { name: await immoFirmenName(admin, vorgang.mandant_id) },
+      firma: {
+        name: await immoFirmenName(admin, vorgang.mandant_id),
+        // Der Datenschutzhinweis der Seite verweist auf die Hinweise des
+        // Maklers. Ohne Eintrag entfaellt der Verweis — ein Hinweis auf
+        // eine tote Adresse ist schlechter als keiner (fork_32).
+        datenschutz: String((await admin.from("firma_stammdaten")
+          .select("url_datenschutz").eq("mandant_id", vorgang.mandant_id)
+          .eq("aktiv", true).order("sortierung", { ascending: true })
+          .limit(1).maybeSingle()).data?.url_datenschutz || "").trim(),
+      },
       pdf_signed_url: pdfSignedUrl,
       kann_unterschreiben: kannUnterschreiben,
       warte_hinweis: warteHinweis,

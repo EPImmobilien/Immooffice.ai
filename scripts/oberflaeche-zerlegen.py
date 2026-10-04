@@ -4282,6 +4282,33 @@ WOERTLICH = [
      '${[f.url_impressum && `<a href="${nlEsc(f.url_impressum)}" style="color:#6b7280">Impressum</a>`, f.url_datenschutz && `<a href="${nlEsc(f.url_datenschutz)}" style="color:#6b7280">Datenschutz</a>`].filter(Boolean).join(" · ")}',
      'Newsletter-Fuss: Impressum und Datenschutz aus den Stammdaten; was '
      'fehlt, wird weggelassen.'),
+
+    # --- Die drei Rechtsadressen gehoeren ins Formular (fork_32) ---------
+    # Sie standen seit fork_32 in der Datenbank und waren nicht pflegbar:
+    # vorhanden und unbenutzbar. Der Platz ist der richtige — dieselbe
+    # Maske fuehrt schon Berufsaufsichtsbehoerde, Kammer und
+    # Rechtshinweis, also genau die uebrigen Pflichtangaben.
+    ('FORK', '}, "Kammer"), React.createElement("input", {\n    style: d,\n    value: e.kammer || "",\n    onChange: t => c(e.id, "kammer", t.target.value),\n    placeholder: "z. B. IHK zu Musterstadt"\n  })), ', '}, "Kammer"), React.createElement("input", {\n    style: d,\n    value: e.kammer || "",\n    onChange: t => c(e.id, "kammer", t.target.value),\n    placeholder: "z. B. IHK zu Musterstadt"\n  })), React.createElement("div", null, React.createElement("label", {\n    style: u\n  }, "Impressum (vollstaendige Adresse)"), React.createElement("input", {\n    style: d,\n    value: e.url_impressum || "",\n    onChange: t => c(e.id, "url_impressum", t.target.value),\n    placeholder: "https://..."\n  })), React.createElement("div", null, React.createElement("label", {\n    style: u\n  }, "Datenschutzhinweise (vollstaendige Adresse)"), React.createElement("input", {\n    style: d,\n    value: e.url_datenschutz || "",\n    onChange: t => c(e.id, "url_datenschutz", t.target.value),\n    placeholder: "https://..."\n  })), React.createElement("div", null, React.createElement("label", {\n    style: u\n  }, "AGB (vollstaendige Adresse)"), React.createElement("input", {\n    style: d,\n    value: e.url_agb || "",\n    onChange: t => c(e.id, "url_agb", t.target.value),\n    placeholder: "https://..."\n  })), ',
+     'Admin, Firmenstammdaten: Eingabefelder fuer Impressum, '
+     'Datenschutzhinweise und AGB.'),
+    ('FORK',
+     '        web: e.web,\n        fax: e.fax,',
+     '        web: e.web,\n'
+     '        url_impressum: e.url_impressum || null,\n'
+     '        url_datenschutz: e.url_datenschutz || null,\n'
+     '        url_agb: e.url_agb || null,\n'
+     '        fax: e.fax,',
+     'Admin, Firmenstammdaten: die drei Adressen werden mitgespeichert.'),
+
+    # --- Der Datenschutzhinweis der Signaturseite (fork_32) --------------
+    # Er endete auf eine verdrahtete Adresse. signatur-token-validieren
+    # liefert sie seit heute mit; fehlt sie, entfaellt der Verweis. Ein
+    # Hinweis auf eine tote Adresse ist schlechter als keiner.
+    ('MARKE',
+     ' Weitere Informationen: immooffice.example/datenschutz`',
+     '${(i && i.firma && i.firma.datenschutz) ? " Weitere Informationen: " + i.firma.datenschutz : ""}`',
+     'Signaturseite: der Datenschutzhinweis verweist auf die Hinweise des '
+     'Mandanten — oder auf nichts.'),
 ]
 
 

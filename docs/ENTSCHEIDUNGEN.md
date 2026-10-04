@@ -4012,3 +4012,29 @@ Eigentümerportal seit dem 03.10.: wer die Meldung liest, kennt seinen Makler.
 Die Adresse half ihm nicht, sie war nur falsch.
 
 Damit ist die Platzhalter-Domain aus **allen sechs Nebenseiten** verschwunden.
+
+## fork_32 bis zum Eingabefeld durchgezogen (04.10.2026)
+
+Am 03.10. kamen die drei Spalten und die Edge Functions, am 04.10. die
+Oberfläche. Der letzte Schritt war der, der am Tag vorher gefehlt hat: **ein
+Feld, das in der Datenbank steht und nicht pflegbar ist, ist vorhanden und
+unbenutzbar.**
+
+Die Felder stehen jetzt in **Admin → Firmenstammdaten**, neben
+Berufsaufsichtsbehörde, Kammer und Rechtshinweis — derselben Maske, die die
+übrigen Pflichtangaben führt. Dieselbe Reihe von Entscheidungen wie überall
+in diesem Durchgang: geladen wird mit `select("*")`, also kamen sie von
+selbst mit; gespeichert wird über eine ausdrückliche Liste, also mussten sie
+dort eingetragen werden.
+
+Die Signaturseite bekommt die Datenschutzadresse jetzt mit der Antwort von
+`signatur-token-validieren`. Fehlt sie, entfällt der Verweis ganz — ein
+Hinweis auf eine tote Adresse ist schlechter als keiner.
+
+### Was das für die Exposé-Freigabe heißt
+
+Solange die drei Adressen leer sind, zeigt die Freigabe **keinen
+AGB-Haken**. Das ist die richtige Folge: einen Haken auf AGB zu verlangen,
+die niemand lesen kann, wäre nur eine Behauptung. Es heißt aber auch, dass
+das Modul ohne Eintrag rechtlich weniger leistet als vorher behauptet.
+Vermerkt in `docs/OFFEN.md`.

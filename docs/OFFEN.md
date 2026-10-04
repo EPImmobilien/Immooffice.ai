@@ -925,15 +925,17 @@ die eingebettete Rundgang-Seite lesen die Felder jetzt. Die Rundgang-Seite
 bekommt sie von `rundgang-oeffentlich` mitgeliefert — sie kennt weder Konto
 noch Objektkennung, nur den Token.
 
-**Noch offen:**
+**Ebenfalls erledigt am 04.10.2026:** die Signaturseite (die Adresse kommt
+jetzt mit der Antwort von `signatur-token-validieren`) und das Formular —
+die drei Felder stehen in **Admin → Firmenstammdaten**, neben
+Berufsaufsichtsbehörde, Kammer und Rechtshinweis.
 
-- Der Datenschutzhinweis der **Signaturseite** verweist auf die
-  Datenschutzhinweise. `signatur-token-validieren` liefert bisher nur
-  `firma.name`; die Adresse muss mitkommen.
-- Es fehlt die **Oberfläche zum Pflegen**: die drei Felder stehen in der
-  Datenbank, aber nicht im Formular der Firmenstammdaten. Ohne sie kann
-  niemand eintragen, was die Links füllen soll — die Felder sind damit
-  vorhanden und unbenutzbar.
+Damit ist `fork_32` von der Spalte bis zum Eingabefeld durchgezogen. Was
+bleibt: **niemand hat es benutzt.** Solange die drei Felder leer sind,
+verhält sich alles wie beschrieben — kein Link, kein Haken auf AGB, kein
+Verweis im Datenschutzhinweis. Das ist gewollt, aber es heißt auch: die
+Exposé-Freigabe verlangt dann keine AGB-Bestätigung mehr. Wer das Modul
+rechtlich nutzen will, muss die drei Adressen eintragen.
 
 ### 2. Mailadressen als Rückfall
 
