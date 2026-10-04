@@ -110,6 +110,30 @@ Deno.serve(async (req) => {
         }
       : null;
 
+    // Briefkopf und Kontakt des Maklers, zu dem der Rundgang gehoert.
+    // Ohne Eintrag bleibt das Feld leer, und die Seite laesst die Zeile
+    // weg — eine fehlende Rufnummer faellt auf, eine fremde nicht.
+    // Den Mandanten holt dieser Block selbst: die Abfrage der Vorlage
+      // darueber bleibt unberuehrt, damit der Vergleich mit der Vorlage
+      // sie weiter Zeile fuer Zeile wiedererkennt.
+    const { data: imM } = rundgang.immobilie_id
+      ? await supabase.from("immobilien").select("mandant_id")
+          .eq("id", rundgang.immobilie_id).maybeSingle()
+      : { data: null };
+    const { data: fs } = imM?.mandant_id
+      ? await supabase.from("firma_stammdaten")
+          .select("firma_name, marken_name, telefon, email, url_impressum, url_datenschutz")
+          .eq("mandant_id", imM.mandant_id).eq("aktiv", true)
+          .order("sortierung", { ascending: true }).limit(1).maybeSingle()
+      : { data: null };
+    const firma = {
+      name: String(fs?.marken_name || fs?.firma_name || "").trim(),
+      telefon: String(fs?.telefon || "").trim(),
+      email: String(fs?.email || "").trim(),
+      impressum: String(fs?.url_impressum || "").trim(),
+      datenschutz: String(fs?.url_datenschutz || "").trim(),
+    };
+
     const startSzene =
       rundgang.start_szene_id && bekannt.has(rundgang.start_szene_id)
         ? rundgang.start_szene_id
@@ -126,6 +150,7 @@ Deno.serve(async (req) => {
           grundriss_url: oeffentlicheUrl(rundgang.grundriss_pfad),
         },
         objekt,
+        firma,
         szenen: szenen.map((s) => ({
           id: s.id,
           name: s.name,

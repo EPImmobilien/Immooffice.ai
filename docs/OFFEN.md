@@ -104,11 +104,9 @@ Neutralisierung: erst die Vorlage genauso formatieren, dann vergleichen.
 
 ## Noch offen an der Oberfläche
 
-1. **Shop-TV ist noch drin** — 118 Zeilen über acht Aufrufstellen: die Seite
-   `ShopTvPage`, `ShopTvKachelModern`, ein Marketing-Format, Kacheln, die
-   Kanalzeile der Objektseite, die Yodeck-Anbindung. Phase 1.4 verlangt die
-   ersatzlose Streichung. Das ist eine echte Modulentfernung, keine
-   Textersetzung — und der Grund, warum `src/` noch nicht versioniert ist.
+1. ~~**Shop-TV ist noch drin**~~ — **erledigt.** Null Fundstellen in `src/`,
+   und `src/` ist inzwischen versioniert (21 Dateien). Beides stand hier noch
+   als offen und war es nicht mehr; richtiggestellt am 04.10.2026.
 
 2. **Die beiden Word-Vorlagen sind leer.** `VORLAGE_MAKLERVERTRAG` und
    `VORLAGE_OBJEKTNACHWEIS` lagen als Base64 im Quelltext und trugen Briefkopf
@@ -922,19 +920,20 @@ und eine echte Anschrift als Beispiel in einer KI-Systemvorgabe.
 
 ### 1. Die Rechtsadressen in der Oberfläche
 
-`fork_32` hat die Spalten, die Edge Functions liefern sie aus — aber vier
-Stellen lesen sie noch nicht:
+**Erledigt am 04.10.2026:** der Fuß der Objektseite, der Newsletter-Fuß und
+die eingebettete Rundgang-Seite lesen die Felder jetzt. Die Rundgang-Seite
+bekommt sie von `rundgang-oeffentlich` mitgeliefert — sie kennt weder Konto
+noch Objektkennung, nur den Token.
 
-- der Fuß der Objektseite (`src/seiten/objekt.html`), der Impressum,
-  Datenschutz und AGB verlinkt,
-- der Newsletter-Fuß in `src/app/anwendung.js`,
-- die eingebettete Rundgang-Seite in `src/start/01-fruehstart.js` — sie hat
-  **keine** Stammdaten zur Hand, dort muss der Link entfallen oder die Seite
-  muss sie laden,
-- der Datenschutzhinweis der Signaturseite, der auf die Hinweise verweist.
+**Noch offen:**
 
-Dazu fehlt die **Oberfläche zum Pflegen**: die drei Felder stehen in der
-Datenbank, aber nicht im Formular der Firmenstammdaten.
+- Der Datenschutzhinweis der **Signaturseite** verweist auf die
+  Datenschutzhinweise. `signatur-token-validieren` liefert bisher nur
+  `firma.name`; die Adresse muss mitkommen.
+- Es fehlt die **Oberfläche zum Pflegen**: die drei Felder stehen in der
+  Datenbank, aber nicht im Formular der Firmenstammdaten. Ohne sie kann
+  niemand eintragen, was die Links füllen soll — die Felder sind damit
+  vorhanden und unbenutzbar.
 
 ### 2. Mailadressen als Rückfall
 

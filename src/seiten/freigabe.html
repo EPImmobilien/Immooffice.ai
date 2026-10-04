@@ -36,6 +36,15 @@ function kopfSetzen(f){
   if(k)k.style.display=t?"":"none";
   if(t&&document.title.indexOf(t)<0)document.title=document.title+" – "+t;
 }
+// Impressum, Datenschutz und AGB des Mandanten (fork_32). Was nicht
+// hinterlegt ist, wird weggelassen - ein Pflichtlink, der ins Nichts
+// fuehrt, ist schlechter als keiner.
+function rechtLinks(f){
+  var raus=[];
+  [[f&&f.url_impressum,"Impressum"],[f&&f.url_datenschutz,"Datenschutz"],[f&&f.url_agb,"AGB"]]
+    .forEach(function(p){ if(p[0]) raus.push('<a href="'+esc(p[0])+'">'+p[1]+'</a>'); });
+  return raus.length?" · "+raus.join(" · "):"";
+}
 </script>
 <div class="box" id="box"><div class="muted">Lädt …</div></div>
 <div class="fuss" id="fuss"></div>
@@ -52,9 +61,9 @@ const dt=s=>new Date(s).toLocaleString("de-DE",{timeZone:"Europe/Berlin"});
 const dlListe=(ds)=>{let h='<div class="dlbox" style="text-align:left">';(ds||[]).forEach((d,i)=>{h+=i?'<a class="btn" style="background:#263159;margin:6px 6px 0 0;font-size:14px;padding:11px 18px" href="'+esc(d.url)+'" target="_blank" rel="noopener">⬇ '+esc(d.typ+": "+d.name)+'</a>':'<a class="btn gross" style="margin:0 6px 4px 0" href="'+esc(d.url)+'" target="_blank" rel="noopener">⬇ Exposé herunterladen (PDF)</a>';});return h+'<div class="muted" style="margin-top:8px">Die Download-Links sind 7 Tage gültig – über Ihren persönlichen Link können Sie die Unterlagen jederzeit erneut laden.</div></div>';};
 async function api(body){const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});return r.json();}
 function fehlerSeite(m,art){
-  if(art==="objekt"){box.innerHTML='<h1>Sofortiger Download nicht möglich</h1><div class="err">'+esc(m||"Für dieses Objekt ist der sofortige Exposé-Download derzeit nicht möglich.")+'</div><div class="muted">Wir senden Ihnen das Exposé gern persönlich zu – schreiben Sie uns an <a href="mailto:info@immooffice.example">info@immooffice.example</a>.</div>';return;}
-  if(art==="ungueltig"||!art&&!m){box.innerHTML='<h1>Link ungültig</h1><div class="err">'+esc(m||"Dieser Exposé-Link ist nicht (mehr) gültig.")+' Bitte wenden Sie sich an info@immooffice.example – wir senden Ihnen gern einen neuen Link.</div>';return;}
-  box.innerHTML='<h1>Seite konnte nicht geladen werden</h1><div class="err">Ihr Link ist in Ordnung, aber die Verbindung zu unserem Server ist gerade fehlgeschlagen'+(m?' ('+esc(m)+')':'')+'. Bitte versuchen Sie es gleich noch einmal.</div><div class="dlbox"><button class="btn" onclick="location.reload()">Erneut versuchen</button></div><div class="muted">Klappt es weiterhin nicht, schreiben Sie uns an info@immooffice.example.</div>';
+  if(art==="objekt"){box.innerHTML='<h1>Sofortiger Download nicht möglich</h1><div class="err">'+esc(m||"Für dieses Objekt ist der sofortige Exposé-Download derzeit nicht möglich.")+'</div><div class="muted">Wir senden Ihnen das Exposé gern persönlich zu – wenden Sie sich bitte an Ihren Ansprechpartner.</div>';return;}
+  if(art==="ungueltig"||!art&&!m){box.innerHTML='<h1>Link ungültig</h1><div class="err">'+esc(m||"Dieser Exposé-Link ist nicht (mehr) gültig.")+' Bitte wenden Sie sich an Ihren Ansprechpartner – wir senden Ihnen gern einen neuen Link.</div>';return;}
+  box.innerHTML='<h1>Seite konnte nicht geladen werden</h1><div class="err">Ihr Link ist in Ordnung, aber die Verbindung zu unserem Server ist gerade fehlgeschlagen'+(m?' ('+esc(m)+')':'')+'. Bitte versuchen Sie es gleich noch einmal.</div><div class="dlbox"><button class="btn" onclick="location.reload()">Erneut versuchen</button></div><div class="muted">Klappt es weiterhin nicht, wenden Sie sich bitte an Ihren Ansprechpartner.</div>';
 }
 function render(d){
   const {im,firma,makler,texte}=d;

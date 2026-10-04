@@ -3707,6 +3707,15 @@ function kopfSetzen(f){
   if(k)k.style.display=t?"":"none";
   if(t&&document.title.indexOf(t)<0)document.title=document.title+" \u2013 "+t;
 }
+// Impressum, Datenschutz und AGB des Mandanten (fork_32). Was nicht
+// hinterlegt ist, wird weggelassen - ein Pflichtlink, der ins Nichts
+// fuehrt, ist schlechter als keiner.
+function rechtLinks(f){
+  var raus=[];
+  [[f&&f.url_impressum,"Impressum"],[f&&f.url_datenschutz,"Datenschutz"],[f&&f.url_agb,"AGB"]]
+    .forEach(function(p){ if(p[0]) raus.push('<a href="'+esc(p[0])+'">'+p[1]+'</a>'); });
+  return raus.length?" \u00b7 "+raus.join(" \u00b7 "):"";
+}
 </script>"""
 
 SEITEN_ERSETZUNGEN = [
@@ -3731,6 +3740,41 @@ SEITEN_ERSETZUNGEN = [
      r'function fussZeile\(firma\)\{if\(!firma\)return;',
      'function fussZeile(firma){kopfSetzen(firma);if(!firma)return;',
      'objekt.html: der Briefkopf wird mit dem Fuss gesetzt.'),
+    ('FORK',
+     r"' \u00b7 <a href=\"https://immooffice\.example/impressum\">Impressum</a> \u00b7 <a href=\"https://immooffice\.example/datenschutz\">Datenschutz</a> \u00b7 <a href=\"https://immooffice\.example/agb\">AGB</a>'",
+     'rechtLinks(firma)',
+     'objekt.html: Impressum, Datenschutz und AGB aus den Stammdaten des '
+     'Mandanten statt aus dem Quelltext (fork_32).'),
+    # Drei Meldungen derselben Seite nennen eine Mailadresse, die niemandem
+    # gehoert. Alle drei stehen in FEHLERPFADEN, also bevor die Stammdaten
+    # geladen sind - dort gibt es keine Mandanten-Adresse und kann es keine
+    # geben. Wie im Eigentuemerportal: wer die Meldung liest, kennt seinen
+    # Makler.
+    ('MARKE',
+     r' Bitte wenden Sie sich an info@immooffice\.example \u2013 wir senden Ihnen gern einen neuen Link\.',
+     ' Bitte wenden Sie sich an Ihren Ansprechpartner \u2013 wir senden Ihnen gern einen neuen Link.',
+     'Objektseite: ungueltiger Link, ohne feste Mailadresse.'),
+    ('MARKE',
+     r'Gern informieren wir Sie \u00fcber vergleichbare Objekte: info@immooffice\.example',
+     'Gern informieren wir Sie ueber vergleichbare Objekte \u2013 sprechen Sie '
+     'Ihren Ansprechpartner an.',
+     'Objektseite: Hinweis auf vergleichbare Objekte, ohne feste Adresse.'),
+    ('MARKE',
+     r'melden Sie sich gern: info@immooffice\.example',
+     'melden Sie sich gern bei Ihrem Ansprechpartner',
+     'Objektseite: Hinweis nach Widerruf, ohne feste Adresse.'),
+    ('MARKE',
+     r'Bitte wenden Sie sich an info@immooffice\.example',
+     'Bitte wenden Sie sich an Ihren Ansprechpartner',
+     'Objektseite: ungueltiger Link, ohne feste Mailadresse.'),
+    ('MARKE',
+     r'schreiben Sie uns an <a href="mailto:info@immooffice\.example">info@immooffice\.example</a>',
+     'wenden Sie sich bitte an Ihren Ansprechpartner',
+     'Freigabeseite: Expose auf Anfrage, ohne feste Mailadresse.'),
+    ('MARKE',
+     r'Klappt es weiterhin nicht, schreiben Sie uns an info@immooffice\.example\.',
+     'Klappt es weiterhin nicht, wenden Sie sich bitte an Ihren Ansprechpartner.',
+     'Freigabeseite: Verbindungsfehler, ohne feste Mailadresse.'),
     # --- sonnenverlauf.html -------------------------------------------------
     ('FORK',
      r"[ ]*'<div class=\"marke\">[^<]*<span>Immobilien</span></div>' \+\n",
@@ -4132,6 +4176,112 @@ WOERTLICH = [
      '"posteingang" !== t',
      'hatRecht(): die Ausnahme fuer eine feste Mailadresse entfaellt, '
      'Oberflaeche und hat_recht() in der Datenbank sagen dasselbe.'),
+
+    # =====================================================================
+    # Die oeffentliche Rundgang-Seite zeigte ihre Platzhalter (04.10.2026)
+    #
+    # Im Fuss stehen Telefon, Mailadresse, Impressum und Datenschutz. Alle
+    # vier standen im Quelltext. Die Neutralisierung hat die Rufnummer gegen
+    # die Marke "{telefon}" getauscht — in der Annahme, irgendwer ersetze
+    # sie. Tut aber niemand: die Seite wird als Zeichenkette geparst und
+    # unveraendert eingesetzt. Dem Kunden stand woertlich "{telefon}" als
+    # Rufnummer da, daneben eine Mailadresse, die niemandem gehoert.
+    #
+    # Die Daten koennen nur aus der Antwort von rundgang-oeffentlich kommen:
+    # die Seite kennt weder Konto noch Objektkennung, nur den Token. Die
+    # Funktion liefert sie seit heute mit (firma.*). Was fehlt, wird
+    # ausgeblendet — eine fehlende Rufnummer faellt auf, eine fremde nicht.
+    # =====================================================================
+    ('MARKE',
+     '<a class=\\"knopf\\" href=\\"tel:{telefon}\\">\\u260e {telefon}</a>',
+     '<a class=\\"knopf\\" id=\\"knopfTelefon\\" href=\\"#\\" hidden></a>',
+     'Rundgang-Seite: der Telefonknopf wird aus den Daten gefuellt.'),
+    ('MARKE',
+     '<a href=\\"tel:{telefon}\\">{telefon}</a> oder\\n          <a href=\\"mailto:info@immooffice.example\\">info@immooffice.example</a>.',
+     '<span id=\\"meldungKontakt\\"></span>',
+     'Rundgang-Seite: der Kontakt in der Fehlermeldung ebenso.'),
+    ('MARKE',
+     '<a class=\\"recht\\" href=\\"https://immooffice.example/impressum\\" target=\\"_blank\\" rel=\\"noopener\\">Impressum</a> \\u00b7\\n      <a class=\\"recht\\" href=\\"https://immooffice.example/datenschutz\\" target=\\"_blank\\" rel=\\"noopener\\">Datenschutz</a>',
+     '<span id=\\"rechtLinks\\"></span>',
+     'Rundgang-Seite: Impressum und Datenschutz aus den Stammdaten.'),
+    ('MARKE',
+     'el(\\"knopfAnfrage\\").href = \\"mailto:info@immooffice.example?subject=\\" +',
+     'el(\\"knopfAnfrage\\").href = \\"mailto:\\" + ((daten.firma && daten.firma.email) || \\"\\") + \\"?subject=\\" +',
+     'Rundgang-Seite: die Besichtigungsanfrage geht an den Makler.'),
+    ('FORK',
+     '        anfrageVorbereiten();\\n',
+     '        kontaktVorbereiten();\\n        anfrageVorbereiten();\\n',
+     'Rundgang-Seite: den Fuss fuellen, sobald die Daten da sind.'),
+    ('FORK',
+     '  /* ---------- Anfrage-Mailto ---------- */\\n',
+     '  /* ---------- Kontakt und Rechtstexte aus den Stammdaten ---------- */\\n'
+     '  function kontaktVorbereiten() {\\n'
+     '    var f = (daten && daten.firma) || {};\\n'
+     '    var tel = el(\\"knopfTelefon\\");\\n'
+     '    if (tel) {\\n'
+     '      if (f.telefon) { tel.href = \\"tel:\\" + f.telefon; tel.textContent = \\"\\u260e \\" + f.telefon; tel.hidden = false; }\\n'
+     '      else { tel.hidden = true; }\\n'
+     '    }\\n'
+     '    var mk = el(\\"meldungKontakt\\");\\n'
+     '    if (mk) {\\n'
+     '      mk.textContent = \\"\\";\\n'
+     '      if (f.telefon) mk.appendChild(document.createTextNode(f.telefon));\\n'
+     '      if (f.telefon && f.email) mk.appendChild(document.createTextNode(\\" oder \\"));\\n'
+     '      if (f.email) {\\n'
+     '        var a = document.createElement(\\"a\\");\\n'
+     '        a.href = \\"mailto:\\" + f.email; a.textContent = f.email;\\n'
+     '        mk.appendChild(a);\\n'
+     '      }\\n'
+     '      if (f.telefon || f.email) mk.appendChild(document.createTextNode(\\".\\"));\\n'
+     '    }\\n'
+     '    var rl = el(\\"rechtLinks\\");\\n'
+     '    if (rl) {\\n'
+     '      rl.textContent = \\"\\";\\n'
+     '      [[f.impressum, \\"Impressum\\"], [f.datenschutz, \\"Datenschutz\\"]].forEach(function (p, i) {\\n'
+     '        if (!p[0]) return;\\n'
+     '        if (rl.childNodes.length) rl.appendChild(document.createTextNode(\\" \\u00b7 \\"));\\n'
+     '        var a = document.createElement(\\"a\\");\\n'
+     '        a.className = \\"recht\\"; a.href = p[0]; a.target = \\"_blank\\";\\n'
+     '        a.rel = \\"noopener\\"; a.textContent = p[1];\\n'
+     '        rl.appendChild(a);\\n'
+     '      });\\n'
+     '    }\\n'
+     '  }\\n\\n'
+     '  /* ---------- Anfrage-Mailto ---------- */\\n',
+     'Rundgang-Seite: der Helfer, der Fuss und Fehlermeldung fuellt.'),
+
+    # --- Die Ersatzseiten nennen eine Adresse, die niemandem gehoert -----
+    # Vier Texte der eingebetteten Expose-Ersatzseite. Alle vier stehen in
+    # FEHLERPFADEN, also bevor irgendwelche Daten geladen sind — eine
+    # Mandanten-Mailadresse gibt es dort nicht und kann es nicht geben.
+    # Dieselbe Entscheidung wie im Eigentuemerportal: wer die Meldung liest,
+    # kennt seinen Makler. Die Adresse half ihm nicht, sie war nur falsch.
+    ('MARKE',
+     'Wir senden Ihnen das Expos\\u00e9 gern pers\\u00f6nlich zu \\u2013 schreiben Sie uns an <a href=\\"mailto:info@immooffice.example\\">info@immooffice.example<\\/a>.',
+     'Wir senden Ihnen das Expos\\u00e9 gern pers\\u00f6nlich zu \\u2013 bitte wenden Sie sich an Ihren Ansprechpartner.',
+     'Ersatzseite: Expose auf Anfrage, ohne feste Mailadresse.'),
+    ('MARKE',
+     ' Bitte wenden Sie sich an info@immooffice.example \\u2013 wir senden Ihnen gern einen neuen Link.',
+     ' Bitte wenden Sie sich an Ihren Ansprechpartner \\u2013 wir senden Ihnen gern einen neuen Link.',
+     'Ersatzseite: ungueltiger Link, ohne feste Mailadresse.'),
+    ('MARKE',
+     'Klappt es weiterhin nicht, schreiben Sie uns an info@immooffice.example.',
+     'Klappt es weiterhin nicht, wenden Sie sich bitte an Ihren Ansprechpartner.',
+     'Ersatzseite: Verbindungsfehler, ohne feste Mailadresse.'),
+    ('MARKE',
+     '<p>Bitte wenden Sie sich an <a style="color:#D4A567" href="mailto:info@immooffice.example">info@immooffice.example</a>.</p>',
+     '<p>Bitte wenden Sie sich an Ihren Ansprechpartner.</p>',
+     'Rundgang-Ersatzseite: dieselbe Meldung.'),
+
+    # --- Der Newsletter-Fuss: Impressum und Datenschutz (fork_32) --------
+    # Beide Links standen im Quelltext. Der Newsletter geht an Empfaenger,
+    # die ihn bestellt haben; ein Impressumslink, der ins Nichts fuehrt, ist
+    # dort nicht nur haesslich. f ist die Stammdatenzeile des Mandanten.
+    ('MARKE',
+     '<a href="https://immooffice.example/impressum" style="color:#6b7280">Impressum</a> · <a href="https://immooffice.example/datenschutz" style="color:#6b7280">Datenschutz</a>',
+     '${[f.url_impressum && `<a href="${nlEsc(f.url_impressum)}" style="color:#6b7280">Impressum</a>`, f.url_datenschutz && `<a href="${nlEsc(f.url_datenschutz)}" style="color:#6b7280">Datenschutz</a>`].filter(Boolean).join(" · ")}',
+     'Newsletter-Fuss: Impressum und Datenschutz aus den Stammdaten; was '
+     'fehlt, wird weggelassen.'),
 ]
 
 

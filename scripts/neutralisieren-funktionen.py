@@ -3055,6 +3055,52 @@ NACHBESSERN = [
      'Die Stammdaten-Abfrage holt die drei Rechtsadressen mit.',
      {'expose-freigabe', 'objekt-landing'}),
 
+    # --- Der 360-Grad-Rundgang kennt seinen Makler nicht -----------------
+    # Die oeffentliche Rundgang-Seite (src/start/01-fruehstart.js, Pflegequelle
+    # rundgang.html) zeigt im Fuss Telefon, Mailadresse, Impressum und
+    # Datenschutz. Alle vier standen im Quelltext. Nach der Neutralisierung
+    # zeigt die Seite dem Kunden woertlich "{telefon}" als Rufnummer und eine
+    # Mailadresse, die niemandem gehoert — die Seite hat naemlich gar keine
+    # Ersetzung fuer diese Marken. Nachgeprueft am 04.10.2026.
+    #
+    # Die Daten koennen nur von hier kommen: die Seite kennt weder Konto noch
+    # Objektkennung, nur den Rundgang-Token. Also liefert diese Funktion sie
+    # mit — aus dem Mandanten DES RUNDGANGS, und nur das, was ohnehin im
+    # Impressum steht.
+    ('FORK',
+     '    const startSzene =',
+     '    // Briefkopf und Kontakt des Maklers, zu dem der Rundgang gehoert.\n'
+     '    // Ohne Eintrag bleibt das Feld leer, und die Seite laesst die Zeile\n'
+     '    // weg — eine fehlende Rufnummer faellt auf, eine fremde nicht.\n'
+     '    // Den Mandanten holt dieser Block selbst: die Abfrage der Vorlage\n'
+     '      // darueber bleibt unberuehrt, damit der Vergleich mit der Vorlage\n'
+     '      // sie weiter Zeile fuer Zeile wiedererkennt.\n'
+     '    const { data: imM } = rundgang.immobilie_id\n'
+     '      ? await supabase.from("immobilien").select("mandant_id")\n'
+     '          .eq("id", rundgang.immobilie_id).maybeSingle()\n'
+     '      : { data: null };\n'
+     '    const { data: fs } = imM?.mandant_id\n'
+     '      ? await supabase.from("firma_stammdaten")\n'
+     '          .select("firma_name, marken_name, telefon, email, url_impressum, url_datenschutz")\n'
+     '          .eq("mandant_id", imM.mandant_id).eq("aktiv", true)\n'
+     '          .order("sortierung", { ascending: true }).limit(1).maybeSingle()\n'
+     '      : { data: null };\n'
+     '    const firma = {\n'
+     '      name: String(fs?.marken_name || fs?.firma_name || "").trim(),\n'
+     '      telefon: String(fs?.telefon || "").trim(),\n'
+     '      email: String(fs?.email || "").trim(),\n'
+     '      impressum: String(fs?.url_impressum || "").trim(),\n'
+     '      datenschutz: String(fs?.url_datenschutz || "").trim(),\n'
+     '    };\n\n'
+     '    const startSzene =',
+     'Rundgang: Kontaktdaten des Maklers aus den Stammdaten seines Mandanten.',
+     {'rundgang-oeffentlich'}),
+    ('FORK',
+     '        objekt,\n        szenen: szenen.map((s) => ({',
+     '        objekt,\n        firma,\n        szenen: szenen.map((s) => ({',
+     'Rundgang: die Antwort traegt firma.',
+     {'rundgang-oeffentlich'}),
+
     # --- Die Datenschutzadresse in den Vertrags-PDF (fork_32) ------------
     # vertrag-pdf und signatur-vorgang-starten schreiben in die AGB des
     # Maklervertrags: "Weitere Informationen ... abrufbar unter: <Adresse>".

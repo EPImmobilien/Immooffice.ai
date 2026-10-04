@@ -34,6 +34,15 @@ function kopfSetzen(f){
   if(k)k.style.display=t?"":"none";
   if(t&&document.title.indexOf(t)<0)document.title=document.title+" – "+t;
 }
+// Impressum, Datenschutz und AGB des Mandanten (fork_32). Was nicht
+// hinterlegt ist, wird weggelassen - ein Pflichtlink, der ins Nichts
+// fuehrt, ist schlechter als keiner.
+function rechtLinks(f){
+  var raus=[];
+  [[f&&f.url_impressum,"Impressum"],[f&&f.url_datenschutz,"Datenschutz"],[f&&f.url_agb,"AGB"]]
+    .forEach(function(p){ if(p[0]) raus.push('<a href="'+esc(p[0])+'">'+p[1]+'</a>'); });
+  return raus.length?" · "+raus.join(" · "):"";
+}
 </script>
 <div class="box" id="box"><div class="muted">Lädt …</div></div>
 <div class="fuss" id="fuss"></div>

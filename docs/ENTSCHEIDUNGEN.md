@@ -3957,3 +3957,58 @@ wie bei `immoFirmenName` und `immoMarke`.
 
 Die Oberfläche und die Nebenseiten lesen die Felder noch nicht — das ist der
 nächste Schritt und steht in `docs/OFFEN.md`.
+
+## Die öffentliche Rundgang-Seite zeigte ihre Platzhalter (04.10.2026)
+
+Im Fuß des 360°-Rundgangs stehen Telefon, Mailadresse, Impressum und
+Datenschutz. Alle vier standen im Quelltext. Die Neutralisierung hat die
+Rufnummer gegen die Marke `{telefon}` getauscht — in der Annahme, irgendwer
+ersetze sie.
+
+**Es ersetzt sie niemand.** Die Seite liegt als Zeichenkette in
+`src/start/01-fruehstart.js`, wird mit `DOMParser` geparst und unverändert
+eingesetzt; eine Ersetzung für `{telefon}` gibt es in dieser Datei nicht.
+Dem Interessenten stand damit wörtlich
+
+```
+☎ {telefon}
+```
+
+als Rufnummer da — viermal auf der Seite —, daneben eine Mailadresse, die
+niemandem gehört, und zwei Pflichtlinks ins Nichts. Nachgeprüft, nicht
+vermutet: `grep` auf eine Ersetzung findet keine, und der Weg der Zeichenkette
+ist nachgelesen.
+
+Das ist die unangenehmste Art von Neutralisierungsfehler: die Regel hat
+getroffen, das Gate war grün, und das Ergebnis war schlechter als vorher. Ein
+verdrahteter fremder Name ist falsch; eine sichtbare Marke ist kaputt.
+
+### Woher die Daten jetzt kommen
+
+Nur von der Edge Function. Die Seite kennt weder Konto noch Objektkennung,
+sondern ausschließlich den Rundgang-Token — `window.IMMO_MARKE` gibt es dort
+nicht. `rundgang-oeffentlich` liefert deshalb `firma.{name, telefon, email,
+impressum, datenschutz}` aus dem Mandanten **des Rundgangs** mit, und zwar nur
+das, was ohnehin im Impressum steht.
+
+`kontaktVorbereiten()` füllt damit Telefonknopf, Fehlermeldung und die
+Rechtslinks — und **blendet aus, was fehlt**. Keine leere Rufnummer, kein
+Link ohne Ziel. Die Besichtigungsanfrage geht an die Mailadresse des Maklers
+statt an die Platzhalter-Domain.
+
+Der Mandant wird in einer **eigenen** Abfrage geholt, obwohl die Objektabfrage
+eine Zeile darüber steht und ihn mitnehmen könnte. Grund:
+`tests/funktionen-unveraendert.py` erkennt die Vorlage Zeile für Zeile
+wieder, und eine geänderte Zeile ohne Kennzeichen färbt die Prüfung rot. Eine
+zusätzliche Abfrage auf einen Primärschlüssel ist der kleinere Preis.
+
+### Dieselbe Entscheidung an sieben weiteren Stellen
+
+Die Ersatzseiten (Exposé-Freigabe, Rundgang) und die Objektseite nannten in
+**Fehlerpfaden** `info@immooffice.example` — also bevor irgendwelche
+Stammdaten geladen sind. Dort gibt es keine Mandanten-Adresse und kann es
+keine geben. Sie verweisen jetzt auf „Ihren Ansprechpartner", wie das
+Eigentümerportal seit dem 03.10.: wer die Meldung liest, kennt seinen Makler.
+Die Adresse half ihm nicht, sie war nur falsch.
+
+Damit ist die Platzhalter-Domain aus **allen sechs Nebenseiten** verschwunden.

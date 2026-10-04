@@ -80,6 +80,15 @@ function kopfSetzen(f){
   if(k)k.style.display=t?"":"none";
   if(t&&document.title.indexOf(t)<0)document.title=document.title+" – "+t;
 }
+// Impressum, Datenschutz und AGB des Mandanten (fork_32). Was nicht
+// hinterlegt ist, wird weggelassen - ein Pflichtlink, der ins Nichts
+// fuehrt, ist schlechter als keiner.
+function rechtLinks(f){
+  var raus=[];
+  [[f&&f.url_impressum,"Impressum"],[f&&f.url_datenschutz,"Datenschutz"],[f&&f.url_agb,"AGB"]]
+    .forEach(function(p){ if(p[0]) raus.push('<a href="'+esc(p[0])+'">'+p[1]+'</a>'); });
+  return raus.length?" · "+raus.join(" · "):"";
+}
 </script>
 <div id="wurzel"><div class="box"><div class="muted">Lädt …</div></div></div>
 <div class="fuss" id="fuss"></div>
@@ -105,12 +114,12 @@ async function api(fn,body){
 let D=null,FOTOS=[],lbIdx=0;
 function fehlerSeite(m,art){
   if(art==="vorschau"){wurzel.innerHTML='<div class="box"><h1>Vorschau nicht möglich</h1><div class="warn">'+esc(m||"Bitte zuerst im Portal anmelden.")+'</div><div class="muted">Die Vorschau der Objektseite nutzt Ihre Anmeldung in ImmoOffice. Öffnen Sie das Portal in diesem Browser, melden Sie sich an und starten Sie die Vorschau erneut aus dem Objekt (Reiter Vermarktung).</div></div>';return;}
-  if(art==="ungueltig")wurzel.innerHTML='<div class="box"><h1>Link ungültig</h1><div class="err">'+esc(m||"Dieser Link ist nicht (mehr) gültig.")+' Bitte wenden Sie sich an info@immooffice.example – wir senden Ihnen gern einen neuen Zugang.</div></div>';
-  else if(art==="weg")wurzel.innerHTML='<div class="box"><h1>Objekt nicht mehr verfügbar</h1><div class="warn">'+esc(m)+'</div><div class="muted">Gern informieren wir Sie über vergleichbare Objekte: info@immooffice.example</div></div>';
-  else if(art==="widerrufen")wurzel.innerHTML='<div class="box"><h1>Zugang nicht mehr gültig</h1><div class="warn">'+esc(m||"Sie haben den Maklervertrag widerrufen – dieser Zugang ist nicht mehr gültig.")+'</div><div class="muted">Sollten Sie sich später erneut für die Immobilie interessieren, melden Sie sich gern: info@immooffice.example</div></div>';
+  if(art==="ungueltig")wurzel.innerHTML='<div class="box"><h1>Link ungültig</h1><div class="err">'+esc(m||"Dieser Link ist nicht (mehr) gültig.")+' Bitte wenden Sie sich an Ihren Ansprechpartner – wir senden Ihnen gern einen neuen Zugang.</div></div>';
+  else if(art==="weg")wurzel.innerHTML='<div class="box"><h1>Objekt nicht mehr verfügbar</h1><div class="warn">'+esc(m)+'</div><div class="muted">Gern informieren wir Sie ueber vergleichbare Objekte – sprechen Sie Ihren Ansprechpartner an.</div></div>';
+  else if(art==="widerrufen")wurzel.innerHTML='<div class="box"><h1>Zugang nicht mehr gültig</h1><div class="warn">'+esc(m||"Sie haben den Maklervertrag widerrufen – dieser Zugang ist nicht mehr gültig.")+'</div><div class="muted">Sollten Sie sich später erneut für die Immobilie interessieren, melden Sie sich gern bei Ihrem Ansprechpartner</div></div>';
   else wurzel.innerHTML='<div class="box"><h1>Seite konnte nicht geladen werden</h1><div class="err">Ihr Link ist in Ordnung, aber die Verbindung zu unserem Server ist gerade fehlgeschlagen'+(m?' ('+esc(m)+')':'')+'.</div><button class="btn" onclick="laden()">Erneut versuchen</button></div>';
 }
-function fussZeile(firma){kopfSetzen(firma);if(!firma)return;fuss.innerHTML=esc(firma.firma_name)+' · '+esc(firma.strasse)+' · '+esc(firma.plz)+' '+esc(firma.ort)+(firma.geschaeftsfuehrer?' · Geschäftsführer: '+esc(firma.geschaeftsfuehrer):"")+(firma.hrb?' · '+esc(firma.registergericht||"")+' '+esc(firma.hrb):"")+' · <a href="https://immooffice.example/impressum">Impressum</a> · <a href="https://immooffice.example/datenschutz">Datenschutz</a> · <a href="https://immooffice.example/agb">AGB</a>';}
+function fussZeile(firma){kopfSetzen(firma);if(!firma)return;fuss.innerHTML=esc(firma.firma_name)+' · '+esc(firma.strasse)+' · '+esc(firma.plz)+' '+esc(firma.ort)+(firma.geschaeftsfuehrer?' · Geschäftsführer: '+esc(firma.geschaeftsfuehrer):"")+(firma.hrb?' · '+esc(firma.registergericht||"")+' '+esc(firma.hrb):"")+rechtLinks(firma);}
 async function laden(){
   if(!T&&!V)return fehlerSeite("",'ungueltig');
   let d;try{d=await api("objekt-landing",{token:T,aktion:"laden"});}catch(e){return fehlerSeite(e.message);}
