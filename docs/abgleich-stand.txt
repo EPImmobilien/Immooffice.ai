@@ -1,0 +1,5 @@
+# Zuletzt uebernommener Stand der Vorlage (siehe docs/ABGLEICH-NACHTLAUF.md)
+quell_commit=cd433e9e8e3fc8fb94830ce46b81a4989d072438
+quell_branch=claude/sonnenverlauf-3d-integration-1yy5ug
+schema_stand=2026-10-05T13:50:46Z
+abgleich=2026-10-05

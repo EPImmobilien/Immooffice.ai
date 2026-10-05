@@ -260,7 +260,9 @@ erreichbar ist. Übernommen wie in der Vorlage, aber vermerkt in
 ## 7. Abgleich vom 05.10.2026 — Stufe 151 bis 173
 
 **Grundlage diesmal nicht ein Netlify-Export, sondern das Bauergebnis aus dem
-Quell-Repository der Vorlage** (`portal/bau/liefer/`, Stand 05.10. 13:48).
+Quell-Repository der Vorlage** (`portal/bau/liefer/`, Commit `cd433e9`, Stand 05.10. 13:48).
+Ab jetzt läuft der Abgleich nachts automatisch, nach `docs/ABGLEICH-NACHTLAUF.md`;
+der übernommene Stand steht in `docs/abgleich-stand.txt`.
 Das ist dieselbe Datei, die ausgeliefert wird, nur ohne den Umweg über einen
 Upload.
 
