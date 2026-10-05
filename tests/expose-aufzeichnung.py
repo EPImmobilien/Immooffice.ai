@@ -429,6 +429,10 @@ def seiten(vorlage):
         "farben": {k: farbe(v) for k, v in thema.items()
                    if hasattr(v, "red")},
         "ersetzte_schnitte": ersetzt,
+        # Die Demodaten des Prototyps. Der Vergleich braucht sie: ein Text,
+        # der aus anderen Daten entsteht, ist nicht vergleichbar. Tupel
+        # werden dabei zu Listen — das ist in JSON so.
+        "daten": {k: v for k, v in modul.D.items()},
         "seiten": leinwand.seiten,
     }
 

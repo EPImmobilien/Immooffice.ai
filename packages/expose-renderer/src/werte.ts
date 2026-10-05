@@ -21,11 +21,21 @@ export type Daten = Record<string, unknown>;
 
 // ------------------------------------------------------------ Formatierung
 
-/** Tausenderpunkte und Dezimalkomma, ohne Intl. */
-export function zahlDe(v: number, stellen = 0): string {
+/**
+ * Tausenderpunkte und Dezimalkomma, ohne Intl.
+ *
+ * `knapp` laesst nachlaufende Nullen weg: fuenf Zimmer sind "5" und nicht
+ * "5,0", dreieinhalb aber "3,5". Betraege und Prozente bleiben feststellig,
+ * weil "1.234,5 €" falsch aussieht.
+ */
+export function zahlDe(v: number, stellen = 0, knapp = false): string {
   const negativ = v < 0;
   const gerundet = Math.abs(v).toFixed(stellen);
-  const [ganz, bruch] = gerundet.split(".");
+  let [ganz, bruch] = gerundet.split(".");
+  if (knapp && bruch) {
+    bruch = bruch.replace(/0+$/, "");
+    if (bruch === "") bruch = undefined as unknown as string;
+  }
   let mitPunkten = "";
   for (let i = 0; i < ganz.length; i++) {
     if (i > 0 && (ganz.length - i) % 3 === 0) mitPunkten += ".";
@@ -61,12 +71,12 @@ export function formatiere(roh: unknown, typ: FeldTyp, stellen?: number): string
     case "zahl": {
       const n = Number(roh);
       if (!Number.isFinite(n)) return undefined;
-      return zahlDe(n, stellen ?? 0);
+      return zahlDe(n, stellen ?? 0, true);
     }
     case "flaeche": {
       const n = Number(roh);
       if (!Number.isFinite(n)) return undefined;
-      return `${zahlDe(n, stellen ?? 0)} m²`;
+      return `${zahlDe(n, stellen ?? 0, true)} m²`;
     }
     case "euro": {
       const n = Number(roh);

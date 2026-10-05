@@ -274,6 +274,16 @@ else
   fehler=1
 fi
 
+abschnitt "Expose-Vorlagen: zeichnet der Renderer wie die Prototypen?"
+# Schrittweiser Vergleich gegen die aufgezeichneten Prototypen: Ort auf
+# 2 pt, dazu Schnitt, Groesse, Sperrung und Farbe. Ohne reference/
+# uebersprungen.
+if node tests/expose-vorlagen.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Oberflaeche: Rauchtest"
 if python3 tests/oberflaeche-rauchtest.py; then
   :

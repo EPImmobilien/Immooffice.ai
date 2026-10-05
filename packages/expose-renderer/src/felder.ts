@@ -75,6 +75,7 @@ export const OBJEKT: Feld[] = [
   { schluessel: "objekt.adresse", name: "Straße und Hausnummer", typ: "text", quelle: GERECHNET },
   { schluessel: "objekt.plz", name: "PLZ", typ: "text", quelle: O("plz") },
   { schluessel: "objekt.ort", name: "Ort", typ: "text", quelle: O("ort") },
+  { schluessel: "objekt.ortsteil", name: "Ortsteil", typ: "text", quelle: O("ortsteil") },
   { schluessel: "objekt.plz_ort", name: "PLZ und Ort", typ: "text", quelle: GERECHNET },
   { schluessel: "objekt.adresse_freigeben", name: "Adresse im Exposé zeigen", typ: "ja_nein",
     quelle: O("adresse_freigeben"),
@@ -97,6 +98,8 @@ export const OBJEKT: Feld[] = [
 
   // Zustand und Technik
   { schluessel: "objekt.baujahr", name: "Baujahr", typ: "jahr", quelle: O("baujahr") },
+  { schluessel: "objekt.modernisierung_jahr", name: "Letzte Modernisierung", typ: "jahr",
+    quelle: O("modernisierung_jahr") },
   { schluessel: "objekt.zustand", name: "Zustand", typ: "text", quelle: O("zustand") },
   { schluessel: "objekt.unterkellert", name: "Keller", typ: "text", quelle: O("unterkellert") },
   { schluessel: "objekt.wintergarten", name: "Wintergarten", typ: "ja_nein", quelle: O("wintergarten") },
@@ -107,6 +110,8 @@ export const OBJEKT: Feld[] = [
   { schluessel: "objekt.fenster_baujahr", name: "Baujahr Fenster", typ: "jahr", quelle: O("fenster_baujahr") },
   { schluessel: "objekt.stellplatz_art", name: "Stellplatzart", typ: "text", quelle: O("stellplatz_art") },
   { schluessel: "objekt.stellplatz_anzahl", name: "Stellplätze", typ: "zahl", quelle: O("stellplatz_anzahl"), stellen: 0 },
+  { schluessel: "objekt.stellplatz", name: "Stellplätze (Anzeige)", typ: "text",
+    quelle: GERECHNET, hinweis: "Art und Anzahl in einer Zeile." },
   { schluessel: "objekt.verfuegbar_ab", name: "Verfügbar ab", typ: "text", quelle: O("verfuegbar_ab") },
 
   // Energie
@@ -122,6 +127,8 @@ export const OBJEKT: Feld[] = [
     quelle: O("energie_warmwasser") },
   { schluessel: "objekt.energie_gueltig_bis", name: "Energieausweis gültig bis", typ: "datum",
     quelle: O("energie_gueltig_bis") },
+  { schluessel: "objekt.energie_gueltig_kurz", name: "Gültig bis (Monat/Jahr)", typ: "text",
+    quelle: GERECHNET, hinweis: "MM/JJJJ — so steht es in den Vorlagen." },
 
   // Preise
   { schluessel: "objekt.angebotspreis", name: "Angebotspreis", typ: "euro", quelle: O("angebotspreis"), stellen: 0 },
@@ -202,6 +209,7 @@ export const ANSPRECHPARTNER: Feld[] = [
   { schluessel: "ansprechpartner.titel", name: "Titel", typ: "text", quelle: P("titel") },
   { schluessel: "ansprechpartner.funktion", name: "Funktion", typ: "text", quelle: P("funktion") },
   { schluessel: "ansprechpartner.telefon", name: "Telefon", typ: "text", quelle: P("telefon") },
+  { schluessel: "ansprechpartner.mobil", name: "Mobil", typ: "text", quelle: P("mobil") },
   { schluessel: "ansprechpartner.email", name: "E-Mail", typ: "text", quelle: P("email") },
   { schluessel: "ansprechpartner.foto", name: "Foto", typ: "bild", quelle: P("foto_url") },
 ];

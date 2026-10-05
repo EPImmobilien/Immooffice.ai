@@ -1,0 +1,356 @@
+{
+  "schema": 1,
+  "name": "Raster",
+  "beschreibung": "Modern, weiche Karten, Plus Jakarta Sans. Die Standardvorlage.",
+  "basis": "raster",
+  "format": {
+    "breite": 595.28,
+    "hoehe": 841.89,
+    "ausrichtung": "hoch"
+  },
+  "stil": {
+    "farben": {
+      "f1": "ci.primaer",
+      "f2": "ci.akzent",
+      "ableitung": "raster"
+    },
+    "schriften": {
+      "headline": {
+        "familie": "jakarta",
+        "schnitt": "ExtraBold"
+      },
+      "text": {
+        "familie": "jakarta",
+        "schnitt": "Regular"
+      },
+      "label": {
+        "familie": "jakarta",
+        "schnitt": "SemiBold"
+      }
+    },
+    "raster": {
+      "spalten": 12,
+      "rand": 42,
+      "abstand": 10
+    },
+    "textstile": {
+      "marke_name": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "ExtraBold"
+        },
+        "groesse": 10,
+        "farbe": "p",
+        "sperrung": 1.4
+      },
+      "marke_name_hell": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "ExtraBold"
+        },
+        "groesse": 10,
+        "farbe": "weiss",
+        "sperrung": 1.4
+      },
+      "marke_zusatz": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 6,
+        "farbe": "muted",
+        "sperrung": 2.2,
+        "grossbuchstaben": true
+      },
+      "bild_label": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 6,
+        "farbe": "pdark",
+        "sperrung": 1.2,
+        "grossbuchstaben": true
+      },
+      "cover_band": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 6.5,
+        "farbe": "weiss",
+        "sperrung": 2.2,
+        "grossbuchstaben": true
+      },
+      "cover_oberzeile": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Bold"
+        },
+        "groesse": 7.5,
+        "farbe": "a",
+        "sperrung": 2.2,
+        "grossbuchstaben": true
+      },
+      "cover_titel": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "ExtraBold"
+        },
+        "groesse": 27,
+        "farbe": "ink",
+        "sperrung": -0.6
+      },
+      "cover_ort": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 10,
+        "farbe": "muted"
+      },
+      "cover_slogan": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 8.5,
+        "farbe": "p"
+      },
+      "cover_web": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 7,
+        "farbe": "muted",
+        "sperrung": 0.8,
+        "ausrichtung": "rechts"
+      },
+      "kz_wert": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "ExtraBold"
+        },
+        "groesse": 19,
+        "farbe": "p",
+        "sperrung": -0.3
+      },
+      "kz_wert_letzter": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "ExtraBold"
+        },
+        "groesse": 17,
+        "farbe": "a",
+        "sperrung": -0.3
+      },
+      "kz_label": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 6.5,
+        "farbe": "muted",
+        "sperrung": 1.6,
+        "grossbuchstaben": true
+      }
+    }
+  },
+  "seiten": [
+    {
+      "id": "cover",
+      "typ": "cover",
+      "name": "Titelseite",
+      "ohne_fuss": true,
+      "elemente": [
+        {
+          "id": "cover-titelbild",
+          "typ": "bild",
+          "gesperrt": true,
+          "x": 0,
+          "y": 336.756,
+          "b": 595.28,
+          "h": 505.134,
+          "slot": {
+            "art": "titelbild"
+          },
+          "fuellmodus": "cover",
+          "platzhalter_farbe": "surf2",
+          "label": "Titelbild",
+          "stil_label": "bild_label",
+          "label_hintergrund": "weiss"
+        },
+        {
+          "id": "cover-markenfeld",
+          "typ": "form",
+          "gesperrt": true,
+          "x": 28,
+          "y": 763.89,
+          "b": 196,
+          "h": 50,
+          "form": "rechteck",
+          "fuell": "weiss"
+        },
+        {
+          "id": "cover-logo",
+          "typ": "bild",
+          "x": 42,
+          "y": 777.89,
+          "b": 22,
+          "h": 22,
+          "slot": {
+            "art": "logo",
+            "ton": "hell"
+          },
+          "fuellmodus": "contain",
+          "eckradius": 5,
+          "platzhalter_farbe": "a"
+        },
+        {
+          "id": "cover-marke",
+          "typ": "text",
+          "x": 71,
+          "y": 778.89,
+          "b": 150,
+          "h": 10,
+          "stil": "marke_name",
+          "inhalt": "{{firma.marken_name}}",
+          "einzeilig": true
+        },
+        {
+          "id": "cover-marke-zusatz",
+          "typ": "text",
+          "x": 71,
+          "y": 773.89,
+          "b": 150,
+          "h": 6,
+          "stil": "marke_zusatz",
+          "inhalt": "Immobilien",
+          "einzeilig": true
+        },
+        {
+          "id": "cover-seitenband",
+          "typ": "text",
+          "x": 569.28,
+          "y": 795.39,
+          "b": 200,
+          "h": 6.5,
+          "drehung": 270,
+          "stil": "cover_band",
+          "inhalt": "Exposé · {{objekt.immo_nr}}",
+          "einzeilig": true
+        },
+        {
+          "id": "cover-farbband",
+          "typ": "form",
+          "gesperrt": true,
+          "x": 0,
+          "y": 330.756,
+          "b": 595.28,
+          "h": 6,
+          "form": "rechteck",
+          "fuell": "a"
+        },
+        {
+          "id": "cover-oberzeile",
+          "typ": "text",
+          "x": 42,
+          "y": 277.256,
+          "b": 400,
+          "h": 7.5,
+          "stil": "cover_oberzeile",
+          "inhalt": "{{objekt.objektart}} zum {{objekt.vertragsart}}",
+          "einzeilig": true
+        },
+        {
+          "id": "cover-titel",
+          "typ": "text",
+          "x": 42,
+          "y": 184.756,
+          "b": 471.28,
+          "h": 64,
+          "stil": "cover_titel",
+          "inhalt": "{{objekt.objekttitel}}",
+          "zeilenschritt": 32,
+          "verdichten": false,
+          "max_zeilen": 2
+        },
+        {
+          "id": "cover-ort",
+          "typ": "text",
+          "x": 42,
+          "y": 172.756,
+          "b": 400,
+          "h": 10,
+          "stil": "cover_ort",
+          "inhalt": "{{objekt.plz_ort}}  ·  {{objekt.ortsteil}}",
+          "einzeilig": true
+        },
+        {
+          "id": "cover-kennzahlen",
+          "typ": "kennzahl",
+          "gesperrt": true,
+          "x": 42,
+          "y": 70,
+          "b": 511.28,
+          "h": 92,
+          "variante": "leiste",
+          "spalten": 4,
+          "polster": 18,
+          "hintergrund": "surf",
+          "eckradius": 10,
+          "trenner": "line",
+          "trenner_oben": 20,
+          "trenner_unten": 20,
+          "trenner_breite": 0.8,
+          "wert_grundlinie": 54,
+          "label_grundlinie": 32,
+          "stil_wert": "kz_wert",
+          "stil_wert_letzter": "kz_wert_letzter",
+          "stil_label": "kz_label",
+          "eintraege": [
+            {
+              "label": "Wohnfläche",
+              "wert": "{{objekt.wohnflaeche}}"
+            },
+            {
+              "label": "Zimmer",
+              "wert": "{{objekt.zimmer}}"
+            },
+            {
+              "label": "Grundstück",
+              "wert": "{{objekt.grundstueck}}"
+            },
+            {
+              "label": "Kaufpreis",
+              "wert": "{{objekt.preis}}"
+            }
+          ]
+        },
+        {
+          "id": "cover-slogan",
+          "typ": "text",
+          "x": 42,
+          "y": 31.5,
+          "b": 360,
+          "h": 8.5,
+          "stil": "cover_slogan",
+          "inhalt": "{{objekt.expose_slogan}}",
+          "einzeilig": true
+        },
+        {
+          "id": "cover-web",
+          "typ": "text",
+          "x": 353.28,
+          "y": 33,
+          "b": 200,
+          "h": 7,
+          "stil": "cover_web",
+          "inhalt": "{{firma.web}}",
+          "einzeilig": true
+        }
+      ]
+    }
+  ]
+}
