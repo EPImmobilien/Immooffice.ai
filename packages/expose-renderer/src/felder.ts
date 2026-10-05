@@ -362,6 +362,8 @@ export const AUSGENOMMEN: Record<string, string> = {
   "immobilien.website_top_angebot": "Schalter für die Website",
   "immobilien.shoptv_veroeffentlichen": "Schalter eines gestrichenen Dienstes",
   "immobilien.expose_vorlage": "Welche Vorlage — nicht ihr Inhalt",
+  "immobilien.expose_vorlage_id": "Welche Vorlage — nicht ihr Inhalt",
+  "immobilien.expose_overrides": "Abweichungen am Dokument, kein Objektdatum",
   "immobilien.quelle": "Woher der Datensatz kam",
   "immobilien.onoffice_id": "Fremdkennung",
   "immobilien.onoffice_synced_at": "Verwaltungszeitpunkt",

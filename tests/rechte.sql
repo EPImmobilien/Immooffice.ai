@@ -121,18 +121,23 @@ end $$;
 
 -- --- Das Recht "Export" ---------------------------------------------------
 -- rechte = {} bedeutet in der Oberflaeche: alles ausser finanzen, admin,
--- rechnungen, posteingang. Die SQL-Fassung muss dasselbe sagen.
+-- rechnungen, posteingang und expose_vorlagen_bearbeiten (fork_37). Die
+-- SQL-Fassung muss dasselbe sagen.
 do $$
 declare r record;
 begin
   for r in select * from (values
       ('chef','finanzen',true,  'Chef darf alles'),
       ('chef','export',  true,  'Chef darf alles'),
-      ('konto','export', true,  'leere Rechte: alles ausser den vier gesperrten'),
+      ('konto','export', true,  'leere Rechte: alles ausser den fuenf gesperrten'),
       ('konto','finanzen',false,'leere Rechte: finanzen bleibt gesperrt'),
       ('konto','admin',   false,'leere Rechte: admin bleibt gesperrt'),
       ('konto','rechnungen',false,'leere Rechte: rechnungen bleibt gesperrt'),
-      ('konto','posteingang',false,'leere Rechte: posteingang bleibt gesperrt')
+      ('konto','posteingang',false,'leere Rechte: posteingang bleibt gesperrt'),
+      -- Wer die Hausvorlage aendert, aendert sie fuer jedes kuenftige Expose
+      -- des Hauses. Das ist keine Nebenbei-Befugnis (fork_37).
+      ('konto','expose_vorlagen_bearbeiten',false,'leere Rechte: Vorlagen bleiben gesperrt'),
+      ('chef','expose_vorlagen_bearbeiten',true, 'Chef darf die Hausvorlage aendern')
     ) v(rolle, modul, soll, warum)
   loop
     perform set_config('request.jwt.claims',

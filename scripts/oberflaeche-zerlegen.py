@@ -3837,6 +3837,17 @@ def B64(s):
 
 
 WOERTLICH = [
+    # --- Recht fuer die Expose-Vorlagen (fork_37) -------------------------
+    ('FORK',
+     '    id: "marketing",\n    label: "Marketing",\n    hinweis: "Logos & Vorlagen"\n  }, {',
+     '    id: "marketing",\n    label: "Marketing",\n    hinweis: "Logos & Vorlagen"\n'
+     '  }, {\n'
+     '    id: "expose_vorlagen_bearbeiten",\n'
+     '    label: "Exposé-Vorlagen",\n'
+     '    hinweis: "Vorlagen gestalten — wirkt auf alle künftigen Exposés"\n'
+     '  }, {',
+     'Die Rechte-Matrix im Admin bietet das neue Recht an. Ohne den '
+     'Eintrag gaebe es ein Recht, das niemand vergeben kann.'),
     # --- Kalendereinladungen (ICS) ---------------------------------------
     ('MARKE', '"PRODID:-//Musterhaus Immobilien GmbH//ImmoOffice//DE"',
      '"PRODID:-//ImmoOffice//DE"',
@@ -4322,6 +4333,21 @@ WOERTLICH = [
      'invoke("generate-text", {\n            body: {\n              textart: l,\n'
      '              kontakt: { email: immoFirma("email"), telefon: immoFirma("telefon") },',
      'Textwerkstatt: die Kontaktdaten des Mandanten gehen an generate-text.'),
+    # --- Recht fuer die Expose-Vorlagen (fork_37) -------------------------
+    # Diese Regel steht ABSICHTLICH am Ende: sie setzt auf dem Ergebnis
+    # einer frueheren Regel auf. Die Vorlage schreibt dort
+    # `("posteingang"!==t||"…@…"===…)` — eine Ausnahme fuer eine feste
+    # Mailadresse der Referenz. Erst nachdem die entfernt ist, steht da
+    # `"posteingang" !== t`, worauf diese Regel trifft.
+    ('FORK',
+     '"finanzen" !== t && "admin" !== t && "rechnungen" !== t && "posteingang" !== t',
+     '"finanzen" !== t && "admin" !== t && "rechnungen" !== t && "posteingang" !== t'
+     ' && "expose_vorlagen_bearbeiten" !== t',
+     'hatRecht: das neue Recht gehoert in die Sperrliste. Ein Mitarbeiter '
+     'ohne ausdrueckliche Rechte bekommt sonst alles, was nicht gesperrt '
+     'ist — und wer die Hausvorlage aendert, aendert sie fuer jedes '
+     'kuenftige Expose des Hauses. Die SQL-Fassung in fork_37 fuehrt '
+     'dieselbe Liste; tests/rechte.sql haelt beide zusammen.'),
 ]
 
 

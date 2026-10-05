@@ -301,6 +301,17 @@ else
   fehler=1
 fi
 
+abschnitt "Expose-Systemvorlagen: Migration entspricht den JSON-Dateien"
+# Die drei Systemvorlagen stehen in der Datenbank, aber geschrieben werden
+# sie in packages/expose-renderer/vorlagen/. Die Migration ist Erzeugnis:
+# wer eine Vorlage aendert und das Skript nicht laufen laesst, haette zwei
+# Fassungen derselben Vorlage.
+if python3 scripts/expose-systemvorlagen.py --pruefen; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Expose-Vorlagen: zeichnet der Renderer wie die Prototypen?"
 # Schrittweiser Vergleich gegen die aufgezeichneten Prototypen: Ort auf
 # 2 pt, dazu Schnitt, Groesse, Sperrung und Farbe. Ohne reference/

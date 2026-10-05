@@ -234,7 +234,31 @@ zuwachs(bereich, mehr, grund) as (values
   ('Spalten', 9, 'fork_34: drei an firma_stammdaten (expose_vorlage, _farben, _rechtsanhang) und sechs an immobilien (expose_vorlage, _zitat, _titel_zeilen, _ausstattung_gruppen, _preis_auf_anfrage, _wege)'),
   ('Pruefbedingungen', 2, 'fork_34: expose_vorlage auf raster/signature/studio, je Tabelle eine'),
   ('Spalten', 3, 'fork_35: immobilien.ortsteil, immobilien.modernisierung_jahr, profiles.mobil — drei Angaben, die die Expose-Vorlagen nennen und das Schema nicht hatte'),
-  ('Spalten', 2, 'fork_36: immobilien.expose_energie_hinweis und immobilien.laufende_kosten — in den Prototypen stehen dort erfundene Objektdaten')
+  ('Spalten', 2, 'fork_36: immobilien.expose_energie_hinweis und immobilien.laufende_kosten — in den Prototypen stehen dort erfundene Objektdaten'),
+  -- fork_37: der Exposé-Baukasten. Eine Vorlage ist ab hier ein
+  -- JSON-Dokument, kein Code. Systemvorlagen tragen mandant_id null:
+  -- lesbar fuer alle, ueber RLS schreibbar fuer niemanden.
+  ('Tabellen', 2, 'fork_37: expose_vorlagen, expose_vorlagen_versionen'),
+  ('Tabellen mit RLS', 2, 'dieselben zwei'),
+  ('Spalten', 23, 'fork_37: expose_vorlagen (14), expose_vorlagen_versionen (7), '
+                  'immobilien.expose_vorlage_id und .expose_overrides'),
+  ('Richtlinien', 6, 'fork_37: je Tabelle lesen, bearbeiten und die restriktive '
+                     'Mandantengrenze'),
+  ('Primaer- und Eindeutigkeitsschluessel', 3, 'fork_37: zwei Primaerschluessel, dazu '
+                                               'eine Fassungsnummer je Vorlage nur einmal'),
+  ('Pruefbedingungen', 1, 'fork_37: basis auf raster/signature/studio/leer'),
+  ('Fremdschluessel', 6, 'fork_37: expose_vorlagen auf mandanten, gesellschaften und '
+                         'profiles, die Fassungen auf Vorlage und profiles, dazu '
+                         'immobilien.expose_vorlage_id'),
+  ('Indizes ohne Constraint', 4, 'fork_37: Vorlagen je Mandant, eine Standardvorlage je '
+                                 'Mandant, Fassungen je Vorlage absteigend, Fassungen je Mandant'),
+  ('Funktionen', 1, 'fork_37: expose_versionen_abraeumen() — hat_recht() wird nur um '
+                    'expose_vorlagen_bearbeiten erweitert, nicht neu angelegt'),
+  ('Trigger', 1, 'fork_37: dieselbe Funktion als Trigger'),
+  ('Buckets', 1, 'fork_37: expose-assets fuer eigene Grafiken in Vorlagen'),
+  ('Storage-Richtlinien', 2, 'fork_37: expose_assets_lesen, expose_assets_pflegen')
+  -- fork_38 legt nur die drei Systemvorlagen als Zeilen an — kein Schema,
+  -- also keine Kennzahl.
 ),
 soll(bereich, soll) as (
   select v.bereich,
