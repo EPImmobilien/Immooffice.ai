@@ -960,3 +960,20 @@ geladen wurde.
 `placeholder: "anna@immooffice.example"` und ähnliche. Die bleiben: ein
 Platzhalter wird nie gesendet, und `example` ist genau die dafür
 reservierte Domain (RFC 2606).
+
+## Aus dem Abgleich vom 05.10.2026
+
+- **`fork_33b` Teil 2 und `fork_33c` sind im Projekt noch nicht angewendet.**
+  Im Repository und auf der lokalen Instanz vollständig, `npm run check`
+  grün. Teil 2 setzt die Team-Wache in zwölf SECURITY-DEFINER-Funktionen
+  (Eigentümer-Konten dürfen interne Funktionen nicht mehr aufrufen);
+  `fork_33c` entfernt die geratene Einmal-Regel für Gesamtscans, erlaubt
+  Fotos in der Scan-Ablage und nimmt zwei Trigger-Funktionen aus der API.
+  Solange `fork_33c` fehlt, lehnt die Ablage Fotos aus Aufmaß-Projekten ab
+  und je Geschoss ist nur ein Gesamtscan zuordenbar. Anwenden braucht eine
+  Freigabe im Werkzeug.
+- **Zwei Aktionen der eigenen Funktionen fehlen gegenüber der Vorlage:**
+  `bild-privat-retusche` `batch` (Hintergrundprüfung aller Fotos, Vorlage alle
+  2 Minuten) und `unterlagen-link` `aufraeumen` (abgelaufene Transfers
+  löschen, Vorlage täglich 01:17). Ohne die zweite bleiben Dateien
+  abgelaufener Transfers im Eimer `transfer-dateien` liegen.

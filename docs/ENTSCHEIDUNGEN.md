@@ -4103,3 +4103,29 @@ Nichts. Das war falsch gelesen: die Zeile geht weiter mit `📞
 ${KONTAKT_TELEFON}`, war also vollständig — nur eben mit leerem Telefonfeld.
 Ebenso hatte ich zwei der drei Fundstellen doppelt gezählt. Beides in den
 Regelbeschreibungen richtiggestellt, bevor es jemand als Begründung liest.
+
+## Abgleich 05.10.2026 und der nächtliche Abgleich
+
+**Auftraggeber, 05.10.2026:** Änderungen der Vorlage, die für den Fork
+sinnvoll sind, werden **automatisch** übernommen — **nachts, einmal
+täglich**, und bei grüner Prüfung **ohne weitere Freigabe** übernommen und
+ausgeliefert. Das setzt die Entscheidung vom 27.09. („laufend nachziehen")
+technisch um. Der Lauf folgt `docs/ABGLEICH.md`; was er nicht selbst lösen
+kann (eine Migration mit `drop`, ein Widerspruch zur Mandantengrenze, ein
+rotes Gate), lässt er liegen und schreibt es in `docs/OFFEN.md`.
+
+Drei Entscheidungen aus dem Abgleich selbst:
+
+- **Gehärtet wird die Fork-Fassung, nicht ersetzt.** Die Vorlage hat
+  `suchkriterien_nachfrage`, `eigentuemer_ansprechpartner_info` und
+  `upload_benachrichtigung_planen` neu geschrieben. Ihre Fassung zu
+  übernehmen hätte die Mandantengrenze aus `fork_14` gelöscht. `fork_33b`
+  setzt nur die Wache dazu; der Rest bleibt, wie der Fork ihn hat.
+- **Fork-eigene Tabellen behalten ihre Lesefreigabe.** `mandanten_einstufung`,
+  `belegnummernkreise`, `zahlungsbedingungen`, `rechnung_einstellungen`,
+  `vertragsvorlagen` und `vorlagen_felder` gibt es in der Vorlage nicht; die
+  Regel der Vorlage hat für sie keine Aussage. Gepflegt werden sie ohnehin
+  nur vom Chef.
+- **`aufmass_scan` behält uuid-Kennungen** (Vorlage: bigint). Die Oberfläche
+  vergleicht Kennungen nur als Zeichenkette, und `scan_ablage.id` ist im Fork
+  ebenfalls uuid.

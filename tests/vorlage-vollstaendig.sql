@@ -215,7 +215,22 @@ zuwachs(bereich, mehr, grund) as (values
   ('Buckets', 2, 'fork_31j: scan-dateien (Stufe 124/125), transfer-dateien (Stufe 117)'),
   ('Funktionen', 1, 'fork_31l: grundriss_ki_waechter() — Waechter fuer den Hintergrundlauf von grundriss-ki-lesen'),
   ('Cron-Jobs', 2, 'fork_31l: unterlagen-link-melden-5min, grundriss-ki-waechter-5min'),
-  ('Spalten', 3, 'fork_32: firma_stammdaten.url_impressum, .url_datenschutz, .url_agb — die drei Rechtsadressen je Mandant')
+  ('Spalten', 3, 'fork_32: firma_stammdaten.url_impressum, .url_datenschutz, .url_agb — die drei Rechtsadressen je Mandant'),
+  -- fork_33a: Aufmass an die echte Fassung der Vorlage angeglichen, dazu
+  -- aufmass_projekt (Stufe 157) und scan_ablage.projekt_id. fork_33b aendert
+  -- nur vorhandene Richtlinien und Funktionen — keine neuen Kennzahlen.
+  ('Tabellen', 1, 'fork_33a: aufmass_projekt'),
+  ('Tabellen mit RLS', 1, 'dieselbe'),
+  ('Spalten', 23, 'fork_33a: aufmass_scan +6, aufmass_projekt 16, scan_ablage.projekt_id'),
+  ('Primaer- und Eindeutigkeitsschluessel', 1, 'fork_33a: aufmass_projekt.id'),
+  ('Pruefbedingungen', 4, 'fork_33a: quelle, Verweis passend zur Quelle, Projekt-Titel, -Art, -Status; '
+                          'gesamt-ohne-Raum aus fork_31a entfaellt'),
+  ('Fremdschluessel', 8, 'fork_33a: aufmass_scan vier Verweise, aufmass_projekt drei, scan_ablage.projekt_id'),
+  ('Indizes ohne Constraint', 4, 'fork_33a: zwei Eindeutigkeiten je Datei, Projekt nach Datum und Mandant, '
+                                 'Ablage je Projekt; der geratene Gesamtscan-Index entfaellt'),
+  ('Richtlinien', 5, 'fork_33a: aufmass_projekt lesen, anlegen, aendern, loeschen, mandant_trennung'),
+  ('Funktionen', 2, 'fork_33a: aufmass_scan_aktualisiert(), aufmass_projekt_aktualisiert()'),
+  ('Trigger', 2, 'fork_33a: dieselben zwei als Trigger')
 ),
 soll(bereich, soll) as (
   select v.bereich,

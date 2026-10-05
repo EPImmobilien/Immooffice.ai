@@ -8,6 +8,8 @@ geändert hat.
 |---|---|---|
 | 14.09.2026 | Schema vom 14.09., Oberfläche vom 14.09. | Vollexport, prüfsummengesichert |
 | 27.09.2026 | Schema vom 26.09., Oberfläche vom 26.09. | Fingerabdruck-Vergleich (siehe unten) |
+| 02./03.10.2026 | Oberfläche bis Stufe 150 | neuer Export, 40 Stufen (ENTSCHEIDUNGEN, 02.10.) |
+| 05.10.2026 | Schema vom 05.10., Oberfläche Stufe 173 | Bauergebnis aus dem Quell-Repository, Migrationsliste (Abschnitt 7) |
 
 ---
 
@@ -252,3 +254,58 @@ Funktion `onoffice-expose-abgleich` **ohne Authorization-Kopf** auf. Das
 funktioniert nur, wenn die Funktion ohne JWT-Prüfung läuft, also öffentlich
 erreichbar ist. Übernommen wie in der Vorlage, aber vermerkt in
 `docs/OFFEN.md`.
+
+---
+
+## 7. Abgleich vom 05.10.2026 — Stufe 151 bis 173
+
+**Grundlage diesmal nicht ein Netlify-Export, sondern das Bauergebnis aus dem
+Quell-Repository der Vorlage** (`portal/bau/liefer/`, Stand 05.10. 13:48).
+Das ist dieselbe Datei, die ausgeliefert wird, nur ohne den Umweg über einen
+Upload.
+
+### Oberfläche
+
+`src/app/anwendung.js` +4.136 / −130 Zeilen, Zerlegung byte-genau, Gate
+sauber. Inhalt der 23 Stufen: Geometrie (Punktwolke Runden 2–5,
+Wandmodell in gemessener Stärke, Außenwände fest 30 cm und geschlossene Hülle,
+Dachgeschoss mit Treppe, Dachfenstern und Wänden über Möbelhöhe, L-Treppe,
+Ansichten/Schnitte/Kubatur, Geschosse stapeln, DXF/PTS-Ausgabe,
+Wohnflächenrechner aus dem Grundriss) und Aufmaß-Projekte im Scanner.
+Nebenseiten: nur `sw.js` (Versionsmarke).
+
+**Kein neuer Aufruf einer Edge Function, kein neuer Bucket, keine neue
+Datenbankfunktion.** Geprüft, indem jede Tabelle, jeder Bucket und jede
+`rpc`/`invoke`-Kennung der Oberfläche gegen die lokale Instanz gehalten wurde.
+Einzige neue Tabelle: `aufmass_projekt`. (`marketing-print-vorlagen` fehlt
+weiterhin, bekannt aus `docs/OFFEN.md`.)
+
+### Schema
+
+Sechs Migrationen der Vorlage seit dem 02.10.:
+
+| Vorlage | Fork | Inhalt |
+|---|---|---|
+| `aufmass_scan`, `aufmass_scan_raumscan_datei` | `fork_33a` | **Korrektur:** `fork_31a` hatte die Tabelle aus der Oberfläche abgeleitet und sechs Spalten nicht gekannt (`quelle`, `scan_ablage_id`, `datei_id`, `ersteller_id`, `updated_at`, `raumscan_datei_id`). Die Oberfläche schreibt drei davon beim Zuordnen aus der Ablage — dieser Weg war im Fork bisher kaputt. |
+| `aufmass_projekt`, `scan_ablage_projekt` | `fork_33a` | neue Tabelle mit Mandantengrenze, `scan_ablage.projekt_id` |
+| `sicherheit_team_only_policies` | `fork_33b` | `is_chef()` nur noch aus `profiles`; 73 erlaubende `true`-Richtlinien gelten nur noch für das Team |
+| `sicherheit_definer_funktionen_team_guard` | `fork_33b` | Team-Wache in zwölf SECURITY-DEFINER-Funktionen, in **ihrer Fork-Fassung** |
+| (entfernende Schritte beider) | `fork_33c` | zwei geratene Regeln aus `fork_31a` weg, Art `foto`, zwei `revoke` |
+
+Bestätigt: `aufmass_scan`, `aufmass_projekt` und `scan_ablage` stimmen im
+lebenden Projekt Spalte für Spalte mit der lokalen Instanz überein (Hash),
+bis auf den Vorgabewert von `umfang`, der in `fork_33c` fällt.
+
+**Im lebenden Projekt noch nicht angewendet:** `fork_33b` Teil 2 (die
+Funktionswachen) und `fork_33c` — siehe `docs/OFFEN.md`. Das Werkzeug lässt
+`drop`/`revoke` nur nach Einzelfreigabe zu.
+
+### Edge Functions und Cron
+
+Keine Funktion der Vorlage ist seit dem 01.10. geändert worden. Bei den
+Cron-Jobs hat die Vorlage drei, die im Fork fehlen, alle zu den beiden
+selbst geschriebenen Funktionen: `bild-privat-retusche-2min` (Aktion
+`batch`), `unterlagen-link-benachrichtigen-5min` (im Fork:
+`unterlagen-link-melden-5min`, gleichwertig) und
+`transfer-aufraeumen-taeglich` (Aktion `aufraeumen`). Die Aktionen `batch`
+und `aufraeumen` kennt die Fork-Fassung nicht — vermerkt in `docs/OFFEN.md`.

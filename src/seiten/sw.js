@@ -6,7 +6,7 @@
  * Offline-Mappe (IndexedDB) anzeigen kann. Datenzugriffe auf Supabase werden
  * NICHT zwischengespeichert — sie laufen unverändert durch.
  *
- * Die Marke 20261002-1823 setzt portal/bauen.py bei jeder Auslieferung neu;
+ * Die Marke 20261005-1348 setzt portal/bauen.py bei jeder Auslieferung neu;
  * dadurch wird der alte Zwischenspeicher ersetzt, sobald der Nutzer online
  * die neue Fassung geladen hat. [
   "https://unpkg.com/react@18.3.1/umd/react.production.min.js",
