@@ -34,14 +34,20 @@ concurrency:
 
 jobs:
   ausliefern:
-    # Feste Abbildung statt ubuntu-latest. Zwei Gruende, beide am 05.10.2026
-    # aufgefallen: die Laeufe 55 bis 57 sind nacheinander mit
+    # Feste Abbildung statt ubuntu-latest, und zwar aus EINEM Grund: GitHub
+    # stellt dieses Etikett ab dem 19.10.2026 auf Ubuntu 26 um, und ein Bau, der
+    # sich ueber Nacht aendert, ist kein Bau.
+    #
+    # Nicht der Grund, auch wenn es am 05.10.2026 so aussah: die Laeufe 55 bis 58
+    # sind nacheinander mit
     #   The job was not acquired by Runner of type hosted even after
     #   multiple attempts
-    # gestorben, ohne einen einzigen Schritt — kein Fehler am Inhalt, sondern
-    # keine Maschine aus dem Topf von ubuntu-latest. Und GitHub stellt dieses
-    # Etikett ab dem 19.10.2026 auf Ubuntu 26 um; ein Bau, der sich ueber
-    # Nacht aendert, ist kein Bau.
+    # gestorben, ohne einen einzigen Schritt. Das Festlegen hat daran nichts
+    # geaendert — Lauf 58 trug schon ubuntu-24.04, und selbst ein reiner
+    # Pruef-Lauf bekam keine Maschine. GitHub gab dem Konto zwischen 19:51 und
+    # 20:52 Uhr keine; danach ging es von allein wieder. Wer das naechste Mal so
+    # etwas sieht, aendert also nicht das Etikett, sondern wartet und probiert es
+    # mit einem billigen Lauf wieder.
     runs-on: ubuntu-24.04
     env:
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}

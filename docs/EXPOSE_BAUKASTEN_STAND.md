@@ -157,11 +157,27 @@ Welche Bilder das sind, sagen die Daten, nicht die Vorlage: eine
 Pflichtkennzeichnung, die der Vorlagenautor ansprechen und damit abschalten
 kann, ist keine.
 
-**Die Schriften gehen über die Auslieferung.** `scripts/bauen.py` legt sie
-nach `dist/schriften/expose/`; von dort holt die Edge Function eine fehlende
-Schrift einmal nach und legt sie im Eimer ab (dafür braucht sie `PORTAL_URL`).
-Von der Google-Quelle kann sie nicht kommen — die Schnitte sind
+**Die Schriften liegen in der Funktion.** `supabase/functions/
+expose-pdf-erzeugen/schriften.mjs` trägt alle zwanzig Schnitte gepackt und
+base64-kodiert; entpackt wird nur, was die Vorlage nennt. Erzeugt von
+`scripts/expose-schriften-einbetten.py` aus `assets/fonts/expose/`, geprüft
+von `npm run check`.
+
+Vorher gingen sie über den Eimer `branding-assets` und, wenn sie dort
+fehlten, über die ausgelieferte Oberfläche; welche Adresse das ist, sagte
+`PORTAL_URL`. Am 05.10.2026 hat genau diese Kette gerissen: der Eimer war
+leer, keiner der beiden Werte stand im Projekt, und die Funktion brach beim
+ersten Schnitt ab („Die Schrift Jak-Light fehlt …"). Es betraf nicht einen
+Schnitt, sondern alle zwanzig — der genannte ist nur der erste, den die
+Vorlage braucht. Drei Dinge, die zusammenpassen müssen — eine
+Umgebungsvariable, eine Auslieferung, ein Eimerinhalt —, sind eine
+Verkettung zu viel für etwas, das 395 KiB wiegt und sich mitliefern lässt.
+Von der Google-Quelle kann es ohnehin nicht kommen: die Schnitte sind
 zurückgerechnete, verkleinerte Instanzen.
+
+`scripts/bauen.py` legt sie weiterhin nach `dist/schriften/expose/` — die
+**Vorschau im Editor** zeichnet im Browser und holt sie von dort. Das PDF
+braucht die Auslieferung nicht mehr.
 
 Dass es wirklich läuft, prüft `tests/expose-funktion.js`: der echte Handler,
 ohne Deno und ohne Netz, mit nachgebautem Supabase. Aus einem vollständigen
@@ -228,12 +244,26 @@ Rückgängig, Vorschaubilder in der Liste, Fassungen zurückholen.
 Der Element-Editor: Seiten und Elemente auswählen, verschieben und ändern,
 Eigenschaftenleiste, Speichern mit Fassung in `expose_vorlagen_versionen`.
 
-**Ausgerollt am 05.10.2026.** Die Migrationen `fork_37` bis `fork_40` liegen
+**Ausgerollt am 05.10.2026.** Die Migrationen `fork_37` bis `fork_41` liegen
 auf `usguiggfciavwzkdfjgt`, die 121 Edge Functions sind über
 `funktionen-ausrollen.yml` ausgerollt (Lauf 54), und die Oberfläche steht in
 Produktion auf `immoofficeeai.netlify.app`. Der Workflow sieht jetzt selbst
 nach, was angekommen ist: Seite, zwei Schriftschnitte, ein Lizenztext und
 `freigabe.html`, alle mit 200 beantwortet.
+
+`expose-pdf-erzeugen` mit den eingebetteten Schriften ist mit Lauf 59
+nachgezogen worden, Fassung 53 um 20:53 Uhr. Nachgeprüft nicht am Lauf,
+sondern am Projekt: alle drei Dateien liegen dort byte-genau so, wie sie im
+Repository stehen (`index.ts` 50.165, `immo-expose.mjs` 150.846,
+`schriften.mjs` 590.196 Zeichen, zwanzig Schnitte), und `index.ts` nennt
+`schriften.mjs` statt einer Webadresse.
+
+Vier Läufe davor sind ohne einen einzigen Schritt gestorben — „The job was
+not acquired by Runner of type hosted even after multiple attempts". Kein
+Fehler am Inhalt: GitHub gab dem Konto zwischen 19:51 und 20:52 Uhr keine
+Maschine, auch nicht für einen reinen Prüf-Lauf. Ausrollen von der
+Arbeitsumgebung aus ist keine Ausweichmöglichkeit: der Netzfilter beantwortet
+`api.supabase.com` **und** `usguiggfciavwzkdfjgt.supabase.co` mit 403.
 
 Dass beim Ausrollen ein echtes Objekt im Projekt stand, hat gleich einen
 Fehler gezeigt, den kein Test finden konnte: seine `vertragsart` ist
@@ -242,12 +272,18 @@ Fehler gezeigt, den kein Test finden konnte: seine `vertragsart` ist
 
 Offen und nicht vergessen:
 
-- **Das erste Exposé im Betrieb ist noch nicht erzeugt.** Beim ersten Lauf
-  holt die Funktion die Schriften von der ausgelieferten Oberfläche in den
-  Eimer; welche Adresse sie fragt, sagt `PORTAL_URL`, sonst der Ursprung von
-  `EXPOSE_FREIGABE_BASIS`. Ob einer der beiden Werte im Projekt gesetzt ist,
-  lässt sich von der Arbeitsumgebung aus nicht sehen — `expose_debug` zeigt
-  es nach dem ersten Lauf.
+- **Das erste Exposé im Betrieb ist noch nicht erzeugt.** Die beiden
+  Versuche vom 05.10.2026 um 19:42 und 19:44 Uhr stehen in `expose_debug`:
+  `start → auto-befuellung-ok → vorbereitung-ok → vorlage-ok` („Raster 10
+  Seiten", „Signature (Kopie) 12 Seiten") — und dann nichts mehr, weil die
+  Schriften fehlten. Seit Fassung 53 trägt die Funktion sie selbst. Ein
+  Klick im Betrieb muss das bestätigen; zu sehen ist es an `schriften-ok`
+  und `pdf-fertig` in `expose_debug`. Von der Arbeitsumgebung aus lässt sich
+  die Funktion nicht rufen: sie verlangt ein JWT oder den Kopf
+  `x-diagnose-secret`, und das Geheimnis `diagnose_secret` liegt im Projekt
+  nicht im Vault. Dafür eines anzulegen heißt, die Exposé-Erzeugung ohne
+  Anmeldung zu öffnen — das ist eine Abkürzung, die eine Prüfung nicht wert
+  ist.
 - **Die Bildunterschriften** der Fotos (`immobilie_datei.titel`) stehen noch
   nicht im Exposé. Die Vorlagen führen die Beschriftung als Text am
   Bildelement; sie gehört ans Bild, und das heißt: als Abweichung am
