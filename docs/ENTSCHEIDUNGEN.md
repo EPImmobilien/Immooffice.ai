@@ -4208,3 +4208,60 @@ Aufzählungszeichen, die vorkommen — zusammen 817 KiB für alle achtzehn
 Schnitte. Griechisch, Kyrillisch und Vietnamesisch sind weg. Fehlt ein
 Zeichen, **meldet** der Renderer das; er setzt nicht still ein leeres
 Rechteck.
+
+## Exposé-Baukasten — Entscheidungen der Etappe 2
+
+### Das Recht `expose_vorlagen_bearbeiten` ist in der Voreinstellung aus
+
+`hat_recht()` gibt einem Mitarbeiter ohne ausdrückliche Rechte alles, was
+nicht in der Sperrliste steht. Die Hausvorlage gehört dorthin: wer sie
+ändert, ändert jedes künftige Exposé des Hauses. Also steht das Recht
+neben `finanzen`, `admin`, `rechnungen` und `posteingang` — Chef ja,
+Mitarbeiter nur mit Häkchen. `tests/rechte.sql` prüft beide Fassungen der
+Regel, die SQL- und die der Oberfläche, gegeneinander.
+
+Die Regel in `scripts/oberflaeche-zerlegen.py` steht **absichtlich am Ende**
+der Liste `WOERTLICH`: sie trifft erst, nachdem eine frühere Regel die
+feste Mailadresse der Referenz aus der Posteingangs-Ausnahme entfernt hat.
+
+### Systemvorlagen tragen `mandant_id = null`
+
+Für alle lesbar, über RLS für niemanden schreibbar — auch nicht für einen
+Chef. Die restriktive Richtlinie lässt `null` beim Lesen durch, beim
+Schreiben nicht; damit kann niemand eine Systemvorlage ändern oder eine
+eigene Vorlage zu einer machen. Gepflegt werden sie über Migrationen, also
+vom Dienstschlüssel. Die drei Kennungen sind fest: eine Systemvorlage, die
+bei jedem Einspielen eine neue bekäme, verlöre die Verbindung zu jedem
+Objekt, das sie benutzt.
+
+### Dreissig Fassungen je Vorlage
+
+Nicht insgesamt, sondern je Vorlage: wer an zwei Vorlagen arbeitet, soll
+nicht die Fassungen der einen durch die Arbeit an der anderen verlieren.
+Mehr als dreissig braucht niemand, und eine Tabelle mit 36 KB je Zeile
+wächst unbegrenzt zu schnell.
+
+### Abweichungen am Objekt, nicht an der Vorlage
+
+`immobilien.expose_overrides` hält ausgeblendete Seiten, getauschte Bilder
+und überschriebene Texte. Die Vorlage bleibt unberührt — eine geänderte
+Hausvorlage soll die Arbeit am einzelnen Objekt nicht wegwerfen. Verwaiste
+Einträge bleiben stehen; sie zu löschen ist eine Entscheidung des Nutzers,
+nicht des Renderers.
+
+### Warum im eigenen Projekt viele kleine Migrationen stehen
+
+Im Repository sind fork_37 und fork_38 je **eine** Datei. Im Projekt
+`usguiggfciavwzkdfjgt` steht dieselbe Änderung als Reihe kleiner Schritte
+(`fork_37a` … `fork_38c5`). Grund: der einzige Weg zur Datenbank ist die
+Verwaltungsschnittstelle (der Ausgangsproxy lässt den Datenbank-Port nicht
+durch), und die bricht nach 60 Sekunden ab — bei grösseren Anweisungen und
+zuverlässig bei `drop policy if exists`. Die Dateien im Repository bleiben
+die Wahrheit; `scripts/lokale-db.sh migrieren` spielt sie als Ganzes ein.
+
+Dass dabei nichts verfälscht wurde, ist **nachgerechnet**, nicht
+angenommen: `md5(dokument::text)` je Systemvorlage stimmt im Projekt und
+in der lokalen Instanz überein (Raster `e760e515…`, Signature
+`8784d5e9…`, Studio `f73418e0…`). `jsonb` normalisiert Schlüsselreihen­folge
+und Zahlenschreibweise, der Vergleich prüft also den Inhalt, nicht die
+Schreibweise.
