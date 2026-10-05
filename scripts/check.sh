@@ -235,6 +235,25 @@ else
   fehler=1
 fi
 
+abschnitt "Expose-Renderer: Feldkatalog deckt das Schema"
+# Der Katalog sagt, welche Platzhalter eine Vorlage benutzen darf. Eine
+# neue Spalte muss aufgenommen oder mit Grund ausgenommen werden — sonst
+# fehlt sie still im Editor.
+if node tests/expose-felder.js; then
+  :
+else
+  fehler=1
+fi
+
+abschnitt "Expose-Renderer: Zufallsfolge wie Pythons random"
+# Zwei Prototypen streuen Platzhaltergrafik mit random.Random(saat). Die
+# Folge ist damit Teil der Vorlage.
+if node tests/expose-zufall.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Expose-Renderer: Zeilenbreiten wie pdfmetrics.stringWidth"
 # Nach der Breite richtet sich jeder Umbruch. Rechnet der Renderer anders
 # als die Prototypen, verlaesst er die verbindliche Vorlage — an langen
