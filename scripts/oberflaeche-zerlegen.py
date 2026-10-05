@@ -3837,6 +3837,79 @@ def B64(s):
 
 
 WOERTLICH = [
+    ('FORK',
+     'if ("undefined" != typeof document && !document.querySelector(`link[href="${fontLink}"]`)) {\n  const e = document.createElement("link");\n  e.rel = "stylesheet", e.href = fontLink, document.head.appendChild(e)\n}',
+     'if ("undefined" != typeof document && !document.querySelector(`link[href="${fontLink}"]`)) {\n  const e = document.createElement("link");\n  e.rel = "stylesheet", e.href = fontLink, document.head.appendChild(e)\n}\n\n// FORK: die eigenen Teile des Forks (src/eigene/) stehen in einem eigenen\n// <script> und sehen die Konstanten dieses Skripts nicht. Statt die Farben\n// dort ein zweites Mal zu schreiben — und beim naechsten Branding zu\n// vergessen — werden sie hier einmal nach aussen gegeben.\nwindow.IMMO_CI = CI;\nwindow.IMMO_FONT_SERIF = FONT_SERIF;',
+     'Farben und Schriftstapel der Anwendung fuer die eigenen Teile. '
+     'Sonst stuenden sie zweimal im Haus.'),
+    # --- Der Exposé-Editor als eigener Bereich (Etappe 3) -----------------
+    # Die Ansicht selbst steht in src/eigene/expose-vorlagen.js und wird von
+    # scripts/bauen.py eingesetzt; hier wird sie nur angemeldet. Drei
+    # Stellen gehoeren dazu: die Ansichtentafel, die Kachel auf der
+    # Startseite und das Recht, das beide gated.
+    ('FORK',
+     '      marketing: {\n'
+     '        title: "Marketingmaterialien",\n'
+     '        subtitle: "Bereich 01",\n'
+     '        comp: React.createElement(MarketingPage, {\n'
+     '          user: k\n'
+     '        })\n'
+     '      },',
+     '      marketing: {\n'
+     '        title: "Marketingmaterialien",\n'
+     '        subtitle: "Bereich 01",\n'
+     '        comp: React.createElement(MarketingPage, {\n'
+     '          user: k\n'
+     '        })\n'
+     '      },\n'
+     '      expose_vorlagen: {\n'
+     '        title: "Exposé-Vorlagen",\n'
+     '        subtitle: "Bereich 01 – Gestaltung der Exposés",\n'
+     '        breit: !0,\n'
+     '        comp: window.ImmoExposeVorlagen\n'
+     '          ? React.createElement(window.ImmoExposeVorlagen, {\n'
+     '              user: k\n'
+     '            })\n'
+     '          : React.createElement("div", null, "Der Vorlagen-Editor ist nicht geladen.")\n'
+     '      },',
+     'Die Ansicht "Exposé-Vorlagen" in der Ansichtentafel. Die Abfrage auf '
+     'window.ImmoExposeVorlagen ist kein Zierrat: faellt der eigene Teil '
+     'beim Bauen aus, soll der Bereich eine Meldung zeigen und nicht die '
+     'ganze Anwendung mitnehmen.'),
+    ('FORK',
+     '    immoEinstellungenKachel = {\n'
+     '      id: "einstellungen",',
+     '    immoExposeVorlagenKachel = {\n'
+     '      id: "expose_vorlagen",\n'
+     '      title: "Exposé-Vorlagen",\n'
+     '      subtitle: "Gestaltung der Exposés",\n'
+     '      icon: ImageIcon,\n'
+     '      num: "★"\n'
+     '    },\n'
+     '    immoEinstellungenKachel = {\n'
+     '      id: "einstellungen",',
+     'Die Kachel zum neuen Bereich. Sie steht neben der Einstellungskachel, '
+     'weil beide Verwaltung sind und nicht Tagesgeschaeft.'),
+    ('FORK',
+     'hatRecht(e, "admin") && c.push(r), e && "chef" === e.role && c.push(immoEinstellungenKachel)',
+     'hatRecht(e, "expose_vorlagen_bearbeiten") && c.push(immoExposeVorlagenKachel), '
+     'hatRecht(e, "admin") && c.push(r), e && "chef" === e.role && c.push(immoEinstellungenKachel)',
+     'Die Kachel erscheint nur mit dem Recht expose_vorlagen_bearbeiten — '
+     'in der Voreinstellung also nur beim Chef, wie die SQL-Fassung in '
+     'fork_37 es auch sieht.'),
+    # --- fontkit fuer den Exposé-Editor (Etappe 3) ------------------------
+    # pdf-lib kann eigene Schriften nur mit fontkit einbetten, und der
+    # Editor zeichnet seine Vorschau mit demselben Renderer wie die Edge
+    # Function — also mit denselben zwanzig Schnitten. Ohne fontkit bliebe
+    # die Vorschau ohne Schrift.
+    #
+    # Fest gepinnt wie alle uebrigen: eine ungepinnte CDN-Fassung hat die
+    # Vorlage am 17.06.2026 vollstaendig lahmgelegt.
+    ('FORK',
+     '<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>',
+     '<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>\n'
+     '<script src="https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js"></script>',
+     'fontkit fuer die Exposé-Vorschau im Browser.'),
     # --- Recht fuer die Expose-Vorlagen (fork_37) -------------------------
     ('FORK',
      '    id: "marketing",\n    label: "Marketing",\n    hinweis: "Logos & Vorlagen"\n  }, {',
@@ -5008,18 +5081,27 @@ def main():
     # scripts/nebenseiten.py aus eigenen Quellen. Am 28.09.2026 hat dieses
     # Skript sie mitgeloescht, und der Commit danach hat die Loeschung
     # mitgenommen: die Auslieferung haette nur noch aus index.html bestanden.
-    fremd = ziel / 'seiten'
-    gerettet = None
-    if fremd.exists():
-        gerettet = ziel.parent / '.seiten-umzug'
-        if gerettet.exists():
-            shutil.rmtree(gerettet)
-        shutil.move(str(fremd), str(gerettet))
+    #
+    # Dasselbe gilt fuer src/eigene/: dort steht Oberflaeche, die der Fork
+    # SELBST schreibt und die es in der Vorlage nicht gibt (der
+    # Exposé-Editor). Sie ist Handarbeit, versioniert, und dieses Skript
+    # hat zu ihr nichts zu sagen.
+    gerettet = {}
+    for name in ('seiten', 'eigene'):
+        fremd = ziel / name
+        if not fremd.exists():
+            continue
+        beiseite = ziel.parent / ('.umzug-' + name)
+        if beiseite.exists():
+            shutil.rmtree(beiseite)
+        shutil.move(str(fremd), str(beiseite))
+        gerettet[name] = beiseite
     if ziel.exists():
         shutil.rmtree(ziel)
-    if gerettet is not None:
+    if gerettet:
         ziel.mkdir(parents=True, exist_ok=True)
-        shutil.move(str(gerettet), str(fremd))
+        for name, beiseite in gerettet.items():
+            shutil.move(str(beiseite), str(ziel / name))
 
     zaehler, formatiert = {}, {}
     for datei, (a, b) in STUECKE.items():

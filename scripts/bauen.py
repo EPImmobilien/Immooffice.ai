@@ -47,7 +47,34 @@ AUFBAU = [
 LEERZEILE_NACH = {'start/04-vorbereitung.js', 'app/anwendung.js'}
 
 
+def eigene_teile():
+    """Die Stuecke, die der Fork selbst schreibt und die Vorlage nicht hat.
+
+    Sie kommen VOR dem Anwendungsskript, damit es sie beim ersten Rendern
+    schon findet. Eingebettet, nicht als eigene Datei: so koennen
+    Anwendung und Renderer nicht in verschiedenen Fassungen im
+    Zwischenspeicher eines Browsers liegen — und die Auslieferung bleibt
+    die eine index.html, die der Auftrag verlangt.
+
+    Beim Rueckbau der Vorlage (--aus) bleibt die Liste leer. Sonst waere
+    der Byte-Vergleich nicht mehr moeglich, und der ist der einzige
+    Nachweis, dass beim Zerlegen nichts verloren ging.
+    """
+    teile = []
+    if BUENDEL.exists():
+        teile.append(('packages/expose-renderer/buendel/immo-expose.js',
+                      BUENDEL.read_text(encoding='utf-8')))
+    if EIGENE.is_dir():
+        for p in sorted(EIGENE.iterdir()):
+            if p.is_file() and p.suffix == '.js':
+                teile.append(('src/eigene/' + p.name, p.read_text(encoding='utf-8')))
+    return teile
+
+
 def bauen(quelle=None):
+    # Nur der echte Bau bekommt die eigenen Stuecke. Ein Rueckbau aus einer
+    # rohen Zerlegung (--aus) muss byte-genau die Vorlage ergeben.
+    eigen = eigene_teile() if quelle is None else []
     quelle = quelle or SRC
     teile = []
     for datei, huelle in AUFBAU:
@@ -64,6 +91,14 @@ def bauen(quelle=None):
             teile.append(inhalt)
         if datei in LEERZEILE_NACH:
             teile.append('')
+        # Die eigenen Stuecke stehen zwischen der Vorbereitung und der
+        # Anwendung: React ist da, die Anwendung noch nicht.
+        if datei == 'start/04-vorbereitung.js':
+            for name, inhalt in eigen:
+                teile.append('<script>\n// ' + name + ' — eigener Teil des Forks, '
+                             'eingesetzt von scripts/bauen.py\n'
+                             + inhalt.rstrip('\n') + '\n</script>')
+                teile.append('')
     return '\n'.join(teile) + '\n'
 
 
@@ -98,6 +133,8 @@ def zugang_einsetzen(inhalt):
 # scripts/nebenseiten.py; hier werden nur noch die Platzhalter gefuellt.
 SEITEN = SRC / 'seiten'
 SCHRIFTEN = WURZEL / 'assets' / 'fonts' / 'expose'
+EIGENE = SRC / 'eigene'
+BUENDEL = WURZEL / 'packages' / 'expose-renderer' / 'buendel' / 'immo-expose.js'
 
 
 def stand_von(inhalt):
@@ -185,10 +222,19 @@ def main():
             print('HINWEIS: ' + ', '.join(fehlend) + ' nicht gesetzt — die '
                   'gebaute Datei kann sich nicht anmelden. Zum Ausrollen die '
                   'Umgebungsvariablen setzen (siehe .env.example).')
-    ZIEL.parent.mkdir(parents=True, exist_ok=True)
-    ZIEL.write_text(inhalt, encoding='utf-8')
-    print(f'{ZIEL.relative_to(WURZEL)}: {len(inhalt):,} Zeichen, '
-          f'{inhalt.count(chr(10)):,} Zeilen')
+    # Ein Rueckbau aus einer rohen Zerlegung (--aus) wird NICHT ausgeliefert.
+    # Er ist eine Gegenprobe und traegt die Kennzeichen der Referenz; bis
+    # zum 05.10.2026 ueberschrieb er dist/index.html, und wer danach den
+    # Ordner ausgerollt hat, lieferte die Vorlage statt immoOffice.ai aus.
+    # Das Neutralitaets-Gate laeuft davor und haette es nicht gesehen.
+    if '--aus' in sys.argv:
+        print(f'Rueckbau aus {quelle}: {len(inhalt):,} Zeichen, '
+              f'{inhalt.count(chr(10)):,} Zeilen (nicht ausgeliefert)')
+    else:
+        ZIEL.parent.mkdir(parents=True, exist_ok=True)
+        ZIEL.write_text(inhalt, encoding='utf-8')
+        print(f'{ZIEL.relative_to(WURZEL)}: {len(inhalt):,} Zeichen, '
+              f'{inhalt.count(chr(10)):,} Zeilen')
 
     if '--roh' not in sys.argv and '--aus' not in sys.argv:
         for name, groesse in nebenseiten_ausliefern(stand_von(inhalt)):

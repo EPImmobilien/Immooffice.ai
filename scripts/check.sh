@@ -342,6 +342,16 @@ else
   fehler=1
 fi
 
+abschnitt "Expose: laeuft der Editor durch?"
+# Die erste eigene Ansicht des Forks. Sie wird hier wirklich ausgefuehrt —
+# gegen ein winziges React, aber mit echtem Buendel, echtem pdf-lib und den
+# ausgelieferten Schriften: aus einer Vorlage entsteht ein PDF.
+if node tests/expose-editor.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Expose: laeuft die Edge Function durch?"
 # Die Syntaxpruefung sagt nur, dass die Datei lesbar ist. Hier laeuft der
 # Handler wirklich — mit nachgebautem Supabase, ohne Netz, ohne Deno: aus

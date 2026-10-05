@@ -410,6 +410,13 @@ if ("undefined" != typeof document && !document.querySelector(`link[href="${font
   e.rel = "stylesheet", e.href = fontLink, document.head.appendChild(e)
 }
 
+// FORK: die eigenen Teile des Forks (src/eigene/) stehen in einem eigenen
+// <script> und sehen die Konstanten dieses Skripts nicht. Statt die Farben
+// dort ein zweites Mal zu schreiben — und beim naechsten Branding zu
+// vergessen — werden sie hier einmal nach aussen gegeben.
+window.IMMO_CI = CI;
+window.IMMO_FONT_SERIF = FONT_SERIF;
+
 // ---------------------------------------------------------------------------
 // Die Schrift des Mandanten.
 //
@@ -22610,6 +22617,13 @@ function HomePage({
     // 768 Pixeln Fensterbreite. Am Schreibtisch fuehrte kein Weg dorthin —
     // ausser ueber "#einstellungen" in der Adresszeile. Gemeldet am
     // 29.09.2026: "wo finde ich Einstellungen".
+    immoExposeVorlagenKachel = {
+      id: "expose_vorlagen",
+      title: "Exposé-Vorlagen",
+      subtitle: "Gestaltung der Exposés",
+      icon: ImageIcon,
+      num: "★"
+    },
     immoEinstellungenKachel = {
       id: "einstellungen",
       title: "Einstellungen",
@@ -22709,7 +22723,7 @@ function HomePage({
     icon: Search,
     num: "14"
   }].filter(t => hatRecht(e, t.id));
-  hatRecht(e, "posteingang") && c.push(o), hatRecht(e, "rechnungen") && !hatRecht(e, "finanzen") && c.push(i), hatRecht(e, "finanzen") && c.push(l), e && "chef" === e.role && c.push(s), hatRecht(e, "admin") && c.push(r), e && "chef" === e.role && c.push(immoEinstellungenKachel);
+  hatRecht(e, "posteingang") && c.push(o), hatRecht(e, "rechnungen") && !hatRecht(e, "finanzen") && c.push(i), hatRecht(e, "finanzen") && c.push(l), e && "chef" === e.role && c.push(s), hatRecht(e, "expose_vorlagen_bearbeiten") && c.push(immoExposeVorlagenKachel), hatRecht(e, "admin") && c.push(r), e && "chef" === e.role && c.push(immoEinstellungenKachel);
   const d = Object.fromEntries(c.map(e => [e.id, e])),
     u = c.map(e => e.id),
     [m, g] = useState(u),
@@ -123243,6 +123257,16 @@ function App() {
         comp: React.createElement(MarketingPage, {
           user: k
         })
+      },
+      expose_vorlagen: {
+        title: "Exposé-Vorlagen",
+        subtitle: "Bereich 01 – Gestaltung der Exposés",
+        breit: !0,
+        comp: window.ImmoExposeVorlagen
+          ? React.createElement(window.ImmoExposeVorlagen, {
+              user: k
+            })
+          : React.createElement("div", null, "Der Vorlagen-Editor ist nicht geladen.")
       },
       verkauf: {
         title: "Verkauf",
