@@ -152,15 +152,23 @@ function ort(s) {
   }
 }
 
+// Rahmen, die im Prototyp eine ZEICHNUNG ersetzen und nicht ein Foto.
+// Dort darf auch Text entschuldigt werden: der gezeichnete Grundriss
+// tragt Raumnamen, der gezeichnete Lageplan eine Strassenbeschriftung.
+// Ein hochgeladener Grundriss bringt seine eigenen mit. Ueberall sonst
+// bleibt Text unentschuldbar.
+const ZEICHNUNG = new Set(['bild:grundriss', 'bild:lageplan']);
+
 /** Rahmen, in denen Platzhaltergrafik der Prototypen stehen darf. */
 function rahmenAus(schritte) {
   const raus = [];
   for (const s of schritte) {
     if (s.art === 'bild' || s.art === 'maske') {
       const e = s.schritte ? s.schritte[0] : null;
-      if (s.art === 'bild') raus.push([s.x, s.y, s.x + s.b, s.y + s.h]);
+      if (s.art === 'bild') raus.push([s.x, s.y, s.x + s.b, s.y + s.h, false]);
       else if (e && (e[0] === 'rect' || e[0] === 'roundRect')) {
-        raus.push([e[1], e[2], e[1] + e[3], e[2] + e[4]]);
+        raus.push([e[1], e[2], e[1] + e[3], e[2] + e[4],
+                   ZEICHNUNG.has(s.zweck)]);
       }
     }
   }
@@ -176,10 +184,59 @@ function istRahmenMaske(s, rahmen) {
     Math.abs(e[1] + e[3] - x2) < 0.5 && Math.abs(e[2] + e[4] - y2) < 0.5);
 }
 
-function imRahmen(s, rahmen) {
-  const [x, y] = ort(s);
-  return rahmen.some(([x1, y1, x2, y2]) =>
-    x >= x1 - 0.5 && x <= x2 + 0.5 && y >= y1 - 0.5 && y <= y2 + 0.5);
+/** Der umschliessende Kasten eines Schritts, in Seitenkoordinaten. */
+function kasten(s) {
+  const m = s.matrix || [1, 0, 0, 1, 0, 0];
+  const p = (x, y) => [m[0] * x + m[2] * y + m[4], m[1] * x + m[3] * y + m[5]];
+  const punkte = [];
+  const dazu = (x, y) => punkte.push(p(x, y));
+  switch (s.art) {
+    case 'text': dazu(s.x, s.y); break;
+    case 'rechteck': case 'rundrechteck': case 'bild': case 'qr':
+      dazu(s.x, s.y); dazu(s.x + s.b, s.y + s.h); break;
+    case 'linie': dazu(s.x1, s.y1); dazu(s.x2, s.y2); break;
+    case 'kreis': dazu(s.x - s.r, s.y - s.r); dazu(s.x + s.r, s.y + s.r); break;
+    case 'ellipse': dazu(s.x1, s.y1); dazu(s.x2, s.y2); break;
+    case 'verlauf': dazu(s.x0, s.y0); dazu(s.x1, s.y1); break;
+    case 'maske': case 'pfad':
+      for (const t of s.schritte) {
+        if (t[0] === 'rect' || t[0] === 'roundRect') {
+          dazu(t[1], t[2]); dazu(t[1] + t[3], t[2] + t[4]);
+        } else if (t[0] === 'circle') {
+          dazu(t[1] - t[3], t[2] - t[3]); dazu(t[1] + t[3], t[2] + t[3]);
+        } else if (t[0] === 'ellipse') {
+          dazu(t[1], t[2]); dazu(t[3], t[4]);
+        } else {
+          for (let i = 1; i + 1 < t.length; i += 2) dazu(t[i], t[i + 1]);
+        }
+      }
+      break;
+    default: dazu(0, 0);
+  }
+  if (!punkte.length) return [0, 0, 0, 0];
+  const xs = punkte.map((q) => q[0]);
+  const ys = punkte.map((q) => q[1]);
+  return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+}
+
+/**
+ * Liegt der Schritt in einem Bildrahmen?
+ *
+ * Geprueft wird die UEBERSCHNEIDUNG der Kaesten, nicht nur der Ansatzpunkt.
+ * Die Prototypen zeichnen ihre Platzhalterkarte bewusst ueber die Kante
+ * hinaus und lassen die Maske schneiden — eine Strasse beginnt bei x = 32,
+ * der Rahmen erst bei x = 42. Nach dem Ansatzpunkt allein waere sie
+ * draussen, und der Test wuerde fuenf Strassen als fehlend melden.
+ *
+ * Das ist unbedenklich, weil erst zugeordnet und dann eingestuft wird:
+ * ein tragendes Element, das ein Foto ueberlappt, ist zu diesem Zeitpunkt
+ * schon zugeordnet.
+ */
+function imRahmen(s, rahmen, nurZeichnung = false) {
+  const [ax1, ay1, ax2, ay2] = kasten(s);
+  return rahmen.some(([x1, y1, x2, y2, zeichnung]) =>
+    (!nurZeichnung || zeichnung) &&
+    ax1 <= x2 + 0.5 && ax2 >= x1 - 0.5 && ay1 <= y2 + 0.5 && ay2 >= y1 - 0.5);
 }
 
 let fehler = 0;
@@ -245,7 +302,9 @@ for (const name of WELCHE) {
     // Platzhalter und steht in keinem Prototyp. Text ist auch hier nie
     // entschuldigt.
     const eigenerPlatzhalter = (s) =>
-      s.art !== 'text' && (s.art === 'maske' ? istRahmenMaske(s, rahmen) : imRahmen(s, rahmen));
+      s.art === 'maske' ? istRahmenMaske(s, rahmen)
+      : s.art === 'text' ? imRahmen(s, rahmen, true)
+      : imRahmen(s, rahmen);
 
     for (const s of istSchritte) {
       if (s.art === 'gruppe') continue;
@@ -304,6 +363,12 @@ for (const name of WELCHE) {
         if (s.art !== 'text' && imRahmen(s, rahmen)) {
           platzhalter++;
           platzhalterArten.set(s.art, (platzhalterArten.get(s.art) || 0) + 1);
+          continue;
+        }
+        if (s.art === 'text' && imRahmen(s, rahmen, true)) {
+          platzhalter++;
+          platzhalterArten.set('Beschriftung einer Zeichnung',
+            (platzhalterArten.get('Beschriftung einer Zeichnung') || 0) + 1);
           continue;
         }
         fehler++;

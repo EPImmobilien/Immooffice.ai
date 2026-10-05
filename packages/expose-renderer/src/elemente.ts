@@ -725,11 +725,12 @@ const bild: Zeichner = (el, u) => {
   const maske: PfadSchritt[] = radius
     ? [["roundRect", el.x, el.y, el.b, el.h, radius]]
     : [["rect", el.x, el.y, el.b, el.h]];
+  const zweck = `bild:${slot?.art ?? "?"}`;
   if (quelle !== undefined) {
     u.blatt.gruppe(maske, [1, 0, 0, 1, 0, 0], (b) => {
       b.bild(el.x, el.y, el.b, el.h, quelle,
              (zeichenkette(el, "fuellmodus") as "cover" | "contain") ?? "cover");
-    });
+    }, zweck);
   } else {
     warne(u, "fehlendes_bild", el,
           `Kein Bild fuer ${slot?.art ?? "diesen Slot"} — Platzhalter gesetzt.`);
@@ -737,7 +738,7 @@ const bild: Zeichner = (el, u) => {
       ?? farbe({ palette: "surf" }, u.palette);
     u.blatt.gruppe(maske, [1, 0, 0, 1, 0, 0], (b) => {
       b.rect(el.x, el.y, el.b, el.h, fuell, null, radius);
-    });
+    }, zweck);
   }
 
   const label = inhalt(el, u, false, "label");
@@ -771,6 +772,36 @@ function bildSchluessel(slot: { art?: string; nr?: number } | undefined): string
     default: return undefined;
   }
 }
+
+// -------------------------------------------------------------------- karte
+
+/**
+ * Der Lageplan. Technisch ein Bildslot — das Bild erzeugt der vorhandene
+ * Lageplan-Generator des Forks, mit dem Ausschnitt, den der Nutzer auf der
+ * Objektseite gewaehlt hat.
+ *
+ * Der Quellenhinweis gehoert zum Element und nicht in ein eigenes
+ * Textfeld: er ist bei OpenStreetMap-Karten Pflicht, und ein Hinweis, den
+ * man versehentlich loeschen kann, ist keiner.
+ */
+const karte: Zeichner = (el, u) => {
+  const rahmen: Element = {
+    ...el,
+    slot: (el["slot"] as unknown) ?? { art: "lageplan" },
+    fuellmodus: zeichenkette(el, "fuellmodus") ?? "cover",
+  } as Element;
+  bild(rahmen, u);
+
+  const hinweis = inhalt(el, u, false, "quellenhinweis");
+  if (hinweis !== undefined && zeichenkette(el, "stil_quelle")) {
+    const s = u.stil(zeichenkette(el, "stil_quelle")!);
+    u.blatt.gruppe([["rect", el.x, el.y, el.b, el.h]], [1, 0, 0, 1, 0, 0], (b) => {
+      b.T(ankerX(el, s.ausrichtung) - zahl(el, "quelle_x", 10),
+          el.y + zahl(el, "quelle_y", 8), hinweis, s.schnitt, s.groesse,
+          s.farbe, s.sperrung, ankerArt(s.ausrichtung));
+    }, "bild:lageplan");
+  }
+};
 
 // ------------------------------------------------------------------ galerie
 
@@ -853,5 +884,5 @@ const qr: Zeichner = (el, u) => {
 
 export const ELEMENTE: Partial<Record<ElementTyp, Zeichner>> = {
   text, form, datenfeld, kennzahl, faktentabelle, raumliste, distanzen,
-  highlights, ausstattung, bild, galerie, qr,
+  highlights, ausstattung, bild, galerie, karte, qr,
 };

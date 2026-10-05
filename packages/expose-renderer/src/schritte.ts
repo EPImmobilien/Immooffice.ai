@@ -49,7 +49,7 @@ export type Schritt =
       fuell: RGBA | null; strich: RGBA | null; matrix: Matrix }
   | { art: "pfad"; schritte: PfadSchritt[]; fuell: RGBA | null;
       strich: RGBA | null; linienbreite: number | null; matrix: Matrix }
-  | { art: "maske"; schritte: PfadSchritt[]; matrix: Matrix }
+  | { art: "maske"; schritte: PfadSchritt[]; matrix: Matrix; zweck?: string }
   | { art: "verlauf"; x0: number; y0: number; x1: number; y1: number;
       farben: RGBA[]; stellen: number[] | null; matrix: Matrix }
   | { art: "radialverlauf"; x: number; y: number; r: number; farben: RGBA[];
@@ -59,6 +59,15 @@ export type Schritt =
   | { art: "qr"; x: number; y: number; b: number; h: number; inhalt: string;
       farbe: RGBA | null; matrix: Matrix }
   | { art: "gruppe"; maske: PfadSchritt[] | null; matrix: Matrix;
+      /**
+       * Wozu die Gruppe da ist, z. B. "bild:grundriss". Der Renderer
+       * braucht es nicht; der Vergleich mit den Prototypen schon. Ein
+       * gezeichneter Grundriss-Platzhalter traegt dort Raumnamen, ein
+       * hochgeladener Grundriss bringt seine eigenen mit — der Vergleich
+       * muss wissen, dass dieser Rahmen eine Zeichnung ersetzt und nicht
+       * nur ein Foto.
+       */
+      zweck?: string;
       schritte: Schritt[] };
 
 export type Seitenbild = {
@@ -81,7 +90,9 @@ export function flach(schritte: Schritt[], eltern: Matrix = EINHEIT): Schritt[] 
   for (const s of schritte) {
     const m = malMatrix(s.matrix, eltern);
     if (s.art === "gruppe") {
-      if (s.maske) raus.push({ art: "maske", schritte: s.maske, matrix: m });
+      if (s.maske) {
+        raus.push({ art: "maske", schritte: s.maske, matrix: m, zweck: s.zweck });
+      }
       raus.push(...flach(s.schritte, m));
     } else {
       raus.push({ ...s, matrix: m } as Schritt);

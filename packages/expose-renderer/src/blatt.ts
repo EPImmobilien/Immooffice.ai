@@ -160,7 +160,7 @@ export class Blatt {
    * sehen kann, und darum wird er hier ausdruecklich geklammert.
    */
   gruppe(maske: PfadSchritt[] | null, matrix: Matrix,
-         inhalt: (b: Blatt) => void): void {
+         inhalt: (b: Blatt) => void, zweck?: string): void {
     const innen = new Blatt(this.breite, this.hoehe, this.schriften);
     inhalt(innen);
     for (const [schnitt, zeichen] of innen.fehlend) {
@@ -169,7 +169,7 @@ export class Blatt {
       this.fehlend.set(schnitt, bisher);
     }
     this.schritte.push({
-      art: "gruppe", maske, matrix, schritte: innen.schritte,
+      art: "gruppe", maske, matrix, zweck, schritte: innen.schritte,
     });
   }
 
