@@ -284,6 +284,16 @@ else
   fehler=1
 fi
 
+abschnitt "Expose-Vorlagen: wird daraus ein PDF?"
+# Die Schrittliste ist noch kein Dokument. Hier wird jede Vorlage
+# geschrieben, zurueckgelesen und nachgesehen, ob Seiten und Schriften
+# darin sind. Ohne reference/ uebersprungen.
+if node tests/expose-pdf.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Oberflaeche: Rauchtest"
 if python3 tests/oberflaeche-rauchtest.py; then
   :
