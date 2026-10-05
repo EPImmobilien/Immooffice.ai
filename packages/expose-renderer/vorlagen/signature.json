@@ -610,6 +610,16 @@
         "groesse": 11,
         "farbe": "onD",
         "ausrichtung": "rechts"
+      },
+      "ebene_label": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 6,
+        "farbe": "a",
+        "sperrung": 2.6,
+        "grossbuchstaben": true
       }
     },
     "seitenfuss": {
@@ -1603,6 +1613,553 @@
           "stil_nummer": "gruppe_nummer",
           "stil_titel": "gruppe_titel",
           "stil_punkt": "gruppe_punkt"
+        }
+      ]
+    },
+    {
+      "id": "grundriss",
+      "typ": "grundriss",
+      "name": "Grundrisse",
+      "elemente": [
+        {
+          "id": "gr-grund",
+          "typ": "form",
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 841.89,
+          "form": "rechteck",
+          "fuell": "paper"
+        },
+        {
+          "id": "kapitel-label",
+          "typ": "text",
+          "x": 54,
+          "y": 743.6899999999999,
+          "b": 300,
+          "h": 6.2,
+          "stil": "kapitel_label",
+          "inhalt": "VI  ·  Grundrisse",
+          "einzeilig": true
+        },
+        {
+          "id": "kapitel-titel",
+          "typ": "text",
+          "x": 54,
+          "y": 675.89,
+          "b": 400,
+          "h": 34,
+          "stil": "kapitel_titel",
+          "inhalt": "Raum, der sich",
+          "einzeilig": true
+        },
+        {
+          "id": "kapitel-titel-2",
+          "typ": "text",
+          "x": 54,
+          "y": 639.89,
+          "b": 400,
+          "h": 34,
+          "stil": "kapitel_titel_kursiv",
+          "inhalt": "entfaltet.",
+          "einzeilig": true
+        },
+        {
+          "id": "gr-ebene",
+          "typ": "text",
+          "x": 54,
+          "y": 641.89,
+          "b": 300,
+          "h": 6,
+          "stil": "ebene_label",
+          "inhalt": "Erdgeschoss",
+          "einzeilig": true
+        },
+        {
+          "id": "gr-plan",
+          "typ": "bild",
+          "x": 74,
+          "y": 333.89,
+          "b": 447.28,
+          "h": 290,
+          "slot": {
+            "art": "grundriss",
+            "nr": 1
+          },
+          "fuellmodus": "contain",
+          "platzhalter_farbe": "paper2"
+        },
+        {
+          "id": "gr-eg-titel",
+          "typ": "text",
+          "x": 54,
+          "y": 281.69,
+          "b": 223.64,
+          "h": 6.2,
+          "stil": "tab_titel",
+          "inhalt": "Erdgeschoss",
+          "einzeilig": true
+        },
+        {
+          "id": "gr-eg-linie",
+          "typ": "form",
+          "x": 54,
+          "y": 277.89,
+          "b": 223.64,
+          "h": 0,
+          "form": "linie",
+          "strich": "ink",
+          "linienbreite": 0.6
+        },
+        {
+          "id": "gr-eg",
+          "typ": "raumliste",
+          "x": 54,
+          "y": 173.89,
+          "b": 223.64,
+          "h": 84,
+          "ebene": "eg",
+          "darstellung": "fuehrungspunkte",
+          "zeilenhoehe": 21,
+          "punkt_luft": 8,
+          "punkt_hoch": 2,
+          "linien_farbe": "hair",
+          "linienbreite": 0.6,
+          "mit_summe": true,
+          "summe_versatz": 4,
+          "summe_label": "Gesamt",
+          "stil_name": "raum_name",
+          "stil_flaeche": "raum_wert",
+          "stil_summe": "raum_summe",
+          "stil_summe_wert": "raum_summe_wert"
+        },
+        {
+          "id": "gr-og-titel",
+          "typ": "text",
+          "x": 317.64,
+          "y": 281.69,
+          "b": 223.64,
+          "h": 6.2,
+          "stil": "tab_titel",
+          "inhalt": "Obergeschoss",
+          "einzeilig": true
+        },
+        {
+          "id": "gr-og-linie",
+          "typ": "form",
+          "x": 317.64,
+          "y": 277.89,
+          "b": 223.64,
+          "h": 0,
+          "form": "linie",
+          "strich": "ink",
+          "linienbreite": 0.6
+        },
+        {
+          "id": "gr-og",
+          "typ": "raumliste",
+          "x": 317.64,
+          "y": 173.89,
+          "b": 223.64,
+          "h": 84,
+          "ebene": "og",
+          "darstellung": "fuehrungspunkte",
+          "zeilenhoehe": 21,
+          "punkt_luft": 8,
+          "punkt_hoch": 2,
+          "linien_farbe": "hair",
+          "linienbreite": 0.6,
+          "mit_summe": true,
+          "summe_versatz": 4,
+          "summe_label": "Gesamt",
+          "stil_name": "raum_name",
+          "stil_flaeche": "raum_wert",
+          "stil_summe": "raum_summe",
+          "stil_summe_wert": "raum_summe_wert"
+        },
+        {
+          "id": "gr-hinweis",
+          "typ": "text",
+          "x": 54,
+          "y": 43,
+          "b": 487.28,
+          "h": 9,
+          "stil": "hinweis_kursiv",
+          "inhalt": "Grundrisse nicht maßstabsgetreu. Flächen ca.-Angaben, berechnet nach WoFlV.",
+          "einzeilig": true
+        }
+      ]
+    },
+    {
+      "id": "lage",
+      "typ": "lage",
+      "name": "Lage",
+      "elemente": [
+        {
+          "id": "lage-grund",
+          "typ": "form",
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 841.89,
+          "form": "rechteck",
+          "fuell": "paper"
+        },
+        {
+          "id": "karte",
+          "typ": "karte",
+          "x": 0,
+          "y": 481.89,
+          "b": 595.28,
+          "h": 360,
+          "platzhalter_farbe": "paper2",
+          "quellenhinweis": "© OpenStreetMap-Mitwirkende",
+          "stil_quelle": "karte_quelle",
+          "quelle_x": 18,
+          "quelle_y": 10
+        },
+        {
+          "id": "kapitel-label",
+          "typ": "text",
+          "x": 54,
+          "y": 425.69,
+          "b": 300,
+          "h": 6.2,
+          "stil": "kapitel_label",
+          "inhalt": "VII  ·  Lage",
+          "einzeilig": true
+        },
+        {
+          "id": "kapitel-titel",
+          "typ": "text",
+          "x": 54,
+          "y": 357.89,
+          "b": 400,
+          "h": 34,
+          "stil": "kapitel_titel",
+          "inhalt": "Uferhain –",
+          "einzeilig": true
+        },
+        {
+          "id": "kapitel-titel-2",
+          "typ": "text",
+          "x": 54,
+          "y": 321.89,
+          "b": 400,
+          "h": 34,
+          "stil": "kapitel_titel_kursiv",
+          "inhalt": "die stille Adresse.",
+          "einzeilig": true
+        },
+        {
+          "id": "lage-text",
+          "typ": "text",
+          "x": 54,
+          "y": 60,
+          "b": 233.64,
+          "h": 259.89,
+          "stil": "lage_text",
+          "inhalt": "{{objekt.beschreibung_lage}}",
+          "blocksatz": true,
+          "verdichten": false
+        },
+        {
+          "id": "dist-titel",
+          "typ": "text",
+          "x": 321.64,
+          "y": 425.69,
+          "b": 219.64,
+          "h": 6.2,
+          "stil": "tab_titel",
+          "inhalt": "Entfernungen",
+          "einzeilig": true
+        },
+        {
+          "id": "dist-linie",
+          "typ": "form",
+          "x": 321.64,
+          "y": 421.89,
+          "b": 219.64,
+          "h": 0,
+          "form": "linie",
+          "strich": "ink",
+          "linienbreite": 0.6
+        },
+        {
+          "id": "distanzen",
+          "typ": "distanzen",
+          "x": 321.64,
+          "y": 60,
+          "b": 219.64,
+          "h": 339.89,
+          "darstellung": "fuehrungspunkte",
+          "zeilenhoehe": 26,
+          "punkt_luft": 8,
+          "punkt_hoch": 2,
+          "linien_farbe": "hair",
+          "linienbreite": 0.6,
+          "stil_name": "dist_name",
+          "stil_wert": "dist_wert"
+        }
+      ]
+    },
+    {
+      "id": "details",
+      "typ": "energie",
+      "name": "Details & Energie",
+      "elemente": [
+        {
+          "id": "det-grund",
+          "typ": "form",
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 841.89,
+          "form": "rechteck",
+          "fuell": "paper"
+        },
+        {
+          "id": "kapitel-label",
+          "typ": "text",
+          "x": 54,
+          "y": 743.6899999999999,
+          "b": 300,
+          "h": 6.2,
+          "stil": "kapitel_label",
+          "inhalt": "VIII  ·  Details & Energie",
+          "einzeilig": true
+        },
+        {
+          "id": "kapitel-titel",
+          "typ": "text",
+          "x": 54,
+          "y": 675.89,
+          "b": 400,
+          "h": 34,
+          "stil": "kapitel_titel",
+          "inhalt": "Fakten mit",
+          "einzeilig": true
+        },
+        {
+          "id": "kapitel-titel-2",
+          "typ": "text",
+          "x": 54,
+          "y": 639.89,
+          "b": 400,
+          "h": 34,
+          "stil": "kapitel_titel_kursiv",
+          "inhalt": "Substanz.",
+          "einzeilig": true
+        },
+        {
+          "id": "details",
+          "typ": "faktentabelle",
+          "x": 54,
+          "y": 419.89,
+          "b": 487.28,
+          "h": 204,
+          "feld": "objekt.fakten",
+          "darstellung": "linie",
+          "spalten": 2,
+          "spaltenabstand": 40,
+          "fuellung": "zeilenweise",
+          "zeilenhoehe": 34,
+          "polster": 0,
+          "wert_tiefer": 1,
+          "linien_farbe": "hair",
+          "linienbreite": 0.4,
+          "linien_versatz": 13,
+          "stil_label": "det_label",
+          "stil_wert": "det_wert"
+        },
+        {
+          "id": "energie-feld",
+          "typ": "form",
+          "x": 54,
+          "y": 66,
+          "b": 487.28,
+          "h": 313.89,
+          "form": "rechteck",
+          "fuell": "d"
+        },
+        {
+          "id": "energie-label",
+          "typ": "text",
+          "x": 84,
+          "y": 339.69,
+          "b": 300,
+          "h": 6.2,
+          "stil": "energie_label_gross",
+          "inhalt": "Energieausweis",
+          "einzeilig": true
+        },
+        {
+          "id": "energie-wert",
+          "typ": "kennzahl",
+          "x": 84,
+          "y": 303.89,
+          "b": 400,
+          "h": 0,
+          "variante": "gitter",
+          "spalten": 1,
+          "zeilenhoehe": 0,
+          "einzug": 0,
+          "wert_versatz": 0,
+          "label_versatz": 0,
+          "einheit_abstand": 8,
+          "stil_wert": "energie_wert_gross",
+          "stil_einheit": "energie_einheit",
+          "stil_label": "energie_label_gross",
+          "eintraege": [
+            {
+              "feld": "objekt.energie_kennwert",
+              "format": "zahl",
+              "stellen": 1,
+              "einheit": "kWh/(m²a)"
+            }
+          ]
+        },
+        {
+          "id": "energie-skala",
+          "typ": "energieskala",
+          "x": 84,
+          "y": 263.89,
+          "b": 427.28,
+          "h": 3,
+          "darstellung": "linie",
+          "balken_hoehe": 3,
+          "luft": 1,
+          "klasse_abstand": 14,
+          "marke_farbe": "onD",
+          "marke_spitze": 2,
+          "marke_hoehe": 7,
+          "marke_breite": 4,
+          "stil_klasse": "skala_klasse",
+          "stil_klasse_erste": "skala_klasse_erste",
+          "stil_grenze": "skala_klasse",
+          "stil_fahne": "skala_klasse",
+          "klassen": [
+            {
+              "name": "A+",
+              "grenze": 30,
+              "farbe": {
+                "mix": [
+                  "a",
+                  "d",
+                  0.15
+                ]
+              }
+            },
+            {
+              "name": "A",
+              "grenze": 50,
+              "farbe": {
+                "mix": [
+                  "a",
+                  "d",
+                  0.23
+                ]
+              }
+            },
+            {
+              "name": "B",
+              "grenze": 75,
+              "farbe": {
+                "mix": [
+                  "a",
+                  "d",
+                  0.31
+                ]
+              }
+            },
+            {
+              "name": "C",
+              "grenze": 100,
+              "farbe": {
+                "mix": [
+                  "a",
+                  "d",
+                  0.39
+                ]
+              }
+            },
+            {
+              "name": "D",
+              "grenze": 130,
+              "farbe": {
+                "mix": [
+                  "a",
+                  "d",
+                  0.47
+                ]
+              }
+            },
+            {
+              "name": "E",
+              "grenze": 160,
+              "farbe": {
+                "mix": [
+                  "a",
+                  "d",
+                  0.55
+                ]
+              }
+            },
+            {
+              "name": "F",
+              "grenze": 200,
+              "farbe": {
+                "mix": [
+                  "a",
+                  "d",
+                  0.63
+                ]
+              }
+            },
+            {
+              "name": "G",
+              "grenze": 250,
+              "farbe": {
+                "mix": [
+                  "a",
+                  "d",
+                  0.71
+                ]
+              }
+            },
+            {
+              "name": "H",
+              "grenze": 300,
+              "farbe": {
+                "mix": [
+                  "a",
+                  "d",
+                  0.79
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "energie-liste",
+          "typ": "faktentabelle",
+          "x": 84,
+          "y": 133.89,
+          "b": 427.28,
+          "h": 84,
+          "feld": "objekt.energie_angaben",
+          "darstellung": "linie",
+          "spalten": 2,
+          "spaltenabstand": 30,
+          "fuellung": "zeilenweise",
+          "zeilenhoehe": 28,
+          "polster": 0,
+          "wert_tiefer": 1,
+          "linien_farbe": "dline",
+          "linienbreite": 0.4,
+          "linien_versatz": 10,
+          "stil_label": "en_label",
+          "stil_wert": "en_wert"
         }
       ]
     }

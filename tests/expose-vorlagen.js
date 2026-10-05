@@ -147,7 +147,13 @@ function schluessel(s) {
       return `${s.art}|${rund(s.b)}|${rund(s.h)}|${rund(s.r || 0)}|` +
              `${farbSchluessel(s.fuell)}|${farbSchluessel(s.strich)}`;
     case 'linie':
-      return `linie|${rund(s.x2 - s.x1)}|${rund(s.y2 - s.y1)}|${farbSchluessel(s.strich)}`;
+      // Die Laenge auf ein Zehntel genau. Eine Fuehrungspunktreihe endet
+      // dort, wo der gemessene Text aufhoert; in der letzten Stelle
+      // schlaegt dann die Rundung der Breitenrechnung durch. Ein
+      // Hundertstel Punkt ist keine Abweichung — der Auftrag erlaubt zwei
+      // ganze. Der ORT der Linie wird weiter voll verglichen.
+      return `linie|${Math.round((s.x2 - s.x1) * 10) / 10}|` +
+             `${Math.round((s.y2 - s.y1) * 10) / 10}|${farbSchluessel(s.strich)}`;
     case 'kreis':
       return `kreis|${rund(s.r)}|${farbSchluessel(s.fuell)}|${farbSchluessel(s.strich)}`;
     case 'ellipse':
