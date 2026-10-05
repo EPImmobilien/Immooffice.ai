@@ -1,0 +1,254 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://immooffice.ai/schema/expose-vorlage-1.json",
+  "title": "Exposé-Vorlage",
+  "description": "Eine Exposé-Vorlage des Baukastens. Alle Maße in Punkt, Ursprung unten links. Geprüft wird die Form; ob ein Platzhalter existiert und ein Textstil in der Vorlage steht, prüft packages/expose-renderer/src/pruefen.ts — das kann ein JSON-Schema nicht wissen.",
+  "type": "object",
+  "required": ["schema", "format", "stil", "seiten"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "beschreibung": { "type": "string" },
+    "basis": { "enum": ["raster", "signature", "studio", "leer"] },
+    "format": {
+      "type": "object",
+      "required": ["breite", "hoehe"],
+      "additionalProperties": false,
+      "properties": {
+        "breite": { "type": "number", "exclusiveMinimum": 0 },
+        "hoehe": { "type": "number", "exclusiveMinimum": 0 },
+        "ausrichtung": { "enum": ["hoch", "quer"] }
+      }
+    },
+    "stil": {
+      "type": "object",
+      "required": ["farben", "schriften", "textstile"],
+      "additionalProperties": false,
+      "properties": {
+        "farben": {
+          "type": "object",
+          "required": ["f1", "f2", "ableitung"],
+          "additionalProperties": false,
+          "properties": {
+            "f1": { "$ref": "#/$defs/farbRef" },
+            "f2": { "$ref": "#/$defs/farbRef" },
+            "ableitung": { "enum": ["raster", "signature", "studio"] }
+          }
+        },
+        "schriften": {
+          "type": "object",
+          "required": ["headline", "text", "label"],
+          "additionalProperties": false,
+          "properties": {
+            "headline": { "$ref": "#/$defs/schriftRef" },
+            "text": { "$ref": "#/$defs/schriftRef" },
+            "label": { "$ref": "#/$defs/schriftRef" }
+          }
+        },
+        "textstile": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "$ref": "#/$defs/textStil" }
+        },
+        "raster": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "spalten": { "type": "integer", "minimum": 1, "maximum": 24 },
+            "rand": { "type": "number", "minimum": 0 },
+            "abstand": { "type": "number", "minimum": 0 }
+          }
+        },
+        "seitenfuss": { "$ref": "#/$defs/gruppe" }
+      }
+    },
+    "seiten": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/seite" }
+    }
+  },
+  "$defs": {
+    "farbRef": {
+      "description": "Hexwert, Name aus der Palette, CI-Farbe oder eine Mischung.",
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        {
+          "type": "object",
+          "required": ["palette"],
+          "additionalProperties": false,
+          "properties": { "palette": { "type": "string", "minLength": 1 } }
+        },
+        {
+          "type": "object",
+          "required": ["mix"],
+          "additionalProperties": false,
+          "properties": {
+            "mix": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "prefixItems": [
+                { "$ref": "#/$defs/farbRef" },
+                { "$ref": "#/$defs/farbRef" },
+                { "type": "number", "minimum": 0, "maximum": 1 }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "schriftRef": {
+      "oneOf": [
+        { "const": "ci.font" },
+        {
+          "type": "object",
+          "required": ["familie", "schnitt"],
+          "additionalProperties": false,
+          "properties": {
+            "familie": { "enum": ["jakarta", "cormorant", "archivo"] },
+            "schnitt": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    },
+    "textStil": {
+      "type": "object",
+      "required": ["schrift", "groesse", "farbe"],
+      "additionalProperties": false,
+      "properties": {
+        "schrift": { "$ref": "#/$defs/schriftRef" },
+        "groesse": { "type": "number", "exclusiveMinimum": 0 },
+        "zeilen": { "type": "number", "exclusiveMinimum": 0 },
+        "farbe": { "$ref": "#/$defs/farbRef" },
+        "sperrung": { "type": "number" },
+        "grossbuchstaben": { "type": "boolean" },
+        "ausrichtung": { "enum": ["links", "mitte", "rechts", "block"] },
+        "min_groesse": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "bedingung": {
+      "oneOf": [
+        {
+          "type": "object", "required": ["feld", "gleich"], "additionalProperties": false,
+          "properties": { "feld": { "type": "string" },
+                          "gleich": { "type": ["string", "number", "boolean"] } }
+        },
+        {
+          "type": "object", "required": ["feld", "ungleich"], "additionalProperties": false,
+          "properties": { "feld": { "type": "string" },
+                          "ungleich": { "type": ["string", "number", "boolean"] } }
+        },
+        {
+          "type": "object", "required": ["feld", "groesser"], "additionalProperties": false,
+          "properties": { "feld": { "type": "string" }, "groesser": { "type": "number" } }
+        },
+        {
+          "type": "object", "required": ["vorhanden"], "additionalProperties": false,
+          "properties": { "vorhanden": { "type": "string" } }
+        },
+        {
+          "type": "object", "required": ["und"], "additionalProperties": false,
+          "properties": { "und": { "type": "array", "minItems": 1,
+                                   "items": { "$ref": "#/$defs/bedingung" } } }
+        },
+        {
+          "type": "object", "required": ["oder"], "additionalProperties": false,
+          "properties": { "oder": { "type": "array", "minItems": 1,
+                                    "items": { "$ref": "#/$defs/bedingung" } } }
+        },
+        {
+          "type": "object", "required": ["nicht"], "additionalProperties": false,
+          "properties": { "nicht": { "$ref": "#/$defs/bedingung" } }
+        }
+      ]
+    },
+    "fuellung": {
+      "oneOf": [
+        {
+          "type": "object", "required": ["art", "farbe"], "additionalProperties": false,
+          "properties": { "art": { "const": "farbe" }, "farbe": { "$ref": "#/$defs/farbRef" } }
+        },
+        {
+          "type": "object", "required": ["art", "slot"], "additionalProperties": false,
+          "properties": { "art": { "const": "bild" }, "slot": { "$ref": "#/$defs/bildSlot" },
+                          "fuellmodus": { "enum": ["cover", "contain"] } }
+        },
+        {
+          "type": "object", "required": ["art", "pfad"], "additionalProperties": false,
+          "properties": { "art": { "const": "asset" }, "pfad": { "type": "string" } }
+        },
+        {
+          "type": "object", "required": ["art", "von", "nach"], "additionalProperties": false,
+          "properties": { "art": { "const": "verlauf" },
+                          "von": { "$ref": "#/$defs/farbRef" },
+                          "nach": { "$ref": "#/$defs/farbRef" },
+                          "richtung": { "enum": ["oben", "unten"] } }
+        }
+      ]
+    },
+    "bildSlot": {
+      "type": "object",
+      "required": ["art"],
+      "properties": {
+        "art": { "enum": ["titelbild", "foto", "foto_kategorie", "grundriss",
+                          "lageplan", "ansprechpartner", "logo", "asset"] },
+        "nr": { "type": "integer", "minimum": 1 },
+        "kategorie": { "type": "string" },
+        "ton": { "enum": ["hell", "dunkel"] },
+        "pfad": { "type": "string" }
+      }
+    },
+    "element": {
+      "type": "object",
+      "required": ["id", "typ", "x", "y", "b", "h"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "typ": { "$ref": "#/$defs/elementTyp" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "b": { "type": "number", "exclusiveMinimum": 0 },
+        "h": { "type": "number", "minimum": 0 },
+        "drehung": { "enum": [0, 90, 270] },
+        "gesperrt": { "type": "boolean" },
+        "deckkraft": { "type": "number", "minimum": 0, "maximum": 1 },
+        "sichtbar_wenn": { "$ref": "#/$defs/bedingung" }
+      }
+    },
+    "elementTyp": {
+      "description": "Muss mit ELEMENTE in packages/expose-renderer/src/elemente.ts übereinstimmen; tests/expose-schema.js prüft das.",
+      "enum": ["text", "datenfeld", "kennzahl", "faktentabelle", "bild", "galerie",
+               "form", "highlights", "ausstattung", "distanzen", "energieskala",
+               "kostenrechnung", "rendite", "raumliste", "karte", "qr",
+               "kontaktkarte", "inhaltsverzeichnis", "rechtstext"]
+    },
+    "gruppe": {
+      "type": "object",
+      "required": ["elemente"],
+      "additionalProperties": false,
+      "properties": {
+        "elemente": { "type": "array", "items": { "$ref": "#/$defs/element" } }
+      }
+    },
+    "seite": {
+      "type": "object",
+      "required": ["id", "typ", "name", "elemente"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "typ": {
+          "enum": ["cover", "inhalt", "auf_einen_blick", "beschreibung", "ausstattung",
+                   "bildseite", "grundriss", "lage", "energie", "kosten",
+                   "kapitalanlage", "kontakt", "rechtliches", "leer"]
+        },
+        "name": { "type": "string", "minLength": 1 },
+        "hintergrund": { "$ref": "#/$defs/fuellung" },
+        "ohne_fuss": { "type": "boolean" },
+        "fliessend": { "type": "boolean" },
+        "sichtbar_wenn": { "$ref": "#/$defs/bedingung" },
+        "elemente": { "type": "array", "items": { "$ref": "#/$defs/element" } }
+      }
+    }
+  }
+}

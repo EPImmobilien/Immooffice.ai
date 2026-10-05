@@ -274,6 +274,33 @@ else
   fehler=1
 fi
 
+abschnitt "Expose-Vorlagen: Schema und Elementtypen"
+# Das Schema prueft die Form der Vorlagen, und Schema und Renderer
+# muessen dieselben Elementtypen fuehren.
+if node tests/expose-schema.js; then
+  :
+else
+  fehler=1
+fi
+
+abschnitt "Expose-Renderer: Seitenlogik"
+# Bedingungen, Wiederholungen, Abweichungen je Objekt, fehlende Werte,
+# Verdichtung. Das prueft kein Vergleich mit vollstaendigen Demodaten.
+if node tests/expose-seitenlogik.js; then
+  :
+else
+  fehler=1
+fi
+
+abschnitt "Expose-Renderer: Buendel entsprechen der Quelle"
+# Browser und Edge Function bekommen dasselbe Paket. Wer ein Buendel von
+# Hand anfasst, bekommt es hier gesagt.
+if node packages/expose-renderer/bauen.mjs --pruefen; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Expose-Vorlagen: zeichnet der Renderer wie die Prototypen?"
 # Schrittweiser Vergleich gegen die aufgezeichneten Prototypen: Ort auf
 # 2 pt, dazu Schnitt, Groesse, Sperrung und Farbe. Ohne reference/

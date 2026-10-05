@@ -60,21 +60,45 @@ export function rendern(a: Auftrag): Ergebnis {
   const texte = a.overrides?.texte ?? {};
   const bilder = a.overrides?.bilder ?? {};
 
-  // 2. Welche Seiten erscheinen
-  const sichtbar: Seite[] = [];
+  // 2. Welche Seiten erscheinen — und wie oft
+  //
+  // Eine Seite kann sich wiederholen: "je Grundriss eine Seite". Die
+  // Vervielfachung passiert HIER und nicht beim Zeichnen, weil die
+  // Seitenzahlen und das Inhaltsverzeichnis sonst die Wiederholungen
+  // nicht kennen wuerden.
+  const sichtbar: { seite: Seite; lauf?: { nummer: number; gesamt: number } }[] = [];
   for (const seite of vorlage.seiten) {
     if (aus.has(seite.id)) continue;
     if (!trifftZu(daten, seite.sichtbar_wenn)) continue;
-    sichtbar.push(seite);
+    const wdh = seite.wiederholen;
+    if (!wdh) { sichtbar.push({ seite }); continue; }
+    const quelle = daten[wdh.feld];
+    const anzahl = Array.isArray(quelle) ? quelle.length : 0;
+    if (anzahl === 0) {
+      warnungen.push({
+        art: "fehlender_wert", seite: seite.id,
+        text: `"${seite.name}" wiederholt sich je Eintrag in ${wdh.feld}, und ` +
+              `dort steht nichts — die Seite entfaellt.`,
+      });
+      continue;
+    }
+    const proSeite = Math.max(1, wdh.pro_seite ?? 1);
+    const seiten = Math.ceil(anzahl / proSeite);
+    for (let i = 0; i < seiten; i++) {
+      sichtbar.push({ seite, lauf: { nummer: i + 1, gesamt: seiten } });
+    }
   }
   const gesamt = sichtbar.length;
   // Das Inhaltsverzeichnis nennt nur, was wirklich im Dokument steht.
   // Darum erst hier, nach der Sichtbarkeitspruefung.
-  daten["dokument.seiten"] = sichtbar.map((s, i) => ({ nummer: i + 1, name: s.name }));
+  daten["dokument.seiten"] = sichtbar.map((s, i) => ({
+    nummer: i + 1,
+    name: s.lauf && s.lauf.gesamt > 1 ? `${s.seite.name} ${s.lauf.nummer}` : s.seite.name,
+  }));
 
   // 3. Zeichnen
   const seiten: Seitenbild[] = [];
-  sichtbar.forEach((seite, i) => {
+  sichtbar.forEach(({ seite, lauf }, i) => {
     const blatt = new Blatt(vorlage.format.breite, vorlage.format.hoehe, a.schriften);
     const u: Umgebung = {
       blatt, daten, palette, vorlage, warnungen,
@@ -88,6 +112,10 @@ export function rendern(a: Auftrag): Ergebnis {
     daten["seite.name"] = seite.name;
     daten["seite.nummer_zweistellig"] = String(i + 1).padStart(2, "0");
     daten["seite.gesamt_zweistellig"] = String(gesamt).padStart(2, "0");
+    // Bei einer wiederholten Seite sagt der Lauf, der wievielte Durchgang
+    // es ist. Elemente binden ihre Bildslots daran: {{lauf.nummer}}.
+    daten["lauf.nummer"] = lauf ? lauf.nummer : 1;
+    daten["lauf.gesamt"] = lauf ? lauf.gesamt : 1;
 
     if (seite.hintergrund) hintergrundZeichnen(u, seite);
 

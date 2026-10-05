@@ -117,6 +117,16 @@ export type Seite = {
   sichtbar_wenn?: Bedingung;
   /** Darf Folgeseiten erzeugen. Nur fuer Text-, Tabellen- und Galerieseiten. */
   fliessend?: boolean;
+  /**
+   * Die Seite wiederholt sich je Eintrag einer Liste — "je Grundriss
+   * eine Seite". Innerhalb der Seite sagt {{lauf.nummer}}, der wievielte
+   * Durchgang es ist; ein Bildslot bindet seine Nummer daran.
+   *
+   * Steht in der Liste nichts, entfaellt die Seite. Das ist der
+   * haeufigste Fall bei einem Objekt ohne Grundrisse, und er soll keine
+   * leere Seite erzeugen.
+   */
+  wiederholen?: { feld: string; pro_seite?: number };
   elemente: Element[];
 };
 

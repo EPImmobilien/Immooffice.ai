@@ -124,7 +124,9 @@ for (const datei of fs.readdirSync(SCHRIFTEN).filter((f) => f.endsWith('.ttf')))
 const { daten: datenFuer, uebernahmen } = require('./expose-vorlagen-daten.js');
 
 // --- Prototypen aufzeichnen ----------------------------------------------
-const WELCHE = fs.readdirSync(VORLAGEN).filter((f) => f.endsWith('.json'))
+// schema.json ist das Schema, keine Vorlage.
+const WELCHE = fs.readdirSync(VORLAGEN)
+  .filter((f) => f.endsWith('.json') && f !== 'schema.json')
   .map((f) => f.replace(/\.json$/, ''));
 if (!WELCHE.length) {
   console.log('  Noch keine Vorlage in packages/expose-renderer/vorlagen/.');

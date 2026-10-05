@@ -24,7 +24,8 @@ if (!fs.existsSync(REF)) {
 
 const PDFLib = require('pdf-lib');
 
-const namen = fs.readdirSync(VORLAGEN).filter((f) => f.endsWith('.json'))
+const namen = fs.readdirSync(VORLAGEN)
+  .filter((f) => f.endsWith('.json') && f !== 'schema.json')
   .map((f) => f.replace(/\.json$/, ''));
 if (!namen.length) {
   console.log('  Noch keine Vorlage — nichts zu schreiben.');

@@ -140,7 +140,11 @@ export function liste(daten: Daten, schluessel: string): unknown[] {
 
 // ----------------------------------------------------------- Platzhalter
 
-const PLATZHALTER = /\{\{\s*([A-Za-z0-9_.]+)\s*\}\}/g;
+// Das Fragezeichen gehoert in die Zeichenklasse: ohne es trifft das
+// Muster {{objekt.etage?}} gar nicht, und der freiwillige Platzhalter
+// bliebe als Text im PDF stehen. tests/expose-seitenlogik.js hat genau
+// das gefunden.
+const PLATZHALTER = /\{\{\s*([A-Za-z0-9_.]+\??)\s*\}\}/g;
 
 /**
  * Ersetzt `{{objekt.wohnflaeche}}` und Verwandte.
