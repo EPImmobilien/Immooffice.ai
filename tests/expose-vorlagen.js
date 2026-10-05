@@ -291,6 +291,7 @@ let fehler = 0;
 let geprueft = 0;
 let platzhalter = 0;
 let groessteAbweichung = 0;
+let doppelt = 0;
 // Werden je Vorlage gesetzt; schluessel() liest sie.
 let unvollstaendig = false;
 let vorlageName = '';
@@ -344,8 +345,18 @@ for (const name of WELCHE) {
     // Schritte der Titelseite ungeprueft, und der Test waere gruen, ohne
     // etwas zu wissen.
     const offen = new Map();
+    const gesehen = new Set();
     for (const s of sollSchritte) {
       const k = schluessel(s);
+      // Zeichnet der Prototyp zweimal genau dasselbe an genau dieselbe
+      // Stelle, ist der zweite Strich unsichtbar. Das kommt vor (die
+      // Trennlinie unter der Kennzahlentafel von Signature steht in der
+      // Schleife UND dahinter), und eine Vorlage, die ein Element doppelt
+      // fuehrt, damit ein Test gruen wird, waere schlechter als der Test.
+      const [ox, oy] = ort(s);
+      const marke = `${k}@${rund(ox)},${rund(oy)}`;
+      if (gesehen.has(marke)) { doppelt++; continue; }
+      gesehen.add(marke);
       if (!offen.has(k)) offen.set(k, []);
       offen.get(k).push(s);
     }
@@ -467,6 +478,10 @@ if (fehler) {
 console.log(`  [ok] ${geprueft} Zeichenschritte stimmen mit den Prototypen ueberein`);
 console.log(`       (Schnitt, Groesse, Sperrung, Farbe; groesste Abweichung beim Ort:`);
 console.log(`       ${groessteAbweichung.toFixed(3)} pt, erlaubt sind ${TOLERANZ}).`);
+if (doppelt) {
+  console.log(`       ${doppelt} Schritte zeichnen die Prototypen doppelt an dieselbe`);
+  console.log(`       Stelle — unsichtbar, und darum nicht gefordert.`);
+}
 console.log(`       ${platzhalter} Schritte sind Platzhaltergrafik in Bildrahmen —`);
 console.log(`       laut Auftrag nur Platzhalter, im Produkt stehen dort Fotos:`);
 console.log(`       ${[...platzhalterArten].map(([a, n]) => `${n}x ${a}`).join(', ')}.`);

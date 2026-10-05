@@ -1,0 +1,886 @@
+{
+  "schema": 1,
+  "name": "Signature",
+  "beschreibung": "Magazin-Stil, Papierton, Cormorant Garamond. Für Luxusobjekte.",
+  "basis": "signature",
+  "format": {
+    "breite": 595.28,
+    "hoehe": 841.89,
+    "ausrichtung": "hoch"
+  },
+  "stil": {
+    "farben": {
+      "f1": "ci.primaer",
+      "f2": "ci.akzent",
+      "ableitung": "signature"
+    },
+    "schriften": {
+      "headline": {
+        "familie": "cormorant",
+        "schnitt": "Light"
+      },
+      "text": {
+        "familie": "jakarta",
+        "schnitt": "Light"
+      },
+      "label": {
+        "familie": "jakarta",
+        "schnitt": "Medium"
+      }
+    },
+    "raster": {
+      "spalten": 12,
+      "rand": 54,
+      "abstand": 10
+    },
+    "textstile": {
+      "marke": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Medium"
+        },
+        "groesse": 15,
+        "farbe": "onD",
+        "sperrung": 5,
+        "ausrichtung": "mitte"
+      },
+      "marke_linie": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Regular"
+        },
+        "groesse": 5.2,
+        "farbe": "a",
+        "sperrung": 3.2,
+        "grossbuchstaben": true,
+        "ausrichtung": "mitte"
+      },
+      "cover_oberzeile": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 6.4,
+        "farbe": "a",
+        "sperrung": 3.2,
+        "grossbuchstaben": true,
+        "ausrichtung": "mitte"
+      },
+      "cover_titel": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Light"
+        },
+        "groesse": 52,
+        "farbe": "onD",
+        "sperrung": -0.5,
+        "ausrichtung": "mitte"
+      },
+      "cover_titel_kursiv": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "LightItalic"
+        },
+        "groesse": 52,
+        "farbe": "onD",
+        "sperrung": -0.5,
+        "ausrichtung": "mitte"
+      },
+      "cover_unter": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "RegularItalic"
+        },
+        "groesse": 13,
+        "farbe": "onDm",
+        "ausrichtung": "mitte"
+      },
+      "cover_fuss": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 5.8,
+        "farbe": "onD",
+        "sperrung": 2.4,
+        "grossbuchstaben": true,
+        "ausrichtung": "mitte"
+      },
+      "kapitel_label": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 6.2,
+        "farbe": "a",
+        "sperrung": 2.8,
+        "grossbuchstaben": true
+      },
+      "kapitel_label_mitte": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 6.2,
+        "farbe": "a",
+        "sperrung": 2.8,
+        "grossbuchstaben": true,
+        "ausrichtung": "mitte"
+      },
+      "kapitel_titel": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Light"
+        },
+        "groesse": 34,
+        "farbe": "ink",
+        "sperrung": -0.3
+      },
+      "kapitel_titel_kursiv": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "LightItalic"
+        },
+        "groesse": 34,
+        "farbe": "ink",
+        "sperrung": -0.3
+      },
+      "kapitel_titel_hell": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Light"
+        },
+        "groesse": 34,
+        "farbe": "onD",
+        "sperrung": -0.3
+      },
+      "kapitel_titel_hell_kursiv": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "LightItalic"
+        },
+        "groesse": 34,
+        "farbe": "onD",
+        "sperrung": -0.3
+      },
+      "zitat_gross": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "LightItalic"
+        },
+        "groesse": 25,
+        "farbe": "ink",
+        "ausrichtung": "mitte",
+        "zeilen": 30
+      },
+      "initiale": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Light"
+        },
+        "groesse": 56,
+        "farbe": "a"
+      },
+      "fliesstext": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Light"
+        },
+        "groesse": 9.2,
+        "farbe": "text",
+        "zeilen": 16
+      },
+      "fliesstext_eng": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Light"
+        },
+        "groesse": 8.9,
+        "farbe": "text",
+        "zeilen": 15.2
+      },
+      "bild_label": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 5.2,
+        "farbe": "onD",
+        "sperrung": 1.8,
+        "grossbuchstaben": true
+      },
+      "fuss_marke": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 5.2,
+        "farbe": "muted",
+        "sperrung": 2.2,
+        "grossbuchstaben": true
+      },
+      "fuss_marke_hell": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 5.2,
+        "farbe": "onDm",
+        "sperrung": 2.2,
+        "grossbuchstaben": true
+      },
+      "fuss_seite": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Regular"
+        },
+        "groesse": 10,
+        "farbe": "a",
+        "sperrung": 1,
+        "ausrichtung": "mitte"
+      },
+      "fuss_objekt": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 5.2,
+        "farbe": "muted",
+        "sperrung": 2.2,
+        "grossbuchstaben": true,
+        "ausrichtung": "rechts"
+      },
+      "fuss_objekt_hell": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 5.2,
+        "farbe": "onDm",
+        "sperrung": 2.2,
+        "grossbuchstaben": true,
+        "ausrichtung": "rechts"
+      },
+      "zitat_klein": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "LightItalic"
+        },
+        "groesse": 17,
+        "farbe": "ink"
+      },
+      "stat_wert": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Light"
+        },
+        "groesse": 50,
+        "farbe": "onD",
+        "sperrung": -1
+      },
+      "stat_einheit": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "LightItalic"
+        },
+        "groesse": 20,
+        "farbe": "a"
+      },
+      "stat_label": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 5.8,
+        "farbe": "onDm",
+        "sperrung": 2.4,
+        "grossbuchstaben": true
+      },
+      "preis_label": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 6.2,
+        "farbe": "a",
+        "sperrung": 2.8,
+        "grossbuchstaben": true
+      },
+      "preis_wert": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Light"
+        },
+        "groesse": 44,
+        "farbe": "onD",
+        "sperrung": -0.5
+      },
+      "preis_zusatz": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "RegularItalic"
+        },
+        "groesse": 12,
+        "farbe": "onDm"
+      },
+      "fakt_label": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 5.6,
+        "farbe": "onDm",
+        "sperrung": 2.2,
+        "grossbuchstaben": true
+      },
+      "fakt_wert": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Regular"
+        },
+        "groesse": 12,
+        "farbe": "onD",
+        "ausrichtung": "rechts"
+      }
+    },
+    "seitenfuss": {
+      "elemente": [
+        {
+          "id": "fuss-marke",
+          "typ": "text",
+          "gesperrt": true,
+          "x": 54,
+          "y": 24.8,
+          "b": 250,
+          "h": 5.2,
+          "stil": "fuss_marke",
+          "inhalt": "{{firma.marken_name}}  ·  {{firma.linie}}",
+          "einzeilig": true
+        },
+        {
+          "id": "fuss-seite",
+          "typ": "text",
+          "gesperrt": true,
+          "x": 197.64,
+          "y": 19,
+          "b": 200,
+          "h": 10,
+          "stil": "fuss_seite",
+          "inhalt": "{{seite.nummer_zweistellig}}",
+          "einzeilig": true
+        },
+        {
+          "id": "fuss-objekt",
+          "typ": "text",
+          "gesperrt": true,
+          "x": 291.28,
+          "y": 24.8,
+          "b": 250,
+          "h": 5.2,
+          "stil": "fuss_objekt",
+          "inhalt": "{{objekt.objekttitel}}",
+          "einzeilig": true
+        }
+      ]
+    }
+  },
+  "seiten": [
+    {
+      "id": "cover",
+      "typ": "cover",
+      "name": "Titelseite",
+      "ohne_fuss": true,
+      "elemente": [
+        {
+          "id": "cover-bild",
+          "typ": "bild",
+          "gesperrt": true,
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 841.89,
+          "slot": {
+            "art": "titelbild"
+          },
+          "fuellmodus": "cover",
+          "platzhalter_farbe": "paper2"
+        },
+        {
+          "id": "cover-scrim-unten",
+          "typ": "form",
+          "gesperrt": true,
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 521.9718,
+          "form": "scrim",
+          "farbe": "d",
+          "staerke": 1.6,
+          "stufen": 60,
+          "richtung": "oben"
+        },
+        {
+          "id": "cover-scrim-oben",
+          "typ": "form",
+          "gesperrt": true,
+          "x": 0,
+          "y": 673.512,
+          "b": 595.28,
+          "h": 168.378,
+          "form": "scrim",
+          "farbe": "d",
+          "staerke": 0.5,
+          "stufen": 30,
+          "richtung": "unten"
+        },
+        {
+          "id": "cover-rahmen",
+          "typ": "form",
+          "x": 18,
+          "y": 18,
+          "b": 559.28,
+          "h": 805.89,
+          "form": "rechteck",
+          "strich": "a",
+          "deckkraft": 0.9,
+          "linienbreite": 0.5
+        },
+        {
+          "id": "cover-marke",
+          "typ": "text",
+          "x": 197.64,
+          "y": 759.89,
+          "b": 200,
+          "h": 10,
+          "stil": "marke",
+          "inhalt": "{{firma.marken_name}}",
+          "einzeilig": true
+        },
+        {
+          "id": "cover-marke-linie",
+          "typ": "form",
+          "x": 283.64,
+          "y": 761.89,
+          "b": 28,
+          "h": 0,
+          "form": "linie",
+          "strich": "a",
+          "linienbreite": 0.6
+        },
+        {
+          "id": "cover-marke-zusatz",
+          "typ": "text",
+          "x": 197.64,
+          "y": 745.69,
+          "b": 200,
+          "h": 5.2,
+          "stil": "marke_linie",
+          "inhalt": "{{firma.linie}}",
+          "einzeilig": true
+        },
+        {
+          "id": "cover-oberzeile",
+          "typ": "text",
+          "x": 197.64,
+          "y": 333.6,
+          "b": 200,
+          "h": 6.4,
+          "stil": "cover_oberzeile",
+          "inhalt": "Exposé  ·  {{objekt.objektart}}",
+          "einzeilig": true
+        },
+        {
+          "id": "cover-titel-1",
+          "typ": "text",
+          "x": 147.64,
+          "y": 236,
+          "b": 300,
+          "h": 52,
+          "stil": "cover_titel",
+          "inhalt": "{{objekt.titel_erste_zeile}}",
+          "einzeilig": true
+        },
+        {
+          "id": "cover-titel-2",
+          "typ": "text",
+          "x": 147.64,
+          "y": 190,
+          "b": 300,
+          "h": 52,
+          "stil": "cover_titel_kursiv",
+          "inhalt": "{{objekt.titel_zweite_zeile}}",
+          "einzeilig": true
+        },
+        {
+          "id": "cover-strich",
+          "typ": "form",
+          "x": 275.64,
+          "y": 216,
+          "b": 44,
+          "h": 0,
+          "form": "linie",
+          "strich": "a",
+          "linienbreite": 0.8
+        },
+        {
+          "id": "cover-unter",
+          "typ": "text",
+          "x": 147.64,
+          "y": 177,
+          "b": 300,
+          "h": 13,
+          "stil": "cover_unter",
+          "inhalt": "{{objekt.untertitel}}",
+          "einzeilig": true
+        },
+        {
+          "id": "cover-fuss",
+          "typ": "text",
+          "x": 147.64,
+          "y": 64.2,
+          "b": 300,
+          "h": 5.8,
+          "stil": "cover_fuss",
+          "inhalt": "{{objekt.ort}}   ·   {{objekt.wohnflaeche}} Wohnfläche   ·   {{objekt.grundstueck}} Grundstück",
+          "einzeilig": true
+        }
+      ]
+    },
+    {
+      "id": "prolog",
+      "typ": "inhalt",
+      "name": "Prolog",
+      "elemente": [
+        {
+          "id": "prolog-grund",
+          "typ": "form",
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 841.89,
+          "form": "rechteck",
+          "fuell": "paper"
+        },
+        {
+          "id": "prolog-label",
+          "typ": "text",
+          "x": 197.64,
+          "y": 743.69,
+          "b": 200,
+          "h": 6.2,
+          "stil": "kapitel_label_mitte",
+          "inhalt": "I  ·  Prolog",
+          "einzeilig": true
+        },
+        {
+          "id": "prolog-zitat",
+          "typ": "text",
+          "x": 77.64,
+          "y": 661.89,
+          "b": 440,
+          "h": 30,
+          "stil": "zitat_gross",
+          "inhalt": "„{{objekt.expose_zitat}}“",
+          "zeilenschritt": 30,
+          "verdichten": false,
+          "umbruch": "saetze",
+          "absatzabstand": 0
+        },
+        {
+          "id": "prolog-strich",
+          "typ": "form",
+          "x": 279.64,
+          "y": 635.89,
+          "b": 36,
+          "h": 0,
+          "form": "linie",
+          "strich": "a",
+          "linienbreite": 0.8
+        },
+        {
+          "id": "prolog-initiale",
+          "typ": "text",
+          "x": 115.64,
+          "y": 503.89,
+          "b": 40,
+          "h": 56,
+          "stil": "initiale",
+          "inhalt": "{{objekt.expose_prolog_initiale}}",
+          "einzeilig": true
+        },
+        {
+          "id": "prolog-text",
+          "typ": "text",
+          "x": 117.64,
+          "y": 440,
+          "b": 360,
+          "h": 149.89,
+          "stil": "fliesstext",
+          "inhalt": "{{objekt.expose_prolog_rest}}",
+          "blocksatz": true,
+          "verdichten": false,
+          "einzug": 40,
+          "einzug_zeilen": 3
+        },
+        {
+          "id": "prolog-bild",
+          "typ": "bild",
+          "x": 54,
+          "y": 66,
+          "b": 487.28,
+          "h": 360,
+          "slot": {
+            "art": "foto",
+            "nr": 1
+          },
+          "fuellmodus": "cover",
+          "platzhalter_farbe": "paper2",
+          "label": "Seeterrasse",
+          "stil_label": "bild_label",
+          "label_hintergrund": "d",
+          "label_deckkraft": 0.55,
+          "label_x": 12,
+          "label_y": 12,
+          "label_hoehe": 13,
+          "label_radius": 0,
+          "label_luft": 16,
+          "label_polster": 8,
+          "label_grundlinie": 4.6
+        }
+      ]
+    },
+    {
+      "id": "zahlen",
+      "typ": "auf_einen_blick",
+      "name": "Das Anwesen in Zahlen",
+      "ohne_fuss": true,
+      "elemente": [
+        {
+          "id": "zahlen-grund",
+          "typ": "form",
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 841.89,
+          "form": "rechteck",
+          "fuell": "d"
+        },
+        {
+          "id": "kapitel-label",
+          "typ": "text",
+          "x": 54,
+          "y": 743.6899999999999,
+          "b": 300,
+          "h": 6.2,
+          "stil": "kapitel_label",
+          "inhalt": "II  ·  Auf einen Blick",
+          "einzeilig": true
+        },
+        {
+          "id": "kapitel-titel",
+          "typ": "text",
+          "x": 54,
+          "y": 675.89,
+          "b": 400,
+          "h": 34,
+          "stil": "kapitel_titel_hell",
+          "inhalt": "Das Anwesen",
+          "einzeilig": true
+        },
+        {
+          "id": "kapitel-titel-2",
+          "typ": "text",
+          "x": 54,
+          "y": 639.89,
+          "b": 400,
+          "h": 34,
+          "stil": "kapitel_titel_hell_kursiv",
+          "inhalt": "in Zahlen",
+          "einzeilig": true
+        },
+        {
+          "id": "stat-linie-oben",
+          "typ": "form",
+          "x": 54,
+          "y": 621.89,
+          "b": 487.28,
+          "h": 0,
+          "form": "linie",
+          "strich": "dline",
+          "linienbreite": 0.5
+        },
+        {
+          "id": "stat-linie-unten",
+          "typ": "form",
+          "x": 54,
+          "y": 365.89,
+          "b": 487.28,
+          "h": 0,
+          "form": "linie",
+          "strich": "dline",
+          "linienbreite": 0.5
+        },
+        {
+          "id": "stats",
+          "typ": "kennzahl",
+          "x": 54,
+          "y": 355.89,
+          "b": 487.28,
+          "h": 256,
+          "variante": "gitter",
+          "spalten": 3,
+          "zeilenhoehe": 128,
+          "einzug": 18,
+          "wert_versatz": 62,
+          "label_versatz": 86,
+          "einheit_abstand": 4,
+          "trenner": "dline",
+          "trenner_oben": 10,
+          "trenner_unten": 28,
+          "trenner_breite": 0.5,
+          "stil_wert": "stat_wert",
+          "stil_einheit": "stat_einheit",
+          "stil_label": "stat_label",
+          "eintraege": [
+            {
+              "label": "Wohnfläche",
+              "feld": "objekt.wohnflaeche",
+              "format": "zahl",
+              "einheit": "m²"
+            },
+            {
+              "label": "Grundstück",
+              "feld": "objekt.grundstueck",
+              "format": "zahl",
+              "einheit": "m²"
+            },
+            {
+              "label": "Zimmer",
+              "feld": "objekt.zimmer",
+              "format": "zahl"
+            },
+            {
+              "label": "Bäder",
+              "feld": "objekt.badezimmer",
+              "format": "zahl"
+            },
+            {
+              "label": "Eigenes Seeufer",
+              "feld": "objekt.seeufer_meter",
+              "format": "zahl",
+              "einheit": "m"
+            },
+            {
+              "label": "Baujahr",
+              "feld": "objekt.baujahr",
+              "format": "jahr"
+            }
+          ]
+        },
+        {
+          "id": "preis-label",
+          "typ": "text",
+          "x": 54,
+          "y": 203.8,
+          "b": 300,
+          "h": 6.2,
+          "stil": "preis_label",
+          "inhalt": "Kaufpreis",
+          "einzeilig": true
+        },
+        {
+          "id": "preis-wert",
+          "typ": "text",
+          "x": 54,
+          "y": 118,
+          "b": 300,
+          "h": 44,
+          "stil": "preis_wert",
+          "inhalt": "{{objekt.preis}}",
+          "einzeilig": true
+        },
+        {
+          "id": "preis-zusatz",
+          "typ": "text",
+          "x": 54,
+          "y": 126,
+          "b": 400,
+          "h": 12,
+          "stil": "preis_zusatz",
+          "inhalt": "zzgl. Käuferprovision {{objekt.provision_aussen}}",
+          "einzeilig": true
+        },
+        {
+          "id": "kurzfakten",
+          "typ": "faktentabelle",
+          "x": 337.64,
+          "y": 132,
+          "b": 203.64,
+          "h": 104,
+          "darstellung": "fuehrungspunkte",
+          "zeilenhoehe": 26,
+          "polster": 0,
+          "grundlinie_versatz": 13,
+          "wert_tiefer": 1,
+          "punkt_luft": 8,
+          "punkt_hoch": 1,
+          "linien_farbe": "dline",
+          "linienbreite": 0.6,
+          "stil_label": "fakt_label",
+          "stil_wert": "fakt_wert",
+          "zeilen": [
+            {
+              "label": "Objekt-Nr.",
+              "feld": "objekt.immo_nr"
+            },
+            {
+              "label": "Objektart",
+              "wert": "Freistehende Villa"
+            },
+            {
+              "label": "Zustand",
+              "feld": "objekt.zustand"
+            },
+            {
+              "label": "Verfügbar",
+              "feld": "objekt.verfuegbar_ab"
+            }
+          ]
+        },
+        {
+          "id": "fuss-marke-hell",
+          "typ": "text",
+          "x": 54,
+          "y": 24.8,
+          "b": 250,
+          "h": 5.2,
+          "stil": "fuss_marke_hell",
+          "inhalt": "{{firma.marken_name}}  ·  {{firma.linie}}",
+          "einzeilig": true
+        },
+        {
+          "id": "fuss-seite-hell",
+          "typ": "text",
+          "x": 197.64,
+          "y": 19,
+          "b": 200,
+          "h": 10,
+          "stil": "fuss_seite",
+          "inhalt": "{{seite.nummer_zweistellig}}",
+          "einzeilig": true
+        },
+        {
+          "id": "fuss-objekt-hell",
+          "typ": "text",
+          "x": 291.28,
+          "y": 24.8,
+          "b": 250,
+          "h": 5.2,
+          "stil": "fuss_objekt_hell",
+          "inhalt": "{{objekt.objekttitel}}",
+          "einzeilig": true
+        }
+      ]
+    }
+  ]
+}

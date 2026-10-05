@@ -208,6 +208,84 @@ function studio(D) {
   };
 }
 
-const UEBERSETZER = { raster, studio };
+function signature(D) {
+  const ap = D.ap || {};
+  const kp = Number(D.kaufpreis);
+  const grest = kp * Number(D.grest) / 100;
+  const notar = kp * Number(D.notar) / 100;
+  const court = kp * Number(D.courtage) / 100;
+  const gesamt = kp + grest + notar + court;
+  const zahl = (v, n) => v.toFixed(n).replace('.', ',');
+  const paare = (liste) => (liste || []).map(([label, wert]) => ({ label, wert }));
+  return {
+    'firma.name': D.firma,
+    'firma.marken_name': D.marke,
+    'firma.linie': D.linie,
+    'firma.adresse': D.firma_adr,
+    'firma.telefon': D.firma_tel,
+    'firma.email': D.firma_mail,
+    'firma.web': D.firma_web,
+    'firma.impressum_zeile': D.hrb,
+
+    'objekt.immo_nr': D.objnr,
+    'objekt.objektart': D.objektart,
+    'objekt.vertragsart': 'Kauf',
+    'objekt.titel_erste_zeile': D.titel1,
+    'objekt.titel_zweite_zeile': D.titel2,
+    'objekt.objekttitel': D.titel1 + ' ' + D.titel2,
+    'objekt.untertitel': D.unter,
+    'objekt.adresse': D.adresse,
+    'objekt.plz_ort': D.ort,
+    'objekt.ort': D.ort,
+    'objekt.preis': D.preis,
+    'objekt.expose_preis_auf_anfrage': D.preis_auf_anfrage,
+    'objekt.provision_aussen': D.provision,
+    'objekt.wohnflaeche': rohzahl(D.wohnflaeche),
+    'objekt.grundstueck': rohzahl(D.grundstueck),
+    'objekt.zimmer': rohzahl(D.zimmer),
+    'objekt.badezimmer': rohzahl(D.baeder),
+    'objekt.baujahr': rohzahl(D.baujahr),
+    'objekt.seeufer_meter': rohzahl(D.ufer),
+    'objekt.zustand': 'neuwertig',
+    'objekt.verfuegbar_ab': 'nach Absprache',
+    'objekt.expose_zitat': D.prolog_quote,
+    'objekt.expose_prolog': D.prolog,
+    // Die Initiale ist der erste Buchstabe, der Rest der Text dahinter.
+    // Der Renderer setzt beides als zwei Elemente — nur so kann die
+    // Initiale ueber drei Zeilen stehen.
+    'objekt.expose_prolog_initiale': String(D.prolog || '').slice(0, 1),
+    'objekt.expose_prolog_rest': String(D.prolog || '').slice(1),
+    'objekt.beschreibung_objekt': D.beschreibung,
+    'objekt.beschreibung_lage': D.lage,
+    'objekt.expose_ausstattung_gruppen': (D.ausstattung || [])
+      .map(([titel, punkte]) => ({ titel, punkte })),
+    'objekt.lage_distanzen': (D.distanzen || []).map(([ziel, wert]) => ({ ziel, wert })),
+    'objekt.raumaufteilung': []
+      .concat((D.raeume_eg || []).map(([name, flaeche]) => ({ name, flaeche, ebene: 'eg' })))
+      .concat((D.raeume_og || []).map(([name, flaeche]) => ({ name, flaeche, ebene: 'og' }))),
+    'objekt.fakten': paare(D.details),
+    'objekt.energie_angaben': paare(D.energie),
+    'objekt.energie_kennwert': D.kennwert,
+    'objekt.angebotspreis': kp,
+    'objekt.expose_qr_url': 'https://' + String(D.firma_web || '') + '/expose/' + String(D.objnr || ''),
+
+    'rechnung.kaufpreis': kp,
+    'rechnung.grunderwerbsteuer': grest,
+    'rechnung.grunderwerbsteuer_satz': Number(D.grest),
+    'rechnung.notar': notar,
+    'rechnung.notar_satz': Number(D.notar),
+    'rechnung.courtage': court,
+    'rechnung.courtage_satz': zahl(Number(D.courtage), 2) + ' %',
+    'rechnung.gesamtaufwand': gesamt,
+
+    'ansprechpartner.name': ap.name,
+    'ansprechpartner.funktion': ap.rolle,
+    'ansprechpartner.telefon': ap.tel,
+    'ansprechpartner.mobil': ap.mobil,
+    'ansprechpartner.email': ap.mail,
+  };
+}
+
+const UEBERSETZER = { raster, studio, signature };
 
 module.exports = { daten: (vorlage, D) => UEBERSETZER[vorlage](D) };

@@ -127,11 +127,20 @@ const textOhneDrehung: Zeichner = (el, u) => {
     warne(u, "fehlender_wert", el, `Text entfaellt: "${zeichenkette(el, "inhalt") ?? ""}"`);
     return;
   }
+  // "saetze": an Satzgrenzen umbrechen statt an der Spaltenbreite. Das
+  // Zitat der Luxusvorlage steht so — zwei Saetze, zwei Zeilen, gleich
+  // gewichtet. Ein Umbruch nach Breite traefe die Stelle nur zufaellig.
+  const text = zeichenkette(el, "umbruch") === "saetze"
+    ? t.replace(/([.!?])\s+/g, "$1\n") : t;
   const spalten = Math.max(1, Math.min(3, zahl(el, "spalten", 1)));
   const abstand = zahl(el, "spaltenabstand", 24);
   const spaltenbreite = (el.b - abstand * (spalten - 1)) / spalten;
   const blocksatz = wahr(el, "blocksatz", s.ausrichtung === "block");
   const regeln = satzRegeln(u.vorlage.stil.farben.ableitung, blocksatz);
+  // Einzug der ersten Zeilen — fuer die Initiale, die bei Signature in
+  // den Absatz hineinragt.
+  regeln.einzug = zahl(el, "einzug", 0);
+  regeln.einzugZeilen = zahl(el, "einzug_zeilen", 0);
   const schritt = zahl(el, "zeilenschritt", s.zeilenhoehe);
   // Bei einem gedrehten Element ist der Rahmen auf (0,0) verschoben; die
   // Hoehe bleibt, damit die Grundlinie dieselbe Rechnung hat.
@@ -149,11 +158,11 @@ const textOhneDrehung: Zeichner = (el, u) => {
   const maxZeilen = zahl(el, "max_zeilen", 0);
   const hoeheFrei = el.h;
   const v = wahr(el, "verdichten", true)
-    ? verdichten(metrik(u, s.schnitt), t, spaltenbreite,
+    ? verdichten(metrik(u, s.schnitt), text, spaltenbreite,
                  hoeheFrei * spalten, s.groesse, s.minGroesse,
                  schritt / s.groesse, regeln)
     : { groesse: s.groesse, zeilenhoehe: schritt, passt: true,
-        zeilen: u.blatt.umbrechen(t, s.schnitt, s.groesse, spaltenbreite, regeln) };
+        zeilen: u.blatt.umbrechen(text, s.schnitt, s.groesse, spaltenbreite, regeln) };
 
   if (v.groesse < s.groesse - 1e-9) {
     warne(u, "verdichtet", el,
@@ -201,7 +210,9 @@ const textOhneDrehung: Zeichner = (el, u) => {
     let y = el.y + el.h;
     for (const schlitz of teil) {
       if (schlitz.zeile) {
-        setzeZeile(u, schlitz.zeile, x, y, spaltenbreite, s, v.groesse, regeln.blocksatz);
+        setzeZeile(u, schlitz.zeile, x + schlitz.zeile.einzug, y,
+                   spaltenbreite - schlitz.zeile.einzug, s, v.groesse,
+                   regeln.blocksatz);
       }
       y -= schlitz.luft;
     }
@@ -217,11 +228,17 @@ function metrik(u: Umgebung, schnitt: string) {
 
 function setzeZeile(u: Umgebung, zeile: { woerter: string[]; letzte: boolean },
                     x: number, y: number, breite: number,
-                    s: { schnitt: string; sperrung: number; farbe: RGBA },
+                    s: { schnitt: string; sperrung: number; farbe: RGBA;
+                         ausrichtung?: string },
                     groesse: number, blocksatz: boolean): void {
   const dehnen = blocksatz && !zeile.letzte && zeile.woerter.length > 1;
   if (!dehnen) {
-    u.blatt.T(x, y, zeile.woerter.join(" "), s.schnitt, groesse, s.farbe, s.sperrung);
+    // Auch ein umbrochener Text kann mittig oder rechtsbuendig stehen —
+    // das Zitat der Luxusvorlage steht zentriert ueber zwei Zeilen.
+    const aus = s.ausrichtung ?? "links";
+    const anker = aus === "mitte" ? x + breite / 2 : aus === "rechts" ? x + breite : x;
+    u.blatt.T(anker, y, zeile.woerter.join(" "), s.schnitt, groesse, s.farbe,
+              s.sperrung, ankerArt(aus));
     return;
   }
   const summe = zeile.woerter.reduce(
@@ -283,6 +300,23 @@ const form: Zeichner = (el, u) => {
       u.blatt.pfad(p, fuell, strich, lb);
       return;
     }
+    case "scrim": {
+      // Ein weicher Abdunkler ueber einem Foto, damit Text darauf lesbar
+      // bleibt. Der Prototyp legt dafuer Flaechen mit kleinem Alpha
+      // uebereinander statt einen Verlauf zu zeichnen — gestuft, aber ohne
+      // die Streifen, die ein grober Verlauf im Druck zeigt. Dieselbe
+      // Rechnung, damit die Vorschau dasselbe zeigt.
+      const stufen = Math.max(1, zahl(el, "stufen", 60));
+      const grund = (el["farbe"] as FarbRef | undefined) ?? "schwarz";
+      const staerke = Math.min(zahl(el, "staerke", 0.85), 1) / stufen * 1.6;
+      const abwaerts = zeichenkette(el, "richtung") === "unten";
+      for (let i = 0; i < stufen; i++) {
+        const hh = el.h * (1 - i / stufen);
+        u.blatt.rect(el.x, abwaerts ? el.y + el.h - hh : el.y, el.b, hh,
+                     farbe(grund, u.palette, staerke), null, 0);
+      }
+      return;
+    }
     case "pfad": {
       const punkte = (el["punkte"] as number[][] | undefined) ?? [];
       if (punkte.length < 2) {
@@ -334,7 +368,21 @@ const datenfeld: Zeichner = (el, u) => {
 
 // ------------------------------------------------------------------ kennzahl
 
-type KennzahlEintrag = { label?: string; wert?: string; einheit?: string };
+type KennzahlEintrag = {
+  label?: string;
+  /** Fester Text mit Platzhaltern. */
+  wert?: string;
+  /** Oder ein Feld — dann entscheidet `format`, wie es gesetzt wird. */
+  feld?: string;
+  /**
+   * Ueberschreibt den Typ des Katalogs. Eine Kennzahl zeigt die Flaeche
+   * als blosse Zahl ("386") und die Einheit daneben in eigener Schrift;
+   * der Katalog wuerde "386 m²" liefern und die Einheit staende zweimal.
+   */
+  format?: import("./felder").FeldTyp;
+  stellen?: number;
+  einheit?: string;
+};
 
 /**
  * Grosse Zahl, Einheit, Label — einmal oder als Leiste.
@@ -358,9 +406,14 @@ const kennzahl: Zeichner = (el, u) => {
           einheit: e.einheit ?? zeichenkette(el, "einheit"),
         }))
     : ((el["eintraege"] as KennzahlEintrag[] | undefined) ?? []);
+
   const gefuellt: { label?: string; wert: string; einheit?: string }[] = [];
   for (const e of eintraege) {
-    const w = e.wert === undefined ? undefined : ersetze(u.daten, e.wert);
+    const w = e.feld !== undefined
+      ? (e.format !== undefined
+          ? formatiere(u.daten[e.feld], e.format, e.stellen)
+          : wert(u.daten, e.feld))
+      : e.wert === undefined ? undefined : ersetze(u.daten, e.wert);
     if (w === undefined) {
       warne(u, "fehlender_wert", el, `Kennzahl "${e.label ?? ""}" entfaellt.`);
       continue;
@@ -561,8 +614,7 @@ const faktentabelle: Zeichner = (el, u) => {
   if (art === "gestapelt") {
     let y = el.y + el.h;
     for (const z of zeilen) {
-      u.blatt.T(el.x, y - zahl(el, "label_versatz", 0),
-                sLabel.grossbuchstaben ? z.label.toLocaleUpperCase("de-DE") : z.label,
+      u.blatt.T(el.x, y - zahl(el, "label_versatz", 0), gross(sLabel, z.label),
                 sLabel.schnitt, sLabel.groesse, sLabel.farbe, sLabel.sperrung);
       u.blatt.T(el.x, y - zahl(el, "wert_versatz", 14), z.wert, sWert.schnitt,
                 sWert.groesse, sWert.farbe, sWert.sperrung);
@@ -594,15 +646,29 @@ const faktentabelle: Zeichner = (el, u) => {
                    zahl(el, "eckradius", 0));
     }
     const grundlinie = spalten > 1 ? y : y - zeilenhoehe / 2 - versatz;
-    u.blatt.T(x + polster, grundlinie, z.label, sLabel.schnitt, sLabel.groesse,
-              sLabel.farbe, sLabel.sperrung);
-    u.blatt.T(x + sb - polster, grundlinie, z.wert, sWert.schnitt, sWert.groesse,
-              sWert.farbe, sWert.sperrung, "r");
+    u.blatt.T(x + polster, grundlinie, gross(sLabel, z.label), sLabel.schnitt,
+              sLabel.groesse, sLabel.farbe, sLabel.sperrung);
+    u.blatt.T(x + sb - polster, grundlinie - zahl(el, "wert_tiefer", 0), z.wert,
+              sWert.schnitt, sWert.groesse, sWert.farbe, sWert.sperrung, "r");
     if (linie && (art === "linie" || art === "punktlinie")) {
       const ly = spalten > 1 ? y - zahl(el, "linien_versatz", 9) : y - zeilenhoehe;
       u.blatt.linie(x, ly, x + sb, ly, linie,
                     zahl(el, "linienbreite", 0.5),
                     art === "punktlinie" ? [0.6, 2.6] : null);
+    } else if (linie && art === "fuehrungspunkte") {
+      // Die Punktreihe laeuft ZWISCHEN Beschriftung und Wert, nicht unter
+      // der Zeile. Sie muss deshalb beide Breiten kennen.
+      const lb = u.blatt.sw(gross(sLabel, z.label), sLabel.schnitt, sLabel.groesse,
+                            sLabel.sperrung);
+      const wb = u.blatt.sw(z.wert, sWert.schnitt, sWert.groesse, sWert.sperrung);
+      const luft = zahl(el, "punkt_luft", 8);
+      const von = x + polster + lb + luft;
+      const bis = x + sb - polster - wb - luft;
+      if (bis > von) {
+        u.blatt.linie(von, grundlinie + zahl(el, "punkt_hoch", 1), bis,
+                      grundlinie + zahl(el, "punkt_hoch", 1), linie,
+                      zahl(el, "linienbreite", 0.6), [0.6, 2.6]);
+      }
     }
   });
 };
