@@ -1194,16 +1194,21 @@ function kiKennzeichnen(el: Element, u: Umgebung, quelle: string): void {
   u.blatt.T(x + 7, y + 4, s, schnitt, groesse, [1, 1, 1, 1], sperrung);
 }
 
-function bildSchluessel(slot: { art?: string; nr?: number } | undefined): string | undefined {
+function bildSchluessel(slot: { art?: string; nr?: number; ton?: string;
+                                kategorie?: string } | undefined): string | undefined {
   if (!slot?.art) return undefined;
   switch (slot.art) {
     case "titelbild": return "objekt.hauptbild_url";
     case "foto": return `bild.foto.${slot.nr ?? 1}`;
+    case "foto_kategorie": return `bild.kategorie.${slot.kategorie ?? ""}.${slot.nr ?? 1}`;
     case "grundriss": return `bild.grundriss.${slot.nr ?? 1}`;
     case "lageplan": return "bild.lageplan";
     case "ansprechpartner": return "ansprechpartner.foto";
-    case "logo": return "firma.logo";
-    case "asset": return "bild.asset";
+    // Der Ton gehoert in den Schluessel: ein Logo auf dunklem Grund ist
+    // eine ANDERE Datei als dasselbe Logo auf hellem. Ohne die
+    // Unterscheidung stand auf der dunklen Kontaktseite ein dunkles Logo.
+    case "logo": return `firma.logo.${slot.ton === "dunkel" ? "dunkel" : "hell"}`;
+    case "asset": return `bild.asset.${(slot as { pfad?: string }).pfad ?? ""}`;
     default: return undefined;
   }
 }

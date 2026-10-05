@@ -74,6 +74,9 @@ export type Seitenbild = {
   breite: number;
   hoehe: number;
   schritte: Schritt[];
+  /** Kennung und Name der Seite in der Vorlage — fuer Editor und Protokoll. */
+  id?: string;
+  name?: string;
 };
 
 /**

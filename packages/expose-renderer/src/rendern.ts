@@ -140,6 +140,8 @@ export function rendern(a: Auftrag): Ergebnis {
       breite: vorlage.format.breite,
       hoehe: vorlage.format.hoehe,
       schritte: blatt.schritte,
+      id: seite.id,
+      name: u.seite.name,
     });
   });
 

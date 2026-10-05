@@ -342,6 +342,16 @@ else
   fehler=1
 fi
 
+abschnitt "Expose: laeuft die Edge Function durch?"
+# Die Syntaxpruefung sagt nur, dass die Datei lesbar ist. Hier laeuft der
+# Handler wirklich — mit nachgebautem Supabase, ohne Netz, ohne Deno: aus
+# einem Objekt entsteht ein PDF, mit allen drei Systemvorlagen.
+if node tests/expose-funktion.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Oberflaeche: Rauchtest"
 if python3 tests/oberflaeche-rauchtest.py; then
   :

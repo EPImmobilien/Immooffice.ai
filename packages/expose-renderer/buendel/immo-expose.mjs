@@ -2676,16 +2676,21 @@ function bildSchluessel(slot) {
       return "objekt.hauptbild_url";
     case "foto":
       return `bild.foto.${slot.nr ?? 1}`;
+    case "foto_kategorie":
+      return `bild.kategorie.${slot.kategorie ?? ""}.${slot.nr ?? 1}`;
     case "grundriss":
       return `bild.grundriss.${slot.nr ?? 1}`;
     case "lageplan":
       return "bild.lageplan";
     case "ansprechpartner":
       return "ansprechpartner.foto";
+    // Der Ton gehoert in den Schluessel: ein Logo auf dunklem Grund ist
+    // eine ANDERE Datei als dasselbe Logo auf hellem. Ohne die
+    // Unterscheidung stand auf der dunklen Kontaktseite ein dunkles Logo.
     case "logo":
-      return "firma.logo";
+      return `firma.logo.${slot.ton === "dunkel" ? "dunkel" : "hell"}`;
     case "asset":
-      return "bild.asset";
+      return `bild.asset.${slot.pfad ?? ""}`;
     default:
       return void 0;
   }
@@ -3504,8 +3509,16 @@ function pruefeElement(el, seite, v, stile, raus) {
     }
   }
   if (typeof el.x === "number" && typeof el.b === "number" && typeof el.y === "number" && typeof el.h === "number" && v.format) {
-    if (el.x < -0.01 || el.y < -0.01 || el.x + el.b > v.format.breite + 0.01 || el.y + el.h > v.format.hoehe + 0.01) {
-      melde("hinweis", `Der Rahmen (${el.x}, ${el.y}, ${el.b}, ${el.h}) reicht ueber die Seite hinaus.`);
+    const drehung = typeof el.drehung === "number" ? (el.drehung % 360 + 360) % 360 : 0;
+    const ecken = [[0, 0], [el.b, 0], [el.b, el.h], [0, el.h]];
+    const bogen = drehung * Math.PI / 180;
+    const sin = Math.round(Math.sin(bogen)), cos = Math.round(Math.cos(bogen));
+    const xs = ecken.map(([dx, dy]) => el.x + dx * cos - dy * sin);
+    const ys = ecken.map(([dx, dy]) => el.y + dx * sin + dy * cos);
+    const links = Math.min(...xs), rechts = Math.max(...xs);
+    const unten = Math.min(...ys), oben = Math.max(...ys);
+    if (links < -0.01 || unten < -0.01 || rechts > v.format.breite + 0.01 || oben > v.format.hoehe + 0.01) {
+      melde("hinweis", `Der Rahmen (${el.x}, ${el.y}, ${el.b}, ${el.h}${drehung ? ", " + drehung + "°" : ""}) reicht ueber die Seite hinaus.`);
     }
   }
 }
@@ -3615,7 +3628,9 @@ function rendern(a) {
     seiten.push({
       breite: vorlage.format.breite,
       hoehe: vorlage.format.hoehe,
-      schritte: blatt.schritte
+      schritte: blatt.schritte,
+      id: seite.id,
+      name: u.seite.name
     });
   });
   return { seiten, warnungen };
@@ -4222,6 +4237,53 @@ function aufbereiten(q) {
   for (const k of ["objekt.eckdaten", "objekt.fakten", "objekt.energie_angaben"]) {
     if (!d[k].length) delete d[k];
   }
+  d["objekt.expose_highlights"] = umbauen(immo["expose_highlights"], (e) => {
+    const titel2 = text2(e["titel"]) ?? text2(e["zeile1"]);
+    if (!titel2) return void 0;
+    return { titel: titel2, text: text2(e["text"]) ?? text2(e["zeile2"]) };
+  });
+  d["objekt.lage_distanzen"] = umbauen(immo["lage_distanzen"], (e) => {
+    const name = text2(e["ziel"]) ?? text2(e["name"]) ?? text2(e["label"]);
+    if (!name) return void 0;
+    const km = z(e["km"]) ?? kmAus(e["wert"]);
+    return { ziel: name, km, wert: km === void 0 ? text2(e["wert"]) : void 0 };
+  });
+  d["objekt.expose_wege"] = umbauen(immo["expose_wege"], (e) => {
+    const ziel = text2(e["ziel"]) ?? text2(e["name"]) ?? text2(e["label"]);
+    if (!ziel) return void 0;
+    return { ziel, fuss: z(e["fuss"]), rad: z(e["rad"]), auto: z(e["auto"]) };
+  });
+  d["objekt.raumaufteilung"] = umbauen(immo["raumaufteilung"], (e) => {
+    const name = text2(e["name"]) ?? text2(e["raum"]) ?? text2(e["bezeichnung"]);
+    const flaeche2 = z(e["flaeche"]) ?? z(e["groesse"]) ?? z(e["qm"]);
+    if (!name || flaeche2 === void 0) return void 0;
+    return { name, flaeche: flaeche2, ebene: text2(e["ebene"]) ?? text2(e["geschoss"]) };
+  });
+  d["objekt.laufende_kosten"] = umbauen(immo["laufende_kosten"], (e) => {
+    const name = text2(e["name"]) ?? text2(e["label"]) ?? text2(e["posten"]);
+    const betrag = z(e["betrag"]) ?? z(e["wert"]);
+    if (!name || betrag === void 0) return void 0;
+    return { name, betrag };
+  });
+  d["objekt.expose_ausstattung_gruppen"] = umbauen(
+    immo["expose_ausstattung_gruppen"],
+    (e) => {
+      const titel2 = text2(e["titel"]) ?? text2(e["name"]);
+      const punkte = Array.isArray(e["punkte"]) ? e["punkte"].map((p) => String(p).trim()).filter(Boolean) : [];
+      if (!titel2 || !punkte.length) return void 0;
+      return { titel: titel2, punkte };
+    }
+  );
+  for (const k of [
+    "objekt.expose_highlights",
+    "objekt.lage_distanzen",
+    "objekt.expose_wege",
+    "objekt.raumaufteilung",
+    "objekt.laufende_kosten",
+    "objekt.expose_ausstattung_gruppen"
+  ]) {
+    if (!d[k].length) delete d[k];
+  }
   const firmaAdresse = fuegen([
     text2(firma["strasse"]),
     fuegen([text2(firma["plz"]), text2(firma["ort"])], " ")
@@ -4243,11 +4305,34 @@ function aufbereiten(q) {
   if (q.bilder && !LEER(q.bilder["objekt.hauptbild_url"])) {
     d["objekt.hauptbild_url"] = q.bilder["objekt.hauptbild_url"];
   }
+  if (!d["objekt.expose_qr_url"]) {
+    const web = text2(firma["web"]);
+    if (web) d["objekt.expose_qr_url"] = /^https?:\/\//i.test(web) ? web : "https://" + web;
+  }
   const ki = (q.ki_bilder ?? []).filter((k) => !LEER(k));
   if (ki.length) d["objekt.ki_bilder"] = ki;
   const heute = q.heute ?? /* @__PURE__ */ new Date();
   d["datum"] = `${String(heute.getDate()).padStart(2, "0")}.${String(heute.getMonth() + 1).padStart(2, "0")}.${heute.getFullYear()}`;
   return d;
+}
+function umbauen(roh, je) {
+  if (!Array.isArray(roh)) return [];
+  const aus = [];
+  for (const e of roh) {
+    if (!e || typeof e !== "object") continue;
+    const neu = je(e);
+    if (neu !== void 0) aus.push(neu);
+  }
+  return aus;
+}
+function kmAus(v) {
+  const s = text2(v);
+  if (!s) return void 0;
+  const m = s.replace(",", ".").match(/-?\d+(\.\d+)?/);
+  if (!m) return void 0;
+  const n = Number(m[0]);
+  if (!Number.isFinite(n)) return void 0;
+  return /\bm\b/.test(s) && !/\bkm\b/.test(s) ? n / 1e3 : n;
 }
 function eckdaten(immo) {
   const aus = [];

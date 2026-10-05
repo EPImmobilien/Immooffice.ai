@@ -58,6 +58,16 @@ zeilen.immobilien.expose_preis_auf_anfrage = false;
 zeilen.immobilien.expose_titel_zeilen = ['Erste Zeile', 'Zweite Zeile'];
 zeilen.immobilien.laufende_kosten = [{ name: 'Grundsteuer', betrag: 38 },
                                      { name: 'Versicherung', betrag: 54 }];
+// Die Listenspalten tragen die Namen, die die Oberflaeche vor dem Baukasten
+// gewaehlt hat. Genau diese Schreibweisen muss der Aufbereiter uebersetzen.
+zeilen.immobilien.expose_highlights = [{ icon: 'haus', zeile1: 'Dachterrasse', zeile2: '32 m² nach Süden' }];
+zeilen.immobilien.lage_distanzen = [{ label: 'Bushaltestelle', wert: '0,3 km' },
+                                    { label: 'Zentrum', wert: '850 m' }];
+zeilen.immobilien.expose_wege = [{ ziel: 'Bahnhof', fuss: 12, rad: 5, auto: 3 }];
+zeilen.immobilien.raumaufteilung = [{ raum: 'Wohnen', groesse: 38.5, geschoss: 'eg' },
+                                    { name: 'Bad', flaeche: 9 },
+                                    { name: 'Flur ohne Mass' }];
+zeilen.immobilien.expose_ausstattung_gruppen = [{ titel: 'Küche', punkte: ['Insel', 'Naturstein'] }];
 
 const voll = R.aufbereiten({
   immobilie: zeilen.immobilien,
@@ -121,6 +131,28 @@ melde('firma.impressum_zeile fuehrt Register und USt-IdNr.',
       String(voll['firma.impressum_zeile']).includes('USt-IdNr.'));
 melde('datum kommt aus der hereingegebenen Uhr',
       voll['datum'] === '05.10.2026', String(voll['datum']));
+// Die Uebersetzung der Listen.
+melde('Highlights: zeile1/zeile2 werden Titel und Text',
+      voll['objekt.expose_highlights'][0].titel === 'Dachterrasse'
+      && voll['objekt.expose_highlights'][0].text === '32 m² nach Süden');
+melde('Entfernungen: label wird ziel, km wird eine Zahl',
+      voll['objekt.lage_distanzen'][0].ziel === 'Bushaltestelle'
+      && voll['objekt.lage_distanzen'][0].km === 0.3,
+      JSON.stringify(voll['objekt.lage_distanzen'][0]));
+melde('Entfernungen: "850 m" sind 0,85 km',
+      voll['objekt.lage_distanzen'][1].km === 0.85,
+      JSON.stringify(voll['objekt.lage_distanzen'][1]));
+melde('Raeume: raum/groesse/geschoss werden name/flaeche/ebene',
+      voll['objekt.raumaufteilung'][0].name === 'Wohnen'
+      && voll['objekt.raumaufteilung'][0].flaeche === 38.5
+      && voll['objekt.raumaufteilung'][0].ebene === 'eg');
+melde('Raum ohne Flaeche faellt heraus statt leer zu bleiben',
+      voll['objekt.raumaufteilung'].length === 2
+      && !voll['objekt.raumaufteilung'].some((r) => r.name === 'Flur ohne Mass'),
+      JSON.stringify(voll['objekt.raumaufteilung']));
+melde('Ausstattungsgruppen behalten Titel und Punkte',
+      voll['objekt.expose_ausstattung_gruppen'][0].punkte.length === 2);
+
 melde('Bilder stehen unter ihren Slot-Schluesseln',
       voll['bild.foto.1'] === 'f1.jpg' && voll['bild.lageplan'] === 'l.jpg');
 

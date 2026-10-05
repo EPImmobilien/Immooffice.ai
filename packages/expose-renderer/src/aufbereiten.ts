@@ -197,6 +197,59 @@ export function aufbereiten(q: Quellen): Daten {
     if (!(d[k] as unknown[]).length) delete d[k];
   }
 
+  // --- 4b. Die Listen aus der Datenbank auf die Namen bringen, die die
+  // Elemente lesen ----------------------------------------------------------
+  // Diese Spalten gibt es laenger als den Baukasten, und sie tragen die
+  // Namen, die die Oberflaeche vor ihm gewaehlt hat: ein Highlight heisst
+  // dort {icon, zeile1, zeile2}, eine Entfernung {label, wert}. Umbenennen
+  // in der Datenbank waere der falsche Weg — es gibt Objekte mit diesen
+  // Daten, und der Export der Vorlage schreibt sie weiter so. Also wird
+  // hier uebersetzt, an einer Stelle, mit den alten Namen daneben.
+  d["objekt.expose_highlights"] = umbauen(immo["expose_highlights"], (e) => {
+    const titel = text(e["titel"]) ?? text(e["zeile1"]);
+    if (!titel) return undefined;
+    return { titel, text: text(e["text"]) ?? text(e["zeile2"]) };
+  });
+  d["objekt.lage_distanzen"] = umbauen(immo["lage_distanzen"], (e) => {
+    const name = text(e["ziel"]) ?? text(e["name"]) ?? text(e["label"]);
+    if (!name) return undefined;
+    // km als Zahl, wenn es eine gibt: nur damit kann das Element Balken
+    // zeichnen. Aus "1,2 km" wird sie gelesen, aber nicht gerundet.
+    const km = z(e["km"]) ?? kmAus(e["wert"]);
+    return { ziel: name, km, wert: km === undefined ? text(e["wert"]) : undefined };
+  });
+  d["objekt.expose_wege"] = umbauen(immo["expose_wege"], (e) => {
+    const ziel = text(e["ziel"]) ?? text(e["name"]) ?? text(e["label"]);
+    if (!ziel) return undefined;
+    return { ziel, fuss: z(e["fuss"]), rad: z(e["rad"]), auto: z(e["auto"]) };
+  });
+  d["objekt.raumaufteilung"] = umbauen(immo["raumaufteilung"], (e) => {
+    const name = text(e["name"]) ?? text(e["raum"]) ?? text(e["bezeichnung"]);
+    const flaeche = z(e["flaeche"]) ?? z(e["groesse"]) ?? z(e["qm"]);
+    if (!name || flaeche === undefined) return undefined;
+    return { name, flaeche, ebene: text(e["ebene"]) ?? text(e["geschoss"]) };
+  });
+  d["objekt.laufende_kosten"] = umbauen(immo["laufende_kosten"], (e) => {
+    const name = text(e["name"]) ?? text(e["label"]) ?? text(e["posten"]);
+    const betrag = z(e["betrag"]) ?? z(e["wert"]);
+    if (!name || betrag === undefined) return undefined;
+    return { name, betrag };
+  });
+  d["objekt.expose_ausstattung_gruppen"] = umbauen(
+    immo["expose_ausstattung_gruppen"], (e) => {
+      const titel = text(e["titel"]) ?? text(e["name"]);
+      const punkte = Array.isArray(e["punkte"])
+        ? (e["punkte"] as unknown[]).map((p) => String(p).trim()).filter(Boolean)
+        : [];
+      if (!titel || !punkte.length) return undefined;
+      return { titel, punkte };
+    });
+  for (const k of ["objekt.expose_highlights", "objekt.lage_distanzen",
+                   "objekt.expose_wege", "objekt.raumaufteilung",
+                   "objekt.laufende_kosten", "objekt.expose_ausstattung_gruppen"]) {
+    if (!(d[k] as unknown[]).length) delete d[k];
+  }
+
   // --- 5. Firma -------------------------------------------------------------
   const firmaAdresse = fuegen([
     text(firma["strasse"]),
@@ -224,6 +277,14 @@ export function aufbereiten(q: Quellen): Daten {
     d["objekt.hauptbild_url"] = q.bilder["objekt.hauptbild_url"];
   }
 
+  // Der QR-Code zeigt auf das Web-Expose, wenn eines hinterlegt ist, sonst
+  // auf die Seite des Maklers. Ohne beides entfaellt er — ein QR-Code, der
+  // ins Leere fuehrt, ist schlimmer als keiner.
+  if (!d["objekt.expose_qr_url"]) {
+    const web = text(firma["web"]);
+    if (web) d["objekt.expose_qr_url"] = /^https?:\/\//i.test(web) ? web : "https://" + web;
+  }
+
   const ki = (q.ki_bilder ?? []).filter((k) => !LEER(k));
   if (ki.length) d["objekt.ki_bilder"] = ki;
 
@@ -231,6 +292,35 @@ export function aufbereiten(q: Quellen): Daten {
   d["datum"] = `${String(heute.getDate()).padStart(2, "0")}.`
     + `${String(heute.getMonth() + 1).padStart(2, "0")}.${heute.getFullYear()}`;
   return d;
+}
+
+// ------------------------------------------------------------------ Listen
+/**
+ * Eine jsonb-Liste Eintrag fuer Eintrag umbauen. Gibt die Abbildung
+ * `undefined` zurueck, faellt der Eintrag heraus — ein Raum ohne Flaeche
+ * ist keine Zeile mit leerer Flaeche, sondern keine Zeile.
+ */
+function umbauen<T>(roh: unknown,
+                    je: (e: Record<string, unknown>) => T | undefined): T[] {
+  if (!Array.isArray(roh)) return [];
+  const aus: T[] = [];
+  for (const e of roh) {
+    if (!e || typeof e !== "object") continue;
+    const neu = je(e as Record<string, unknown>);
+    if (neu !== undefined) aus.push(neu);
+  }
+  return aus;
+}
+
+/** "1,2 km" -> 1.2, "850 m" -> 0.85. Ohne Einheit: unveraendert. */
+function kmAus(v: unknown): number | undefined {
+  const s = text(v);
+  if (!s) return undefined;
+  const m = s.replace(",", ".").match(/-?\d+(\.\d+)?/);
+  if (!m) return undefined;
+  const n = Number(m[0]);
+  if (!Number.isFinite(n)) return undefined;
+  return /\bm\b/.test(s) && !/\bkm\b/.test(s) ? n / 1000 : n;
 }
 
 // ---------------------------------------------------------------- Eckdaten

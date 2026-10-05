@@ -142,13 +142,27 @@ function pruefeElement(el: Element, seite: string | undefined, v: Vorlage,
 
   // Rahmen, der ueber die Seite hinausgeht: manchmal gewollt, nie
   // selbstverstaendlich.
+  //
+  // Bei einem gedrehten Element wird der GEDREHTE Rahmen geprueft. Ohne das
+  // meldete jedes Seitenband einen Befund: das Band am rechten Rand ist
+  // 200 Punkt lang und steht bei x = 569 — waagerecht gelesen ragt es weit
+  // hinaus, gedreht laeuft es die Seite hinauf. Ein Hinweis, der bei jeder
+  // Vorlage erscheint, wird nicht gelesen.
   if (typeof el.x === "number" && typeof el.b === "number" &&
       typeof el.y === "number" && typeof el.h === "number" && v.format) {
-    if (el.x < -0.01 || el.y < -0.01 ||
-        el.x + el.b > v.format.breite + 0.01 ||
-        el.y + el.h > v.format.hoehe + 0.01) {
-      melde("hinweis", `Der Rahmen (${el.x}, ${el.y}, ${el.b}, ${el.h}) reicht ` +
-        `ueber die Seite hinaus.`);
+    const drehung = typeof el.drehung === "number" ? ((el.drehung % 360) + 360) % 360 : 0;
+    // Gedreht wird um den linken unteren Punkt des Rahmens.
+    const ecken: [number, number][] = [[0, 0], [el.b, 0], [el.b, el.h], [0, el.h]];
+    const bogen = drehung * Math.PI / 180;
+    const sin = Math.round(Math.sin(bogen)), cos = Math.round(Math.cos(bogen));
+    const xs = ecken.map(([dx, dy]) => el.x + dx * cos - dy * sin);
+    const ys = ecken.map(([dx, dy]) => el.y + dx * sin + dy * cos);
+    const links = Math.min(...xs), rechts = Math.max(...xs);
+    const unten = Math.min(...ys), oben = Math.max(...ys);
+    if (links < -0.01 || unten < -0.01 ||
+        rechts > v.format.breite + 0.01 || oben > v.format.hoehe + 0.01) {
+      melde("hinweis", `Der Rahmen (${el.x}, ${el.y}, ${el.b}, ${el.h}` +
+        `${drehung ? ", " + drehung + "°" : ""}) reicht ueber die Seite hinaus.`);
     }
   }
 }

@@ -204,6 +204,14 @@ for _f in ('credentials-anzeigen', 'mitarbeiter-loeschen',
     ERWEITERT[_f] = ('Prueft Kennungen aus dem Anfragekoerper gegen den '
                      'Mandanten des Aufrufers (Phase 2)')
 
+# Diese eine traegt mehr als eine Erweiterung: ihr Zeichenteil ist ersetzt.
+ERWEITERT['expose-pdf-erzeugen'] = (
+    'Zeichnet nicht mehr selbst. Statt siebenhundert Zeilen Querformat laedt '
+    'sie die Vorlage aus expose_vorlagen und ruft packages/expose-renderer — '
+    'dasselbe Paket, mit dem der Editor die Vorschau zeichnet (Etappe 2 des '
+    'Exposé-Baukastens, 05.10.2026). Datenbeschaffung, Storage-Huelle und '
+    'Mandantengrenze wie zuvor.')
+
 # Dateien, die der Fork einer uebernommenen Funktion BEILEGT. Sie haben
 # keine Entsprechung in der Vorlage und sind trotzdem kein Befund — sie sind
 # Erzeugnis, und wer sie erzeugt, steht dabei.
