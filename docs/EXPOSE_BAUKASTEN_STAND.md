@@ -7,7 +7,7 @@
 | Etappe | Stand |
 |---|---|
 | 1 — Renderer, Schema, drei Start-Vorlagen | **fertig** |
-| 2 — Edge Function und Datenbank auf den Renderer umstellen | offen |
+| 2 — Edge Function und Datenbank auf den Renderer umstellen | **fertig** |
 | 3 — Editor Basis | offen |
 | 4 — Editor Komfort | offen |
 | 5 — Objektmodus mit Abweichungen | Renderer-Seite fertig, Oberfläche offen |
@@ -87,7 +87,10 @@ Prototypen nicht versioniert sind.
 | `tests/expose-seitenlogik.js` | Bedingungen, Wiederholungen, Abweichungen, fehlende Werte, Verdichtung |
 | `tests/expose-vorlagen.js` | der Schritt-für-Schritt-Vergleich mit den Prototypen |
 | `tests/expose-pdf.js` | aus jeder Vorlage entsteht ein PDF mit Seiten und eingebetteten Schriften |
-| `packages/expose-renderer/bauen.mjs --pruefen` | die Bündel entsprechen der Quelle |
+| `packages/expose-renderer/bauen.mjs --pruefen` | die Bündel entsprechen der Quelle, auch die Kopie im Ordner der Edge Function |
+| `tests/expose-aufbereiten.js` | aus vollständigen Datenbankzeilen kommt jeder der 169 Platzhalter an, aus leeren keiner |
+| `scripts/expose-systemvorlagen.py --pruefen` | die Migration spielt genau die drei JSON-Vorlagen ein |
+| `tests/expose-funktion.js` | der Handler der Edge Function läuft wirklich durch — ohne Deno, ohne Netz, mit nachgebautem Supabase |
 
 ## Was aus den Prototypen zurückgerechnet werden musste
 
@@ -116,6 +119,56 @@ wäre für jedes andere Objekt genau das.
 |---|---|
 | `fork_35` | `immobilien.ortsteil`, `immobilien.modernisierung_jahr`, `profiles.mobil` |
 | `fork_36` | `immobilien.expose_energie_hinweis`, `immobilien.laufende_kosten` |
+| `fork_39` | `firma_stammdaten.marken_linie` (zweite Markenzeile der Luxusvorlage) |
+
+Eine Angabe hat **keine** Quelle und bekommt auch keine: `objekt.seeufer_meter`,
+die Besonderheit „eigenes Seeufer, 80 m" aus den Demodaten der Luxusvorlage.
+Eine Spalte dafür hieße, sie für jedes andere Objekt leer mitzuschleppen. Die
+Kennzahl entfällt, bis der Editor eigene Kennzahlen am Objekt erlaubt
+(Etappe 5). `tests/expose-aufbereiten.js` führt sie mit diesem Grund.
+
+## Was Etappe 2 gebracht hat
+
+**Eine Vorlage ist ab jetzt ein Dokument in der Datenbank.** `fork_37` legt
+`expose_vorlagen` an, `fork_38` spielt die drei Systemvorlagen ein — erzeugt
+von `scripts/expose-systemvorlagen.py` aus den JSON-Dateien, damit es nicht
+zwei Fassungen derselben Vorlage gibt.
+
+Systemvorlagen tragen `mandant_id = null`: für alle lesbar, über RLS für
+niemanden schreibbar, auch nicht für einen Chef. Das Recht
+`expose_vorlagen_bearbeiten` steht in der Sperrliste von `hat_recht()` — wer
+die Hausvorlage ändert, ändert sie für jedes künftige Exposé des Hauses.
+
+**Die Edge Function zeichnet nicht mehr selbst.** Statt siebenhundert Zeilen
+Querformat lädt `expose-pdf-erzeugen` die Vorlage, sammelt Daten, Bilder und
+Schriften und ruft `packages/expose-renderer`. Die Vorlage wird in drei
+Stufen gesucht: die des Objekts, sonst die Standardvorlage des Mandanten,
+sonst die Systemvorlage, die der Standort nennt. Eine Vorlage eines fremden
+Mandanten gilt nicht, auch wenn sie am Objekt steht.
+
+**Die Übersetzung zwischen Datenbank und Renderer steht im Paket**
+(`aufbereiten.ts`, `rechnen.ts`), nicht in der Edge Function: der Editor
+braucht sie genauso, und zwei Übersetzungen wären zwei Exposés. Die
+Spaltenwerte kopiert sie aus dem Feldkatalog, nicht von Hand — eine neue
+Spalte kann damit nicht im Katalog stehen und in der Übersetzung fehlen.
+
+**KI-bearbeitete Bilder tragen im PDF das Schild „MIT KI BEARBEITET".**
+Welche Bilder das sind, sagen die Daten, nicht die Vorlage: eine
+Pflichtkennzeichnung, die der Vorlagenautor ansprechen und damit abschalten
+kann, ist keine.
+
+**Die Schriften gehen über die Auslieferung.** `scripts/bauen.py` legt sie
+nach `dist/schriften/expose/`; von dort holt die Edge Function eine fehlende
+Schrift einmal nach und legt sie im Eimer ab (dafür braucht sie `PORTAL_URL`).
+Von der Google-Quelle kann sie nicht kommen — die Schnitte sind
+zurückgerechnete, verkleinerte Instanzen.
+
+Dass es wirklich läuft, prüft `tests/expose-funktion.js`: der echte Handler,
+ohne Deno und ohne Netz, mit nachgebautem Supabase. Aus einem vollständigen
+Objekt entstehen zehn Seiten und 123 KB, aus einem mageren weniger, und alle
+drei Systemvorlagen kommen durch. Gefunden hat der Test gleich einen Fehler:
+die Rahmenprüfung meldete jedes gedrehte Seitenband als „reicht über die
+Seite hinaus".
 
 ## Bewusst nicht in Version 1
 
@@ -145,13 +198,18 @@ Dazu, aus der Umsetzung:
 
 ## Was als Nächstes kommt
 
-Etappe 2: `expose-pdf-erzeugen` lädt Vorlage, Abweichungen, Daten, Bilder
-und Schriften und ruft den Renderer; Migration `expose_baukasten` mit
-`expose_vorlagen`, `expose_vorlagen_versionen`, `immobilien.expose_vorlage_id`,
-`immobilien.expose_overrides`, Bucket `expose-assets` und dem Recht
-`expose_vorlagen_bearbeiten`.
+Etappe 3, der Editor: Vorlagenliste mit Vorschaubildern, Kopieren, Seiten
+und Elemente verschieben und ändern, Live-Vorschau mit demselben Renderer,
+Speichern mit Fassung.
 
-Die Rechenwerte (`rechnung.*`) kommen dabei aus **einer** Stelle: die
-bestehende Edge Function rechnet Grunderwerbsteuer, Notarkosten, Courtage,
-Gesamtaufwand, Monatsrate und Rendite schon, und der Renderer bekommt sie
-fertig herein. Zwei Rechenwege für denselben Betrag wären zwei Beträge.
+Offen und nicht vergessen:
+
+- **Ausgerollt ist noch nichts.** `fork_37`, `fork_38` und `fork_39` liegen
+  auf `usguiggfciavwzkdfjgt`, die Edge Function und die Oberfläche müssen
+  noch über die beiden GitHub-Workflows hinaus. Vor dem ersten Exposé im
+  Betrieb muss `PORTAL_URL` in der Supabase-Umgebung stehen, sonst findet
+  die Funktion die Schriften nicht.
+- **Die Bildunterschriften** der Fotos (`immobilie_datei.titel`) stehen noch
+  nicht im Exposé. Die Vorlagen führen die Beschriftung als Text am
+  Bildelement; sie gehört ans Bild, und das heißt: als Abweichung am
+  Objekt, die der Editor schreibt (Etappe 5).
