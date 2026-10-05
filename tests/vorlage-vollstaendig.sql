@@ -230,7 +230,9 @@ zuwachs(bereich, mehr, grund) as (values
                                  'Ablage je Projekt; der geratene Gesamtscan-Index entfaellt'),
   ('Richtlinien', 5, 'fork_33a: aufmass_projekt lesen, anlegen, aendern, loeschen, mandant_trennung'),
   ('Funktionen', 2, 'fork_33a: aufmass_scan_aktualisiert(), aufmass_projekt_aktualisiert()'),
-  ('Trigger', 2, 'fork_33a: dieselben zwei als Trigger')
+  ('Trigger', 2, 'fork_33a: dieselben zwei als Trigger'),
+  ('Spalten', 9, 'fork_34: drei an firma_stammdaten (expose_vorlage, _farben, _rechtsanhang) und sechs an immobilien (expose_vorlage, _zitat, _titel_zeilen, _ausstattung_gruppen, _preis_auf_anfrage, _wege)'),
+  ('Pruefbedingungen', 2, 'fork_34: expose_vorlage auf raster/signature/studio, je Tabelle eine')
 ),
 soll(bereich, soll) as (
   select v.bereich,
