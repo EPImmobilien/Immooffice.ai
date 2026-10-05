@@ -8,7 +8,7 @@
 |---|---|
 | 1 — Renderer, Schema, drei Start-Vorlagen | **fertig** |
 | 2 — Edge Function und Datenbank auf den Renderer umstellen | **fertig** |
-| 3 — Editor Basis | offen |
+| 3 — Editor Basis | Liste, Kopie und Vorschau fertig; Element-Editor offen |
 | 4 — Editor Komfort | offen |
 | 5 — Objektmodus mit Abweichungen | Renderer-Seite fertig, Oberfläche offen |
 | 6 — E2E-Tests, Neutralitäts-Gate, dieser Bericht | Gates stehen, Playwright offen |
@@ -196,11 +196,37 @@ Dazu, aus der Umsetzung:
   mit ihm. Er steht in keinem Referenz-PDF, seine Breitenachse ist also
   nicht messbar. Geraten wird nichts.
 
+## Was Etappe 3 bisher gebracht hat
+
+**Einen Ort für eigene Oberfläche.** `src/eigene/` wird von
+`scripts/oberflaeche-zerlegen.py` nicht angefasst — wie `src/seiten/` — und
+von `scripts/bauen.py` als eigener `<script>`-Block in `dist/index.html`
+eingesetzt, zusammen mit dem Renderer-Bündel. Eingebettet und nicht als
+zweite Datei: Anwendung und Renderer können so nicht in verschiedenen
+Fassungen im Zwischenspeicher eines Browsers liegen, und die Auslieferung
+bleibt die eine `index.html`, die der Auftrag verlangt.
+
+**Den Bereich „Exposé-Vorlagen".** Systemvorlagen und eigene in einer Liste,
+Kopie anlegen, umbenennen, Standard setzen, archivieren. Die Vorschau zeichnet
+**derselbe Renderer**, den die Edge Function benutzt — damit können Vorschau
+und Ergebnis nicht auseinanderlaufen. Die Werte sind Beispiele und heißen auch
+so; die Marke des Mandanten wird übernommen, damit man seine Farben sieht.
+
+Angemeldet ist der Bereich über vier Regeln in `oberflaeche-zerlegen.py`:
+Ansichtentafel, Kachel, Rechteprüfung (`expose_vorlagen_bearbeiten`) und
+fontkit in den Bibliotheken.
+
+`tests/expose-editor.js` führt die Ansicht wirklich aus: gegen ein winziges
+React, aber mit echtem Bündel, echtem pdf-lib und den ausgelieferten
+Schriften. Aus der Hausvorlage entsteht ein PDF mit zehn Seiten.
+
+Noch nicht da: Seiten und Elemente verschieben, Eigenschaftenleiste,
+Rückgängig, Vorschaubilder in der Liste, Fassungen zurückholen.
+
 ## Was als Nächstes kommt
 
-Etappe 3, der Editor: Vorlagenliste mit Vorschaubildern, Kopieren, Seiten
-und Elemente verschieben und ändern, Live-Vorschau mit demselben Renderer,
-Speichern mit Fassung.
+Der Element-Editor: Seiten und Elemente auswählen, verschieben und ändern,
+Eigenschaftenleiste, Speichern mit Fassung in `expose_vorlagen_versionen`.
 
 Offen und nicht vergessen:
 
