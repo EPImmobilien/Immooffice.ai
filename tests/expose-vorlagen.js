@@ -107,7 +107,7 @@ for (const datei of fs.readdirSync(SCHRIFTEN).filter((f) => f.endsWith('.ttf')))
   schriften.set(name, metrikLesen(new Uint8Array(fs.readFileSync(path.join(SCHRIFTEN, datei))), name));
 }
 
-const { daten: datenFuer } = require('./expose-vorlagen-daten.js');
+const { daten: datenFuer, uebernahmen } = require('./expose-vorlagen-daten.js');
 
 // --- Prototypen aufzeichnen ----------------------------------------------
 const WELCHE = fs.readdirSync(VORLAGEN).filter((f) => f.endsWith('.json'))
@@ -317,6 +317,12 @@ for (const name of WELCHE) {
     // heisst bei jedem anders: Raster p/a, Signature d/a, Studio s/d.
     // Genau diese zwei gibt der Test als Branding des Mandanten herein.
     marke: marke(name, soll.farben),
+    // Texte, die je Objekt geschrieben werden, kommen ueber die
+    // Abweichungen — genau den Weg, den der Editor im Objektmodus
+    // benutzt. In der Vorlage steht dafuer ein neutraler Vorschlag: eine
+    // Systemvorlage darf nicht behaupten, jedes Objekt habe sechs Meter
+    // Raumhoehe.
+    overrides: uebernahmen(name),
   });
 
   const schlimm = ergebnis.warnungen.filter((w) => w.art === 'unbekannt');

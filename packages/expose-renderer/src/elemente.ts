@@ -707,7 +707,20 @@ const raumliste: Zeichner = (el, u) => {
                 sFlaeche.farbe, sFlaeche.sperrung, "r");
       summe += f;
     }
-    if (linie) {
+    if (linie && zeichenkette(el, "darstellung") === "fuehrungspunkte") {
+      // Punktreihe zwischen Raumname und Flaeche, nicht unter der Zeile.
+      const nb = u.blatt.sw(String(r.name), sName.schnitt, sName.groesse, sName.sperrung);
+      const wb = text === undefined ? 0
+        : u.blatt.sw(text, sFlaeche.schnitt, sFlaeche.groesse, sFlaeche.sperrung);
+      const luft = zahl(el, "punkt_luft", 8);
+      const von = el.x + nb + luft;
+      const bis = el.x + el.b - wb - luft;
+      if (bis > von) {
+        u.blatt.linie(von, y + zahl(el, "punkt_hoch", 2), bis,
+                      y + zahl(el, "punkt_hoch", 2), linie,
+                      zahl(el, "linienbreite", 0.6), [0.6, 2.6]);
+      }
+    } else if (linie) {
       u.blatt.linie(el.x, y - zahl(el, "linien_versatz", 6), el.x + el.b,
                     y - zahl(el, "linien_versatz", 6), linie,
                     zahl(el, "linienbreite", 0.5));
@@ -746,13 +759,14 @@ const raumliste: Zeichner = (el, u) => {
 const distanzen: Zeichner = (el, u) => {
   const quelle = zeichenkette(el, "feld") ?? "objekt.lage_distanzen";
   const roh = liste(u.daten, quelle) as { ziel?: string; name?: string;
-                                          km?: number; minuten?: number }[];
-  type Entfernung = { name: string; km?: number; minuten?: number };
+                                          km?: number; minuten?: number;
+                                          wert?: string }[];
+  type Entfernung = { name: string; km?: number; minuten?: number; wert?: string };
   const eintraege: Entfernung[] = [];
   for (const d of roh) {
     const name = d.ziel ?? d.name;
     if (!name) continue;
-    eintraege.push({ name, km: d.km, minuten: d.minuten });
+    eintraege.push({ name, km: d.km, minuten: d.minuten, wert: d.wert });
   }
   if (!eintraege.length) {
     warne(u, "fehlender_wert", el, "Keine Entfernungen erfasst — das Element entfaellt.");
@@ -823,7 +837,10 @@ const distanzen: Zeichner = (el, u) => {
   for (const d of eintraege) {
     u.blatt.T(el.x, y, d.name, sName.schnitt, sName.groesse, sName.farbe,
               sName.sperrung);
-    const text = d.km !== undefined ? `${zahlDe(d.km, 1)} km`
+    // Eine Entfernung kann als Zahl gefuehrt sein (dann rechnet der
+    // Renderer die Einheit dazu) oder schon als Text ("1,2 km", "10 Min.").
+    const text = d.wert !== undefined ? d.wert
+               : d.km !== undefined ? `${zahlDe(d.km, 1)} km`
                : d.minuten !== undefined ? `${zahlDe(d.minuten, 0)} min`
                : undefined;
     if (text !== undefined) {
@@ -839,6 +856,18 @@ const distanzen: Zeichner = (el, u) => {
     } else if (art === "punktlinie" && grund) {
       u.blatt.linie(el.x, y - balkenVersatz, el.x + el.b, y - balkenVersatz,
                     grund, 0.6, [0.6, 2.6]);
+    } else if (art === "fuehrungspunkte" && grund) {
+      const nb = u.blatt.sw(d.name, sName.schnitt, sName.groesse, sName.sperrung);
+      const wb = text === undefined ? 0
+        : u.blatt.sw(text, sWert.schnitt, sWert.groesse, sWert.sperrung);
+      const luft = zahl(el, "punkt_luft", 8);
+      const von = el.x + nb + luft;
+      const bis = el.x + el.b - wb - luft;
+      if (bis > von) {
+        u.blatt.linie(von, y + zahl(el, "punkt_hoch", 2), bis,
+                      y + zahl(el, "punkt_hoch", 2), grund,
+                      zahl(el, "linienbreite", 0.6), [0.6, 2.6]);
+      }
     }
     y -= zh;
   }
@@ -949,10 +978,13 @@ const highlights: Zeichner = (el, u) => {
 
 /** Ausstattungspunkte als Checkliste, Gruppen oder nummeriert. */
 const ausstattung: Zeichner = (el, u) => {
-  const quelle = zeichenkette(el, "feld") ?? "objekt.beschreibung_ausstattung_expose";
-  const roh = wert(u.daten, quelle);
+  const art0 = zeichenkette(el, "darstellung") ?? "checkliste";
+  const quelle = zeichenkette(el, "feld")
+    ?? (art0 === "gruppen" ? "objekt.expose_ausstattung_gruppen"
+                           : "objekt.beschreibung_ausstattung_expose");
+  const roh = art0 === "gruppen" ? undefined : wert(u.daten, quelle);
   const punkte = (roh ?? "").split("\n").map((z) => z.trim()).filter(Boolean);
-  if (!punkte.length) {
+  if (art0 !== "gruppen" && !punkte.length) {
     warne(u, "fehlender_wert", el, "Keine Ausstattungspunkte — das Element entfaellt.");
     return;
   }
@@ -965,9 +997,53 @@ const ausstattung: Zeichner = (el, u) => {
   const fuell = farbRef(el, "hintergrund", u);
   const haken = farbRef(el, "haken_farbe", u);
   const hakenInnen = farbRef(el, "haken_innen", u) ?? [1, 1, 1, 1];
-  const art = zeichenkette(el, "darstellung") ?? "checkliste";
+  const art = art0;
   const polster = zahl(el, "polster", 10);
   const einzug = zahl(el, "einzug", 28);
+
+  // Gruppen: die Ausstattung ist nach Themen geordnet ("Architektur",
+  // "Technik"), jede Gruppe mit Nummer, Ueberschrift und eigener Liste.
+  // Quelle ist objekt.expose_ausstattung_gruppen.
+  if (art === "gruppen") {
+    const gruppen = (liste(u.daten, zeichenkette(el, "feld") ?? "objekt.expose_ausstattung_gruppen") as
+      { titel?: string; punkte?: string[] }[])
+      .filter((g) => g && g.titel && Array.isArray(g.punkte) && g.punkte.length);
+    if (!gruppen.length) {
+      warne(u, "fehlender_wert", el, "Keine Ausstattungsgruppen — das Element entfaellt.");
+      return;
+    }
+    const sNummer = stilVon(el, u, "stil_nummer");
+    const sTitel = stilVon(el, u, "stil_titel");
+    const gh = zahl(el, "gruppe_hoehe", 230);
+    const titelLinie = farbRef(el, "titel_linie_farbe", u);
+    const zeilenLinie = farbRef(el, "linien_farbe", u);
+    gruppen.forEach((g, i) => {
+      const spalte = i % spalten;
+      const reihe = Math.floor(i / spalten);
+      const x = el.x + spalte * (sb + abstand);
+      const y = el.y + el.h - reihe * gh;
+      u.blatt.T(x, y - zahl(el, "nummer_hoch", 0), String(i + 1).padStart(2, "0"),
+                sNummer.schnitt, sNummer.groesse, sNummer.farbe, sNummer.sperrung);
+      u.blatt.T(x + einzug, y + zahl(el, "titel_hoch", 4), gross(sTitel, g.titel!),
+                sTitel.schnitt, sTitel.groesse, sTitel.farbe, sTitel.sperrung);
+      if (titelLinie) {
+        u.blatt.linie(x, y - zahl(el, "titel_linie_tief", 14), x + sb,
+                      y - zahl(el, "titel_linie_tief", 14), titelLinie,
+                      zahl(el, "titel_linienbreite", 0.6));
+      }
+      let iy = y - zahl(el, "erste_zeile", 40);
+      for (const punkt of g.punkte!) {
+        u.blatt.T(x, iy, punkt, s.schnitt, s.groesse, s.farbe, s.sperrung);
+        if (zeilenLinie) {
+          u.blatt.linie(x, iy - zahl(el, "zeilen_linie_tief", 12), x + sb,
+                        iy - zahl(el, "zeilen_linie_tief", 12), zeilenLinie,
+                        zahl(el, "linienbreite", 0.4));
+        }
+        iy -= zh;
+      }
+    });
+    return;
+  }
 
   // Nummeriert: laufende Nummer links, Punkt daneben, Trennlinie
   // darunter — die letzte Zeile einer Spalte kraeftiger.
@@ -1148,6 +1224,10 @@ const energieskala: Zeichner = (el, u) => {
     });
     return;
   }
+  // "linie": eine schmale Leiste, die Klassen darunter, die Markierung
+  // darueber — ohne Grenzwerte und ohne Fahne. So steht sie im
+  // Energiefeld der Luxusvorlage.
+  const schmal = zeichenkette(el, "darstellung") === "linie";
   const kennwertRoh = rohzahl(u.daten, zeichenkette(el, "feld") ?? "objekt.energie_kennwert");
   const sKlasse = stilVon(el, u, "stil_klasse");
   const sGrenze = stilVon(el, u, "stil_grenze");
@@ -1159,7 +1239,14 @@ const energieskala: Zeichner = (el, u) => {
   klassen.forEach((k, i) => {
     const x = el.x + i * bw;
     u.blatt.rect(x + luft, yBalken, bw - 2 * luft, bh,
-                 farbe(k.farbe, u.palette), null, zahl(el, "eckradius", 4));
+                 farbe(k.farbe, u.palette), null, zahl(el, "eckradius", schmal ? 0 : 4));
+    if (schmal) {
+      const erste = i === 0 && zeichenkette(el, "stil_klasse_erste")
+        ? u.stil(zeichenkette(el, "stil_klasse_erste")!) : sKlasse;
+      u.blatt.T(x + bw / 2, yBalken - zahl(el, "klasse_abstand", 14), k.name,
+                erste.schnitt, erste.groesse, erste.farbe, erste.sperrung, "c");
+      return;
+    }
     u.blatt.T(x + bw / 2, yBalken + zahl(el, "klasse_grundlinie", 12), k.name,
               sKlasse.schnitt, sKlasse.groesse, sKlasse.farbe, sKlasse.sperrung, "c");
     const untergrenze = i === 0 ? 0 : klassen[i - 1].grenze;
@@ -1168,7 +1255,7 @@ const energieskala: Zeichner = (el, u) => {
               sGrenze.farbe, sGrenze.sperrung, "c");
   });
 
-  const einheit = zeichenkette(el, "einheit");
+  const einheit = schmal ? undefined : zeichenkette(el, "einheit");
   if (einheit) {
     u.blatt.T(el.x + el.b, yBalken - zahl(el, "grenze_abstand", 12), einheit,
               sGrenze.schnitt, sGrenze.groesse, sGrenze.farbe, sGrenze.sperrung, "r");
@@ -1200,6 +1287,7 @@ const energieskala: Zeichner = (el, u) => {
      ["lineTo", marke - halb, yBalken + bh + spitze + hoehe],
      ["lineTo", marke + halb, yBalken + bh + spitze + hoehe],
      ["close"]], tinte);
+  if (schmal) return;
   const fb = zahl(el, "fahne_breite", 104);
   const fh = zahl(el, "fahne_hoehe", 26);
   const fy = yBalken + bh + zahl(el, "fahne_abstand", 18);

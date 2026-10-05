@@ -341,6 +341,275 @@
         "groesse": 12,
         "farbe": "onD",
         "ausrichtung": "rechts"
+      },
+      "kapitel_titel_mittel": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Light"
+        },
+        "groesse": 28,
+        "farbe": "ink",
+        "sperrung": 0
+      },
+      "kapitel_titel_mittel_kursiv": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "LightItalic"
+        },
+        "groesse": 28,
+        "farbe": "ink",
+        "sperrung": 0
+      },
+      "kapitel_titel_klein": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Light"
+        },
+        "groesse": 26,
+        "farbe": "ink"
+      },
+      "kapitel_titel_klein_kursiv": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "LightItalic"
+        },
+        "groesse": 26,
+        "farbe": "ink"
+      },
+      "bild_unterzeile": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 5.6,
+        "farbe": "muted",
+        "sperrung": 2.2,
+        "grossbuchstaben": true
+      },
+      "fuss_seite_rechts": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Regular"
+        },
+        "groesse": 10,
+        "farbe": "a",
+        "sperrung": 1,
+        "ausrichtung": "rechts"
+      },
+      "fliesstext_schmal": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Light"
+        },
+        "groesse": 8.8,
+        "farbe": "text",
+        "zeilen": 15
+      },
+      "gruppe_nummer": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "LightItalic"
+        },
+        "groesse": 22,
+        "farbe": "a"
+      },
+      "gruppe_titel": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 6.6,
+        "farbe": "ink",
+        "sperrung": 2.8,
+        "grossbuchstaben": true
+      },
+      "gruppe_punkt": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Regular"
+        },
+        "groesse": 13,
+        "farbe": "text"
+      },
+      "tab_titel": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 6.2,
+        "farbe": "ink",
+        "sperrung": 2.6,
+        "grossbuchstaben": true
+      },
+      "raum_name": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Regular"
+        },
+        "groesse": 11,
+        "farbe": "text"
+      },
+      "raum_wert": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Regular"
+        },
+        "groesse": 11,
+        "farbe": "ink",
+        "ausrichtung": "rechts"
+      },
+      "raum_summe": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 11,
+        "farbe": "ink"
+      },
+      "raum_summe_wert": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 11,
+        "farbe": "a",
+        "ausrichtung": "rechts"
+      },
+      "hinweis_kursiv": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "RegularItalic"
+        },
+        "groesse": 9,
+        "farbe": "muted"
+      },
+      "lage_text": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Light"
+        },
+        "groesse": 8.7,
+        "farbe": "text",
+        "zeilen": 14.6
+      },
+      "dist_name": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Regular"
+        },
+        "groesse": 11.5,
+        "farbe": "text"
+      },
+      "dist_wert": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Regular"
+        },
+        "groesse": 11.5,
+        "farbe": "ink",
+        "ausrichtung": "rechts"
+      },
+      "karte_quelle": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 4.6,
+        "farbe": "muted",
+        "sperrung": 1.4,
+        "grossbuchstaben": true,
+        "ausrichtung": "rechts"
+      },
+      "karte_adresse": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "RegularItalic"
+        },
+        "groesse": 12,
+        "farbe": "ink"
+      },
+      "det_label": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 5.6,
+        "farbe": "muted",
+        "sperrung": 2.2,
+        "grossbuchstaben": true
+      },
+      "det_wert": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Regular"
+        },
+        "groesse": 12,
+        "farbe": "ink",
+        "ausrichtung": "rechts"
+      },
+      "energie_label_gross": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 6.2,
+        "farbe": "a",
+        "sperrung": 2.8,
+        "grossbuchstaben": true
+      },
+      "energie_wert_gross": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Light"
+        },
+        "groesse": 52,
+        "farbe": "onD",
+        "sperrung": -1
+      },
+      "energie_einheit": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "LightItalic"
+        },
+        "groesse": 15,
+        "farbe": "a"
+      },
+      "skala_klasse": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Regular"
+        },
+        "groesse": 10,
+        "farbe": "onDm",
+        "ausrichtung": "mitte"
+      },
+      "skala_klasse_erste": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Regular"
+        },
+        "groesse": 10,
+        "farbe": "onD",
+        "ausrichtung": "mitte"
+      },
+      "en_label": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 5.2,
+        "farbe": "onDm",
+        "sperrung": 2,
+        "grossbuchstaben": true
+      },
+      "en_wert": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Regular"
+        },
+        "groesse": 11,
+        "farbe": "onD",
+        "ausrichtung": "rechts"
       }
     },
     "seitenfuss": {
@@ -879,6 +1148,461 @@
           "stil": "fuss_objekt_hell",
           "inhalt": "{{objekt.objekttitel}}",
           "einzeilig": true
+        }
+      ]
+    },
+    {
+      "id": "anwesen",
+      "typ": "beschreibung",
+      "name": "Das Anwesen",
+      "ohne_fuss": true,
+      "elemente": [
+        {
+          "id": "anwesen-grund",
+          "typ": "form",
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 841.89,
+          "form": "rechteck",
+          "fuell": "paper"
+        },
+        {
+          "id": "anwesen-bild",
+          "typ": "bild",
+          "x": 0,
+          "y": 0,
+          "b": 261.9232,
+          "h": 841.89,
+          "slot": {
+            "art": "foto",
+            "nr": 2
+          },
+          "fuellmodus": "cover",
+          "platzhalter_farbe": "paper2",
+          "label": "Fassade / Entree",
+          "stil_label": "bild_label",
+          "label_hintergrund": "d",
+          "label_deckkraft": 0.55,
+          "label_x": 12,
+          "label_y": 12,
+          "label_hoehe": 13,
+          "label_radius": 0,
+          "label_luft": 16,
+          "label_polster": 8,
+          "label_grundlinie": 4.6
+        },
+        {
+          "id": "kapitel-label",
+          "typ": "text",
+          "x": 301.9232,
+          "y": 743.69,
+          "b": 250,
+          "h": 6.2,
+          "stil": "kapitel_label",
+          "inhalt": "III  ·  Das Anwesen",
+          "einzeilig": true
+        },
+        {
+          "id": "kapitel-titel",
+          "typ": "text",
+          "x": 301.9232,
+          "y": 675.89,
+          "b": 250,
+          "h": 34,
+          "stil": "kapitel_titel",
+          "inhalt": "Architektur,",
+          "einzeilig": true
+        },
+        {
+          "id": "kapitel-titel-2",
+          "typ": "text",
+          "x": 301.9232,
+          "y": 639.89,
+          "b": 250,
+          "h": 34,
+          "stil": "kapitel_titel_kursiv",
+          "inhalt": "die bleibt.",
+          "einzeilig": true
+        },
+        {
+          "id": "anwesen-text",
+          "typ": "text",
+          "x": 301.9232,
+          "y": 300,
+          "b": 245.3568,
+          "h": 329.89,
+          "stil": "fliesstext_eng",
+          "inhalt": "{{objekt.beschreibung_objekt}}",
+          "blocksatz": true,
+          "verdichten": false
+        },
+        {
+          "id": "anwesen-strich",
+          "typ": "form",
+          "x": 301.9232,
+          "y": 132,
+          "b": 239.3568,
+          "h": 0,
+          "form": "linie",
+          "strich": "hair",
+          "linienbreite": 0.4
+        },
+        {
+          "id": "anwesen-zitat-1",
+          "typ": "text",
+          "x": 301.9232,
+          "y": 87,
+          "b": 250,
+          "h": 17,
+          "stil": "zitat_klein",
+          "inhalt": "„Licht, Weite und Ruhe –",
+          "einzeilig": true
+        },
+        {
+          "id": "anwesen-zitat-2",
+          "typ": "text",
+          "x": 301.9232,
+          "y": 67,
+          "b": 250,
+          "h": 17,
+          "stil": "zitat_klein",
+          "inhalt": "jeder Raum mit Blick aufs Wasser.“",
+          "einzeilig": true
+        },
+        {
+          "id": "fuss-marke",
+          "typ": "text",
+          "x": 301.9232,
+          "y": 24.8,
+          "b": 250,
+          "h": 5.2,
+          "stil": "fuss_marke",
+          "inhalt": "{{firma.marken_name}}  ·  {{firma.linie}}",
+          "einzeilig": true
+        },
+        {
+          "id": "fuss-seite",
+          "typ": "text",
+          "x": 341.28,
+          "y": 19,
+          "b": 200,
+          "h": 10,
+          "stil": "fuss_seite_rechts",
+          "inhalt": "{{seite.nummer_zweistellig}}",
+          "einzeilig": true
+        }
+      ]
+    },
+    {
+      "id": "strecke",
+      "typ": "bildseite",
+      "name": "Impressionen",
+      "elemente": [
+        {
+          "id": "strecke-grund",
+          "typ": "form",
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 841.89,
+          "form": "rechteck",
+          "fuell": "paper"
+        },
+        {
+          "id": "strecke-bild",
+          "typ": "bild",
+          "x": 0,
+          "y": 252.567,
+          "b": 595.28,
+          "h": 589.323,
+          "slot": {
+            "art": "foto",
+            "nr": 3
+          },
+          "fuellmodus": "cover",
+          "platzhalter_farbe": "paper2",
+          "label": "Wohnsalon mit Seeblick",
+          "stil_label": "bild_label",
+          "label_hintergrund": "d",
+          "label_deckkraft": 0.55,
+          "label_x": 12,
+          "label_y": 12,
+          "label_hoehe": 13,
+          "label_radius": 0,
+          "label_luft": 16,
+          "label_polster": 8,
+          "label_grundlinie": 4.6
+        },
+        {
+          "id": "strecke-label",
+          "typ": "text",
+          "x": 54,
+          "y": 192.367,
+          "b": 300,
+          "h": 6.2,
+          "stil": "kapitel_label",
+          "inhalt": "IV  ·  Impressionen",
+          "einzeilig": true
+        },
+        {
+          "id": "strecke-titel-1",
+          "typ": "text",
+          "x": 54,
+          "y": 134.567,
+          "b": 250,
+          "h": 28,
+          "stil": "kapitel_titel_mittel",
+          "inhalt": "Wo der Tag am",
+          "einzeilig": true
+        },
+        {
+          "id": "strecke-titel-2",
+          "typ": "text",
+          "x": 54,
+          "y": 104.567,
+          "b": 250,
+          "h": 28,
+          "stil": "kapitel_titel_mittel_kursiv",
+          "inhalt": "Wasser beginnt.",
+          "einzeilig": true
+        },
+        {
+          "id": "strecke-text",
+          "typ": "text",
+          "x": 307.64,
+          "y": 60,
+          "b": 233.64,
+          "h": 132.567,
+          "stil": "fliesstext_schmal",
+          "inhalt": "Beschreiben Sie hier, was dieses Bild zeigt.",
+          "blocksatz": true,
+          "verdichten": false
+        }
+      ]
+    },
+    {
+      "id": "diptychon",
+      "typ": "bildseite",
+      "name": "Diptychon",
+      "elemente": [
+        {
+          "id": "dip-grund",
+          "typ": "form",
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 841.89,
+          "form": "rechteck",
+          "fuell": "paper2"
+        },
+        {
+          "id": "dip-links",
+          "typ": "bild",
+          "x": 54,
+          "y": 190,
+          "b": 236.64,
+          "h": 575.89,
+          "slot": {
+            "art": "foto",
+            "nr": 4
+          },
+          "fuellmodus": "cover",
+          "platzhalter_farbe": "paper2",
+          "label": "Mastersuite",
+          "stil_label": "bild_label",
+          "label_hintergrund": "d",
+          "label_deckkraft": 0.55,
+          "label_x": 12,
+          "label_y": 12,
+          "label_hoehe": 13,
+          "label_radius": 0,
+          "label_luft": 16,
+          "label_polster": 8,
+          "label_grundlinie": 4.6
+        },
+        {
+          "id": "dip-rechts",
+          "typ": "bild",
+          "x": 304.64,
+          "y": 280,
+          "b": 236.64,
+          "h": 485.89,
+          "slot": {
+            "art": "foto",
+            "nr": 5
+          },
+          "fuellmodus": "cover",
+          "platzhalter_farbe": "paper2",
+          "label": "Spa-Bad",
+          "stil_label": "bild_label",
+          "label_hintergrund": "d",
+          "label_deckkraft": 0.55,
+          "label_x": 12,
+          "label_y": 12,
+          "label_hoehe": 13,
+          "label_radius": 0,
+          "label_luft": 16,
+          "label_polster": 8,
+          "label_grundlinie": 4.6
+        },
+        {
+          "id": "dip-links-zeile",
+          "typ": "text",
+          "x": 54,
+          "y": 162.4,
+          "b": 260,
+          "h": 5.6,
+          "stil": "bild_unterzeile",
+          "inhalt": "Mastersuite  —  mit Loggia über dem Wasser",
+          "einzeilig": true
+        },
+        {
+          "id": "dip-rechts-zeile",
+          "typ": "text",
+          "x": 304.64,
+          "y": 252.4,
+          "b": 260,
+          "h": 5.6,
+          "stil": "bild_unterzeile",
+          "inhalt": "Spa-Bad  —  Naturstein & Eiche",
+          "einzeilig": true
+        },
+        {
+          "id": "dip-titel-1",
+          "typ": "text",
+          "x": 304.64,
+          "y": 184,
+          "b": 250,
+          "h": 26,
+          "stil": "kapitel_titel_klein",
+          "inhalt": "Rückzug,",
+          "einzeilig": true
+        },
+        {
+          "id": "dip-titel-2",
+          "typ": "text",
+          "x": 304.64,
+          "y": 156,
+          "b": 250,
+          "h": 26,
+          "stil": "kapitel_titel_klein_kursiv",
+          "inhalt": "neu gedacht.",
+          "einzeilig": true
+        },
+        {
+          "id": "diptychon-text",
+          "typ": "text",
+          "x": 54,
+          "y": 60,
+          "b": 487.28,
+          "h": 74,
+          "stil": "fliesstext_schmal",
+          "inhalt": "Beschreiben Sie hier, was diese Bilder zeigen.",
+          "blocksatz": true,
+          "verdichten": false
+        }
+      ]
+    },
+    {
+      "id": "ausstattung",
+      "typ": "ausstattung",
+      "name": "Ausstattung",
+      "elemente": [
+        {
+          "id": "aus-grund",
+          "typ": "form",
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 841.89,
+          "form": "rechteck",
+          "fuell": "paper"
+        },
+        {
+          "id": "kapitel-label",
+          "typ": "text",
+          "x": 54,
+          "y": 743.6899999999999,
+          "b": 300,
+          "h": 6.2,
+          "stil": "kapitel_label",
+          "inhalt": "V  ·  Ausstattung",
+          "einzeilig": true
+        },
+        {
+          "id": "kapitel-titel",
+          "typ": "text",
+          "x": 54,
+          "y": 675.89,
+          "b": 400,
+          "h": 34,
+          "stil": "kapitel_titel",
+          "inhalt": "Qualität in",
+          "einzeilig": true
+        },
+        {
+          "id": "kapitel-titel-2",
+          "typ": "text",
+          "x": 54,
+          "y": 639.89,
+          "b": 400,
+          "h": 34,
+          "stil": "kapitel_titel_kursiv",
+          "inhalt": "jedem Detail.",
+          "einzeilig": true
+        },
+        {
+          "id": "aus-bild",
+          "typ": "bild",
+          "x": 341.28,
+          "y": 611.89,
+          "b": 200,
+          "h": 150,
+          "slot": {
+            "art": "foto",
+            "nr": 6
+          },
+          "fuellmodus": "cover",
+          "platzhalter_farbe": "paper2",
+          "label": "Küche",
+          "stil_label": "bild_label",
+          "label_hintergrund": "d",
+          "label_deckkraft": 0.55,
+          "label_x": 12,
+          "label_y": 12,
+          "label_hoehe": 13,
+          "label_radius": 0,
+          "label_luft": 16,
+          "label_polster": 8,
+          "label_grundlinie": 4.6
+        },
+        {
+          "id": "gruppen",
+          "typ": "ausstattung",
+          "x": 54,
+          "y": 60,
+          "b": 487.28,
+          "h": 559.89,
+          "darstellung": "gruppen",
+          "feld": "objekt.expose_ausstattung_gruppen",
+          "spalten": 2,
+          "spaltenabstand": 40,
+          "gruppe_hoehe": 230,
+          "einzug": 34,
+          "nummer_hoch": 0,
+          "titel_hoch": 4,
+          "titel_linie_tief": 14,
+          "erste_zeile": 40,
+          "zeilenhoehe": 34,
+          "zeilen_linie_tief": 12,
+          "linien_farbe": "hair",
+          "linienbreite": 0.4,
+          "titel_linie_farbe": "ink",
+          "titel_linienbreite": 0.6,
+          "stil_nummer": "gruppe_nummer",
+          "stil_titel": "gruppe_titel",
+          "stil_punkt": "gruppe_punkt"
         }
       ]
     }

@@ -288,4 +288,27 @@ function signature(D) {
 
 const UEBERSETZER = { raster, studio, signature };
 
-module.exports = { daten: (vorlage, D) => UEBERSETZER[vorlage](D) };
+// Texte, die der Prototyp je Objekt schreibt. Im Produkt stehen sie in
+// immobilien.expose_overrides; die Vorlage haelt nur einen neutralen
+// Vorschlag bereit.
+const UEBERNAHMEN = {
+  signature: {
+    texte: {
+      'strecke-text':
+        'Der Wohnsalon mit über sechs Meter Raumhöhe öffnet sich über eine '
+        + 'rahmenlose Glasfront vollständig zur Seeterrasse. Morgens fällt das '
+        + 'Licht über das Wasser bis tief in den Raum, abends spiegeln sich die '
+        + 'Ufer im ruhigen See.',
+      'diptychon-text':
+        'Vier Schlafzimmer, jedes mit eigenem Bad, schaffen private Räume für '
+        + 'Familie und Gäste. Die Mastersuite nimmt das gesamte Westende des '
+        + 'Obergeschosses ein – mit Ankleide, freistehender Wanne und einer '
+        + 'Loggia, von der der Blick ungehindert über den See reicht.',
+    },
+  },
+};
+
+module.exports = {
+  daten: (vorlage, D) => UEBERSETZER[vorlage](D),
+  uebernahmen: (vorlage) => UEBERNAHMEN[vorlage],
+};
