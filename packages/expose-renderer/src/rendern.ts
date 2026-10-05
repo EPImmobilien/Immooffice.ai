@@ -83,6 +83,8 @@ export function rendern(a: Auftrag): Ergebnis {
     daten["seite.nummer"] = i + 1;
     daten["seite.gesamt"] = gesamt;
     daten["seite.name"] = seite.name;
+    daten["seite.nummer_zweistellig"] = String(i + 1).padStart(2, "0");
+    daten["seite.gesamt_zweistellig"] = String(gesamt).padStart(2, "0");
 
     if (seite.hintergrund) hintergrundZeichnen(u, seite);
 

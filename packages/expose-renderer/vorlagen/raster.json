@@ -154,7 +154,278 @@
         "farbe": "muted",
         "sperrung": 1.6,
         "grossbuchstaben": true
+      },
+      "kapitel_nr": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "ExtraBold"
+        },
+        "groesse": 9,
+        "farbe": "a",
+        "sperrung": 0.5
+      },
+      "kapitel_label": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 7,
+        "farbe": "muted",
+        "sperrung": 1.8,
+        "grossbuchstaben": true
+      },
+      "kapitel_titel": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Bold"
+        },
+        "groesse": 24,
+        "farbe": "ink",
+        "sperrung": -0.4
+      },
+      "kapitel_unter": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Regular"
+        },
+        "groesse": 9.5,
+        "farbe": "muted"
+      },
+      "panel_kopf": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 6.5,
+        "farbe": {
+          "mix": [
+            "p",
+            "weiss",
+            0.6
+          ]
+        },
+        "sperrung": 1.8,
+        "grossbuchstaben": true
+      },
+      "panel_preis": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "ExtraBold"
+        },
+        "groesse": 24,
+        "farbe": "weiss",
+        "sperrung": -0.5
+      },
+      "panel_label": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 6,
+        "farbe": {
+          "mix": [
+            "p",
+            "weiss",
+            0.55
+          ]
+        },
+        "sperrung": 1.4,
+        "grossbuchstaben": true
+      },
+      "panel_wert": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 10,
+        "farbe": "weiss"
+      },
+      "energie_klasse": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "ExtraBold"
+        },
+        "groesse": 11,
+        "farbe": "weiss",
+        "ausrichtung": "mitte"
+      },
+      "energie_wert": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 8.5,
+        "farbe": "weiss"
+      },
+      "tab_label": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 8.5,
+        "farbe": "muted"
+      },
+      "tab_wert": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 8.5,
+        "farbe": "ink",
+        "ausrichtung": "rechts"
+      },
+      "abschnitt_label": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Bold"
+        },
+        "groesse": 7,
+        "farbe": "a",
+        "sperrung": 2,
+        "grossbuchstaben": true
+      },
+      "hl_nummer": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "ExtraBold"
+        },
+        "groesse": 18,
+        "farbe": "a",
+        "sperrung": -0.4
+      },
+      "hl_titel": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Bold"
+        },
+        "groesse": 9.5,
+        "farbe": "ink"
+      },
+      "hl_text": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Regular"
+        },
+        "groesse": 7.8,
+        "farbe": "text",
+        "zeilen": 11
+      },
+      "fuss_firma": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 6.5,
+        "farbe": "muted",
+        "sperrung": 0.6
+      },
+      "fuss_mitte": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 6.5,
+        "farbe": "muted",
+        "sperrung": 1,
+        "grossbuchstaben": true,
+        "ausrichtung": "mitte"
+      },
+      "fuss_seite": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Bold"
+        },
+        "groesse": 6.5,
+        "farbe": "p",
+        "sperrung": 1,
+        "ausrichtung": "rechts"
+      },
+      "zitat": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 13,
+        "farbe": "p",
+        "sperrung": -0.2
+      },
+      "zitat_quelle": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Regular"
+        },
+        "groesse": 8,
+        "farbe": "muted"
+      },
+      "fliesstext": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Regular"
+        },
+        "groesse": 9.2,
+        "farbe": "text",
+        "zeilen": 15.5
+      },
+      "ausstattung_punkt": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 8.6,
+        "farbe": "ink"
       }
+    },
+    "seitenfuss": {
+      "elemente": [
+        {
+          "id": "fuss-linie",
+          "typ": "form",
+          "gesperrt": true,
+          "x": 42,
+          "y": 40,
+          "b": 511.28,
+          "h": 0,
+          "form": "linie",
+          "strich": "line",
+          "linienbreite": 0.6
+        },
+        {
+          "id": "fuss-firma",
+          "typ": "text",
+          "gesperrt": true,
+          "x": 42,
+          "y": 19.5,
+          "b": 220,
+          "h": 6.5,
+          "stil": "fuss_firma",
+          "inhalt": "{{firma.name}}",
+          "einzeilig": true
+        },
+        {
+          "id": "fuss-objekt",
+          "typ": "text",
+          "gesperrt": true,
+          "x": 197.64,
+          "y": 19.5,
+          "b": 200,
+          "h": 6.5,
+          "stil": "fuss_mitte",
+          "inhalt": "Objekt-Nr. {{objekt.immo_nr}}",
+          "einzeilig": true
+        },
+        {
+          "id": "fuss-seite",
+          "typ": "text",
+          "gesperrt": true,
+          "x": 403.28,
+          "y": 19.5,
+          "b": 150,
+          "h": 6.5,
+          "stil": "fuss_seite",
+          "inhalt": "{{seite.nummer_zweistellig}} / {{seite.gesamt_zweistellig}}",
+          "einzeilig": true
+        }
+      ]
     }
   },
   "seiten": [
@@ -349,6 +620,621 @@
           "stil": "cover_web",
           "inhalt": "{{firma.web}}",
           "einzeilig": true
+        }
+      ]
+    },
+    {
+      "id": "auf-einen-blick",
+      "typ": "auf_einen_blick",
+      "name": "Auf einen Blick",
+      "elemente": [
+        {
+          "id": "kopf-nr",
+          "typ": "text",
+          "x": 42,
+          "y": 780.89,
+          "b": 18,
+          "h": 9,
+          "stil": "kapitel_nr",
+          "inhalt": "01",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-label",
+          "typ": "text",
+          "x": 62,
+          "y": 782.89,
+          "b": 200,
+          "h": 7,
+          "stil": "kapitel_label",
+          "inhalt": "Auf einen Blick",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-linie",
+          "typ": "form",
+          "x": 156.887,
+          "y": 792.39,
+          "b": 396.393,
+          "h": 0,
+          "form": "linie",
+          "strich": "line",
+          "linienbreite": 0.6
+        },
+        {
+          "id": "kopf-titel",
+          "typ": "text",
+          "x": 42,
+          "y": 725.89,
+          "b": 471.28,
+          "h": 24,
+          "stil": "kapitel_titel",
+          "inhalt": "Die wichtigsten Fakten.",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-unter",
+          "typ": "text",
+          "x": 42,
+          "y": 722.39,
+          "b": 471.28,
+          "h": 9.5,
+          "stil": "kapitel_unter",
+          "inhalt": "Alle Angaben im Überblick – kompakt und transparent.",
+          "einzeilig": true
+        },
+        {
+          "id": "preis-panel",
+          "typ": "form",
+          "gesperrt": true,
+          "x": 42,
+          "y": 281.89,
+          "b": 178,
+          "h": 420,
+          "form": "rechteck",
+          "fuell": "p",
+          "eckradius": 12
+        },
+        {
+          "id": "preis-kennzahl",
+          "typ": "kennzahl",
+          "x": 62,
+          "y": 637.89,
+          "b": 140,
+          "h": 30,
+          "variante": "einzeln",
+          "wert_grundlinie": 0,
+          "label_grundlinie": 30,
+          "stil_wert": "panel_preis",
+          "stil_label": "panel_kopf",
+          "eintraege": [
+            {
+              "label": "Kaufpreis",
+              "wert": "{{objekt.preis}}"
+            }
+          ]
+        },
+        {
+          "id": "preis-strich",
+          "typ": "form",
+          "x": 62,
+          "y": 619.89,
+          "b": 30,
+          "h": 0,
+          "form": "linie",
+          "strich": "a",
+          "linienbreite": 2
+        },
+        {
+          "id": "preis-angaben",
+          "typ": "faktentabelle",
+          "x": 62,
+          "y": 403.89,
+          "b": 140,
+          "h": 190,
+          "darstellung": "gestapelt",
+          "zeilenhoehe": 38,
+          "label_versatz": 0,
+          "wert_versatz": 14,
+          "stil_label": "panel_label",
+          "stil_wert": "panel_wert",
+          "zeilen": [
+            {
+              "label": "Käuferprovision",
+              "feld": "objekt.provision_aussen"
+            },
+            {
+              "label": "Verfügbar ab",
+              "feld": "objekt.verfuegbar_ab"
+            },
+            {
+              "label": "Objekt-Nr.",
+              "feld": "objekt.immo_nr"
+            },
+            {
+              "label": "Objektart",
+              "feld": "objekt.objektart"
+            },
+            {
+              "label": "Vermarktung",
+              "feld": "objekt.vertragsart"
+            }
+          ]
+        },
+        {
+          "id": "energie-kasten",
+          "typ": "form",
+          "x": 56,
+          "y": 295.89,
+          "b": 150,
+          "h": 54,
+          "form": "rechteck",
+          "fuell": "pdark",
+          "eckradius": 8
+        },
+        {
+          "id": "energie-label",
+          "typ": "text",
+          "x": 68,
+          "y": 323.89,
+          "b": 130,
+          "h": 6,
+          "stil": "panel_label",
+          "inhalt": "Energieeffizienz",
+          "einzeilig": true
+        },
+        {
+          "id": "energie-chip",
+          "typ": "form",
+          "x": 68,
+          "y": 303.89,
+          "b": 24,
+          "h": 20,
+          "form": "rechteck",
+          "fuell": "a",
+          "eckradius": 4
+        },
+        {
+          "id": "energie-klasse",
+          "typ": "text",
+          "x": 68,
+          "y": 298.89,
+          "b": 24,
+          "h": 11,
+          "stil": "energie_klasse",
+          "inhalt": "{{objekt.energie_klasse}}",
+          "einzeilig": true
+        },
+        {
+          "id": "energie-kennwert",
+          "typ": "text",
+          "x": 100,
+          "y": 301.39,
+          "b": 100,
+          "h": 8.5,
+          "stil": "energie_wert",
+          "inhalt": "{{objekt.energie_kennwert}} kWh/(m²a)",
+          "einzeilig": true
+        },
+        {
+          "id": "fakten",
+          "typ": "faktentabelle",
+          "x": 242,
+          "y": 281.89,
+          "b": 311.28,
+          "h": 420,
+          "darstellung": "zebra",
+          "zebra_farbe": "surf",
+          "eckradius": 4,
+          "polster": 12,
+          "grundlinie_versatz": 3,
+          "stil_label": "tab_label",
+          "stil_wert": "tab_wert",
+          "zeilen": [
+            {
+              "label": "Wohnfläche",
+              "feld": "objekt.wohnflaeche"
+            },
+            {
+              "label": "Nutzfläche",
+              "feld": "objekt.nutzflaeche"
+            },
+            {
+              "label": "Grundstück",
+              "feld": "objekt.grundstueck"
+            },
+            {
+              "label": "Zimmer",
+              "feld": "objekt.zimmer"
+            },
+            {
+              "label": "Schlafzimmer",
+              "feld": "objekt.schlafzimmer"
+            },
+            {
+              "label": "Badezimmer",
+              "feld": "objekt.badezimmer"
+            },
+            {
+              "label": "Etagen",
+              "feld": "objekt.etagen_gesamt"
+            },
+            {
+              "label": "Keller",
+              "feld": "objekt.unterkellert"
+            },
+            {
+              "label": "Baujahr",
+              "feld": "objekt.baujahr"
+            },
+            {
+              "label": "Modernisierung",
+              "feld": "objekt.modernisierung_jahr"
+            },
+            {
+              "label": "Zustand",
+              "feld": "objekt.zustand"
+            },
+            {
+              "label": "Stellplätze",
+              "feld": "objekt.stellplatz"
+            },
+            {
+              "label": "Heizung",
+              "feld": "objekt.heizungsart"
+            },
+            {
+              "label": "Energieträger",
+              "feld": "objekt.energie_traeger"
+            },
+            {
+              "label": "Energieausweis",
+              "feld": "objekt.energieausweis_typ"
+            }
+          ]
+        },
+        {
+          "id": "highlights-label",
+          "typ": "text",
+          "x": 42,
+          "y": 240.89,
+          "b": 200,
+          "h": 7,
+          "stil": "abschnitt_label",
+          "inhalt": "Highlights",
+          "einzeilig": true
+        },
+        {
+          "id": "highlights",
+          "typ": "highlights",
+          "x": 42,
+          "y": 62,
+          "b": 511.28,
+          "h": 171.89,
+          "darstellung": "karten",
+          "spalten": 4,
+          "abstand": 10,
+          "polster": 14,
+          "eckradius": 10,
+          "rahmen": "line",
+          "linienbreite": 0.8,
+          "nummer_versatz": 30,
+          "titel_versatz": 52,
+          "text_versatz": 14,
+          "stil_nummer": "hl_nummer",
+          "stil_titel": "hl_titel",
+          "stil_text": "hl_text"
+        }
+      ]
+    },
+    {
+      "id": "beschreibung",
+      "typ": "beschreibung",
+      "name": "Objektbeschreibung",
+      "elemente": [
+        {
+          "id": "kopf-nr",
+          "typ": "text",
+          "x": 42,
+          "y": 780.89,
+          "b": 18,
+          "h": 9,
+          "stil": "kapitel_nr",
+          "inhalt": "02",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-label",
+          "typ": "text",
+          "x": 62,
+          "y": 782.89,
+          "b": 260,
+          "h": 7,
+          "stil": "kapitel_label",
+          "inhalt": "Objektbeschreibung",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-linie",
+          "typ": "form",
+          "x": 186.486,
+          "y": 792.39,
+          "b": 366.794,
+          "h": 0,
+          "form": "linie",
+          "strich": "line",
+          "linienbreite": 0.6
+        },
+        {
+          "id": "kopf-titel",
+          "typ": "text",
+          "x": 42,
+          "y": 725.89,
+          "b": 471.28,
+          "h": 24,
+          "stil": "kapitel_titel",
+          "inhalt": "Raum für das, was zählt.",
+          "einzeilig": true
+        },
+        {
+          "id": "beschreibung-bild-1",
+          "typ": "bild",
+          "x": 42,
+          "y": 413.89,
+          "b": 311.9936,
+          "h": 300,
+          "slot": {
+            "art": "foto",
+            "nr": 1
+          },
+          "fuellmodus": "cover",
+          "eckradius": 10,
+          "platzhalter_farbe": "surf2",
+          "label": "Wohnbereich",
+          "stil_label": "bild_label",
+          "label_hintergrund": "weiss"
+        },
+        {
+          "id": "beschreibung-bild-2",
+          "typ": "bild",
+          "x": 363.9936,
+          "y": 413.89,
+          "b": 189.2864,
+          "h": 300,
+          "slot": {
+            "art": "foto",
+            "nr": 2
+          },
+          "fuellmodus": "cover",
+          "eckradius": 10,
+          "platzhalter_farbe": "surf2",
+          "label": "Außenansicht",
+          "stil_label": "bild_label",
+          "label_hintergrund": "weiss"
+        },
+        {
+          "id": "zitat-balken",
+          "typ": "form",
+          "x": 42,
+          "y": 361.89,
+          "b": 3,
+          "h": 30,
+          "form": "rechteck",
+          "fuell": "a"
+        },
+        {
+          "id": "zitat",
+          "typ": "text",
+          "x": 58,
+          "y": 364.89,
+          "b": 471.28,
+          "h": 13,
+          "stil": "zitat",
+          "inhalt": "„{{objekt.expose_slogan}}“",
+          "einzeilig": true
+        },
+        {
+          "id": "zitat-quelle",
+          "typ": "text",
+          "x": 58,
+          "y": 355.89,
+          "b": 471.28,
+          "h": 8,
+          "stil": "zitat_quelle",
+          "inhalt": "{{objekt.objekttitel}}",
+          "einzeilig": true
+        },
+        {
+          "id": "beschreibung-text",
+          "typ": "text",
+          "x": 42,
+          "y": 62,
+          "b": 511.28,
+          "h": 261.89,
+          "stil": "fliesstext",
+          "inhalt": "{{objekt.beschreibung_objekt}}",
+          "spalten": 2,
+          "spaltenabstand": 24,
+          "blocksatz": true,
+          "absatzabstand": 7,
+          "aufteilung": "haelfte",
+          "verdichten": false
+        }
+      ]
+    },
+    {
+      "id": "ausstattung",
+      "typ": "ausstattung",
+      "name": "Ausstattung",
+      "elemente": [
+        {
+          "id": "kopf-nr",
+          "typ": "text",
+          "x": 42,
+          "y": 780.89,
+          "b": 18,
+          "h": 9,
+          "stil": "kapitel_nr",
+          "inhalt": "03",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-label",
+          "typ": "text",
+          "x": 62,
+          "y": 782.89,
+          "b": 260,
+          "h": 7,
+          "stil": "kapitel_label",
+          "inhalt": "Ausstattung",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-linie",
+          "typ": "form",
+          "x": 142.75,
+          "y": 792.39,
+          "b": 410.53,
+          "h": 0,
+          "form": "linie",
+          "strich": "line",
+          "linienbreite": 0.6
+        },
+        {
+          "id": "kopf-titel",
+          "typ": "text",
+          "x": 42,
+          "y": 725.89,
+          "b": 471.28,
+          "h": 24,
+          "stil": "kapitel_titel",
+          "inhalt": "Durchdacht bis ins Detail.",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-unter",
+          "typ": "text",
+          "x": 42,
+          "y": 722.39,
+          "b": 471.28,
+          "h": 9.5,
+          "stil": "kapitel_unter",
+          "inhalt": "Qualität, die man sieht – und im Alltag spürt.",
+          "einzeilig": true
+        },
+        {
+          "id": "ausstattung-bild",
+          "typ": "bild",
+          "x": 42,
+          "y": 431.89,
+          "b": 511.28,
+          "h": 270,
+          "slot": {
+            "art": "foto",
+            "nr": 3
+          },
+          "fuellmodus": "cover",
+          "eckradius": 10,
+          "platzhalter_farbe": "surf2",
+          "label": "Küche / Essbereich",
+          "stil_label": "bild_label",
+          "label_hintergrund": "weiss"
+        },
+        {
+          "id": "ausstattung-liste",
+          "typ": "ausstattung",
+          "x": 42,
+          "y": 62,
+          "b": 511.28,
+          "h": 333.89,
+          "darstellung": "checkliste",
+          "spalten": 2,
+          "spaltenabstand": 20,
+          "zeilenhoehe": 34,
+          "kachel_versatz": 10,
+          "kachel_hoehe": 28,
+          "eckradius": 6,
+          "hintergrund": "surf",
+          "haken_farbe": "a",
+          "haken_innen": "weiss",
+          "haken_versatz": 2,
+          "haken_groesse": 9,
+          "polster": 10,
+          "einzug": 28,
+          "text_versatz": -0.5,
+          "stil_punkt": "ausstattung_punkt"
+        }
+      ]
+    },
+    {
+      "id": "bildseite-1",
+      "typ": "bildseite",
+      "name": "Impressionen",
+      "elemente": [
+        {
+          "id": "kopf-nr",
+          "typ": "text",
+          "x": 42,
+          "y": 780.89,
+          "b": 18,
+          "h": 9,
+          "stil": "kapitel_nr",
+          "inhalt": "04",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-label",
+          "typ": "text",
+          "x": 62,
+          "y": 782.89,
+          "b": 260,
+          "h": 7,
+          "stil": "kapitel_label",
+          "inhalt": "Impressionen",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-linie",
+          "typ": "form",
+          "x": 146.79,
+          "y": 792.39,
+          "b": 406.49,
+          "h": 0,
+          "form": "linie",
+          "strich": "line",
+          "linienbreite": 0.6
+        },
+        {
+          "id": "kopf-titel",
+          "typ": "text",
+          "x": 42,
+          "y": 725.89,
+          "b": 471.28,
+          "h": 24,
+          "stil": "kapitel_titel",
+          "inhalt": "Ein Zuhause mit Charakter.",
+          "einzeilig": true
+        },
+        {
+          "id": "galerie",
+          "typ": "galerie",
+          "x": 42,
+          "y": 62,
+          "b": 511.28,
+          "h": 657.89,
+          "layout": "gross_oben",
+          "gross_anteil": 0.46,
+          "abstand": 10,
+          "eckradius": 10,
+          "ab_nr": 4,
+          "platzhalter_farbe": "surf2",
+          "stil_label": "bild_label",
+          "label_hintergrund": "weiss",
+          "beschriftungen": [
+            "Terrasse & Garten",
+            "Elternschlafzimmer",
+            "Tageslichtbad"
+          ]
         }
       ]
     }

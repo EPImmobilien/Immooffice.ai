@@ -25,7 +25,9 @@ export type FarbRef =
   // Abstufungen, die die Ableitung rechnet. Welche es gibt, haengt an der
   // Ableitung — raster kennt surf/surf2/line, signature paper/hair, studio
   // tint/tint2. Der Editor bietet nur an, was die Vorlage hat.
-  | { palette: string };
+  | { palette: string }
+  // Gemischt, wie die Prototypen es im Satz tun: mix(p, weiss, 0.6).
+  | { mix: [FarbRef, FarbRef, number] };
 
 /** Eine Schrift: eine der mitgelieferten oder die des Mandanten. */
 export type SchriftRef =

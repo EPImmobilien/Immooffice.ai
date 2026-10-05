@@ -12,7 +12,7 @@
 // ============================================================================
 
 import type { Farbe } from "./farben";
-import { SCHWARZ, WEISS, hx, palette } from "./farben";
+import { SCHWARZ, WEISS, hx, mix as mischen, palette } from "./farben";
 import type { Ableitung } from "./farben";
 import type { FarbRef, SchriftRef, TextStil, Vorlage } from "./schema";
 import type { RGBA } from "./schritte";
@@ -58,6 +58,19 @@ export function farbe(ref: FarbRef, p: Palette, deckkraft = 1): RGBA {
 }
 
 function farbeOhne(ref: FarbRef, p: Palette): Farbe {
+  // Gemischte Farbe: { mix: ["p", "weiss", 0.6] }. Die Prototypen mischen
+  // an vielen Stellen unmittelbar im Satz — ein halbdurchsichtiges Weiss
+  // auf der Primaerflaeche, ein aufgehelltes Dunkel fuer eine Haarlinie.
+  // Das sind keine Palettenfarben, und sie als Hexwert einzutragen wuerde
+  // sie vom Branding des Mandanten abschneiden: bei einem anderen
+  // Primaerton muesste jede davon nachgerechnet werden.
+  if (typeof ref === "object" && ref !== null && "mix" in ref) {
+    const [a, b, t] = (ref as { mix: [FarbRef, FarbRef, number] }).mix;
+    if (typeof t !== "number") {
+      throw new Error(`mix braucht einen Anteil als Zahl: ${JSON.stringify(ref)}`);
+    }
+    return mischen(farbeOhne(a, p), farbeOhne(b, p), t);
+  }
   if (typeof ref === "object" && ref !== null && "palette" in ref) {
     const c = p[ref.palette];
     if (!c) {

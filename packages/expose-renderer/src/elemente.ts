@@ -166,25 +166,38 @@ const textOhneDrehung: Zeichner = (el, u) => {
     warne(u, "gekuerzt", el, `Auf ${maxZeilen} Zeilen gekuerzt.`);
   }
 
-  // Wie viele Zeilen in eine Spalte passen. Bei "haelfte" teilt sich der
-  // Text gleichmaessig, bei "fliessend" laeuft Spalte 1 voll.
+  // Der Text wird in SCHLITZE zerlegt: jede Zeile einer, jeder
+  // Absatzwechsel einer. Das ist nicht Formalismus, sondern das Verhalten
+  // der Prototypen: ihr wrap() liefert die Leerzeile zwischen zwei
+  // Absaetzen als eigenen Eintrag, und die zweispaltige
+  // Objektbeschreibung teilt die Liste in der Mitte — Leerzeilen
+  // mitgezaehlt. Wer nur die Zeilen zaehlt, teilt eine Zeile zu spaet.
+  const absatzLuft = zahl(el, "absatzabstand", v.zeilenhoehe * regeln.absatzFaktor);
+  type Schlitz = { zeile?: typeof zeilen[number]; luft: number };
+  const schlitze: Schlitz[] = [];
+  let letzterAbsatz = zeilen.length ? zeilen[0].absatz : 0;
+  for (const zeile of zeilen) {
+    if (zeile.absatz !== letzterAbsatz) {
+      schlitze.push({ luft: absatzLuft });
+      letzterAbsatz = zeile.absatz;
+    }
+    schlitze.push({ zeile, luft: v.zeilenhoehe });
+  }
+
   const proSpalte = zeichenkette(el, "aufteilung") === "fliessend"
-    ? Math.max(1, Math.floor(v.zeilenhoehe > 0 ? el.h / v.zeilenhoehe : zeilen.length))
-    : Math.ceil(zeilen.length / spalten);
+    ? Math.max(1, Math.floor(v.zeilenhoehe > 0 ? el.h / v.zeilenhoehe : schlitze.length))
+    : Math.ceil(schlitze.length / spalten);
 
   for (let sp = 0; sp < spalten; sp++) {
-    const teil = zeilen.slice(sp * proSpalte, (sp + 1) * proSpalte);
+    const teil = schlitze.slice(sp * proSpalte, (sp + 1) * proSpalte);
     if (!teil.length) continue;
     const x = el.x + sp * (spaltenbreite + abstand);
     let y = el.y + el.h;
-    let letzterAbsatz = teil[0].absatz;
-    for (const zeile of teil) {
-      if (zeile.absatz !== letzterAbsatz) {
-        y -= v.zeilenhoehe * regeln.absatzFaktor;
-        letzterAbsatz = zeile.absatz;
+    for (const schlitz of teil) {
+      if (schlitz.zeile) {
+        setzeZeile(u, schlitz.zeile, x, y, spaltenbreite, s, v.groesse, regeln.blocksatz);
       }
-      setzeZeile(u, zeile, x, y, spaltenbreite, s, v.groesse, regeln.blocksatz);
-      y -= v.zeilenhoehe;
+      y -= schlitz.luft;
     }
   }
 };
@@ -423,6 +436,21 @@ const faktentabelle: Zeichner = (el, u) => {
   const flaecheFarbe = farbRef(el, "zebra_farbe", u);
   const linie = farbRef(el, "linien_farbe", u);
 
+  // Gestapelt: Label ueber dem Wert, beide am linken Rand. So steht das
+  // Preis-Panel der Raster-Vorlage und die Angabenliste von Signature.
+  if (art === "gestapelt") {
+    let y = el.y + el.h;
+    for (const z of zeilen) {
+      u.blatt.T(el.x, y - zahl(el, "label_versatz", 0),
+                sLabel.grossbuchstaben ? z.label.toLocaleUpperCase("de-DE") : z.label,
+                sLabel.schnitt, sLabel.groesse, sLabel.farbe, sLabel.sperrung);
+      u.blatt.T(el.x, y - zahl(el, "wert_versatz", 14), z.wert, sWert.schnitt,
+                sWert.groesse, sWert.farbe, sWert.sperrung);
+      y -= zh;
+    }
+    return;
+  }
+
   let y = el.y + el.h;
   zeilen.forEach((z, i) => {
     if (art === "zebra" && i % 2 === 0 && flaecheFarbe) {
@@ -643,22 +671,25 @@ const ausstattung: Zeichner = (el, u) => {
   const polster = zahl(el, "polster", 10);
   const einzug = zahl(el, "einzug", 28);
 
+  // Alle Masse zaehlen von der Oberkante der Zeile nach unten — so
+  // rechnen die Prototypen, und so bleibt eine Zeile zusammen, wenn der
+  // Rahmen sich aendert.
   punkte.forEach((p, i) => {
     const sp = i % spalten;
     const reihe = Math.floor(i / spalten);
     const x = el.x + sp * (sb + abstand);
     const y = el.y + el.h - reihe * zh;
     if (fuell) {
-      u.blatt.rect(x, y - zh + zahl(el, "kachel_luft", 4), sb,
-                   zh - zahl(el, "kachel_luft", 4) * 2 + 2, fuell, null,
+      u.blatt.rect(x, y - zahl(el, "kachel_versatz", 10), sb,
+                   zahl(el, "kachel_hoehe", zh - 6), fuell, null,
                    zahl(el, "eckradius", 6));
     }
     if (art === "checkliste" && haken) {
-      hakenZeichnen(u, x + polster, y - zahl(el, "haken_versatz", 10), haken,
+      hakenZeichnen(u, x + polster, y - zahl(el, "haken_versatz", 2), haken,
                     hakenInnen, zahl(el, "haken_groesse", 9));
     }
-    u.blatt.T(x + einzug, y - zahl(el, "text_versatz", 8), p, s.schnitt, s.groesse,
-              s.farbe, s.sperrung);
+    u.blatt.T(x + einzug, y - zahl(el, "text_versatz", -0.5), p, s.schnitt,
+              s.groesse, s.farbe, s.sperrung);
   });
 };
 
@@ -741,6 +772,71 @@ function bildSchluessel(slot: { art?: string; nr?: number } | undefined): string
   }
 }
 
+// ------------------------------------------------------------------ galerie
+
+/**
+ * Ein Raster aus Bildslots. Die Aufteilungen sind die, die in den drei
+ * Vorlagen vorkommen:
+ *
+ *   "gross_oben"  ein breites Bild oben, zwei gleich grosse darunter
+ *   "1+2"         ein hohes Bild links, zwei gestapelte rechts
+ *   "2x2"         vier gleich grosse
+ *   "reihe"       n gleich breite nebeneinander
+ *
+ * Die Beschriftungen stehen in der Vorlage — es sind die Vorschlaege der
+ * Seitenbibliothek, die ein Nutzer ueberschreibt. Fehlt eine, nimmt der
+ * Renderer die Beschriftung des Fotos selbst.
+ */
+const galerie: Zeichner = (el, u) => {
+  const layout = zeichenkette(el, "layout") ?? "gross_oben";
+  const g = zahl(el, "abstand", 10);
+  const abNr = zahl(el, "ab_nr", 1);
+  const beschriftungen = (el["beschriftungen"] as string[] | undefined) ?? [];
+
+  const rahmen: { x: number; y: number; b: number; h: number }[] = [];
+  if (layout === "gross_oben") {
+    const anteil = zahl(el, "gross_anteil", 0.46);
+    const gross = el.h * anteil;
+    const klein = el.h - gross - g;
+    const kb = (el.b - g) / 2;
+    rahmen.push({ x: el.x, y: el.y + el.h - gross, b: el.b, h: gross });
+    rahmen.push({ x: el.x, y: el.y, b: kb, h: klein });
+    rahmen.push({ x: el.x + kb + g, y: el.y, b: kb, h: klein });
+  } else if (layout === "1+2") {
+    const anteil = zahl(el, "gross_anteil", 0.5);
+    const gb = el.b * anteil - g / 2;
+    const kb = el.b - gb - g;
+    const kh = (el.h - g) / 2;
+    rahmen.push({ x: el.x, y: el.y, b: gb, h: el.h });
+    rahmen.push({ x: el.x + gb + g, y: el.y + kh + g, b: kb, h: kh });
+    rahmen.push({ x: el.x + gb + g, y: el.y, b: kb, h: kh });
+  } else if (layout === "2x2") {
+    const kb = (el.b - g) / 2;
+    const kh = (el.h - g) / 2;
+    for (const [sx, sy] of [[0, 1], [1, 1], [0, 0], [1, 0]]) {
+      rahmen.push({ x: el.x + sx * (kb + g), y: el.y + sy * (kh + g), b: kb, h: kh });
+    }
+  } else {
+    const n = Math.max(1, zahl(el, "anzahl", 3));
+    const kb = (el.b - g * (n - 1)) / n;
+    for (let i = 0; i < n; i++) {
+      rahmen.push({ x: el.x + i * (kb + g), y: el.y, b: kb, h: el.h });
+    }
+  }
+
+  rahmen.forEach((r, i) => {
+    const kind: Element = {
+      ...el,
+      id: `${el.id}-${i + 1}`,
+      typ: "bild",
+      x: r.x, y: r.y, b: r.b, h: r.h,
+      slot: { art: "foto", nr: abNr + i },
+      label: beschriftungen[i] ?? `{{bild.foto.${abNr + i}.titel?}}`,
+    } as Element;
+    bild(kind, u);
+  });
+};
+
 // ----------------------------------------------------------------------- qr
 
 const qr: Zeichner = (el, u) => {
@@ -757,5 +853,5 @@ const qr: Zeichner = (el, u) => {
 
 export const ELEMENTE: Partial<Record<ElementTyp, Zeichner>> = {
   text, form, datenfeld, kennzahl, faktentabelle, raumliste, distanzen,
-  highlights, ausstattung, bild, qr,
+  highlights, ausstattung, bild, galerie, qr,
 };

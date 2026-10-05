@@ -105,7 +105,7 @@ const farbSchluessel = (c) => (c ? `${hex({ r: c[0], g: c[1], b: c[2] })}/${rund
 function schluessel(s) {
   switch (s.art) {
     case 'text':
-      return `text|${s.text}|${schnittName(s.schnitt)}|${s.groesse}|${rund(s.sperrung)}|${farbSchluessel(s.farbe)}`;
+      return `text|${seitenzahl(s.text)}|${schnittName(s.schnitt)}|${s.groesse}|${rund(s.sperrung)}|${farbSchluessel(s.farbe)}`;
     case 'rechteck':
     case 'rundrechteck':
       return `${s.art}|${rund(s.b)}|${rund(s.h)}|${rund(s.r || 0)}|` +
@@ -186,6 +186,10 @@ let fehler = 0;
 let geprueft = 0;
 let platzhalter = 0;
 let groessteAbweichung = 0;
+// Wird je Vorlage gesetzt; schluessel() liest es.
+let unvollstaendig = false;
+const seitenzahl = (t) => (unvollstaendig && /^\d+ \/ \d+$/.test(t))
+  ? t.replace(/\/ \d+$/, '/ n') : t;
 const platzhalterArten = new Map();
 const meldungen = [];
 
@@ -212,6 +216,11 @@ for (const name of WELCHE) {
 
   // Nur so viele Seiten vergleichen, wie die Vorlage schon hat.
   const seiten = Math.min(ergebnis.seiten.length, soll.seiten.length);
+  // Solange die Vorlage weniger Seiten hat als der Prototyp, steht im Fuss
+  // zwangslaeufig eine andere Gesamtzahl ("02 / 02" statt "02 / 10"). Die
+  // Nachsicht gilt nur fuer genau diese Form und verschwindet von selbst,
+  // sobald alle Seiten gebaut sind.
+  unvollstaendig = ergebnis.seiten.length < soll.seiten.length;
   for (let i = 0; i < seiten; i++) {
     const sollSchritte = soll.seiten[i];
     const istSchritte = flach(ergebnis.seiten[i].schritte);

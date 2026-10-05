@@ -39,7 +39,7 @@ function istBekannt(schluessel: string): boolean {
   if (BEKANNTE_FELDER.has(schluessel)) return true;
   if (EIGENE_FELDER.has(schluessel)) return true;
   // Durchnummerierte Bildslots: bild.foto.3, bild.grundriss.2
-  return /^bild\.(foto|grundriss)\.\d+$/.test(schluessel);
+  return /^bild\.(foto|grundriss)\.\d+(\.titel)?$/.test(schluessel);
 }
 
 export function vorlagePruefen(v: Vorlage): Befund[] {

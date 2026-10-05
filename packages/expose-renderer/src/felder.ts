@@ -278,6 +278,10 @@ export const RECHNUNG: Feld[] = [
 export const SEITE: Feld[] = [
   { schluessel: "seite.nummer", name: "Seitenzahl", typ: "zahl", quelle: GERECHNET, stellen: 0 },
   { schluessel: "seite.gesamt", name: "Seiten insgesamt", typ: "zahl", quelle: GERECHNET, stellen: 0 },
+  { schluessel: "seite.nummer_zweistellig", name: "Seitenzahl, zweistellig", typ: "text",
+    quelle: GERECHNET, hinweis: "Mit fuehrender Null: 02 statt 2." },
+  { schluessel: "seite.gesamt_zweistellig", name: "Seiten insgesamt, zweistellig",
+    typ: "text", quelle: GERECHNET },
   { schluessel: "seite.name", name: "Name der Seite", typ: "text", quelle: GERECHNET },
   { schluessel: "datum", name: "Heutiges Datum", typ: "datum", quelle: GERECHNET },
 ];
