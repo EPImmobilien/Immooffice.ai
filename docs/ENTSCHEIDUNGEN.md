@@ -4295,3 +4295,28 @@ als Preis `angebotspreis`, und wenn der fehlte, `verkaufspreis`. Der
 erzielte Preis gehört in kein Exposé für Interessenten — er steht mit
 diesem Grund in `AUSGENOMMEN` des Feldkatalogs. Ohne Angebotspreis steht im
 Exposé jetzt kein Preis, und die Zeile entfällt.
+
+### Die Kostenseite braucht einen Preis, nicht nur einen Verkauf
+
+Sie zeigt Kaufpreis, Grunderwerbsteuer, Notar, Courtage, Gesamtaufwand und
+Monatsrate — alles davon hängt am Angebotspreis. Fehlt der, fällt jede
+einzelne Zeile aus, und zurück bleiben zwei Überschriften auf einer leeren
+Seite. Das ist schlechter als keine Seite.
+
+Der Fall ist nicht theoretisch: das eine Objekt, das am 05.10.2026 im
+eigenen Projekt steht, hat keinen Angebotspreis. `fork_41` erweitert die
+Bedingung auf „Verkauf **und** Preis vorhanden".
+
+### Eine Kopie im Browser verliert das nachgestellte Null
+
+Beim Vergleich der gespeicherten Vorlagen fiel auf, dass „Studio (Kopie)"
+eine andere `md5` hat als die Systemvorlage — bei gleichem Inhalt. Grund:
+`1.0` in der JSON-Datei wird in JavaScript zur Zahl `1` und als `1`
+zurückgeschrieben. `jsonb` bewahrt die Schreibweise einer Zahl, `jsonb =
+jsonb` vergleicht sie aber numerisch: die beiden Dokumente sind **gleich**
+(nachgeprüft), nur 30 Zeichen kürzer.
+
+Steht hier, weil der Abgleich „stimmt das Dokument im Projekt mit dem im
+Repository überein" über `md5(dokument::text)` läuft. Bei einer Kopie, die
+durch den Browser gegangen ist, muss er auf `jsonb = jsonb` umgestellt
+werden — sonst sucht jemand einen Fehler, den es nicht gibt.

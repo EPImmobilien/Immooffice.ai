@@ -348,6 +348,21 @@ const VOLL = {
     }
   }
 
+  // --- 3d. Verkauf ohne Preis: die Kostenseite entfaellt ------------------
+  // Sie zeigt Kaufpreis, Nebenkosten und Monatsrate. Ohne Angebotspreis
+  // faellt jede einzelne Zeile aus und zurueck blieben zwei Ueberschriften
+  // auf einer leeren Seite — schlechter als keine Seite. Genau dieser Fall
+  // steht im Projekt: das eine echte Objekt hat keinen Preis.
+  {
+    const o = await lauf({ ...VOLL, angebotspreis: null }, { nur_pruefen: true });
+    if (o) {
+      const namen = o.ergebnis.seitennamen || [];
+      melde('Ohne Preis entfaellt die Kostenseite',
+            o.ergebnis.ok === true && !namen.includes('Kosten & Finanzierung'),
+            JSON.stringify(namen));
+    }
+  }
+
   // --- 4. Ohne Fotos: eine klare Ansage, kein Abbruch ---------------------
   const d = await lauf({ ...VOLL, expose_titelbild_id: null }, { nur_pruefen: true });
   if (d) melde('Mit Titelbild-Verweis ins Leere laeuft es trotzdem',

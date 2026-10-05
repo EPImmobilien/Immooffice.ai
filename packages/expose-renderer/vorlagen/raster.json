@@ -2208,8 +2208,15 @@
       "typ": "kosten",
       "name": "Kosten & Finanzierung",
       "sichtbar_wenn": {
-        "feld": "objekt.vermarktung",
-        "gleich": "kauf"
+        "und": [
+          {
+            "feld": "objekt.vermarktung",
+            "gleich": "kauf"
+          },
+          {
+            "vorhanden": "rechnung.kaufpreis"
+          }
+        ]
       },
       "elemente": [
         {
