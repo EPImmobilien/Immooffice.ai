@@ -29,7 +29,15 @@ on:
 
 jobs:
   pruefen:
-    runs-on: ubuntu-latest
+    # Feste Abbildung statt ubuntu-latest. Zwei Gruende, beide am 05.10.2026
+    # aufgefallen: die Laeufe 55 bis 57 sind nacheinander mit
+    #   The job was not acquired by Runner of type hosted even after
+    #   multiple attempts
+    # gestorben, ohne einen einzigen Schritt — kein Fehler am Inhalt, sondern
+    # keine Maschine aus dem Topf von ubuntu-latest. Und GitHub stellt dieses
+    # Etikett ab dem 19.10.2026 auf Ubuntu 26 um; ein Bau, der sich ueber
+    # Nacht aendert, ist kein Bau.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
