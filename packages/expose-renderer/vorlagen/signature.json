@@ -620,6 +620,186 @@
         "farbe": "a",
         "sperrung": 2.6,
         "grossbuchstaben": true
+      },
+      "kond_name": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Regular"
+        },
+        "groesse": 13,
+        "farbe": "text"
+      },
+      "kond_wert": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Regular"
+        },
+        "groesse": 13,
+        "farbe": "ink",
+        "ausrichtung": "rechts"
+      },
+      "kond_summe": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 6.4,
+        "farbe": "ink",
+        "sperrung": 2.6,
+        "grossbuchstaben": true
+      },
+      "kond_summe_wert": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Light"
+        },
+        "groesse": 30,
+        "farbe": "a",
+        "sperrung": -0.4,
+        "ausrichtung": "rechts"
+      },
+      "saeule_titel": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "LightItalic"
+        },
+        "groesse": 20,
+        "farbe": "ink"
+      },
+      "saeule_text": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Light"
+        },
+        "groesse": 8,
+        "farbe": "text",
+        "zeilen": 13.2
+      },
+      "kontakt_ober": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 6.2,
+        "farbe": "a",
+        "sperrung": 2.8,
+        "grossbuchstaben": true,
+        "ausrichtung": "mitte"
+      },
+      "kontakt_titel": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Light"
+        },
+        "groesse": 32,
+        "farbe": "onD",
+        "sperrung": -0.3,
+        "ausrichtung": "mitte"
+      },
+      "kontakt_titel_kursiv": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "LightItalic"
+        },
+        "groesse": 32,
+        "farbe": "onD",
+        "sperrung": -0.3,
+        "ausrichtung": "mitte"
+      },
+      "ap_name_gross": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Regular"
+        },
+        "groesse": 22,
+        "farbe": "onD",
+        "ausrichtung": "mitte"
+      },
+      "ap_rolle_klein": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 5.6,
+        "farbe": "a",
+        "sperrung": 2.4,
+        "grossbuchstaben": true,
+        "ausrichtung": "mitte"
+      },
+      "ap_label_hell": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 5.4,
+        "farbe": "onDm",
+        "sperrung": 2.2,
+        "grossbuchstaben": true
+      },
+      "ap_wert_hell": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Regular"
+        },
+        "groesse": 11.5,
+        "farbe": "onD"
+      },
+      "qr_label": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 4.8,
+        "farbe": "onDm",
+        "sperrung": 1.6,
+        "grossbuchstaben": true,
+        "ausrichtung": "mitte"
+      },
+      "firma_name": {
+        "schrift": {
+          "familie": "cormorant",
+          "schnitt": "Regular"
+        },
+        "groesse": 11,
+        "farbe": "onD"
+      },
+      "firma_zeile": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 5.2,
+        "farbe": "onDm",
+        "sperrung": 1.8,
+        "grossbuchstaben": true
+      },
+      "firma_zeile_eng": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 5.2,
+        "farbe": "onDm",
+        "sperrung": 1.4,
+        "grossbuchstaben": true
+      },
+      "firma_web": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Medium"
+        },
+        "groesse": 5.2,
+        "farbe": "a",
+        "sperrung": 1.8,
+        "grossbuchstaben": true
+      },
+      "firma_hrb": {
+        "schrift": {
+          "familie": "jakarta",
+          "schnitt": "Light"
+        },
+        "groesse": 5.6,
+        "farbe": "onDm"
       }
     },
     "seitenfuss": {
@@ -2160,6 +2340,435 @@
           "linien_versatz": 10,
           "stil_label": "en_label",
           "stil_wert": "en_wert"
+        }
+      ]
+    },
+    {
+      "id": "konditionen",
+      "typ": "kosten",
+      "name": "Konditionen",
+      "elemente": [
+        {
+          "id": "kond-grund",
+          "typ": "form",
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 841.89,
+          "form": "rechteck",
+          "fuell": "paper"
+        },
+        {
+          "id": "kapitel-label",
+          "typ": "text",
+          "x": 54,
+          "y": 743.6899999999999,
+          "b": 300,
+          "h": 6.2,
+          "stil": "kapitel_label",
+          "inhalt": "IX  ·  Konditionen",
+          "einzeilig": true
+        },
+        {
+          "id": "kapitel-titel",
+          "typ": "text",
+          "x": 54,
+          "y": 675.89,
+          "b": 400,
+          "h": 34,
+          "stil": "kapitel_titel",
+          "inhalt": "Klarheit von",
+          "einzeilig": true
+        },
+        {
+          "id": "kapitel-titel-2",
+          "typ": "text",
+          "x": 54,
+          "y": 639.89,
+          "b": 400,
+          "h": 34,
+          "stil": "kapitel_titel_kursiv",
+          "inhalt": "Beginn an.",
+          "einzeilig": true
+        },
+        {
+          "id": "konditionen",
+          "typ": "kostenrechnung",
+          "x": 54,
+          "y": 485.89,
+          "b": 487.28,
+          "h": 128,
+          "balken_hoehe": 0,
+          "liste_abstand": 0,
+          "zeilenhoehe": 32,
+          "wert_spalte": 487.28,
+          "einzug": 0,
+          "punkt_groesse": 0,
+          "darstellung": "fuehrungspunkte",
+          "linien_farbe": "hair",
+          "linienbreite": 0.6,
+          "punkt_luft": 10,
+          "punkt_hoch": 3,
+          "mit_summe": false,
+          "stil_name": "kond_name",
+          "stil_wert": "kond_wert",
+          "posten": [
+            {
+              "label": "Kaufpreis",
+              "feld": "rechnung.kaufpreis"
+            },
+            {
+              "label": "Grunderwerbsteuer ({{rechnung.grunderwerbsteuer_satz}})",
+              "feld": "rechnung.grunderwerbsteuer"
+            },
+            {
+              "label": "Notar & Grundbuch (ca. {{rechnung.notar_satz}})",
+              "feld": "rechnung.notar"
+            },
+            {
+              "label": "Käuferprovision ({{rechnung.courtage_satz}} inkl. MwSt.)",
+              "feld": "rechnung.courtage"
+            }
+          ]
+        },
+        {
+          "id": "kond-linie",
+          "typ": "form",
+          "x": 54,
+          "y": 499.89,
+          "b": 487.28,
+          "h": 0,
+          "form": "linie",
+          "strich": "ink",
+          "linienbreite": 0.8
+        },
+        {
+          "id": "kond-summe-label",
+          "typ": "text",
+          "x": 54,
+          "y": 465.49,
+          "b": 300,
+          "h": 6.4,
+          "stil": "kond_summe",
+          "inhalt": "Gesamtinvestition",
+          "einzeilig": true
+        },
+        {
+          "id": "kond-summe-wert",
+          "typ": "text",
+          "x": 241.28,
+          "y": 433.89,
+          "b": 300,
+          "h": 30,
+          "stil": "kond_summe_wert",
+          "inhalt": "{{rechnung.gesamtaufwand}}",
+          "einzeilig": true
+        },
+        {
+          "id": "saeulen",
+          "typ": "rechtstext",
+          "x": 54,
+          "y": 200,
+          "b": 487.28,
+          "h": 175.89,
+          "spalten": 3,
+          "spaltenabstand": 20,
+          "titel_abstand": 32,
+          "titel_linie": "a",
+          "titel_linie_tief": 12,
+          "titel_linie_breite": 24,
+          "titel_linienbreite": 0.8,
+          "stil_titel": "saeule_titel",
+          "stil_text": "saeule_text",
+          "blocksatz": false,
+          "bloecke": [
+            {
+              "titel": "Diskretion",
+              "text": "Auf Wunsch präsentieren wir diese Immobilie ausschließlich ausgewählten Interessenten. Detaillierte Unterlagen erhalten Sie nach Unterzeichnung einer Vertraulichkeitserklärung."
+            },
+            {
+              "titel": "Besichtigung",
+              "text": "Besichtigungen finden ausschließlich nach persönlicher Vereinbarung und in Begleitung Ihres Ansprechpartners statt."
+            },
+            {
+              "titel": "Provision",
+              "text": "Die Käuferprovision von {{objekt.provision_aussen}} ist mit notarieller Beurkundung des Kaufvertrags verdient und fällig."
+            }
+          ]
+        },
+        {
+          "id": "kond-hinweis",
+          "typ": "text",
+          "x": 54,
+          "y": 51,
+          "b": 487.28,
+          "h": 9,
+          "stil": "hinweis_kursiv",
+          "inhalt": "Alle Angaben ohne Gewähr. Irrtum, Änderungen und Zwischenverkauf vorbehalten. Nebenkosten als Orientierungswerte.",
+          "einzeilig": true
+        }
+      ]
+    },
+    {
+      "id": "kontakt",
+      "typ": "kontakt",
+      "name": "Kontakt",
+      "ohne_fuss": true,
+      "elemente": [
+        {
+          "id": "kon-grund",
+          "typ": "form",
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 841.89,
+          "form": "rechteck",
+          "fuell": "d"
+        },
+        {
+          "id": "kon-bild",
+          "typ": "bild",
+          "x": 0,
+          "y": 541.89,
+          "b": 595.28,
+          "h": 300,
+          "slot": {
+            "art": "foto",
+            "nr": 7
+          },
+          "fuellmodus": "cover",
+          "platzhalter_farbe": "paper2"
+        },
+        {
+          "id": "kon-scrim-unten",
+          "typ": "form",
+          "x": 0,
+          "y": 541.89,
+          "b": 595.28,
+          "h": 300,
+          "form": "scrim",
+          "farbe": "d",
+          "staerke": 0.9,
+          "stufen": 40,
+          "richtung": "oben"
+        },
+        {
+          "id": "kon-scrim-oben",
+          "typ": "form",
+          "x": 0,
+          "y": 721.89,
+          "b": 595.28,
+          "h": 120,
+          "form": "scrim",
+          "farbe": "d",
+          "staerke": 0.5,
+          "stufen": 30,
+          "richtung": "unten"
+        },
+        {
+          "id": "kon-marke",
+          "typ": "text",
+          "x": 197.64,
+          "y": 761.89,
+          "b": 200,
+          "h": 10,
+          "stil": "marke",
+          "inhalt": "{{firma.marken_name}}",
+          "einzeilig": true
+        },
+        {
+          "id": "kon-marke-linie",
+          "typ": "form",
+          "x": 283.64,
+          "y": 763.89,
+          "b": 28,
+          "h": 0,
+          "form": "linie",
+          "strich": "a",
+          "linienbreite": 0.6
+        },
+        {
+          "id": "kon-marke-zusatz",
+          "typ": "text",
+          "x": 197.64,
+          "y": 747.69,
+          "b": 200,
+          "h": 5.2,
+          "stil": "marke_linie",
+          "inhalt": "{{firma.linie}}",
+          "einzeilig": true
+        },
+        {
+          "id": "kon-ober",
+          "typ": "text",
+          "x": 197.64,
+          "y": 475.69,
+          "b": 200,
+          "h": 6.2,
+          "stil": "kontakt_ober",
+          "inhalt": "X  ·  Ihr persönlicher Kontakt",
+          "einzeilig": true
+        },
+        {
+          "id": "kon-titel-1",
+          "typ": "text",
+          "x": 147.64,
+          "y": 403.89,
+          "b": 300,
+          "h": 32,
+          "stil": "kontakt_titel",
+          "inhalt": "Wir freuen uns auf",
+          "einzeilig": true
+        },
+        {
+          "id": "kon-titel-2",
+          "typ": "text",
+          "x": 147.64,
+          "y": 367.89,
+          "b": 300,
+          "h": 32,
+          "stil": "kontakt_titel_kursiv",
+          "inhalt": "Ihren Besuch.",
+          "einzeilig": true
+        },
+        {
+          "id": "ap",
+          "typ": "kontaktkarte",
+          "x": 0,
+          "y": 121.89,
+          "b": 595.28,
+          "h": 246,
+          "foto_radius": 44,
+          "foto_x": 297.64,
+          "foto_y": 190,
+          "foto_platzhalter": "paper2",
+          "ring_farbe": "a",
+          "ring_abstand": 5,
+          "ring_breite": 0.6,
+          "text_x": 0,
+          "name_versatz": 132,
+          "funktion_abstand": 18,
+          "kontakt_abstand": 36,
+          "kontakt_zeilenhoehe": 20,
+          "kontakt_ausrichtung": "mitte",
+          "kontakt_luft": 10,
+          "label_hoch": 1,
+          "stil_name": "ap_name_gross",
+          "stil_funktion": "ap_rolle_klein",
+          "stil_kontakt_label": "ap_label_hell",
+          "stil_kontakt_wert": "ap_wert_hell",
+          "kontakte": [
+            {
+              "label": "Telefon",
+              "feld": "ansprechpartner.telefon"
+            },
+            {
+              "label": "Mobil",
+              "feld": "ansprechpartner.mobil"
+            },
+            {
+              "label": "E-Mail",
+              "feld": "ansprechpartner.email"
+            }
+          ]
+        },
+        {
+          "id": "qr",
+          "typ": "qr",
+          "x": 479.28,
+          "y": 64,
+          "b": 62,
+          "h": 62,
+          "inhalt": "{{objekt.expose_qr_url}}",
+          "farbe": "onD"
+        },
+        {
+          "id": "qr-label",
+          "typ": "text",
+          "x": 479.28,
+          "y": 49.2,
+          "b": 62,
+          "h": 4.8,
+          "stil": "qr_label",
+          "inhalt": "Online-Exposé",
+          "einzeilig": true
+        },
+        {
+          "id": "kon-linie",
+          "typ": "form",
+          "x": 54,
+          "y": 128,
+          "b": 401.28,
+          "h": 0,
+          "form": "linie",
+          "strich": "dline",
+          "linienbreite": 0.4
+        },
+        {
+          "id": "kon-firma",
+          "typ": "text",
+          "x": 54,
+          "y": 97,
+          "b": 400,
+          "h": 11,
+          "stil": "firma_name",
+          "inhalt": "{{firma.name}}",
+          "einzeilig": true
+        },
+        {
+          "id": "kon-adresse",
+          "typ": "text",
+          "x": 54,
+          "y": 86.8,
+          "b": 400,
+          "h": 5.2,
+          "stil": "firma_zeile",
+          "inhalt": "{{firma.adresse}}",
+          "einzeilig": true
+        },
+        {
+          "id": "kon-kontakt",
+          "typ": "text",
+          "x": 54,
+          "y": 72.8,
+          "b": 400,
+          "h": 5.2,
+          "stil": "firma_zeile_eng",
+          "inhalt": "{{firma.telefon}}  ·  {{firma.email}}",
+          "einzeilig": true
+        },
+        {
+          "id": "kon-web",
+          "typ": "text",
+          "x": 54,
+          "y": 58.8,
+          "b": 400,
+          "h": 5.2,
+          "stil": "firma_web",
+          "inhalt": "{{firma.web}}",
+          "einzeilig": true
+        },
+        {
+          "id": "kon-hrb",
+          "typ": "text",
+          "x": 54,
+          "y": 38.4,
+          "b": 400,
+          "h": 5.6,
+          "stil": "firma_hrb",
+          "inhalt": "{{firma.impressum_zeile}}",
+          "einzeilig": true
+        },
+        {
+          "id": "kon-seite",
+          "typ": "text",
+          "x": 197.64,
+          "y": 16,
+          "b": 200,
+          "h": 10,
+          "stil": "fuss_seite",
+          "inhalt": "{{seite.nummer_zweistellig}}",
+          "einzeilig": true
         }
       ]
     }

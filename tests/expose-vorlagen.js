@@ -69,6 +69,20 @@ const ABWEICHENDE_TEXTE = [
          + 'eine Schreibweise. Der Fork setzt "ca." mit Punkt.',
   },
   {
+    vorlage: 'signature',
+    soll: 'Notar & Grundbuch (ca, 1,5 %)',
+    ist: 'Notar & Grundbuch (ca. 1,5 %)',
+    grund: 'Derselbe Tippfehler wie bei Raster: `.replace(".", ",")` trifft '
+         + 'auch den Punkt in "ca.".',
+  },
+  {
+    vorlage: 'signature',
+    soll: 'Käuferprovision (3,57 % inkl, MwSt,)',
+    ist: 'Käuferprovision (3,57 % inkl. MwSt.)',
+    grund: 'Derselbe Tippfehler, hier gleich zweimal: aus "inkl. MwSt." wird '
+         + '"inkl, MwSt,".',
+  },
+  {
     vorlage: 'studio',
     soll: 'Neubaustandard 2021 – durchdacht und sofort bezugsfertig.',
     ist: 'Durchdacht und sofort bezugsfertig.',
@@ -147,13 +161,15 @@ function schluessel(s) {
       return `${s.art}|${rund(s.b)}|${rund(s.h)}|${rund(s.r || 0)}|` +
              `${farbSchluessel(s.fuell)}|${farbSchluessel(s.strich)}`;
     case 'linie':
-      // Die Laenge auf ein Zehntel genau. Eine Fuehrungspunktreihe endet
-      // dort, wo der gemessene Text aufhoert; in der letzten Stelle
-      // schlaegt dann die Rundung der Breitenrechnung durch. Ein
-      // Hundertstel Punkt ist keine Abweichung — der Auftrag erlaubt zwei
-      // ganze. Der ORT der Linie wird weiter voll verglichen.
-      return `linie|${Math.round((s.x2 - s.x1) * 10) / 10}|` +
-             `${Math.round((s.y2 - s.y1) * 10) / 10}|${farbSchluessel(s.strich)}`;
+      // Die Laenge gehoert NICHT in den Schluessel. Eine
+      // Fuehrungspunktreihe endet dort, wo der gemessene Text aufhoert —
+      // ihre Laenge ist also abgeleitet und nicht gesetzt. Verglichen
+      // werden statt dessen beide Endpunkte, jeder mit derselben
+      // Toleranz wie jeder andere Ort. Das ist strenger als eine
+      // gerundete Laenge und sagt mehr: eine Linie, die 2 pt zu kurz
+      // ist, faellt auf, eine, die um ein Hundertstel abweicht, nicht.
+      return `linie|${s.y1 === s.y2 ? 'waagerecht' : s.x1 === s.x2 ? 'senkrecht' : 'schraeg'}` +
+             `|${farbSchluessel(s.strich)}`;
     case 'kreis':
       return `kreis|${rund(s.r)}|${farbSchluessel(s.fuell)}|${farbSchluessel(s.strich)}`;
     case 'ellipse':
@@ -177,6 +193,30 @@ function schluessel(s) {
     default:
       return s.art;
   }
+}
+
+/**
+ * Die kennzeichnenden Punkte eines Schritts. Bei einer Linie sind es
+ * beide Enden, sonst der Ansatzpunkt.
+ */
+function punkte(s) {
+  const m = s.matrix || [1, 0, 0, 1, 0, 0];
+  const p = (x, y) => [m[0] * x + m[2] * y + m[4], m[1] * x + m[3] * y + m[5]];
+  if (s.art === 'linie') return [p(s.x1, s.y1), p(s.x2, s.y2)];
+  return [ort(s)];
+}
+
+/** Groesster Abstand zwischen zwei Schritten, ueber ihre Punkte. */
+function abstand(a, b) {
+  const pa = punkte(a);
+  const pb = punkte(b);
+  if (pa.length !== pb.length) return Infinity;
+  let groesste = 0;
+  for (let i = 0; i < pa.length; i++) {
+    groesste = Math.max(groesste, Math.abs(pa[i][0] - pb[i][0]),
+                        Math.abs(pa[i][1] - pb[i][1]));
+  }
+  return groesste;
 }
 
 /** Der Ort eines Schritts, in Seitenkoordinaten (Matrix angewandt). */
@@ -392,8 +432,7 @@ for (const name of WELCHE) {
       let treffer = -1;
       let beste = Infinity;
       kandidaten.forEach((c, j) => {
-        const [cx, cy] = ort(c);
-        const d = Math.max(Math.abs(cx - x), Math.abs(cy - y));
+        const d = abstand(s, c);
         if (d < beste) { beste = d; treffer = j; }
       });
       if (treffer < 0) {

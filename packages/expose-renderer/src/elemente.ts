@@ -1392,7 +1392,19 @@ const kostenrechnung: Zeichner = (el, u) => {
               sName.farbe, sName.sperrung);
     u.blatt.T(el.x + spalte, y, `${zahlDe(Number(p.betrag), 0)} €`, sWert.schnitt,
               sWert.groesse, sWert.farbe, sWert.sperrung, "r");
-    if (linie) {
+    if (linie && zeichenkette(el, "darstellung") === "fuehrungspunkte") {
+      const nb = u.blatt.sw(p.name, sName.schnitt, sName.groesse, sName.sperrung);
+      const betrag = `${zahlDe(Number(p.betrag), 0)} €`;
+      const wb = u.blatt.sw(betrag, sWert.schnitt, sWert.groesse, sWert.sperrung);
+      const luft = zahl(el, "punkt_luft", 10);
+      const von = el.x + zahl(el, "einzug", 16) + nb + luft;
+      const bis = el.x + spalte - wb - luft;
+      if (bis > von) {
+        u.blatt.linie(von, y + zahl(el, "punkt_hoch", 3), bis,
+                      y + zahl(el, "punkt_hoch", 3), linie,
+                      zahl(el, "linienbreite", 0.6), [0.6, 2.6]);
+      }
+    } else if (linie) {
       u.blatt.linie(el.x, y - zahl(el, "linien_versatz", 9), el.x + spalte,
                     y - zahl(el, "linien_versatz", 9), linie,
                     zahl(el, "linienbreite", 0.5));
@@ -1503,6 +1515,11 @@ const kontaktkarte: Zeichner = (el, u) => {
     if (quelle === undefined) {
       warne(u, "fehlendes_bild", el, "Kein Foto des Ansprechpartners.");
     }
+    const ring = farbRef(el, "ring_farbe", u);
+    if (ring) {
+      u.blatt.kreis(fx, fy, r + zahl(el, "ring_abstand", 5), null, ring,
+                    zahl(el, "ring_breite", 0.6));
+    }
   }
 
   const x = el.x + zahl(el, "text_x", 140);
@@ -1510,8 +1527,9 @@ const kontaktkarte: Zeichner = (el, u) => {
   const name = wert(u.daten, "ansprechpartner.name");
   let y = el.y + el.h - zahl(el, "name_versatz", 40);
   if (name !== undefined) {
-    u.blatt.T(x, y, gross(sName, name), sName.schnitt, sName.groesse, sName.farbe,
-              sName.sperrung);
+    u.blatt.T(sName.ausrichtung === "mitte" ? el.x + el.b / 2 : x, y,
+              gross(sName, name), sName.schnitt, sName.groesse, sName.farbe,
+              sName.sperrung, ankerArt(sName.ausrichtung));
   } else {
     warne(u, "fehlender_wert", el, "Kein Name des Ansprechpartners.");
   }
@@ -1519,7 +1537,8 @@ const kontaktkarte: Zeichner = (el, u) => {
   y -= zahl(el, "funktion_abstand", 16);
   if (funktion !== undefined && zeichenkette(el, "stil_funktion")) {
     const s = u.stil(zeichenkette(el, "stil_funktion")!);
-    u.blatt.T(x, y, funktion, s.schnitt, s.groesse, s.farbe, s.sperrung);
+    u.blatt.T(s.ausrichtung === "mitte" ? el.x + el.b / 2 : x, y, gross(s, funktion),
+              s.schnitt, s.groesse, s.farbe, s.sperrung, ankerArt(s.ausrichtung));
   }
 
   const zeilen = (el["kontakte"] as { label: string; feld: string }[] | undefined) ?? [];
@@ -1528,11 +1547,28 @@ const kontaktkarte: Zeichner = (el, u) => {
   const zh = zahl(el, "kontakt_zeilenhoehe", 16);
   const wertX = x + zahl(el, "kontakt_spalte", 50);
   y -= zahl(el, "kontakt_abstand", 24);
+  // Mittig heisst: Beschriftung UND Wert zusammen zentriert, nicht jedes
+  // fuer sich. Sonst stuende der Doppelpunkt mal links, mal rechts von der
+  // Mitte und die Spalte flattert.
+  const mittig = zeichenkette(el, "kontakt_ausrichtung") === "mitte";
+  const luft = zahl(el, "kontakt_luft", 10);
   for (const z of zeilen) {
     const v = wert(u.daten, z.feld);
     if (v === undefined) continue;
-    u.blatt.T(x, y, sLabel.grossbuchstaben ? z.label.toLocaleUpperCase("de-DE") : z.label,
-              sLabel.schnitt, sLabel.groesse, sLabel.farbe, sLabel.sperrung);
+    const beschriftung = gross(sLabel, z.label);
+    if (mittig) {
+      const lb = u.blatt.sw(beschriftung, sLabel.schnitt, sLabel.groesse, sLabel.sperrung);
+      const wb = u.blatt.sw(v, sWert.schnitt, sWert.groesse, sWert.sperrung);
+      const x0 = el.x + el.b / 2 - (lb + luft + wb) / 2;
+      u.blatt.T(x0, y + zahl(el, "label_hoch", 1), beschriftung, sLabel.schnitt,
+                sLabel.groesse, sLabel.farbe, sLabel.sperrung);
+      u.blatt.T(x0 + lb + luft, y, v, sWert.schnitt, sWert.groesse, sWert.farbe,
+                sWert.sperrung);
+      y -= zh;
+      continue;
+    }
+    u.blatt.T(x, y, beschriftung, sLabel.schnitt, sLabel.groesse, sLabel.farbe,
+              sLabel.sperrung);
     u.blatt.T(wertX, y, v, sWert.schnitt, sWert.groesse, sWert.farbe, sWert.sperrung);
     y -= zh;
   }
@@ -1575,8 +1611,15 @@ const rechtstext: Zeichner = (el, u) => {
     const x = el.x + (i % spalten) * (sb + abstand);
     let y = el.y + el.h;
     if (b.titel !== undefined && sTitel) {
-      u.blatt.T(x, y, sTitel.grossbuchstaben ? b.titel.toLocaleUpperCase("de-DE") : b.titel,
-                sTitel.schnitt, sTitel.groesse, sTitel.farbe, sTitel.sperrung);
+      u.blatt.T(x, y, gross(sTitel, b.titel), sTitel.schnitt, sTitel.groesse,
+                sTitel.farbe, sTitel.sperrung);
+      const strich = farbRef(el, "titel_linie", u);
+      if (strich) {
+        u.blatt.linie(x, y - zahl(el, "titel_linie_tief", 12),
+                      x + zahl(el, "titel_linie_breite", 24),
+                      y - zahl(el, "titel_linie_tief", 12), strich,
+                      zahl(el, "titel_linienbreite", 0.8));
+      }
       y -= zahl(el, "titel_abstand", 16);
     }
     // Jede Zeile des Quelltexts ist ein eigener Absatz — so stehen
