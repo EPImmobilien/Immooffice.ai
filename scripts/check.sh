@@ -311,6 +311,16 @@ else
   fehler=1
 fi
 
+abschnitt "Expose-Schriften: eingebettet wie in assets/fonts/expose/"
+# Die Edge Function traegt die zwanzig Schnitte selbst — gepackt und
+# base64-kodiert. Weicht die Datei von den Schriften ab, bekommt ein Expose
+# andere Zeilenumbrueche als die Vorschau im Browser.
+if python3 scripts/expose-schriften-einbetten.py --pruefen; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Expose-Systemvorlagen: Migration entspricht den JSON-Dateien"
 # Die drei Systemvorlagen stehen in der Datenbank, aber geschrieben werden
 # sie in packages/expose-renderer/vorlagen/. Die Migration ist Erzeugnis:

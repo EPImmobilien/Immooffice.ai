@@ -4320,3 +4320,41 @@ Steht hier, weil der Abgleich „stimmt das Dokument im Projekt mit dem im
 Repository überein" über `md5(dokument::text)` läuft. Bei einer Kopie, die
 durch den Browser gegangen ist, muss er auf `jsonb = jsonb` umgestellt
 werden — sonst sucht jemand einen Fehler, den es nicht gibt.
+
+### Die Edge Function trägt ihre Schriften selbst
+
+Am 05.10.2026, kurz nach dem Ausrollen, brach jedes Exposé ab:
+
+> Die Schrift Jak-Light fehlt im Eimer branding-assets unter fonts/expose/
+> und war auch unter PORTAL_URL nicht erreichbar.
+
+Es war **nicht** Jak-Light. Alle drei Läufe (`expose_debug`) hören hinter
+`vorlage-ok` auf, also beim ersten Schnitt, den die jeweilige Vorlage nennt
+— bei Signature ist das Jak-Light. Im Eimer lagen null von zwanzig
+Schnitten, und in den Funktionsprotokollen steht **keine** Zeile „Schrift
+nicht erreichbar": der Nachlade-Zweig wurde nie betreten. Er wird nur
+betreten, wenn die Liste der Quellen gefüllt ist, und die ist leer, wenn
+weder `PORTAL_URL` noch `EXPOSE_FREIGABE_BASIS` eine Adresse mit Schema
+liefert.
+
+Die Ursache war also nicht eine Schrift, sondern die Kette: eine
+Umgebungsvariable **und** eine Auslieferung **und** ein Eimerinhalt mussten
+zusammenpassen, damit ein Exposé entsteht. Drei Dinge für etwas, das 395 KiB
+groß ist.
+
+Deshalb liegen die zwanzig Schnitte jetzt **in** der Funktion:
+`scripts/expose-schriften-einbetten.py` erzeugt
+`supabase/functions/expose-pdf-erzeugen/schriften.mjs` aus
+`assets/fonts/expose/` — gepackt und base64-kodiert, 576 KiB Quelltext,
+entpackt wird nur, was die Vorlage nennt. `npm run check` hält beides
+zusammen, und ein Test beweist, dass die Funktion **nicht** mehr im Eimer
+sucht.
+
+Die Auslieferung behält die Schriften unter `/schriften/expose/`: der Editor
+läuft im Browser und kann sie nicht mitbringen.
+
+Was damit auch wegfällt: `PORTAL_URL` wird für das Exposé nicht mehr
+gebraucht. Für die Links in den Mails der anderen zwölf Funktionen bleibt es
+nötig — und dass es nicht gesetzt ist, heißt, dass jeder Einladungs- und
+Freigabelink bisher auf `immooffice.example` zeigte. Das steht in
+`docs/INBETRIEBNAHME.md`, Schritt 2.

@@ -71,7 +71,8 @@ const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'immo-fn-'));
 // die Namen nach aussen gibt, die die Funktion benutzt.
 fs.writeFileSync(path.join(tmp, 'huelle.mjs'),
   'export async function laden(G) {\n'
-  + '  const { PDFLib, Image, Expose, fontkit, QRCode, createClient, Deno } = G;\n'
+  + '  const { PDFLib, Image, Expose, fontkit, QRCode, createClient, Deno,\n'
+  + '          SCHRIFTEN_EINGEBAUT } = G;\n'
   + '  let handler = null;\n'
   + '  const DenoStub = { ...Deno, serve: (h) => { handler = h; } };\n'
   + js.replace(/\bDeno\./g, 'DenoStub.')
@@ -149,14 +150,14 @@ function nachbau(daten) {
     };
     return api;
   };
-  const schriften = new Map();
-  for (const d of fs.readdirSync(SCHRIFTEN).filter((f) => f.endsWith('.ttf'))) {
-    schriften.set('fonts/expose/' + d, fs.readFileSync(path.join(SCHRIFTEN, d)));
-  }
   const eimer = (name) => ({
     download: async (pfad) => {
-      const roh = schriften.get(pfad);
-      if (roh) return { data: blob(roh), error: null };
+      // Fragt die Funktion noch im Eimer nach einer Schrift? Dann steht das
+      // im Protokoll und die Pruefung unten faellt um.
+      if (String(pfad).includes('fonts/')) {
+        protokoll.aufrufe.push(['schrift-im-eimer-gesucht', pfad]);
+        return { data: null, error: { message: 'keine Schrift im Eimer' } };
+      }
       if (name === 'branding-assets' && pfad.endsWith('logo.png')) return { data: null, error: { message: 'kein Logo' } };
       if (/\.(jpg|jpeg|png)$/i.test(String(pfad))) return { data: blob(JPEG), error: null };
       return { data: null, error: { message: 'nicht da: ' + pfad } };
@@ -191,6 +192,10 @@ async function lauf(immo, koerper, basis) {
     PDFLib: require('pdf-lib'),
     Image: class { static rgbaToColor() { return 0; } },
     Expose: await import('file://' + path.join(FUNKTION, 'immo-expose.mjs')),
+    // Die eingebetteten Schriften, genau wie die Funktion sie im Betrieb
+    // bekommt. Der Nachbau des Eimers liefert ABSICHTLICH keine Schrift
+    // mehr: wenn die Funktion wieder dort suchte, fiele der Test um.
+    SCHRIFTEN_EINGEBAUT: (await import('file://' + path.join(FUNKTION, 'schriften.mjs'))).SCHRIFTEN,
     fontkit: require('@pdf-lib/fontkit'),
     QRCode: {
       create: () => ({ modules: { size: 21, data: new Uint8Array(21 * 21).fill(1) } }),
@@ -259,6 +264,12 @@ const VOLL = {
     melde('Die Schnitte der Vorlage wurden geladen',
           Array.isArray(a.ergebnis.schnitte) && a.ergebnis.schnitte.length >= 4,
           JSON.stringify(a.ergebnis.schnitte));
+    // Der Kern des Befunds vom 05.10.2026: die Schriften muessen aus der
+    // Funktion selbst kommen. Kein Eimer, keine Umgebungsvariable, keine
+    // Auslieferung.
+    melde('Keine Schrift wurde im Eimer gesucht',
+          !a.db.protokoll.aufrufe.some((x) => x[0] === 'schrift-im-eimer-gesucht'),
+          JSON.stringify(a.db.protokoll.aufrufe.filter((x) => x[0] === 'schrift-im-eimer-gesucht')));
     melde('Bilder sind geladen', a.ergebnis.bilder >= 4, String(a.ergebnis.bilder));
     melde('Das KI-Bild ist als solches erkannt', a.ergebnis.ki_bilder === 1,
           String(a.ergebnis.ki_bilder));

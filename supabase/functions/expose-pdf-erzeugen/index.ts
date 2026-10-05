@@ -54,10 +54,30 @@ import { Image } from "https://deno.land/x/imagescript@1.3.0/mod.ts";
 // Es liegt in diesem Ordner, weil `supabase functions deploy` den Ordner
 // ausrollt; npm run check vergleicht es mit der Quelle.
 import * as Expose from "./immo-expose.mjs";
+// Die zwanzig Schnitte, gepackt und base64-kodiert. Erzeugt von
+// scripts/expose-schriften-einbetten.py aus assets/fonts/expose/.
+import { SCHRIFTEN as SCHRIFTEN_EINGEBAUT } from "./schriften.mjs";
 let fontkit: any = null;
 try { const m = await import("npm:@pdf-lib/fontkit@1.1.1"); fontkit = m.default || m; } catch (_e) {}
 let QRCode: any = null;
 try { const m = await import("npm:qrcode@1.5.3"); QRCode = m.default || m; } catch (_e) {}
+// Entpackt einen Schnitt und behaelt ihn. Modulebene ist hier richtig und
+// anderswo in dieser Datei ausdruecklich falsch: eine Schrift gehoert der
+// Plattform, nicht einem Mandanten. Zwischen zwei Anfragen kann daraus
+// nichts durchsickern, was nicht ohnehin jedem gehoert — und das Entpacken
+// von 40 KB je Schnitt soll nicht bei jedem Expose neu passieren.
+const immoSchriftCache = new Map<string, Uint8Array>();
+async function immoSchrift(name: string): Promise<Uint8Array | null> {
+const schon = immoSchriftCache.get(name);
+if (schon) return schon;
+const kodiert = (SCHRIFTEN_EINGEBAUT as Record<string, string>)[name];
+if (!kodiert) return null;
+const gepackt = Uint8Array.from(atob(kodiert), (c) => c.charCodeAt(0));
+const strom = new Blob([gepackt]).stream().pipeThrough(new DecompressionStream("gzip"));
+const roh = new Uint8Array(await new Response(strom).arrayBuffer());
+immoSchriftCache.set(name, roh);
+return roh;
+}
 const corsHeaders = {
 "Access-Control-Allow-Origin": "*",
 "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -390,41 +410,18 @@ const admin = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY
 // Funktion verhaelt sich dann wie bisher.
 let immoMandant: string | null = null;
 const immoSetzeMandant = (m: unknown) => { immoMandant = (typeof m === "string" && m) ? m : null; };
-// Die Schriften des Exposé-Baukastens. Sie sind Plattform-Gut, kein
-// Mandanten-Branding, und liegen im Wurzelverzeichnis des Eimers unter
-// fonts/expose/. Fehlt eine, holt die Huelle sie EINMAL von der
-// ausgelieferten Oberflaeche und legt sie dort ab — danach nie wieder.
-// Ein Mandant, der eine eigene Hausschrift hochlaedt, legt sie unter
-// {mandant}/fonts/… und uebersteuert damit die der Plattform.
+// Die Schriften des Exposé-Baukastens liegen NICHT im Eimer und nicht auf
+// der Oberflaeche, sondern in schriften.mjs neben dieser Datei. Warum, steht
+// dort; kurz: ein Expose hing sonst an einer Umgebungsvariablen, einer
+// Auslieferung und einem Eimerinhalt, die alle drei zusammenpassen mussten.
+// Am 05.10.2026 hat die Kette gerissen, und zwar bei allen zwanzig Schnitten
+// gleichzeitig.
 //
-// Nicht von der Google-Quelle, wie die Schriften der Vorlage: die
-// gelieferten Schnitte sind Instanzen einer variablen Schrift (die Achsen
-// sind aus den Referenz-PDFs zurueckgerechnet), auf den Zeichensatz der
-// Vorlagen verkleinert und ohne GSUB/GPOS. Es gibt sie nur dort, wo
-// scripts/expose-schriften.py sie erzeugt und scripts/bauen.py sie
-// hingelegt hat.
-// Woher die Oberflaeche erreichbar ist. PORTAL_URL zuerst; wo das nicht
-// gesetzt ist, steht derselbe Ursprung in EXPOSE_FREIGABE_BASIS, das vier
-// andere Funktionen fuer ihre Links benutzen (dort mit Pfad und
-// Abfrageteil — hier zaehlt nur der Ursprung). Ein eigenes Geheimnis mehr
-// zu verlangen, wo der Wert schon im Projekt steht, waere eine Huerde
-// ohne Gewinn.
-const WEB_BASIS = (function () {
-  const kandidaten = [Deno.env.get("PORTAL_URL"), Deno.env.get("EXPOSE_FREIGABE_BASIS")];
-  for (const k of kandidaten) {
-    const v = (k || "").trim();
-    if (!v) continue;
-    try { return new URL(v).origin; } catch (_e) { /* naechster */ }
-  }
-  return "";
-})();
+// Die Liste bleibt leer: die Huelle unten holt eine fehlende Datei nur dann
+// von einer Quelle, wenn sie hier eine findet. Fuer die Schriften der
+// Vorlage (Montserrat und Verwandte) tun das die anderen Funktionen
+// weiterhin; diese braucht sie nicht mehr.
 const IMMO_SCHRIFTEN: Record<string, string> = {};
-if (WEB_BASIS) {
-  for (const name of Expose.SCHNITTE) {
-    IMMO_SCHRIFTEN["fonts/expose/" + name + ".ttf"] =
-      WEB_BASIS + "/schriften/expose/" + name + ".ttf";
-  }
-}
 {
   const immoEcht = admin.storage.from.bind(admin.storage);
   const immoVorne = (pf: unknown): unknown =>
@@ -716,11 +713,16 @@ sammle(vorlage);
 if (!gebrauchteSchnitte.size) return jsonErr(500, "Die Vorlage nennt keine Schrift.");
 const schriften = new Map<string, any>();
 for (const name of gebrauchteSchnitte) {
-const { data } = await admin.storage.from("branding-assets").download("fonts/expose/" + name + ".ttf");
-if (!data) return jsonErr(500, "Die Schrift " + name + " fehlt im Eimer branding-assets "
-+ "unter fonts/expose/ und war auch unter PORTAL_URL nicht erreichbar. "
-+ "Erst `python3 scripts/expose-schriften.py`, dann die Oberflaeche ausliefern.");
-schriften.set(name, Expose.metrikLesen(new Uint8Array(await data.arrayBuffer()), name));
+const roh = await immoSchrift(name);
+if (!roh) {
+// Das ist kein Betriebsfehler mehr, sondern ein Fehler in der Vorlage:
+// sie nennt einen Schnitt, den es nicht gibt. Die zwanzig, die es gibt,
+// stehen in packages/expose-renderer (SCHNITTE).
+return jsonErr(500, "Die Vorlage " + vz.name + " nennt den Schriftschnitt \""
++ name + "\", und den gibt es nicht. Erlaubt sind: "
++ Expose.SCHNITTE.join(", ") + ".");
+}
+schriften.set(name, Expose.metrikLesen(roh, name));
 }
 await schritt("schriften-ok", Array.from(gebrauchteSchnitte).join(" "));
 

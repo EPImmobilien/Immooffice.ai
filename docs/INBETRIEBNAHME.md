@@ -83,14 +83,15 @@ die Registrierung nirgends erreichbar, egal wie grün die Tests sind.
 Die beiden Netlify-Geheimnisse (`NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`)
 liegen bereits im Repository — die Entwürfe sind damit gelaufen.
 
-**Was an diesem Schritt noch hängt:** die Exposé-Schriften. Sie werden mit
-der Oberfläche ausgeliefert (`/schriften/expose/`, zwanzig Schnitte). Der
-Vorlagen-Editor zeichnet seine Vorschau damit, und `expose-pdf-erzeugen`
-holt sich eine fehlende Schrift beim ersten Exposé von dort und legt sie im
-Eimer `branding-assets` ab — danach nie wieder. Solange es nur Entwürfe
-gibt, findet die Edge Function sie nicht und bricht mit einer Meldung ab,
-die den Pfad nennt. Welche Adresse sie fragt, sagt `PORTAL_URL` aus
-Schritt 2, sonst der Ursprung von `EXPOSE_FREIGABE_BASIS`.
+**Was an diesem Schritt hängt:** die Exposé-Schriften für den
+**Vorlagen-Editor**. Er zeichnet seine Vorschau im Browser und holt die
+zwanzig Schnitte von `/schriften/expose/`; die kommen mit dieser
+Auslieferung. Ohne Produktions-Deploy bleibt die Vorschau ohne Schrift.
+
+Das **PDF** braucht diesen Schritt nicht: `expose-pdf-erzeugen` trägt die
+Schnitte seit dem 05.10.2026 selbst (`schriften.mjs`, gepackt). Bis dahin
+holte sie sie von hier, und als am 05.10. weder `PORTAL_URL` noch der Eimer
+etwas hatte, brach jedes Exposé beim ersten Schnitt ab.
 
 ---
 

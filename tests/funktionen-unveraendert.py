@@ -217,6 +217,11 @@ ERWEITERT['expose-pdf-erzeugen'] = (
 # Erzeugnis, und wer sie erzeugt, steht dabei.
 BEIGELEGT = {
     'expose-pdf-erzeugen': {
+        'schriften.mjs':
+            'Die zwanzig Exposé-Schnitte, gepackt und base64-kodiert, '
+            'erzeugt von scripts/expose-schriften-einbetten.py. Sie liegen '
+            'in der Funktion, damit ein Expose nicht von Umgebungsvariablen, '
+            'Auslieferung und Eimerinhalt zugleich abhaengt.',
         'immo-expose.mjs':
             'Das Buendel des Exposé-Renderers, erzeugt von '
             'packages/expose-renderer/bauen.mjs. Es liegt IM Ordner der '
