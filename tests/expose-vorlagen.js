@@ -37,6 +37,10 @@ const VORLAGEN = path.join(WURZEL, 'packages', 'expose-renderer', 'vorlagen');
 
 const TOLERANZ = 2;   // Punkt, aus dem Auftrag
 
+// Welche zwei Farben ein Prototyp als "die beiden der Vorlage" fuehrt,
+// heisst bei jedem anders.
+const MARKENFARBEN = { raster: ['p', 'a'], signature: ['d', 'a'], studio: ['s', 'd'] };
+
 // Die Prototypen registrieren ihre Schriften unter Kurznamen ("J-Medium",
 // "S-Light", "A-CondXB"). assets/fonts/expose/ fuehrt sie unter den Namen,
 // die auch in den Referenz-PDFs eingebettet sind. Dieselbe Datei, zwei
@@ -298,10 +302,10 @@ for (const name of WELCHE) {
     vorlage,
     daten: datenFuer(name, soll.daten),
     schriften,
-    marke: {
-      primaer: soll.farben.p ? hex({ r: soll.farben.p[0], g: soll.farben.p[1], b: soll.farben.p[2] }) : undefined,
-      akzent: soll.farben.a ? hex({ r: soll.farben.a[0], g: soll.farben.a[1], b: soll.farben.a[2] }) : undefined,
-    },
+    // Welche zwei Farben der Prototyp als "die beiden der Vorlage" fuehrt,
+    // heisst bei jedem anders: Raster p/a, Signature d/a, Studio s/d.
+    // Genau diese zwei gibt der Test als Branding des Mandanten herein.
+    marke: marke(name, soll.farben),
   });
 
   const schlimm = ergebnis.warnungen.filter((w) => w.art === 'unbekannt');
@@ -424,6 +428,12 @@ for (const name of WELCHE) {
     meldungen.push(`${name}: die Vorlage hat ${ergebnis.seiten.length} von ` +
       `${soll.seiten.length} Seiten — die uebrigen sind noch nicht gebaut.`);
   }
+}
+
+function marke(name, farben) {
+  const [a, b] = MARKENFARBEN[name] || ['p', 'a'];
+  const h = (c) => (c ? hex({ r: c[0], g: c[1], b: c[2] }) : undefined);
+  return { primaer: h(farben[a]), akzent: h(farben[b]) };
 }
 
 function beschreibe(s) {

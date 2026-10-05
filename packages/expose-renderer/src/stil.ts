@@ -12,7 +12,7 @@
 // ============================================================================
 
 import type { Farbe } from "./farben";
-import { SCHWARZ, WEISS, hx, mix as mischen, palette } from "./farben";
+import { SCHWARZ, VORGABE, WEISS, hx, mix as mischen, palette } from "./farben";
 import type { Ableitung } from "./farben";
 import type { FarbRef, SchriftRef, TextStil, Vorlage } from "./schema";
 import type { RGBA } from "./schritte";
@@ -36,8 +36,12 @@ export type Marke = {
  */
 export function paletteFuer(vorlage: Vorlage, marke: Marke = {}): Palette {
   const ableitung = vorlage.stil.farben.ableitung as Ableitung;
-  const f1 = farbQuelle(vorlage.stil.farben.f1, marke);
-  const f2 = farbQuelle(vorlage.stil.farben.f2, marke);
+  // Hat der Mandant keine CI-Farbe gesetzt, bleibt die Vorgabe der
+  // Ableitung. Ohne diesen Rueckfall stuende dort eine leere Zeichenkette,
+  // und die Farbableitung braeche ab — ein Mandant ohne Branding haette
+  // kein Expose.
+  const f1 = farbQuelle(vorlage.stil.farben.f1, marke) || VORGABE[ableitung].f1;
+  const f2 = farbQuelle(vorlage.stil.farben.f2, marke) || VORGABE[ableitung].f2;
   const p = palette(ableitung, f1, f2) as unknown as Palette;
   return { ...p, weiss: WEISS, schwarz: SCHWARZ };
 }

@@ -369,8 +369,12 @@ const kennzahl: Zeichner = (el, u) => {
 
   const sWert = stilVon(el, u, "stil_wert");
   const sLabel = stilVon(el, u, "stil_label");
+  // Eine Leiste hebt oft einen Wert hervor — bei Raster den letzten
+  // (Kaufpreis rechts), bei Studio den ersten (Kaufpreis links).
   const sLetzt = zeichenkette(el, "stil_wert_letzter")
     ? u.stil(zeichenkette(el, "stil_wert_letzter")!) : sWert;
+  const sErst = zeichenkette(el, "stil_wert_erster")
+    ? u.stil(zeichenkette(el, "stil_wert_erster")!) : null;
   const polster = zahl(el, "polster", 18);
   // Bei "leiste" und "einzeln" zaehlen die Grundlinien von der Unterkante
   // des Elements; bei "kacheln" von der Unterkante der jeweiligen Kachel.
@@ -432,7 +436,8 @@ const kennzahl: Zeichner = (el, u) => {
                     el.x + i * sb, el.y + el.h - trennerOben,
                     trenner, trennerBreite);
     }
-    const s = i === gefuellt.length - 1 ? sLetzt : sWert;
+    const s = i === 0 && sErst ? sErst
+            : i === gefuellt.length - 1 ? sLetzt : sWert;
     u.blatt.T(x, yWert, e.wert, s.schnitt, s.groesse, s.farbe, s.sperrung);
     if (e.label) {
       u.blatt.T(x, yLabel,

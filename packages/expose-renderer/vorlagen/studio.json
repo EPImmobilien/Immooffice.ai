@@ -1,0 +1,269 @@
+{
+  "schema": 1,
+  "name": "Studio",
+  "beschreibung": "Grafisch, Swiss-Stil, Signalflächen, Archivo. Für auffällige Objekte.",
+  "basis": "studio",
+  "format": {
+    "breite": 595.28,
+    "hoehe": 841.89,
+    "ausrichtung": "hoch"
+  },
+  "stil": {
+    "farben": {
+      "f1": "ci.primaer",
+      "f2": "ci.akzent",
+      "ableitung": "studio"
+    },
+    "schriften": {
+      "headline": {
+        "familie": "archivo",
+        "schnitt": "CondBlack"
+      },
+      "text": {
+        "familie": "archivo",
+        "schnitt": "Regular"
+      },
+      "label": {
+        "familie": "archivo",
+        "schnitt": "SemiBold"
+      }
+    },
+    "raster": {
+      "spalten": 12,
+      "rand": 36,
+      "abstand": 10
+    },
+    "textstile": {
+      "marke": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Bold"
+        },
+        "groesse": 15,
+        "farbe": "paper"
+      },
+      "marke_zusatz": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 5.6,
+        "farbe": {
+          "mix": [
+            "d",
+            "weiss",
+            0.6
+          ]
+        },
+        "sperrung": 1.0,
+        "grossbuchstaben": true
+      },
+      "seitenband": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 6.6,
+        "farbe": "paper",
+        "sperrung": 1.0,
+        "grossbuchstaben": true
+      },
+      "cover_titel": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "CondBlack"
+        },
+        "groesse": 78,
+        "farbe": "paper",
+        "sperrung": -1
+      },
+      "cover_unter": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Medium"
+        },
+        "groesse": 12,
+        "farbe": "paper"
+      },
+      "leiste_label": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 6,
+        "farbe": {
+          "mix": [
+            "d",
+            "weiss",
+            0.55
+          ]
+        },
+        "sperrung": 1.0,
+        "grossbuchstaben": true
+      },
+      "leiste_wert": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "CondXB"
+        },
+        "groesse": 22,
+        "farbe": "paper"
+      },
+      "leiste_wert_signal": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "CondXB"
+        },
+        "groesse": 22,
+        "farbe": "s"
+      }
+    }
+  },
+  "seiten": [
+    {
+      "id": "cover",
+      "typ": "cover",
+      "name": "Titelseite",
+      "ohne_fuss": true,
+      "elemente": [
+        {
+          "id": "cover-flaeche",
+          "typ": "form",
+          "gesperrt": true,
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 841.89,
+          "form": "rechteck",
+          "fuell": "s"
+        },
+        {
+          "id": "cover-bild",
+          "typ": "bild",
+          "gesperrt": true,
+          "x": 126,
+          "y": 362.0127,
+          "b": 469.28,
+          "h": 443.8773,
+          "slot": {
+            "art": "titelbild"
+          },
+          "fuellmodus": "cover",
+          "platzhalter_farbe": "tint2"
+        },
+        {
+          "id": "cover-markenfeld",
+          "typ": "form",
+          "x": 0,
+          "y": 751.89,
+          "b": 126,
+          "h": 54,
+          "form": "rechteck",
+          "fuell": "rule"
+        },
+        {
+          "id": "cover-marke",
+          "typ": "text",
+          "x": 36,
+          "y": 762.89,
+          "b": 90,
+          "h": 10,
+          "stil": "marke",
+          "inhalt": "{{firma.marken_name}}.",
+          "einzeilig": true
+        },
+        {
+          "id": "cover-marke-zusatz",
+          "typ": "text",
+          "x": 36,
+          "y": 754.29,
+          "b": 90,
+          "h": 5.6,
+          "stil": "marke_zusatz",
+          "inhalt": "Immobilien",
+          "einzeilig": true
+        },
+        {
+          "id": "cover-band",
+          "typ": "text",
+          "x": 88,
+          "y": 372.2505,
+          "b": 260,
+          "h": 6.6,
+          "drehung": 90,
+          "stil": "seitenband",
+          "inhalt": "Exposé  /  {{objekt.vertragsart}}  /  {{objekt.immo_nr}}",
+          "einzeilig": true
+        },
+        {
+          "id": "cover-titel",
+          "typ": "text",
+          "x": 33,
+          "y": 148.013,
+          "b": 500,
+          "h": 140,
+          "stil": "cover_titel",
+          "inhalt": "{{objekt.expose_titel_text}}",
+          "zeilenschritt": 70,
+          "verdichten": false,
+          "absatzabstand": 0
+        },
+        {
+          "id": "cover-unter",
+          "typ": "text",
+          "x": 36,
+          "y": 88.013,
+          "b": 500,
+          "h": 12,
+          "stil": "cover_unter",
+          "inhalt": "{{objekt.untertitel}}",
+          "einzeilig": true
+        },
+        {
+          "id": "cover-leiste-flaeche",
+          "typ": "form",
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 78,
+          "form": "rechteck",
+          "fuell": "rule"
+        },
+        {
+          "id": "cover-leiste",
+          "typ": "kennzahl",
+          "x": 36,
+          "y": 0,
+          "b": 523.28,
+          "h": 78,
+          "variante": "leiste",
+          "spalten": 4,
+          "polster": 0,
+          "wert_grundlinie": 24,
+          "label_grundlinie": 52,
+          "stil_wert": "leiste_wert",
+          "stil_wert_erster": "leiste_wert_signal",
+          "stil_label": "leiste_label",
+          "eintraege": [
+            {
+              "label": "Kaufpreis",
+              "wert": "{{objekt.preis}}"
+            },
+            {
+              "label": "Wohnfläche",
+              "wert": "{{objekt.wohnflaeche}}"
+            },
+            {
+              "label": "Zimmer",
+              "wert": "{{objekt.zimmer}}"
+            },
+            {
+              "label": "Lage",
+              "wert": "{{objekt.ortsteil}}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

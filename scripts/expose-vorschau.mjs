@@ -67,8 +67,13 @@ const ergebnis = rendern({
   vorlage,
   daten: daten(name, aufzeichnung.daten),
   schriften,
-  marke: { primaer: farbe(aufzeichnung.farben.p ?? aufzeichnung.farben.d ?? aufzeichnung.farben.s),
-           akzent: farbe(aufzeichnung.farben.a ?? aufzeichnung.farben.d) },
+  // Raster fuehrt die beiden Vorlagenfarben als p/a, Signature als d/a,
+  // Studio als s/d.
+  marke: (() => {
+    const paare = { raster: ['p', 'a'], signature: ['d', 'a'], studio: ['s', 'd'] };
+    const [x, y] = paare[name] ?? ['p', 'a'];
+    return { primaer: farbe(aufzeichnung.farben[x]), akzent: farbe(aufzeichnung.farben[y]) };
+  })(),
 });
 
 const qrErzeuger = require('qrcode-generator');

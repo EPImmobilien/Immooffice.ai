@@ -124,6 +124,84 @@ function raster(D) {
   };
 }
 
-const UEBERSETZER = { raster };
+function studio(D) {
+  const ap = D.ap || {};
+  const kp = Number(D.kaufpreis);
+  const grest = kp * Number(D.grest) / 100;
+  const notar = kp * Number(D.notar) / 100;
+  const court = kp * Number(D.courtage) / 100;
+  const gesamt = kp + grest + notar + court;
+  const zahl = (v, n) => v.toFixed(n).replace('.', ',');
+  const eck = (D.eck || []).map(([wert, einheit, label]) => ({ label, wert, einheit }));
+  return {
+    'firma.name': D.firma,
+    'firma.marken_name': D.marke,
+    'firma.adresse': D.firma_adr,
+    'firma.telefon': D.firma_tel,
+    'firma.email': D.firma_mail,
+    'firma.web': D.firma_web,
+    'firma.impressum_zeile': D.hrb,
+
+    'objekt.immo_nr': D.objnr,
+    'objekt.objektart': D.objektart,
+    'objekt.vertragsart': D.vermarktung,
+    // Der Prototyp fuehrt den Titel als drei feste Zeilen — die Studio-Vorlage
+    // setzt ihn in 78 Punkt, da bricht nichts von selbst sinnvoll um.
+    'objekt.expose_titel_text': (D.titel || []).join('\n'),
+    'objekt.objekttitel': (D.titel || []).join(' '),
+    'objekt.untertitel': D.untertitel,
+    'objekt.adresse': D.adresse,
+    'objekt.plz_ort': D.ort,
+    // "Musterstadt-Hafenviertel" ist Stadt UND Viertel in einem Feld des
+    // Prototyps. Der Ortsteil ist der Teil dahinter.
+    'objekt.ortsteil': String(D.viertel || '').split('-').pop(),
+    'objekt.preis': D.preis,
+    'objekt.provision_aussen': D.provision,
+    'objekt.hausgeld': rohzahl(D.hausgeld),
+    'objekt.angebotspreis': kp,
+    'objekt.grunderwerbsteuer_satz': D.grest,
+    'objekt.beschreibung_objekt': D.beschreibung,
+    'objekt.beschreibung_lage': D.lage,
+    'objekt.beschreibung_ausstattung_expose': (D.ausstattung || []).join('\n'),
+    'objekt.expose_highlights': (D.highlights || []).map((h) => ({ titel: h })),
+    'objekt.expose_wege': (D.wege || []).map(([ziel, fuss, rad, auto]) =>
+      ({ ziel, fuss, rad, auto })),
+    'objekt.raumaufteilung': (D.raeume || []).map(([name, flaeche]) => ({ name, flaeche })),
+    'objekt.miete_ist': D.miete,
+    'objekt.hausgeld_nicht_umlagefaehig': D.hg_nu,
+    'objekt.expose_qr_url': 'https://' + String(D.firma_web || '') + '/expose/' + String(D.objnr || ''),
+    'objekt.eckdaten': eck,
+    // Der Studio-Prototyp fuehrt die Einzelwerte nur in `eck` und
+    // `fakten`. Hier zurueck in die Felder, aus denen sie im Betrieb
+    // kommen.
+    'objekt.wohnflaeche': 112,
+    'objekt.zimmer': 3,
+    'objekt.etage': '4. OG (Dachgeschoss)',
+    'objekt.baujahr': 2021,
+    'objekt.energie_klasse': 'A+',
+    'objekt.schlafzimmer': 2,
+    'objekt.zustand': 'neuwertig',
+    'objekt.verfuegbar_ab': '01.02.2027',
+    'objekt.heizungsart': 'Fernwärme, Fußbodenheizung',
+    'objekt.fakten': (D.fakten || []).map(([label, wert]) => ({ label, wert })),
+    'objekt.energie_angaben': (D.energie || []).map(([label, wert]) => ({ label, wert })),
+
+    'rechnung.posten': [
+      { name: 'Kaufpreis', betrag: kp },
+      { name: 'Grunderwerbsteuer ' + zahl(Number(D.grest), 1) + ' %', betrag: grest },
+      { name: 'Notar & Grundbuch ' + zahl(Number(D.notar), 1) + ' %', betrag: notar },
+      { name: 'Käuferprovision ' + zahl(Number(D.courtage), 2) + ' %', betrag: court },
+    ],
+    'rechnung.gesamtaufwand': gesamt,
+
+    'ansprechpartner.name': ap.name,
+    'ansprechpartner.funktion': ap.rolle,
+    'ansprechpartner.telefon': ap.tel,
+    'ansprechpartner.mobil': ap.mobil,
+    'ansprechpartner.email': ap.mail,
+  };
+}
+
+const UEBERSETZER = { raster, studio };
 
 module.exports = { daten: (vorlage, D) => UEBERSETZER[vorlage](D) };
