@@ -68,6 +68,16 @@ const ABWEICHENDE_TEXTE = [
          + 'den Punkt in "ca." — das ist ein Tippfehler im Prototyp, nicht '
          + 'eine Schreibweise. Der Fork setzt "ca." mit Punkt.',
   },
+  {
+    vorlage: 'studio',
+    soll: 'Neubaustandard 2021 – durchdacht und sofort bezugsfertig.',
+    ist: 'Durchdacht und sofort bezugsfertig.',
+    grund: 'Die Unterzeile einer Seite steht in der Vorlage und gilt damit '
+         + 'fuer jedes Objekt, das sie benutzt. "Neubaustandard 2021" ist eine '
+         + 'Aussage ueber EIN Objekt; als Vorgabe waere sie fuer jedes andere '
+         + 'eine erfundene Angabe (CLAUDE.md: keine erfundenen Objektdaten). '
+         + 'Der Makler kann sie im Editor jederzeit so schreiben.',
+  },
 ];
 
 const textErsatz = new Map();

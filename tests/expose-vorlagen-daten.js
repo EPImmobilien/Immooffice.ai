@@ -152,6 +152,7 @@ function studio(D) {
     'objekt.untertitel': D.untertitel,
     'objekt.adresse': D.adresse,
     'objekt.plz_ort': D.ort,
+    'objekt.ort': String(D.ort || '').replace(/^\d+\s+/, ''),
     // "Musterstadt-Hafenviertel" ist Stadt UND Viertel in einem Feld des
     // Prototyps. Der Ortsteil ist der Teil dahinter.
     'objekt.ortsteil': String(D.viertel || '').split('-').pop(),

@@ -343,23 +343,27 @@ const kennzahl: Zeichner = (el, u) => {
   const variante = zeichenkette(el, "variante") ?? "leiste";
   const gebunden = zeichenkette(el, "feld");
   const eintraege: KennzahlEintrag[] = gebunden
-    ? (liste(u.daten, gebunden) as { name?: string; bezeichnung?: string;
-        betrag?: number; wert?: string; einheit?: string }[])
+    ? (liste(u.daten, gebunden) as { label?: string; name?: string;
+        bezeichnung?: string; betrag?: number; wert?: string; einheit?: string }[])
         .map((e) => ({
-          label: e.name ?? e.bezeichnung,
+          label: e.label ?? e.name ?? e.bezeichnung,
           wert: e.betrag !== undefined
             ? `${zahlDe(Number(e.betrag), zahl(el, "stellen", 0), true)}` : e.wert,
           einheit: e.einheit ?? zeichenkette(el, "einheit"),
         }))
     : ((el["eintraege"] as KennzahlEintrag[] | undefined) ?? []);
-  const gefuellt: { label?: string; wert: string }[] = [];
+  const gefuellt: { label?: string; wert: string; einheit?: string }[] = [];
   for (const e of eintraege) {
     const w = e.wert === undefined ? undefined : ersetze(u.daten, e.wert);
     if (w === undefined) {
       warne(u, "fehlender_wert", el, `Kennzahl "${e.label ?? ""}" entfaellt.`);
       continue;
     }
-    gefuellt.push({ label: e.label, wert: e.einheit ? `${w} ${e.einheit}` : w });
+    gefuellt.push({
+      label: e.label,
+      wert: e.einheit && variante !== "gitter" ? `${w} ${e.einheit}` : w,
+      einheit: e.einheit,
+    });
   }
   if (!gefuellt.length) return;
 
@@ -393,6 +397,46 @@ const kennzahl: Zeichner = (el, u) => {
     return;
   }
 
+  // Gitter: grosse Zahl, Einheit unmittelbar daneben, Label darunter,
+  // Haarlinien zwischen den Spalten. Die Einheit ist dabei ein eigener
+  // Satz in eigener Groesse und Farbe — "112" gross, "m²" klein daneben.
+  // Darum kann sie nicht Teil des Werts sein.
+  if (variante === "gitter") {
+    const spalten = Math.max(1, zahl(el, "spalten", 3));
+    const zh = zahl(el, "zeilenhoehe", 104);
+    const sb = el.b / spalten;
+    const einzug = zahl(el, "einzug", 14);
+    const sEinheit = zeichenkette(el, "stil_einheit")
+      ? u.stil(zeichenkette(el, "stil_einheit")!) : null;
+    const trenner = farbRef(el, "trenner", u);
+    gefuellt.forEach((e, i) => {
+      const spalte = i % spalten;
+      const reihe = Math.floor(i / spalten);
+      const x = el.x + spalte * sb;
+      const y = el.y + el.h - reihe * zh;
+      if (spalte > 0 && trenner) {
+        u.blatt.linie(x, y - zh + zahl(el, "trenner_unten", 14),
+                      x, y - zahl(el, "trenner_oben", 6), trenner,
+                      zahl(el, "trenner_breite", 1));
+      }
+      const xx = x + (spalte > 0 ? einzug : 0);
+      const yWert = y - zahl(el, "wert_versatz", 62);
+      const breite = u.blatt.T(xx, yWert, e.wert, sWert.schnitt, sWert.groesse,
+                               sWert.farbe, sWert.sperrung);
+      if (e.einheit && sEinheit) {
+        u.blatt.T(xx + breite + zahl(el, "einheit_abstand", 4), yWert, e.einheit,
+                  sEinheit.schnitt, sEinheit.groesse, sEinheit.farbe,
+                  sEinheit.sperrung);
+      }
+      if (e.label) {
+        u.blatt.T(xx, y - zahl(el, "label_versatz", 82),
+                  sLabel.grossbuchstaben ? e.label.toLocaleUpperCase("de-DE") : e.label,
+                  sLabel.schnitt, sLabel.groesse, sLabel.farbe, sLabel.sperrung);
+      }
+    });
+    return;
+  }
+
   // Kacheln: jede Kennzahl in eigenem Rahmen, von oben nach unten
   // gefuellt. So stehen die Energieangaben und die laufenden Kosten.
   if (variante === "kacheln") {
@@ -407,17 +451,27 @@ const kennzahl: Zeichner = (el, u) => {
       const reihe = Math.floor(i / spalten);
       const x = el.x + sp * (kb + abstand);
       const unten = el.y + el.h - reihe * (kh + abstand) - kh;
-      if (kFuell || kStrich) {
-        u.blatt.rect(x, unten, kb, kh, kFuell, kStrich,
+      // Die erste Kachel darf hervorgehoben sein — die wichtigste Zahl
+      // steht dann auf der Signalflaeche.
+      const ersteFuell = i === 0 ? farbRef(el, "kachel_fuell_erster", u) : null;
+      const sErstWert = i === 0 && zeichenkette(el, "stil_wert_erster")
+        ? u.stil(zeichenkette(el, "stil_wert_erster")!) : sWert;
+      const sErstLabel = i === 0 && zeichenkette(el, "stil_label_erster")
+        ? u.stil(zeichenkette(el, "stil_label_erster")!) : sLabel;
+      if (ersteFuell || kFuell || kStrich) {
+        u.blatt.rect(x, unten, kb, kh, ersteFuell ?? kFuell, kStrich,
                      zahl(el, "eckradius", 8), zahl(el, "linienbreite", 0.8));
       }
       if (e.label) {
         u.blatt.T(x + polster, unten + zahl(el, "label_grundlinie", 38),
-                  sLabel.grossbuchstaben ? e.label.toLocaleUpperCase("de-DE") : e.label,
-                  sLabel.schnitt, sLabel.groesse, sLabel.farbe, sLabel.sperrung);
+                  sErstLabel.grossbuchstaben
+                    ? e.label.toLocaleUpperCase("de-DE") : e.label,
+                  sErstLabel.schnitt, sErstLabel.groesse, sErstLabel.farbe,
+                  sErstLabel.sperrung);
       }
       u.blatt.T(x + polster, unten + zahl(el, "wert_grundlinie", 18), e.wert,
-                sWert.schnitt, sWert.groesse, sWert.farbe, sWert.sperrung);
+                sErstWert.schnitt, sErstWert.groesse, sErstWert.farbe,
+                sErstWert.sperrung);
     });
     return;
   }
@@ -460,7 +514,16 @@ type Zeilenvorgabe = { label: string; feld?: string; wert?: string; einheit?: st
  * unter der Zeile), "punktlinie", "ohne".
  */
 const faktentabelle: Zeichner = (el, u) => {
-  const vorgaben = (el["zeilen"] as Zeilenvorgabe[] | undefined) ?? [];
+  // Die Zeilen koennen in der Vorlage stehen (Label plus Feld) oder aus
+  // einer Liste kommen (Label und Wert schon fertig). Das zweite braucht
+  // Studio: dort waehlt der Nutzer auf der Objektseite, welche Angaben
+  // ins Expose sollen und in welcher Reihenfolge.
+  const gebunden = zeichenkette(el, "feld");
+  const vorgaben: Zeilenvorgabe[] = gebunden
+    ? (liste(u.daten, gebunden) as { label?: string; wert?: string }[])
+        .filter((z) => z && z.label !== undefined)
+        .map((z) => ({ label: z.label as string, wert: z.wert }))
+    : ((el["zeilen"] as Zeilenvorgabe[] | undefined) ?? []);
   const zeilen: { label: string; wert: string }[] = [];
   for (const z of vorgaben) {
     const roh = z.feld !== undefined ? wert(u.daten, z.feld)
@@ -502,23 +565,35 @@ const faktentabelle: Zeichner = (el, u) => {
     return;
   }
 
-  let y = el.y + el.h;
+  // Mehrspaltig wird SPALTENWEISE gefuellt: erst die linke Spalte ganz,
+  // dann die rechte. Zeilenweise zu fuellen waere beim Lesen falsch — die
+  // Angaben gehoeren der Reihe nach untereinander.
+  const spalten = Math.max(1, zahl(el, "spalten", 1));
+  const spaltenabstand = zahl(el, "spaltenabstand", 24);
+  const sb = (el.b - spaltenabstand * (spalten - 1)) / spalten;
+  const jeSpalte = Math.ceil(zeilen.length / spalten);
+  const zeilenhoehe = spalten > 1 ? zahl(el, "zeilenhoehe", 25) : zh;
+
   zeilen.forEach((z, i) => {
-    if (art === "zebra" && i % 2 === 0 && flaecheFarbe) {
-      u.blatt.rect(el.x, y - zh, el.b, zh, flaecheFarbe, null,
+    const spalte = spalten > 1 ? Math.floor(i / jeSpalte) : 0;
+    const reihe = spalten > 1 ? i % jeSpalte : i;
+    const x = el.x + spalte * (sb + spaltenabstand);
+    const y = el.y + el.h - reihe * zeilenhoehe;
+    if (art === "zebra" && reihe % 2 === 0 && flaecheFarbe) {
+      u.blatt.rect(x, y - zeilenhoehe, sb, zeilenhoehe, flaecheFarbe, null,
                    zahl(el, "eckradius", 0));
     }
-    const mitte = y - zh / 2 - versatz;
-    u.blatt.T(el.x + polster, mitte, z.label, sLabel.schnitt, sLabel.groesse,
+    const grundlinie = spalten > 1 ? y : y - zeilenhoehe / 2 - versatz;
+    u.blatt.T(x + polster, grundlinie, z.label, sLabel.schnitt, sLabel.groesse,
               sLabel.farbe, sLabel.sperrung);
-    u.blatt.T(el.x + el.b - polster, mitte, z.wert, sWert.schnitt, sWert.groesse,
+    u.blatt.T(x + sb - polster, grundlinie, z.wert, sWert.schnitt, sWert.groesse,
               sWert.farbe, sWert.sperrung, "r");
     if (linie && (art === "linie" || art === "punktlinie")) {
-      u.blatt.linie(el.x, y - zh, el.x + el.b, y - zh, linie,
+      const ly = spalten > 1 ? y - zahl(el, "linien_versatz", 9) : y - zeilenhoehe;
+      u.blatt.linie(x, ly, x + sb, ly, linie,
                     zahl(el, "linienbreite", 0.5),
                     art === "punktlinie" ? [0.6, 2.6] : null);
     }
-    y -= zh;
   });
 };
 
@@ -564,11 +639,28 @@ const raumliste: Zeichner = (el, u) => {
     y -= zh;
   }
   if (wahr(el, "mit_summe", true) && summe > 0) {
+    const balken = farbRef(el, "summe_flaeche", u);
+    const sSummeWert = zeichenkette(el, "stil_summe_wert")
+      ? u.stil(zeichenkette(el, "stil_summe_wert")!) : sSumme;
+    if (balken) {
+      // Die Summe sitzt in einem eigenen Balken statt frei darunter.
+      const bh = zahl(el, "summe_hoehe", 26);
+      const by = y - zahl(el, "summe_versatz", 14);
+      u.blatt.rect(el.x, by, el.b, bh, balken, null, zahl(el, "summe_radius", 0));
+      const polster = zahl(el, "summe_polster", 10);
+      const ys = by + zahl(el, "summe_grundlinie", 9);
+      u.blatt.T(el.x + polster, ys, zeichenkette(el, "summe_label") ?? "Summe",
+                sSumme.schnitt, sSumme.groesse, sSumme.farbe, sSumme.sperrung);
+      u.blatt.T(el.x + el.b - polster, ys, `${zahlDe(summe, 1)} ${einheit}`,
+                sSummeWert.schnitt, sSummeWert.groesse, sSummeWert.farbe,
+                sSummeWert.sperrung, "r");
+      return;
+    }
     const ys = y - zahl(el, "summe_versatz", 2);
     u.blatt.T(el.x, ys, zeichenkette(el, "summe_label") ?? "Summe", sSumme.schnitt,
               sSumme.groesse, sSumme.farbe, sSumme.sperrung);
-    u.blatt.T(el.x + el.b, ys, `${zahlDe(summe, 1)} ${einheit}`, sSumme.schnitt,
-              sSumme.groesse, sSumme.farbe, sSumme.sperrung, "r");
+    u.blatt.T(el.x + el.b, ys, `${zahlDe(summe, 1)} ${einheit}`, sSummeWert.schnitt,
+              sSummeWert.groesse, sSummeWert.farbe, sSummeWert.sperrung, "r");
   }
 };
 
@@ -601,6 +693,55 @@ const distanzen: Zeichner = (el, u) => {
   const balken = farbRef(el, "balken_farbe", u);
   const grund = farbRef(el, "linien_farbe", u);
   const groesste = Math.max(...eintraege.map((d) => d.km ?? 0), 0.1);
+
+  // "wege": drei Zahlenspalten (zu Fuss, Rad, Auto) statt eines Balkens.
+  // Die Spalten stehen in der Vorlage, weil ihre Breite zur Schrift
+  // gehoert und nicht zum Datensatz.
+  if (art === "wege") {
+    const spalten = (el["spalten_x"] as number[] | undefined) ?? [-98, -52, -6];
+    const kopf = (el["spaltenkopf"] as string[] | undefined) ?? [];
+    const sKopf = zeichenkette(el, "stil_kopf") ? u.stil(zeichenkette(el, "stil_kopf")!) : null;
+    const sErste = zeichenkette(el, "stil_wert_erster")
+      ? u.stil(zeichenkette(el, "stil_wert_erster")!) : sWert;
+    const linieWege = farbRef(el, "linien_farbe", u);
+    const zhWege = zahl(el, "zeilenhoehe", 23);
+    let yy = el.y + el.h;
+    if (sKopf && kopf.length) {
+      kopf.forEach((k, i) => {
+        u.blatt.T(el.x + el.b + spalten[i], yy, k.toLocaleUpperCase("de-DE"),
+                  sKopf.schnitt, sKopf.groesse, sKopf.farbe, sKopf.sperrung, "r");
+      });
+      yy -= zahl(el, "kopf_abstand", 24);
+    }
+    const kopflinie = farbRef(el, "kopflinie_farbe", u);
+    if (kopflinie) {
+      u.blatt.linie(el.x, yy + zahl(el, "kopflinie_versatz", 6), el.x + el.b,
+                    yy + zahl(el, "kopflinie_versatz", 6), kopflinie,
+                    zahl(el, "kopflinie_breite", 1.2));
+      yy -= zahl(el, "nach_kopflinie", 18);
+    }
+    const felder = (el["felder"] as string[] | undefined) ?? ["fuss", "rad", "auto"];
+    for (const d of roh) {
+      const name = d.ziel ?? d.name;
+      if (!name) continue;
+      u.blatt.T(el.x, yy, name, sName.schnitt, sName.groesse, sName.farbe,
+                sName.sperrung);
+      felder.forEach((f, i) => {
+        const v = (d as unknown as Record<string, unknown>)[f];
+        if (v === undefined || v === null) return;
+        const st = i === 0 ? sErste : sWert;
+        u.blatt.T(el.x + el.b + spalten[i], yy, String(v), st.schnitt, st.groesse,
+                  st.farbe, st.sperrung, "r");
+      });
+      if (linieWege) {
+        u.blatt.linie(el.x, yy - zahl(el, "linien_versatz", 8), el.x + el.b,
+                      yy - zahl(el, "linien_versatz", 8), linieWege,
+                      zahl(el, "linienbreite", 0.8));
+      }
+      yy -= zhWege;
+    }
+    return;
+  }
 
   let y = el.y + el.h;
   for (const d of eintraege) {
@@ -699,17 +840,31 @@ const highlights: Zeichner = (el, u) => {
     return;
   }
 
-  // Nummerierte Liste, eine Zeile je Highlight.
+  // Nummerierte Liste. "fliessend" laesst jedem Eintrag so viel Platz,
+  // wie sein Text braucht, haelt aber einen Mindestabstand ein — ein
+  // einzeiliges Highlight soll nicht an das naechste stossen.
+  const fliessend = art === "nummern_fliessend";
   const zh = zahl(el, "zeilenhoehe", 24);
+  const einzug = zahl(el, "einzug", 24);
+  const regelnText = satzRegeln(u.vorlage.stil.farben.ableitung, false);
   let y = el.y + el.h;
   eintraege.forEach((h, i) => {
     if (sNummer) {
-      u.blatt.T(el.x, y, String(i + 1).padStart(2, "0"), sNummer.schnitt,
-                sNummer.groesse, sNummer.farbe, sNummer.sperrung);
+      const nummer = fliessend ? String(i + 1) : String(i + 1).padStart(2, "0");
+      u.blatt.T(el.x, y, nummer, sNummer.schnitt, sNummer.groesse, sNummer.farbe,
+                sNummer.sperrung);
     }
-    const x = el.x + zahl(el, "einzug", 24);
-    u.blatt.T(x, y, h.titel, sTitel.schnitt, sTitel.groesse, sTitel.farbe,
-              sTitel.sperrung);
+    if (fliessend) {
+      const unten = u.blatt.absatz(el.x + einzug, y + zahl(el, "text_hoch", 14),
+                                   h.titel, el.b - zahl(el, "textbreite_abzug", 56),
+                                   sTitel.schnitt, sTitel.groesse, sTitel.zeilenhoehe,
+                                   sTitel.farbe, regelnText);
+      y = Math.min(y - zahl(el, "mindestabstand", 50),
+                   unten - zahl(el, "nachabstand", 26));
+      return;
+    }
+    u.blatt.T(el.x + einzug, y, h.titel, sTitel.schnitt, sTitel.groesse,
+              sTitel.farbe, sTitel.sperrung);
     y -= zh;
   });
 };
@@ -737,6 +892,35 @@ const ausstattung: Zeichner = (el, u) => {
   const art = zeichenkette(el, "darstellung") ?? "checkliste";
   const polster = zahl(el, "polster", 10);
   const einzug = zahl(el, "einzug", 28);
+
+  // Nummeriert: laufende Nummer links, Punkt daneben, Trennlinie
+  // darunter — die letzte Zeile einer Spalte kraeftiger.
+  if (art === "nummeriert") {
+    const sNummer = stilVon(el, u, "stil_nummer");
+    const jeSpalte = Math.ceil(punkte.length / spalten);
+    const linie = farbRef(el, "linien_farbe", u);
+    const schluss = farbRef(el, "schluss_farbe", u) ?? linie;
+    punkte.forEach((p, i) => {
+      const sp = Math.floor(i / jeSpalte);
+      const reihe = i % jeSpalte;
+      const x = el.x + sp * (sb + abstand);
+      const y = el.y + el.h - reihe * zh;
+      u.blatt.T(x, y - zahl(el, "nummer_versatz", 22),
+                String(i + 1).padStart(2, "0"), sNummer.schnitt, sNummer.groesse,
+                sNummer.farbe, sNummer.sperrung);
+      u.blatt.T(x + einzug, y - zahl(el, "text_versatz", 18), p, s.schnitt,
+                s.groesse, s.farbe, s.sperrung);
+      const letzte = reihe === jeSpalte - 1;
+      const strich = letzte ? schluss : linie;
+      if (strich) {
+        u.blatt.linie(x, y - zahl(el, "linien_versatz", 32), x + sb,
+                      y - zahl(el, "linien_versatz", 32), strich,
+                      letzte ? zahl(el, "schluss_breite", 1.2)
+                             : zahl(el, "linienbreite", 0.8));
+      }
+    });
+    return;
+  }
 
   // Alle Masse zaehlen von der Oberkante der Zeile nach unten — so
   // rechnen die Prototypen, und so bleibt eine Zeile zusammen, wenn der
@@ -859,6 +1043,33 @@ const energieskala: Zeichner = (el, u) => {
   const klassen = (el["klassen"] as EnergieKlasse[] | undefined) ?? [];
   if (!klassen.length) {
     warne(u, "unbekannt", el, "Die Skala nennt keine Klassen.");
+    return;
+  }
+
+  // "stufen": nur die Leiste, die eigene Klasse hervorgehoben, ohne
+  // Grenzwerte und ohne Markierung. Das ist die knappe Fassung, die
+  // Studio benutzt.
+  if (zeichenkette(el, "darstellung") === "stufen") {
+    const sKlasse = stilVon(el, u, "stil_klasse");
+    const sAktiv = zeichenkette(el, "stil_klasse_aktiv")
+      ? u.stil(zeichenkette(el, "stil_klasse_aktiv")!) : sKlasse;
+    const eigene = (u.daten[zeichenkette(el, "feld") ?? "objekt.energie_klasse"] ?? "")
+      .toString().trim().toLocaleUpperCase("de-DE");
+    const bw = el.b / klassen.length;
+    const luecke = zahl(el, "luecke", 3);
+    klassen.forEach((k, i) => {
+      const aktiv = k.name.toLocaleUpperCase("de-DE") === eigene;
+      const x = el.x + i * bw;
+      u.blatt.rect(x, el.y, bw - luecke, el.h,
+                   farbe(aktiv ? (zeichenkette(el, "aktiv_farbe") ?? k.farbe) : k.farbe,
+                         u.palette), null, zahl(el, "eckradius", 0));
+      const st = aktiv ? sAktiv : sKlasse;
+      const hell = (el["helle_klassen"] as string[] | undefined) ?? [];
+      const stil = !aktiv && hell.includes(k.name) && zeichenkette(el, "stil_klasse_hell")
+        ? u.stil(zeichenkette(el, "stil_klasse_hell")!) : st;
+      u.blatt.T(x + (bw - luecke) / 2, el.y + zahl(el, "klasse_grundlinie", 8),
+                k.name, stil.schnitt, stil.groesse, stil.farbe, stil.sperrung, "c");
+    });
     return;
   }
   const kennwertRoh = rohzahl(u.daten, zeichenkette(el, "feld") ?? "objekt.energie_kennwert");
