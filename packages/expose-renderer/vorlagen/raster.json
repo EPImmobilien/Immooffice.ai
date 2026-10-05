@@ -2208,7 +2208,7 @@
       "typ": "kosten",
       "name": "Kosten & Finanzierung",
       "sichtbar_wenn": {
-        "feld": "objekt.vertragsart",
+        "feld": "objekt.vermarktung",
         "gleich": "kauf"
       },
       "elemente": [

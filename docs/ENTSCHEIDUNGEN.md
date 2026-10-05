@@ -4265,3 +4265,33 @@ in der lokalen Instanz überein (Raster `e760e515…`, Signature
 `8784d5e9…`, Studio `f73418e0…`). `jsonb` normalisiert Schlüsselreihen­folge
 und Zahlenschreibweise, der Vergleich prüft also den Inhalt, nicht die
 Schreibweise.
+
+### Die Vermarktungsart steht zweimal in den Daten
+
+`immobilien.vertragsart` enthält, was die Oberfläche schreibt: `verkauf`,
+`vermietung`, `beides`. Die Kostenseite der Raster-Vorlage prüfte auf
+`objekt.vertragsart gleich "kauf"` — ein Wert, den es dort nie gibt. Die
+Seite ist damit bei **jedem** Objekt entfallen, ohne Fehler und ohne
+Warnung: eine Seite, deren Bedingung nicht zutrifft, soll entfallen.
+
+Gefunden hat es das Ausrollen, nicht ein Test: im eigenen Projekt steht ein
+Objekt, und dessen `vertragsart` ist `verkauf`.
+
+Jetzt rechnet `aufbereiten.ts` zwei Werte aus:
+
+- **`objekt.vermarktung`** — der Schlüssel, auf den Bedingungen prüfen:
+  `kauf`, `miete`, `beides`. Alles außer einer Vermietung gilt als Kauf,
+  dieselbe Regel, nach der die Edge Function bisher Preis und Courtage
+  gerechnet hat (`vertragsart !== "vermietung"`).
+- **`objekt.vertragsart`** — der Text, der im Exposé steht: „Verkauf",
+  „Vermietung", „Verkauf & Vermietung". „Haus zum verkauf" wäre kein
+  deutscher Satz, und die Vorlage setzt genau das zusammen.
+
+`fork_40` zieht die Bedingung in den gespeicherten Vorlagen nach — auch in
+eigenen Kopien der Mandanten, die den Fehler mitgenommen haben.
+
+**Nicht übernommen** wurde dabei ein Rückfall der alten Fassung: sie nahm
+als Preis `angebotspreis`, und wenn der fehlte, `verkaufspreis`. Der
+erzielte Preis gehört in kein Exposé für Interessenten — er steht mit
+diesem Grund in `AUSGENOMMEN` des Feldkatalogs. Ohne Angebotspreis steht im
+Exposé jetzt kein Preis, und die Zeile entfällt.

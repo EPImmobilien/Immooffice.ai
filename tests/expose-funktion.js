@@ -213,7 +213,10 @@ async function lauf(immo, koerper, basis) {
 const VOLL = {
   id: OBJEKT, mandant_id: MANDANT, zustaendig_id: NUTZER, bezeichnung: 'Objekt 1',
   immo_nr: 'HH-2026-001', objekttitel: 'Lichtdurchflutete Stadtwohnung – mit Dachterrasse',
-  objektart: 'Wohnung', vertragsart: 'kauf', strasse: 'Musterweg', hausnummer: '7',
+  // "verkauf" ist der Wert, den die Oberflaeche schreibt — nicht "kauf".
+  // Genau daran ist die Kostenseite bis zum 05.10.2026 stillschweigend
+  // entfallen; die Pruefung unten besteht darauf, dass sie da ist.
+  objektart: 'Wohnung', vertragsart: 'verkauf', strasse: 'Musterweg', hausnummer: '7',
   plz: '20095', ort: 'Hamburg', ortsteil: 'Hafenviertel', adresse_freigeben: true,
   wohnflaeche: 112.5, nutzflaeche: 14, grundstueck: 0, zimmer: 3, schlafzimmer: 2,
   badezimmer: 2, etagen_gesamt: 5, etage: '4. OG', baujahr: 2021,
@@ -272,6 +275,8 @@ const VOLL = {
     const namen = a.ergebnis.seitennamen || [];
     melde('Das Inhaltsverzeichnis nennt die Seiten', namen.includes('Titelseite'),
           JSON.stringify(namen));
+    melde('Die Kostenseite erscheint bei vertragsart "verkauf"',
+          namen.includes('Kosten & Finanzierung'), JSON.stringify(namen));
   }
 
   // --- 2. Dasselbe Objekt, aber als PDF in den Speicher --------------------
@@ -326,6 +331,21 @@ const VOLL = {
     const schlimm = (e.ergebnis.befunde || []).filter((b) => b.art === 'unbekannt');
     melde(`Vorlage ${name} ohne unbekannte Platzhalter oder Elemente`,
           schlimm.length === 0, JSON.stringify(schlimm.slice(0, 4)));
+  }
+
+  // --- 3c. Eine Vermietung: dieselbe Vorlage, ohne Kostenseite ------------
+  {
+    const v = await lauf({ ...VOLL, vertragsart: 'vermietung', kaltmiete: 1450,
+                           angebotspreis: null }, { nur_pruefen: true });
+    if (v) {
+      const namen = v.ergebnis.seitennamen || [];
+      melde('Bei einer Vermietung entfaellt die Kostenseite',
+            v.ergebnis.ok === true && !namen.includes('Kosten & Finanzierung'),
+            JSON.stringify(namen));
+      melde('Die Vermietung hat darum weniger Seiten',
+            a && v.ergebnis.seiten === a.ergebnis.seiten - 1,
+            `miete ${v.ergebnis.seiten}, kauf ${a && a.ergebnis.seiten}`);
+    }
   }
 
   // --- 4. Ohne Fotos: eine klare Ansage, kein Abbruch ---------------------

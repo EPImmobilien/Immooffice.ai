@@ -787,7 +787,14 @@ var ImmoExpose = (() => {
       name: "Vermarktungsart",
       typ: "text",
       quelle: O("vertragsart"),
-      hinweis: "Kauf oder Miete. Steuert, welche Seiten erscheinen."
+      hinweis: 'Als Text fuer das Exposé: "Verkauf", "Vermietung", "Verkauf & Vermietung".'
+    },
+    {
+      schluessel: "objekt.vermarktung",
+      name: "Vermarktungsart (Schluessel)",
+      typ: "text",
+      quelle: GERECHNET,
+      hinweis: "kauf, miete oder beides. DAS ist der Wert fuer Bedingungen — objekt.vertragsart ist der Text und wechselt mit der Sprache."
     },
     { schluessel: "objekt.status", name: "Status", typ: "text", quelle: O("status") },
     // Anschrift
@@ -4209,11 +4216,18 @@ var ImmoExpose = (() => {
     const da = teile.map((t) => (t ?? "").trim()).filter(Boolean);
     return da.length ? da.join(trenner) : void 0;
   }
-  function istKauf2(immo) {
-    const v = String(immo["vertragsart"] ?? "").toLowerCase();
-    if (!v) return true;
-    return !/miet|vermiet|pacht/.test(v);
+  function vermarktungVon(immo) {
+    const v = String(immo["vertragsart"] ?? "").toLowerCase().trim();
+    if (!v) return "kauf";
+    if (v === "beides") return "beides";
+    if (/miet|pacht/.test(v)) return "miete";
+    return "kauf";
   }
+  var VERMARKTUNG_TEXT = {
+    kauf: "Verkauf",
+    miete: "Vermietung",
+    beides: "Verkauf & Vermietung"
+  };
   function aufbereiten(q) {
     const immo = q.immobilie ?? {};
     const firma = q.firma ?? {};
@@ -4282,7 +4296,10 @@ var ImmoExpose = (() => {
       const t = gueltig.split("T")[0].split("-");
       if (t.length === 3) d["objekt.energie_gueltig_kurz"] = `${t[1]}/${t[0]}`;
     }
-    const kauf = istKauf2(immo);
+    const vermarktung = vermarktungVon(immo);
+    d["objekt.vermarktung"] = vermarktung;
+    d["objekt.vertragsart"] = VERMARKTUNG_TEXT[vermarktung];
+    const kauf = vermarktung !== "miete";
     const preisZahl = kauf ? z(immo["angebotspreis"]) : z(immo["kaltmiete"]);
     if (immo["expose_preis_auf_anfrage"] === true) {
       d["objekt.preis"] = "auf Anfrage";

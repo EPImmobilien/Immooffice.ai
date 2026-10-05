@@ -217,6 +217,26 @@ melde('Gesperrte Adresse erscheint nirgends',
 melde('PLZ und Ort bleiben auch ohne Freigabe',
       gesperrt['objekt.plz_ort'] === '20095 Hamburg');
 
+// --- 4b. Die Vermarktungsart, wie die Oberflaeche sie schreibt -------------
+// Die Oberflaeche schreibt "verkauf", "vermietung" oder "beides" — nicht
+// "kauf". Die Kostenseite der Raster-Vorlage prueft aber auf einen
+// Schluessel, und bis zum 05.10.2026 war das objekt.vertragsart: die Seite
+// ist damit bei JEDEM Verkaufsobjekt still entfallen. Darum beides
+// getrennt: ein Schluessel fuer Bedingungen, ein Text fuer das Papier.
+for (const [roh, schluessel, text] of [
+  ['verkauf', 'kauf', 'Verkauf'],
+  ['vermietung', 'miete', 'Vermietung'],
+  ['beides', 'beides', 'Verkauf & Vermietung'],
+  ['miete', 'miete', 'Vermietung'],
+  [undefined, 'kauf', 'Verkauf'],
+]) {
+  const r = R.aufbereiten({ immobilie: { vertragsart: roh } });
+  melde(`vertragsart ${JSON.stringify(roh)} wird zu ${schluessel}`,
+        r['objekt.vermarktung'] === schluessel, String(r['objekt.vermarktung']));
+  melde(`vertragsart ${JSON.stringify(roh)} steht als "${text}" im Exposé`,
+        r['objekt.vertragsart'] === text, String(r['objekt.vertragsart']));
+}
+
 // --- 5. Miete statt Kauf ---------------------------------------------------
 const miete = R.aufbereiten({
   immobilie: { vertragsart: 'miete', kaltmiete: 1200, nebenkosten: 180,

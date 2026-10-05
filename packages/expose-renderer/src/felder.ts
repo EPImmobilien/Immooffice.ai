@@ -84,7 +84,12 @@ export const OBJEKT: Feld[] = [
   { schluessel: "objekt.objekttyp", name: "Objekttyp", typ: "text", quelle: O("objekttyp") },
   { schluessel: "objekt.nutzungsart", name: "Nutzungsart", typ: "text", quelle: O("nutzungsart") },
   { schluessel: "objekt.vertragsart", name: "Vermarktungsart", typ: "text", quelle: O("vertragsart"),
-    hinweis: "Kauf oder Miete. Steuert, welche Seiten erscheinen." },
+    hinweis: "Als Text fuer das Exposé: \"Verkauf\", \"Vermietung\", "
+           + "\"Verkauf & Vermietung\"." },
+  { schluessel: "objekt.vermarktung", name: "Vermarktungsart (Schluessel)", typ: "text",
+    quelle: GERECHNET,
+    hinweis: "kauf, miete oder beides. DAS ist der Wert fuer Bedingungen — "
+           + "objekt.vertragsart ist der Text und wechselt mit der Sprache." },
   { schluessel: "objekt.status", name: "Status", typ: "text", quelle: O("status") },
 
   // Anschrift

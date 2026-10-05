@@ -261,6 +261,8 @@ zuwachs(bereich, mehr, grund) as (values
   -- also keine Kennzahl.
   ,
   ('Spalten', 1, 'fork_39: firma_stammdaten.marken_linie — die zweite Markenzeile der Luxusvorlage')
+  -- fork_40 aendert nur eine Bedingung IN den gespeicherten Vorlagen —
+  -- kein Schema, also keine Kennzahl.
 ),
 soll(bereich, soll) as (
   select v.bereich,

@@ -228,13 +228,26 @@ Rückgängig, Vorschaubilder in der Liste, Fassungen zurückholen.
 Der Element-Editor: Seiten und Elemente auswählen, verschieben und ändern,
 Eigenschaftenleiste, Speichern mit Fassung in `expose_vorlagen_versionen`.
 
+**Ausgerollt am 05.10.2026.** Die Migrationen `fork_37` bis `fork_40` liegen
+auf `usguiggfciavwzkdfjgt`, die 121 Edge Functions sind über
+`funktionen-ausrollen.yml` ausgerollt (Lauf 54), und die Oberfläche steht in
+Produktion auf `immoofficeeai.netlify.app`. Der Workflow sieht jetzt selbst
+nach, was angekommen ist: Seite, zwei Schriftschnitte, ein Lizenztext und
+`freigabe.html`, alle mit 200 beantwortet.
+
+Dass beim Ausrollen ein echtes Objekt im Projekt stand, hat gleich einen
+Fehler gezeigt, den kein Test finden konnte: seine `vertragsart` ist
+`verkauf`, und die Kostenseite prüfte auf `kauf`. Siehe
+`ENTSCHEIDUNGEN.md`, „Die Vermarktungsart steht zweimal in den Daten".
+
 Offen und nicht vergessen:
 
-- **Ausgerollt ist noch nichts.** `fork_37`, `fork_38` und `fork_39` liegen
-  auf `usguiggfciavwzkdfjgt`, die Edge Function und die Oberfläche müssen
-  noch über die beiden GitHub-Workflows hinaus. Vor dem ersten Exposé im
-  Betrieb muss `PORTAL_URL` in der Supabase-Umgebung stehen, sonst findet
-  die Funktion die Schriften nicht.
+- **Das erste Exposé im Betrieb ist noch nicht erzeugt.** Beim ersten Lauf
+  holt die Funktion die Schriften von der ausgelieferten Oberfläche in den
+  Eimer; welche Adresse sie fragt, sagt `PORTAL_URL`, sonst der Ursprung von
+  `EXPOSE_FREIGABE_BASIS`. Ob einer der beiden Werte im Projekt gesetzt ist,
+  lässt sich von der Arbeitsumgebung aus nicht sehen — `expose_debug` zeigt
+  es nach dem ersten Lauf.
 - **Die Bildunterschriften** der Fotos (`immobilie_datei.titel`) stehen noch
   nicht im Exposé. Die Vorlagen führen die Beschriftung als Text am
   Bildelement; sie gehört ans Bild, und das heißt: als Abweichung am

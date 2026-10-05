@@ -73,12 +73,32 @@ function fuegen(teile: (string | undefined)[], trenner: string): string | undefi
   return da.length ? da.join(trenner) : undefined;
 }
 
-/** Kauf oder Miete? Leeres Feld gilt als Kauf — so haelt es die Vorlage. */
-function istKauf(immo: Record<string, unknown>): boolean {
-  const v = String(immo["vertragsart"] ?? "").toLowerCase();
-  if (!v) return true;
-  return !/miet|vermiet|pacht/.test(v);
+/**
+ * Die Vermarktungsart auf drei Schluessel gebracht: kauf, miete, beides.
+ *
+ * In der Datenbank steht, was die Oberflaeche schreibt — "verkauf",
+ * "vermietung", "beides". Eine Vorlage soll das nicht wissen muessen: eine
+ * Bedingung `objekt.vermarktung gleich "kauf"` liest sich fuer den
+ * Vorlagenautor richtig und bleibt richtig, wenn die Oberflaeche ihre Werte
+ * einmal anders schreibt.
+ *
+ * Alles ausser einer Vermietung gilt als Kauf — dieselbe Regel, nach der
+ * die Edge Function bisher Preis und Courtage gerechnet hat
+ * (`vertragsart !== "vermietung"`). "beides" bekommt seinen eigenen
+ * Schluessel, damit eine Vorlage beide Seiten zeigen kann; fuer Preis und
+ * Rechnung zaehlt es als Kauf.
+ */
+function vermarktungVon(immo: Record<string, unknown>): "kauf" | "miete" | "beides" {
+  const v = String(immo["vertragsart"] ?? "").toLowerCase().trim();
+  if (!v) return "kauf";
+  if (v === "beides") return "beides";
+  if (/miet|pacht/.test(v)) return "miete";
+  return "kauf";
 }
+
+const VERMARKTUNG_TEXT: Record<string, string> = {
+  kauf: "Verkauf", miete: "Vermietung", beides: "Verkauf & Vermietung",
+};
 
 export function aufbereiten(q: Quellen): Daten {
   const immo = q.immobilie ?? {};
@@ -176,7 +196,14 @@ export function aufbereiten(q: Quellen): Daten {
   }
 
   // --- 3. Preis und Miete ---------------------------------------------------
-  const kauf = istKauf(immo);
+  // Die Vermarktungsart steht zweimal in den Daten, und das ist Absicht:
+  // objekt.vermarktung ist der Schluessel, auf den Bedingungen pruefen,
+  // objekt.vertragsart der Text, der im Exposé steht. "Haus zum verkauf"
+  // waere kein deutscher Satz.
+  const vermarktung = vermarktungVon(immo);
+  d["objekt.vermarktung"] = vermarktung;
+  d["objekt.vertragsart"] = VERMARKTUNG_TEXT[vermarktung];
+  const kauf = vermarktung !== "miete";
   const preisZahl = kauf ? z(immo["angebotspreis"]) : z(immo["kaltmiete"]);
   if (immo["expose_preis_auf_anfrage"] === true) {
     d["objekt.preis"] = "auf Anfrage";

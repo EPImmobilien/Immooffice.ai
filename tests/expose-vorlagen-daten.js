@@ -34,6 +34,9 @@ function raster(D) {
     'objekt.immo_nr': D.objnr,
     'objekt.objektart': D.objektart,
     'objekt.vertragsart': D.vermarktung,
+    // Der Schluessel, auf den die Kostenseite prueft. Im Betrieb
+    // rechnet ihn aufbereiten.ts aus immobilien.vertragsart aus.
+    'objekt.vermarktung': 'kauf',
     'objekt.objekttitel': D.titel,
     'objekt.expose_slogan': D.slogan,
     'objekt.adresse': D.adresse,
@@ -146,6 +149,9 @@ function studio(D) {
     'objekt.immo_nr': D.objnr,
     'objekt.objektart': D.objektart,
     'objekt.vertragsart': D.vermarktung,
+    // Der Schluessel, auf den die Kostenseite prueft. Im Betrieb
+    // rechnet ihn aufbereiten.ts aus immobilien.vertragsart aus.
+    'objekt.vermarktung': 'kauf',
     // Der Prototyp fuehrt den Titel als drei feste Zeilen — die Studio-Vorlage
     // setzt ihn in 78 Punkt, da bricht nichts von selbst sinnvoll um.
     'objekt.expose_titel_text': (D.titel || []).join('\n'),
