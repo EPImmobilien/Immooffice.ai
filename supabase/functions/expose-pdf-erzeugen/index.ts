@@ -403,7 +403,21 @@ const immoSetzeMandant = (m: unknown) => { immoMandant = (typeof m === "string" 
 // Vorlagen verkleinert und ohne GSUB/GPOS. Es gibt sie nur dort, wo
 // scripts/expose-schriften.py sie erzeugt und scripts/bauen.py sie
 // hingelegt hat.
-const WEB_BASIS = (Deno.env.get("PORTAL_URL") || "").replace(/\/+$/, "");
+// Woher die Oberflaeche erreichbar ist. PORTAL_URL zuerst; wo das nicht
+// gesetzt ist, steht derselbe Ursprung in EXPOSE_FREIGABE_BASIS, das vier
+// andere Funktionen fuer ihre Links benutzen (dort mit Pfad und
+// Abfrageteil — hier zaehlt nur der Ursprung). Ein eigenes Geheimnis mehr
+// zu verlangen, wo der Wert schon im Projekt steht, waere eine Huerde
+// ohne Gewinn.
+const WEB_BASIS = (function () {
+  const kandidaten = [Deno.env.get("PORTAL_URL"), Deno.env.get("EXPOSE_FREIGABE_BASIS")];
+  for (const k of kandidaten) {
+    const v = (k || "").trim();
+    if (!v) continue;
+    try { return new URL(v).origin; } catch (_e) { /* naechster */ }
+  }
+  return "";
+})();
 const IMMO_SCHRIFTEN: Record<string, string> = {};
 if (WEB_BASIS) {
   for (const name of Expose.SCHNITTE) {
