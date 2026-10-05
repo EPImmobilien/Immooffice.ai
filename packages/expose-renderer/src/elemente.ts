@@ -24,7 +24,8 @@ import { ankerArt, ankerX, warne } from "./umgebung";
 import { farbe } from "./stil";
 import type { FarbRef } from "./schema";
 import { satzRegeln } from "./stil";
-import { ersetze, liste, wert, zahlDe } from "./werte";
+import { ersetze, formatiere, liste, wert, zahlDe } from "./werte";
+import { feld } from "./felder";
 import type { PfadSchritt, RGBA } from "./schritte";
 import { verdichten } from "./text";
 
@@ -51,6 +52,11 @@ function farbRef(el: Element, name: string, u: Umgebung, deckkraft = 1): RGBA | 
   const v = el[name];
   if (v === undefined || v === null) return null;
   return farbe(v as FarbRef, u.palette, deckkraft);
+}
+
+/** Wendet die Versalien eines Textstils an. */
+function gross(s: { grossbuchstaben: boolean }, t: string): string {
+  return s.grossbuchstaben ? t.toLocaleUpperCase("de-DE") : t;
 }
 
 function stilVon(el: Element, u: Umgebung, name = "stil", vorgabe?: string) {
@@ -574,9 +580,13 @@ const faktentabelle: Zeichner = (el, u) => {
   const jeSpalte = Math.ceil(zeilen.length / spalten);
   const zeilenhoehe = spalten > 1 ? zahl(el, "zeilenhoehe", 25) : zh;
 
+  // Spaltenweise ist die Vorgabe: Angaben gehoeren der Reihe nach
+  // untereinander. "zeilenweise" braucht die Energieliste von Studio,
+  // wo die Paare nebeneinander gelesen werden.
+  const zeilenweise = zeichenkette(el, "fuellung") === "zeilenweise";
   zeilen.forEach((z, i) => {
-    const spalte = spalten > 1 ? Math.floor(i / jeSpalte) : 0;
-    const reihe = spalten > 1 ? i % jeSpalte : i;
+    const spalte = spalten > 1 ? (zeilenweise ? i % spalten : Math.floor(i / jeSpalte)) : 0;
+    const reihe = spalten > 1 ? (zeilenweise ? Math.floor(i / spalten) : i % jeSpalte) : i;
     const x = el.x + spalte * (sb + spaltenabstand);
     const y = el.y + el.h - reihe * zeilenhoehe;
     if (art === "zebra" && reihe % 2 === 0 && flaecheFarbe) {
@@ -649,7 +659,7 @@ const raumliste: Zeichner = (el, u) => {
       u.blatt.rect(el.x, by, el.b, bh, balken, null, zahl(el, "summe_radius", 0));
       const polster = zahl(el, "summe_polster", 10);
       const ys = by + zahl(el, "summe_grundlinie", 9);
-      u.blatt.T(el.x + polster, ys, zeichenkette(el, "summe_label") ?? "Summe",
+      u.blatt.T(el.x + polster, ys, gross(sSumme, zeichenkette(el, "summe_label") ?? "Summe"),
                 sSumme.schnitt, sSumme.groesse, sSumme.farbe, sSumme.sperrung);
       u.blatt.T(el.x + el.b - polster, ys, `${zahlDe(summe, 1)} ${einheit}`,
                 sSummeWert.schnitt, sSummeWert.groesse, sSummeWert.farbe,
@@ -657,8 +667,8 @@ const raumliste: Zeichner = (el, u) => {
       return;
     }
     const ys = y - zahl(el, "summe_versatz", 2);
-    u.blatt.T(el.x, ys, zeichenkette(el, "summe_label") ?? "Summe", sSumme.schnitt,
-              sSumme.groesse, sSumme.farbe, sSumme.sperrung);
+    u.blatt.T(el.x, ys, gross(sSumme, zeichenkette(el, "summe_label") ?? "Summe"),
+              sSumme.schnitt, sSumme.groesse, sSumme.farbe, sSumme.sperrung);
     u.blatt.T(el.x + el.b, ys, `${zahlDe(summe, 1)} ${einheit}`, sSummeWert.schnitt,
               sSummeWert.groesse, sSummeWert.farbe, sSummeWert.sperrung, "r");
   }
@@ -1155,27 +1165,61 @@ function rohzahl(daten: Record<string, unknown>, schluessel: string): number | u
  * Rechenwege fuer denselben Betrag waeren zwei Betraege.
  */
 const kostenrechnung: Zeichner = (el, u) => {
-  const posten = (liste(u.daten, zeichenkette(el, "feld") ?? "rechnung.posten") as
-    { name?: string; betrag?: number }[])
-    .filter((p): p is { name: string; betrag: number } =>
-      !!p && typeof p.name === "string" && Number.isFinite(Number(p.betrag)));
+  // Die Bezeichnungen stehen in der Vorlage, die Betraege in den Daten.
+  // Das muss so herum sein: Raster schreibt "Notar & Grundbuch (ca. 2,0 %)",
+  // Studio "Notar & Grundbuch ca. 2,0 %" — dieselbe Zahl, zwei
+  // Schreibweisen. Stuende der Text in den Daten, koennte nur eine der
+  // beiden Vorlagen recht haben.
+  type Posten = { name: string; betrag: number };
+  const vorgaben = el["posten"] as { label: string; feld: string }[] | undefined;
+  const posten: Posten[] = [];
+  if (vorgaben) {
+    for (const v of vorgaben) {
+      const betrag = Number(u.daten[v.feld]);
+      if (!Number.isFinite(betrag)) continue;
+      const label = ersetze(u.daten, v.label);
+      if (label === undefined) continue;
+      posten.push({ name: label, betrag });
+    }
+  } else {
+    for (const p of liste(u.daten, zeichenkette(el, "feld") ?? "rechnung.posten") as
+         { name?: string; betrag?: number }[]) {
+      if (!p || typeof p.name !== "string" || !Number.isFinite(Number(p.betrag))) continue;
+      posten.push({ name: p.name, betrag: Number(p.betrag) });
+    }
+  }
   if (!posten.length) {
     warne(u, "fehlender_wert", el, "Keine Kostenposten — das Element entfaellt.");
     return;
   }
   const summe = posten.reduce((a, p) => a + Number(p.betrag), 0);
-  const farben = ((el["farben"] as FarbRef[] | undefined) ?? ["f1", "f2"])
-    .map((f) => farbe(f, u.palette));
+  // Die Farben werden nur gelesen, wenn sie gebraucht werden. Studio
+  // zeigt die Posten ohne Balken und ohne Punkte — und seine Palette hat
+  // die Farbnamen gar nicht, die eine andere Vorlage hier nennt.
+  const farbliste = (el["farben"] as FarbRef[] | undefined) ?? [];
+  const braucht = zahl(el, "balken_hoehe", 16) > 0 || zahl(el, "punkt_groesse", 8) > 0;
+  if (braucht && !farbliste.length) {
+    warne(u, "unbekannt", el,
+          "Balken oder Punkte sollen gezeichnet werden, aber die Vorlage nennt " +
+          "keine Farben.");
+  }
+  const farben = farbliste.length
+    ? farbliste.map((f) => farbe(f, u.palette))
+    : [farbe({ palette: "schwarz" }, u.palette)];
 
+  // Der gestapelte Balken ist nicht Pflicht: Studio zeigt die Posten nur
+  // als Liste. balken_hoehe 0 laesst ihn weg.
   const bh = zahl(el, "balken_hoehe", 16);
   const yBalken = el.y + el.h - bh;
-  let x = el.x;
-  posten.forEach((p, i) => {
-    const b = (el.b * Number(p.betrag)) / summe;
-    u.blatt.rect(x, yBalken, b, bh, farben[i % farben.length], null,
-                 zahl(el, "balken_radius", 0));
-    x += b;
-  });
+  if (bh > 0) {
+    let x = el.x;
+    posten.forEach((p, i) => {
+      const b = (el.b * Number(p.betrag)) / summe;
+      u.blatt.rect(x, yBalken, b, bh, farben[i % farben.length], null,
+                   zahl(el, "balken_radius", 0));
+      x += b;
+    });
+  }
 
   const sName = stilVon(el, u, "stil_name");
   const sWert = stilVon(el, u, "stil_wert");
@@ -1186,8 +1230,10 @@ const kostenrechnung: Zeichner = (el, u) => {
   let y = yBalken - zahl(el, "liste_abstand", 30);
 
   posten.forEach((p, i) => {
-    u.blatt.rect(el.x, y - zahl(el, "punkt_versatz", 1), punktGroesse, punktGroesse,
-                 farben[i % farben.length], null, zahl(el, "punkt_radius", 2));
+    if (punktGroesse > 0) {
+      u.blatt.rect(el.x, y - zahl(el, "punkt_versatz", 1), punktGroesse, punktGroesse,
+                   farben[i % farben.length], null, zahl(el, "punkt_radius", 2));
+    }
     u.blatt.T(el.x + zahl(el, "einzug", 16), y, p.name, sName.schnitt, sName.groesse,
               sName.farbe, sName.sperrung);
     u.blatt.T(el.x + spalte, y, `${zahlDe(Number(p.betrag), 0)} €`, sWert.schnitt,
@@ -1204,9 +1250,23 @@ const kostenrechnung: Zeichner = (el, u) => {
     const sSumme = stilVon(el, u, "stil_summe");
     const sSummeWert = zeichenkette(el, "stil_summe_wert")
       ? u.stil(zeichenkette(el, "stil_summe_wert")!) : sSumme;
+    const flaeche = farbRef(el, "summe_flaeche", u);
+    if (flaeche) {
+      const sh = zahl(el, "summe_hoehe", 40);
+      const sy = y - zahl(el, "summe_versatz", 30);
+      const polster = zahl(el, "summe_polster", 12);
+      u.blatt.rect(el.x, sy, el.b, sh, flaeche, null, zahl(el, "summe_radius", 0));
+      u.blatt.T(el.x + polster, y - zahl(el, "summe_label_versatz", 14),
+                gross(sSumme, zeichenkette(el, "summe_label") ?? "Gesamtaufwand"),
+                sSumme.schnitt, sSumme.groesse, sSumme.farbe, sSumme.sperrung);
+      u.blatt.T(el.x + el.b - polster, y - zahl(el, "summe_wert_versatz", 16),
+                `${zahlDe(summe, 0)} €`, sSummeWert.schnitt, sSummeWert.groesse,
+                sSummeWert.farbe, sSummeWert.sperrung, "r");
+      return;
+    }
     const ys = y - zahl(el, "summe_versatz", 4);
     u.blatt.T(el.x + zahl(el, "einzug", 16), ys,
-              zeichenkette(el, "summe_label") ?? "Gesamtaufwand",
+              gross(sSumme, zeichenkette(el, "summe_label") ?? "Gesamtaufwand"),
               sSumme.schnitt, sSumme.groesse, sSumme.farbe, sSumme.sperrung);
     u.blatt.T(el.x + spalte, ys, `${zahlDe(summe, 0)} €`, sSummeWert.schnitt,
               sSummeWert.groesse, sSummeWert.farbe, sSummeWert.sperrung, "r");
@@ -1217,13 +1277,20 @@ const kostenrechnung: Zeichner = (el, u) => {
 
 /** Brutto, Netto und Faktor als Kacheln. Werte aus rechnung.*. */
 const rendite: Zeichner = (el, u) => {
-  const kacheln = (el["kacheln"] as { label: string; feld: string; einheit?: string }[]
-    | undefined) ?? [];
+  const kacheln = (el["kacheln"] as
+    { label: string; feld: string; einheit?: string; stellen?: number;
+      nachsatz?: string }[] | undefined) ?? [];
   const gefuellt: { label: string; wert: string; einheit?: string }[] = [];
   for (const k of kacheln) {
-    const w = wert(u.daten, k.feld);
+    // "stellen" ueberschreibt die Nachkommastellen des Katalogs: eine
+    // Rendite steht hier auf zwei Stellen, sonst auf einer.
+    const f = feld(k.feld);
+    const w = k.stellen !== undefined && f
+      ? formatiere(u.daten[k.feld], f.typ, k.stellen)
+      : wert(u.daten, k.feld);
     if (w === undefined) continue;
-    gefuellt.push({ label: k.label, wert: w, einheit: k.einheit });
+    gefuellt.push({ label: k.label, wert: k.nachsatz ? w + k.nachsatz : w,
+                    einheit: k.einheit });
   }
   if (!gefuellt.length) {
     warne(u, "fehlender_wert", el, "Keine Renditewerte — das Element entfaellt.");
@@ -1246,21 +1313,42 @@ const rendite: Zeichner = (el, u) => {
  * hinterlegt.
  */
 const kontaktkarte: Zeichner = (el, u) => {
+  // Das Bildfenster ist rund (Raster, Signature) oder rechteckig
+  // (Studio). Beides ist derselbe Slot, nur anders beschnitten.
+  const eckig = zeichenkette(el, "foto_form") === "rechteck";
   const r = zahl(el, "foto_radius", 46);
   const fx = el.x + zahl(el, "foto_x", 70);
   const fy = el.y + zahl(el, "foto_y", el.h / 2);
-  const quelle = wert(u.daten, "ansprechpartner.foto");
-  u.blatt.gruppe([["circle", fx, fy, r]], [1, 0, 0, 1, 0, 0], (b) => {
-    if (quelle !== undefined) {
-      b.bild(fx - r, fy - r, 2 * r, 2 * r, quelle, "cover");
-    } else {
-      b.rect(fx - r, fy - r, 2 * r, 2 * r,
-             farbRef(el, "foto_platzhalter", u) ?? farbe({ palette: "surf" }, u.palette),
-             null, 0);
+  const rahmen = eckig
+    ? { x: el.x + zahl(el, "foto_x", 0), y: el.y + zahl(el, "foto_y", 0),
+        b: zahl(el, "foto_breite", 150), h: zahl(el, "foto_hoehe", el.h) }
+    : { x: fx - r, y: fy - r, b: 2 * r, h: 2 * r };
+  const kind: Element = {
+    ...el,
+    id: `${el.id}-foto`,
+    typ: "bild",
+    x: rahmen.x, y: rahmen.y, b: rahmen.b, h: rahmen.h,
+    eckradius: 0,
+    slot: { art: "ansprechpartner" },
+    fuellmodus: "cover",
+    platzhalter_farbe: (el["foto_platzhalter"] as unknown) ?? { palette: "surf" },
+  } as Element;
+  if (eckig) {
+    bild(kind, u);
+  } else {
+    const quelle = wert(u.daten, "ansprechpartner.foto");
+    u.blatt.gruppe([["circle", fx, fy, r]], [1, 0, 0, 1, 0, 0], (b) => {
+      if (quelle !== undefined) {
+        b.bild(rahmen.x, rahmen.y, rahmen.b, rahmen.h, quelle, "cover");
+      } else {
+        b.rect(rahmen.x, rahmen.y, rahmen.b, rahmen.h,
+               farbRef(el, "foto_platzhalter", u) ?? farbe({ palette: "surf" }, u.palette),
+               null, 0);
+      }
+    }, "bild:ansprechpartner");
+    if (quelle === undefined) {
+      warne(u, "fehlendes_bild", el, "Kein Foto des Ansprechpartners.");
     }
-  }, "bild:ansprechpartner");
-  if (quelle === undefined) {
-    warne(u, "fehlendes_bild", el, "Kein Foto des Ansprechpartners.");
   }
 
   const x = el.x + zahl(el, "text_x", 140);
@@ -1268,7 +1356,8 @@ const kontaktkarte: Zeichner = (el, u) => {
   const name = wert(u.daten, "ansprechpartner.name");
   let y = el.y + el.h - zahl(el, "name_versatz", 40);
   if (name !== undefined) {
-    u.blatt.T(x, y, name, sName.schnitt, sName.groesse, sName.farbe, sName.sperrung);
+    u.blatt.T(x, y, gross(sName, name), sName.schnitt, sName.groesse, sName.farbe,
+              sName.sperrung);
   } else {
     warne(u, "fehlender_wert", el, "Kein Name des Ansprechpartners.");
   }

@@ -266,6 +266,8 @@ export const FIRMA: Feld[] = [
 // Werte, die niemand erfasst — sie entstehen beim Rendern. Die Formeln
 // stehen nicht hier, sondern in rechnen.ts; hier steht, dass es sie gibt.
 export const RECHNUNG: Feld[] = [
+  { schluessel: "rechnung.kaufpreis", name: "Kaufpreis (Rechnung)", typ: "euro",
+    quelle: GERECHNET, stellen: 0 },
   { schluessel: "rechnung.grunderwerbsteuer_satz", name: "Grunderwerbsteuersatz", typ: "prozent",
     quelle: GERECHNET, stellen: 1,
     hinweis: "Aus dem Objekt, sonst aus dem Bundesland der PLZ." },

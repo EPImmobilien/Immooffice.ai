@@ -2309,7 +2309,25 @@
           "stil_name": "kosten_name",
           "stil_wert": "kosten_wert",
           "stil_summe": "kosten_summe",
-          "stil_summe_wert": "kosten_summe_wert"
+          "stil_summe_wert": "kosten_summe_wert",
+          "posten": [
+            {
+              "label": "Kaufpreis",
+              "feld": "rechnung.kaufpreis"
+            },
+            {
+              "label": "Grunderwerbsteuer ({{rechnung.grunderwerbsteuer_satz}})",
+              "feld": "rechnung.grunderwerbsteuer"
+            },
+            {
+              "label": "Notar & Grundbuch (ca. {{rechnung.notar_satz}})",
+              "feld": "rechnung.notar"
+            },
+            {
+              "label": "Käuferprovision ({{rechnung.courtage_satz}})",
+              "feld": "rechnung.courtage"
+            }
+          ]
         },
         {
           "id": "fin-panel",

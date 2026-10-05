@@ -99,12 +99,13 @@ function raster(D) {
       const darlehen = gesamt - ek;
       const zahl = (v, n) => v.toFixed(n).replace('.', ',');
       return {
-        'rechnung.posten': [
-          { name: 'Kaufpreis', betrag: kp },
-          { name: 'Grunderwerbsteuer (' + zahl(Number(D.grest), 1) + ' %)', betrag: grest },
-          { name: 'Notar & Grundbuch (ca. ' + zahl(Number(D.notar), 1) + ' %)', betrag: notar },
-          { name: 'Käuferprovision (' + zahl(Number(D.courtage), 2) + ' %)', betrag: court },
-        ],
+        'rechnung.kaufpreis': kp,
+        'rechnung.grunderwerbsteuer': grest,
+        'rechnung.grunderwerbsteuer_satz': Number(D.grest),
+        'rechnung.notar': notar,
+        'rechnung.notar_satz': Number(D.notar),
+        'rechnung.courtage': court,
+        'rechnung.courtage_satz': zahl(Number(D.courtage), 2) + ' %',
         'rechnung.gesamtaufwand': gesamt,
         'rechnung.eigenkapital_prozent': Number(D.ek),
         'rechnung.eigenkapital': ek,
@@ -187,13 +188,17 @@ function studio(D) {
     'objekt.fakten': (D.fakten || []).map(([label, wert]) => ({ label, wert })),
     'objekt.energie_angaben': (D.energie || []).map(([label, wert]) => ({ label, wert })),
 
-    'rechnung.posten': [
-      { name: 'Kaufpreis', betrag: kp },
-      { name: 'Grunderwerbsteuer ' + zahl(Number(D.grest), 1) + ' %', betrag: grest },
-      { name: 'Notar & Grundbuch ' + zahl(Number(D.notar), 1) + ' %', betrag: notar },
-      { name: 'Käuferprovision ' + zahl(Number(D.courtage), 2) + ' %', betrag: court },
-    ],
+    'rechnung.kaufpreis': kp,
+    'rechnung.grunderwerbsteuer': grest,
+    'rechnung.grunderwerbsteuer_satz': Number(D.grest),
+    'rechnung.notar': notar,
+    'rechnung.notar_satz': Number(D.notar),
+    'rechnung.courtage': court,
+    'rechnung.courtage_satz': zahl(Number(D.courtage), 2) + ' %',
     'rechnung.gesamtaufwand': gesamt,
+    'rechnung.bruttorendite': (Number(D.miete) * 12) / kp * 100,
+    'rechnung.nettorendite': (Number(D.miete) * 12 - Number(D.hg_nu) * 12) / gesamt * 100,
+    'rechnung.kaufpreisfaktor': kp / (Number(D.miete) * 12),
 
     'ansprechpartner.name': ap.name,
     'ansprechpartner.funktion': ap.rolle,

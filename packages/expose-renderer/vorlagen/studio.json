@@ -367,6 +367,386 @@
         "farbe": "weiss",
         "sperrung": 1,
         "grossbuchstaben": true
+      },
+      "block_titel": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "CondXB"
+        },
+        "groesse": 20,
+        "farbe": "rule",
+        "grossbuchstaben": true
+      },
+      "block_titel_klein": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "CondXB"
+        },
+        "groesse": 16,
+        "farbe": "rule",
+        "grossbuchstaben": true
+      },
+      "raum_name": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Regular"
+        },
+        "groesse": 9,
+        "farbe": "text"
+      },
+      "raum_wert": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 9,
+        "farbe": "rule",
+        "ausrichtung": "rechts"
+      },
+      "raum_summe": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Bold"
+        },
+        "groesse": 8.5,
+        "farbe": "weiss",
+        "sperrung": 0.6,
+        "grossbuchstaben": true
+      },
+      "raum_summe_wert": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Bold"
+        },
+        "groesse": 9,
+        "farbe": "s",
+        "ausrichtung": "rechts"
+      },
+      "kleingedruckt": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Regular"
+        },
+        "groesse": 6.8,
+        "farbe": "muted"
+      },
+      "lage_text": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Regular"
+        },
+        "groesse": 8.9,
+        "farbe": "text",
+        "zeilen": 14.2
+      },
+      "wege_titel": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "CondXB"
+        },
+        "groesse": 14,
+        "farbe": "rule",
+        "grossbuchstaben": true
+      },
+      "wege_kopf": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 5.8,
+        "farbe": "muted",
+        "sperrung": 1.0,
+        "grossbuchstaben": true,
+        "ausrichtung": "rechts"
+      },
+      "wege_name": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Regular"
+        },
+        "groesse": 8.8,
+        "farbe": "text"
+      },
+      "wege_wert": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Bold"
+        },
+        "groesse": 9,
+        "farbe": "rule",
+        "ausrichtung": "rechts"
+      },
+      "wege_wert_erster": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Bold"
+        },
+        "groesse": 9,
+        "farbe": "s",
+        "ausrichtung": "rechts"
+      },
+      "karte_quelle": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Regular"
+        },
+        "groesse": 5.4,
+        "farbe": "muted",
+        "ausrichtung": "rechts"
+      },
+      "nk_name": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Regular"
+        },
+        "groesse": 8.8,
+        "farbe": "text"
+      },
+      "nk_wert": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 8.8,
+        "farbe": "rule",
+        "ausrichtung": "rechts"
+      },
+      "nk_summe": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Bold"
+        },
+        "groesse": 8,
+        "farbe": "weiss",
+        "sperrung": 0.6,
+        "grossbuchstaben": true
+      },
+      "nk_summe_wert": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "CondXB"
+        },
+        "groesse": 18,
+        "farbe": "s",
+        "ausrichtung": "rechts"
+      },
+      "kachel_wert_s": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "CondBlack"
+        },
+        "groesse": 24,
+        "farbe": "on_s"
+      },
+      "kachel_wert_d": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "CondBlack"
+        },
+        "groesse": 24,
+        "farbe": "rule"
+      },
+      "kachel_label_s": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 5.6,
+        "farbe": "on_s",
+        "sperrung": 1.0,
+        "grossbuchstaben": true
+      },
+      "kachel_label_d": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 5.6,
+        "farbe": "muted",
+        "sperrung": 1.0,
+        "grossbuchstaben": true
+      },
+      "skala_klasse_dunkel": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Bold"
+        },
+        "groesse": 9,
+        "farbe": "rule",
+        "ausrichtung": "mitte"
+      },
+      "skala_klasse_hell": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Bold"
+        },
+        "groesse": 9,
+        "farbe": "weiss",
+        "ausrichtung": "mitte"
+      },
+      "skala_klasse_aktiv": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Bold"
+        },
+        "groesse": 9,
+        "farbe": "on_s",
+        "ausrichtung": "mitte"
+      },
+      "energie_label": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Regular"
+        },
+        "groesse": 8.4,
+        "farbe": "muted"
+      },
+      "energie_wert": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 8.4,
+        "farbe": "rule",
+        "ausrichtung": "rechts"
+      },
+      "fussnote": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Regular"
+        },
+        "groesse": 6.6,
+        "farbe": "muted",
+        "zeilen": 9.4
+      },
+      "kontakt_marke": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Bold"
+        },
+        "groesse": 15,
+        "farbe": "weiss"
+      },
+      "kontakt_zusatz": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 5.6,
+        "farbe": {
+          "mix": [
+            "weiss",
+            "rule",
+            0.4
+          ]
+        },
+        "sperrung": 1.0,
+        "grossbuchstaben": true
+      },
+      "kontakt_wort": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "CondBlack"
+        },
+        "groesse": 84,
+        "farbe": "on_s",
+        "sperrung": -1,
+        "grossbuchstaben": true
+      },
+      "kontakt_lead": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Medium"
+        },
+        "groesse": 11,
+        "farbe": "on_s"
+      },
+      "ap_oberzeile": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 6.4,
+        "farbe": "s",
+        "sperrung": 1.0,
+        "grossbuchstaben": true
+      },
+      "ap_name": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "CondBlack"
+        },
+        "groesse": 30,
+        "farbe": "weiss",
+        "sperrung": -0.2,
+        "grossbuchstaben": true
+      },
+      "ap_rolle": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Medium"
+        },
+        "groesse": 9,
+        "farbe": {
+          "mix": [
+            "weiss",
+            "rule",
+            0.35
+          ]
+        }
+      },
+      "ap_label": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Bold"
+        },
+        "groesse": 8.6,
+        "farbe": "s"
+      },
+      "ap_wert": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Medium"
+        },
+        "groesse": 8.6,
+        "farbe": "weiss"
+      },
+      "foto_label": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 5.8,
+        "farbe": "weiss",
+        "sperrung": 1,
+        "grossbuchstaben": true
+      },
+      "recht_titel": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "SemiBold"
+        },
+        "groesse": 6,
+        "farbe": "on_s",
+        "sperrung": 1.0,
+        "grossbuchstaben": true
+      },
+      "recht_text": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Regular"
+        },
+        "groesse": 7,
+        "farbe": "on_s",
+        "zeilen": 10
+      },
+      "impressum": {
+        "schrift": {
+          "familie": "archivo",
+          "schnitt": "Regular"
+        },
+        "groesse": 6.2,
+        "farbe": "on_s"
       }
     },
     "seitenfuss": {
@@ -1172,6 +1552,925 @@
           "label_polster": 6,
           "label_grundlinie": 5,
           "label": "Bad / Detail"
+        }
+      ]
+    },
+    {
+      "id": "grundriss",
+      "typ": "grundriss",
+      "name": "Grundriss",
+      "elemente": [
+        {
+          "id": "kopf-marke",
+          "typ": "form",
+          "x": 36,
+          "y": 771.89,
+          "b": 28,
+          "h": 28,
+          "form": "rechteck",
+          "fuell": "s"
+        },
+        {
+          "id": "kopf-nr",
+          "typ": "text",
+          "x": 36,
+          "y": 770.89,
+          "b": 28,
+          "h": 10,
+          "stil": "kopf_nr",
+          "inhalt": "04",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-label",
+          "typ": "text",
+          "x": 74,
+          "y": 775.29,
+          "b": 400,
+          "h": 6.6,
+          "stil": "kopf_label",
+          "inhalt": "{{objekt.objektart}}  /  {{objekt.ort}}-{{objekt.ortsteil}}",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-titel",
+          "typ": "text",
+          "x": 36,
+          "y": 663.89,
+          "b": 523.28,
+          "h": 50,
+          "stil": "kopf_titel",
+          "inhalt": "Grundriss.",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-linie",
+          "typ": "form",
+          "x": 36,
+          "y": 697.89,
+          "b": 523.28,
+          "h": 0,
+          "form": "linie",
+          "strich": "rule",
+          "linienbreite": 2.4
+        },
+        {
+          "id": "plan-flaeche",
+          "typ": "form",
+          "x": 36,
+          "y": 299.89,
+          "b": 523.28,
+          "h": 380,
+          "form": "rechteck",
+          "fuell": "tint"
+        },
+        {
+          "id": "plan",
+          "typ": "bild",
+          "x": 66,
+          "y": 329.89,
+          "b": 463.28,
+          "h": 320,
+          "slot": {
+            "art": "grundriss",
+            "nr": 1
+          },
+          "fuellmodus": "contain",
+          "platzhalter_farbe": "tint"
+        },
+        {
+          "id": "flaechen-titel",
+          "typ": "text",
+          "x": 36,
+          "y": 243.89,
+          "b": 300,
+          "h": 20,
+          "stil": "block_titel",
+          "inhalt": "Flächen",
+          "einzeilig": true
+        },
+        {
+          "id": "flaechen-linie",
+          "typ": "form",
+          "x": 36,
+          "y": 253.89,
+          "b": 523.28,
+          "h": 0,
+          "form": "linie",
+          "strich": "rule",
+          "linienbreite": 1.2
+        },
+        {
+          "id": "raeume",
+          "typ": "raumliste",
+          "x": 36,
+          "y": 79.89,
+          "b": 523.28,
+          "h": 154,
+          "zeilenhoehe": 22,
+          "linien_versatz": 8,
+          "linien_farbe": "hair",
+          "linienbreite": 0.8,
+          "mit_summe": true,
+          "summe_flaeche": "rule",
+          "summe_versatz": 14,
+          "summe_hoehe": 26,
+          "summe_polster": 10,
+          "summe_grundlinie": 9,
+          "summe_label": "Wohnfläche gesamt",
+          "stil_name": "raum_name",
+          "stil_flaeche": "raum_wert",
+          "stil_summe": "raum_summe",
+          "stil_summe_wert": "raum_summe_wert"
+        },
+        {
+          "id": "plan-hinweis",
+          "typ": "text",
+          "x": 36,
+          "y": 47.2,
+          "b": 523.28,
+          "h": 6.8,
+          "stil": "kleingedruckt",
+          "inhalt": "Grundriss nicht maßstabsgetreu. Terrasse zu ¼ angerechnet, Berechnung nach WoFlV.",
+          "einzeilig": true
+        }
+      ]
+    },
+    {
+      "id": "lage",
+      "typ": "lage",
+      "name": "Die Lage",
+      "elemente": [
+        {
+          "id": "kopf-marke",
+          "typ": "form",
+          "x": 36,
+          "y": 771.89,
+          "b": 28,
+          "h": 28,
+          "form": "rechteck",
+          "fuell": "s"
+        },
+        {
+          "id": "kopf-nr",
+          "typ": "text",
+          "x": 36,
+          "y": 770.89,
+          "b": 28,
+          "h": 10,
+          "stil": "kopf_nr",
+          "inhalt": "05",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-label",
+          "typ": "text",
+          "x": 74,
+          "y": 775.29,
+          "b": 400,
+          "h": 6.6,
+          "stil": "kopf_label",
+          "inhalt": "{{objekt.objektart}}  /  {{objekt.ort}}-{{objekt.ortsteil}}",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-titel",
+          "typ": "text",
+          "x": 36,
+          "y": 663.89,
+          "b": 523.28,
+          "h": 50,
+          "stil": "kopf_titel",
+          "inhalt": "Die Lage.",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-linie",
+          "typ": "form",
+          "x": 36,
+          "y": 697.89,
+          "b": 523.28,
+          "h": 0,
+          "form": "linie",
+          "strich": "rule",
+          "linienbreite": 2.4
+        },
+        {
+          "id": "karte",
+          "typ": "karte",
+          "x": 36,
+          "y": 429.89,
+          "b": 523.28,
+          "h": 250,
+          "platzhalter_farbe": "tint",
+          "quellenhinweis": "© OpenStreetMap-Mitwirkende",
+          "stil_quelle": "karte_quelle",
+          "quelle_x": 6,
+          "quelle_y": 6
+        },
+        {
+          "id": "lage-text",
+          "typ": "text",
+          "x": 36,
+          "y": 62,
+          "b": 219.7776,
+          "h": 341.89,
+          "stil": "lage_text",
+          "inhalt": "{{objekt.beschreibung_lage}}",
+          "blocksatz": false,
+          "verdichten": false
+        },
+        {
+          "id": "wege-titel",
+          "typ": "text",
+          "x": 279.7776,
+          "y": 391.89,
+          "b": 279.5024,
+          "h": 14,
+          "stil": "wege_titel",
+          "inhalt": "Wege in Minuten",
+          "einzeilig": true
+        },
+        {
+          "id": "wege",
+          "typ": "distanzen",
+          "x": 279.7776,
+          "y": 62,
+          "b": 279.5024,
+          "h": 325.89,
+          "darstellung": "wege",
+          "feld": "objekt.expose_wege",
+          "spalten_x": [
+            -98,
+            -52,
+            -6
+          ],
+          "spaltenkopf": [
+            "zu Fuß",
+            "Rad",
+            "Auto"
+          ],
+          "felder": [
+            "fuss",
+            "rad",
+            "auto"
+          ],
+          "kopf_abstand": 24,
+          "kopflinie_farbe": "rule",
+          "kopflinie_versatz": 18,
+          "kopflinie_breite": 1.2,
+          "nach_kopflinie": 0,
+          "zeilenhoehe": 23,
+          "linien_farbe": "hair",
+          "linienbreite": 0.8,
+          "linien_versatz": 8,
+          "stil_name": "wege_name",
+          "stil_wert": "wege_wert",
+          "stil_wert_erster": "wege_wert_erster",
+          "stil_kopf": "wege_kopf"
+        }
+      ]
+    },
+    {
+      "id": "zahlen",
+      "typ": "kosten",
+      "name": "Die Zahlen",
+      "elemente": [
+        {
+          "id": "kopf-marke",
+          "typ": "form",
+          "x": 36,
+          "y": 771.89,
+          "b": 28,
+          "h": 28,
+          "form": "rechteck",
+          "fuell": "s"
+        },
+        {
+          "id": "kopf-nr",
+          "typ": "text",
+          "x": 36,
+          "y": 770.89,
+          "b": 28,
+          "h": 10,
+          "stil": "kopf_nr",
+          "inhalt": "06",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-label",
+          "typ": "text",
+          "x": 74,
+          "y": 775.29,
+          "b": 400,
+          "h": 6.6,
+          "stil": "kopf_label",
+          "inhalt": "{{objekt.objektart}}  /  {{objekt.ort}}-{{objekt.ortsteil}}",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-titel",
+          "typ": "text",
+          "x": 36,
+          "y": 663.89,
+          "b": 523.28,
+          "h": 50,
+          "stil": "kopf_titel",
+          "inhalt": "Die Zahlen.",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-linie",
+          "typ": "form",
+          "x": 36,
+          "y": 697.89,
+          "b": 523.28,
+          "h": 0,
+          "form": "linie",
+          "strich": "rule",
+          "linienbreite": 2.4
+        },
+        {
+          "id": "kopf-unter",
+          "typ": "text",
+          "x": 36,
+          "y": 670.89,
+          "b": 523.28,
+          "h": 9,
+          "stil": "kopf_unter",
+          "inhalt": "Kaufnebenkosten, Kapitalanlage und Energie – transparent gerechnet.",
+          "einzeilig": true
+        },
+        {
+          "id": "nk-titel",
+          "typ": "text",
+          "x": 36,
+          "y": 629.89,
+          "b": 249.64,
+          "h": 16,
+          "stil": "block_titel_klein",
+          "inhalt": "Nebenkosten",
+          "einzeilig": true
+        },
+        {
+          "id": "nk-linie",
+          "typ": "form",
+          "x": 36,
+          "y": 637.89,
+          "b": 249.64,
+          "h": 0,
+          "form": "linie",
+          "strich": "rule",
+          "linienbreite": 1.2
+        },
+        {
+          "id": "nebenkosten",
+          "typ": "kostenrechnung",
+          "x": 36,
+          "y": 525.89,
+          "b": 249.64,
+          "h": 92,
+          "balken_hoehe": 0,
+          "liste_abstand": 0,
+          "zeilenhoehe": 23,
+          "wert_spalte": 249.64,
+          "einzug": 0,
+          "punkt_groesse": 0,
+          "linien_farbe": "hair",
+          "linienbreite": 0.8,
+          "linien_versatz": 8,
+          "mit_summe": true,
+          "summe_flaeche": "rule",
+          "summe_hoehe": 40,
+          "summe_versatz": 30,
+          "summe_polster": 12,
+          "summe_label_versatz": 14,
+          "summe_wert_versatz": 16,
+          "summe_label": "Gesamtaufwand",
+          "stil_name": "nk_name",
+          "stil_wert": "nk_wert",
+          "stil_summe": "nk_summe",
+          "stil_summe_wert": "nk_summe_wert",
+          "posten": [
+            {
+              "label": "Kaufpreis",
+              "feld": "rechnung.kaufpreis"
+            },
+            {
+              "label": "Grunderwerbsteuer {{rechnung.grunderwerbsteuer_satz}}",
+              "feld": "rechnung.grunderwerbsteuer"
+            },
+            {
+              "label": "Notar & Grundbuch ca. {{rechnung.notar_satz}}",
+              "feld": "rechnung.notar"
+            },
+            {
+              "label": "Käuferprovision {{rechnung.courtage_satz}}",
+              "feld": "rechnung.courtage"
+            }
+          ]
+        },
+        {
+          "id": "ka-titel",
+          "typ": "text",
+          "x": 309.64,
+          "y": 629.89,
+          "b": 249.64,
+          "h": 16,
+          "stil": "block_titel_klein",
+          "inhalt": "Als Kapitalanlage",
+          "einzeilig": true
+        },
+        {
+          "id": "ka-linie",
+          "typ": "form",
+          "x": 309.64,
+          "y": 637.89,
+          "b": 249.64,
+          "h": 0,
+          "form": "linie",
+          "strich": "rule",
+          "linienbreite": 1.2
+        },
+        {
+          "id": "rendite",
+          "typ": "rendite",
+          "x": 309.64,
+          "y": 493.89,
+          "b": 249.64,
+          "h": 128,
+          "variante": "kacheln",
+          "spalten": 2,
+          "abstand": 8,
+          "kachel_hoehe": 60,
+          "polster": 10,
+          "wert_grundlinie": 26,
+          "label_grundlinie": 10,
+          "eckradius": 0,
+          "kachel_fuell": "tint",
+          "kachel_fuell_erster": "s",
+          "stil_wert": "kachel_wert_d",
+          "stil_wert_erster": "kachel_wert_s",
+          "stil_label": "kachel_label_d",
+          "stil_label_erster": "kachel_label_s",
+          "kacheln": [
+            {
+              "label": "Bruttorendite",
+              "feld": "rechnung.bruttorendite",
+              "stellen": 2
+            },
+            {
+              "label": "Nettorendite*",
+              "feld": "rechnung.nettorendite",
+              "stellen": 2
+            },
+            {
+              "label": "Kaufpreisfaktor",
+              "feld": "rechnung.kaufpreisfaktor",
+              "stellen": 1,
+              "nachsatz": "×"
+            },
+            {
+              "label": "Marktmiete / Monat**",
+              "feld": "objekt.miete_ist"
+            }
+          ]
+        },
+        {
+          "id": "energie-titel",
+          "typ": "text",
+          "x": 36,
+          "y": 427.89,
+          "b": 523.28,
+          "h": 16,
+          "stil": "block_titel_klein",
+          "inhalt": "Energie",
+          "einzeilig": true
+        },
+        {
+          "id": "energie-linie",
+          "typ": "form",
+          "x": 36,
+          "y": 435.89,
+          "b": 523.28,
+          "h": 0,
+          "form": "linie",
+          "strich": "rule",
+          "linienbreite": 1.2
+        },
+        {
+          "id": "energie-skala",
+          "typ": "energieskala",
+          "x": 36,
+          "y": 397.89,
+          "b": 523.28,
+          "h": 24,
+          "darstellung": "stufen",
+          "klassen": [
+            {
+              "name": "A+",
+              "grenze": 30,
+              "farbe": {
+                "mix": [
+                  "rule",
+                  "weiss",
+                  0.9
+                ]
+              }
+            },
+            {
+              "name": "A",
+              "grenze": 50,
+              "farbe": {
+                "mix": [
+                  "rule",
+                  "weiss",
+                  0.83
+                ]
+              }
+            },
+            {
+              "name": "B",
+              "grenze": 75,
+              "farbe": {
+                "mix": [
+                  "rule",
+                  "weiss",
+                  0.76
+                ]
+              }
+            },
+            {
+              "name": "C",
+              "grenze": 100,
+              "farbe": {
+                "mix": [
+                  "rule",
+                  "weiss",
+                  0.69
+                ]
+              }
+            },
+            {
+              "name": "D",
+              "grenze": 130,
+              "farbe": {
+                "mix": [
+                  "rule",
+                  "weiss",
+                  0.62
+                ]
+              }
+            },
+            {
+              "name": "E",
+              "grenze": 160,
+              "farbe": {
+                "mix": [
+                  "rule",
+                  "weiss",
+                  0.55
+                ]
+              }
+            },
+            {
+              "name": "F",
+              "grenze": 200,
+              "farbe": {
+                "mix": [
+                  "rule",
+                  "weiss",
+                  0.48
+                ]
+              }
+            },
+            {
+              "name": "G",
+              "grenze": 250,
+              "farbe": {
+                "mix": [
+                  "rule",
+                  "weiss",
+                  0.41
+                ]
+              }
+            },
+            {
+              "name": "H",
+              "grenze": 300,
+              "farbe": {
+                "mix": [
+                  "rule",
+                  "weiss",
+                  0.34
+                ]
+              }
+            }
+          ],
+          "luecke": 3,
+          "aktiv_farbe": "s",
+          "klasse_grundlinie": 8,
+          "helle_klassen": [
+            "F",
+            "G",
+            "H"
+          ],
+          "stil_klasse": "skala_klasse_dunkel",
+          "stil_klasse_hell": "skala_klasse_hell",
+          "stil_klasse_aktiv": "skala_klasse_aktiv"
+        },
+        {
+          "id": "energie-liste",
+          "typ": "faktentabelle",
+          "x": 36,
+          "y": 269.89,
+          "b": 523.28,
+          "h": 102,
+          "feld": "objekt.energie_angaben",
+          "darstellung": "linie",
+          "spalten": 2,
+          "spaltenabstand": 24,
+          "fuellung": "zeilenweise",
+          "zeilenhoehe": 22,
+          "polster": 0,
+          "linien_farbe": "hair",
+          "linienbreite": 0.8,
+          "linien_versatz": 8,
+          "stil_label": "energie_label",
+          "stil_wert": "energie_wert"
+        },
+        {
+          "id": "zahlen-fussnote",
+          "typ": "text",
+          "x": 36,
+          "y": 62,
+          "b": 523.28,
+          "h": 20,
+          "stil": "fussnote",
+          "verdichten": false,
+          "inhalt": "* auf Gesamtaufwand, abzgl. nicht umlagefähigem Hausgeld (95 €/Monat).  ** Marktmiete laut Mietspiegel-Einschätzung, Wohnung ist bezugsfrei. Alle Werte ohne Gewähr, keine Anlage- oder Steuerberatung."
+        }
+      ]
+    },
+    {
+      "id": "kontakt",
+      "typ": "kontakt",
+      "name": "Kontakt",
+      "ohne_fuss": true,
+      "elemente": [
+        {
+          "id": "kontakt-grund",
+          "typ": "form",
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 841.89,
+          "form": "rechteck",
+          "fuell": "s"
+        },
+        {
+          "id": "kontakt-markenfeld",
+          "typ": "form",
+          "x": 0,
+          "y": 751.89,
+          "b": 126,
+          "h": 54,
+          "form": "rechteck",
+          "fuell": "rule"
+        },
+        {
+          "id": "kontakt-marke",
+          "typ": "text",
+          "x": 36,
+          "y": 762.89,
+          "b": 90,
+          "h": 10,
+          "stil": "kontakt_marke",
+          "inhalt": "{{firma.marken_name}}.",
+          "einzeilig": true
+        },
+        {
+          "id": "kontakt-zusatz",
+          "typ": "text",
+          "x": 36,
+          "y": 754.29,
+          "b": 90,
+          "h": 5.6,
+          "stil": "kontakt_zusatz",
+          "inhalt": "Immobilien",
+          "einzeilig": true
+        },
+        {
+          "id": "kontakt-wort-1",
+          "typ": "text",
+          "x": 33,
+          "y": 611.89,
+          "b": 520,
+          "h": 0,
+          "stil": "kontakt_wort",
+          "inhalt": "Lust auf",
+          "einzeilig": true
+        },
+        {
+          "id": "kontakt-wort-2",
+          "typ": "text",
+          "x": 33,
+          "y": 535.89,
+          "b": 520,
+          "h": 0,
+          "stil": "kontakt_wort",
+          "inhalt": "Aussicht?",
+          "einzeilig": true
+        },
+        {
+          "id": "kontakt-lead",
+          "typ": "text",
+          "x": 36,
+          "y": 483.89,
+          "b": 520,
+          "h": 0,
+          "stil": "kontakt_lead",
+          "inhalt": "Rufen Sie an oder scannen Sie den Code – wir zeigen Ihnen die Wohnung gern persönlich.",
+          "einzeilig": true
+        },
+        {
+          "id": "kontakt-kasten",
+          "typ": "form",
+          "x": 36,
+          "y": 150,
+          "b": 523.28,
+          "h": 250,
+          "form": "rechteck",
+          "fuell": "rule"
+        },
+        {
+          "id": "ap",
+          "typ": "kontaktkarte",
+          "x": 36,
+          "y": 150,
+          "b": 523.28,
+          "h": 250,
+          "foto_form": "rechteck",
+          "foto_x": 0,
+          "foto_y": 0,
+          "foto_breite": 150,
+          "foto_hoehe": 250,
+          "foto_platzhalter": {
+            "mix": [
+              "s",
+              "rule",
+              0.35
+            ]
+          },
+          "label": "Porträtfoto",
+          "stil_label": "foto_label",
+          "label_hintergrund": "rule",
+          "label_deckkraft": 1,
+          "label_x": 0,
+          "label_y": 0,
+          "label_hoehe": 15,
+          "label_radius": 0,
+          "label_luft": 12,
+          "label_polster": 6,
+          "label_grundlinie": 5,
+          "text_x": 172,
+          "name_versatz": 70,
+          "funktion_abstand": 18,
+          "kontakt_abstand": 34,
+          "kontakt_zeilenhoehe": 18,
+          "kontakt_spalte": 34,
+          "stil_name": "ap_name",
+          "stil_funktion": "ap_rolle",
+          "stil_kontakt_label": "ap_label",
+          "stil_kontakt_wert": "ap_wert",
+          "kontakte": [
+            {
+              "label": "Tel.",
+              "feld": "ansprechpartner.telefon"
+            },
+            {
+              "label": "Mail",
+              "feld": "ansprechpartner.email"
+            },
+            {
+              "label": "Web",
+              "feld": "firma.web"
+            }
+          ]
+        },
+        {
+          "id": "ap-oberzeile",
+          "typ": "text",
+          "x": 208,
+          "y": 353.6,
+          "b": 300,
+          "h": 6.4,
+          "stil": "ap_oberzeile",
+          "inhalt": "Ihr Ansprechpartner",
+          "einzeilig": true
+        },
+        {
+          "id": "qr-feld",
+          "typ": "form",
+          "x": 467.28,
+          "y": 168,
+          "b": 78,
+          "h": 78,
+          "form": "rechteck",
+          "fuell": "weiss"
+        },
+        {
+          "id": "qr",
+          "typ": "qr",
+          "x": 471.28,
+          "y": 172,
+          "b": 70,
+          "h": 70,
+          "inhalt": "{{objekt.expose_qr_url}}",
+          "farbe": "rule"
+        },
+        {
+          "id": "rechtstext",
+          "typ": "rechtstext",
+          "x": 36,
+          "y": 60,
+          "b": 523.28,
+          "h": 68,
+          "spalten": 3,
+          "spaltenabstand": 15,
+          "titel_abstand": 14,
+          "stil_titel": "recht_titel",
+          "stil_text": "recht_text",
+          "blocksatz": false,
+          "bloecke": [
+            {
+              "titel": "Anbieter",
+              "text": "{{firma.name}}, {{firma.adresse}}, Tel. {{firma.telefon}}, {{firma.email}}"
+            },
+            {
+              "titel": "Provision",
+              "text": "Käuferprovision {{objekt.provision_aussen}} vom Kaufpreis, verdient und fällig mit notarieller Beurkundung."
+            },
+            {
+              "titel": "Hinweis",
+              "text": "Angaben laut Eigentümer, ohne Gewähr. Irrtum und Zwischenverkauf vorbehalten. Bitte Widerrufsbelehrung beachten."
+            }
+          ]
+        },
+        {
+          "id": "impressum",
+          "typ": "text",
+          "x": 36,
+          "y": 51.8,
+          "b": 523.28,
+          "h": 6.2,
+          "stil": "impressum",
+          "inhalt": "{{firma.impressum_zeile}}",
+          "einzeilig": true
+        },
+        {
+          "id": "fuss-linie-hell",
+          "typ": "form",
+          "x": 36,
+          "y": 44,
+          "b": 523.28,
+          "h": 0,
+          "form": "linie",
+          "strich": "weiss",
+          "linienbreite": 0.8
+        },
+        {
+          "id": "fuss-marke-hell",
+          "typ": "text",
+          "x": 36,
+          "y": 21,
+          "b": 200,
+          "h": 9,
+          "stil": "fuss_hell",
+          "inhalt": "{{firma.marken_name}}.",
+          "einzeilig": true
+        },
+        {
+          "id": "fuss-objekt-hell",
+          "typ": "text",
+          "x": 197.64,
+          "y": 25,
+          "b": 200,
+          "h": 6,
+          "stil": "fuss_mitte_hell",
+          "inhalt": "Objekt {{objekt.immo_nr}}",
+          "einzeilig": true
+        },
+        {
+          "id": "fuss-seite-hell",
+          "typ": "text",
+          "x": 409.28,
+          "y": 21,
+          "b": 150,
+          "h": 9,
+          "stil": "fuss_seite_hell",
+          "inhalt": "{{seite.nummer_zweistellig}}",
+          "einzeilig": true
         }
       ]
     }
