@@ -235,6 +235,16 @@ else
   fehler=1
 fi
 
+abschnitt "Expose-Renderer: Zeilenbreiten wie pdfmetrics.stringWidth"
+# Nach der Breite richtet sich jeder Umbruch. Rechnet der Renderer anders
+# als die Prototypen, verlaesst er die verbindliche Vorlage — an langen
+# Absaetzen am meisten. Ohne reportlab uebersprungen.
+if node tests/expose-breiten.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Expose-Vorlagen: Farbableitung wie in den Prototypen"
 # Die drei theme()-Funktionen der Prototypen sind laut Auftrag verbindlich.
 # Der Test fuehrt sie aus und vergleicht jede abgeleitete Farbe mit der

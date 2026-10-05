@@ -34,6 +34,8 @@ DATEI = {
     "Corm-SemiBold": "Corm-SemiBold.ttf",
     "Corm-LightItalic": "Corm-LightItalic.ttf",
     "Corm-RegularItalic": "Corm-RegularItalic.ttf",
+    "Corm-MediumItalic": "Corm-MediumItalic.ttf",
+    "Arch-Light": "Arch-Light.ttf",
     "Arch-Regular": "Arch-Regular.ttf",
     "Arch-Medium": "Arch-Medium.ttf",
     "Arch-SemiBold": "Arch-SemiBold.ttf",

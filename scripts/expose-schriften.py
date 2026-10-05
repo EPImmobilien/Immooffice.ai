@@ -73,7 +73,9 @@ SCHNITTE = [
     ("Corm-SemiBold.ttf",    "cormorant", {"wght": 600},              "Corm-SemiBold",         "Corm SemiBold"),
     ("Corm-LightItalic.ttf", "cormorant-kursiv", {"wght": 300},       "Corm-LightItalic",      "Corm Light Italic"),
     ("Corm-RegularItalic.ttf", "cormorant-kursiv", {"wght": 400},     "Corm-RegularItalic",    "Corm Regular Italic"),
+    ("Corm-MediumItalic.ttf", "cormorant-kursiv", {"wght": 500},      "Corm-MediumItalic",     "Corm Medium Italic"),
 
+    ("Arch-Light.ttf",       "archivo",   {"wght": 300, "wdth": 100}, "Arch-Light",            "Arch Light"),
     ("Arch-Regular.ttf",     "archivo",   {"wght": 400, "wdth": 100}, "Arch-Regular",          "Arch Regular"),
     ("Arch-Medium.ttf",      "archivo",   {"wght": 500, "wdth": 100}, "Arch-Medium",           "Arch Medium"),
     ("Arch-SemiBold.ttf",    "archivo",   {"wght": 600, "wdth": 100}, "Arch-SemiBold",         "Arch SemiBold"),
@@ -117,10 +119,22 @@ ZEICHEN = [
     (0xFB01, 0xFB02),   # fi und fl als Einzelzeichen
 ]
 
-# Zwei Schnitte registriert der Studio-Prototyp, zeichnet aber nie damit:
-# A-SemiCondBold und A-Light. Sie stehen in keinem Referenz-PDF, also ist
-# ihre Breitenachse nicht messbar. Geraten wird hier nichts — sie fehlen
-# bewusst. Siehe docs/ENTSCHEIDUNGEN.md.
+# Zwei der obigen Schnitte zeichnet kein Referenz-PDF: Corm-MediumItalic
+# (Signature registriert ihn) und Arch-Light (Studio registriert ihn).
+# Sie sind trotzdem dabei, weil nichts daran zu raten ist: die kursive
+# Gewichtsachse ist mit 300 und 400 zweifach belegt, und wdth 100 ist fuer
+# vier andere Archivo-Schnitte belegt. 500 bzw. 300 liegt auf derselben
+# Achse mit derselben Benennung.
+#
+# Arch-SemiCondBold fehlt dagegen bewusst. Studio registriert ihn, zeichnet
+# nie damit, und Google liefert fuer Archivo ueberhaupt keine statischen
+# Schnitte — es gibt also keine Konvention, von der man "SemiCondensed"
+# ableiten koennte. Cond ist nachweislich wdth 62, die Untergrenze der
+# Achse; SemiCond waere die Mitte, waere aber geraten.
+# tests/expose-aufzeichnung.py setzt beim Laden der Prototypen einen
+# vorhandenen Schnitt an seine Stelle UND prueft danach, dass kein
+# aufgezeichneter Schritt ihn benutzt. Faengt eine Vorlage doch damit an zu
+# zeichnen, faellt es dort auf. Siehe docs/ENTSCHEIDUNGEN.md.
 
 
 class KeinNetz(Exception):
