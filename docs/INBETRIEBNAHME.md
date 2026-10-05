@@ -83,6 +83,15 @@ die Registrierung nirgends erreichbar, egal wie grün die Tests sind.
 Die beiden Netlify-Geheimnisse (`NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`)
 liegen bereits im Repository — die Entwürfe sind damit gelaufen.
 
+**Was an diesem Schritt noch hängt:** die Exposé-Schriften. Sie werden mit
+der Oberfläche ausgeliefert (`/schriften/expose/`, zwanzig Schnitte). Der
+Vorlagen-Editor zeichnet seine Vorschau damit, und `expose-pdf-erzeugen`
+holt sich eine fehlende Schrift beim ersten Exposé von dort und legt sie im
+Eimer `branding-assets` ab — danach nie wieder. Solange es nur Entwürfe
+gibt, findet die Edge Function sie nicht und bricht mit einer Meldung ab,
+die den Pfad nennt. Welche Adresse sie fragt, sagt `PORTAL_URL` aus
+Schritt 2, sonst der Ursprung von `EXPOSE_FREIGABE_BASIS`.
+
 ---
 
 ## Schritt 4 — Ausprobieren (5 Minuten)

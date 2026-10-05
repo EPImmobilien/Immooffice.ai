@@ -112,6 +112,7 @@ jobs:
           exit $schlecht
 
       - name: Auf Netlify stellen
+        id: stellen
         run: |
           set -euo pipefail
           npm install --no-save netlify-cli@17
@@ -119,10 +120,48 @@ jobs:
           # Altbestands nicht mitgelesen wird.
           mkdir -p auslieferung && cp -r dist/. auslieferung/
           cd auslieferung
+          # --json, damit die Adresse maschinell weitergegeben werden kann.
+          # Das Protokoll der CLI nennt sie auch, aber ein Schritt, der sie
+          # aus Menschenschrift herausliest, bricht beim naechsten
+          # Fassungswechsel.
           if [ "${{ github.event.inputs.umgebung }}" = "produktion" ]; then
-            npx netlify deploy --dir . --site "$NETLIFY_SITE_ID" --prod \
-              --message "immoOffice.ai ${{ github.sha }}"
+            npx netlify deploy --dir . --site "$NETLIFY_SITE_ID" --prod --json \
+              --message "immoOffice.ai ${{ github.sha }}" > ../ausgabe.json
+            schluessel=url
           else
-            npx netlify deploy --dir . --site "$NETLIFY_SITE_ID" \
-              --message "Entwurf ${{ github.sha }}"
+            npx netlify deploy --dir . --site "$NETLIFY_SITE_ID" --json \
+              --message "Entwurf ${{ github.sha }}" > ../ausgabe.json
+            schluessel=deploy_url
           fi
+          cd ..
+          ziel=$(python3 -c "import json,sys; print(json.load(open('ausgabe.json'))['$schluessel'])")
+          echo "ziel=$ziel" >> "$GITHUB_OUTPUT"
+          echo "Ausgeliefert nach $ziel"
+          {
+            echo "### Oberflaeche ausgeliefert"
+            echo ""
+            echo "Umgebung: **${{ github.event.inputs.umgebung }}**"
+            echo ""
+            echo "$ziel"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Nachsehen, ob wirklich da ist, was da sein soll. Der Runner kann das
+      # und die Arbeitsumgebung nicht: deren Netzfilter laesst Netlify nicht
+      # durch. Geprueft wird die Seite selbst und zwei Schriftschnitte —
+      # fehlen die, bleibt die Exposé-Vorschau ohne Schrift, und das sieht
+      # man an der Seite nicht.
+      - name: Nachsehen, was angekommen ist
+        run: |
+          set -uo pipefail
+          ziel="${{ steps.stellen.outputs.ziel }}"
+          schlecht=0
+          for pfad in "/" "/schriften/expose/Jak-Regular.ttf" \
+                      "/schriften/expose/Arch-CondXB.ttf" \
+                      "/schriften/expose/OFL-archivo.txt" "/freigabe.html"; do
+            antwort=$(curl -s -o /dev/null --max-time 30 \
+                      -w '%{http_code} %{size_download}' "$ziel$pfad" || echo "000 0")
+            code=${antwort%% *}
+            echo "$antwort  $pfad"
+            [ "$code" = "200" ] || { echo "::error::$ziel$pfad antwortet mit $code"; schlecht=1; }
+          done
+          exit $schlecht
