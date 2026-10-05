@@ -73,6 +73,49 @@ function raster(D) {
     'objekt.grunderwerbsteuer_satz': D.grest,
     'objekt.expose_qr_url': 'https://' + String(D.firma_web || '') + '/expose/' + String(D.objnr || ''),
 
+    'objekt.expose_energie_hinweis':
+      'Durch Wärmepumpe und Photovoltaik mit Speicher wird ein großer Teil des '
+      + 'Strombedarfs selbst erzeugt. Der vollständige Energieausweis liegt zur '
+      + 'Besichtigung vor.',
+    'objekt.laufende_kosten': [
+      { name: 'Grundsteuer', betrag: 38 },
+      { name: 'Gebäudeversicherung', betrag: 54 },
+      { name: 'Strom (nach PV)', betrag: 65 },
+      { name: 'Wasser / Abwasser', betrag: 48 },
+    ],
+    'objekt.stellplatz': D.stellplatz,
+
+    // Die Rechnung: der Prototyp rechnet sie im Satz, die Edge Function
+    // wird sie in rechnen.ts rechnen. Fuer den Vergleich stehen hier
+    // dieselben Formeln — nicht dieselben Zahlen, damit ein Fehler in der
+    // Rechnung nicht mit abgeschrieben wird.
+    ...(() => {
+      const kp = Number(D.kaufpreis);
+      const grest = kp * Number(D.grest) / 100;
+      const notar = kp * Number(D.notar) / 100;
+      const court = kp * Number(D.courtage) / 100;
+      const gesamt = kp + grest + notar + court;
+      const ek = gesamt * Number(D.ek) / 100;
+      const darlehen = gesamt - ek;
+      const zahl = (v, n) => v.toFixed(n).replace('.', ',');
+      return {
+        'rechnung.posten': [
+          { name: 'Kaufpreis', betrag: kp },
+          { name: 'Grunderwerbsteuer (' + zahl(Number(D.grest), 1) + ' %)', betrag: grest },
+          { name: 'Notar & Grundbuch (ca. ' + zahl(Number(D.notar), 1) + ' %)', betrag: notar },
+          { name: 'Käuferprovision (' + zahl(Number(D.courtage), 2) + ' %)', betrag: court },
+        ],
+        'rechnung.gesamtaufwand': gesamt,
+        'rechnung.eigenkapital_prozent': Number(D.ek),
+        'rechnung.eigenkapital': ek,
+        'rechnung.darlehen': darlehen,
+        'rechnung.zinssatz': Number(D.zins),
+        'rechnung.tilgung': Number(D.tilgung),
+        'rechnung.monatsrate': darlehen * (Number(D.zins) + Number(D.tilgung)) / 100 / 12,
+        'rechnung.laufende_summe': 38 + 54 + 65 + 48,
+      };
+    })(),
+
     'ansprechpartner.name': ap.name,
     'ansprechpartner.funktion': ap.rolle,
     'ansprechpartner.telefon': ap.tel,

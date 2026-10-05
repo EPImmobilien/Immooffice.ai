@@ -129,6 +129,9 @@ export const OBJEKT: Feld[] = [
     quelle: O("energie_gueltig_bis") },
   { schluessel: "objekt.energie_gueltig_kurz", name: "Gültig bis (Monat/Jahr)", typ: "text",
     quelle: GERECHNET, hinweis: "MM/JJJJ — so steht es in den Vorlagen." },
+  { schluessel: "objekt.expose_energie_hinweis", name: "Hinweis zur Energie", typ: "mehrzeilig",
+    quelle: O("expose_energie_hinweis"),
+    hinweis: "Füllt den Kasten „Gut zu wissen“. Bleibt er leer, entfällt der Kasten." },
 
   // Preise
   { schluessel: "objekt.angebotspreis", name: "Angebotspreis", typ: "euro", quelle: O("angebotspreis"), stellen: 0 },
@@ -150,6 +153,9 @@ export const OBJEKT: Feld[] = [
     quelle: O("kaution_monate"), stellen: 1 },
   { schluessel: "objekt.stellplatzmiete", name: "Stellplatzmiete", typ: "euro",
     quelle: O("stellplatzmiete"), stellen: 0 },
+  { schluessel: "objekt.laufende_kosten", name: "Laufende Kosten je Monat", typ: "liste",
+    quelle: O("laufende_kosten"),
+    hinweis: "Name und Betrag je Posten. Nichts erfasst, keine Kachel." },
   { schluessel: "objekt.hausgeld", name: "Hausgeld", typ: "euro", quelle: O("hausgeld"), stellen: 0 },
   { schluessel: "objekt.hausgeld_nicht_umlagefaehig", name: "Hausgeld, nicht umlagefähig", typ: "euro",
     quelle: O("hausgeld_nicht_umlagefaehig"), stellen: 0 },
@@ -259,7 +265,11 @@ export const RECHNUNG: Feld[] = [
   { schluessel: "rechnung.notar", name: "Notar und Grundbuch", typ: "euro", quelle: GERECHNET, stellen: 0 },
   { schluessel: "rechnung.courtage_satz", name: "Courtagesatz", typ: "text", quelle: GERECHNET },
   { schluessel: "rechnung.courtage", name: "Käufercourtage", typ: "euro", quelle: GERECHNET, stellen: 0 },
+  { schluessel: "rechnung.posten", name: "Kostenposten", typ: "liste", quelle: GERECHNET,
+    hinweis: "Kaufpreis, Grunderwerbsteuer, Notar, Courtage — mit Betrag." },
   { schluessel: "rechnung.gesamtaufwand", name: "Gesamtaufwand", typ: "euro", quelle: GERECHNET, stellen: 0 },
+  { schluessel: "rechnung.laufende_summe", name: "Summe laufende Kosten", typ: "euro",
+    quelle: GERECHNET, stellen: 0 },
   { schluessel: "rechnung.eigenkapital_prozent", name: "Eigenkapital", typ: "prozent",
     quelle: GERECHNET, stellen: 0 },
   { schluessel: "rechnung.eigenkapital", name: "Eigenkapital", typ: "euro", quelle: GERECHNET, stellen: 0 },
@@ -276,6 +286,8 @@ export const RECHNUNG: Feld[] = [
 
 // ----------------------------------------------------------------- Seite
 export const SEITE: Feld[] = [
+  { schluessel: "dokument.seiten", name: "Seiten des Dokuments", typ: "liste",
+    quelle: GERECHNET, hinweis: "Für das Inhaltsverzeichnis: Nummer und Name." },
   { schluessel: "seite.nummer", name: "Seitenzahl", typ: "zahl", quelle: GERECHNET, stellen: 0 },
   { schluessel: "seite.gesamt", name: "Seiten insgesamt", typ: "zahl", quelle: GERECHNET, stellen: 0 },
   { schluessel: "seite.nummer_zweistellig", name: "Seitenzahl, zweistellig", typ: "text",

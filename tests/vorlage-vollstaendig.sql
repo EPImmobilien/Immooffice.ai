@@ -233,7 +233,8 @@ zuwachs(bereich, mehr, grund) as (values
   ('Trigger', 2, 'fork_33a: dieselben zwei als Trigger'),
   ('Spalten', 9, 'fork_34: drei an firma_stammdaten (expose_vorlage, _farben, _rechtsanhang) und sechs an immobilien (expose_vorlage, _zitat, _titel_zeilen, _ausstattung_gruppen, _preis_auf_anfrage, _wege)'),
   ('Pruefbedingungen', 2, 'fork_34: expose_vorlage auf raster/signature/studio, je Tabelle eine'),
-  ('Spalten', 3, 'fork_35: immobilien.ortsteil, immobilien.modernisierung_jahr, profiles.mobil — drei Angaben, die die Expose-Vorlagen nennen und das Schema nicht hatte')
+  ('Spalten', 3, 'fork_35: immobilien.ortsteil, immobilien.modernisierung_jahr, profiles.mobil — drei Angaben, die die Expose-Vorlagen nennen und das Schema nicht hatte'),
+  ('Spalten', 2, 'fork_36: immobilien.expose_energie_hinweis und immobilien.laufende_kosten — in den Prototypen stehen dort erfundene Objektdaten')
 ),
 soll(bereich, soll) as (
   select v.bereich,

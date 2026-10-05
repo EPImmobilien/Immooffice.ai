@@ -50,10 +50,24 @@ const schnittName = (n) => {
 };
 
 // Texte, die sich zwangslaeufig unterscheiden, mit Grund. Jeder Eintrag
-// ist eine Entscheidung, nicht eine Ausnahme: die Prototypen fuehren
-// manche Beispieldaten fertig formatiert oder in Feldern, die das Schema
-// des Forks nicht hat.
-const ABWEICHENDE_TEXTE = [];
+// ist eine Entscheidung, nicht eine Ausnahme: der Prototyp schreibt an
+// dieser Stelle etwas, das der Fork bewusst anders schreibt. Der Eintrag
+// ersetzt den Text des Prototyps vor dem Vergleich — Ort, Schnitt,
+// Groesse und Farbe werden weiter voll geprueft.
+const ABWEICHENDE_TEXTE = [
+  {
+    vorlage: 'raster',
+    soll: 'Notar & Grundbuch (ca, 2,0 %)',
+    ist: 'Notar & Grundbuch (ca. 2,0 %)',
+    grund: 'Der Prototyp baut die Zeile mit '
+         + '`f"… (ca. {notar:.1f} %)".replace(".", ",")` und trifft damit auch '
+         + 'den Punkt in "ca." — das ist ein Tippfehler im Prototyp, nicht '
+         + 'eine Schreibweise. Der Fork setzt "ca." mit Punkt.',
+  },
+];
+
+const textErsatz = new Map();
+for (const e of ABWEICHENDE_TEXTE) textErsatz.set(`${e.vorlage}|${e.soll}`, e.ist);
 
 if (!fs.existsSync(REF)) {
   console.log('  reference/expose-vorlagen fehlt — uebersprungen. Die Prototypen');
@@ -99,7 +113,15 @@ if (aufzeichnung.uebersprungen) {
 
 // --- Vergleichen ----------------------------------------------------------
 const rund = (v) => Math.round(v * 100) / 100;
-const farbSchluessel = (c) => (c ? `${hex({ r: c[0], g: c[1], b: c[2] })}/${rund(c[3])}` : '-');
+// Farben werden auf vier Stellen gerundet verglichen, nicht ueber ihren
+// Hexwert. Die Aufzeichnung rundet auf sechs Stellen, und genau an einer
+// halben Stufe kippt das: mix(p, weiss, 0.5) ergibt im Gruenkanal
+// 0,6490196…, gerundet 0,64902 — mal 255 sind das 165,4999… gegen
+// 165,5001, also #a5 gegen #a6. Dieselbe Farbe, zwei Hexwerte. Vier
+// Stellen sind feiner als 8 Bit und liegen von dieser Kante weg.
+const kanal = (v) => Math.round(v * 10000) / 10000;
+const farbSchluessel = (c) =>
+  (c ? `${kanal(c[0])},${kanal(c[1])},${kanal(c[2])}/${rund(c[3])}` : '-');
 
 /** Wonach ein Schritt vergleichbar ist — ohne seinen Ort. */
 function schluessel(s) {
@@ -116,8 +138,14 @@ function schluessel(s) {
       return `kreis|${rund(s.r)}|${farbSchluessel(s.fuell)}|${farbSchluessel(s.strich)}`;
     case 'ellipse':
       return `ellipse|${rund(s.x2 - s.x1)}|${rund(s.y2 - s.y1)}|${farbSchluessel(s.fuell)}`;
-    case 'maske':
-      return `maske|${s.schritte.length}`;
+    case 'maske': {
+      // Die Form gehoert in den Schluessel. Sonst konkurrieren der
+      // rechteckige Bildrahmen und das runde Portraitfenster um dieselbe
+      // Zuordnung, und der Vergleich meldet beide als falsch platziert.
+      const e = s.schritte[0] || [];
+      const masse = e.slice(3).map((v) => (typeof v === 'number' ? rund(v) : v));
+      return `maske|${s.schritte.length}|${e[0]}|${masse.join(',')}`;
+    }
     case 'pfad':
       return `pfad|${s.schritte.length}|${farbSchluessel(s.fuell)}|${farbSchluessel(s.strich)}`;
     case 'verlauf':
@@ -168,6 +196,12 @@ function rahmenAus(schritte) {
       if (s.art === 'bild') raus.push([s.x, s.y, s.x + s.b, s.y + s.h, false]);
       else if (e && (e[0] === 'rect' || e[0] === 'roundRect')) {
         raus.push([e[1], e[2], e[1] + e[3], e[2] + e[4],
+                   ZEICHNUNG.has(s.zweck)]);
+      } else if (e && e[0] === 'circle') {
+        // Das runde Portraitfenster der Kontaktkarte. Der Prototyp malt
+        // darin eine Silhouette; im Produkt steht dort das Foto des
+        // Ansprechpartners.
+        raus.push([e[1] - e[3], e[2] - e[3], e[1] + e[3], e[2] + e[3],
                    ZEICHNUNG.has(s.zweck)]);
       }
     }
@@ -243,10 +277,14 @@ let fehler = 0;
 let geprueft = 0;
 let platzhalter = 0;
 let groessteAbweichung = 0;
-// Wird je Vorlage gesetzt; schluessel() liest es.
+// Werden je Vorlage gesetzt; schluessel() liest sie.
 let unvollstaendig = false;
-const seitenzahl = (t) => (unvollstaendig && /^\d+ \/ \d+$/.test(t))
-  ? t.replace(/\/ \d+$/, '/ n') : t;
+let vorlageName = '';
+const seitenzahl = (t) => {
+  const ersatz = textErsatz.get(`${vorlageName}|${t}`);
+  if (ersatz !== undefined) return ersatz;
+  return (unvollstaendig && /^\d+ \/ \d+$/.test(t)) ? t.replace(/\/ \d+$/, '/ n') : t;
+};
 const platzhalterArten = new Map();
 const meldungen = [];
 
@@ -254,6 +292,7 @@ for (const name of WELCHE) {
   const soll = aufzeichnung[name];
   if (!soll) { console.log(`  [FEHLER] Keine Aufzeichnung fuer "${name}".`); fehler++; continue; }
 
+  vorlageName = name;
   const vorlage = JSON.parse(fs.readFileSync(path.join(VORLAGEN, `${name}.json`), 'utf-8'));
   const ergebnis = rendern({
     vorlage,
@@ -390,7 +429,9 @@ for (const name of WELCHE) {
 function beschreibe(s) {
   if (s.art === 'text') return `"${s.text}" (${schnittName(s.schnitt)} ${s.groesse})`;
   if (s.art === 'rechteck' || s.art === 'rundrechteck') {
-    return `${s.art} ${rund(s.b)}x${rund(s.h)}`;
+    const c = s.fuell || s.strich;
+    return `${s.art} ${rund(s.b)}x${rund(s.h)}` +
+      (c ? ` in ${hex({ r: c[0], g: c[1], b: c[2] })}` : '');
   }
   if (s.art === 'linie') return `linie ${rund(s.x2 - s.x1)}x${rund(s.y2 - s.y1)}`;
   return s.art;
@@ -409,6 +450,7 @@ console.log(`       ${groessteAbweichung.toFixed(3)} pt, erlaubt sind ${TOLERANZ
 console.log(`       ${platzhalter} Schritte sind Platzhaltergrafik in Bildrahmen —`);
 console.log(`       laut Auftrag nur Platzhalter, im Produkt stehen dort Fotos:`);
 console.log(`       ${[...platzhalterArten].map(([a, n]) => `${n}x ${a}`).join(', ')}.`);
-if (ABWEICHENDE_TEXTE.length) {
-  console.log(`       ${ABWEICHENDE_TEXTE.length} Texte weichen mit Grund ab.`);
+for (const e of ABWEICHENDE_TEXTE) {
+  console.log(`       Mit Grund abweichend: ${e.vorlage} — "${e.soll}"`);
+  console.log(`         statt dessen "${e.ist}". ${e.grund}`);
 }

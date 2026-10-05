@@ -68,6 +68,9 @@ export function rendern(a: Auftrag): Ergebnis {
     sichtbar.push(seite);
   }
   const gesamt = sichtbar.length;
+  // Das Inhaltsverzeichnis nennt nur, was wirklich im Dokument steht.
+  // Darum erst hier, nach der Sichtbarkeitspruefung.
+  daten["dokument.seiten"] = sichtbar.map((s, i) => ({ nummer: i + 1, name: s.name }));
 
   // 3. Zeichnen
   const seiten: Seitenbild[] = [];
