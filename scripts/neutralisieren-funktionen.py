@@ -3110,6 +3110,95 @@ NACHBESSERN = [
      'Rundgang: die Antwort traegt firma.',
      {'rundgang-oeffentlich'}),
 
+    # --- Die KI wurde angewiesen, eine tote Adresse zu nennen -----------
+    # generate-text baut die Systemvorgabe fuer Beitraege in den sozialen
+    # Netzen. Darin stand:
+    #
+    #   10. Kontakt: 📩 ${KONTAKT_EMAIL}  📞 ${KONTAKT_TELEFON}
+    #   - Kontaktdaten NIEMALS erfinden ... AUSSCHLIESSLICH: <Mail> bzw. <Tel>
+    #
+    # Beide Werte standen im Quelltext. Nach der Neutralisierung ist die
+    # Mailadresse eine, die niemandem gehoert, und die Rufnummer LEER. Die
+    # KI wurde also ausdruecklich angewiesen, in Werbetexte eine tote
+    # Adresse und ein leeres Telefonfeld zu schreiben — an drei Stellen
+    # der Systemvorgaben.
+    #
+    # Die Funktion hat keinen Datenbankzugang und keinen Mandanten; sie ist
+    # ein reiner Textbauer. Die Kontaktdaten kommen deshalb aus dem
+    # Anfragekoerper — die Oberflaeche kennt sie seit dem 03.10. ueber
+    # immoFirma(feld). Ohne Angabe entfallen Kontaktzeile UND Regel: dann
+    # schreibt die KI keine Kontaktdaten, was die Regel darueber ohnehin
+    # verlangt.
+    ('FORK',
+     'const KONTAKT_EMAIL = "info@immooffice.example";\nconst KONTAKT_TELEFON = "";',
+     '// Kontaktdaten kommen aus dem Anfragekoerper (body.kontakt), nicht aus\n'
+     '// dem Quelltext: diese Funktion bedient jeden Mandanten. Ohne Angabe\n'
+     '// entfaellt die Kontaktzeile.\n'
+     'function immoKontaktZeilen(k: { email?: string; telefon?: string } | undefined | null) {\n'
+     '  const mail = String(k?.email || "").trim();\n'
+     '  const tel = String(k?.telefon || "").trim();\n'
+     '  const teile = [mail ? `\\u{1F4E9} ${mail}` : "", tel ? `\\u{1F4DE} ${tel}` : ""].filter(Boolean);\n'
+     '  return {\n'
+     '    // Punkt 10 der Struktur. Ohne Kontaktdaten gibt es ihn nicht.\n'
+     '    zeile: teile.length ? `10. Kontakt: ${teile.join("  ")}` : "",\n'
+     '    // Dieselbe Angabe mehrzeilig, so steht sie in zwei der Vorgaben.\n'
+     '    block: teile.length ? `Kontakt:\\n   ${teile.join("\\n   ")}` : "",\n'
+     '    // Die Regel, auf welche Daten sich die KI beschraenken soll.\n'
+     '    regel: teile.length\n'
+     '      ? `- Kontaktdaten NIEMALS erfinden (keine Telefonnummern, E-Mail- oder Webadressen ausdenken). Falls Kontaktdaten genannt werden, AUSSCHLIESSLICH: ${teile.join(" bzw. ")}`\n'
+     '      : "- Kontaktdaten NIEMALS erfinden und auch keine nennen: es liegen keine vor.",\n'
+     '  };\n'
+     '}',
+     'generate-text: Kontaktdaten aus dem Anfragekoerper statt aus dem '
+     'Quelltext.',
+     {'generate-text'}),
+    ('FORK',
+     '  const { textart, daten, kuerzer } = body;',
+     '  const { textart, daten, kuerzer } = body;\n'
+     '  const kontakt = immoKontaktZeilen((body as any).kontakt);',
+     'generate-text: die Kontaktzeilen einmal bauen.',
+     {'generate-text'}),
+    ('FORK',
+     '10. Kontakt: \U0001F4E9 ${KONTAKT_EMAIL}  \U0001F4DE ${KONTAKT_TELEFON}${hashtagsBlock}',
+     '${kontakt.zeile}${hashtagsBlock}',
+     'generate-text: Punkt 10 der Struktur, oder gar nichts.',
+     {'generate-text'}),
+    ('FORK',
+     'Kontakt:\\n   \U0001F4E9 ${KONTAKT_EMAIL}\\n   \U0001F4DE ${KONTAKT_TELEFON}${hashtagsBlock}',
+     '${kontakt.block}${hashtagsBlock}',
+     'generate-text: derselbe Block mehrzeilig, in einer weiteren Vorgabe.',
+     {'generate-text'}),
+    ('FORK',
+     '- Kontaktdaten NIEMALS erfinden (keine Telefonnummern, E-Mail- oder Webadressen ausdenken). Falls Kontaktdaten genannt werden, AUSSCHLIESSLICH: \U0001F4E9 ${KONTAKT_EMAIL} bzw. \U0001F4DE ${KONTAKT_TELEFON}',
+     '${kontakt.regel}',
+     'generate-text: die Regel dazu.',
+     {'generate-text'}),
+
+    # --- Die Anschrift der Widerrufsbelehrung ----------------------------
+    # § 356 BGB: der Verbraucher muss wissen, WOHIN er widerruft. Der Block
+    # nennt Name, Firma, Strasse und Ort — alles aus den Stammdaten des
+    # Mandanten — und dann eine Mailadresse aus dem Quelltext, die es nicht
+    # gibt. Die Belehrung nennt damit eine Anschrift, an die ein Widerruf
+    # nicht zugestellt werden kann.
+    #
+    # Dasselbe im Muster-Widerrufsformular, das der Verbraucher ausfuellt
+    # und zurueckschickt.
+    #
+    # Ohne Eintrag entfaellt die Zeile: die postalische Anschrift darueber
+    # steht vollstaendig da, und ein Widerruf per Brief ist nach § 355 BGB
+    # genauso wirksam. Eine Adresse, an die nichts ankommt, waere schlechter.
+    ('FORK',
+     'a.push({ text: "info@immooffice.example", noJustify: true });',
+     'if (standort.email) a.push({ text: standort.email, noJustify: true });',
+     'Widerrufsbelehrung im Maklervertrag: die Mailadresse des Mandanten.',
+     {'vertrag-pdf'}),
+    ('FORK',
+     'a.push({ text: "info@immooffice.example" });',
+     'if (standort.email) a.push({ text: standort.email });',
+     'Widerrufsbelehrung und Muster-Widerrufsformular im Signaturvorgang: '
+     'dieselbe Adresse, vier Stellen.',
+     {'signatur-vorgang-starten'}),
+
     # --- Die Datenschutzadresse in den Vertrags-PDF (fork_32) ------------
     # vertrag-pdf und signatur-vorgang-starten schreiben in die AGB des
     # Maklervertrags: "Weitere Informationen ... abrufbar unter: <Adresse>".

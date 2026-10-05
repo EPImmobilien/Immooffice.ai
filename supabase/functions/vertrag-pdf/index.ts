@@ -308,7 +308,7 @@ function buildWiderrufAbsaetze(standort: ImmoStandort): Absatz[] {
   a.push({ text: standort.firma, noJustify: true });
   a.push({ text: standort.strasse, noJustify: true });
   a.push({ text: standort.plzOrt, noJustify: true });
-  a.push({ text: "info@immooffice.example", noJustify: true });
+  if (standort.email) a.push({ text: standort.email, noJustify: true });
   a.push({ text: "mittels einer eindeutigen Erklärung (z. B. ein mit der Post versandter Brief oder E-Mail) über Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie können dafür das beigefügte Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist." });
   a.push({ text: "Zur Wahrung der Widerrufsfrist reicht es aus, dass Sie die Mitteilung über die Ausübung des Widerrufsrechts vor Ablauf der Widerrufsfrist absenden.", spaceAfter: 8 });
   a.push({ text: "Folgen des Widerrufs", bold: true, spaceAfter: 2 });

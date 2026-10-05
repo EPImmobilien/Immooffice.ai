@@ -79,8 +79,24 @@ const corsHeaders = {
 // EINZIGE zulaessige Quelle fuer Telefon/E-Mail in Captions - die Nummer
 // stammt aus Website/Impressum immooffice.example.
 // ---------------------------------------------------------------
-const KONTAKT_EMAIL = "info@immooffice.example";
-const KONTAKT_TELEFON = "";
+// Kontaktdaten kommen aus dem Anfragekoerper (body.kontakt), nicht aus
+// dem Quelltext: diese Funktion bedient jeden Mandanten. Ohne Angabe
+// entfaellt die Kontaktzeile.
+function immoKontaktZeilen(k: { email?: string; telefon?: string } | undefined | null) {
+  const mail = String(k?.email || "").trim();
+  const tel = String(k?.telefon || "").trim();
+  const teile = [mail ? `\u{1F4E9} ${mail}` : "", tel ? `\u{1F4DE} ${tel}` : ""].filter(Boolean);
+  return {
+    // Punkt 10 der Struktur. Ohne Kontaktdaten gibt es ihn nicht.
+    zeile: teile.length ? `10. Kontakt: ${teile.join("  ")}` : "",
+    // Dieselbe Angabe mehrzeilig, so steht sie in zwei der Vorgaben.
+    block: teile.length ? `Kontakt:\n   ${teile.join("\n   ")}` : "",
+    // Die Regel, auf welche Daten sich die KI beschraenken soll.
+    regel: teile.length
+      ? `- Kontaktdaten NIEMALS erfinden (keine Telefonnummern, E-Mail- oder Webadressen ausdenken). Falls Kontaktdaten genannt werden, AUSSCHLIESSLICH: ${teile.join(" bzw. ")}`
+      : "- Kontaktdaten NIEMALS erfinden und auch keine nennen: es liegen keine vor.",
+  };
+}
 const KI_HINWEIS = "Hinweis: Dieser Beitrag wurde mit KI-Unterstützung erstellt.";
 
 // Haengt den KI-Hinweis an eine Caption an - vor einem evtl. vorhandenen
@@ -193,6 +209,7 @@ function datenAufzaehlen(d: Daten): string {
 
 function buildPrompt(body: RequestBody): { system: string; user: string } {
   const { textart, daten, kuerzer } = body;
+  const kontakt = immoKontaktZeilen((body as any).kontakt);
 
   // -------------------------------------------------------------
   // News-Kernpunkte: 3 praegnante Kernaussagen als JSON-Array.
@@ -259,7 +276,7 @@ STRUKTUR:
 4. Leerzeile.
 5. Abschnitt "Was bedeutet das für Sie?" (ohne diese Überschrift wörtlich, aber sinngemäß): 2–4 Sätze konkrete Einordnung für Eigentümer/Verkäufer in MV/Norddeutschland – worauf man achten sollte, warum es relevant ist.
 6. Leerzeile.
-7. Einladung zum Gespräch: freundlich, ohne Druck (z.B. "Sie sind unsicher, was das für Ihre Immobilie bedeutet? Sprechen Sie uns gern an – wir ordnen es gemeinsam ein.") + Kontakt:\n   📩 ${KONTAKT_EMAIL}\n   📞 ${KONTAKT_TELEFON}${hashtagsBlock}
+7. Einladung zum Gespräch: freundlich, ohne Druck (z.B. "Sie sind unsicher, was das für Ihre Immobilie bedeutet? Sprechen Sie uns gern an – wir ordnen es gemeinsam ein.") + ${kontakt.block}${hashtagsBlock}
 
 Du bekommst:
 - Schlagzeile: ${titel || "(keine)"}
@@ -315,7 +332,7 @@ STRUKTUR:
 7. Glückwunsch + Dank
 8. Leerzeile
 9. Akquise-Zeile
-10. Kontakt: 📩 ${KONTAKT_EMAIL}  📞 ${KONTAKT_TELEFON}${hashtagsBlock}
+${kontakt.zeile}${hashtagsBlock}
 
 Daten:
 - Ort: ${ort || "(unbekannt)"}
@@ -356,7 +373,7 @@ Antworte AUSSCHLIESSLICH mit der fertigen Caption.`,
 REGELN:
 - Deutsch, neutral. Emojis am Zeilenanfang (🏡 ✨ 📍 📐 🛏️ 📩). 600–900 Zeichen ohne Hashtags.
 - Nur Fakten aus Eckdaten/Bild. Keine Energieausweis-Pflichtangaben. CTA am Ende.
-- Kontaktdaten NIEMALS erfinden (keine Telefonnummern, E-Mail- oder Webadressen ausdenken). Falls Kontaktdaten genannt werden, AUSSCHLIESSLICH: 📩 ${KONTAKT_EMAIL} bzw. 📞 ${KONTAKT_TELEFON}.
+${kontakt.regel}.
 - KEINEN eigenen KI-Hinweis anfügen – der wird automatisch ergänzt.
 
 STRUKTUR:

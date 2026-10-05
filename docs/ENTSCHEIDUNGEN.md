@@ -4038,3 +4038,68 @@ AGB-Haken**. Das ist die richtige Folge: einen Haken auf AGB zu verlangen,
 die niemand lesen kann, wäre nur eine Behauptung. Es heißt aber auch, dass
 das Modul ohne Eintrag rechtlich weniger leistet als vorher behauptet.
 Vermerkt in `docs/OFFEN.md`.
+
+## Die Widerrufsbelehrung nannte eine Adresse, an die nichts ankommt (05.10.2026)
+
+§ 356 BGB verlangt, dass der Verbraucher weiß, **wohin** er widerruft. Der
+Adressblock in `vertrag-pdf` und `signatur-vorgang-starten` nennt Name,
+Firma, Straße und Ort — alles aus den Stammdaten des Mandanten — und danach
+eine Mailadresse aus dem Quelltext, die niemandem gehört. Dasselbe im
+**Muster-Widerrufsformular**, das der Verbraucher ausfüllt und zurückschickt.
+Fünf Stellen.
+
+Jetzt `standort.email`, und **ohne Eintrag entfällt die Zeile**. Die
+postalische Anschrift darüber steht vollständig da; ein Widerruf per Brief
+ist nach § 355 BGB genauso wirksam. Eine Adresse, an die nichts ankommt, wäre
+schlechter als keine.
+
+## Die KI wurde angewiesen, eine tote Adresse zu nennen (05.10.2026)
+
+`generate-text` baut die Systemvorgaben für Beiträge in den sozialen Netzen.
+Darin stand, an drei Stellen:
+
+```
+10. Kontakt: 📩 ${KONTAKT_EMAIL}  📞 ${KONTAKT_TELEFON}
+- Kontaktdaten NIEMALS erfinden … Falls Kontaktdaten genannt werden,
+  AUSSCHLIESSLICH: 📩 <Mail> bzw. 📞 <Telefon>
+```
+
+Beide Werte standen im Quelltext. Nach der Neutralisierung ist die
+Mailadresse eine, die niemandem gehört, und die Rufnummer **leer**. Die KI
+wurde also ausdrücklich angewiesen, in Werbetexte eine tote Adresse und ein
+leeres Telefonfeld zu schreiben — und zwar unter der Überschrift
+„Kontaktdaten NIEMALS erfinden".
+
+### Warum die Daten aus dem Anfragekörper kommen
+
+`generate-text` hat **keinen Datenbankzugang** — kein `createClient`, keine
+Authentisierung. Sie ist ein reiner Textbauer. Einen Mandanten könnte sie nur
+bekommen, wenn man ihr Auth und einen Client einbaut.
+
+Das ist nicht nötig: die Oberfläche kennt die Kontaktdaten seit dem 03.10.
+über `immoFirma(feld)`. Sie schickt sie jetzt als `body.kontakt` mit. **Ohne
+Angabe entfallen Kontaktzeile und Regel**, und an deren Stelle tritt:
+„Kontaktdaten NIEMALS erfinden und auch keine nennen: es liegen keine vor."
+Das ist dieselbe Regel wie überall — fehlt die Angabe, wird sie weggelassen,
+nicht erfunden.
+
+Nur **einer** der fünf Aufrufe schickt sie: der, der die Texte mit
+Kontaktzeile erzeugt. Die übrigen vier holen Kernpunkte zu Nachrichten und
+brauchen keine.
+
+### Eintrag in ERWEITERT
+
+Die drei geänderten Zeilen tragen kein Kennzeichen der Referenz mehr —
+`tests/funktionen-unveraendert.py` verlangt das aber von jeder geänderten
+Zeile. Das ist richtig so: es ist keine Neutralisierung, sondern eine
+**Erweiterung**, und für die gibt es `ERWEITERT`. Dort steht sie jetzt mit
+Grund und Datum, damit die Liste kurz bleibt und niemand darunter heimlich
+Verhalten ändert.
+
+### Eine Korrektur an meiner eigenen Aussage
+
+Im ersten Durchgang hatte ich notiert, das „bzw." am Zeilenende hänge ins
+Nichts. Das war falsch gelesen: die Zeile geht weiter mit `📞
+${KONTAKT_TELEFON}`, war also vollständig — nur eben mit leerem Telefonfeld.
+Ebenso hatte ich zwei der drei Fundstellen doppelt gezählt. Beides in den
+Regelbeschreibungen richtiggestellt, bevor es jemand als Begründung liest.

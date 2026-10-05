@@ -45,6 +45,14 @@ KENNZEICHEN = re.compile(
 ERWEITERT = {
     'urlaub-hinweise': 'Feiertage aller sechzehn Bundeslaender statt nur '
                        'Mecklenburg-Vorpommern (Auftrag 28.09.2026)',
+    # Die Funktion hatte Mailadresse und Rufnummer im Quelltext und wies die
+    # KI an, genau diese in Werbetexte zu schreiben. Sie bekommt sie jetzt
+    # im Anfragekoerper (body.kontakt) — eine Erweiterung, nicht blosse
+    # Neutralisierung: die geaenderten Zeilen tragen deshalb kein
+    # Kennzeichen der Referenz mehr, sondern den neuen Weg.
+    'generate-text': 'Kontaktdaten kommen aus dem Anfragekoerper statt aus '
+                     'dem Quelltext; ohne Angabe nennt die KI keine '
+                     '(Phase 2.4, 05.10.2026)',
 }
 # Die sechzehn Funktionen, die Dateien anfassen, bekommen die Storage-Huelle.
 # Beim Schreiben stellt sie den Mandanten voran, sobald immoSetzeMandant()

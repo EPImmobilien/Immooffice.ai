@@ -4309,6 +4309,19 @@ WOERTLICH = [
      '${(i && i.firma && i.firma.datenschutz) ? " Weitere Informationen: " + i.firma.datenschutz : ""}`',
      'Signaturseite: der Datenschutzhinweis verweist auf die Hinweise des '
      'Mandanten — oder auf nichts.'),
+
+    # --- Die KI braucht die Kontaktdaten des Mandanten -------------------
+    # generate-text hatte Mailadresse und Rufnummer im Quelltext und wies
+    # die KI an, genau diese in Werbetexte zu schreiben. Die Funktion hat
+    # keinen Datenbankzugang; sie bekommt die Daten jetzt im Anfragekoerper.
+    # Hier ist die Stelle, die sie kennt — immoFirma(feld) seit dem 03.10.
+    # Nur dieser Aufruf erzeugt die Texte mit Kontaktzeile; die uebrigen
+    # vier holen Kernpunkte zu Nachrichten und brauchen keine.
+    ('FORK',
+     'invoke("generate-text", {\n            body: {\n              textart: l,',
+     'invoke("generate-text", {\n            body: {\n              textart: l,\n'
+     '              kontakt: { email: immoFirma("email"), telefon: immoFirma("telefon") },',
+     'Textwerkstatt: die Kontaktdaten des Mandanten gehen an generate-text.'),
 ]
 
 

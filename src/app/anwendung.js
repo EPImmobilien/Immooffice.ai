@@ -44550,6 +44550,7 @@ function ExposeSchmiede({
           } = await window._sb.functions.invoke("generate-text", {
             body: {
               textart: l,
+              kontakt: { email: immoFirma("email"), telefon: immoFirma("telefon") },
               daten: {
                 ...o,
                 objektart_kategorie: a

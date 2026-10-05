@@ -359,7 +359,7 @@ function buildMaklervertragAbsaetze(vertrag: any, standort: ImmoStandort): Absat
   a.push({ text: standort.firma });
   a.push({ text: standort.strasse });
   a.push({ text: standort.plzOrt });
-  a.push({ text: "info@immooffice.example" });
+  if (standort.email) a.push({ text: standort.email });
   a.push({ text: "mittels einer eindeutigen Erkl\u00e4rung (z. B. ein mit der Post versandter Brief oder E-Mail) \u00fcber Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie k\u00f6nnen daf\u00fcr das beigef\u00fcgte Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist." });
   a.push({ text: "Zur Wahrung der Widerrufsfrist reicht es aus, dass Sie die Mitteilung \u00fcber die Aus\u00fcbung des Widerrufsrechts vor Ablauf der Widerrufsfrist absenden." });
   a.push({ text: "Folgen des Widerrufs", bold: true });
@@ -383,7 +383,7 @@ function buildMaklervertragAbsaetze(vertrag: any, standort: ImmoStandort): Absat
   a.push({ text: standort.vertreter });
   a.push({ text: standort.strasse });
   a.push({ text: standort.plzOrt });
-  a.push({ text: "info@immooffice.example" });
+  if (standort.email) a.push({ text: standort.email });
   a.push({ text: "Hiermit widerrufe(n) ich/wir den von mir/uns abgeschlossenen Vertrag \u00fcber die Erbringung der Maklerleistung" });
   a.push({ text: "Bestellt/erhalten am _______________" });
   a.push({ text: "Name:" });
@@ -624,7 +624,7 @@ function buildObjektnachweisWiderruf(standort: ImmoStandort): Absatz[] {
   a.push({ text: standort.firma });
   a.push({ text: standort.strasse });
   a.push({ text: standort.plzOrt });
-  a.push({ text: "info@immooffice.example" });
+  if (standort.email) a.push({ text: standort.email });
   a.push({ text: "mittels einer eindeutigen Erkl\u00e4rung (z. B. ein mit der Post versandter Brief oder E-Mail) \u00fcber Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie k\u00f6nnen daf\u00fcr das beigef\u00fcgte Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist." });
   a.push({ text: "Zur Wahrung der Widerrufsfrist reicht es aus, dass Sie die Mitteilung \u00fcber die Aus\u00fcbung des Widerrufsrechts vor Ablauf der Widerrufsfrist absenden." });
   a.push({ text: "Folgen des Widerrufs", bold: true });
@@ -642,7 +642,7 @@ function buildObjektnachweisWiderruf(standort: ImmoStandort): Absatz[] {
   a.push({ text: standort.vertreter });
   a.push({ text: standort.strasse });
   a.push({ text: standort.plzOrt });
-  a.push({ text: "info@immooffice.example" });
+  if (standort.email) a.push({ text: standort.email });
   a.push({ text: "Hiermit widerrufe(n) ich/wir den von mir/uns abgeschlossenen Vertrag \u00fcber die Erbringung der Maklerleistung" });
   a.push({ text: "Bestellt/erhalten am _______________" });
   a.push({ text: "Name:" });
