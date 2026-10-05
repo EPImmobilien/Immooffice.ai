@@ -247,8 +247,9 @@ export const ANSPRECHPARTNER: Feld[] = [
 // ----------------------------------------------------------------- Firma
 export const FIRMA: Feld[] = [
   { schluessel: "firma.name", name: "Firmenname", typ: "text", quelle: F("firma_name") },
-  { schluessel: "firma.linie", name: "Produktlinie", typ: "text", quelle: GERECHNET,
-    hinweis: "Zweite Markenzeile, z. B. fuer ein Premium-Segment." },
+  { schluessel: "firma.linie", name: "Produktlinie", typ: "text", quelle: F("marken_linie"),
+    hinweis: "Zweite Markenzeile, z. B. fuer ein Premium-Segment (fork_39). "
+           + "Leer = die Zeile entfaellt." },
   { schluessel: "firma.marken_name", name: "Markenname", typ: "text", quelle: F("marken_name"),
     hinweis: "Kurzform für Kopf und Fuß. Fehlt sie, nimmt der Renderer den Firmennamen." },
   { schluessel: "firma.strasse", name: "Straße", typ: "text", quelle: F("strasse") },

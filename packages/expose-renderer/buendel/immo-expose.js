@@ -35,7 +35,9 @@ var ImmoExpose = (() => {
     SEITE: () => SEITE,
     VORGABE: () => VORGABE,
     Zufall: () => Zufall,
+    aufbereiten: () => aufbereiten,
     breite: () => breite,
+    courtageSatz: () => courtageSatz,
     datumDe: () => datumDe,
     ersetze: () => ersetze,
     farbe: () => farbe,
@@ -43,6 +45,7 @@ var ImmoExpose = (() => {
     feld: () => feld,
     flach: () => flach,
     formatiere: () => formatiere,
+    grunderwerbsteuerSatz: () => grunderwerbsteuerSatz,
     helligkeit: () => helligkeit,
     hex: () => hex,
     hx: () => hx,
@@ -51,6 +54,7 @@ var ImmoExpose = (() => {
     palette: () => palette,
     paletteFuer: () => paletteFuer,
     platzhalterIn: () => platzhalterIn,
+    rechnen: () => rechnen,
     rendern: () => rendern,
     schnittName: () => schnittName,
     stilAus: () => stilAus,
@@ -324,7 +328,7 @@ var ImmoExpose = (() => {
       const fehlt = fehlendeZeichen(this.metrik(schnitt), s);
       if (fehlt.length) {
         const bisher = this.fehlend.get(schnitt) ?? /* @__PURE__ */ new Set();
-        for (const z of fehlt) bisher.add(z);
+        for (const z2 of fehlt) bisher.add(z2);
         this.fehlend.set(schnitt, bisher);
       }
       this.schritte.push({
@@ -466,7 +470,7 @@ var ImmoExpose = (() => {
       inhalt2(innen);
       for (const [schnitt, zeichen] of innen.fehlend) {
         const bisher = this.fehlend.get(schnitt) ?? /* @__PURE__ */ new Set();
-        for (const z of zeichen) bisher.add(z);
+        for (const z2 of zeichen) bisher.add(z2);
         this.fehlend.set(schnitt, bisher);
       }
       this.schritte.push({
@@ -507,8 +511,8 @@ var ImmoExpose = (() => {
   };
 
   // packages/expose-renderer/src/umgebung.ts
-  function warne(u, art, element, text2) {
-    u.warnungen.push({ art, seite: u.seite.id, element: element?.id, text: text2 });
+  function warne(u, art, element, text3) {
+    u.warnungen.push({ art, seite: u.seite.id, element: element?.id, text: text3 });
   }
   function ankerX(el, ausrichtung) {
     if (ausrichtung === "rechts") return el.x + el.b;
@@ -531,8 +535,8 @@ var ImmoExpose = (() => {
     };
   }
   function hex(c) {
-    const z = (v) => Math.max(0, Math.min(255, Math.round(v * 255))).toString(16).padStart(2, "0");
-    return "#" + z(c.r) + z(c.g) + z(c.b);
+    const z2 = (v) => Math.max(0, Math.min(255, Math.round(v * 255))).toString(16).padStart(2, "0");
+    return "#" + z2(c.r) + z2(c.g) + z2(c.b);
   }
   function mix(a, b, t) {
     return {
@@ -1090,8 +1094,8 @@ var ImmoExpose = (() => {
       schluessel: "firma.linie",
       name: "Produktlinie",
       typ: "text",
-      quelle: GERECHNET,
-      hinweis: "Zweite Markenzeile, z. B. fuer ein Premium-Segment."
+      quelle: F("marken_linie"),
+      hinweis: "Zweite Markenzeile, z. B. fuer ein Premium-Segment (fork_39). Leer = die Zeile entfaellt."
     },
     {
       schluessel: "firma.marken_name",
@@ -1328,9 +1332,9 @@ var ImmoExpose = (() => {
     return Array.isArray(roh) ? roh : [];
   }
   var PLATZHALTER = /\{\{\s*([A-Za-z0-9_.]+\??)\s*\}\}/g;
-  function ersetze(daten, text2) {
+  function ersetze(daten, text3) {
     let etwasFehlt = false;
-    const raus = text2.replace(PLATZHALTER, (_treffer, schluessel) => {
+    const raus = text3.replace(PLATZHALTER, (_treffer, schluessel) => {
       const freiwillig = schluessel.endsWith("?");
       const name = freiwillig ? schluessel.slice(0, -1) : schluessel;
       const w = wert(daten, name);
@@ -1343,9 +1347,9 @@ var ImmoExpose = (() => {
     if (etwasFehlt) return void 0;
     return raus.trim() === "" ? void 0 : raus;
   }
-  function platzhalterIn(text2) {
+  function platzhalterIn(text3) {
     const raus = [];
-    for (const t of text2.matchAll(PLATZHALTER)) {
+    for (const t of text3.matchAll(PLATZHALTER)) {
       const name = t[1].endsWith("?") ? t[1].slice(0, -1) : t[1];
       if (!raus.includes(name)) raus.push(name);
     }
@@ -1453,7 +1457,7 @@ var ImmoExpose = (() => {
       warne(u, "fehlender_wert", el, `Text entfaellt: "${zeichenkette(el, "inhalt") ?? ""}"`);
       return;
     }
-    const text2 = zeichenkette(el, "umbruch") === "saetze" ? t.replace(/([.!?])\s+/g, "$1\n") : t;
+    const text3 = zeichenkette(el, "umbruch") === "saetze" ? t.replace(/([.!?])\s+/g, "$1\n") : t;
     const spalten = Math.max(1, Math.min(3, zahl(el, "spalten", 1)));
     const abstand = zahl(el, "spaltenabstand", 24);
     const spaltenbreite = (el.b - abstand * (spalten - 1)) / spalten;
@@ -1479,7 +1483,7 @@ var ImmoExpose = (() => {
     const hoeheFrei = el.h;
     const v = wahr(el, "verdichten", true) ? verdichten(
       metrik(u, s.schnitt),
-      text2,
+      text3,
       spaltenbreite,
       hoeheFrei * spalten,
       s.groesse,
@@ -1490,7 +1494,7 @@ var ImmoExpose = (() => {
       groesse: s.groesse,
       zeilenhoehe: schritt,
       passt: true,
-      zeilen: u.blatt.umbrechen(text2, s.schnitt, s.groesse, spaltenbreite, regeln)
+      zeilen: u.blatt.umbrechen(text3, s.schnitt, s.groesse, spaltenbreite, regeln)
     };
     if (v.groesse < s.groesse - 1e-9) {
       warne(
@@ -1692,7 +1696,7 @@ var ImmoExpose = (() => {
     const sw = stilVon(el, u, "stil_wert");
     const label = zeichenkette(el, "label");
     const einheit = zeichenkette(el, "einheit");
-    const text2 = einheit ? `${w} ${einheit}` : w;
+    const text3 = einheit ? `${w} ${einheit}` : w;
     if (label !== void 0) {
       const sl = stilVon(el, u, "stil_label");
       const yl = el.y + el.h - zahl(el, "label_versatz", 0);
@@ -1711,7 +1715,7 @@ var ImmoExpose = (() => {
     u.blatt.T(
       ankerX(el, sw.ausrichtung),
       yw,
-      text2,
+      text3,
       sw.schnitt,
       sw.groesse,
       sw.farbe,
@@ -1918,14 +1922,14 @@ var ImmoExpose = (() => {
   };
   var faktentabelle = (el, u) => {
     const gebunden = zeichenkette(el, "feld");
-    const vorgaben = gebunden ? liste(u.daten, gebunden).filter((z) => z && z.label !== void 0).map((z) => ({ label: z.label, wert: z.wert })) : el["zeilen"] ?? [];
+    const vorgaben = gebunden ? liste(u.daten, gebunden).filter((z2) => z2 && z2.label !== void 0).map((z2) => ({ label: z2.label, wert: z2.wert })) : el["zeilen"] ?? [];
     const zeilen = [];
-    for (const z of vorgaben) {
-      const roh = z.feld !== void 0 ? wert(u.daten, z.feld) : z.wert !== void 0 ? ersetze(u.daten, z.wert) : void 0;
+    for (const z2 of vorgaben) {
+      const roh = z2.feld !== void 0 ? wert(u.daten, z2.feld) : z2.wert !== void 0 ? ersetze(u.daten, z2.wert) : void 0;
       if (roh === void 0) continue;
-      const label = z.label.includes("{{") ? ersetze(u.daten, z.label) : z.label;
+      const label = z2.label.includes("{{") ? ersetze(u.daten, z2.label) : z2.label;
       if (label === void 0) continue;
-      zeilen.push({ label, wert: z.einheit ? `${roh} ${z.einheit}` : roh });
+      zeilen.push({ label, wert: z2.einheit ? `${roh} ${z2.einheit}` : roh });
     }
     if (!zeilen.length) {
       warne(u, "fehlender_wert", el, "Keine einzige Angabe gefuellt — Tabelle entfaellt.");
@@ -1941,11 +1945,11 @@ var ImmoExpose = (() => {
     const linie = farbRef(el, "linien_farbe", u);
     if (art === "gestapelt") {
       let y = el.y + el.h;
-      for (const z of zeilen) {
+      for (const z2 of zeilen) {
         u.blatt.T(
           el.x,
           y - zahl(el, "label_versatz", 0),
-          gross(sLabel, z.label),
+          gross(sLabel, z2.label),
           sLabel.schnitt,
           sLabel.groesse,
           sLabel.farbe,
@@ -1954,7 +1958,7 @@ var ImmoExpose = (() => {
         u.blatt.T(
           el.x,
           y - zahl(el, "wert_versatz", 14),
-          z.wert,
+          z2.wert,
           sWert.schnitt,
           sWert.groesse,
           sWert.farbe,
@@ -1970,7 +1974,7 @@ var ImmoExpose = (() => {
     const jeSpalte = Math.ceil(zeilen.length / spalten);
     const zeilenhoehe = spalten > 1 ? zahl(el, "zeilenhoehe", 25) : zh;
     const zeilenweise = zeichenkette(el, "fuellung") === "zeilenweise";
-    zeilen.forEach((z, i) => {
+    zeilen.forEach((z2, i) => {
       const spalte = spalten > 1 ? zeilenweise ? i % spalten : Math.floor(i / jeSpalte) : 0;
       const reihe = spalten > 1 ? zeilenweise ? Math.floor(i / spalten) : i % jeSpalte : i;
       const x = el.x + spalte * (sb + spaltenabstand);
@@ -1990,7 +1994,7 @@ var ImmoExpose = (() => {
       u.blatt.T(
         x + polster,
         grundlinie,
-        gross(sLabel, z.label),
+        gross(sLabel, z2.label),
         sLabel.schnitt,
         sLabel.groesse,
         sLabel.farbe,
@@ -1999,7 +2003,7 @@ var ImmoExpose = (() => {
       u.blatt.T(
         x + sb - polster,
         grundlinie - zahl(el, "wert_tiefer", 0),
-        z.wert,
+        z2.wert,
         sWert.schnitt,
         sWert.groesse,
         sWert.farbe,
@@ -2019,12 +2023,12 @@ var ImmoExpose = (() => {
         );
       } else if (linie && art === "fuehrungspunkte") {
         const lb = u.blatt.sw(
-          gross(sLabel, z.label),
+          gross(sLabel, z2.label),
           sLabel.schnitt,
           sLabel.groesse,
           sLabel.sperrung
         );
-        const wb = u.blatt.sw(z.wert, sWert.schnitt, sWert.groesse, sWert.sperrung);
+        const wb = u.blatt.sw(z2.wert, sWert.schnitt, sWert.groesse, sWert.sperrung);
         const luft = zahl(el, "punkt_luft", 8);
         const von = x + polster + lb + luft;
         const bis = x + sb - polster - wb - luft;
@@ -2061,7 +2065,7 @@ var ImmoExpose = (() => {
     let summe = 0;
     for (const r of raeume) {
       const f = Number(String(r.flaeche ?? "").replace(",", "."));
-      const text2 = Number.isFinite(f) ? `${zahlDe(f, 1)} ${einheit}` : void 0;
+      const text3 = Number.isFinite(f) ? `${zahlDe(f, 1)} ${einheit}` : void 0;
       u.blatt.T(
         el.x,
         y,
@@ -2071,11 +2075,11 @@ var ImmoExpose = (() => {
         sName.farbe,
         sName.sperrung
       );
-      if (text2 !== void 0) {
+      if (text3 !== void 0) {
         u.blatt.T(
           el.x + el.b,
           y,
-          text2,
+          text3,
           sFlaeche.schnitt,
           sFlaeche.groesse,
           sFlaeche.farbe,
@@ -2086,7 +2090,7 @@ var ImmoExpose = (() => {
       }
       if (linie && zeichenkette(el, "darstellung") === "fuehrungspunkte") {
         const nb = u.blatt.sw(String(r.name), sName.schnitt, sName.groesse, sName.sperrung);
-        const wb = text2 === void 0 ? 0 : u.blatt.sw(text2, sFlaeche.schnitt, sFlaeche.groesse, sFlaeche.sperrung);
+        const wb = text3 === void 0 ? 0 : u.blatt.sw(text3, sFlaeche.schnitt, sFlaeche.groesse, sFlaeche.sperrung);
         const luft = zahl(el, "punkt_luft", 8);
         const von = el.x + nb + luft;
         const bis = el.x + el.b - wb - luft;
@@ -2276,12 +2280,12 @@ var ImmoExpose = (() => {
         sName.farbe,
         sName.sperrung
       );
-      const text2 = d.wert !== void 0 ? d.wert : d.km !== void 0 ? `${zahlDe(d.km, 1)} km` : d.minuten !== void 0 ? `${zahlDe(d.minuten, 0)} min` : void 0;
-      if (text2 !== void 0) {
+      const text3 = d.wert !== void 0 ? d.wert : d.km !== void 0 ? `${zahlDe(d.km, 1)} km` : d.minuten !== void 0 ? `${zahlDe(d.minuten, 0)} min` : void 0;
+      if (text3 !== void 0) {
         u.blatt.T(
           el.x + el.b,
           y,
-          text2,
+          text3,
           sWert.schnitt,
           sWert.groesse,
           sWert.farbe,
@@ -2313,7 +2317,7 @@ var ImmoExpose = (() => {
         );
       } else if (art === "fuehrungspunkte" && grund) {
         const nb = u.blatt.sw(d.name, sName.schnitt, sName.groesse, sName.sperrung);
-        const wb = text2 === void 0 ? 0 : u.blatt.sw(text2, sWert.schnitt, sWert.groesse, sWert.sperrung);
+        const wb = text3 === void 0 ? 0 : u.blatt.sw(text3, sWert.schnitt, sWert.groesse, sWert.sperrung);
         const luft = zahl(el, "punkt_luft", 8);
         const von = el.x + nb + luft;
         const bis = el.x + el.b - wb - luft;
@@ -2482,7 +2486,7 @@ var ImmoExpose = (() => {
     const art0 = zeichenkette(el, "darstellung") ?? "checkliste";
     const quelle = zeichenkette(el, "feld") ?? (art0 === "gruppen" ? "objekt.expose_ausstattung_gruppen" : "objekt.beschreibung_ausstattung_expose");
     const roh = art0 === "gruppen" ? void 0 : wert(u.daten, quelle);
-    const punkte = (roh ?? "").split("\n").map((z) => z.trim()).filter(Boolean);
+    const punkte = (roh ?? "").split("\n").map((z2) => z2.trim()).filter(Boolean);
     if (art0 !== "gruppen" && !punkte.length) {
       warne(u, "fehlender_wert", el, "Keine Ausstattungspunkte — das Element entfaellt.");
       return;
@@ -2684,6 +2688,7 @@ var ImmoExpose = (() => {
         b.rect(el.x, el.y, el.b, el.h, fuell, null, radius);
       }, zweck);
     }
+    if (quelle !== void 0) kiKennzeichnen(el, u, String(quelle));
     const label = inhalt(el, u, false, "label");
     if (label !== void 0 && zeichenkette(el, "stil_label")) {
       const s = u.stil(zeichenkette(el, "stil_label"));
@@ -2714,6 +2719,19 @@ var ImmoExpose = (() => {
       );
     }
   };
+  function kiKennzeichnen(el, u, quelle) {
+    const liste2 = u.daten["objekt.ki_bilder"];
+    if (!Array.isArray(liste2) || !liste2.map(String).includes(quelle)) return;
+    const s = "MIT KI BEARBEITET";
+    const schnitt = schnittName(u.vorlage.stil.schriften.label);
+    const groesse = 5.5, sperrung = 1.4;
+    const b = u.blatt.sw(s, schnitt, groesse, sperrung);
+    const h = 13;
+    const x = el.x + 8;
+    const y = el.y + el.h - 8 - h;
+    u.blatt.rect(x, y, b + 14, h, [0, 0, 0, 0.72], null, 0);
+    u.blatt.T(x + 7, y + 4, s, schnitt, groesse, [1, 1, 1, 1], sperrung);
+  }
   function bildSchluessel(slot) {
     if (!slot?.art) return void 0;
     switch (slot.art) {
@@ -2885,8 +2903,8 @@ var ImmoExpose = (() => {
     const fy = yBalken + bh + zahl(el, "fahne_abstand", 18);
     u.blatt.rect(marke - fb / 2, fy, fb, fh, tinte, null, zahl(el, "fahne_radius", 6));
     const sFahne = stilVon(el, u, "stil_fahne");
-    const text2 = zeichenkette(el, "fahne_text") ?? "{{objekt.energie_kennwert}}";
-    const beschriftung = ersetze(u.daten, text2);
+    const text3 = zeichenkette(el, "fahne_text") ?? "{{objekt.energie_kennwert}}";
+    const beschriftung = ersetze(u.daten, text3);
     if (beschriftung !== void 0) {
       u.blatt.T(
         marke,
@@ -3201,10 +3219,10 @@ var ImmoExpose = (() => {
     y -= zahl(el, "kontakt_abstand", 24);
     const mittig = zeichenkette(el, "kontakt_ausrichtung") === "mitte";
     const luft = zahl(el, "kontakt_luft", 10);
-    for (const z of zeilen) {
-      const v = wert(u.daten, z.feld);
+    for (const z2 of zeilen) {
+      const v = wert(u.daten, z2.feld);
       if (v === void 0) continue;
-      const beschriftung = gross(sLabel, z.label);
+      const beschriftung = gross(sLabel, z2.label);
       if (mittig) {
         const lb = u.blatt.sw(beschriftung, sLabel.schnitt, sLabel.groesse, sLabel.sperrung);
         const wb = u.blatt.sw(v, sWert.schnitt, sWert.groesse, sWert.sperrung);
@@ -3259,8 +3277,8 @@ var ImmoExpose = (() => {
       wahr(el, "blocksatz", false)
     );
     bloecke.forEach((b, i) => {
-      const text2 = ersetze(u.daten, b.text);
-      if (text2 === void 0) {
+      const text3 = ersetze(u.daten, b.text);
+      if (text3 === void 0) {
         warne(
           u,
           "fehlender_wert",
@@ -3294,7 +3312,7 @@ var ImmoExpose = (() => {
         }
         y -= zahl(el, "titel_abstand", 16);
       }
-      for (const absatz of text2.split("\n")) {
+      for (const absatz of text3.split("\n")) {
         y = u.blatt.absatz(
           x,
           y,
@@ -3520,7 +3538,7 @@ var ImmoExpose = (() => {
     }
   }
   function pruefeElement(el, seite, v, stile, raus) {
-    const melde = (schwere, text2) => raus.push({ schwere, seite, element: el.id, text: text2 });
+    const melde = (schwere, text3) => raus.push({ schwere, seite, element: el.id, text: text3 });
     if (!el.id) melde("fehler", "Ein Element hat keine Kennung.");
     if (!ELEMENTE[el.typ]) {
       melde("fehler", `Unbekannter Elementtyp "${el.typ}". Bekannt sind: ${Object.keys(ELEMENTE).sort().join(", ")}.`);
@@ -3541,8 +3559,8 @@ var ImmoExpose = (() => {
         melde("fehler", `Der Textstil "${wert2}" steht nicht in der Vorlage. Vorhanden: ${[...stile].sort().join(", ")}.`);
       }
     }
-    for (const text2 of texteIn(el)) {
-      for (const feld2 of platzhalterIn(text2)) {
+    for (const text3 of texteIn(el)) {
+      for (const feld2 of platzhalterIn(text3)) {
         if (!istBekannt(feld2)) {
           melde("fehler", `Der Platzhalter {{${feld2}}} ist dem Feldkatalog nicht bekannt. Im PDF bliebe dort eine Luecke.`);
         }
@@ -3762,62 +3780,62 @@ var ImmoExpose = (() => {
   function istPng(b) {
     return b.length > 8 && b[0] === 137 && b[1] === 80 && b[2] === 78 && b[3] === 71;
   }
-  function zeichne(schritte, z) {
-    const P2 = z.PDFLib;
+  function zeichne(schritte, z2) {
+    const P2 = z2.PDFLib;
     for (const s of schritte) {
       if (s.art === "gruppe") {
-        z.blatt.pushOperators(P2.pushGraphicsState());
+        z2.blatt.pushOperators(P2.pushGraphicsState());
         if (s.matrix[0] !== 1 || s.matrix[1] !== 0 || s.matrix[2] !== 0 || s.matrix[3] !== 1 || s.matrix[4] !== 0 || s.matrix[5] !== 0) {
-          z.blatt.pushOperators(P2.concatTransformationMatrix(...s.matrix));
+          z2.blatt.pushOperators(P2.concatTransformationMatrix(...s.matrix));
         }
         if (s.maske) {
-          pfadOperatoren(s.maske, z);
-          z.blatt.pushOperators(P2.clip(), P2.endPath());
+          pfadOperatoren(s.maske, z2);
+          z2.blatt.pushOperators(P2.clip(), P2.endPath());
         }
-        zeichne(s.schritte, z);
-        z.blatt.pushOperators(P2.popGraphicsState());
+        zeichne(s.schritte, z2);
+        z2.blatt.pushOperators(P2.popGraphicsState());
         continue;
       }
-      z.blatt.pushOperators(P2.pushGraphicsState());
+      z2.blatt.pushOperators(P2.pushGraphicsState());
       const m = s.matrix;
       if (m[0] !== 1 || m[1] !== 0 || m[2] !== 0 || m[3] !== 1 || m[4] !== 0 || m[5] !== 0) {
-        z.blatt.pushOperators(P2.concatTransformationMatrix(...m));
+        z2.blatt.pushOperators(P2.concatTransformationMatrix(...m));
       }
-      einzeln(s, z);
-      z.blatt.pushOperators(P2.popGraphicsState());
+      einzeln(s, z2);
+      z2.blatt.pushOperators(P2.popGraphicsState());
     }
   }
-  function farbOps(z, fuell, strich, linienbreite) {
-    const P2 = z.PDFLib;
+  function farbOps(z2, fuell, strich, linienbreite) {
+    const P2 = z2.PDFLib;
     if (fuell) {
-      z.blatt.pushOperators(P2.setFillingRgbColor(fuell[0], fuell[1], fuell[2]));
-      if (fuell[3] < 1) deckkraft(z, fuell[3], "fuell");
+      z2.blatt.pushOperators(P2.setFillingRgbColor(fuell[0], fuell[1], fuell[2]));
+      if (fuell[3] < 1) deckkraft(z2, fuell[3], "fuell");
     }
     if (strich) {
-      z.blatt.pushOperators(P2.setStrokingRgbColor(strich[0], strich[1], strich[2]));
-      if (strich[3] < 1) deckkraft(z, strich[3], "strich");
+      z2.blatt.pushOperators(P2.setStrokingRgbColor(strich[0], strich[1], strich[2]));
+      if (strich[3] < 1) deckkraft(z2, strich[3], "strich");
     }
-    if (linienbreite != null) z.blatt.pushOperators(P2.setLineWidth(linienbreite));
+    if (linienbreite != null) z2.blatt.pushOperators(P2.setLineWidth(linienbreite));
   }
-  function deckkraft(z, wert2, art) {
-    const P2 = z.PDFLib;
-    const dict = z.doc.context.obj(
+  function deckkraft(z2, wert2, art) {
+    const P2 = z2.PDFLib;
+    const dict = z2.doc.context.obj(
       art === "fuell" ? { Type: "ExtGState", ca: wert2 } : { Type: "ExtGState", CA: wert2 }
     );
-    const ref = z.doc.context.register(dict);
-    const name = z.blatt.node.newExtGState("GS", ref);
-    z.blatt.pushOperators(P2.PDFOperator.of("gs", [name]));
+    const ref = z2.doc.context.register(dict);
+    const name = z2.blatt.node.newExtGState("GS", ref);
+    z2.blatt.pushOperators(P2.PDFOperator.of("gs", [name]));
   }
-  function einzeln(s, z) {
-    const P2 = z.PDFLib;
+  function einzeln(s, z2) {
+    const P2 = z2.PDFLib;
     switch (s.art) {
       case "text": {
-        const schrift = z.schriften.get(s.schnitt);
+        const schrift = z2.schriften.get(s.schnitt);
         if (!schrift) throw new Error(`Schrift "${s.schnitt}" nicht eingebettet.`);
-        const name = z.blatt.node.newFontDictionary(schrift.name, schrift.ref);
+        const name = z2.blatt.node.newFontDictionary(schrift.name, schrift.ref);
         const farbe2 = s.farbe ?? [0, 0, 0, 1];
-        if (farbe2[3] < 1) deckkraft(z, farbe2[3], "fuell");
-        z.blatt.pushOperators(
+        if (farbe2[3] < 1) deckkraft(z2, farbe2[3], "fuell");
+        z2.blatt.pushOperators(
           P2.beginText(),
           P2.setFontAndSize(name, s.groesse),
           P2.setCharacterSpacing(s.sperrung),
@@ -3829,57 +3847,57 @@ var ImmoExpose = (() => {
         return;
       }
       case "rechteck":
-        farbOps(z, s.fuell, s.strich, s.linienbreite);
-        z.blatt.pushOperators(P2.rectangle(s.x, s.y, s.b, s.h));
-        malen(z, s.fuell, s.strich);
+        farbOps(z2, s.fuell, s.strich, s.linienbreite);
+        z2.blatt.pushOperators(P2.rectangle(s.x, s.y, s.b, s.h));
+        malen(z2, s.fuell, s.strich);
         return;
       case "rundrechteck":
-        farbOps(z, s.fuell, s.strich, s.linienbreite);
-        rundRechteck(z, s.x, s.y, s.b, s.h, s.r);
-        malen(z, s.fuell, s.strich);
+        farbOps(z2, s.fuell, s.strich, s.linienbreite);
+        rundRechteck(z2, s.x, s.y, s.b, s.h, s.r);
+        malen(z2, s.fuell, s.strich);
         return;
       case "linie":
-        farbOps(z, null, s.strich, s.linienbreite);
+        farbOps(z2, null, s.strich, s.linienbreite);
         if (s.strichmuster) {
-          z.blatt.pushOperators(P2.setDashPattern(s.strichmuster, 0));
+          z2.blatt.pushOperators(P2.setDashPattern(s.strichmuster, 0));
         }
-        z.blatt.pushOperators(P2.moveTo(s.x1, s.y1), P2.lineTo(s.x2, s.y2), P2.stroke());
+        z2.blatt.pushOperators(P2.moveTo(s.x1, s.y1), P2.lineTo(s.x2, s.y2), P2.stroke());
         return;
       case "kreis":
-        farbOps(z, s.fuell, s.strich, s.linienbreite);
-        kreisbogen(z, s.x, s.y, s.r, s.r);
-        malen(z, s.fuell, s.strich);
+        farbOps(z2, s.fuell, s.strich, s.linienbreite);
+        kreisbogen(z2, s.x, s.y, s.r, s.r);
+        malen(z2, s.fuell, s.strich);
         return;
       case "ellipse": {
-        farbOps(z, s.fuell, s.strich, null);
+        farbOps(z2, s.fuell, s.strich, null);
         const mx = (s.x1 + s.x2) / 2;
         const my = (s.y1 + s.y2) / 2;
-        kreisbogen(z, mx, my, Math.abs(s.x2 - s.x1) / 2, Math.abs(s.y2 - s.y1) / 2);
-        malen(z, s.fuell, s.strich);
+        kreisbogen(z2, mx, my, Math.abs(s.x2 - s.x1) / 2, Math.abs(s.y2 - s.y1) / 2);
+        malen(z2, s.fuell, s.strich);
         return;
       }
       case "pfad":
-        farbOps(z, s.fuell, s.strich, s.linienbreite);
-        pfadOperatoren(s.schritte, z);
-        malen(z, s.fuell, s.strich);
+        farbOps(z2, s.fuell, s.strich, s.linienbreite);
+        pfadOperatoren(s.schritte, z2);
+        malen(z2, s.fuell, s.strich);
         return;
       case "maske":
         return;
       case "verlauf":
-        verlauf(s, z);
+        verlauf(s, z2);
         return;
       case "radialverlauf":
         return;
       case "bild": {
-        const bild2 = z.bilder.get(s.quelle);
+        const bild2 = z2.bilder.get(s.quelle);
         if (!bild2) return;
-        const name = z.blatt.node.newXObject("Bild", bild2.ref);
+        const name = z2.blatt.node.newXObject("Bild", bild2.ref);
         const skalaX = s.b / bild2.b;
         const skalaY = s.h / bild2.h;
         const f = s.fuellmodus === "contain" ? Math.min(skalaX, skalaY) : Math.max(skalaX, skalaY);
         const bb = bild2.b * f;
         const hh = bild2.h * f;
-        z.blatt.pushOperators(
+        z2.blatt.pushOperators(
           P2.concatTransformationMatrix(
             bb,
             0,
@@ -3893,18 +3911,18 @@ var ImmoExpose = (() => {
         return;
       }
       case "qr": {
-        if (!z.qr) return;
-        const felder = z.qr(s.inhalt);
+        if (!z2.qr) return;
+        const felder = z2.qr(s.inhalt);
         const n = felder.length;
         if (!n) return;
         const farbe2 = s.farbe ?? [0, 0, 0, 1];
-        z.blatt.pushOperators(P2.setFillingRgbColor(farbe2[0], farbe2[1], farbe2[2]));
+        z2.blatt.pushOperators(P2.setFillingRgbColor(farbe2[0], farbe2[1], farbe2[2]));
         const bx = s.b / n;
         const by = s.h / n;
         for (let zeile = 0; zeile < n; zeile++) {
           for (let spalte = 0; spalte < n; spalte++) {
             if (!felder[zeile][spalte]) continue;
-            z.blatt.pushOperators(P2.rectangle(
+            z2.blatt.pushOperators(P2.rectangle(
               s.x + spalte * bx,
               s.y + s.h - (zeile + 1) * by,
               bx,
@@ -3912,25 +3930,25 @@ var ImmoExpose = (() => {
             ));
           }
         }
-        z.blatt.pushOperators(P2.fill());
+        z2.blatt.pushOperators(P2.fill());
         return;
       }
       case "gruppe":
         return;
     }
   }
-  function malen(z, fuell, strich) {
-    const P2 = z.PDFLib;
-    if (fuell && strich) z.blatt.pushOperators(P2.fillAndStroke());
-    else if (fuell) z.blatt.pushOperators(P2.fill());
-    else if (strich) z.blatt.pushOperators(P2.stroke());
-    else z.blatt.pushOperators(P2.endPath());
+  function malen(z2, fuell, strich) {
+    const P2 = z2.PDFLib;
+    if (fuell && strich) z2.blatt.pushOperators(P2.fillAndStroke());
+    else if (fuell) z2.blatt.pushOperators(P2.fill());
+    else if (strich) z2.blatt.pushOperators(P2.stroke());
+    else z2.blatt.pushOperators(P2.endPath());
   }
-  function rundRechteck(z, x, y, b, h, r) {
-    const P2 = z.PDFLib;
+  function rundRechteck(z2, x, y, b, h, r) {
+    const P2 = z2.PDFLib;
     const rr = Math.min(r, Math.abs(b) / 2, Math.abs(h) / 2);
     const k = rr * KAPPA;
-    z.blatt.pushOperators(
+    z2.blatt.pushOperators(
       P2.moveTo(x + rr, y),
       P2.lineTo(x + b - rr, y),
       P2.appendBezierCurve(x + b - rr + k, y, x + b, y + rr - k, x + b, y + rr),
@@ -3943,11 +3961,11 @@ var ImmoExpose = (() => {
       P2.closePath()
     );
   }
-  function kreisbogen(z, cx, cy, rx, ry) {
-    const P2 = z.PDFLib;
+  function kreisbogen(z2, cx, cy, rx, ry) {
+    const P2 = z2.PDFLib;
     const kx = rx * KAPPA;
     const ky = ry * KAPPA;
-    z.blatt.pushOperators(
+    z2.blatt.pushOperators(
       P2.moveTo(cx + rx, cy),
       P2.appendBezierCurve(cx + rx, cy + ky, cx + kx, cy + ry, cx, cy + ry),
       P2.appendBezierCurve(cx - kx, cy + ry, cx - rx, cy + ky, cx - rx, cy),
@@ -3956,16 +3974,16 @@ var ImmoExpose = (() => {
       P2.closePath()
     );
   }
-  function neuesBetriebsmittel(z, tafel, praefix, ref) {
-    const P2 = z.PDFLib;
-    const betriebsmittel = z.blatt.node.Resources();
+  function neuesBetriebsmittel(z2, tafel, praefix, ref) {
+    const P2 = z2.PDFLib;
+    const betriebsmittel = z2.blatt.node.Resources();
     if (!betriebsmittel) {
       throw new Error("Die Seite hat keine Betriebsmittel — das kann nicht sein.");
     }
     const schluessel = P2.PDFName.of(tafel);
     let unter = betriebsmittel.lookup(schluessel, P2.PDFDict);
     if (!unter) {
-      unter = P2.PDFDict.withContext(z.doc.context);
+      unter = P2.PDFDict.withContext(z2.doc.context);
       betriebsmittel.set(schluessel, unter);
     }
     let i = 0;
@@ -3977,34 +3995,34 @@ var ImmoExpose = (() => {
     unter.set(name, ref);
     return name;
   }
-  function pfadOperatoren(schritte, z) {
-    const P2 = z.PDFLib;
+  function pfadOperatoren(schritte, z2) {
+    const P2 = z2.PDFLib;
     for (const t of schritte) {
       switch (t[0]) {
         case "moveTo":
-          z.blatt.pushOperators(P2.moveTo(t[1], t[2]));
+          z2.blatt.pushOperators(P2.moveTo(t[1], t[2]));
           break;
         case "lineTo":
-          z.blatt.pushOperators(P2.lineTo(t[1], t[2]));
+          z2.blatt.pushOperators(P2.lineTo(t[1], t[2]));
           break;
         case "curveTo":
-          z.blatt.pushOperators(P2.appendBezierCurve(t[1], t[2], t[3], t[4], t[5], t[6]));
+          z2.blatt.pushOperators(P2.appendBezierCurve(t[1], t[2], t[3], t[4], t[5], t[6]));
           break;
         case "close":
-          z.blatt.pushOperators(P2.closePath());
+          z2.blatt.pushOperators(P2.closePath());
           break;
         case "rect":
-          z.blatt.pushOperators(P2.rectangle(t[1], t[2], t[3], t[4]));
+          z2.blatt.pushOperators(P2.rectangle(t[1], t[2], t[3], t[4]));
           break;
         case "roundRect":
-          rundRechteck(z, t[1], t[2], t[3], t[4], t[5]);
+          rundRechteck(z2, t[1], t[2], t[3], t[4], t[5]);
           break;
         case "circle":
-          kreisbogen(z, t[1], t[2], t[3], t[3]);
+          kreisbogen(z2, t[1], t[2], t[3], t[3]);
           break;
         case "ellipse":
           kreisbogen(
-            z,
+            z2,
             (t[1] + t[3]) / 2,
             (t[2] + t[4]) / 2,
             Math.abs(t[3] - t[1]) / 2,
@@ -4014,20 +4032,20 @@ var ImmoExpose = (() => {
       }
     }
   }
-  function verlauf(s, z) {
-    const P2 = z.PDFLib;
+  function verlauf(s, z2) {
+    const P2 = z2.PDFLib;
     const farben = s.farben;
     if (farben.length < 2) return;
-    const funktion = farben.length === 2 ? z.doc.context.obj({
+    const funktion = farben.length === 2 ? z2.doc.context.obj({
       FunctionType: 2,
       Domain: [0, 1],
       N: 1,
       C0: [farben[0][0], farben[0][1], farben[0][2]],
       C1: [farben[1][0], farben[1][1], farben[1][2]]
-    }) : z.doc.context.obj({
+    }) : z2.doc.context.obj({
       FunctionType: 3,
       Domain: [0, 1],
-      Functions: farben.slice(0, -1).map((c, i) => z.doc.context.obj({
+      Functions: farben.slice(0, -1).map((c, i) => z2.doc.context.obj({
         FunctionType: 2,
         Domain: [0, 1],
         N: 1,
@@ -4037,16 +4055,332 @@ var ImmoExpose = (() => {
       Bounds: s.stellen ?? farben.slice(1, -1).map((_, i) => (i + 1) / (farben.length - 1)),
       Encode: farben.slice(0, -1).flatMap(() => [0, 1])
     });
-    const schattierung = z.doc.context.obj({
+    const schattierung = z2.doc.context.obj({
       ShadingType: 2,
       ColorSpace: "DeviceRGB",
       Coords: [s.x0, s.y0, s.x1, s.y1],
-      Function: z.doc.context.register(funktion),
+      Function: z2.doc.context.register(funktion),
       Extend: [true, true]
     });
-    const ref = z.doc.context.register(schattierung);
-    const name = neuesBetriebsmittel(z, "Shading", "Verlauf", ref);
-    z.blatt.pushOperators(P2.PDFOperator.of("sh", [name]));
+    const ref = z2.doc.context.register(schattierung);
+    const name = neuesBetriebsmittel(z2, "Shading", "Verlauf", ref);
+    z2.blatt.pushOperators(P2.PDFOperator.of("sh", [name]));
+  }
+
+  // packages/expose-renderer/src/rechnen.ts
+  var VORGABE2 = {
+    notar: 2,
+    zins: 3.9,
+    tilgung: 2,
+    eigenkapital: 20,
+    courtage: 3.57,
+    hinweis: "Unverbindliche Beispielrechnung, keine Finanzierungsberatung. Konditionen abhängig von Bonität und Anbieter."
+  };
+  function grunderwerbsteuerSatz(plz) {
+    const p = parseInt(String(plz ?? "").slice(0, 2), 10);
+    if (!isFinite(p)) return 6;
+    if ([17, 18, 19].includes(p)) return 6;
+    if ([20, 21, 22].includes(p)) return 5.5;
+    if ([23, 24, 25].includes(p)) return 6.5;
+    if ([26, 27, 28, 29, 30, 31, 37, 38, 49].includes(p)) return 5;
+    if ([10, 12, 13].includes(p)) return 6;
+    if ([3, 14, 15, 16].includes(p)) return 6.5;
+    if ([6, 39].includes(p)) return 5;
+    if ([1, 2, 4, 8, 9].includes(p)) return 5.5;
+    if ([7, 98, 99].includes(p)) return 6.5;
+    if (p >= 32 && p <= 59) return 6.5;
+    if (p >= 60 && p <= 65) return 6;
+    if (p >= 66 && p <= 67) return 6.5;
+    if (p >= 68 && p <= 79) return 5;
+    if (p >= 80 && p <= 97) return 3.5;
+    return 6;
+  }
+  function courtageSatz(v) {
+    const s = (v == null ? "" : String(v)).trim();
+    if (!s) return void 0;
+    const nurZahl = /^[\d.,\s%]+$/.test(s);
+    const m = s.replace(",", ".").match(/\d+(\.\d+)?/);
+    if (m && (s.includes("%") || nurZahl)) {
+      const z2 = parseFloat(m[0]);
+      return Number.isFinite(z2) ? z2 : void 0;
+    }
+    return void 0;
+  }
+  function zahl2(v) {
+    if (v == null || v === "") return void 0;
+    const n = Number(typeof v === "string" ? v.replace(",", ".") : v);
+    return Number.isFinite(n) ? n : void 0;
+  }
+  function istKauf(immo) {
+    const v = String(immo["vertragsart"] ?? "").toLowerCase();
+    if (!v) return true;
+    return !/miet|vermiet|pacht/.test(v);
+  }
+  function rechnen(immo, annahmen) {
+    const d = {};
+    const a = annahmen ?? {};
+    const kauf = istKauf(immo);
+    const notarSatz = zahl2(a.notar_prozent) ?? VORGABE2.notar;
+    const zinsSatz = zahl2(a.zinssatz) ?? VORGABE2.zins;
+    const tilgSatz = zahl2(a.tilgung) ?? VORGABE2.tilgung;
+    const ekSatz = zahl2(a.eigenkapital_prozent) ?? VORGABE2.eigenkapital;
+    d["rechnung.notar_satz"] = notarSatz;
+    d["rechnung.zinssatz"] = zinsSatz;
+    d["rechnung.tilgung"] = tilgSatz;
+    d["rechnung.eigenkapital_prozent"] = ekSatz;
+    d["rechnung.hinweis"] = a.hinweis && String(a.hinweis).trim() || VORGABE2.hinweis;
+    const laufend = immo["laufende_kosten"];
+    if (Array.isArray(laufend)) {
+      let summe = 0, gezaehlt = 0;
+      for (const p of laufend) {
+        const b = zahl2(p?.betrag);
+        if (b === void 0) continue;
+        summe += b;
+        gezaehlt++;
+      }
+      if (gezaehlt) d["rechnung.laufende_summe"] = summe;
+    }
+    const preis = zahl2(immo["angebotspreis"]);
+    const flaeche2 = zahl2(immo["wohnflaeche"]) ?? zahl2(immo["nutzflaeche"]);
+    if (preis !== void 0 && flaeche2) d["rechnung.preis_pro_qm"] = preis / flaeche2;
+    if (!kauf || preis === void 0) return d;
+    const grestSatz = zahl2(immo["grunderwerbsteuer_satz"]) ?? grunderwerbsteuerSatz(immo["plz"]);
+    const grest = preis * grestSatz / 100;
+    const notar = preis * notarSatz / 100;
+    const frei = immo["provisionsfrei"] === true;
+    const courtProz = frei ? 0 : courtageSatz(immo["provision_aussen"]) ?? VORGABE2.courtage;
+    const court = preis * courtProz / 100;
+    const gesamt = preis + grest + notar + court;
+    d["rechnung.kaufpreis"] = preis;
+    d["rechnung.grunderwerbsteuer_satz"] = grestSatz;
+    d["rechnung.grunderwerbsteuer"] = grest;
+    d["rechnung.notar"] = notar;
+    if (courtProz > 0) {
+      d["rechnung.courtage"] = court;
+      d["rechnung.courtage_satz"] = courtProz.toFixed(2).replace(".", ",") + " %";
+    }
+    d["rechnung.gesamtaufwand"] = gesamt;
+    const posten = [
+      { name: "Kaufpreis", betrag: preis },
+      { name: "Grunderwerbsteuer", betrag: grest },
+      { name: "Notar & Grundbuch", betrag: notar }
+    ];
+    if (courtProz > 0) posten.push({ name: "Käuferprovision", betrag: court });
+    d["rechnung.posten"] = posten;
+    const ek = gesamt * ekSatz / 100;
+    d["rechnung.eigenkapital"] = ek;
+    d["rechnung.darlehen"] = gesamt - ek;
+    d["rechnung.monatsrate"] = (gesamt - ek) * (zinsSatz + tilgSatz) / 100 / 12;
+    const miete = zahl2(immo["miete_ist"]) ?? zahl2(immo["kaltmiete"]) ?? zahl2(immo["miete_soll"]);
+    if (miete !== void 0) {
+      const jahr = miete * 12;
+      const nichtUmlage = zahl2(immo["hausgeld_nicht_umlagefaehig"]) ?? 0;
+      d["rechnung.bruttorendite"] = jahr / preis * 100;
+      d["rechnung.nettorendite"] = (jahr - nichtUmlage * 12) / gesamt * 100;
+      if (jahr > 0) d["rechnung.kaufpreisfaktor"] = preis / jahr;
+    }
+    return d;
+  }
+
+  // packages/expose-renderer/src/aufbereiten.ts
+  var LEER = (v) => v == null || typeof v === "string" && v.trim() === "" || Array.isArray(v) && v.length === 0;
+  function z(v) {
+    if (LEER(v)) return void 0;
+    const n = Number(typeof v === "string" ? v.replace(",", ".") : v);
+    return Number.isFinite(n) ? n : void 0;
+  }
+  var text2 = (v) => LEER(v) ? void 0 : String(v).trim();
+  function fuegen(teile, trenner) {
+    const da = teile.map((t) => (t ?? "").trim()).filter(Boolean);
+    return da.length ? da.join(trenner) : void 0;
+  }
+  function istKauf2(immo) {
+    const v = String(immo["vertragsart"] ?? "").toLowerCase();
+    if (!v) return true;
+    return !/miet|vermiet|pacht/.test(v);
+  }
+  function aufbereiten(q) {
+    const immo = q.immobilie ?? {};
+    const firma = q.firma ?? {};
+    const ap = q.ansprechpartner ?? {};
+    const d = {};
+    const zeilen = {
+      immobilien: immo,
+      profiles: ap,
+      firma_stammdaten: firma
+    };
+    for (const f of KATALOG) {
+      if (!("tabelle" in f.quelle)) continue;
+      const zeile = zeilen[f.quelle.tabelle];
+      if (!zeile) continue;
+      const roh = zeile[f.quelle.spalte];
+      if (LEER(roh)) continue;
+      d[f.schluessel] = roh;
+    }
+    const freigabe = immo["adresse_freigeben"];
+    const mitAdresse = freigabe === void 0 || freigabe === null || freigabe === true;
+    if (!mitAdresse) {
+      delete d["objekt.strasse"];
+      delete d["objekt.hausnummer"];
+    }
+    const adresse = mitAdresse ? fuegen([text2(immo["strasse"]), text2(immo["hausnummer"])], " ") : void 0;
+    if (adresse) d["objekt.adresse"] = adresse;
+    const plzOrt = fuegen([text2(immo["plz"]), text2(immo["ort"])], " ");
+    if (plzOrt) d["objekt.plz_ort"] = plzOrt;
+    const zeilenTitel = Array.isArray(immo["expose_titel_zeilen"]) ? immo["expose_titel_zeilen"].map((t) => String(t).trim()).filter(Boolean) : [];
+    const titel = text2(immo["objekttitel"]) ?? text2(immo["bezeichnung"]);
+    if (zeilenTitel.length) {
+      d["objekt.expose_titel_text"] = zeilenTitel.join("\n");
+      d["objekt.titel_erste_zeile"] = zeilenTitel[0];
+      if (zeilenTitel[1]) d["objekt.titel_zweite_zeile"] = zeilenTitel.slice(1).join(" ");
+      if (!d["objekt.objekttitel"]) d["objekt.objekttitel"] = zeilenTitel.join(" ");
+    } else if (titel) {
+      d["objekt.expose_titel_text"] = titel;
+      const m = titel.match(/^(.{6,}?)\s*[–—-]\s*(.+)$/) ?? titel.match(/^(.{6,}?),\s*(.+)$/);
+      d["objekt.titel_erste_zeile"] = m ? m[1] : titel;
+      if (m) d["objekt.titel_zweite_zeile"] = m[2];
+    }
+    const zimmer = z(immo["zimmer"]);
+    const wohnflaeche = z(immo["wohnflaeche"]);
+    const unter = fuegen([
+      zimmer !== void 0 ? `${zahlDe(zimmer, zimmer % 1 ? 1 : 0, true)} Zimmer` : void 0,
+      wohnflaeche !== void 0 ? `${zahlDe(wohnflaeche, 0, true)} m²` : void 0,
+      text2(immo["ortsteil"]) ?? text2(immo["ort"])
+    ], "  ·  ");
+    if (unter) d["objekt.untertitel"] = unter;
+    const beschreibung = text2(immo["beschreibung_objekt"]);
+    if (beschreibung) {
+      const prolog = beschreibung.split(/\n\s*\n/)[0].trim();
+      if (prolog) {
+        d["objekt.expose_prolog"] = prolog;
+        d["objekt.expose_prolog_initiale"] = prolog.slice(0, 1);
+        d["objekt.expose_prolog_rest"] = prolog.slice(1);
+      }
+    }
+    const stellplatzArt = text2(immo["stellplatz_art"]);
+    const stellplatzAnzahl = z(immo["stellplatz_anzahl"]);
+    if (stellplatzArt || stellplatzAnzahl !== void 0) {
+      d["objekt.stellplatz"] = stellplatzArt && stellplatzAnzahl !== void 0 ? `${zahlDe(stellplatzAnzahl, 0)} × ${stellplatzArt}` : stellplatzArt ?? zahlDe(stellplatzAnzahl, 0);
+    }
+    const gueltig = text2(immo["energie_gueltig_bis"]);
+    if (gueltig) {
+      const t = gueltig.split("T")[0].split("-");
+      if (t.length === 3) d["objekt.energie_gueltig_kurz"] = `${t[1]}/${t[0]}`;
+    }
+    const kauf = istKauf2(immo);
+    const preisZahl = kauf ? z(immo["angebotspreis"]) : z(immo["kaltmiete"]);
+    if (immo["expose_preis_auf_anfrage"] === true) {
+      d["objekt.preis"] = "auf Anfrage";
+    } else if (preisZahl !== void 0) {
+      d["objekt.preis"] = formatiere(preisZahl, "euro", 0);
+    }
+    const kalt = z(immo["kaltmiete"]);
+    if (!kauf && kalt !== void 0) {
+      const warm = kalt + (z(immo["nebenkosten"]) ?? 0) + (z(immo["heizkosten"]) ?? 0);
+      if (warm > kalt) d["objekt.warmmiete"] = warm;
+    }
+    d["objekt.eckdaten"] = eckdaten(immo);
+    d["objekt.fakten"] = fakten(immo, d);
+    d["objekt.energie_angaben"] = energieAngaben(immo);
+    for (const k of ["objekt.eckdaten", "objekt.fakten", "objekt.energie_angaben"]) {
+      if (!d[k].length) delete d[k];
+    }
+    const firmaAdresse = fuegen([
+      text2(firma["strasse"]),
+      fuegen([text2(firma["plz"]), text2(firma["ort"])], " ")
+    ], ", ");
+    if (firmaAdresse) d["firma.adresse"] = firmaAdresse;
+    if (!d["firma.marken_name"] && text2(firma["firma_name"])) {
+      d["firma.marken_name"] = text2(firma["firma_name"]);
+    }
+    const impressum = fuegen([
+      fuegen([text2(firma["registergericht"]), text2(firma["hrb"])], " "),
+      text2(firma["ust_id"]) ? "USt-IdNr. " + text2(firma["ust_id"]) : void 0,
+      text2(firma["geschaeftsfuehrer"])
+    ], "  ·  ");
+    if (impressum) d["firma.impressum_zeile"] = impressum;
+    Object.assign(d, rechnen(immo, q.annahmen));
+    for (const [k, v] of Object.entries(q.bilder ?? {})) {
+      if (!LEER(v)) d[k] = v;
+    }
+    if (q.bilder && !LEER(q.bilder["objekt.hauptbild_url"])) {
+      d["objekt.hauptbild_url"] = q.bilder["objekt.hauptbild_url"];
+    }
+    const ki = (q.ki_bilder ?? []).filter((k) => !LEER(k));
+    if (ki.length) d["objekt.ki_bilder"] = ki;
+    const heute = q.heute ?? /* @__PURE__ */ new Date();
+    d["datum"] = `${String(heute.getDate()).padStart(2, "0")}.${String(heute.getMonth() + 1).padStart(2, "0")}.${heute.getFullYear()}`;
+    return d;
+  }
+  function eckdaten(immo) {
+    const aus = [];
+    const nimm = (label, roh, einheit, stellen = 0) => {
+      const n = z(roh);
+      if (n === void 0) return;
+      aus.push({ label, wert: zahlDe(n, n % 1 ? Math.max(stellen, 1) : stellen, true), einheit });
+    };
+    nimm("Wohnfläche", immo["wohnflaeche"], "m²");
+    nimm("Grundstück", immo["grundstueck"], "m²");
+    nimm("Zimmer", immo["zimmer"]);
+    nimm("Schlafzimmer", immo["schlafzimmer"]);
+    nimm("Bäder", immo["badezimmer"]);
+    nimm("Baujahr", immo["baujahr"]);
+    nimm("Nutzfläche", immo["nutzflaeche"], "m²");
+    nimm("Etagen", immo["etagen_gesamt"]);
+    return aus.slice(0, 6);
+  }
+  function fakten(immo, d) {
+    const aus = [];
+    const nimm = (label, roh, typ) => {
+      const n = z(roh);
+      const stellen = n !== void 0 && n % 1 ? 1 : 0;
+      const v = formatiere(roh, typ, stellen);
+      if (v === void 0) return;
+      aus.push({ label, wert: v });
+    };
+    nimm("Objektart", immo["objektart"], "text");
+    nimm("Wohnfläche", immo["wohnflaeche"], "flaeche");
+    nimm("Nutzfläche", immo["nutzflaeche"], "flaeche");
+    nimm("Grundstück", immo["grundstueck"], "flaeche");
+    nimm("Zimmer", immo["zimmer"], "zahl");
+    nimm("Schlafzimmer", immo["schlafzimmer"], "zahl");
+    nimm("Badezimmer", immo["badezimmer"], "zahl");
+    nimm("Etage", immo["etage"], "text");
+    nimm("Etagen", immo["etagen_gesamt"], "zahl");
+    nimm("Baujahr", immo["baujahr"], "jahr");
+    nimm("Modernisierung", immo["modernisierung_jahr"], "jahr");
+    nimm("Zustand", immo["zustand"], "text");
+    nimm("Keller", immo["unterkellert"], "ja_nein");
+    if (d["objekt.stellplatz"]) aus.push({ label: "Stellplätze", wert: String(d["objekt.stellplatz"]) });
+    nimm("Heizung", immo["heizungsart"], "text");
+    nimm("Energieträger", immo["energie_traeger"], "text");
+    nimm("Verfügbar ab", immo["verfuegbar_ab"], "text");
+    nimm("Hausgeld", immo["hausgeld"], "euro");
+    return aus;
+  }
+  function energieAngaben(immo) {
+    const aus = [];
+    const nimm = (label, roh, typ) => {
+      const v = formatiere(roh, typ);
+      if (v === void 0) return;
+      aus.push({ label, wert: v });
+    };
+    nimm("Ausweisart", immo["energieausweis_typ"], "text");
+    const kennwert = z(immo["energie_kennwert"]);
+    if (kennwert !== void 0) {
+      aus.push({ label: "Energiekennwert", wert: `${zahlDe(kennwert, 1, true)} kWh/(m²a)` });
+    }
+    nimm("Effizienzklasse", immo["energie_klasse"], "text");
+    nimm("Wesentl. Energieträger", immo["energie_traeger"], "text");
+    nimm("Heizungsart", immo["heizungsart"], "text");
+    nimm("Baujahr Heizung", immo["energie_baujahr_anlage"], "jahr");
+    nimm("Warmwasser enthalten", immo["energie_warmwasser"], "ja_nein");
+    const gueltig = text2(immo["energie_gueltig_bis"]);
+    if (gueltig) {
+      const t = gueltig.split("T")[0].split("-");
+      if (t.length === 3) aus.push({ label: "Gültig bis", wert: `${t[2]}.${t[1]}.${t[0]}` });
+    }
+    return aus;
   }
 
   // packages/expose-renderer/src/schema.ts
@@ -4083,11 +4417,11 @@ var ImmoExpose = (() => {
       return Uint32Array.from(raus);
     }
     initGenrand(s) {
-      const z = this.zustand;
-      z[0] = s >>> 0;
+      const z2 = this.zustand;
+      z2[0] = s >>> 0;
       for (let i = 1; i < N; i++) {
-        const v = z[i - 1] ^ z[i - 1] >>> 30;
-        z[i] = _Zufall.mal(1812433253, v) + i >>> 0;
+        const v = z2[i - 1] ^ z2[i - 1] >>> 30;
+        z2[i] = _Zufall.mal(1812433253, v) + i >>> 0;
       }
       this.stelle = N;
     }
@@ -4099,44 +4433,44 @@ var ImmoExpose = (() => {
     }
     ausFeld(feld2) {
       this.initGenrand(19650218);
-      const z = this.zustand;
+      const z2 = this.zustand;
       let i = 1;
       let j = 0;
       let k = Math.max(N, feld2.length);
       for (; k > 0; k--) {
-        const v = z[i - 1] ^ z[i - 1] >>> 30;
-        z[i] = (z[i] ^ _Zufall.mal(1664525, v)) + feld2[j] + j >>> 0;
+        const v = z2[i - 1] ^ z2[i - 1] >>> 30;
+        z2[i] = (z2[i] ^ _Zufall.mal(1664525, v)) + feld2[j] + j >>> 0;
         i++;
         j++;
         if (i >= N) {
-          z[0] = z[N - 1];
+          z2[0] = z2[N - 1];
           i = 1;
         }
         if (j >= feld2.length) j = 0;
       }
       for (k = N - 1; k > 0; k--) {
-        const v = z[i - 1] ^ z[i - 1] >>> 30;
-        z[i] = (z[i] ^ _Zufall.mal(1566083941, v)) - i >>> 0;
+        const v = z2[i - 1] ^ z2[i - 1] >>> 30;
+        z2[i] = (z2[i] ^ _Zufall.mal(1566083941, v)) - i >>> 0;
         i++;
         if (i >= N) {
-          z[0] = z[N - 1];
+          z2[0] = z2[N - 1];
           i = 1;
         }
       }
-      z[0] = 2147483648;
+      z2[0] = 2147483648;
       this.stelle = N;
     }
     /** Eine 32-Bit-Zufallszahl, genrand_uint32. */
     wort() {
-      const z = this.zustand;
+      const z2 = this.zustand;
       if (this.stelle >= N) {
         for (let i = 0; i < N; i++) {
-          const y2 = (z[i] & OBEN | z[(i + 1) % N] & UNTEN) >>> 0;
-          z[i] = (z[(i + M) % N] ^ y2 >>> 1 ^ (y2 & 1 ? MATRIX : 0)) >>> 0;
+          const y2 = (z2[i] & OBEN | z2[(i + 1) % N] & UNTEN) >>> 0;
+          z2[i] = (z2[(i + M) % N] ^ y2 >>> 1 ^ (y2 & 1 ? MATRIX : 0)) >>> 0;
         }
         this.stelle = 0;
       }
-      let y = z[this.stelle++];
+      let y = z2[this.stelle++];
       y = (y ^ y >>> 11) >>> 0;
       y = (y ^ y << 7 & 2636928640) >>> 0;
       y = (y ^ y << 15 & 4022730752) >>> 0;

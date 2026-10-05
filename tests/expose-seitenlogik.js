@@ -159,9 +159,31 @@ const pruefe = (bedingung, was) => {
          'Ein Platzhalter, den der Katalog nicht kennt, muss gemeldet werden.');
 }
 
+// --- 7. Ein mit KI bearbeitetes Bild wird gekennzeichnet ---------------
+// CLAUDE.md: sichtbare Kennzeichnung, auch in Exporten. Die Kennzeichnung
+// haengt an den Daten, nicht an der Vorlage — eine Vorlage soll sie nicht
+// abschalten koennen. Darum wird hier beides geprueft: mit und ohne.
+{
+  const bildEl = { id: 'b', typ: 'bild', x: 40, y: 400, b: 300, h: 200,
+                   slot: { art: 'foto', nr: 1 } };
+  const v = baue([seite('eins', 'Eins', {}, [bildEl])]);
+  const schild = (daten) => rendern({ vorlage: v, daten, schriften })
+    .seiten[0].schritte.some((s) => s.art === 'text' && s.text === 'MIT KI BEARBEITET');
+
+  pruefe(schild({ 'bild.foto.1': 'f1.jpg', 'objekt.ki_bilder': ['f1.jpg'] }),
+         'Ein mit KI bearbeitetes Bild muss das Schild tragen.');
+  pruefe(!schild({ 'bild.foto.1': 'f1.jpg' }),
+         'Ein unbearbeitetes Bild darf kein Schild tragen.');
+  pruefe(!schild({ 'bild.foto.1': 'f1.jpg', 'objekt.ki_bilder': ['anderes.jpg'] }),
+         'Das Schild gehoert nur an das genannte Bild.');
+  pruefe(!schild({ 'objekt.ki_bilder': ['f1.jpg'] }),
+         'Ohne Bild kein Schild — ein Platzhalter ist kein KI-Bild.');
+}
+
 if (fehler) {
   console.log(`\n  ${fehler} Pruefungen fehlgeschlagen.`);
   process.exit(1);
 }
 console.log('  [ok] Seitenlogik: Bedingungen, Wiederholungen, Abweichungen,');
-console.log('       fehlende Werte, Verdichtung und unbekannte Platzhalter.');
+console.log('       fehlende Werte, Verdichtung, unbekannte Platzhalter und die');
+console.log('       Kennzeichnung KI-bearbeiteter Bilder.');

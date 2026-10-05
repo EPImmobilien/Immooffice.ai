@@ -259,6 +259,8 @@ zuwachs(bereich, mehr, grund) as (values
   ('Storage-Richtlinien', 2, 'fork_37: expose_assets_lesen, expose_assets_pflegen')
   -- fork_38 legt nur die drei Systemvorlagen als Zeilen an — kein Schema,
   -- also keine Kennzahl.
+  ,
+  ('Spalten', 1, 'fork_39: firma_stammdaten.marken_linie — die zweite Markenzeile der Luxusvorlage')
 ),
 soll(bereich, soll) as (
   select v.bereich,

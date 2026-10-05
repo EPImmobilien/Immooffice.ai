@@ -97,6 +97,7 @@ def zugang_einsetzen(inhalt):
 # objekt.html und sonnenverlauf.html verlinkt. src/seiten/ entsteht aus
 # scripts/nebenseiten.py; hier werden nur noch die Platzhalter gefuellt.
 SEITEN = SRC / 'seiten'
+SCHRIFTEN = WURZEL / 'assets' / 'fonts' / 'expose'
 
 
 def stand_von(inhalt):
@@ -108,6 +109,38 @@ def stand_von(inhalt):
     jedem Nutzer einen Neuladen auf, der nichts bringt.
     """
     return hashlib.sha256(inhalt.encode()).hexdigest()[:12]
+
+
+def schriften_ausliefern():
+    """Legt die Exposé-Schriften neben die Auslieferung.
+
+    Zwei Leser brauchen sie ueber HTTP: der Editor im Browser, der die
+    Vorschau mit demselben Renderer zeichnet wie das endgueltige PDF, und
+    die Edge Function, die sie beim ersten Bedarf von hier holt und in
+    ihrem Eimer ablegt. Deshalb werden sie ausgeliefert und nicht in das
+    Buendel gelegt: ein Megabyte Schrift in jedem Seitenaufruf waere
+    Verschwendung, und in der Funktion laege dasselbe Megabyte ein zweites
+    Mal.
+
+    Die Lizenztexte gehen mit. Die SIL Open Font License verlangt, dass sie
+    bei jeder Weitergabe der Schrift dabei sind — eine ausgelieferte Datei
+    ist eine Weitergabe.
+    """
+    if not SCHRIFTEN.is_dir():
+        print('HINWEIS: assets/fonts/expose/ fehlt — erst '
+              '`python3 scripts/expose-schriften.py`. Der Editor und die '
+              'Edge Function finden dann keine Schriften.')
+        return []
+    ziel = ZIEL.parent / 'schriften' / 'expose'
+    ziel.mkdir(parents=True, exist_ok=True)
+    geschrieben = []
+    for p in sorted(SCHRIFTEN.iterdir()):
+        if not p.is_file() or p.suffix not in ('.ttf', '.txt'):
+            continue
+        roh = p.read_bytes()
+        (ziel / p.name).write_bytes(roh)
+        geschrieben.append((p.name, len(roh)))
+    return geschrieben
 
 
 def nebenseiten_ausliefern(stand):
@@ -160,6 +193,11 @@ def main():
     if '--roh' not in sys.argv and '--aus' not in sys.argv:
         for name, groesse in nebenseiten_ausliefern(stand_von(inhalt)):
             print(f'{(ZIEL.parent / name).relative_to(WURZEL)}: {groesse:,} B')
+        schriften = schriften_ausliefern()
+        if schriften:
+            summe = sum(g for _, g in schriften)
+            print(f'dist/schriften/expose/: {len(schriften)} Dateien, '
+                  f'{summe:,} B')
 
     if '--pruefen' in sys.argv:
         if not VORLAGE.exists():

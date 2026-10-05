@@ -23,7 +23,7 @@ import type { Umgebung } from "./umgebung";
 import { ankerArt, ankerX, warne } from "./umgebung";
 import { farbe } from "./stil";
 import type { FarbRef } from "./schema";
-import { satzRegeln } from "./stil";
+import { satzRegeln, schnittName } from "./stil";
 import { ersetze, formatiere, liste, wert, zahlDe } from "./werte";
 import { feld } from "./felder";
 import type { PfadSchritt, RGBA } from "./schritte";
@@ -1144,6 +1144,16 @@ const bild: Zeichner = (el, u) => {
     }, zweck);
   }
 
+  // Ein mit KI bearbeitetes Bild wird gekennzeichnet, sichtbar und im
+  // Export. CLAUDE.md laesst dazu keinen Spielraum, und die Kennzeichnung
+  // gehoert an das Bild, nicht in eine Fussnote: wer das Expose
+  // ueberfliegt, sieht sie dort und nur dort.
+  //
+  // Welche Bilder bearbeitet sind, sagen die Daten (objekt.ki_bilder) —
+  // nicht die Vorlage. Eine Vorlage kann das nicht wissen, und sie darf es
+  // auch nicht abschalten koennen.
+  if (quelle !== undefined) kiKennzeichnen(el, u, String(quelle));
+
   const label = inhalt(el, u, false, "label");
   if (label !== undefined && zeichenkette(el, "stil_label")) {
     const s = u.stil(zeichenkette(el, "stil_label")!);
@@ -1161,6 +1171,28 @@ const bild: Zeichner = (el, u) => {
               t, s.schnitt, s.groesse, s.farbe, s.sperrung);
   }
 };
+
+/**
+ * "MIT KI BEARBEITET" in der oberen Ecke des Bildes.
+ *
+ * Masse und Schrift stehen hier und nicht in der Vorlage: eine
+ * Pflichtkennzeichnung, die der Vorlagenautor kleiner stellen oder
+ * wegnehmen kann, ist keine. Die Schrift ist die Beschriftungsschrift der
+ * Vorlage, damit das Schild nicht wie ein Fremdkoerper wirkt.
+ */
+function kiKennzeichnen(el: Element, u: Umgebung, quelle: string): void {
+  const liste = u.daten["objekt.ki_bilder"];
+  if (!Array.isArray(liste) || !liste.map(String).includes(quelle)) return;
+  const s = "MIT KI BEARBEITET";
+  const schnitt = schnittName(u.vorlage.stil.schriften.label);
+  const groesse = 5.5, sperrung = 1.4;
+  const b = u.blatt.sw(s, schnitt, groesse, sperrung);
+  const h = 13;
+  const x = el.x + 8;
+  const y = el.y + el.h - 8 - h;
+  u.blatt.rect(x, y, b + 14, h, [0, 0, 0, 0.72], null, 0);
+  u.blatt.T(x + 7, y + 4, s, schnitt, groesse, [1, 1, 1, 1], sperrung);
+}
 
 function bildSchluessel(slot: { art?: string; nr?: number } | undefined): string | undefined {
   if (!slot?.art) return undefined;

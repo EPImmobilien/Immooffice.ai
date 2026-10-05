@@ -204,6 +204,19 @@ for _f in ('credentials-anzeigen', 'mitarbeiter-loeschen',
     ERWEITERT[_f] = ('Prueft Kennungen aus dem Anfragekoerper gegen den '
                      'Mandanten des Aufrufers (Phase 2)')
 
+# Dateien, die der Fork einer uebernommenen Funktion BEILEGT. Sie haben
+# keine Entsprechung in der Vorlage und sind trotzdem kein Befund — sie sind
+# Erzeugnis, und wer sie erzeugt, steht dabei.
+BEIGELEGT = {
+    'expose-pdf-erzeugen': {
+        'immo-expose.mjs':
+            'Das Buendel des Exposé-Renderers, erzeugt von '
+            'packages/expose-renderer/bauen.mjs. Es liegt IM Ordner der '
+            'Funktion, weil `supabase functions deploy` den Ordner ausrollt; '
+            'npm run check vergleicht es mit der Quelle.',
+    },
+}
+
 BLOCKZEILEN = {
     'mpe-pdf-erzeugen': {
         'const pins: Array<[number, number, string, string, string]> = [',
@@ -219,6 +232,7 @@ def main():
         return 0
 
     beanstandet = []
+    beigelegt = []
     erweitert = []
     eigen = set()
     geprueft = 0
@@ -237,6 +251,9 @@ def main():
                 # und hat zu ihnen nichts zu sagen.
                 if (EIGENE / ordner.name).is_dir():
                     eigen.add(ordner.name)
+                    continue
+                if neu.name in BEIGELEGT.get(ordner.name, {}):
+                    beigelegt.append((ordner.name, neu.name))
                     continue
                 beanstandet.append((str(neu), 0, 'hat keine Entsprechung in der Vorlage'))
                 continue
@@ -281,6 +298,9 @@ def main():
     if eigen:
         print(f'     {len(eigen)} eigene Funktion(en) des Forks, ohne Entsprechung '
               f'in der Vorlage: {", ".join(sorted(eigen))}')
+    for funktion, datei in sorted(beigelegt):
+        print(f'     beigelegt: {funktion}/{datei} — '
+              f'{BEIGELEGT[funktion][datei]}')
     for name in sorted(set(erweitert)):
         print(f'     erweitert, deshalb nicht Zeile fuer Zeile geprueft: '
               f'{name} — {ERWEITERT[name]}')

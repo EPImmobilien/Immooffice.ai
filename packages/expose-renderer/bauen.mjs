@@ -26,6 +26,14 @@ import { fileURLToPath } from 'node:url';
 const HIER = path.dirname(fileURLToPath(import.meta.url));
 const QUELLE = path.join(HIER, 'src', 'index.ts');
 const ZIEL = path.join(HIER, 'buendel');
+// Die Edge Function bekommt eine Kopie des ESM-Buendels IN ihr Verzeichnis.
+// Grund: ausgerollt wird mit `supabase functions deploy --use-api`, und was
+// dabei mitgeht, ist der Ordner der Funktion. Ein Import aus
+// ../../../packages/ waere eine Wette darauf, wie weit die CLI die
+// Abhaengigkeiten verfolgt. Die Kopie ist Erzeugnis wie das Buendel selbst;
+// --pruefen vergleicht sie mit.
+const FUNKTION = path.join(HIER, '..', '..', 'supabase', 'functions',
+                           'expose-pdf-erzeugen', 'immo-expose.mjs');
 
 const GEMEINSAM = {
   entryPoints: [QUELLE],
@@ -65,13 +73,25 @@ for (const fassung of FASSUNGEN) {
     });
 }
 
+// Die Kopie fuer die Edge Function.
+{
+  const esm = fs.readFileSync(path.join(ZIEL, 'immo-expose.mjs'), 'utf-8');
+  const vorher = fs.existsSync(FUNKTION) ? fs.readFileSync(FUNKTION, 'utf-8') : null;
+  if (pruefen) {
+    if (vorher !== esm) abweichend.push('supabase/functions/expose-pdf-erzeugen/immo-expose.mjs');
+  } else if (vorher !== esm) {
+    fs.mkdirSync(path.dirname(FUNKTION), { recursive: true });
+    fs.writeFileSync(FUNKTION, esm);
+  }
+}
+
 if (pruefen) {
   if (abweichend.length) {
     console.log(`  [FEHLER] ${abweichend.join(', ')} weicht von der Quelle ab.`);
     console.log('  `node packages/expose-renderer/bauen.mjs` ausfuehren.');
     process.exit(1);
   }
-  console.log('  [ok] Beide Buendel entsprechen der Quelle.');
+  console.log('  [ok] Beide Buendel und die Kopie der Edge Function entsprechen der Quelle.');
 } else {
   for (const f of FASSUNGEN) {
     const groesse = fs.statSync(f.outfile).size;

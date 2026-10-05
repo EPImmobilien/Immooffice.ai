@@ -245,6 +245,16 @@ else
   fehler=1
 fi
 
+abschnitt "Expose-Renderer: aus Datenbankzeilen werden Werte"
+# Der Aufbereiter steht zwischen Datenbank und Renderer. Zwei Fragen, die
+# im Betrieb nicht auffallen: kommt jeder Platzhalter an, und bleibt ein
+# fehlender Wert weg, statt eine 0 zu werden?
+if node tests/expose-aufbereiten.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Expose-Renderer: Zufallsfolge wie Pythons random"
 # Zwei Prototypen streuen Platzhaltergrafik mit random.Random(saat). Die
 # Folge ist damit Teil der Vorlage.
