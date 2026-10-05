@@ -225,6 +225,26 @@ else
   fehler=1
 fi
 
+abschnitt "Expose-Schriften: dieselben wie in den Referenz-PDFs"
+# assets/fonts/expose/ ist Erzeugnis, nicht Handarbeit: erst der Vergleich
+# mit dem Skript, dann der Vergleich mit den eingebetteten Schriften der
+# Referenz-PDFs. Ohne reference/ uebersprungen.
+if python3 scripts/expose-schriften.py --pruefen && python3 tests/expose-schriften.py; then
+  :
+else
+  fehler=1
+fi
+
+abschnitt "Expose-Vorlagen: Farbableitung wie in den Prototypen"
+# Die drei theme()-Funktionen der Prototypen sind laut Auftrag verbindlich.
+# Der Test fuehrt sie aus und vergleicht jede abgeleitete Farbe mit der
+# Portierung in packages/expose-renderer. Ohne reference/ uebersprungen.
+if node tests/expose-farben.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Oberflaeche: Rauchtest"
 if python3 tests/oberflaeche-rauchtest.py; then
   :

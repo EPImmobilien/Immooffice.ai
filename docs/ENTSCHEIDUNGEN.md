@@ -4129,3 +4129,82 @@ Drei Entscheidungen aus dem Abgleich selbst:
 - **`aufmass_scan` behält uuid-Kennungen** (Vorlage: bigint). Die Oberfläche
   vergleicht Kennungen nur als Zeichenkette, und `scan_ablage.id` ist im Fork
   ebenfalls uuid.
+
+## Exposé-Baukasten — Entscheidungen der Etappe 1
+
+### Der Renderer ist ein Paket, geliefert wird ein klassisches Skript
+
+Der Auftrag verlangt **einen** Renderer, der im Browser (Live-Vorschau) und
+in der Edge Function läuft. `CLAUDE.md` verlangt für die Oberfläche die
+klassische Runtime: kein `import`, kein `type="module"`. Das ist kein
+Widerspruch, sondern eine Lieferfrage.
+
+Entschieden: `packages/expose-renderer/` ist TypeScript mit Modulen — das
+ist Quelltext, kein Produktbestandteil. Geliefert wird daraus ein Bündel
+(esbuild):
+
+- für die Oberfläche ein **IIFE** unter `src/`, das `window.ImmoExpose`
+  setzt und über ein gewöhnliches `<script>` geladen wird. Die Oberfläche
+  sieht damit genau das, was sie auch von supabase-js sieht: ein globales
+  Objekt. Kein `import`, kein `type="module"`, kein Bundler zur Laufzeit.
+- für die Edge Function ein **ESM**-Bündel, das Deno direkt lädt.
+
+Damit rechnet beide Seiten derselbe Code aus derselben Quelle — die
+Bedingung dafür, dass die Vorschau zeigt, was das PDF wird. Das Bündel ist
+Erzeugnis und versioniert, wie `src/` und `supabase/functions/`.
+
+### Keine Unterschneidung, keine Ligaturen
+
+Die Prototypen rechnen jede Breite mit `pdfmetrics.stringWidth`. Das
+addiert Vorschubbreiten — ohne Kerning, ohne Ligaturen. Der Auftrag nennt
+„Maße, Abstände, Schriftgrößen … verbindlich und 1:1 zu übernehmen"; ein
+Renderer, der unterschneidet, läuft mit jeder Zeile weiter von dieser
+Vorlage weg, und zwar unterschiedlich weit je Zeile, also auch mit anderen
+Umbrüchen.
+
+Entschieden: `GSUB` und `GPOS` fliegen aus den gelieferten Schnitten heraus
+(`scripts/expose-schriften.py`). Dann hat fontkit nichts anzuwenden, und
+Browser und Edge Function rechnen zwangsläufig dasselbe. Der Preis ist
+bekannt: „AV" steht etwas weiter auseinander als ein Grafiker es setzen
+würde. Der Gegenwert ist, dass die Vorschau nicht lügt.
+
+### Die Schriften sind aus den Referenz-PDFs zurückgerechnet
+
+Die Prototypen laden `/home/claude/fonts/Jak-*.ttf`, `Corm-*.ttf`,
+`Arch-*.ttf` — Dateien, die es nur auf dem Rechner gab, auf dem sie liefen.
+Welche Achsenwerte dahinterstanden, stand nirgends, und „Light" ist kein
+Maß: Archivo hat zwei Achsen.
+
+Die sechs Referenz-PDFs tragen aber die eingebetteten Schriftprogramme.
+Jede der achtzehn Instanzen wurde daraus zurückgerechnet: Vorschubbreite
+und Umrissrahmen jedes Glyphs gegen ein Gitter aus `wght` × `wdth`
+gestellt, Treffer jeweils 100 %. Ergebnis unter anderem: `Arch-CondXB` ist
+`wght 800, wdth 62` — die **Untergrenze** der Breitenachse, nicht die
+Google-Konvention 75 oder 87,5, die ich sonst geraten hätte.
+`tests/expose-schriften.py` rechnet das bei jedem `npm run check` nach.
+
+Zwei Schnitte fehlen bewusst: `A-SemiCondBold` und `A-Light` registriert
+der Studio-Prototyp, zeichnet aber nie mit ihnen. Sie stehen in keinem
+Referenz-PDF, ihre Breitenachse ist also nicht messbar. Eine Schrift, die
+niemand gesehen hat, kann nicht „1:1" sein.
+
+#### Eine Fehlmessung, die beinahe durchgegangen wäre
+
+Der erste Anlauf zerschnitt die PDFs an der Bytefolge `endobj`. Die kommt
+in einem Schriftstrom vor. Dadurch waren Namen und Programme um eine
+Stelle verdreht, und das Gitter meldete `Arch-Medium` als `wght 800,
+wdth 62`. Aufgefallen ist es nur, weil `Arch-Regular` als einziges 100 %
+traf und der Rest 0 % — ein Ergebnis, das nicht sein kann. Seitdem laufen
+die Objektgrenzen über die Marken `N 0 obj`. Steht so auch im Test, damit
+niemand es zurückbaut.
+
+### Zeichensatz eingegrenzt
+
+Mit vollem Zeichensatz ist `Corm-Light` 772 KiB; die Signature-Vorlage lädt
+sechs Schnitte, also vier Megabyte für eine Vorschau im Browser. Geblieben
+sind Latin-1 und Latin Extended-A (damit auch Polnisch, Tschechisch,
+Ungarisch, Türkisch), Interpunktion, Währungen und die Mathematik- und
+Aufzählungszeichen, die vorkommen — zusammen 817 KiB für alle achtzehn
+Schnitte. Griechisch, Kyrillisch und Vietnamesisch sind weg. Fehlt ein
+Zeichen, **meldet** der Renderer das; er setzt nicht still ein leeres
+Rechteck.
