@@ -63,6 +63,7 @@ iframe.sonne{width:100%;height:560px;border:0;background:#e5e7eb;border-radius:1
 .grundrisse{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}.grundrisse figure{margin:0;cursor:zoom-in;position:relative}.grundrisse img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#e5e7eb}.grundrisse figcaption{position:absolute;left:0;right:0;bottom:0;font-size:11px;padding:4px 8px;background:rgba(20,26,50,.72);color:#fff}
 .vorschau{position:sticky;top:0;z-index:60;background:#fff3cd;color:#5a4300;border-bottom:2px solid #d4a017;padding:10px 16px;font-size:13px;text-align:center;line-height:1.45}
 .vorschau a{color:#5a4300;font-weight:700;margin-left:8px}
+.mitmarke{margin-top:8px;font-size:10.5px;color:#9aa1ab;letter-spacing:.06em}
 </style></head><body>
 <div class="kopf" id="kopf" style="display:none"><div class="n" id="kopfname"></div></div>
 <script>
@@ -92,6 +93,7 @@ function rechtLinks(f){
 </script>
 <div id="wurzel"><div class="box"><div class="muted">Lädt …</div></div></div>
 <div class="fuss" id="fuss"></div>
+<div class="fuss mitmarke">erstellt mit immoOffice.ai</div>
 <div class="pdfv" id="pdfv"><div class="kopfz"><span class="t" id="pdfTitel"></span><a id="pdfDl" href="#" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><span class="lbl">Herunterladen</span></a><a id="pdfNeu" class="hell" href="#" target="_blank" rel="noopener" title="Im neuen Tab öffnen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg><span class="lbl">Im neuen Tab</span></a><button class="x" type="button" onclick="pdfZu()" title="Schließen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg><span class="lbl">Schließen</span></button></div><iframe id="pdfRahmen" title="Dokument"></iframe><div class="seiten" id="pdfSeiten"></div></div>
 <div class="lightbox" id="lb"><button class="x" onclick="lbZu()">×</button><button class="l" onclick="lbWeiter(-1)">‹</button><img id="lbimg" alt=""><div class="lc" id="lbc"></div><button class="r" onclick="lbWeiter(1)">›</button></div>
 <script>

@@ -4589,3 +4589,57 @@ Kein Dienst, keine KI, kein Hochladen zum Prüfen: das Logo verlässt den
 Rechner erst, wenn der Nutzer das Ergebnis gesehen hat. Das Original wird
 nicht verändert — es entsteht eine neue PNG-Datei. Wer lieber das Original
 will, bekommt es (Knopf „Original hochladen").
+
+## Wo immoOffice.ai sichtbar bleibt (06.10.2026)
+
+Entscheidung des Betreibers, auf drei Vorschläge hin: **Mandanten-CI plus
+dezenter Hinweis.** Die Oberfläche trägt weiter das Logo und die Farben des
+Mandanten — ein Makler soll seine Software sehen, nicht unsere. Damit das
+Produkt dabei nicht unsichtbar wird, steht sein Name an genau drei Stellen,
+leise und ohne Verweis:
+
+- am Fuß der Seitenleiste, unter der Versionsnummer („mit immoOffice.ai"),
+- unter der Anmeldung („Immobiliensoftware mit immoOffice.ai"),
+- auf den Kundenseiten (Freigabelink, Objektseite, Unterlagen-Download)
+  unter der Fußzeile des Mandanten („erstellt mit immoOffice.ai").
+
+Kein Verweis: eine Adresse, die ins Nichts führt, ist schlechter als keine.
+Angemeldet sind alle fünf Stellen als Regeln in
+`scripts/oberflaeche-zerlegen.py` — `src/app/anwendung.js` und
+`src/seiten/` werden erzeugt, Handarbeit darin wäre beim nächsten Abgleich
+mit der Vorlage weg.
+
+## Eigenes Exposé hochladen — Stufe 2 (06.10.2026)
+
+Gewählte Richtung des Betreibers für den Canva-Ausbau. Stufe 1 hat Flächen,
+Linien, Bildrahmen und Textzeilen mit ihren Maßen übernommen — einen genauen
+Nachbau EINES Exposés. Stufe 2 macht daraus eine Vorlage:
+
+- **Platzhalter.** Der Nutzer sagt, welches Objekt das PDF zeigt. Die Werte
+  dieses Objekts werden im Text gesucht und ersetzt: aus „113 m²" wird
+  `{{objekt.wohnflaeche}}`. Lange Werte zuerst, sonst gewinnt „Hamburg"
+  gegen „Hamburg-Altona"; unter vier Zeichen gar nicht, denn eine „3" steht
+  in jedem Exposé zwanzigmal.
+- **Absätze.** Die Objektbeschreibung steht im PDF als zwanzig Einzelzeilen;
+  keine gleicht dem Feldwert. Zeilen mit gleichem Stil, gleichem linken Rand
+  und dichtem Abstand werden darum zusammengefasst und zu **einem** Feld mit
+  Umbruch und Verdichtung.
+- **Bildfelder.** Welches Bild wohin gehört, sagt die Seite: kleines Bild
+  oben am Rand → Logo (helle oder dunkle Fassung, je nach Grund darunter),
+  hochkant auf der Kontaktseite → Porträt, groß auf einer Grundrissseite →
+  Grundriss, groß auf der Lageseite → Lageplan.
+- **Marke.** Die beiden häufigsten **bunten** Farben des Dokuments werden f1
+  und f2; liegen sie beim CI des Mandanten, werden sie an `ci.primaer` und
+  `ci.akzent` gebunden, sonst bleiben sie feste Werte — dann sieht die
+  Vorlage aus wie das PDF, und das ist wichtiger. Jede Stelle, die eine der
+  beiden nennt, verweist danach auf die Palette.
+  Grau und Schwarz sind ausdrücklich **keine** Markenfarben: das ist die
+  Farbe des Fließtexts, und wer sie bindet, bekommt goldene Überschriften.
+- **Schriftrollen.** `stil.schriften` (headline/text/label) wird aus dem
+  Dokument abgeleitet: die größte Schrift ist die Überschrift, die
+  häufigste der Lauftext.
+
+Geraten wird dabei zwangsläufig, deshalb gilt für jeden Schritt: er schlägt
+vor, er entscheidet nicht. Was er getan hat, steht im Befund, „Platzhalter
+zurücknehmen" stellt den Nachbau wieder her, und auf der Bearbeitungsfläche
+ist jedes Feld noch zu ändern.

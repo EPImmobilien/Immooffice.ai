@@ -3754,6 +3754,21 @@ SEITEN_ERSETZUNGEN = [
      r' Bitte wenden Sie sich an info@immooffice\.example \u2013 wir senden Ihnen gern einen neuen Link\.',
      ' Bitte wenden Sie sich an Ihren Ansprechpartner \u2013 wir senden Ihnen gern einen neuen Link.',
      'Objektseite: ungueltiger Link, ohne feste Mailadresse.'),
+    # --- Dezenter Produkthinweis auf den Kundenseiten (06.10.2026) ------
+    # Die Seiten tragen den Briefkopf des Mandanten. Dass die Software
+    # darunter immoOffice.ai ist, steht in einer leisen Zeile unter der
+    # Fusszeile — ohne Verweis: eine Adresse, die ins Nichts fuehrt, ist
+    # schlechter als keine.
+    ('FORK',
+     re.escape('<div class="fuss" id="fuss"></div>'),
+     '<div class="fuss" id="fuss"></div>\n'
+     '<div class="fuss mitmarke">erstellt mit immoOffice.ai</div>',
+     'Kundenseiten: leiser Produkthinweis unter der Fusszeile.'),
+    ('FORK',
+     re.escape('\n</style></head>'),
+     '\n.mitmarke{margin-top:8px;font-size:10.5px;color:#9aa1ab;'
+     'letter-spacing:.06em}\n</style></head>',
+     'Kundenseiten: Stil fuer den Produkthinweis.'),
     ('MARKE',
      r'Gern informieren wir Sie \u00fcber vergleichbare Objekte: info@immooffice\.example',
      'Gern informieren wir Sie ueber vergleichbare Objekte \u2013 sprechen Sie '
@@ -4421,6 +4436,36 @@ WOERTLICH = [
      'ist — und wer die Hausvorlage aendert, aendert sie fuer jedes '
      'kuenftige Expose des Hauses. Die SQL-Fassung in fork_37 fuehrt '
      'dieselbe Liste; tests/rechte.sql haelt beide zusammen.'),
+
+    # --- Vorlagenwahl, Logo freistellen, Produkthinweis (06.10.2026) ------
+    # Drei Aenderungen aus derselben Ansage des Betreibers. Sie stehen hier
+    # als Regel und nicht von Hand in src/: dieses Skript schreibt
+    # src/app/anwendung.js bei jedem Lauf neu, und was nicht als Regel
+    # angemeldet ist, waere beim naechsten Abgleich mit der Vorlage weg.
+    ('FORK',
+     '    let n = !1;\n    "pdf" === e && (n = confirm("Ist dieses Exposé FINAL',
+     '    // Die gewaehlte Vorlage. Ohne Wahl wird kein Expose erzeugt: eine\n    // stille Standardvorlage hat am 06.10.2026 Exposes im falschen Design\n    // erzeugt, ohne dass es jemand sehen konnte.\n    const exposeVorlageId = window.ImmoExposeVorlagenwahl\n      ? window.ImmoExposeVorlagenwahl.gewaehlt(t.id) : null;\n    if ("pdf" === e && !exposeVorlageId) return void Me({\n      typ: "fehler",\n      text: "Bitte oben die Exposé-Vorlage wählen — es gibt keine stille Standardvorlage mehr."\n    });\n    let n = !1;\n    "pdf" === e && (n = confirm("Ist dieses Exposé FINAL',
+     'Expose erzeugen: ohne gewaehlte Vorlage wird keines erzeugt. Die Vorlagenwahl steht in src/eigene/expose-vorlagenwahl.js.'),
+    ('FORK',
+     '        body: {\n          immobilie_id: t.id,\n          modus: e\n        }',
+     '        body: {\n          immobilie_id: t.id,\n          modus: e,\n          vorlage_id: exposeVorlageId || null\n        }',
+     'Die gewaehlte Vorlage geht an expose-pdf-erzeugen mit.'),
+    ('FORK',
+     '}, "pdf" === Te ? "Exposé wird erstellt… (kann bis zu 1 Minute dauern)" : "📄 Exposé-PDF erstellen")), React.createElement("div", {\n      style: {\n        fontSize: 12,\n        color: CI.muted,\n        marginBottom: 10\n      }\n    }, "Erstellt das mehrseitige Verkaufs-Exposé',
+     '}, "pdf" === Te ? "Exposé wird erstellt… (kann bis zu 1 Minute dauern)" : "📄 Exposé-PDF erstellen")),\n    // Welche Vorlage? Das entscheidet ab fork_43 der Nutzer, hier, vor dem\n    // Erzeugen — nicht mehr eine stille Standardvorlage.\n    // src/eigene/expose-vorlagenwahl.js schreibt die Wahl an das Objekt.\n    window.ImmoExposeVorlagenwahl && React.createElement(window.ImmoExposeVorlagenwahl, {\n      immobilieId: t.id,\n      vorlageId: t.expose_vorlage_id || ""\n    }), React.createElement("div", {\n      style: {\n        fontSize: 12,\n        color: CI.muted,\n        marginBottom: 10\n      }\n    }, "Erstellt das mehrseitige Verkaufs-Exposé',
+     'Die Vorlagenwahl steht im Expose-Kasten des Objekts, ueber der Beschreibung und unter dem Knopf.'),
+    ('FORK',
+     '        const endung = (datei.name.split(".").pop() || "png").toLowerCase();\n        // Mandantenrelativ — die Speicher-Huelle stellt die\n        // Mandantenkennung voran, die Richtlinie aus fork_09 prueft sie.\n        const pfad = "logos/" + e.id + "-" + Date.now() + "." + endung;\n        const { error: uErr } = await window._sb.storage.from("branding-assets")\n          .upload(pfad, datei, { upsert: false, contentType: datei.type || undefined });',
+     '        // Freistellen anbieten: ein Logo mit weisser Flaeche steht auf den\n        // farbigen und dunklen Expose-Seiten sonst als Kasten.\n        // src/eigene/logo-freistellen.js rechnet im Browser, das Original\n        // verlaesst das Haus nicht. "abbruch" heisst: nichts hochladen.\n        let hochzuladen = datei, endung = (datei.name.split(".").pop() || "png").toLowerCase();\n        if (window.ImmoLogoFreistellen && !/svg/i.test(datei.type || endung)) {\n          const frei = await window.ImmoLogoFreistellen.oeffnen(datei);\n          if (frei === "abbruch") return;\n          if (frei && frei.blob) { hochzuladen = frei.blob; endung = frei.endung || "png"; }\n        }\n        // Mandantenrelativ — die Speicher-Huelle stellt die\n        // Mandantenkennung voran, die Richtlinie aus fork_09 prueft sie.\n        const pfad = "logos/" + e.id + "-" + Date.now() + "." + endung;\n        const { error: uErr } = await window._sb.storage.from("branding-assets")\n          .upload(pfad, hochzuladen, { upsert: false,\n            contentType: hochzuladen === datei ? (datei.type || undefined) : "image/png" });',
+     'Logo freistellen, bevor es hochgeladen wird (src/eigene/logo-freistellen.js).'),
+    ('FORK',
+     '  }, "v", "5.34.0"), React.createElement("div", {\n    style: {\n      height: "env(safe-area-inset-bottom, 0)"\n    }\n  }))))',
+     '  }, "v", "5.34.0"), React.createElement("div", {\n    // Der dezente Produkthinweis. Die Oberflaeche traegt das CI des\n    // Mandanten (so entschieden am 06.10.2026); damit das Produkt dabei\n    // nicht unsichtbar wird, steht sein Name hier, in der Fusszeile, in\n    // der Anmeldung und auf den Freigabeseiten — und nur dort.\n    style: {\n      fontSize: 9.5,\n      color: "rgba(255,255,255,0.32)",\n      marginTop: 2,\n      textAlign: "center",\n      letterSpacing: "0.08em"\n    }\n  }, "mit immoOffice.ai"), React.createElement("div", {\n    style: {\n      height: "env(safe-area-inset-bottom, 0)"\n    }\n  }))))',
+     'Dezenter Produkthinweis am Fuss der Seitenleiste.'),
+    ('FORK',
+     '  }, "Noch kein Konto? ", React.createElement("a", {\n    href: "#",\n    onClick: ev => { ev.preventDefault(); immoSetzeModus("registrieren"); },\n    style: { color: CI.blau, fontWeight: 600 }\n  }, "Firma registrieren")), React.createElement(ZugangLinkAnfordern, null), "Mitarbeiter: Passwort vergessen?", React.createElement("br", null), "Bitte wenden Sie sich an Ihren Ansprechpartner."))))',
+     '  }, "Noch kein Konto? ", React.createElement("a", {\n    href: "#",\n    onClick: ev => { ev.preventDefault(); immoSetzeModus("registrieren"); },\n    style: { color: CI.blau, fontWeight: 600 }\n  }, "Firma registrieren")), React.createElement(ZugangLinkAnfordern, null), "Mitarbeiter: Passwort vergessen?", React.createElement("br", null), "Bitte wenden Sie sich an Ihren Ansprechpartner.", React.createElement("div", {\n    style: { marginTop: 14, fontSize: 10.5, color: CI.muted, letterSpacing: "0.08em" }\n  }, "Immobiliensoftware mit immoOffice.ai")))))',
+     'Dezenter Produkthinweis unter der Anmeldung.'),
 ]
 
 

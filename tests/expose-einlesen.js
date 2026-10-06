@@ -52,6 +52,75 @@ const SOLL = {
   bild: { x: 40, y: 200, b: 300, h: 220 },
 };
 
+// --- Das zweite Pruef-PDF: fuer Stufe 2 ------------------------------------
+// Es enthaelt genau die Werte eines bekannten Objekts, ein Logo im dunklen
+// Kopfband, eine Grundrissseite und eine Kontaktseite. Damit ist pruefbar,
+// was Stufe 2 leisten soll: Platzhalter, Bildfelder, Marke.
+const OBJEKT = {
+  id: 'o-probe', objekttitel: 'Stadtvilla am Hafen', objektart: 'Haus',
+  vertragsart: 'verkauf', ort: 'Wismar', plz: '23966', strasse: 'Hafenweg',
+  hausnummer: '3', adresse_freigeben: true, immo_nr: 'HWI-2026-007',
+  wohnflaeche: 113, zimmer: 5, baujahr: 1998, angebotspreis: 489000,
+  beschreibung_objekt: 'Das Haus liegt in zweiter Reihe hinter dem alten '
+    + 'Hafenbecken und wurde zuletzt im Jahr 2019 umfassend instand gesetzt, '
+    + 'vom Dach bis zur Heizung.',
+};
+const FIRMA2 = {
+  firma_name: 'Nordwind Immobilien GmbH', marken_name: 'Nordwind',
+  ort: 'Wismar', ci_primaer: '#1B2A47', ci_akzent: '#B5934F',
+};
+const SOLL2 = {
+  breite: 595.28, hoehe: 841.89,
+  band: { x: 0, y: 741.89, b: 595.28, h: 100, farbe: '#1b2a47' },
+  logo: { x: 40, y: 780, b: 96, h: 24 },
+  titel: { text: OBJEKT.objekttitel, x: 40, y: 640, groesse: 24 },
+  flaeche: { text: 'Wohnfläche 113 m²', x: 40, y: 600, groesse: 11 },
+  // Die Beschreibung, wie ein Setzer sie bricht: drei Zeilen, gleicher
+  // Stil, gleicher linker Rand. Zusammen sind sie der Feldwert.
+  absatz: [
+    'Das Haus liegt in zweiter Reihe hinter dem alten Hafenbecken und',
+    'wurde zuletzt im Jahr 2019 umfassend instand gesetzt, vom Dach',
+    'bis zur Heizung.',
+  ],
+  absatzX: 40, absatzY: 540, absatzGroesse: 10, absatzSchritt: 14,
+};
+
+async function pdf2Bauen() {
+  const { PDFDocument, rgb, StandardFonts } = require('pdf-lib');
+  const doc = await PDFDocument.create();
+  const normal = await doc.embedFont(StandardFonts.Helvetica);
+  const fett = await doc.embedFont(StandardFonts.HelveticaBold);
+  const bild = await doc.embedJpg(new Uint8Array(JPEG));
+
+  const eins = doc.addPage([SOLL2.breite, SOLL2.hoehe]);
+  eins.drawRectangle({ x: SOLL2.band.x, y: SOLL2.band.y, width: SOLL2.band.b,
+    height: SOLL2.band.h, color: rgb(0x1b / 255, 0x2a / 255, 0x47 / 255) });
+  eins.drawImage(bild, { x: SOLL2.logo.x, y: SOLL2.logo.y,
+    width: SOLL2.logo.b, height: SOLL2.logo.h });
+  eins.drawText(SOLL2.titel.text, { x: SOLL2.titel.x, y: SOLL2.titel.y,
+    size: SOLL2.titel.groesse, font: fett, color: rgb(0x1b / 255, 0x2a / 255, 0x47 / 255) });
+  eins.drawText(SOLL2.flaeche.text, { x: SOLL2.flaeche.x, y: SOLL2.flaeche.y,
+    size: SOLL2.flaeche.groesse, font: normal, color: rgb(0.2, 0.2, 0.2) });
+  SOLL2.absatz.forEach((zeile, i) => {
+    eins.drawText(zeile, { x: SOLL2.absatzX, y: SOLL2.absatzY - i * SOLL2.absatzSchritt,
+      size: SOLL2.absatzGroesse, font: normal, color: rgb(0.2, 0.2, 0.2) });
+  });
+  // Ein grosses Foto, damit das Titelbild erkannt wird.
+  eins.drawImage(bild, { x: 40, y: 200, width: 515, height: 300 });
+
+  const zwei = doc.addPage([SOLL2.breite, SOLL2.hoehe]);
+  zwei.drawText('Grundriss Erdgeschoss', { x: 40, y: 790, size: 16, font: fett,
+    color: rgb(0.1, 0.1, 0.1) });
+  zwei.drawImage(bild, { x: 40, y: 400, width: 400, height: 300 });
+
+  const drei = doc.addPage([SOLL2.breite, SOLL2.hoehe]);
+  drei.drawText('Ihr Ansprechpartner', { x: 40, y: 700, size: 16, font: fett,
+    color: rgb(0xb5 / 255, 0x93 / 255, 0x4f / 255) });
+  drei.drawImage(bild, { x: 40, y: 500, width: 110, height: 150 });
+
+  return await doc.save();
+}
+
 async function pdfBauen() {
   const { PDFDocument, rgb, StandardFonts } = require('pdf-lib');
   const doc = await PDFDocument.create();
@@ -156,7 +225,11 @@ async function pdfBauen() {
   if (band) {
     melde('Das Farbband liegt richtig', nah(band.x, SOLL.band.x) && nah(band.y, SOLL.band.y),
           JSON.stringify([band.x, band.y]));
-    melde('Das Farbband hat die Farbe aus dem PDF', band.fuell === '#980101', String(band.fuell));
+    // Die Farbe kommt an — ab Stufe 2 als Verweis auf die Palette, damit
+    // sie dem CI folgen kann. f1 der Vorlage ist der Wert aus dem PDF.
+    melde('Das Farbband hat die Farbe aus dem PDF',
+          band.fuell === 'p' && dokument.stil.farben.f1 === '#980101',
+          String(band.fuell) + ' / ' + String(dokument.stil.farben.f1));
   }
 
   // --- Die Linie ----------------------------------------------------------
@@ -239,6 +312,7 @@ async function pdfBauen() {
   const { execFileSync } = require('child_process');
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'immo-einlesen-'));
   execFileSync('tsc', [path.join(WURZEL, 'packages', 'expose-renderer', 'src', 'rendern.ts'),
+                       path.join(WURZEL, 'packages', 'expose-renderer', 'src', 'aufbereiten.ts'),
                        '--outDir', tmp, '--module', 'commonjs', '--target', 'es2020',
                        '--skipLibCheck', '--esModuleInterop'],
                { stdio: 'pipe', cwd: os.tmpdir() });
@@ -262,6 +336,112 @@ async function pdfBauen() {
         JSON.stringify(unbekannt.slice(0, 2)));
   const schritte = erg.seiten[0].schritte.length;
   melde('Auf der ersten Seite entstehen Zeichenschritte', schritte >= 5, String(schritte));
+  // === STUFE 2 ===========================================================
+  // Aus dem Nachbau wird eine Vorlage: Platzhalter aus den Werten eines
+  // bekannten Objekts, Bildfelder nach ihrer Seite, Marke an das CI.
+  const { aufbereiten } = require(path.join(tmp, 'aufbereiten.js'));
+  const { wert } = require(path.join(tmp, 'werte.js'));
+  fenster.ImmoExpose = { wert, aufbereiten };
+
+  const bytes2 = await pdf2Bauen();
+  const zwei = await fenster.ImmoExposeEinlesen.ausPdf(new Uint8Array(bytes2), {
+    name: 'Nordwind', standardFontDataUrl: schriftquelle,
+    marke: { primaer: FIRMA2.ci_primaer, akzent: FIRMA2.ci_akzent },
+  });
+  const d2 = zwei.dokument, b2 = zwei.befund;
+
+  // --- Bildfelder ---------------------------------------------------------
+  const alleBilder = [];
+  d2.seiten.forEach((se, i) => se.elemente.forEach((el) => {
+    if (el.typ === 'bild') alleBilder.push({ seite: i + 1, el });
+  }));
+  const mitSlot = (art) => alleBilder.filter((x) => x.el.slot && x.el.slot.art === art);
+  melde('Das kleine Bild im Kopfband wird das Logo', mitSlot('logo').length === 1,
+        JSON.stringify(alleBilder.map((x) => [x.seite, x.el.b, x.el.h, x.el.slot])));
+  if (mitSlot('logo').length) {
+    const lg = mitSlot('logo')[0].el;
+    melde('Das Logo steht auf dunklem Grund und bekommt die helle Fassung',
+          lg.slot.ton === 'dunkel', String(lg.slot.ton));
+    melde('Das Logo wird vollstaendig eingepasst und links verankert',
+          lg.fuellmodus === 'contain' && lg.ausrichtung === 'links',
+          JSON.stringify([lg.fuellmodus, lg.ausrichtung]));
+  }
+  melde('Das Bild auf der Grundrissseite wird ein Grundriss',
+        mitSlot('grundriss').length === 1, String(mitSlot('grundriss').length));
+  melde('Das hochkante Bild auf der Kontaktseite wird das Portraet',
+        mitSlot('ansprechpartner').length === 1, String(mitSlot('ansprechpartner').length));
+  melde('Das grosse Bild der ersten Seite bleibt das Titelbild',
+        mitSlot('titelbild').length === 1, String(mitSlot('titelbild').length));
+  melde('Der Befund zaehlt die erkannten Bildfelder',
+        b2.slots && b2.slots.logo === 1 && b2.slots.grundriss === 1 && b2.slots.portraet === 1,
+        JSON.stringify(b2.slots));
+
+  // --- Marke --------------------------------------------------------------
+  melde('Die Hausfarbe des PDF wird an das CI gebunden',
+        d2.stil.farben.f1 === 'ci.primaer' || d2.stil.farben.f2 === 'ci.primaer',
+        JSON.stringify(d2.stil.farben));
+  melde('Der Befund sagt, dass die Marke gebunden wurde',
+        !!(b2.marke && b2.marke.an_ci), JSON.stringify(b2.marke));
+  const bandZwei = d2.seiten[0].elemente
+    .filter((el) => el.typ === 'form' && Math.abs(el.h - SOLL2.band.h) < 2)[0];
+  melde('Das Kopfband verweist auf die Palette statt auf einen Hexwert',
+        bandZwei && (bandZwei.fuell === 'p' || bandZwei.fuell === 'a'),
+        JSON.stringify(bandZwei && bandZwei.fuell));
+  melde('Die Herkunft haelt die Farben des PDF fest',
+        Array.isArray(d2.herkunft.farben_im_pdf) && d2.herkunft.farben_im_pdf.length === 2,
+        JSON.stringify(d2.herkunft.farben_im_pdf));
+  melde('Die Schriftrollen kommen aus dem Dokument',
+        !!(b2.schriftrollen && b2.schriftrollen.headline && b2.schriftrollen.text),
+        JSON.stringify(b2.schriftrollen));
+
+  // --- Platzhalter --------------------------------------------------------
+  const daten2 = aufbereiten({ immobilie: OBJEKT, firma: FIRMA2, ansprechpartner: null });
+  const vorPlatzhalter = d2.seiten[0].elemente.filter((el) => el.typ === 'text').length;
+  const p2 = fenster.ImmoExposeEinlesen.platzhalterSetzen(d2, daten2);
+  const texteZwei = d2.seiten[0].elemente.filter((el) => el.typ === 'text');
+  const inhalte = texteZwei.map((el) => el.inhalt);
+  melde('Der Objekttitel wird ein Platzhalter',
+        inhalte.indexOf('{{objekt.objekttitel}}') >= 0, JSON.stringify(inhalte));
+  melde('Die Wohnflaeche wird in der Zeile ersetzt, das Wort davor bleibt',
+        inhalte.indexOf('Wohnfläche {{objekt.wohnflaeche}}') >= 0, JSON.stringify(inhalte));
+  const absatzEl = texteZwei.filter((el) => el.inhalt === '{{objekt.beschreibung_objekt}}')[0];
+  melde('Die drei Zeilen der Beschreibung werden EIN Feld', !!absatzEl,
+        JSON.stringify(inhalte));
+  if (absatzEl) {
+    melde('Das Beschreibungsfeld umfasst die Hoehe aller drei Zeilen',
+          absatzEl.h > SOLL2.absatzSchritt * 2, String(absatzEl.h));
+    melde('Das Beschreibungsfeld bricht um und verdichtet',
+          absatzEl.einzeilig === false && absatzEl.verdichten === true,
+          JSON.stringify([absatzEl.einzeilig, absatzEl.verdichten]));
+    melde('Die beiden Folgezeilen sind weg',
+          texteZwei.length === vorPlatzhalter - 2,
+          `vorher ${vorPlatzhalter}, jetzt ${texteZwei.length}`);
+  }
+  melde('Der Befund nennt die gefundenen Felder',
+        p2.felder.indexOf('objekt.objekttitel') >= 0
+        && p2.felder.indexOf('objekt.wohnflaeche') >= 0
+        && p2.felder.indexOf('objekt.beschreibung_objekt') >= 0,
+        JSON.stringify(p2.felder));
+  melde('Der Befund zaehlt die Platzhalter', p2.platzhalter >= 3, String(p2.platzhalter));
+
+  // Und das Ergebnis muss weiterhin eine gueltige Vorlage sein.
+  const befunde2 = vorlagePruefen(d2);
+  const schlimm2 = befunde2.filter((b) => b.schwere === 'fehler');
+  melde('Die Vorlage mit Platzhaltern besteht die Pruefung', schlimm2.length === 0,
+        JSON.stringify(schlimm2.slice(0, 3)));
+  const erg2 = rendern({ vorlage: d2, daten: daten2, schriften,
+                         marke: { primaer: FIRMA2.ci_primaer, akzent: FIRMA2.ci_akzent } });
+  melde('Der Renderer zeichnet sie mit den Daten des Objekts',
+        erg2.seiten.length === 3, String(erg2.seiten.length));
+  const gezeichnet = erg2.seiten[0].schritte
+    .filter((sc) => sc.art === 'text').map((sc) => sc.text).join(' | ');
+  melde('Im Ergebnis steht der Wert des Objekts, nicht der Platzhalter',
+        gezeichnet.indexOf(OBJEKT.objekttitel) >= 0 && gezeichnet.indexOf('{{') < 0,
+        gezeichnet.slice(0, 200));
+  const unbekannt2 = erg2.warnungen.filter((w) => w.art === 'unbekannt');
+  melde('Ohne unbekannte Verweise', unbekannt2.length === 0,
+        JSON.stringify(unbekannt2.slice(0, 2)));
+
   fs.rmSync(tmp, { recursive: true, force: true });
 
   if (fehler) {
@@ -271,4 +451,7 @@ async function pdfBauen() {
   console.log('  [ok] Aus einem PDF wird eine Vorlage: Format, Flaechen, Linien,');
   console.log('       Bildfelder und Textzeilen stehen an ihrer Stelle, Schriften');
   console.log('       sind zugeordnet — und der Renderer zeichnet das Ergebnis.');
+  console.log('       Stufe 2: Logo, Grundriss und Portraet werden erkannt, die');
+  console.log('       Hausfarben an das CI gebunden, und aus den Werten eines');
+  console.log('       Objekts werden Platzhalter — auch ueber drei Zeilen hinweg.');
 })();

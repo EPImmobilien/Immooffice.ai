@@ -456,9 +456,360 @@
       if (f === "#000000" || f === "#ffffff") return false;
       var r = parseInt(f.slice(1, 3), 16), g = parseInt(f.slice(3, 5), 16), bl = parseInt(f.slice(5, 7), 16);
       var max = Math.max(r, g, bl), min = Math.min(r, g, bl);
-      return (max - min) > 18 || max < 200;        // nicht fast grau und nicht fast weiss
+      // Nur BUNTE Farben. Grau und Schwarz sind in einem Exposé die Farbe
+      // des Lauftexts und der Haarlinien, nicht die Farbe der Marke. Wer
+      // sie zur Markenfarbe macht, bindet spaeter den Fliesstext an die
+      // Akzentfarbe des Mandanten — und die Ueberschrift wird golden.
+      return (max - min) > 18;
     }).sort(function (a, b) { return zaehlung[b] - zaehlung[a]; });
     return [sortiert[0] || "#1B2A47", sortiert[1] || "#B5934F"];
+  }
+
+
+  // ======================================================================
+  // STUFE 2 — aus Geometrie wird eine Vorlage
+  // ----------------------------------------------------------------------
+  // Stufe 1 hat jede Flaeche, Linie, jedes Bild und jede Textzeile mit
+  // ihren Massen uebernommen. Was dabei entsteht, ist ein genauer Nachbau
+  // EINES Exposés: die Werte des Objekts stehen als Text darin.
+  //
+  // Eine Vorlage ist das noch nicht. Stufe 2 macht daraus eine:
+  //
+  //   1. Platzhalter: steht im PDF "112,5 m²" und ist das die Wohnflaeche
+  //      des Objekts, wird daraus {{objekt.wohnflaeche}}.
+  //   2. Bildfelder: welches Bild ist das Logo, welches das Portraet,
+  //      welches ein Grundriss? Das sagt die Seite, auf der es steht.
+  //   3. Marke: die beiden Hausfarben des Dokuments werden zu f1 und f2
+  //      und, wenn sie zum CI des Mandanten passen, an das CI gebunden.
+  //
+  // Geraten wird dabei zwangslaeufig. Darum gilt fuer jeden Schritt: er
+  // schlaegt vor, er entscheidet nicht. Was er getan hat, steht im Befund,
+  // und auf der Bearbeitungsflaeche ist jedes Feld noch zu aendern.
+  // ======================================================================
+
+  /** Vergleichsform: Leerraum zusammengezogen, Sonderzeichen vereinheitlicht. */
+  function vergleichsform(t) {
+    return String(t == null ? "" : t)
+      .replace(/ /g, " ")
+      .replace(/[‐-―]/g, "-")
+      .replace(/[‘’‚′]/g, "'")
+      .replace(/[“”„″]/g, '"')
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function maskieren(t) {
+    return String(t).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  /**
+   * Die Werte des Vergleichsobjekts, nach Laenge sortiert.
+   *
+   * Lang zuerst: sonst ersetzt "Hamburg" das Wort im Ortsteil "Hamburg-Altona"
+   * und der laengere Treffer kommt nie zustande. Werte unter vier Zeichen
+   * bleiben aussen vor — eine "3" steht in jedem Exposé zwanzigmal, und
+   * neunzehnmal ist sie nicht die Zimmerzahl.
+   */
+  function vergleichswerte(daten) {
+    var raus = [];
+    var W = window.ImmoExpose && window.ImmoExpose.wert;
+    Object.keys(daten || {}).forEach(function (schluessel) {
+      if (/^bild\./.test(schluessel)) return;
+      if (/\.titel$/.test(schluessel)) return;
+      if (schluessel === "objekt.ki_bilder") return;
+      var roh = daten[schluessel];
+      if (roh == null || typeof roh === "object" || typeof roh === "boolean") return;
+      var wert = W ? W(daten, schluessel) : String(roh);
+      if (wert === undefined || wert === null) return;
+      var v = vergleichsform(wert);
+      if (v.length < 4) return;
+      raus.push({ schluessel: schluessel, wert: v });
+    });
+    raus.sort(function (a, b) { return b.wert.length - a.wert.length; });
+    return raus;
+  }
+
+  /**
+   * Zeilen, die zusammen einen Absatz bilden: gleicher Textstil, gleicher
+   * linker Rand, dicht untereinander.
+   *
+   * Gebraucht wird das fuer die langen Texte. Die Objektbeschreibung steht
+   * im PDF als zwanzig einzelne Zeilen; keine davon gleicht dem Feldwert.
+   * Erst zusammengesetzt tun sie es.
+   */
+  function absaetze(elemente) {
+    var raus = [];
+    var lauf = null;
+    var schliessen = function () {
+      if (lauf && lauf.teile.length > 1) raus.push(lauf);
+      lauf = null;
+    };
+    for (var i = 0; i < elemente.length; i++) {
+      var el = elemente[i];
+      if (el.typ !== "text" || el.gesperrt || typeof el.inhalt !== "string") { schliessen(); continue; }
+      if (lauf) {
+        var vor = lauf.teile[lauf.teile.length - 1];
+        var zeilenhoehe = Math.max(vor.h, el.h);
+        var abstand = (vor.y + vor.h) - (el.y + el.h);
+        var passt = lauf.stil === el.stil
+          && Math.abs(el.x - lauf.x) < 2.5
+          && abstand > 0 && abstand < zeilenhoehe * 2.4;
+        if (passt) { lauf.teile.push(el); continue; }
+        schliessen();
+      }
+      lauf = { stil: el.stil, x: el.x, teile: [el] };
+    }
+    schliessen();
+    return raus;
+  }
+
+  /**
+   * Setzt Platzhalter in ein eingelesenes Dokument.
+   *
+   * @param {object} dokument  wird an Ort und Stelle geaendert
+   * @param {object} daten     aufbereitete Daten des Vergleichsobjekts
+   * @returns {{platzhalter: number, felder: string[], absaetze: number,
+   *            warnungen: string[]}}
+   */
+  function platzhalterSetzen(dokument, daten, opt) {
+    opt = opt || {};
+    var werte = vergleichswerte(daten);
+    var befund = { platzhalter: 0, felder: [], absaetze: 0, warnungen: [] };
+    if (!werte.length) {
+      befund.warnungen.push("Das Vergleichsobjekt hat keine verwertbaren Angaben — "
+        + "ohne sie laesst sich kein Platzhalter erkennen.");
+      return befund;
+    }
+    var gefunden = {};
+    var lang = werte.filter(function (w) { return w.wert.length >= 60; });
+
+    (dokument.seiten || []).forEach(function (seite) {
+      // 1. Die langen Texte zuerst: sie fassen mehrere Zeilen zu einem
+      //    Feld zusammen und veraendern die Elementliste.
+      var weg = {};
+      absaetze(seite.elemente || []).forEach(function (lauf) {
+        var ganz = vergleichsform(lauf.teile.map(function (t) { return t.inhalt; }).join(" "));
+        for (var i = 0; i < lang.length; i++) {
+          if (gefunden[lang[i].schluessel]) continue;
+          if (ganz.indexOf(lang[i].wert) !== 0 && ganz.indexOf(lang[i].wert) < 0) continue;
+          var erstes = lauf.teile[0], letztes = lauf.teile[lauf.teile.length - 1];
+          var breite = 0;
+          lauf.teile.forEach(function (t) { breite = Math.max(breite, t.b); });
+          erstes.inhalt = "{{" + lang[i].schluessel + "}}";
+          erstes.b = breite;
+          erstes.h = (erstes.y + erstes.h) - letztes.y;
+          erstes.y = letztes.y;
+          erstes.einzeilig = false;
+          erstes.verdichten = true;
+          // Der Rest des Absatzes entfaellt: der Platzhalter bringt den
+          // ganzen Text mit, und der Umbruch ist Sache des Renderers.
+          lauf.teile.slice(1).forEach(function (t) { weg[t.id] = true; });
+          gefunden[lang[i].schluessel] = true;
+          befund.platzhalter++;
+          befund.absaetze++;
+          break;
+        }
+      });
+      if (Object.keys(weg).length) {
+        seite.elemente = (seite.elemente || []).filter(function (el) { return !weg[el.id]; });
+      }
+
+      // 2. Jede einzelne Zeile gegen jeden Wert.
+      (seite.elemente || []).forEach(function (el) {
+        if (el.typ !== "text" || el.gesperrt || typeof el.inhalt !== "string") return;
+        if (/\{\{/.test(el.inhalt)) return;
+        var text = el.inhalt;
+        for (var i = 0; i < werte.length; i++) {
+          var w = werte[i];
+          if (w.wert.length >= 60) continue;           // schon als Absatz versucht
+          var muster = new RegExp(maskieren(w.wert).replace(/ /g, "\\s+"), "i");
+          var vorher = text;
+          text = vergleichsform(text).replace(muster, "{{" + w.schluessel + "}}");
+          if (text !== vergleichsform(vorher)) {
+            befund.platzhalter++;
+            gefunden[w.schluessel] = true;
+          }
+        }
+        if (text !== el.inhalt) el.inhalt = text;
+      });
+    });
+
+    befund.felder = Object.keys(gefunden).sort();
+    if (!befund.platzhalter) {
+      befund.warnungen.push("Kein Platzhalter erkannt. Zeigt dieses PDF wirklich "
+        + "das gewaehlte Objekt? Sonst stehen die Werte als Text in der Vorlage "
+        + "und muessen auf der Flaeche ersetzt werden.");
+    }
+    return befund;
+  }
+
+  // --- Bildfelder erkennen -----------------------------------------------
+  // Welches Bild wohin gehoert, sagt die Seite: auf einer Grundrissseite
+  // sind die grossen Bilder Grundrisse, auf der Kontaktseite ist das
+  // hochkante kleine Bild das Portraet, und ein kleines Bild oben am Rand
+  // ist in neun von zehn Faellen das Logo.
+  function slotsVerfeinern(seiten, format) {
+    var befund = { logo: 0, portraet: 0, grundriss: 0, lageplan: 0 };
+    var hoehe = (format && format.hoehe) || 841.89;
+    var grundrissNr = 1;
+    seiten.forEach(function (seite) {
+      var text = (seite.elemente || []).filter(function (el) { return el.typ === "text"; })
+        .map(function (el) { return String(el.inhalt || ""); }).join(" ").toLowerCase();
+      var istGrundriss = /grundriss|wohnfl(ä|ae)chenberechnung|raumaufteilung/.test(text);
+      var istLage = /\blage\b|umgebung|standort|infrastruktur|entfernung/.test(text);
+      var istKontakt = /ansprechpartner|ihr kontakt|kontaktieren|ihre maklerin|ihr makler|sprechen sie/.test(text);
+      var bilder = (seite.elemente || []).filter(function (el) { return el.typ === "bild"; });
+      bilder.forEach(function (el) {
+        var verh = el.b / Math.max(1, el.h);
+        var oben = (el.y + el.h) > hoehe * 0.86;
+        var klein = el.b <= 170 && el.h <= 60;
+        var quadratisch = el.b <= 70 && el.h <= 70 && verh > 0.5 && verh < 2;
+        // Logo: klein und oben, oder klein und unten in der Fusszone.
+        if ((klein || quadratisch) && (oben || el.y < hoehe * 0.12)) {
+          el.slot = { art: "logo", ton: dunklerGrund(seite, el) ? "dunkel" : "hell" };
+          el.fuellmodus = "contain";
+          el.ausrichtung = el.x < (format.breite || 595.28) * 0.3 ? "links" : "mitte";
+          befund.logo++;
+          return;
+        }
+        if (istKontakt && verh < 0.95 && el.h <= 260 && el.h >= 50) {
+          el.slot = { art: "ansprechpartner" };
+          befund.portraet++;
+          return;
+        }
+        if (istGrundriss && el.b * el.h > 12000) {
+          el.slot = { art: "grundriss", nr: grundrissNr++ };
+          el.fuellmodus = "contain";
+          befund.grundriss++;
+          return;
+        }
+        if (istLage && !befund.lageplan && el.b * el.h > 20000) {
+          el.slot = { art: "lageplan" };
+          befund.lageplan++;
+        }
+      });
+    });
+    return befund;
+  }
+
+  /** Liegt hinter diesem Rahmen eine dunkle Flaeche? */
+  function dunklerGrund(seite, rahmen) {
+    var treffer = null;
+    (seite.elemente || []).forEach(function (el) {
+      if (el.typ !== "form" || el.form !== "rechteck") return;
+      if (typeof el.fuell !== "string" || el.fuell.charAt(0) !== "#") return;
+      if (el.x > rahmen.x + 1 || el.y > rahmen.y + 1) return;
+      if (el.x + el.b < rahmen.x + rahmen.b - 1) return;
+      if (el.y + el.h < rahmen.y + rahmen.h - 1) return;
+      treffer = el.fuell;              // spaeter heisst weiter vorn
+    });
+    if (!treffer) return false;
+    var r = parseInt(treffer.slice(1, 3), 16), g = parseInt(treffer.slice(3, 5), 16),
+        b = parseInt(treffer.slice(5, 7), 16);
+    return (0.299 * r + 0.587 * g + 0.114 * b) < 128;
+  }
+
+  // --- Die Marke binden --------------------------------------------------
+  /**
+   * Bindet die beiden Hausfarben des Dokuments an die Palette und, wenn sie
+   * zum CI des Mandanten passen, an das CI selbst.
+   *
+   * Der Sinn: das hochgeladene Exposé IST das Design des Mandanten, seine
+   * Farben sind dessen Markenfarben. Stehen sie als Hexwerte in jedem
+   * Element, ist die Vorlage von seinem CI abgeschnitten — wer sein Blau
+   * aendert, muesste jedes Feld anfassen. Als Verweis auf die Palette
+   * folgt sie dem CI von selbst.
+   *
+   * Nur bei Naehe zum CI: ist das CI nicht gesetzt oder eine voellig
+   * andere Farbe, bleiben die Hexwerte stehen. Dann sieht die Vorlage aus
+   * wie das PDF — und das ist wichtiger.
+   */
+  function markeZuordnen(dokument, marke) {
+    var befund = { f1: null, f2: null, an_ci: false, ersetzt: 0, warnungen: [] };
+    var farben = dokument.stil && dokument.stil.farben;
+    if (!farben) return befund;
+    befund.f1 = farben.f1;
+    befund.f2 = farben.f2;
+    var nah = function (a, b) {
+      if (typeof a !== "string" || typeof b !== "string") return false;
+      if (a.charAt(0) !== "#" || b.charAt(0) !== "#") return false;
+      var z = function (h, i) { return parseInt(h.slice(i, i + 2), 16); };
+      return Math.sqrt(Math.pow(z(a, 1) - z(b, 1), 2) + Math.pow(z(a, 3) - z(b, 3), 2)
+        + Math.pow(z(a, 5) - z(b, 5), 2)) < 60;
+    };
+    var primaer = marke && marke.primaer, akzent = marke && marke.akzent;
+    // Die Zuordnung darf tauschen: die haeufigste Farbe des Dokuments muss
+    // nicht die Primaerfarbe des Mandanten sein.
+    if (nah(farben.f1, primaer) || nah(farben.f2, akzent)) {
+      if (nah(farben.f1, primaer)) farben.f1 = "ci.primaer";
+      if (nah(farben.f2, akzent)) farben.f2 = "ci.akzent";
+      befund.an_ci = true;
+    } else if (nah(farben.f1, akzent) || nah(farben.f2, primaer)) {
+      if (nah(farben.f1, akzent)) farben.f1 = "ci.akzent";
+      if (nah(farben.f2, primaer)) farben.f2 = "ci.primaer";
+      befund.an_ci = true;
+    } else if (primaer || akzent) {
+      befund.warnungen.push("Die Farben des PDF (" + befund.f1 + ", " + befund.f2
+        + ") liegen nicht beim CI des Mandanten — sie bleiben als feste Werte "
+        + "stehen, damit die Vorlage aussieht wie das PDF.");
+    }
+
+    // Jede Stelle, die genau eine der beiden Farben nennt, verweist
+    // kuenftig auf die Palette. "p" und "a" sind die Namen, die die
+    // Ableitung "raster" dafuer fuehrt.
+    var tausch = {};
+    tausch[String(befund.f1).toLowerCase()] = "p";
+    tausch[String(befund.f2).toLowerCase()] = "a";
+    var ersetze = function (v) {
+      if (typeof v !== "string") return v;
+      var t = tausch[v.toLowerCase()];
+      if (!t) return v;
+      befund.ersetzt++;
+      return t;
+    };
+    Object.keys(dokument.stil.textstile || {}).forEach(function (name) {
+      var st = dokument.stil.textstile[name];
+      st.farbe = ersetze(st.farbe);
+    });
+    (dokument.seiten || []).forEach(function (seite) {
+      (seite.elemente || []).forEach(function (el) {
+        if (el.fuell !== undefined) el.fuell = ersetze(el.fuell);
+        if (el.strich !== undefined) el.strich = ersetze(el.strich);
+      });
+    });
+    return befund;
+  }
+
+  // --- Schriften der Vorlage ---------------------------------------------
+  // stil.schriften nennt die drei Rollen headline / text / label. Sie
+  // stehen in der Vorlage nicht zur Zierde: "ci.font" und die Ersatzschrift
+  // haengen daran. Abgeleitet werden sie aus dem Dokument selbst — die
+  // groesste Schrift ist die Ueberschrift, die haeufigste der Lauftext.
+  function schriftenAbleiten(dokument) {
+    var stile = (dokument.stil && dokument.stil.textstile) || {};
+    var zaehlung = {};
+    (dokument.seiten || []).forEach(function (seite) {
+      (seite.elemente || []).forEach(function (el) {
+        if (el.typ !== "text" || !el.stil) return;
+        var laenge = String(el.inhalt || "").length;
+        zaehlung[el.stil] = (zaehlung[el.stil] || 0) + Math.max(1, laenge);
+      });
+    });
+    var namen = Object.keys(stile);
+    if (!namen.length) return null;
+    var haeufigster = namen.slice().sort(function (a, b) {
+      return (zaehlung[b] || 0) - (zaehlung[a] || 0);
+    })[0];
+    var groesster = namen.slice().sort(function (a, b) {
+      return (stile[b].groesse || 0) - (stile[a].groesse || 0);
+    })[0];
+    var kopie = function (s) { return { familie: s.familie, schnitt: s.schnitt }; };
+    dokument.stil.schriften = {
+      headline: kopie(stile[groesster].schrift),
+      text: kopie(stile[haeufigster].schrift),
+      label: kopie(stile[haeufigster].schrift),
+    };
+    return { headline: groesster, text: haeufigster };
   }
 
   /**
@@ -480,6 +831,8 @@
       seiten: 0, texte: 0, flaechen: 0, linien: 0, bilder: 0, stile: 0,
       gedrehteTexte: 0, schraegeLinien: 0, winzigeBilder: 0, fotoNummer: 1,
       schriften: {}, warnungen: [],
+      // Stufe 2, gleich mitgemacht: Bildfelder, Marke, Schriftrollen.
+      slots: null, marke: null, schriftrollen: null,
     };
     var buch = stilBuch();
     var alleFarben = [];
@@ -554,11 +907,14 @@
           stile.t1 = { schrift: { familie: "jakarta", schnitt: "Regular" },
                        groesse: 10, farbe: "#000000" };
         }
+        // --- Stufe 2, soweit sie ohne Vergleichsobjekt geht ------------
+        befund.slots = slotsVerfeinern(seiten, format || { breite: 595.28, hoehe: 841.89 });
+
         var dokument = {
           schema: 1,
           name: opt.name || "Eingelesene Vorlage",
           beschreibung: "Aus einem PDF nachgebaut. Schriften sind zugeordnet, "
-            + "nicht übernommen; Platzhalter sind noch keine gesetzt.",
+            + "nicht übernommen.",
           // "leer" ist die einzige Basis neben den drei Hausvorlagen, die die
           // Datenbank erlaubt (fork_37) — und sie stimmt: diese Vorlage
           // stammt von keiner von ihnen ab. Woher sie wirklich kommt, steht
@@ -586,14 +942,25 @@
           herkunft: {
             art: "pdf", datei: opt.name || "", eingelesen_am: new Date().toISOString(),
             schriften_im_pdf: befund.schriften, zuordnung: buch.quellen,
+            farben_im_pdf: [mf[0], mf[1]],
           },
         };
+        // Die Marke binden und die drei Schriftrollen ableiten — beides
+        // braucht das fertige Dokument.
+        befund.marke = markeZuordnen(dokument, opt.marke || {});
+        befund.schriftrollen = schriftenAbleiten(dokument);
+        (befund.marke.warnungen || []).forEach(function (w) { befund.warnungen.push(w); });
         return { dokument: dokument, befund: befund };
       });
   }
 
   window.ImmoExposeEinlesen = {
     ausPdf: ausPdf,
+    // Stufe 2, zweiter Teil: er braucht ein Vergleichsobjekt und wird
+    // darum einzeln aufgerufen, wenn der Nutzer eines gewaehlt hat.
+    platzhalterSetzen: platzhalterSetzen,
+    markeZuordnen: markeZuordnen,
+    slotsVerfeinern: slotsVerfeinern,
     schriftZuordnen: schriftZuordnen,
     verfuegbar: function () { return !!(window.pdfjsLib || window["pdfjs-dist/build/pdf"]); },
   };

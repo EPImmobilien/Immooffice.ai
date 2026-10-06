@@ -2594,6 +2594,18 @@ function MobileBurgerMenu({
       letterSpacing: "0.1em"
     }
   }, "v", "5.34.0"), React.createElement("div", {
+    // Der dezente Produkthinweis. Die Oberflaeche traegt das CI des
+    // Mandanten (so entschieden am 06.10.2026); damit das Produkt dabei
+    // nicht unsichtbar wird, steht sein Name hier, in der Fusszeile, in
+    // der Anmeldung und auf den Freigabeseiten — und nur dort.
+    style: {
+      fontSize: 9.5,
+      color: "rgba(255,255,255,0.32)",
+      marginTop: 2,
+      textAlign: "center",
+      letterSpacing: "0.08em"
+    }
+  }, "mit immoOffice.ai"), React.createElement("div", {
     style: {
       height: "env(safe-area-inset-bottom, 0)"
     }
@@ -76712,7 +76724,9 @@ function Login() {
     href: "#",
     onClick: ev => { ev.preventDefault(); immoSetzeModus("registrieren"); },
     style: { color: CI.blau, fontWeight: 600 }
-  }, "Firma registrieren")), React.createElement(ZugangLinkAnfordern, null), "Mitarbeiter: Passwort vergessen?", React.createElement("br", null), "Bitte wenden Sie sich an Ihren Ansprechpartner."))))
+  }, "Firma registrieren")), React.createElement(ZugangLinkAnfordern, null), "Mitarbeiter: Passwort vergessen?", React.createElement("br", null), "Bitte wenden Sie sich an Ihren Ansprechpartner.", React.createElement("div", {
+    style: { marginTop: 14, fontSize: 10.5, color: CI.muted, letterSpacing: "0.08em" }
+  }, "Immobiliensoftware mit immoOffice.ai")))))
 }
 
 function ConfigError() {

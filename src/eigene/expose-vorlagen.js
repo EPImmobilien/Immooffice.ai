@@ -301,6 +301,13 @@
     // Eine eingelesene Vorlage, die noch nicht gespeichert ist.
     var einleseS = React.useState(null);
     var einlese = einleseS[0], setEinlese = einleseS[1];
+    // Stufe 2 des Einlesens: das Objekt, das dieses PDF zeigt. Aus seinen
+    // Werten werden die Platzhalter. Geladen wird die Liste erst, wenn ein
+    // PDF gelesen ist — vorher braucht sie niemand.
+    var objekteS = React.useState(null);
+    var objekte = objekteS[0], setObjekte = objekteS[1];
+    var vergleichS = React.useState("");
+    var vergleich = vergleichS[0], setVergleich = vergleichS[1];
 
     var laden = React.useCallback(function () {
       setDaten({ lade: true, liste: [], fehler: "" });
@@ -471,12 +478,79 @@
       datei.arrayBuffer().then(function (puffer) {
         return window.ImmoExposeEinlesen.ausPdf(puffer, {
           name: datei.name.replace(/\.pdf$/i, ""),
+          // Damit Stufe 2 die Hausfarben des PDF an das CI des Mandanten
+          // binden kann, wenn sie dazu passen.
+          marke: { primaer: firma && firma.ci_primaer, akzent: firma && firma.ci_akzent },
         });
       }).then(function (r) {
         setEinlese({ dokument: r.dokument, befund: r.befund, name: datei.name });
       }).catch(function (f) {
         setEinlese({ fehler: String((f && f.message) || f), name: datei.name });
       });
+    }
+
+    /**
+     * Die Objekte des Mandanten, fuer die Platzhaltererkennung. Nur
+     * Kennung, Nummer, Bezeichnung und Ort — mehr braucht die Auswahl
+     * nicht, und mehr soll auch nicht im Browser liegen.
+     */
+    function objekteLaden() {
+      if (objekte) return;
+      setObjekte({ lade: true, liste: [] });
+      window._sb.from("immobilien")
+        .select("id,immo_nr,bezeichnung,ort")
+        .order("created_at", { ascending: false }).limit(300)
+        .then(function (a) {
+          setObjekte({ lade: false, liste: (a && a.data) || [],
+                       fehler: a && a.error ? a.error.message : "" });
+        });
+    }
+
+    /**
+     * Stufe 2: aus den Werten EINES Objekts werden Platzhalter.
+     *
+     * Das hochgeladene PDF zeigt ein bestimmtes Objekt. Steht dort
+     * "112,5 m²" und ist das die Wohnflaeche dieses Objekts, dann gehoert
+     * an die Stelle {{objekt.wohnflaeche}} — und die Vorlage taugt fuer
+     * jedes andere Objekt auch.
+     */
+    function platzhalterErkennen() {
+      if (!einlese || !einlese.dokument || !vergleich) return;
+      setArbeit("platzhalter");
+      var ap = null, immo = null;
+      window._sb.from("immobilien").select("*").eq("id", vergleich).maybeSingle()
+        .then(function (a) {
+          if (a.error || !a.data) throw new Error((a.error && a.error.message) || "Objekt nicht lesbar.");
+          immo = a.data;
+          if (!immo.zustaendig_id) return { data: null };
+          return window._sb.from("profiles")
+            .select("id,name,funktion,telefon,mobil,email,foto_url")
+            .eq("id", immo.zustaendig_id).maybeSingle();
+        })
+        .then(function (a) {
+          ap = (a && a.data) || null;
+          return window._sb.from("finanzierungs_annahmen").select("*")
+            .eq("aktiv", true).limit(1).maybeSingle();
+        })
+        .then(function (a) {
+          var daten = window.ImmoExpose.aufbereiten({
+            immobilie: immo, firma: firma || {}, ansprechpartner: ap,
+            annahmen: (a && a.data) || null,
+          });
+          // Auf einer Kopie arbeiten: wer das Ergebnis verwirft, soll den
+          // Nachbau aus Stufe 1 unveraendert zurueckbekommen.
+          var kopie = JSON.parse(JSON.stringify(einlese.dokument));
+          var b2 = window.ImmoExposeEinlesen.platzhalterSetzen(kopie, daten);
+          setArbeit("");
+          setEinlese({
+            dokument: kopie, befund: einlese.befund, name: einlese.name,
+            stufe2: b2, stufe1: einlese.stufe1 || einlese.dokument,
+          });
+        })
+        .catch(function (f) {
+          setArbeit("");
+          window.alert("Platzhalter nicht erkannt: " + ((f && f.message) || f));
+        });
     }
 
     function eingelesenAnlegen() {
@@ -747,12 +821,72 @@
             ? e("div", { key: "s", style: { fontSize: 11.5, color: CI.muted, marginTop: 6, lineHeight: 1.5 } },
                 "Schriften im PDF: " + Object.keys(b.schriften).slice(0, 6).join(", ")
                 + (Object.keys(b.schriften).length > 6 ? " …" : "")) : null,
+          (b.slots && (b.slots.logo || b.slots.portraet || b.slots.grundriss || b.slots.lageplan))
+            ? e("div", { key: "sl", style: { fontSize: 11.5, color: CI.muted, marginTop: 6, lineHeight: 1.5 } },
+                "Erkannte Bildfelder: " + [
+                  b.slots.logo ? b.slots.logo + "× Logo" : null,
+                  b.slots.portraet ? b.slots.portraet + "× Porträt" : null,
+                  b.slots.grundriss ? b.slots.grundriss + "× Grundriss" : null,
+                  b.slots.lageplan ? b.slots.lageplan + "× Lageplan" : null,
+                ].filter(Boolean).join(", ") + ". Die übrigen sind Objektfotos.")
+            : null,
+          b.marke ? e("div", { key: "mk", style: { fontSize: 11.5, color: CI.muted, marginTop: 6, lineHeight: 1.5 } },
+            "Hausfarben: " + b.marke.f1 + " und " + b.marke.f2
+            + (b.marke.an_ci ? " — an das CI des Mandanten gebunden" : " — als feste Werte übernommen")
+            + (b.marke.ersetzt ? ", " + b.marke.ersetzt + "× im Dokument als Verweis gesetzt." : ".")) : null,
           (b.warnungen || []).map(function (w, i) {
             return e("div", { key: "w" + i, style: {
               background: "#fff8e6", border: "1px solid #f0e0b8", borderRadius: 7,
               padding: "7px 10px", fontSize: 12, marginTop: 8, lineHeight: 1.5,
             } }, w);
           }),
+          // --- Stufe 2: Platzhalter aus einem echten Objekt --------------
+          e("div", { key: "p2", style: {
+            marginTop: 12, paddingTop: 12, borderTop: "1px solid " + CI.border,
+          } }, [
+            e("div", { key: "t", style: { fontSize: 12.5, color: CI.ink, lineHeight: 1.55, marginBottom: 8 } },
+              "Welches Objekt zeigt dieses Exposé? Aus seinen Werten werden "
+              + "Platzhalter — aus „112,5 m²" + "\u201c" + " wird {{objekt.wohnflaeche}}, und die "
+              + "Vorlage taugt danach für jedes andere Objekt."),
+            einlese.stufe2 ? e("div", { key: "e", style: {
+              background: "#eef7ee", border: "1px solid #cfe3cf", borderRadius: 7,
+              padding: "8px 11px", fontSize: 12.5, lineHeight: 1.55,
+            } }, [
+              einlese.stufe2.platzhalter + " Platzhalter gesetzt"
+              + (einlese.stufe2.absaetze ? ", davon " + einlese.stufe2.absaetze
+                 + " zusammenhängende Textblöcke" : "") + ".",
+              einlese.stufe2.felder.length
+                ? e("div", { key: "f", style: { color: CI.muted, fontSize: 11.5, marginTop: 4 } },
+                    einlese.stufe2.felder.join(", "))
+                : null,
+              (einlese.stufe2.warnungen || []).map(function (w, i) {
+                return e("div", { key: "w" + i, style: { color: CI.danger, fontSize: 11.5, marginTop: 4 } }, w);
+              }),
+              e("div", { key: "z", style: { marginTop: 8 } },
+                knopf("Platzhalter zurücknehmen", function () {
+                  setEinlese({ dokument: einlese.stufe1, befund: einlese.befund,
+                               name: einlese.name });
+                }, "zweit", !!arbeit)),
+            ]) : e("div", { key: "w", style: { display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" } }, [
+              e("select", {
+                key: "s", value: vergleich, style: {
+                  padding: "6px 9px", border: "1px solid " + CI.border, borderRadius: 6,
+                  fontSize: 12.5, maxWidth: 320, fontFamily: "inherit", color: CI.ink,
+                },
+                "data-immo-vergleichsobjekt": "1",
+                onFocus: objekteLaden, onMouseDown: objekteLaden,
+                onChange: function (ev) { setVergleich(ev.target.value); },
+              }, [e("option", { key: "0", value: "" },
+                    (objekte && objekte.lade) ? "lädt …" : "— Objekt wählen —")]
+                 .concat(((objekte && objekte.liste) || []).map(function (o) {
+                   return e("option", { key: o.id, value: o.id },
+                     (o.immo_nr ? o.immo_nr + " · " : "") + (o.bezeichnung || "ohne Bezeichnung")
+                     + (o.ort ? ", " + o.ort : ""));
+                 }))),
+              knopf("Platzhalter erkennen", platzhalterErkennen, "zweit",
+                    !vergleich || arbeit === "platzhalter"),
+            ]),
+          ]),
           e("div", { key: "k", style: { display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" } }, [
             knopf("Als eigene Vorlage anlegen", eingelesenAnlegen, "haupt", arbeit === "einlesen"),
             knopf("Verwerfen", function () { setEinlese(null); }, "zweit", !!arbeit),
