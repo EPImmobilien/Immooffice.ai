@@ -364,3 +364,65 @@ Vorschaubilder der Seiten statt einer Auswahlliste, mehrere Felder
 zugleich auswählen, Bedingungen (`sichtbar_wenn`) im Editor ändern — und
 der Objektmodus, in dem dieselbe Fläche die Abweichungen EINES Objekts
 bearbeitet statt der Vorlage (Etappe 5).
+
+## Eigenes Design mitbringen — Stufe 1 (06.10.2026)
+
+> „Die Makler haben seit Jahren eigene Exposé-Designs, die sie weiter nutzen
+> wollen … das laden sie hoch und es wird nachgebaut, so gut es geht."
+
+Ein PDF ist kein Bild. Es trägt jeden Textlauf mit Ort, Größe und Farbe,
+jedes gefüllte Rechteck, jede Linie und jedes Bild mit seinem Rahmen. Das
+Nachbauen ist darum überwiegend **Auslesen**, nicht Raten —
+[`src/eigene/expose-einlesen.js`](../src/eigene/expose-einlesen.js) liest mit
+`pdf.js` beide Schichten (Text und Zeichnung) und baut daraus eine Vorlage im
+Format des Baukastens.
+
+Im **Browser**, nicht in einer Edge Function: ein Exposé mit vierzig Fotos
+sprengt deren Speicher — der Kopf von `parse-expose` hält genau diesen Fall
+fest („Fix gegen Status 546 / Memory-Limit"). pdf.js ist in der Anwendung
+ohnehin schon geladen (3.11.174, für den Grundriss-Editor).
+
+**Was Stufe 1 kann**, gemessen an zwei echten Exposés aus dem Betrieb:
+
+| | Studio-Exposé | Signature-Exposé |
+|---|---|---|
+| Seiten | 9 | 12 |
+| Elemente | 579 | 793 |
+| Textzeilen · Flächen · Linien · Bilder | 162 · 370 · 40 · 7 | 218 · 524 · 46 · 9 |
+| Textstile | 43 | 77 |
+| Dauer | 0,9 s | 0,8 s |
+
+Die beiden Markenfarben findet es nebenbei: `#980101` und `#c2c2bd` sind
+genau die, die der Mandant eingestellt hat.
+
+**Drei Dinge waren dabei nicht offensichtlich** und stehen jetzt als
+Kommentar an der Stelle, an der sie wehtun:
+
+1. **Die Schriftnamen.** `getTextContent()` nennt nur „sans-serif" — das ist
+   die Familie, mit der ein Browser zeichnen würde, nicht die Schrift im
+   Dokument. Der echte Name steht in den aufgelösten Objekten der Seite. Ohne
+   ihn würde jede Schrift zu Plus Jakarta Sans Regular, und die Zuordnung
+   wäre keine.
+2. **Die Farbe eines Textes** darf nicht nach der Reihenfolge zugeordnet
+   werden. Ein `showText` kann mehrere Textstücke erzeugen; auf der Datenseite
+   waren es 42 Aufrufe und 44 Stücke, und ab dem ersten Versatz stand jede
+   Farbe falsch. Jetzt wird der **Ort** festgehalten — und dafür braucht es
+   die Textzustandsmaschine (Tm, Td, TD, T\*), nicht nur `setTextMatrix`.
+3. **Das Leerzeichen** zwischen zwei Wörtern ist bei pdf.js ein eigenes
+   Stück. Wer es wegwirft, bekommt „DIEDATEN."
+
+**Was Stufe 1 bewusst nicht tut:** Platzhalter setzen (aus „123 m²" wird noch
+nicht `{{objekt.wohnflaeche}}`), Bilder den Slots zuordnen, die Marke
+verknüpfen. Das ist Stufe 2.
+
+**Grenzen, die bleiben:** Schriften werden zugeordnet, nicht übernommen
+(lizenzrechtlich meist nicht möglich — der Weg dafür ist `ci.font`, im Schema
+vorgesehen, im Renderer noch nicht). Ein als Bild exportiertes oder
+eingescanntes PDF hat keine Geometrie; dann sagt der Befund das auch.
+Gedrehte Texte werden waagerecht übernommen, schräge Linien weggelassen,
+gerundete Ecken werden zu Rechtecken.
+
+Geprüft wird in `tests/expose-einlesen.js` gegen ein PDF mit **bekannter**
+Geometrie: Farbfläche, Linie, Bild und zwei Textzeilen müssen hinterher an
+derselben Stelle stehen, in derselben Farbe, mit derselben Größe — und der
+Renderer muss die eingelesene Vorlage zeichnen können.

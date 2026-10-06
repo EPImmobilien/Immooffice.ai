@@ -362,6 +362,16 @@ else
   fehler=1
 fi
 
+abschnitt "Expose: wird aus einem fremden PDF eine Vorlage?"
+# Ein PDF mit bekannter Geometrie wird gebaut und wieder eingelesen. Geprueft
+# wird nicht "laeuft durch", sondern "steht nachher dasselbe an derselben
+# Stelle" — und ob der Renderer die eingelesene Vorlage zeichnen kann.
+if node tests/expose-einlesen.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Expose: malt die Bearbeitungsflaeche im Browser?"
 # Die einzige Stelle des Forks, die ohne Browser nicht laeuft: ein Canvas,
 # eine Schrift als FontFace, ein Zeichenkontext. Ohne Chromium wird der

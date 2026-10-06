@@ -298,6 +298,9 @@
     var modus = modusS[0], setModus = modusS[1];
     var seiteS = React.useState(0);
     var seite = seiteS[0], setSeite = seiteS[1];
+    // Eine eingelesene Vorlage, die noch nicht gespeichert ist.
+    var einleseS = React.useState(null);
+    var einlese = einleseS[0], setEinlese = einleseS[1];
 
     var laden = React.useCallback(function () {
       setDaten({ lade: true, liste: [], fehler: "" });
@@ -447,6 +450,48 @@
         if (a && a.error) { window.alert("Nicht gespeichert: " + a.error.message); return; }
         setEntwurf(null);
         laden();
+      });
+    }
+
+    /**
+     * Ein fremdes Exposé-PDF einlesen.
+     *
+     * Im Browser, nicht in einer Edge Function: ein Exposé mit vierzig
+     * Fotos sprengt deren Speicher (siehe den Kopf von parse-expose,
+     * "Fix gegen Status 546 / Memory-Limit"). Hier muss die Datei fuer
+     * diesen Schritt gar nicht erst hochgeladen werden.
+     */
+    function pdfEinlesen(datei) {
+      if (!datei) return;
+      if (!window.ImmoExposeEinlesen || !window.ImmoExposeEinlesen.verfuegbar()) {
+        setEinlese({ fehler: "pdf.js ist nicht geladen. Bitte die Seite neu laden." });
+        return;
+      }
+      setEinlese({ laeuft: true, name: datei.name });
+      datei.arrayBuffer().then(function (puffer) {
+        return window.ImmoExposeEinlesen.ausPdf(puffer, {
+          name: datei.name.replace(/\.pdf$/i, ""),
+        });
+      }).then(function (r) {
+        setEinlese({ dokument: r.dokument, befund: r.befund, name: datei.name });
+      }).catch(function (f) {
+        setEinlese({ fehler: String((f && f.message) || f), name: datei.name });
+      });
+    }
+
+    function eingelesenAnlegen() {
+      if (!einlese || !einlese.dokument) return;
+      setArbeit("einlesen");
+      var d = einlese.dokument;
+      window._sb.from("expose_vorlagen").insert({
+        name: d.name, beschreibung: d.beschreibung, basis: "leer", dokument: d,
+      }).select("id").single().then(function (a) {
+        setArbeit("");
+        if (a.error) { window.alert("Nicht angelegt: " + a.error.message); return; }
+        setEinlese(null);
+        laden();
+        setGewaehlt(a.data && a.data.id);
+        setModus("felder");
       });
     }
 
@@ -654,6 +699,68 @@
       ]);
     }
 
+
+    // --- Eigenes Design mitbringen ----------------------------------------
+    function einleseBereich() {
+      var b = einlese && einlese.befund;
+      return e("div", { key: "einlesen", style: {
+        marginBottom: 22, background: CI.card, border: "1px solid " + CI.border,
+        borderRadius: 10, padding: "14px 16px",
+      } }, [
+        e("div", { key: "t", style: {
+          fontSize: 10.5, fontWeight: 700, letterSpacing: "0.12em",
+          color: CI.muted, textTransform: "uppercase", marginBottom: 8,
+        } }, "Eigenes Design mitbringen"),
+        e("div", { key: "h", style: { fontSize: 12, color: CI.muted, lineHeight: 1.55, marginBottom: 10 } },
+          "Du hast ein Exposé-Design, das du seit Jahren benutzt? Lade es als "
+          + "PDF hoch — Flächen, Linien, Bildrahmen und jede Textzeile werden "
+          + "mit ihren Maßen übernommen und als eigene Vorlage angelegt. "
+          + "Schriften werden dem nächstliegenden unserer Schnitte zugeordnet, "
+          + "nicht übernommen; den Rest machst du auf der Fläche fertig."),
+        e("label", { key: "w", style: {
+          display: "inline-block", padding: "7px 14px", borderRadius: 8,
+          fontSize: 12.5, fontWeight: 600, cursor: "pointer",
+          background: CI.blau, color: "#fff", border: "1px solid " + CI.blau,
+        } }, [
+          (einlese && einlese.laeuft) ? "wird gelesen …" : "PDF wählen",
+          e("input", {
+            key: "i", type: "file", accept: "application/pdf,.pdf",
+            style: { display: "none" },
+            onChange: function (ev) {
+              var d = ev.target.files && ev.target.files[0];
+              ev.target.value = "";
+              pdfEinlesen(d);
+            },
+          }),
+        ]),
+        (einlese && einlese.fehler) ? e("div", { key: "f", style: {
+          background: "#fdecea", border: "1px solid #f5c6cb", color: CI.danger,
+          padding: "9px 11px", borderRadius: 8, fontSize: 12.5, marginTop: 10,
+          lineHeight: 1.5,
+        } }, einlese.fehler) : null,
+        b ? e("div", { key: "b", style: { marginTop: 12 } }, [
+          e("div", { key: "z", style: { fontSize: 12.5, color: CI.ink, lineHeight: 1.6 } },
+            einlese.name + ": " + b.seiten + " Seiten, " + b.texte + " Textzeilen, "
+            + b.flaechen + " Flächen, " + b.linien + " Linien, " + b.bilder
+            + " Bilder, " + b.stile + " Textstile."),
+          Object.keys(b.schriften || {}).length
+            ? e("div", { key: "s", style: { fontSize: 11.5, color: CI.muted, marginTop: 6, lineHeight: 1.5 } },
+                "Schriften im PDF: " + Object.keys(b.schriften).slice(0, 6).join(", ")
+                + (Object.keys(b.schriften).length > 6 ? " …" : "")) : null,
+          (b.warnungen || []).map(function (w, i) {
+            return e("div", { key: "w" + i, style: {
+              background: "#fff8e6", border: "1px solid #f0e0b8", borderRadius: 7,
+              padding: "7px 10px", fontSize: 12, marginTop: 8, lineHeight: 1.5,
+            } }, w);
+          }),
+          e("div", { key: "k", style: { display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" } }, [
+            knopf("Als eigene Vorlage anlegen", eingelesenAnlegen, "haupt", arbeit === "einlesen"),
+            knopf("Verwerfen", function () { setEinlese(null); }, "zweit", !!arbeit),
+          ]),
+        ]) : null,
+      ]);
+    }
+
     var warnArten = {};
     (vorschau.warnungen || []).forEach(function (w) {
       warnArten[w.art] = (warnArten[w.art] || 0) + 1;
@@ -667,6 +774,7 @@
           padding: "10px 12px", borderRadius: 8, fontSize: 12.5, marginBottom: 14,
         } }, daten.fehler) : null,
         daten.lade ? e("div", { key: "l", style: { color: CI.muted, fontSize: 13 } }, "Vorlagen werden geladen …") : null,
+        einleseBereich(),
         abschnitt("Systemvorlagen", "Sie gehören der Plattform und lassen sich "
           + "nicht ändern. Eine Kopie gehört dir und ist frei bearbeitbar.", system, "system"),
         abschnitt("Eigene Vorlagen", "", eigene, "eigen"),

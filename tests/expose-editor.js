@@ -312,6 +312,9 @@ if (fehler) { console.log(`\n  ${fehler} Pruefung(en) gescheitert.`); process.ex
   melde('Die eigene Vorlage steht da und ist Standard',
         alles.includes('Hausvorlage') && alles.includes('STANDARD'));
   melde('Beispieldaten sind als Beispiel benannt', alles.includes('Beispieldaten'));
+  melde('Ein eigenes Design laesst sich mitbringen',
+        alles.includes('Eigenes Design mitbringen') && alles.includes('PDF wählen'),
+        alles.slice(0, 200));
   melde('Ohne Auswahl keine Vorschau', alles.includes('Eine Vorlage wählen'));
 
   // --- 2. Eine Vorlage wählen: es entsteht ein PDF -----------------------
