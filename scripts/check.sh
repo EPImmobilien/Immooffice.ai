@@ -127,6 +127,17 @@ else
   fehler=1
 fi
 
+abschnitt "Sichten: halten sie die Mandantengrenze?"
+# Die uebrigen Mandantentests pruefen Tabellen. Eine Sicht ohne
+# security_invoker laeuft mit den Rechten ihres Eigners und hebt die
+# Trennung auf — am 06.10.2026 taten das fuenf, zwei davon auch fuers
+# Schreiben (fork_62).
+if scripts/lokale-db.sh psql -q -f tests/sichten.sql; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Rufnummern: nur dort suchen, wo eine steht"
 if python3 tests/rufnummern.py; then
   :

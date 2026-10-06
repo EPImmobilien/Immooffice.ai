@@ -5463,3 +5463,54 @@ fiel der zeilenweise Vergleich von 30 Dateien auf 10 — und mit ihm die
 Prüfung, dass an diesen Funktionen sonst nichts geändert wurde. Richtig ist:
 die Schranke **fügt** Zeilen hinzu und entfernt keine, und dieser Test sieht
 die entfernten. Der einzige Hinweis war die Zahl in der Erfolgsmeldung.
+
+---
+
+## 2026-10-06 · Fünf Sichten hoben die Mandantentrennung auf
+
+**Befund:** Der Sicherheitsberater von Supabase meldete fünf Sichten in
+`public` mit der Eigenschaft `SECURITY DEFINER`. Nachgesehen, was das hier
+bedeutet:
+
+In PostgreSQL läuft eine Sicht ohne `security_invoker` mit den Rechten ihres
+**Eigners**. Eigner ist `postgres`, und `postgres` ist Eigner der
+Basistabellen. Ein Tabelleneigner ist von Row-Level-Security befreit, solange
+`force row level security` aus ist — und es ist aus. Die restriktive
+Richtlinie `mandant_trennung` galt für diese fünf Wege also nicht.
+
+Dazu kam: `anon` hatte auf jeder dieser Sichten SELECT, INSERT, UPDATE und
+DELETE — Supabase vergibt das als Vorgabe auf alles in `public` —, und
+PostgreSQL stuft zwei der fünf als schreibbar ein
+(`is_updatable`/`is_insertable_into` = YES).
+
+Mit dem öffentlichen anon-Schlüssel allein, der im Browser jeder Auslieferung
+steht und kein Geheimnis ist, war damit über `/rest/v1/` der Akquise-Bestand
+**jedes** Mandanten lesbar — Anschrift, Preis, Courtage, Telefonnummern und
+E-Mail-Adressen privater Verkäufer — und schreibbar.
+
+**Nicht behauptet, nachgewiesen.** `tests/sichten.sql` legt zwei Mandanten an
+und versucht es. Vor `fork_62` fielen alle acht Prüfungen durch: A las B's
+Bewertung und B's Radar-Objekt, änderte B's Bewertungstitel auf „Gekapert"
+und löschte B's Radar-Objekt. Nach `fork_62` bestehen alle acht.
+
+**Entscheidung:** `security_invoker = true` auf **alle** Sichten in `public`,
+nicht auf die fünf gefundenen; dazu `anon` nichts und `authenticated` nur
+SELECT. Zwei Riegel, weil der zweite hier billig ist.
+
+**Grund für „alle" statt „die fünf":** die nächste Sicht entsteht sonst wieder
+mit den Rechten des Eigners. `create view` ist in PostgreSQL ohne weitere
+Angabe `SECURITY DEFINER`, und das ist eine Vorgabe, die sich serverseitig
+nicht ändern lässt. Deshalb läuft die Prüfung über alle Sichten und bei jedem
+Commit.
+
+**Was das eigentlich zeigt:** `tests/mandant.sql`,
+`tests/mandant-rundumschlag.sql` und `tests/rechte.sql` prüfen **Tabellen**.
+Sichten hat keiner von ihnen angesehen — ein ganzer Zugriffsweg war nie
+geprüft. Gefunden hat es ein fremdes Werkzeug, nicht ein eigenes Gate. Das
+ist der Grund, den Berater von jetzt an regelmäßig zu lesen.
+
+**Mitgeprüft und in Ordnung:** neun Tabellen in `public` haben RLS ohne
+Richtlinie (`rls_enabled_no_policy`, INFO). Alle neun sind in
+`mandanten_einstufung` als `DIENST` eingetragen — RLS an und keine Richtlinie
+heisst: niemand kommt heran ausser dem Dienstschlüssel. Das ist die Absicht,
+nicht ein Versäumnis.
