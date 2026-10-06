@@ -71,9 +71,65 @@ for (const name of empfaenger) {
 const katalogDatei = path.join(WURZEL, 'supabase', 'migrations',
   '20261006210000_fork_47_abrechnung.sql');
 const katalog = fs.existsSync(katalogDatei) ? fs.readFileSync(katalogDatei, 'utf8') : '';
+// Nur der EINE insert-Block. Bis zum 06.10.2026 lief der Ausdruck ueber die
+// ganze Datei und nahm die Tarifzeilen aus plattform_tarife mit — starter,
+// professional, business, zusatznutzer standen damit als "bekannte
+// Aktionen" da. Aufgefallen ist es erst, als die Gegenrichtung geprueft
+// wurde: ein zu grosser Satz bekannter Namen faellt bei einer Pruefung auf
+// Zugehoerigkeit nie auf.
+const katalogBlock = (katalog.match(
+  /insert into public\.plattform_credit_preise[\s\S]*?on conflict/) || [''])[0];
 const bekannt = new Set(
-  Array.from(katalog.matchAll(/\('([a-z_]+)',\s*'[^']*',\s*\d+,/g)).map((m) => m[1]));
+  Array.from(katalogBlock.matchAll(/\('([a-z_]+)',\s*'[^']*',\s*\d+,/g)).map((m) => m[1]));
 melde('der Katalog nennt Aktionen', bekannt.size >= 5, `${bekannt.size} Aktionen`);
+
+// --- 2b. Jeder Preis ueber null braucht einen Aufrufer -------------------
+// Die Gegenrichtung zu 2: dort muss jeder benutzte Schluessel im Katalog
+// stehen, hier muss jede bepreiste Aktion benutzt werden. Ein Preis fuer
+// etwas, das niemand ausloest, ist schlimmer als kein Preis — er steht auf
+// der oeffentlichen Preisseite (tarife-oeffentlich zeigt die aktiven
+// Zeilen) und verspricht eine Leistung, die es nicht gibt.
+//
+// Nullpreise stehen bewusst ohne Aufrufer da: CLAUDE.md verlangt, dass
+// PDF-Export, Web-Exposé ohne neue KI und erneute Downloads kostenfrei
+// sind, und der Katalog sagt das dem Kunden. Sie sind Auskunft, keine
+// Aktion.
+const preise = new Map(
+  Array.from(katalogBlock.matchAll(/\('([a-z_]+)',\s*'[^']*',\s*(\d+),/g))
+    .map((m) => [m[1], Number(m[2])]));
+// Mit Grund ohne Aufrufer. fork_60 hat sie in der Datenbank abgeschaltet;
+// hier stehen sie, damit niemand sie fuer vergessen haelt.
+const OHNE_AUFRUFER = {
+  expose_text: 'Die Oberflaeche erzeugt Baustein fuer Baustein, jeder als '
+    + 'eigener generate-text-Aufruf zu ki_text. Einen Sammelaufruf gibt es '
+    + 'nicht; ob es ihn geben soll, ist eine Produktentscheidung (fork_60).',
+  social_paket: 'Die Bildunterschrift ist ein einzelner generate-text-'
+    + 'Aufruf, also ki_text (fork_60).',
+  grundriss_visual: 'Keine Funktion erzeugt eine Grundrissvisualisierung. '
+    + 'grundriss-ki-lesen LIEST einen Grundriss (fork_60).',
+};
+const benutzt = new Set();
+for (const ordner of fs.readdirSync(FUNKTIONEN)) {
+  const datei = path.join(FUNKTIONEN, ordner, 'index.ts');
+  if (!fs.existsSync(datei)) continue;
+  const q = fs.readFileSync(datei, 'utf8');
+  if (!q.includes('kiAbrechnen(')) continue;
+  for (const t of q.matchAll(/kiAbrechnen\(\s*req\s*,\s*"([a-z_]+)"/g)) benutzt.add(t[1]);
+  for (const t of q.matchAll(/const abrAktion = [^;]+;/g)) {
+    for (const u of t[0].replace(/[=!]==?\s*"[^"]*"/g, '').matchAll(/"([a-z_]+)"/g)) benutzt.add(u[1]);
+  }
+}
+for (const [aktion, credits] of preise) {
+  if (credits === 0) continue;
+  melde(`"${aktion}" (${credits} Credits) wird von einer Funktion ausgeloest`,
+        benutzt.has(aktion) || aktion in OHNE_AUFRUFER,
+        'sonst steht ein Preis auf der Preisseite, den nichts ausloest');
+}
+for (const aktion of Object.keys(OHNE_AUFRUFER)) {
+  melde(`"${aktion}" steht zu Recht ohne Aufrufer`, !benutzt.has(aktion),
+        'es gibt jetzt einen — der Eintrag in OHNE_AUFRUFER gehoert raus, '
+        + 'und die Zeile in der Datenbank wieder auf aktiv');
+}
 
 // --- 3. Jede Funktion haengt richtig an ----------------------------------
 for (const name of empfaenger) {

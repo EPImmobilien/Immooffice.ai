@@ -187,6 +187,36 @@ Anbieter", sondern gegen „die Leistung": für die KI-Funktionen ist das der
 Anbieteraufruf, für den Signaturvorgang die Zeile in `signatur_vorgaenge`.
 Eine Funktion ohne Anbieter wäre sonst ungeprüft geblieben.
 
+### Nachtrag 06.10.2026 — drei Preise ohne Aktion (fork_60)
+
+Die Gegenrichtung zur Lücke unten: nicht eine Funktion ohne Preis, sondern
+ein Preis ohne Funktion. Drei Katalogzeilen standen auf der öffentlichen
+Preisseite und versprachen etwas, das die Software nicht tut:
+
+| Aktion | Preis | Warum nichts sie auslöst |
+|---|---|---|
+| `expose_text` | 10 | Die Oberfläche erzeugt Baustein für Baustein, jeder als eigener `generate-text`-Aufruf zu `ki_text`. Einen Sammelaufruf gibt es nicht. |
+| `social_paket` | 5 | Die Bildunterschrift ist ein einzelner `generate-text`-Aufruf, also ebenfalls `ki_text`. |
+| `grundriss_visual` | 30 | Keine Funktion erzeugt so etwas. `grundriss-ki-lesen` **liest** einen Grundriss, es zeichnet keinen. |
+
+`fork_60` schaltet sie ab, löscht sie aber nicht: sie beschreiben, was gebaut
+werden soll, und der Betreiber macht im Plattform-Admin ein Häkchen, sobald es
+die Aktion gibt. Ob ein Sammelpreis überhaupt gewollt ist — zehn Credits für
+das ganze Exposé gegen zwei je Baustein — ist eine Produktentscheidung, keine
+Code-Frage.
+
+Dass keine vierte Karteileiche entsteht, prüft `tests/credits.js`: jede
+Katalogaktion mit einem Preis über null braucht einen Aufrufer oder einen
+Eintrag mit Grund — und umgekehrt meldet der Test, wenn eine der drei
+plötzlich doch einen bekommt.
+
+**Nebenbefund dabei:** derselbe Test las die Katalognamen bis dahin aus der
+ganzen Migrationsdatei und nahm die Tarifzeilen aus `plattform_tarife` mit.
+`starter`, `professional`, `business` und `zusatznutzer` galten damit als
+bekannte Aktionen; ein `kiAbrechnen(req, "starter")` wäre durchgegangen.
+Aufgefallen ist es erst, als die Gegenrichtung geprüft wurde — ein zu großer
+Satz bekannter Namen fällt bei einer Prüfung auf Zugehörigkeit nie auf.
+
 ### Was noch NICHT abgerechnet wird
 
 Ehrlich benannt, weil es Geld ist: rund vierzig weitere Edge Functions rufen
