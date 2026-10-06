@@ -72,6 +72,21 @@ ABGESICHERT = {
         'Chef-Rolle vorbehalten. Die Stripe-Kennungen kommen aus der '
         'eigenen Abo-Zeile, nie aus dem Koerper — sonst liesse sich das Abo '
         'eines fremden Mandanten kuendigen.'),
+    'plattform-admin': ("plattform_admins",
+        'Der Bereich des Betreibers. Er NIMMT Kennungen aus dem Koerper — '
+        'eine Mandantenkennung fuer die Gutschrift, einen Katalogschluessel '
+        'fuer eine Preisaenderung — und das ist hier Absicht: wer in '
+        'plattform_admins steht, pflegt die Plattform und ihre '
+        'Vertragsbeziehungen. Die Pruefung ist deshalb nicht der Mandant, '
+        'sondern die Mitgliedschaft in dieser Liste; sie steht vor jeder '
+        'Aktion. Was NICHT herausgeht, ist die Grenze, die zaehlt: keine '
+        'Immobilie, kein Kontakt, keine Mail, keine Datei eines Mandanten — '
+        'nur Tarif, Status, Fristen, Nutzerzahl und Verbrauch. Welche '
+        'Spalten eine Katalogtabelle aendern laesst, steht in einer Liste '
+        'und nicht als Durchreiche: sonst liesse sich ueber dieselbe Aktion '
+        'stripe_price_id setzen und ein Tarif auf ein fremdes Produkt '
+        'zeigen. Jede Aenderung steht im Protokoll, das niemand aendern '
+        'oder loeschen kann.'),
     'expose-sofortversand': ('mandant_sichern',
         'Sendet das Exposé an eine Adresse aus dem Anfragekoerper. Ohne '
         'Pruefung haette ein angemeldeter Makler das Exposé eines fremden '

@@ -170,6 +170,17 @@ UNBEDENKLICH = {
         'und die ist eine Anzahl ohne Bezug: sie sagt "noch 37 frei" und '
         'nicht, wer die anderen dreizehn sind. Stripe-Kennungen gehen '
         'bewusst NICHT hinaus.',
+    'testphase-erinnerung':
+        'Ziel eines Cron-Jobs, wie die uebrigen Sammelversender der Vorlage: '
+        'der Zeitplan bringt kein Konto mit. Aus dem Koerper nimmt sie '
+        'NICHTS ausser dem Schalter "probelauf" — keine Mandanten-, keine '
+        'Benutzerkennung, nichts, worueber sich eine Grenze ueberschreiten '
+        'liesse. Sie arbeitet auf allen Mandanten in der Testphase, und das '
+        'ist ihre Aufgabe. Verschickt wird ausschliesslich an die '
+        'Chef-Konten DESSELBEN Mandanten, dessen Testphase endet; der Inhalt '
+        'ist die Frist und ein Link zum Tarif, keine fachliche Angabe. Der '
+        'Doppelversand ist ueber den Primaerschluessel von '
+        'abo_erinnerungen gesperrt, nicht ueber eine Abfrage davor.',
     'stripe-webhook':
         'Oeffentlich, weil Stripe kein Supabase-Token mitbringt. Die '
         'Echtheit haengt an der Signatur im Kopf, und die rechnet die '

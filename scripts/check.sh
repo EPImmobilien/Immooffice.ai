@@ -550,6 +550,26 @@ else
   fehler=1
 fi
 
+abschnitt "Testphase: Erinnerung und Band"
+# Drei Meldungen vor dem Ende, je einmal. Die Sperre gegen Doppelversand ist
+# ein Schluessel und keine Abfrage — zwei gleichzeitige Laeufe saehen eine
+# Abfrage nicht.
+if node tests/testphase.js; then
+  :
+else
+  fehler=1
+fi
+
+abschnitt "Plattform-Bereich: was der Betreiber sieht — und was nicht"
+# Die Linie verlaeuft bei "Daten AUS einem Mandanten". Geprueft wird gegen
+# eine Liste ERLAUBTER Tabellen; eine Verbotsliste waere am Tag ihrer
+# Entstehung vollstaendig und danach nie wieder.
+if node tests/plattform-admin.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Abo & Abrechnung: die Tafel im Kundenbereich"
 # Gezeichnet wird mit einem nachgebauten React. Die Frage ist nicht, wie es
 # aussieht, sondern ob vor einer Kuendigung das Datum steht und ob die Tafel

@@ -4619,6 +4619,44 @@ WOERTLICH = [
      '      : reiter === "vertragsvorlagen" ? React.createElement(EinstVertragsvorlagen, { user })\n      : React.createElement(EinstVorgaben, null));',
      '      : reiter === "vertragsvorlagen" ? React.createElement(EinstVertragsvorlagen, { user })\n      : reiter === "abrechnung" ? (window.ImmoAbrechnung\n          ? React.createElement(window.ImmoAbrechnung, null)\n          : React.createElement("div", { style: { padding: 20, color: CI.muted } },\n              "Die Abrechnung konnte nicht geladen werden."))\n      : React.createElement(EinstVorgaben, null));',
      'Einstellungen: der Reiter zeigt die Abrechnungstafel.'),
+
+    # =====================================================================
+    # fork_52 — der Plattform-Bereich des Betreibers
+    # ---------------------------------------------------------------------
+    # Eine Kachel, eine Ansicht, eine Sperre und die Frage beim Anmelden.
+    # Die Sperre hier ist die zweite; die erste steht in der Edge Function
+    # `plattform-admin` und prueft dieselbe Liste. Wer die Ansicht ueber
+    # die Adresszeile aufruft, sieht deshalb nichts — die Tafel bekommt
+    # schlicht keine Daten.
+    # =====================================================================
+    ('FORK',
+     '  window.IMMO_MANDANT_ID = (t && t.mandant_id) || null;',
+     '  window.IMMO_MANDANT_ID = (t && t.mandant_id) || null;\n  // fork_52: Ist der Angemeldete Plattform-Administrator? Die Antwort\n  // steuert nur, OB die Kachel erscheint. Was sie zeigt, entscheidet die\n  // Edge Function `plattform-admin` noch einmal — gegen dieselbe Liste.\n  // Ein ausgeblendetes Bedienelement ist keine Sperre.\n  try {\n    const { data: pa } = await window._sb.rpc("ist_plattform_admin");\n    window.IMMO_PLATTFORM_ADMIN = pa === true;\n  } catch (f) { window.IMMO_PLATTFORM_ADMIN = false; }',
+     'Plattform-Admin: beim Anmelden einmal nachfragen.'),
+    ('FORK',
+     '    immoEinstellungenKachel = {\n      id: "einstellungen",\n      title: "Einstellungen",\n      subtitle: "Firma, Standorte, Vorlagen",\n      icon: Wrench,\n      num: "★",\n      isChef: !0\n    };',
+     '    immoEinstellungenKachel = {\n      id: "einstellungen",\n      title: "Einstellungen",\n      subtitle: "Firma, Standorte, Vorlagen",\n      icon: Wrench,\n      num: "★",\n      isChef: !0\n    },\n    // fork_52: der Bereich des Betreibers, nicht des Maklers. Erscheint nur\n    // fuer die, die in plattform_admins stehen.\n    immoPlattformKachel = {\n      id: "plattform",\n      title: "Plattform",\n      subtitle: "Tarife, Mandanten, Zahlen",\n      icon: Wrench,\n      num: "★",\n      isChef: !0\n    };',
+     'Plattform-Admin: die Kachel.'),
+    ('FORK',
+     'hatRecht(e, "admin") && c.push(r), e && "chef" === e.role && c.push(immoEinstellungenKachel);',
+     'hatRecht(e, "admin") && c.push(r), e && "chef" === e.role && c.push(immoEinstellungenKachel), window.IMMO_PLATTFORM_ADMIN && c.push(immoPlattformKachel);',
+     'Plattform-Admin: die Kachel erscheint nur fuer ihn.'),
+    ('FORK',
+     '      bewerber: {\n        title: "Bewerber",\n        subtitle: "Chef-Bereich – Einstellungstests",\n        comp: React.createElement(BewerberPage, {\n          user: k\n        })\n      }\n    };',
+     '      bewerber: {\n        title: "Bewerber",\n        subtitle: "Chef-Bereich – Einstellungstests",\n        comp: React.createElement(BewerberPage, {\n          user: k\n        })\n      },\n      // fork_52: Plattform-Admin. Die Tafel steht in src/eigene/plattform.js.\n      plattform: {\n        title: "Plattform",\n        subtitle: "Betreiber – Tarife, Mandanten, Zahlen",\n        breit: !0,\n        comp: window.ImmoPlattform\n          ? React.createElement(window.ImmoPlattform, null)\n          : React.createElement("div", {\n              style: { padding: 24, color: CI.muted }\n            }, "Der Plattform-Bereich konnte nicht geladen werden.")\n      }\n    };',
+     'Plattform-Admin: die Ansicht.'),
+    ('FORK',
+     '  if ("bewerber" === g && (!k || "chef" !== k.role)) {',
+     '  if ("plattform" === g && !window.IMMO_PLATTFORM_ADMIN) {\n    A("home");\n    try {\n      window.history.replaceState({\n        view: "home"\n      }, "", window.location.pathname + window.location.search)\n    } catch (e) {}\n    return null\n  }\n  if ("bewerber" === g && (!k || "chef" !== k.role)) {',
+     'Plattform-Admin: die Ansichtssperre.'),
+
+    # =====================================================================
+    # fork_53 — das Abo-Band ueber jeder Seite
+    # =====================================================================
+    ('FORK',
+     '  }, [u, n?.id]), React.createElement("div", {\n    style: {\n      minHeight: "100vh",\n      background: CI.bg,\n      fontFamily: FONT\n    }\n  }, c && i && React.createElement(MobileBurgerMenu, {',
+     '  }, [u, n?.id]), React.createElement("div", {\n    style: {\n      minHeight: "100vh",\n      background: CI.bg,\n      fontFamily: FONT\n    }\n  },\n  // fork_53: das Band ueber der Anwendung. Es erscheint nur in den vier\n  // Lagen, in denen jemand etwas erfahren MUSS, bevor er es daran merkt,\n  // dass etwas nicht mehr geht — Testphase laeuft aus, Zahlung offen,\n  // Lesezugriff oder Sperre, Credits knapp. Sonst ist es nicht da; ein\n  // Band, das immer steht, liest niemand mehr.\n  window.ImmoAboBanner && React.createElement(window.ImmoAboBanner, {\n    onNavigate: i\n  }), c && i && React.createElement(MobileBurgerMenu, {',
+     'Abo-Band: erscheint ueber jeder Seite, wenn es etwas zu sagen gibt.'),
 ]
 
 

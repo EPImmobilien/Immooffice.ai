@@ -890,6 +890,14 @@ async function getProfile(e) {
   // darauf eingerichtet: die Feiertagsrechnung nimmt dann die neun
   // bundesweiten, und das ist besser als falsche.
   window.IMMO_MANDANT_ID = (t && t.mandant_id) || null;
+  // fork_52: Ist der Angemeldete Plattform-Administrator? Die Antwort
+  // steuert nur, OB die Kachel erscheint. Was sie zeigt, entscheidet die
+  // Edge Function `plattform-admin` noch einmal — gegen dieselbe Liste.
+  // Ein ausgeblendetes Bedienelement ist keine Sperre.
+  try {
+    const { data: pa } = await window._sb.rpc("ist_plattform_admin");
+    window.IMMO_PLATTFORM_ADMIN = pa === true;
+  } catch (f) { window.IMMO_PLATTFORM_ADMIN = false; }
   try {
     const {
       data: s
@@ -2696,7 +2704,15 @@ function PageShell({
       background: CI.bg,
       fontFamily: FONT
     }
-  }, c && i && React.createElement(MobileBurgerMenu, {
+  },
+  // fork_53: das Band ueber der Anwendung. Es erscheint nur in den vier
+  // Lagen, in denen jemand etwas erfahren MUSS, bevor er es daran merkt,
+  // dass etwas nicht mehr geht — Testphase laeuft aus, Zahlung offen,
+  // Lesezugriff oder Sperre, Credits knapp. Sonst ist es nicht da; ein
+  // Band, das immer steht, liest niemand mehr.
+  window.ImmoAboBanner && React.createElement(window.ImmoAboBanner, {
+    onNavigate: i
+  }), c && i && React.createElement(MobileBurgerMenu, {
     user: n,
     offen: u,
     onSchliessen: () => m(!1),
@@ -22681,6 +22697,16 @@ function HomePage({
       icon: Wrench,
       num: "★",
       isChef: !0
+    },
+    // fork_52: der Bereich des Betreibers, nicht des Maklers. Erscheint nur
+    // fuer die, die in plattform_admins stehen.
+    immoPlattformKachel = {
+      id: "plattform",
+      title: "Plattform",
+      subtitle: "Tarife, Mandanten, Zahlen",
+      icon: Wrench,
+      num: "★",
+      isChef: !0
     };
   let c = [{
     id: "immobilien",
@@ -22773,7 +22799,7 @@ function HomePage({
     icon: Search,
     num: "14"
   }].filter(t => hatRecht(e, t.id));
-  hatRecht(e, "posteingang") && c.push(o), hatRecht(e, "rechnungen") && !hatRecht(e, "finanzen") && c.push(i), hatRecht(e, "finanzen") && c.push(l), e && "chef" === e.role && c.push(s), hatRecht(e, "expose_vorlagen_bearbeiten") && c.push(immoExposeVorlagenKachel), hatRecht(e, "admin") && c.push(r), e && "chef" === e.role && c.push(immoEinstellungenKachel);
+  hatRecht(e, "posteingang") && c.push(o), hatRecht(e, "rechnungen") && !hatRecht(e, "finanzen") && c.push(i), hatRecht(e, "finanzen") && c.push(l), e && "chef" === e.role && c.push(s), hatRecht(e, "expose_vorlagen_bearbeiten") && c.push(immoExposeVorlagenKachel), hatRecht(e, "admin") && c.push(r), e && "chef" === e.role && c.push(immoEinstellungenKachel), window.IMMO_PLATTFORM_ADMIN && c.push(immoPlattformKachel);
   const d = Object.fromEntries(c.map(e => [e.id, e])),
     u = c.map(e => e.id),
     [m, g] = useState(u),
@@ -123589,6 +123615,17 @@ function App() {
         comp: React.createElement(BewerberPage, {
           user: k
         })
+      },
+      // fork_52: Plattform-Admin. Die Tafel steht in src/eigene/plattform.js.
+      plattform: {
+        title: "Plattform",
+        subtitle: "Betreiber – Tarife, Mandanten, Zahlen",
+        breit: !0,
+        comp: window.ImmoPlattform
+          ? React.createElement(window.ImmoPlattform, null)
+          : React.createElement("div", {
+              style: { padding: 24, color: CI.muted }
+            }, "Der Plattform-Bereich konnte nicht geladen werden.")
       }
     };
   if ("posteingang" === g && !hatRecht(k, "posteingang")) {
@@ -123601,6 +123638,15 @@ function App() {
     return null
   }
   if ("einstellungen" === g && (!k || "chef" !== k.role)) {
+    A("home");
+    try {
+      window.history.replaceState({
+        view: "home"
+      }, "", window.location.pathname + window.location.search)
+    } catch (e) {}
+    return null
+  }
+  if ("plattform" === g && !window.IMMO_PLATTFORM_ADMIN) {
     A("home");
     try {
       window.history.replaceState({

@@ -43,8 +43,12 @@ function machReact(zustaende) {
       typ, props: Object.assign({}, eigenschaften || {},
         kinder.length ? { children: kinder.length === 1 ? kinder[0] : kinder } : {}),
     }),
-    useState: () => {
-      const wert = zustaende[i++];
+    // Die ersten Aufrufe bekommen den vorgegebenen Zustand, alle weiteren
+    // ihren eigenen Anfangswert — sonst bekaeme eine innere Tafel
+    // `undefined` statt ihres Entwurfs.
+    useState: (anfang) => {
+      const wert = i < zustaende.length ? zustaende[i] : anfang;
+      i++;
       return [wert, () => {}];
     },
     useEffect: () => {},

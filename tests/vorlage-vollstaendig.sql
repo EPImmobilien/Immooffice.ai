@@ -333,7 +333,29 @@ zuwachs(bereich, mehr, grund) as (values
   -- fork_48: die Buckets, die keine einzige Richtlinie hatten.
   ('Storage-Richtlinien', 13, 'fork_48: sieben Buckets ohne jede Richtlinie — '
      'transfer-dateien, scan-dateien, objektbilder, objektdokumente und '
-     'energieausweis je drei, importe zwei, briefe-pdf eine')
+     'energieausweis je drei, importe zwei, briefe-pdf eine'),
+
+  -- fork_52: das Protokoll der Plattform-Administratoren.
+  ('Tabellen', 1, 'fork_52: plattform_protokoll'),
+  ('Tabellen mit RLS', 1, 'fork_52: auch dieses'),
+  ('Spalten', 6, 'fork_52: id, benutzer_id, aktion, gegenstand, einzelheiten, erstellt_am'),
+  ('Primaer- und Eindeutigkeitsschluessel', 1, 'fork_52: der Primaerschluessel'),
+  ('Fremdschluessel', 1, 'fork_52: auf profiles'),
+  ('Indizes ohne Constraint', 2, 'fork_52: Zeit und Gegenstand'),
+  ('Richtlinien', 1, 'fork_52: lesen darf nur ein Plattform-Administrator'),
+  ('Funktionen', 1, 'fork_52: plattform_protokoll_unveraenderlich'),
+  ('Trigger', 1, 'fork_52: das Protokoll wird nicht geaendert und nicht geloescht'),
+
+  -- fork_53: die Erinnerung vor dem Ende der Testphase.
+  ('Tabellen', 1, 'fork_53: abo_erinnerungen'),
+  ('Tabellen mit RLS', 1, 'fork_53: auch diese'),
+  ('Spalten', 5, 'fork_53: mandant_id, art, gesendet_am, empfaenger, erstellt_am'),
+  ('Primaer- und Eindeutigkeitsschluessel', 1,
+     'fork_53: (mandant_id, art) ist die Sperre gegen Doppelversand'),
+  ('Fremdschluessel', 1, 'fork_53: auf mandanten'),
+  ('Indizes ohne Constraint', 2, 'fork_53: nach Mandant und nach Zeit'),
+  ('Richtlinien', 2, 'fork_53: lesen und die restriktive Mandantentrennung'),
+  ('Cron-Jobs', 1, 'fork_53: testphase-erinnerung-taeglich')
 ),
 soll(bereich, soll) as (
   select v.bereich,

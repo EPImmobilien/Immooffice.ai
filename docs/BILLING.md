@@ -219,7 +219,73 @@ Fall ohne Katalog. 38 Prüfungen.
 
 ---
 
-## 7. Die Preise auf der Website
+## 7. Der Plattform-Bereich des Betreibers (fork_52)
+
+Eine eigene Kachel, sichtbar nur für die, die in `plattform_admins` stehen.
+Vier Reiter: **Zahlen** (Monatserlös, zahlende Abos, Credit-Verbrauch und
+Anbieterkosten der letzten 30 Tage, freie Gründerplätze, Verbrauch nach
+Aktion), **Mandanten**, **Katalog** und **Protokoll**.
+
+**Die Grenze.** CLAUDE.md: „Plattform-Administratoren erhalten keinen
+automatischen Zugriff auf Mandantendaten." Sie verläuft nicht bei „Daten über
+einen Mandanten" — Tarif, Status und Verbrauch braucht jeder, der Rechnungen
+schreibt —, sondern bei **Daten aus einem Mandanten**. Keine Immobilie, kein
+Kontakt, keine Mail, keine Datei.
+
+`tests/plattform-admin.js` prüft das gegen eine Liste **erlaubter** Tabellen,
+nicht gegen eine Liste verbotener: eine Verbotsliste ist am Tag ihrer
+Entstehung vollständig und danach nie wieder.
+
+**Was sich ändern lässt**, steht ebenfalls in einer Liste: Name, Preise,
+Nutzerzahl, Credits, Merkmale, Hinweis, aktiv, empfohlen. Keine
+Stripe-Kennung und keine Mandantenzuordnung — sonst liesse sich über dieselbe
+Aktion `stripe_price_id` setzen, und ein Tarif zeigte auf ein fremdes Produkt.
+
+**Jede Änderung** steht in `plattform_protokoll`, mit Person, Zeit,
+Gegenstand und Vorher/Nachher. Eine Credit-Gutschrift ohne Begründung wird
+abgewiesen. Das Protokoll ist durch einen Trigger geschützt — eine Richtlinie
+allein genügte nicht, weil der Dienstschlüssel sie umgeht.
+
+Eine Preisänderung wirkt **sofort** auf der Website und im Kundenbereich; bei
+Stripe entsteht sie erst mit dem nächsten Lauf von
+`scripts/stripe-einrichten.mjs`. Das sagt die Antwort der Funktion, statt es
+den Betreiber herausfinden zu lassen.
+
+---
+
+## 8. Die Testphase endet nicht unangekündigt (fork_53)
+
+Drei Meldungen, gerechnet in **verbleibenden** Tagen: sieben, zwei, null. Bei
+der voreingestellten Testphase von 28 Tagen ist das Tag 21, 26 und 28; ändert
+der Betreiber die Länge im Plattform-Admin, wandern die Meldungen mit. Eine
+feste Zahl „Tag 21" wäre bei einer vierzehntägigen Testphase die dritte Mail
+nach dem Ende.
+
+Jede Meldung geht **einmal**. Die Sperre ist der Primärschlüssel von
+`abo_erinnerungen` (Mandant, Art), nicht eine Abfrage davor: zwei
+gleichzeitige Läufe sähen sich sonst nicht. Scheitert der Versand, wird die
+Sperre wieder gelöst — eine Meldung, die nicht hinausging, darf nicht als
+erledigt gelten.
+
+Empfänger sind die **Chef-Konten desselben Mandanten**. Inhalt: die Frist,
+der Hinweis, dass nichts automatisch abgebucht und nichts stillschweigend
+verlängert wird, die Dauer des anschliessenden Lesezugriffs und ein Link zur
+Tarifwahl. Keine fachliche Angabe.
+
+Dazu ein **Band über jeder Seite** der Anwendung, in genau vier Lagen:
+Testphase läuft in sieben Tagen aus · Zahlung offen · Lesezugriff oder Sperre
+· Credits knapp. Sonst ist es nicht da — ein Band, das immer steht, liest
+niemand mehr. Bei einer Sperre lässt es sich nicht wegklicken, in den letzten
+beiden Testtagen auch nicht.
+
+„Knapp" ist kein Gefühl: der Anteil steht als `warnung_rest_prozent` im
+Katalog und wird gegen das Monatskontingent des Tarifs gerechnet — in
+`abo-verwalten`, nicht in der Oberfläche, weil ein Mitarbeiter den Tarif mit
+Absicht nicht zu sehen bekommt.
+
+---
+
+## 9. Die Preise auf der Website
 
 Ein Abschnitt `#preise` in der bestehenden Landingpage, keine eigene
 Preisseite. Die Zahlen im HTML sind **Rückfall**, nicht Quelle: `seite.js`
@@ -246,9 +312,9 @@ in den Fragen ist genau der, den später niemand mitpflegt.
 
 ---
 
-## 8. Abnahme
+## 10. Abnahme
 
-### 8.1 Hier geprüft — `tests/abrechnung.sql`, Teil von `npm run check`
+### 10.1 Hier geprüft — `tests/abrechnung.sql`, Teil von `npm run check`
 
 34 Prüfungen gegen eine echte Postgres-Instanz, alle grün:
 
@@ -264,6 +330,14 @@ in den Fragen ist genau der, den später niemand mitpflegt.
 | Zugriff | aktiv → `voll` · nach Kündigungstermin → `nur_lesen` · danach → `gesperrt` · Sperre wirkt sofort |
 | Gründer | ein Platz wird vergeben, ein zweiter Aufruf vergibt keinen zweiten, der Zähler zählt genau einen herunter |
 
+Dazu `tests/plattform-admin.js` (44 Prüfungen): die Funktion fasst nur
+Plattform- und Vertragstabellen an, keine Stripe-Kennung lässt sich von Hand
+setzen, jede Änderung wird protokolliert, und die vier Reiter zeichnen sich.
+Und `tests/testphase.js` (33 Prüfungen): drei Stufen in verbleibenden Tagen,
+die Sperre vor dem Versand, die Freigabe nach einem Fehlschlag, nur
+Chef-Konten desselben Hauses — und ein Band, das in sieben Lagen das Richtige
+zeigt oder gar nichts.
+
 Dazu `tests/credits.js` (62 Prüfungen): jede Kopie der Beilage ist byte-gleich
 mit ihrer Quelle, jeder Aktionsschlüssel steht im Katalog, reserviert wird vor
 dem Anbieter, gebucht danach, und zwischen Reservierung und Buchung gibt jeder
@@ -277,7 +351,7 @@ sähe man nicht, ob die Seite den Katalog oder den Rückfall zeigt), der
 Umschalter rechnet, der Knopf nimmt Tarif und Takt mit, und bei 375 px Breite
 steht nichts über dem Rand.
 
-### 8.2 Nicht hier prüfbar — Abnahme beim Betreiber
+### 10.2 Nicht hier prüfbar — Abnahme beim Betreiber
 
 Dieser Container kommt **weder an Stripe noch an Supabase über HTTPS** heran,
 und einen Stripe-Schlüssel gibt es hier nicht. Die folgenden Punkte muss der
@@ -302,18 +376,18 @@ Betreiber einmal durchspielen. Die Reihenfolge ist die sinnvolle.
 8. **Gründerpreis** → der Coupon greift nur auf dem dafür bestimmten Tarif,
    und der Zähler auf der Website zählt herunter.
 9. **Zwei Mandanten nebeneinander** → Mandant A sieht in der Oberfläche
-   nichts von B. (Die Datenbankseite ist unter 8.1 geprüft; hier geht es um
+   nichts von B. (Die Datenbankseite ist unter 10.1 geprüft; hier geht es um
    den Weg durch die Anwendung.)
 
-Ergebnisse gehören in dieses Dokument, Abschnitt 8.3.
+Ergebnisse gehören in dieses Dokument, Abschnitt 10.3.
 
-### 8.3 Ergebnisse der Abnahme beim Betreiber
+### 10.3 Ergebnisse der Abnahme beim Betreiber
 
-Noch keine. Einzutragen, sobald die Punkte aus 8.2 durchgespielt sind.
+Noch keine. Einzutragen, sobald die Punkte aus 10.2 durchgespielt sind.
 
 ---
 
-## 9. Was der Betreiber setzen muss
+## 11. Was der Betreiber setzen muss
 
 Supabase → Edge Functions → Secrets (siehe `docs/SECRETS.md` und
 `.env.example`):
@@ -324,12 +398,21 @@ Supabase → Edge Functions → Secrets (siehe `docs/SECRETS.md` und
 | `STRIPE_WEBHOOK_SECRET` | `whsec_…` aus dem Webhook-Endpunkt |
 | `STRIPE_COUPON_GRUENDER` | `GRUENDER` — ohne ihn gibt es schlicht keinen Nachlass |
 | `PORTAL_URL` | wohin Stripe den Kunden zurückschickt |
+| `RESEND_API_KEY`, `SMTP_FROM_EMAIL` | für die Testphasen-Erinnerung (beide sind schon für andere Mails gesetzt) |
+
+Dazu **einmalig**: sich selbst in `plattform_admins` eintragen — sonst ist
+der Plattform-Bereich für niemanden sichtbar.
+
+```sql
+insert into public.plattform_admins (benutzer_id, notiz)
+select id, 'Betreiber' from public.profiles where email = '…';
+```
 
 Danach `website/konfig.js` → `preise` auf die eigene Projektadresse prüfen.
 
 ---
 
-## 10. Gate 3 — bevor es live geht
+## 12. Gate 3 — bevor es live geht
 
 Dieses Gate ist ein **Stopp**, kein Haken. Vor der Umstellung auf Live-Keys:
 

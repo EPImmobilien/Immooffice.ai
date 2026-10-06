@@ -93,9 +93,21 @@ Deno.serve(async (req) => {
       const { data: m } = await db.from("mandanten")
         .select("testphase_bis, abo_status, gesperrt_am").eq("id", mandant).maybeSingle();
 
+      // Sind die Credits knapp? „Knapp" ist kein Gefühl: der Anteil steht im
+      // Katalog (warnung_rest_prozent) und wird gegen das Monatskontingent
+      // des Tarifs gerechnet. Gerechnet wird HIER und nicht in der
+      // Oberfläche — sonst bräuchte jede Ansicht den Tarif, und ein
+      // Mitarbeiter bekommt ihn mit Absicht nicht zu sehen.
+      const { data: w } = await db.from("plattform_werte")
+        .select("wert").eq("schluessel", "warnung_rest_prozent").maybeSingle();
+      const anteil = Number(String(w?.wert ?? "10").replace(/"/g, "")) || 10;
+      const monatskontingent = Number((tarif as { data?: { credits_monat?: number } })?.data?.credits_monat ?? 0);
+      const knapp = monatskontingent > 0
+        && Number(saldo ?? 0) < Math.ceil(monatskontingent * anteil / 100);
+
       return antwort({
         ok: true,
-        zugriff, saldo,
+        zugriff, saldo, credits_knapp: knapp,
         nutzer: { ist: nutzer || 0, limit },
         testphase_bis: m?.testphase_bis || null,
         konten: (konten.data || []).map((k: any) => ({

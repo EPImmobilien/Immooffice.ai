@@ -389,6 +389,17 @@ verify_jwt = true
 [functions.tarife-oeffentlich]
 verify_jwt = false
 
+# Plattform-Admin (fork_52). Angemeldet; ob der Angemeldete einer ist,
+# prueft die Funktion gegen plattform_admins — nicht gegen eine Rolle.
+[functions.plattform-admin]
+verify_jwt = true
+
+# Oeffentlich, weil der Zeitplan sie ruft (wie alle Cron-Ziele der Vorlage).
+# Sie nimmt NICHTS aus dem Koerper ausser dem Schalter "probelauf" und
+# arbeitet auf allen Mandanten in der Testphase — das ist ihre Aufgabe.
+[functions.testphase-erinnerung]
+verify_jwt = false
+
 # Oeffentlich, zwangslaeufig: Stripe bringt kein Supabase-Token mit. Die
 # Echtheit haengt an der Signatur, und die prueft die Funktion selbst.
 [functions.stripe-webhook]
