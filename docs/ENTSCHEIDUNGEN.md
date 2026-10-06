@@ -5132,3 +5132,52 @@ Stücke Oberfläche, alle in `src/eigene/` (Handarbeit, klassische Laufzeit):
   der Datei. Lässt sie sich nicht laden, läuft es wie vorher weiter: ein
   Werkzeug, das wegen einer fehlgeschlagenen Nebenabfrage gar nicht mehr
   arbeitet, ist schlimmer als eines ohne Auswahl.
+
+### Nachtrag: derselbe Katalog, zwei Gestalten (06.10.2026)
+
+Rückmeldung: „auf der Mobilversion ist das jetzt aber sehr unübersichtlich
+mit all den Tools … das müssen wir irgendwie noch ein bisschen schöner
+darstellen."
+
+Gemessen, bevor etwas geändert wurde — bei 390 × 844 px:
+
+| | vorher | nachher |
+|---|---|---|
+| Höhe des Katalogs | **9946 px** (knapp zwölf Bildschirme) | 2651 px |
+| Anteil an der ganzen Seite | 54 % | 24 % |
+| Filterleiste | 4 umgebrochene Zeilen, 134 px | 1 schiebbare Zeile, 52 px |
+| je Bereich | 224–449 px | ~73 px zugeklappt |
+
+**Zwei Gestalten, ein Markup.** Breit: Karten nebeneinander, alles sichtbar,
+nichts zum Klicken. Schmal: eine Liste, eine Zeile je Bereich, mit der
+**Anzahl der Funktionen** als Grund zu tippen. Beides ist dasselbe
+`<details open>` — ohne JavaScript bleibt alles offen, und das ist die
+richtige Rückfallebene: lieber alles sehen als nichts aufklappen können.
+
+**Umgeschaltet wird nur beim Wechsel der Breite**, nicht bei jedem
+`resize`. Sonst fiele jeder aufgeklappte Bereich wieder zu, sobald die
+Adresszeile eines Telefons beim Scrollen ein- oder ausfährt — der häufigste
+Fehler an solchen Umschaltern.
+
+**Ein Fund beim Nachmessen.** Beim Filtern sprang die Seite von selbst
+1892 px weit, und die Filterleiste landete hinter der klebenden Kopfzeile:
+man filtert und sieht nicht mehr, wonach. Ursache war nicht der eigene
+Code, sondern eine Kette — beim Tippen bekommt der Knopf den Fokus, der
+Browser scrollt ihn von sich aus ins Bild, und weil die Seite
+`scroll-behavior: smooth` hat, wird daraus eine Animation, deren Ziel beim
+Start feststeht. Währenddessen verschwinden bis zu 22 Bereiche aus dem
+Fluss, die Seite wird 1632 px kürzer, und die Animation landet 70 px zu
+weit unten.
+
+Im **echten** Ablauf — jemand tippt einen Knopf, den er sieht — tritt das
+nicht auf; es brauchte einen Klick auf einen Knopf außerhalb des Bildes, um
+es zu erzeugen. Behoben ist es trotzdem: zwei Bilder warten, bis Layout und
+fremde Animation stehen, dann die Strecke neu rechnen. Und nur dann, wenn
+die Leiste wirklich daneben steht — ein Ruck um zwanzig Pixel sähe aus wie
+ein Fehler.
+
+`tests/website-browser.js` prüft das Telefon jetzt eigens: Katalog unter
+vier Bildschirmhöhen, Filterleiste einzeilig, Bereiche zugeklappt, jede
+Zeile mit ihrer Zahl — und dass ein Tipp wirklich aufklappt. Eine Liste,
+die nur zuklappt, wäre schlimmer als gar keine. Gegengeprüft: ohne das
+Zuklappen schlagen drei Prüfungen an.

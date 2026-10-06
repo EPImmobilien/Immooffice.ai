@@ -149,6 +149,49 @@ const MIME = {
             `${zurueck} von ${katalog.module}`);
     }
 
+    // Der Katalog auf dem Telefon. Am 06.10.2026 war er dort 9946 px hoch —
+    // knapp zwoelf Bildschirmhoehen, mehr als die halbe Seite — und die
+    // Filterleiste brach in vier Zeilen um. Rueckmeldung des Betreibers:
+    // „auf der Mobilversion ist das jetzt aber sehr unübersichtlich".
+    // Deshalb stehen die Zahlen hier: sie sind die Beschwerde in Zahlen.
+    if (breite < 720) {
+      const schmal = await seite.evaluate(() => ({
+        hoehe: Math.round(document.querySelector('#module-katalog').getBoundingClientRect().height),
+        chipsHoehe: Math.round(document.querySelector('.chips').getBoundingClientRect().height),
+        offen: document.querySelectorAll('.modul[open]').length,
+        zahlen: document.querySelectorAll('.modul .anzahl').length,
+      }));
+      melde(`${name}: der Katalog passt in wenige Bildschirme`,
+            schmal.hoehe < hoehe * 4, `${schmal.hoehe} px bei ${hoehe} px Fenster`);
+      melde(`${name}: die Filterleiste ist EINE Zeile`, schmal.chipsHoehe < 70,
+            `${schmal.chipsHoehe} px`);
+      melde(`${name}: die Bereiche starten zugeklappt`, schmal.offen === 0,
+            `${schmal.offen} offen`);
+      melde(`${name}: jede Zeile sagt, wie viel dahintersteckt`,
+            schmal.zahlen === katalog.module, `${schmal.zahlen} Zahlen`);
+
+      // Und sie muessen sich auch oeffnen lassen — eine Liste, die nur
+      // zuklappt, waere schlimmer als gar keine.
+      await seite.click('.modul:nth-of-type(2) > summary');
+      await seite.waitForTimeout(250);
+      const geoeffnet = await seite.evaluate(() => {
+        const m = document.querySelectorAll('.modul')[1];
+        const li = m.querySelector('li');
+        return {
+          offen: m.hasAttribute('open'),
+          punktSichtbar: !!(li && li.getBoundingClientRect().height > 0),
+        };
+      });
+      melde(`${name}: ein Tipp klappt den Bereich auf`, geoeffnet.offen);
+      melde(`${name}: und die Funktionen werden sichtbar`, geoeffnet.punktSichtbar);
+    } else {
+      // Breit soll NICHTS zugeklappt sein: dort ist Platz, und ein Klick,
+      // der nichts bringt, ist ein Klick zu viel.
+      const zu = await seite.evaluate(() =>
+        document.querySelectorAll('.modul:not([open])').length);
+      melde(`${name}: breit steht alles offen`, zu === 0, `${zu} zugeklappt`);
+    }
+
     // Und der Weg in die Anwendung muss stimmen.
     const ziele = await seite.evaluate(() =>
       ['anmelden-oben', 'anmelden-buehne', 'anmelden-unten', 'anmelden-fuss']

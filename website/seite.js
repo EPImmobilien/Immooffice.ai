@@ -145,6 +145,35 @@
   // als nichts.
   var chips = Array.prototype.slice.call(document.querySelectorAll(".chip[data-filter]"));
   var module = Array.prototype.slice.call(document.querySelectorAll(".modul[data-gruppe]"));
+
+  // Schmal zugeklappt, breit offen.
+  //
+  // Im Markup steht `open`, und zwar mit Absicht: ohne JavaScript ist alles
+  // sichtbar, und das ist die richtige Rueckfallebene — lieber alles sehen
+  // als nichts aufklappen koennen. Erst hier wird auf dem Telefon
+  // zugeklappt, wo 27 ausgeklappte Bereiche 8691 px ergaeben.
+  //
+  // Umgeschaltet wird NUR beim Wechsel der Breite, nicht bei jedem
+  // resize-Ereignis: sonst fiele jedes Aufgeklappte wieder zu, sobald die
+  // Adresszeile eines Telefons beim Scrollen ein- oder ausfaehrt. Genau
+  // das ist der haeufigste Fehler an solchen Umschaltern.
+  var schmal = window.matchMedia("(max-width: 720px)");
+  var warSchmal = null;
+  function faltenAnpassen() {
+    var jetztSchmal = schmal.matches;
+    if (jetztSchmal === warSchmal) return;
+    warSchmal = jetztSchmal;
+    module.forEach(function (m) {
+      if (jetztSchmal) m.removeAttribute("open"); else m.setAttribute("open", "");
+    });
+  }
+  if (module.length) {
+    faltenAnpassen();
+    // addListener ist der alte Name; Safari unter 14 kennt den neuen nicht.
+    if (schmal.addEventListener) schmal.addEventListener("change", faltenAnpassen);
+    else if (schmal.addListener) schmal.addListener(faltenAnpassen);
+  }
+
   if (chips.length && module.length) {
     chips.forEach(function (chip) {
       chip.addEventListener("click", function () {
@@ -162,6 +191,41 @@
         });
         // Was gerade sichtbar geworden ist, soll auch erscheinen.
         if (typeof planen === "function") planen();
+        // Auf dem Telefon steht man nach dem Filtern sonst mitten in einer
+        // Liste, die gerade kuerzer geworden ist — und sieht nichts von dem,
+        // was man ausgewaehlt hat.
+        // Auf dem Telefon die Filterleiste unter die Kopfzeile holen — und
+        // zwar SELBST, nicht dem Browser ueberlassen.
+        //
+        // Was sonst passiert, ist am 06.10.2026 gemessen worden: beim Tippen
+        // bekommt der Knopf den Fokus, der Browser scrollt ihn von sich aus
+        // ins Bild, und weil die Seite "scroll-behavior: smooth" hat, wird
+        // daraus eine Animation. Ihr Ziel steht aber beim Start fest —
+        // berechnet am Layout VOR dem Filtern. Waehrend sie laeuft,
+        // verschwinden bis zu zweiundzwanzig Bereiche aus dem Fluss, die
+        // Seite wird 1632 px kuerzer, und die Animation landet 70 px zu
+        // weit unten: die Filterleiste steht hinter der klebenden
+        // Kopfzeile. Man filtert und sieht nicht mehr, wonach.
+        //
+        // Deshalb: zwei Bilder warten, bis Layout und fremde Animation
+        // stehen, dann die Strecke neu rechnen und selbst dorthin.
+        if (schmal.matches) {
+          window.requestAnimationFrame(function () {
+            window.requestAnimationFrame(function () {
+              var leiste = document.querySelector(".chips");
+              var kopfzeile = document.querySelector("header");
+              if (!leiste) return;
+              var hoehe = (kopfzeile ? kopfzeile.getBoundingClientRect().height : 64) + 12;
+              var ist = leiste.getBoundingClientRect().top;
+              // Im Normalfall — jemand tippt einen Knopf, den er sieht —
+              // bleibt die Leiste ohnehin stehen. Dann soll hier NICHTS
+              // passieren: ein Ruck um zwanzig Pixel sieht aus wie ein
+              // Fehler. Korrigiert wird nur, was wirklich daneben steht.
+              if (Math.abs(ist - hoehe) < 40) return;
+              window.scrollTo({ top: window.scrollY + ist - hoehe, behavior: "smooth" });
+            });
+          });
+        }
       });
       chip.setAttribute("aria-pressed", chip.classList.contains("an") ? "true" : "false");
     });

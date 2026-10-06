@@ -485,10 +485,16 @@ footer .schluss {
 }
 
 /* ------------------------------------------------------------------ Modul-Katalog
-   27 Bereiche sind zu viele für eine Reihe Kacheln und zu wenige für eine
-   eigene Seite. Also: Filterleiste oben, darunter ein Raster, das bei
-   schmalem Fenster einspaltig wird. Ohne JavaScript sind alle Bereiche
-   sichtbar — der Filter blendet aus, er lädt nicht nach. */
+   27 Bereiche sind auf einem grossen Bildschirm ein Raster und auf einem
+   Telefon eine Wand: gemessen am 06.10.2026 waren es dort 8691 px Kacheln,
+   knapp zwoelf Bildschirmhoehen, und die Filterleiste brach vorher in vier
+   Zeilen um. Niemand scrollt das.
+   Deshalb zwei Gestalten derselben Sache:
+     * breit  — Karten nebeneinander, alles sichtbar, nichts zum Klicken;
+     * schmal — eine Liste zum Aufklappen, eine Zeile je Bereich.
+   Beides ist dasselbe Markup: <details open>. Ohne JavaScript bleibt alles
+   offen, und das ist die richtige Rueckfallebene — lieber alles sehen als
+   nichts aufklappen koennen. */
 .fuehrung {
   max-width: 680px; margin: 14px auto 0; font-size: 17px; line-height: 1.7;
   color: var(--gedaempft);
@@ -502,7 +508,8 @@ footer .schluss {
 .chip {
   font: inherit; font-size: 14px; padding: 9px 17px; border-radius: 999px;
   border: 1px solid var(--linie); background: var(--karte); color: var(--blau);
-  cursor: pointer; transition: background .2s ease, color .2s ease, border-color .2s ease;
+  cursor: pointer; white-space: nowrap;
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
 }
 .chip:hover { border-color: var(--gold); }
 .chip.an { background: var(--blau); border-color: var(--blau); color: #fff; }
@@ -510,6 +517,12 @@ footer .schluss {
 .module {
   display: grid; gap: 18px;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  /* Beim Filtern verschwinden bis zu zweiundzwanzig Bereiche aus dem Fluss.
+     Der Browser versucht dann von sich aus, die Blickposition zu halten
+     (Scroll-Anchoring) — und sprang dabei gemessen 1892 px weit, mitten in
+     eine Liste, die gerade kuerzer geworden war. Hier ist das kein Dienst,
+     sondern eine Ueberraschung: der Blick soll bleiben, wo er ist. */
+  overflow-anchor: none;
 }
 .modul {
   background: var(--karte); border: 1px solid var(--linie);
@@ -517,9 +530,17 @@ footer .schluss {
   transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease, border-color .25s ease;
 }
 .modul:hover { transform: translateY(-3px); box-shadow: var(--schatten); border-color: var(--gold-hell); }
+
+/* Das Dreieck, das <details> von sich aus setzt, waere hier ein Fremdkoerper. */
+.modul > summary { list-style: none; display: block; }
+.modul > summary::-webkit-details-marker { display: none; }
+.modul > summary::marker { content: ""; }
+
 .modul .zeichen { font-size: 26px; display: block; margin-bottom: 10px; }
-.modul h3 { font-size: 19px; margin: 0 0 6px; }
-.modul > p { color: var(--gedaempft); font-size: 15px; margin: 0 0 14px; }
+.modul .name { display: block; font-family: var(--serif); font-size: 19px; font-weight: 600; margin-bottom: 6px; }
+.modul .satz { display: block; color: var(--gedaempft); font-size: 15px; margin-bottom: 14px; }
+.modul .anzahl, .modul .pfeil { display: none; }
+
 .modul ul { list-style: none; margin: 0; padding: 0; }
 .modul li {
   position: relative; padding-left: 20px; font-size: 14.5px; line-height: 1.55;
@@ -532,8 +553,82 @@ footer .schluss {
 /* Ausgefiltert: weg aus dem Fluss und weg aus dem Vorlesefluss. */
 .modul[hidden] { display: none; }
 
+/* --- Schmal: eine Liste zum Aufklappen ---------------------------------- */
+@media (max-width: 720px) {
+  /* Die Filterleiste als EINE Zeile, die man schiebt. Vier umgebrochene
+     Reihen Knoepfe sehen aus wie ein Formular, nicht wie eine Auswahl —
+     und sie schieben den ersten Bereich unter den Falz. Der Rand links und
+     rechts ist negativ, damit die Zeile bis an die Kante laeuft und
+     sichtbar ist, dass es weitergeht. */
+  .chips {
+    flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto;
+    margin: 24px -18px 18px; padding: 2px 18px 10px; gap: 8px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    /* Die Kopfzeile klebt oben. Ohne diesen Abstand landet die
+       Filterleiste beim Hinspringen genau darunter und ist weg — man
+       filtert und sieht nicht mehr, wonach. */
+    scroll-margin-top: 84px;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { scroll-snap-align: start; flex: 0 0 auto; font-size: 13.5px; padding: 8px 15px; }
+
+  .module { grid-template-columns: 1fr; gap: 0; }
+
+  /* Keine Karten mehr, sondern Zeilen einer Liste. Eine Umrandung je Zeile
+     ergaebe doppelte Linien; also nur eine Trennlinie, und die Rundung
+     bleibt der Liste als Ganzes. */
+  .modul {
+    border-radius: 0; border: 0; border-top: 1px solid var(--linie);
+    padding: 0; background: transparent; transform: none;
+  }
+  .modul:hover { transform: none; box-shadow: none; border-color: var(--linie); }
+  .modul:first-of-type { border-top: 0; }
+  .module { border: 1px solid var(--linie); border-radius: var(--rund); background: var(--karte); overflow: hidden; }
+
+  .modul > summary {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 14px; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .modul > summary:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+  .modul[open] > summary { align-items: flex-start; }
+  .modul[open] .zeichen,
+  .modul[open] .anzahl,
+  .modul[open] .pfeil { margin-top: 2px; }
+  .modul .zeichen { font-size: 20px; margin: 0; flex: 0 0 auto; line-height: 1; }
+  .modul .wort { flex: 1 1 auto; min-width: 0; }
+  .modul .name { font-size: 16px; margin: 0; }
+  .modul .satz {
+    font-size: 13px; margin: 2px 0 0; line-height: 1.45;
+    /* Zugeklappt reicht eine Zeile Vorschau; aufgeklappt darf sie atmen. */
+    overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;
+  }
+  .modul[open] .satz { -webkit-line-clamp: 3; }
+
+  /* Die Zahl sagt, wie viel dahintersteckt — das ist der Grund zu tippen. */
+  .modul .anzahl {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px;
+    background: var(--bg); color: var(--gedaempft);
+    font-size: 12px; font-weight: 600; flex: 0 0 auto;
+  }
+  .modul .pfeil {
+    display: block; width: 16px; height: 16px; flex: 0 0 auto;
+    color: var(--gedaempft); transition: transform .2s ease;
+  }
+  .modul[open] .pfeil { transform: rotate(180deg); }
+  .modul[open] .anzahl { background: rgba(181,147,79,.14); color: var(--gold); }
+
+  .modul ul { padding: 0 14px 14px 46px; }
+  .modul li { font-size: 14px; margin-bottom: 6px; }
+}
+
 @media (max-width: 560px) {
-  .module { grid-template-columns: 1fr; }
-  .chips { gap: 8px; margin: 26px 0 22px; }
-  .chip { padding: 8px 13px; font-size: 13px; }
+  .fuehrung { font-size: 15.5px; line-height: 1.65; margin-top: 12px; }
+}
+
+@media (max-width: 420px) {
+  .modul > summary { padding: 13px 12px; gap: 10px; }
+  .modul ul { padding-left: 42px; }
 }
