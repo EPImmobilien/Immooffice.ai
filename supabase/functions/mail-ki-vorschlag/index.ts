@@ -80,6 +80,10 @@ async function immoMandantDesAufrufers(req: Request): Promise<string | null> {
 const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type" };
 
 import { ABSICHTEN, absichtBlock, stilProfil } from "./stil.ts";
+// --- Abo-Schranke (fork_61) ----------------------------------------
+// Quelle: supabase/eigene-beilagen/_abo/abo.ts. Sie rechnet nichts ab;
+// sie weist nur ab, wessen Abo abgelaufen oder gesperrt ist.
+import { aboSchranke } from "./abo.ts";
 
 const HTML_ENTITIES: Record<string, string> = { nbsp: " ", amp: "&", lt: "<", gt: ">", quot: "\"", apos: "'", auml: "ä", ouml: "ö", uuml: "ü", Auml: "Ä", Ouml: "Ö", Uuml: "Ü", szlig: "ß", euro: "€", hellip: "…", ndash: "–", mdash: "—", minus: "−", deg: "°", laquo: "«", raquo: "»", bdquo: "„", ldquo: "“", rdquo: "”", sbquo: "‚", lsquo: "‘", rsquo: "’", middot: "·", bull: "•", copy: "©", reg: "®", trade: "™", eacute: "é", egrave: "è", agrave: "à", uacute: "ú" };
 function htmlZuText(html: string): string {
@@ -147,6 +151,14 @@ function objektBlock(i: any, wissen: any[]): string {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  // --- Abo-Schranke (fork_61) ---------------------------------------
+  // Diese Funktion ruft ein Sprachmodell, hat aber noch keinen Preis
+  // im Katalog. Abgerechnet wird deshalb nichts — ein Mandant ohne
+  // gueltiges Abo kommt trotzdem nicht daran. Die Schranke liegt in
+  // der Beilage abo.ts und faellt im Zweifel offen aus.
+  const immoAboSperre = await aboSchranke(req, corsHeaders);
+  if (immoAboSperre) return immoAboSperre;
   try {
     const body = await req.json();
     const { mail_eingang_id } = body;

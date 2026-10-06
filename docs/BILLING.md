@@ -238,6 +238,55 @@ Nachlässigkeit:
   machbar, aber eine eigene Entscheidung — ein Hintergrundlauf, der einem
   Mandanten unbemerkt Credits abzieht, muss vorher angekündigt sein.
 
+#### Aber eine Schranke haben sie jetzt (fork_61)
+
+Dass der **Preis** fehlt, ist eine offene Frage. Daran hing eine zweite, die
+keine Preisfrage ist: durfte ein Mandant, dessen Testphase abgelaufen ist
+oder dessen Zahlung ausbleibt, weiter ein Sprachmodell rufen? Er durfte —
+dreißig Funktionen lang. Jeder solche Aufruf kostet den Betreiber bares Geld
+beim Anbieter, und `CLAUDE.md` verlangt, dass Rechte serverseitig
+durchgesetzt werden.
+
+`supabase/eigene-beilagen/_abo/abo.ts` beantwortet nur diese zweite Frage.
+Credits zieht sie keine ab; das tut `credits.ts`, sobald ein Preis im Katalog
+steht. Sie liegt als Beilage in dreißig Ordnern und steht in jedem als
+Erstes nach dem OPTIONS-Zweig.
+
+**Sie fällt im Zweifel offen aus, und zwar absichtlich.** Abgewiesen wird
+nur der eindeutige Fall: ein angemeldeter Nutzer, dessen Mandant bekannt ist
+und dessen `abo_zugriff` nicht `voll` lautet. Kein Anmeldekopf, ein Kopf ohne
+Nutzer (die Cron-Läufe dieses Projekts schicken den anon-Schlüssel), kein
+Mandant am Profil, ein Fehler der Datenbank — alles kommt durch. Eine
+Schranke, die im Zweifel zumacht, legt beim ersten Schluckauf das Haus still;
+eine, die im Zweifel durchlässt, kostet im schlimmsten Fall einen KI-Aufruf.
+Die Abrechnung selbst ist strenger, weil dort Geld bewegt wird.
+
+Eingehängt wird sie nicht von dreißig handgeschriebenen Regelpaaren, sondern
+von einem Durchgang in `scripts/neutralisieren-funktionen.py`
+(`abo_schranke_einhaengen`): die dreißig Funktionen unterscheiden sich im
+Vorspann nur in Kleinigkeiten — `Deno.serve` oder `serve`, `req` oder `_req`,
+`corsHeaders` oder `cors`, der OPTIONS-Zweig ein- oder dreizeilig. Findet der
+Durchgang seine Anker nicht, bricht er ab; eine Schranke, die sich still
+nicht einhängt, wäre schlimmer als keine.
+
+`tests/abo-schranke.js` prüft 247 Punkte. Der wichtigste ist nicht „steht vor
+dem Anbieter" — das wäre unprüfbar, weil in der Hälfte dieser Funktionen der
+Anbieteraufruf in einem Helfer **oberhalb** des Handlers steht, textlich
+davor und ausgeführt danach. Geprüft wird stattdessen, dass zwischen
+OPTIONS-Zweig und Schranke nichts steht außer Leerraum und Kommentar. Dann
+läuft sie vor allem, was die Funktion sonst tut, Helfer eingeschlossen.
+Gegenprobe gemacht: die Schranke in den try-Block verschoben, der Test
+schlägt an.
+
+**Zwei Funktionen von Hand:** `bild-privat-retusche` und `grundriss-ki-lesen`
+liegen in `supabase/eigene/` und haben keine Vorlage. Dort steht die Schranke
+im Quelltext — ein Durchgang, der handgeschriebenen Code umschreibt, wäre
+eine Falle für den Nächsten, der ihn anfasst.
+
+**Kein Mandant wurde dabei ausgesperrt:** beide bestehenden Mandanten
+antworten auf `abo_zugriff` mit `voll` (nachgesehen am 06.10.2026, vor dem
+Ausrollen).
+
 ---
 
 ## 6. Der Kundenbereich „Abo & Abrechnung" (fork_51)

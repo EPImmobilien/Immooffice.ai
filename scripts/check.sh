@@ -588,6 +588,17 @@ else
   fehler=1
 fi
 
+abschnitt "Abo-Schranke vor den KI-Aufrufen ohne Preis"
+# Dreissig Funktionen rufen ein Sprachmodell, ohne Credits zu verbrauchen —
+# der Preis fehlt im Katalog, und den setzt der Betreiber. Dass ein Mandant
+# ohne gueltiges Abo sie trotzdem benutzen darf, war kein Beschluss, sondern
+# ein Loch: jeder Aufruf kostet beim Anbieter Geld.
+if node tests/abo-schranke.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Testphase: Erinnerung und Band"
 # Drei Meldungen vor dem Ende, je einmal. Die Sperre gegen Doppelversand ist
 # ein Schluessel und keine Abfrage — zwei gleichzeitige Laeufe saehen eine

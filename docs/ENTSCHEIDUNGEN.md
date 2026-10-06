@@ -5422,3 +5422,44 @@ für den Signaturvorgang die Zeile in `signatur_vorgaenge`, denn ab da
 existiert der Vorgang, das PDF liegt im Speicher und die Links sind
 unterwegs. Gegenprobe gemacht: die Reservierung hinter diese Zeile geschoben,
 der Test schlägt an.
+
+---
+
+## 2026-10-06 · Die Abo-Schranke fällt im Zweifel offen aus
+
+**Frage:** Dreißig Funktionen rufen ein Sprachmodell, ohne Credits zu
+verbrauchen — der Preis fehlt im Katalog, und den setzt der Betreiber. Darf
+ein Mandant ohne gültiges Abo sie trotzdem benutzen?
+
+**Entscheidung:** Nein. `fork_61` legt `abo.ts` als Beilage in alle dreißig
+Ordner und weist ab, wessen `abo_zugriff` nicht `voll` lautet. Credits zieht
+sie keine ab.
+
+**Grund:** Dass der Preis fehlt, ist eine offene Preisfrage. Dass der Zugang
+offen steht, war keine Entscheidung, sondern ein Loch — jeder Aufruf kostet
+den Betreiber Geld beim Anbieter, und `CLAUDE.md` verlangt serverseitige
+Durchsetzung. Die beiden Fragen hingen aneinander und mussten getrennt
+werden.
+
+**Die zweite Entscheidung, und die wichtigere:** Die Schranke fällt im
+Zweifel **offen** aus. Abgewiesen wird nur der eindeutige Fall — angemeldeter
+Nutzer, bekannter Mandant, Abo nicht `voll`. Kein Anmeldekopf, ein Kopf ohne
+Nutzer, kein Mandant am Profil, ein Fehler der Datenbank: alles kommt durch.
+
+Eine Schranke, die im Zweifel zumacht, legt beim ersten Schluckauf der
+Datenbank das ganze Haus still. Eine, die im Zweifel durchlässt, kostet im
+schlimmsten Fall einen KI-Aufruf. Die Abrechnung selbst ist strenger — dort
+wird Geld bewegt, und dort ist ein Irrtum teurer als ein Ausfall.
+
+**Was das kostet:** Eine zusätzliche Rundreise zur Datenbank je Aufruf
+(Nutzer, Profil, `abo_zugriff`). Und die Schranke greift nicht, wenn ein
+Aufruf ohne Nutzerkennung kommt — wer den anon-Schlüssel hat, kommt an die
+Funktion. Das ist keine neue Lücke: `verify_jwt` lässt ihn ohnehin durch,
+und die Funktionen prüfen ihre Datenzugriffe selbst gegen den Mandanten.
+
+**Nebenbefund:** Der erste Entwurf hat die 28 erzeugten Funktionen in die
+Liste `ERWEITERT` von `tests/funktionen-unveraendert.py` eingetragen. Damit
+fiel der zeilenweise Vergleich von 30 Dateien auf 10 — und mit ihm die
+Prüfung, dass an diesen Funktionen sonst nichts geändert wurde. Richtig ist:
+die Schranke **fügt** Zeilen hinzu und entfernt keine, und dieser Test sieht
+die entfernten. Der einzige Hinweis war die Zahl in der Erfolgsmeldung.

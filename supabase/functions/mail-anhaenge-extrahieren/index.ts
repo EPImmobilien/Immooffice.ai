@@ -25,6 +25,10 @@
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+// --- Abo-Schranke (fork_61) ----------------------------------------
+// Quelle: supabase/eigene-beilagen/_abo/abo.ts. Sie rechnet nichts ab;
+// sie weist nur ab, wessen Abo abgelaufen oder gesperrt ist.
+import { aboSchranke } from "./abo.ts";
 
 // --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
 // Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
@@ -510,6 +514,14 @@ class SimpleImap {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  // --- Abo-Schranke (fork_61) ---------------------------------------
+  // Diese Funktion ruft ein Sprachmodell, hat aber noch keinen Preis
+  // im Katalog. Abgerechnet wird deshalb nichts — ein Mandant ohne
+  // gueltiges Abo kommt trotzdem nicht daran. Die Schranke liegt in
+  // der Beilage abo.ts und faellt im Zweifel offen aus.
+  const immoAboSperre = await aboSchranke(req, corsHeaders);
+  if (immoAboSperre) return immoAboSperre;
 
   let imap: SimpleImap | null = null;
   let mailIdFuerFehler: string | null = null;

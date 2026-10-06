@@ -5,6 +5,10 @@
 // Deploy: supabase functions deploy parse-objektnachweis
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+// --- Abo-Schranke (fork_61) ----------------------------------------
+// Quelle: supabase/eigene-beilagen/_abo/abo.ts. Sie rechnet nichts ab;
+// sie weist nur ab, wessen Abo abgelaufen oder gesperrt ist.
+import { aboSchranke } from "./abo.ts";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -13,6 +17,14 @@ const CORS = {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
+
+  // --- Abo-Schranke (fork_61) ---------------------------------------
+  // Diese Funktion ruft ein Sprachmodell, hat aber noch keinen Preis
+  // im Katalog. Abgerechnet wird deshalb nichts — ein Mandant ohne
+  // gueltiges Abo kommt trotzdem nicht daran. Die Schranke liegt in
+  // der Beilage abo.ts und faellt im Zweifel offen aus.
+  const immoAboSperre = await aboSchranke(req, CORS);
+  if (immoAboSperre) return immoAboSperre;
 
   try {
     const { pdf_base64 } = await req.json();

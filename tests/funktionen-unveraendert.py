@@ -24,6 +24,10 @@ WURZEL = pathlib.Path(__file__).resolve().parent.parent
 VORLAGE = WURZEL / 'reference' / 'functions'
 FORK = WURZEL / 'supabase' / 'functions'
 EIGENE = WURZEL / 'supabase' / 'eigene'
+ERZEUGER = WURZEL / 'scripts' / 'neutralisieren-funktionen.py'
+# Die Listen des Erzeugers werden GELESEN, nicht abgeschrieben. Eine Liste,
+# die man doppelt pflegt, prueft nichts.
+ERZEUGER_TEXT = ERZEUGER.read_text(encoding='utf-8') if ERZEUGER.exists() else ''
 
 # Was eine Zeile enthalten haben muss, damit ihre Aenderung erklaert ist.
 #
@@ -275,6 +279,27 @@ for _f in KOSTENPFLICHTIG:
         'Credits reservieren, buchen, freigeben (fork_49). Quelle: '
         'supabase/eigene-beilagen/_credits/credits.ts; geprueft von '
         'tests/credits.js.')
+
+# fork_61: die Abo-Schranke. Sie liegt bei den Funktionen, die ein
+# Sprachmodell rufen und (noch) keinen Preis im Katalog haben — abgerechnet
+# wird dort nichts, aber ein Mandant ohne gueltiges Abo kommt nicht daran.
+# Welche Funktionen das sind, steht in ABO_SCHRANKE im Erzeuger; die Liste
+# wird von dort gelesen, damit es nicht zwei gibt.
+_abo_block = re.search(r'ABO_SCHRANKE = \{(.*?)\n\}',
+                       ERZEUGER_TEXT, re.S) if ERZEUGER_TEXT else None
+ABO_SCHRANKE = set(re.findall(r"'([a-z0-9-]+)'", _abo_block.group(1))) \
+    if _abo_block else set()
+# NICHT in ERWEITERT: die Schranke FUEGT Zeilen hinzu und entfernt keine.
+# Dieser Test sieht die entfernten Zeilen, und von denen gibt es keine. Ein
+# Eintrag in ERWEITERT haette die 28 Funktionen aus dem zeilenweisen
+# Vergleich genommen — und damit die Pruefung verloren, dass sonst nichts an
+# ihnen geaendert wurde. Beinahe passiert am 06.10.2026: der Vergleich fiel
+# von 30 Dateien auf 10, und das war der einzige Hinweis.
+for _f in ABO_SCHRANKE:
+    BEIGELEGT.setdefault(_f, {})['abo.ts'] = (
+        'Die Abo-Schranke (fork_61). Quelle: '
+        'supabase/eigene-beilagen/_abo/abo.ts; geprueft von '
+        'tests/abo-schranke.js.')
 
 BEIGELEGT.update({
     'expose-pdf-erzeugen': {

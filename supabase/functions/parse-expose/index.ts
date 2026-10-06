@@ -28,6 +28,10 @@
 // Env:     ANTHROPIC_API_KEY muss gesetzt sein (wie bei den anderen Functions).
 // ---------------------------------------------------------------------------
 
+// --- Abo-Schranke (fork_61) ----------------------------------------
+// Quelle: supabase/eigene-beilagen/_abo/abo.ts. Sie rechnet nichts ab;
+// sie weist nur ab, wessen Abo abgelaufen oder gesperrt ist.
+import { aboSchranke } from "./abo.ts";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -84,6 +88,14 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
+
+  // --- Abo-Schranke (fork_61) ---------------------------------------
+  // Diese Funktion ruft ein Sprachmodell, hat aber noch keinen Preis
+  // im Katalog. Abgerechnet wird deshalb nichts — ein Mandant ohne
+  // gueltiges Abo kommt trotzdem nicht daran. Die Schranke liegt in
+  // der Beilage abo.ts und faellt im Zweifel offen aus.
+  const immoAboSperre = await aboSchranke(req, corsHeaders);
+  if (immoAboSperre) return immoAboSperre;
 
   const json = (body: unknown, status = 200) =>
     new Response(JSON.stringify(body), {

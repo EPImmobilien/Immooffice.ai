@@ -15,6 +15,10 @@
 // ============================================================
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+// --- Abo-Schranke (fork_61) ----------------------------------------
+// Quelle: supabase/eigene-beilagen/_abo/abo.ts. Sie rechnet nichts ab;
+// sie weist nur ab, wessen Abo abgelaufen oder gesperrt ist.
+import { aboSchranke } from "./abo.ts";
 
 const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
@@ -61,6 +65,14 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
+
+  // --- Abo-Schranke (fork_61) ---------------------------------------
+  // Diese Funktion ruft ein Sprachmodell, hat aber noch keinen Preis
+  // im Katalog. Abgerechnet wird deshalb nichts — ein Mandant ohne
+  // gueltiges Abo kommt trotzdem nicht daran. Die Schranke liegt in
+  // der Beilage abo.ts und faellt im Zweifel offen aus.
+  const immoAboSperre = await aboSchranke(req, corsHeaders);
+  if (immoAboSperre) return immoAboSperre;
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ ok: false, error: "Nur POST" }), {
       status: 405,

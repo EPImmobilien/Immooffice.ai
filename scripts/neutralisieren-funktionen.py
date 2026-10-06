@@ -53,7 +53,45 @@ GEMEINSAME_BEILAGEN = {
         'ki-bildbearbeitung',
         'signatur-vorgang-starten',
     },
+    # fork_61 — die Abo-Schranke. Sie liegt bei den Funktionen, die ein
+    # Sprachmodell rufen und (noch) keinen Preis im Katalog haben. Welche
+    # das sind, steht in ABO_SCHRANKE weiter unten; beide Listen muessen
+    # zusammenpassen, und tests/abo-schranke.js besteht darauf.
+    '_abo/abo.ts': set(),   # wird unter ABO_SCHRANKE gefuellt
 }
+
+# --------------------------------------------------------------- fork_61
+# Die Funktionen, die ein Sprachmodell rufen, ohne Credits zu verbrauchen.
+#
+# Der Grund steht in docs/BILLING.md und bleibt richtig: einen Credit-Preis
+# zu erfinden waere eine Preisentscheidung, und die trifft der Betreiber.
+# Nur haengt daran eine zweite Frage, die KEINE Preisentscheidung ist —
+# darf ein Mandant ohne gueltiges Abo weiter ein Sprachmodell rufen? Nein.
+# Das kostet den Betreiber Geld beim Anbieter, und CLAUDE.md verlangt
+# serverseitige Durchsetzung.
+#
+# NICHT in dieser Liste stehen die Hintergrundlaeufe (mail-postfach-pull,
+# mail-anfrage-verarbeiten, akq-mail-leads, besichtigung-nachfassen,
+# news-briefing-erstellen, objekt-landing, mail-rechnung-weiterleiten).
+# Sie laufen aus dem Zeitplan heraus mit dem anon-Schluessel; die Schranke
+# liesse sie ohnehin durch, und ein Eintrag waere nur Zierde.
+#
+# Ebenso wenig die vier Funktionen, die schon abrechnen — dort prueft
+# credits.ts dasselbe, und zweimal pruefen heisst zweimal rundreisen.
+ABO_SCHRANKE = {
+    'akq-ki-vorlage', 'bewertung-aus-aufnahme', 'bild-beschriften',
+    'bild-privat-retusche', 'claude-chat', 'datei-namen-ki',
+    'dokument-umbenennen-vorschlag', 'energieausweis-auslesen',
+    'energieausweis-schaetzen', 'grundriss-ki-lesen',
+    'mail-anhaenge-extrahieren', 'mail-aufgaben-erkennen', 'mail-ki-vorschlag',
+    'mail-zu-mietanfrage', 'mail-zu-todo', 'notiz-analysieren',
+    'notiz-transkribieren', 'objekt-wissen-auslesen', 'parse-einwertung',
+    'parse-energieabrechnung', 'parse-energieausweis', 'parse-expose',
+    'parse-grundbuch', 'parse-immo-dokument', 'parse-maklervertrag',
+    'parse-objektnachweis', 'parse-schmiede-notizen', 'parse-zaehler',
+    'radar-erfassen', 'sprachmemo-auswerten',
+}
+GEMEINSAME_BEILAGEN['_abo/abo.ts'] = set(ABO_SCHRANKE)
 
 # --------------------------------------------------------------- Phase 1.4
 # Vier Funktionen entfallen ersatzlos. jotform-* ist der Formular-Sync des
@@ -4424,6 +4462,94 @@ NACHBESSERN = [
 ]
 
 
+
+# ---------------------------------------------------------------- fork_61
+def abo_schranke_einhaengen(inhalt, name):
+    """Setzt die Abo-Schranke an den Anfang des Handlers.
+
+    Als Pass und nicht als dreissig Regelpaare: die dreissig Funktionen
+    unterscheiden sich im Vorspann nur in Kleinigkeiten — `Deno.serve` oder
+    `serve`, `req` oder `_req`, `corsHeaders` oder `cors`, der
+    OPTIONS-Zweig ein- oder dreizeilig. Sechzig handgeschriebene Regeln
+    dafuer waeren sechzig Stellen, an denen eine Vorlagenaenderung
+    unbemerkt vorbeilaeuft.
+
+    Eingehaengt wird NACH dem OPTIONS-Zweig. Davor waere die Schranke ein
+    Fehler: ein CORS-Vorabflug traegt keinen Anmeldekopf, und die Antwort
+    403 ohne CORS-Kopf sieht im Browser aus wie ein Netzfehler.
+
+    Findet sie ihre beiden Anker nicht, bricht sie ab. Eine Schranke, die
+    sich still nicht einhaengt, ist schlimmer als keine: sie steht im
+    Buch und wirkt nicht.
+    """
+    # 1) Der Handler. Deno.serve(...) oder das aeltere serve(...).
+    kopf = re.search(
+        r'\n(?:Deno\.)?serve\(async \((_?req)(?:\s*:\s*Request)?\)\s*=>\s*\{\n',
+        inhalt)
+    if not kopf:
+        sys.exit(f'ABBRUCH: {name} — kein Handler fuer die Abo-Schranke gefunden.')
+    arg = kopf.group(1)
+    ab = kopf.end()
+
+    # 2) Der OPTIONS-Zweig, ein- oder mehrzeilig. Gesucht wird im ersten
+    #    Stueck des Handlers, nicht unmittelbar hinter seinem Kopf: in
+    #    parse-grundbuch und Geschwistern stehen die CORS-Kopfzeilen IM
+    #    Handler, also zwischen Kopf und OPTIONS-Zweig.
+    FENSTER = 1200
+    rest = inhalt[ab:ab + FENSTER]
+    m = re.search(
+        r'[ \t]*if \(' + re.escape(arg) + r'\.method ===? "OPTIONS"\)\s*'
+        r'(?:\{\n[^\n]*\n\s*\}\n|[^\n]*\n)', rest)
+    if not m:
+        sys.exit(f'ABBRUCH: {name} — kein OPTIONS-Zweig in den ersten {FENSTER} '
+                 'Zeichen des Handlers. Ohne ihn weiss die Schranke nicht, wo '
+                 'sie stehen darf.')
+    ende = ab + m.end()
+
+    # 3) Der Name der CORS-Kopfzeilen steht in genau diesem Zweig.
+    kopfname = re.search(r"headers:\s*([A-Za-z_$][\w$]*)", m.group(0))
+    if not kopfname:
+        sys.exit(f'ABBRUCH: {name} — der OPTIONS-Zweig nennt keine CORS-Variable.')
+    cors = kopfname.group(1)
+
+    schranke = (
+        '\n'
+        '  // --- Abo-Schranke (fork_61) ---------------------------------------\n'
+        '  // Diese Funktion ruft ein Sprachmodell, hat aber noch keinen Preis\n'
+        '  // im Katalog. Abgerechnet wird deshalb nichts — ein Mandant ohne\n'
+        '  // gueltiges Abo kommt trotzdem nicht daran. Die Schranke liegt in\n'
+        '  // der Beilage abo.ts und faellt im Zweifel offen aus.\n'
+        f'  const immoAboSperre = await aboSchranke({arg}, {cors});\n'
+        '  if (immoAboSperre) return immoAboSperre;\n')
+    inhalt = inhalt[:ende] + schranke + inhalt[ende:]
+
+    # 4) Die Einbindung, hinter die LETZTE Einbindung auf oberster Ebene.
+    #    Nicht vor die CORS-Zeile: die steht in einigen Funktionen im
+    #    Handler, und ein import mitten in einer Funktion ist kein import.
+    einbindungen = list(re.finditer(r'^import [^\n]*;\n', inhalt, re.M))
+    if einbindungen:
+        stelle = einbindungen[-1].end()
+    else:
+        # datei-namen-ki und Geschwister binden gar nichts ein — sie reden
+        # nur ueber fetch mit dem Anbieter. Dann steht die Einbindung vor
+        # der ersten Anweisung auf oberster Ebene.
+        erste = re.search(
+            r'^(?:export\s+)?(?:const|let|var|function|async function|type|'
+            r'interface|Deno\.serve|serve)\b', inhalt, re.M)
+        if not erste:
+            sys.exit(f'ABBRUCH: {name} — weder Einbindung noch Anweisung auf '
+                     'oberster Ebene gefunden; die Abo-Schranke haette keinen '
+                     'Platz.')
+        stelle = erste.start()
+    inhalt = (inhalt[:stelle]
+              + '// --- Abo-Schranke (fork_61) ----------------------------------------\n'
+                '// Quelle: supabase/eigene-beilagen/_abo/abo.ts. Sie rechnet nichts ab;\n'
+                '// sie weist nur ab, wessen Abo abgelaufen oder gesperrt ist.\n'
+                'import { aboSchranke } from "./abo.ts";\n'
+              + inhalt[stelle:])
+    return inhalt
+
+
 def pruefe_haeufigkeit(n, bemerkung, datei):
     """Notbremse gegen Regeln, die versehentlich zu breit greifen.
 
@@ -4441,7 +4567,7 @@ def main():
         sys.exit(f'Nicht gefunden: {QUELLE}\n'
                  'Die Funktionen der Vorlage gehoeren unversioniert nach reference/functions.')
 
-    zaehler, farbzaehler = {}, {}
+    zaehler, farbzaehler, abozaehler = {}, {}, {}
     if ZIEL.exists():
         shutil.rmtree(ZIEL)
     ZIEL.mkdir(parents=True)
@@ -4494,6 +4620,13 @@ def main():
                     # ERSETZUNGEN abbekam, fiel es nicht auf.
                     if grund == 'FORK':
                         erweitert = True
+            # fork_61: die Abo-Schranke, als Pass statt als Regelpaar.
+            if ordner.name in ABO_SCHRANKE and rel.name == 'index.ts':
+                vorher_z = inhalt.count('\n')
+                inhalt = abo_schranke_einhaengen(inhalt, ordner.name)
+                abozaehler[ordner.name] = inhalt.count('\n') - vorher_z
+                erweitert = True
+
             # Der Farb-Nachlauf, nach allen Regeln: er tauscht die
             # Vorgabefarben der Referenz in allen fuenf Schreibweisen —
             # auch in der Fliesskomma-Form, die pdf-lib verlangt und in der
@@ -4554,6 +4687,9 @@ def main():
     print('Neutralisierung der Edge Functions:')
     if farbzaehler:
         farben.bericht(farbzaehler)
+    if abozaehler:
+        print(f'  [FORK   ] {len(abozaehler)} Funktionen mit Abo-Schranke '
+              f'(je {min(abozaehler.values())}–{max(abozaehler.values())} Zeilen).')
     # Regeln sind Vierer- oder Fuenfertupel; das fuenfte Element grenzt eine
     # Regel auf bestimmte Funktionen ein. Fuer den Bericht zaehlt nur, was in
     # den ersten vier steht.
