@@ -662,21 +662,42 @@ if (!firma) return jsonErr(500, "Firma-Stammdaten fehlen");
 // ===========================================================================
 
 // --- Welche Vorlage? ------------------------------------------------------
-// Drei Stufen, von eng nach weit: die Vorlage DIESES Objekts, sonst die
-// Standardvorlage des Mandanten, sonst die Systemvorlage, die der Standort
-// in firma_stammdaten.expose_vorlage nennt.
+// Vier Stufen, von eng nach weit: die Vorlage, die der Aufruf nennt, dann
+// die Vorlage DIESES Objekts, dann die Standardvorlage des Mandanten, dann
+// die Systemvorlage, die der Standort in firma_stammdaten.expose_vorlage
+// nennt.
+//
+// Die erste Stufe ist neu (fork_43): die Oberflaeche laesst die Vorlage vor
+// dem Erzeugen auswaehlen. Die drei dahinter bleiben, weil nicht jeder
+// Aufruf aus der Oberflaeche kommt — Portalexport, Newsletter und die
+// Nachbestellung eines Exposes nennen keine Vorlage und muessen trotzdem
+// eine bekommen.
 const BASEN = ["raster", "signature", "studio"];
 const basisName = BASEN.includes(String(firma.expose_vorlage || ""))
   ? String(firma.expose_vorlage) : "raster";
 let vz: any = null;
-if (immo.expose_vorlage_id) {
+// Die Mandantengrenze gilt fuer beide Wege: der Dienstschluessel sieht jede
+// Vorlage, und eine Kennung aus dem Anfragekoerper oder aus einer Zeile
+// kann falsch gesetzt sein. Systemvorlagen (mandant_id null) sind fuer alle.
+const vorlageHolen = async (kennung: string) => {
 const { data } = await admin.from("expose_vorlagen")
-.select("id,name,mandant_id,dokument").eq("id", immo.expose_vorlage_id).maybeSingle();
-// Die Mandantengrenze gilt auch hier: der Dienstschluessel sieht jede
-// Vorlage, und expose_vorlage_id kommt aus einer Zeile, die falsch
-// gesetzt sein kann. Systemvorlagen (mandant_id null) sind fuer alle.
-if (data && (data.mandant_id === null || data.mandant_id === immoMandant)) vz = data;
-else if (data) warnungen.push("Die am Objekt gesetzte Vorlage gehoert einem anderen Mandanten — Standardvorlage benutzt.");
+.select("id,name,mandant_id,dokument").eq("id", kennung).maybeSingle();
+if (data && (data.mandant_id === null || data.mandant_id === immoMandant)) return data;
+if (data) warnungen.push("Die gewaehlte Vorlage gehoert einem anderen Mandanten — sie wurde nicht benutzt.");
+return null;
+};
+const gewaehlteVorlage = typeof body.vorlage_id === "string" && body.vorlage_id
+  ? body.vorlage_id : null;
+if (gewaehlteVorlage) {
+vz = await vorlageHolen(gewaehlteVorlage);
+// Die Wahl bleibt am Objekt stehen: beim naechsten Erzeugen — und beim
+// Portalexport, der keine nennt — gilt dieselbe Vorlage.
+if (vz && immo.expose_vorlage_id !== vz.id) {
+await admin.from("immobilien").update({ expose_vorlage_id: vz.id }).eq("id", immobilie_id);
+}
+}
+if (!vz && immo.expose_vorlage_id) {
+vz = await vorlageHolen(immo.expose_vorlage_id);
 }
 if (!vz) {
 const { data } = await admin.from("expose_vorlagen").select("id,name,dokument")
@@ -856,12 +877,25 @@ bildWerte["ansprechpartner.foto"] = pfad;
 // Zwei Logos, nicht eines: auf dunklem Grund braucht es die helle Fassung.
 // Die rechnet logoWeissLaden einmal aus und legt sie im Eimer ab.
 const logoPfad = String(firma.logo_pfad || "logo.png");
+let logoForm: "breit" | "quadratisch" | undefined;
 try {
 const { data } = await admin.storage.from("branding-assets").download(logoPfad);
 if (data) {
 const pfad = "logo:hell";
-bilder.set(pfad, new Uint8Array(await data.arrayBuffer()));
+const bytes = new Uint8Array(await data.arrayBuffer());
+bilder.set(pfad, bytes);
 bildWerte["firma.logo.hell"] = pfad;
+// Wortzeichen oder Bildzeichen? Danach richtet sich, wie viel Platz die
+// Vorlage dem Logo gibt. Ein breites Wortzeichen in einem quadratischen
+// Rahmen wird winzig — das war am 06.10.2026 der Befund an zwei echten
+// Exposés. Die Schwelle 2,2 trennt ein Quadrat oder leichtes Rechteck
+// (Bildzeichen) von einem Schriftzug.
+try {
+const img = await Image.decode(bytes);
+if (img.width && img.height) {
+logoForm = img.width / img.height >= 2.2 ? "breit" : "quadratisch";
+}
+} catch (_e3) { /* Form unbekannt: die Vorlage bleibt bei ihrem Vorgabefall */ }
 } else {
 warnungen.push("Kein Logo im Eimer branding-assets unter " + logoPfad
 + " — die Vorlagen setzen stattdessen den Markennamen.");
@@ -884,6 +918,7 @@ ansprechpartner: ap,
 annahmen: finAnn,
 bilder: bildWerte,
 bildtitel: bildTitel,
+logo_form: logoForm,
 ki_bilder: kiBilder,
 });
 

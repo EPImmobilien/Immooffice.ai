@@ -20,6 +20,8 @@ const WURZEL = path.join(__dirname, '..');
 const EDITOR = path.join(WURZEL, 'src', 'eigene', 'expose-vorlagen.js');
 const FLAECHE = path.join(WURZEL, 'src', 'eigene', 'expose-bearbeiten.js');
 const LEINWAND = path.join(WURZEL, 'src', 'eigene', 'expose-leinwand.js');
+const WAHL = path.join(WURZEL, 'src', 'eigene', 'expose-vorlagenwahl.js');
+const FREISTELLEN = path.join(WURZEL, 'src', 'eigene', 'logo-freistellen.js');
 const BUENDEL = path.join(WURZEL, 'packages', 'expose-renderer', 'buendel', 'immo-expose.js');
 const SCHRIFTEN = path.join(WURZEL, 'assets', 'fonts', 'expose');
 const VORLAGEN = path.join(WURZEL, 'packages', 'expose-renderer', 'vorlagen');
@@ -219,6 +221,7 @@ const reihen = {
   }]),
   firma_stammdaten: [{ firma_name: 'Beispiel GmbH', marken_name: 'Beispiel',
     ort: 'Musterstadt', ci_primaer: '#0F4C5C', ci_akzent: '#E8915A' }],
+  immobilien: [{ id: 'o1', mandant_id: 'm1', expose_vorlage_id: null }],
 };
 
 const db = nachbau(reihen);
@@ -288,12 +291,18 @@ melde('Das Buendel gibt rendern, zuPdf, aufbereiten und schnittName heraus',
 ladeSkript(LEINWAND);
 ladeSkript(FLAECHE);
 ladeSkript(EDITOR);
+ladeSkript(WAHL);
+ladeSkript(FREISTELLEN);
 melde('Die Ansicht meldet sich als window.ImmoExposeVorlagen',
       typeof fenster.ImmoExposeVorlagen === 'function');
 melde('Die Bearbeitungsflaeche meldet sich als window.ImmoExposeBearbeiten',
       typeof fenster.ImmoExposeBearbeiten === 'function');
 melde('Die Leinwand meldet sich als window.ImmoExposeLeinwand',
       !!(fenster.ImmoExposeLeinwand && fenster.ImmoExposeLeinwand.zeichne));
+melde('Die Vorlagenwahl meldet sich als window.ImmoExposeVorlagenwahl',
+      typeof fenster.ImmoExposeVorlagenwahl === 'function');
+melde('Das Freistellen meldet sich als window.ImmoLogoFreistellen',
+      !!(fenster.ImmoLogoFreistellen && fenster.ImmoLogoFreistellen.freistellen));
 
 if (fehler) { console.log(`\n  ${fehler} Pruefung(en) gescheitert.`); process.exit(1); }
 
@@ -593,6 +602,109 @@ if (fehler) { console.log(`\n  ${fehler} Pruefung(en) gescheitert.`); process.ex
           JSON.stringify([frei.x, frei.y, verschoben && verschoben.x, verschoben && verschoben.y]));
   }
 
+  // --- Die Vorlagenwahl am Objekt ----------------------------------------
+  // Der Makler soll die Vorlage VOR dem Erzeugen waehlen. Geprueft wird,
+  // dass die Liste vollstaendig angeboten wird, dass nichts stillschweigend
+  // vorausgewaehlt ist und dass die Wahl am Objekt landet.
+  {
+    const holWahl = zeichne(fenster.ImmoExposeVorlagenwahl,
+                            { immobilieId: 'o1', vorlageId: '' });
+    await warte(20);
+    let baum = holWahl();
+    const felder = knotenMit(baum, 'select');
+    melde('Die Vorlagenwahl zeigt ein Auswahlfeld', felder.length === 1);
+    if (felder.length) {
+      const angebote = knotenMit(felder[0], 'option');
+      melde('Alle vier Vorlagen stehen zur Wahl', angebote.length === 5,
+            `${angebote.length} Einträge: ${angebote.map((o) => texte(o).join('')).join(' | ')}`);
+      melde('Nichts ist stillschweigend vorausgewaehlt', felder[0].props.value === '',
+            String(felder[0].props.value));
+      melde('Die eigene Vorlage steht in einer eigenen Gruppe',
+            knotenMit(baum, 'optgroup').length === 2);
+      melde('Ohne Wahl sagt die Ansicht, dass kein Expose entsteht',
+            texte(baum).join(' ').includes('Ohne Auswahl wird kein Exposé erzeugt'));
+      melde('Ohne Wahl meldet gewaehlt() nichts',
+            fenster.ImmoExposeVorlagenwahl.gewaehlt('o1') === null);
+
+      const vorherW = db.protokoll.length;
+      felder[0].props.onChange({ target: { value: 'v-studio' } });
+      await warte(20);
+      baum = holWahl();
+      melde('Die Wahl steht im Feld', knotenMit(baum, 'select')[0].props.value === 'v-studio');
+      melde('gewaehlt() gibt die gewaehlte Vorlage heraus',
+            fenster.ImmoExposeVorlagenwahl.gewaehlt('o1') === 'v-studio',
+            String(fenster.ImmoExposeVorlagenwahl.gewaehlt('o1')));
+      const geschrieben = db.protokoll.slice(vorherW)
+        .filter((p) => p[0] === 'update' && p[1] === 'immobilien');
+      melde('Die Wahl wird am Objekt gespeichert',
+            geschrieben.length === 1 && geschrieben[0][2].expose_vorlage_id === 'v-studio',
+            JSON.stringify(geschrieben));
+      melde('Die Ansicht bestaetigt das Speichern',
+            texte(holWahl()).join(' ').includes('am Objekt gespeichert'));
+    }
+  }
+
+  // --- Das Freistellen des Logos -----------------------------------------
+  // Gerechnet wird auf einem Canvas; die Rechnung selbst braucht keines.
+  // Geprueft wird das, was man im Browser nicht sieht: dass weisser Grund
+  // verschwindet, Weiss INNERHALB des Zeichens aber stehen bleibt — sonst
+  // ist jedes O ein Loch.
+  {
+    const breite = 16, hoehe = 16;
+    const daten = new Uint8ClampedArray(breite * hoehe * 4);
+    const setze = (x, y, r, g, b) => {
+      const i = (y * breite + x) * 4;
+      daten[i] = r; daten[i + 1] = g; daten[i + 2] = b; daten[i + 3] = 255;
+    };
+    // Weisser Grund, ein schwarzer Ring, darin wieder Weiss.
+    for (let y = 0; y < hoehe; y++) for (let x = 0; x < breite; x++) setze(x, y, 255, 255, 255);
+    for (let y = 4; y < 12; y++) for (let x = 4; x < 12; x++) setze(x, y, 20, 20, 20);
+    for (let y = 6; y < 10; y++) for (let x = 6; x < 10; x++) setze(x, y, 255, 255, 255);
+    const alpha = (d, x, y) => d[(y * breite + x) * 4 + 3];
+    const ctxBau = () => {
+      const kopie = new Uint8ClampedArray(daten);
+      return {
+        bild: { data: kopie, width: breite, height: hoehe },
+        getImageData: () => ({ data: kopie, width: breite, height: hoehe }),
+        putImageData: () => {},
+      };
+    };
+
+    const rand = ctxBau();
+    const e1 = fenster.ImmoLogoFreistellen.freistellen(rand, breite, hoehe,
+      { toleranz: 32, modus: 'rand' });
+    melde('Freistellen erkennt Weiss als Hintergrundfarbe',
+          e1.farbe && e1.farbe.join(',') === '255,255,255', JSON.stringify(e1.farbe));
+    melde('Der weisse Grund wird durchsichtig', alpha(rand.bild.data, 0, 0) === 0,
+          String(alpha(rand.bild.data, 0, 0)));
+    melde('Das Zeichen bleibt stehen', alpha(rand.bild.data, 5, 5) === 255);
+    melde('Weiss INNERHALB des Zeichens bleibt stehen',
+          alpha(rand.bild.data, 7, 7) === 255, String(alpha(rand.bild.data, 7, 7)));
+    melde('Freistellen zaehlt die entfernten Bildpunkte', e1.entfernt > 100,
+          String(e1.entfernt));
+
+    const alle = ctxBau();
+    fenster.ImmoLogoFreistellen.freistellen(alle, breite, hoehe,
+      { toleranz: 32, modus: 'alle' });
+    melde('Im Modus "alle" verschwindet auch das Weiss im Zeichen',
+          alpha(alle.bild.data, 7, 7) === 0, String(alpha(alle.bild.data, 7, 7)));
+    melde('Im Modus "alle" bleibt das Zeichen selbst stehen',
+          alpha(alle.bild.data, 5, 5) === 255);
+
+    // Ein Logo, das schon freigestellt ist, wird nicht angefasst.
+    const schon = ctxBau();
+    for (let x = 0; x < breite; x++) {
+      for (const y of [0, hoehe - 1]) schon.bild.data[(y * breite + x) * 4 + 3] = 0;
+    }
+    for (let y = 0; y < hoehe; y++) {
+      for (const x of [0, breite - 1]) schon.bild.data[(y * breite + x) * 4 + 3] = 0;
+    }
+    const e3 = fenster.ImmoLogoFreistellen.freistellen(schon, breite, hoehe,
+      { toleranz: 32, modus: 'rand' });
+    melde('Ein bereits freigestelltes Logo wird nicht angefasst',
+          e3.entfernt === 0 && e3.farbe === null, JSON.stringify(e3));
+  }
+
   if (fehler) {
     console.log(`\n  ${fehler} Pruefung(en) gescheitert.`);
     process.exit(1);
@@ -602,5 +714,7 @@ if (fehler) { console.log(`\n  ${fehler} Pruefung(en) gescheitert.`); process.ex
   console.log('       Umbenennen, Standard setzen — und die Texte der Vorlage');
   console.log('       aendern, in der Vorschau sehen und mit Historie speichern —');
   console.log('       und auf der Flaeche Felder verschieben, anlegen, auf eine');
-  console.log('       andere Bildquelle stellen und speichern.');
+  console.log('       andere Bildquelle stellen und speichern. Dazu: die Vorlage');
+  console.log('       wird am Objekt gewaehlt und gespeichert, und ein Logo laesst');
+  console.log('       sich freistellen, ohne die Buchstaben auszuhoehlen.');
 })();

@@ -36,6 +36,7 @@ var ImmoExpose = (() => {
     VORGABE: () => VORGABE,
     Zufall: () => Zufall,
     aufbereiten: () => aufbereiten,
+    bildKasten: () => bildKasten,
     breite: () => breite,
     courtageSatz: () => courtageSatz,
     datumDe: () => datumDe,
@@ -201,6 +202,15 @@ var ImmoExpose = (() => {
     }
     return raus;
   }
+  function bildKasten(s, bildBreite, bildHoehe) {
+    const bb = bildBreite || 1;
+    const hh = bildHoehe || 1;
+    const sx = s.b / bb, sy = s.h / hh;
+    const f = s.fuellmodus === "contain" ? Math.min(sx, sy) : Math.max(sx, sy);
+    const b = bb * f, h = hh * f;
+    const [ax, ay] = s.anker ?? [0.5, 0.5];
+    return { x: s.x + (s.b - b) * ax, y: s.y + (s.h - h) * ay, b, h };
+  }
   function malMatrix(innen, aussen) {
     const [a, b, c, d, e, f] = aussen;
     const [a2, b2, c2, d2, e2, f2] = innen;
@@ -238,10 +248,11 @@ var ImmoExpose = (() => {
     }
     return raus;
   }
-  function hoehe(zeilen, zeilenhoehe, regeln) {
+  function hoehe(zeilen, zeilenhoehe, regeln, absatzLuft) {
     if (zeilen.length === 0) return 0;
     const absaetze = zeilen[zeilen.length - 1].absatz + 1;
-    return zeilen.length * zeilenhoehe + (absaetze - 1) * zeilenhoehe * regeln.absatzFaktor;
+    const luft = absatzLuft === void 0 ? zeilenhoehe * regeln.absatzFaktor : absatzLuft;
+    return zeilen.length * zeilenhoehe + (absaetze - 1) * luft;
   }
   function setzen(m, zeilen, x, y, maxBreite, groesse, zeilenhoehe, regeln) {
     const raus = [];
@@ -269,13 +280,14 @@ var ImmoExpose = (() => {
     }
     return { woerter: raus, unten: aktuell };
   }
-  function verdichten(m, s, maxBreite, maxHoehe, groesse, minGroesse, zeilenFaktor, regeln) {
+  function verdichten(m, s, maxBreite, maxHoehe, groesse, minGroesse, zeilenFaktor, regeln, absatzLuft, maxZeilen) {
     let g = groesse;
     const schritt = 0.1;
     for (; ; ) {
       const zh = g * zeilenFaktor;
       const zeilen = umbrechen(m, s, g, maxBreite, regeln);
-      if (hoehe(zeilen, zh, regeln) <= maxHoehe) {
+      const zuViele = maxZeilen !== void 0 && maxZeilen > 0 && zeilen.length > maxZeilen;
+      if (!zuViele && hoehe(zeilen, zh, regeln, absatzLuft) - zh <= maxHoehe + 1e-9) {
         return { groesse: g, zeilenhoehe: zh, zeilen, passt: true };
       }
       if (g - schritt < minGroesse - 1e-9) {
@@ -444,7 +456,7 @@ var ImmoExpose = (() => {
         matrix: this.matrix
       });
     }
-    bild(x, y, b, h, quelle, fuellmodus = "cover") {
+    bild(x, y, b, h, quelle, fuellmodus = "cover", anker) {
       this.schritte.push({
         art: "bild",
         x,
@@ -453,6 +465,9 @@ var ImmoExpose = (() => {
         h,
         quelle,
         fuellmodus,
+        // Nur eintragen, wenn der Anker von der Mitte abweicht: der
+        // Vergleich mit den Prototypen liest die Schritte Feld fuer Feld.
+        ...anker ? { anker } : {},
         matrix: this.matrix
       });
     }
@@ -583,6 +598,15 @@ var ImmoExpose = (() => {
       dline: mix(d, paper, 0.18)
     };
   }
+  function abstandHalten(vorn, hinten, mindest = 0.25) {
+    const ziel = helligkeit(hinten) > 0.5 ? SCHWARZ : WEISS;
+    if (Math.abs(helligkeit(vorn) - helligkeit(hinten)) >= mindest) return vorn;
+    for (let t = 0.05; t <= 0.9; t += 0.05) {
+      const c = mix(vorn, ziel, t);
+      if (Math.abs(helligkeit(c) - helligkeit(hinten)) >= mindest) return c;
+    }
+    return ziel;
+  }
   function themaStudio(signal, dunkel) {
     const s = hx(signal);
     const gewaehlt = hx(dunkel);
@@ -600,7 +624,11 @@ var ImmoExpose = (() => {
       text: mix(d, WEISS, 0.12),
       muted: mix(d, WEISS, 0.48),
       rule: d,
-      hair: mix(d, WEISS, 0.84)
+      hair: mix(d, WEISS, 0.84),
+      // Die Signalfarbe, lesbar auf dem Dunkelton. Die Kontaktseite setzt
+      // ihre Beschriftungen darauf. Mit der Prototypfarbe ist das dieselbe
+      // Farbe wie s; bei einer dunklen Mandantenfarbe eine aufgehellte.
+      s_auf_d: abstandHalten(s, d)
     };
   }
   var VORGABE = {
@@ -1540,12 +1568,28 @@ var ImmoExpose = (() => {
             br = u.blatt.sw(t, s.schnitt, groesse, sperrung);
           }
           if (br > el.b) {
+            let gekuerzt = t;
+            while (gekuerzt.length > 1 && u.blatt.sw(gekuerzt + "…", s.schnitt, groesse, sperrung) > el.b) {
+              gekuerzt = gekuerzt.slice(0, -1);
+            }
+            gekuerzt = gekuerzt.replace(/[\s,;:–-]+$/, "") + "…";
             warne(
               u,
               "gekuerzt",
               el,
-              `Die Zeile ist auch bei ${groesse.toFixed(1)} Punkt breiter als ihr Rahmen (${br.toFixed(0)} statt ${el.b.toFixed(0)} Punkt) und ragt darueber hinaus. Rahmen breiter machen oder Text kuerzen.`
+              `Die Zeile passt auch bei ${groesse.toFixed(1)} Punkt nicht in ihren Rahmen (${br.toFixed(0)} statt ${el.b.toFixed(0)} Punkt) und wurde gekuerzt. Rahmen breiter machen oder Text kuerzen.`
             );
+            u.blatt.T(
+              ankerX(el, s.ausrichtung),
+              el.y + el.h,
+              gekuerzt,
+              s.schnitt,
+              groesse,
+              s.farbe,
+              sperrung,
+              ankerArt(s.ausrichtung)
+            );
+            return;
           } else {
             warne(
               u,
@@ -1570,6 +1614,7 @@ var ImmoExpose = (() => {
     }
     const maxZeilen = zahl(el, "max_zeilen", 0);
     const hoeheFrei = el.h;
+    const festeLuft = el["absatzabstand"];
     const v = wahr(el, "verdichten", true) ? verdichten(
       metrik(u, s.schnitt),
       text3,
@@ -1578,7 +1623,9 @@ var ImmoExpose = (() => {
       s.groesse,
       s.minGroesse,
       schritt / s.groesse,
-      regeln
+      regeln,
+      typeof festeLuft === "number" ? festeLuft : void 0,
+      maxZeilen
     ) : {
       groesse: s.groesse,
       zeilenhoehe: schritt,
@@ -1617,6 +1664,7 @@ var ImmoExpose = (() => {
       schlitze.push({ zeile, luft: v.zeilenhoehe });
     }
     const proSpalte = zeichenkette(el, "aufteilung") === "fliessend" ? Math.max(1, Math.floor(v.zeilenhoehe > 0 ? el.h / v.zeilenhoehe : schlitze.length)) : Math.ceil(schlitze.length / spalten);
+    let weggelassen = 0;
     for (let sp = 0; sp < spalten; sp++) {
       const teil = schlitze.slice(sp * proSpalte, (sp + 1) * proSpalte);
       if (!teil.length) continue;
@@ -1624,19 +1672,31 @@ var ImmoExpose = (() => {
       let y = el.y + el.h;
       for (const schlitz of teil) {
         if (schlitz.zeile) {
-          setzeZeile(
-            u,
-            schlitz.zeile,
-            x + schlitz.zeile.einzug,
-            y,
-            spaltenbreite - schlitz.zeile.einzug,
-            s,
-            v.groesse,
-            regeln.blocksatz
-          );
+          if (y < el.y - 0.01) {
+            weggelassen++;
+          } else {
+            setzeZeile(
+              u,
+              schlitz.zeile,
+              x + schlitz.zeile.einzug,
+              y,
+              spaltenbreite - schlitz.zeile.einzug,
+              s,
+              v.groesse,
+              regeln.blocksatz
+            );
+          }
         }
         y -= schlitz.luft;
       }
+    }
+    if (weggelassen) {
+      warne(
+        u,
+        "gekuerzt",
+        el,
+        `${weggelassen} Zeile${weggelassen === 1 ? "" : "n"} passt${weggelassen === 1 ? "" : "en"} nicht mehr in den Rahmen und ${weggelassen === 1 ? "wurde" : "wurden"} weggelassen. Rahmen groesser machen, Text kuerzen oder die Schrift kleiner stellen.`
+      );
     }
   };
   function metrik(u, schnitt) {
@@ -2747,6 +2807,13 @@ var ImmoExpose = (() => {
       g * 0.1333
     );
   }
+  var ANKER_X = { links: 0, mitte: 0.5, rechts: 1 };
+  var ANKER_Y = { unten: 0, mitte: 0.5, oben: 1 };
+  function bildAnker(el) {
+    const x = ANKER_X[zeichenkette(el, "ausrichtung") ?? ""] ?? 0.5;
+    const y = ANKER_Y[zeichenkette(el, "vertikal") ?? ""] ?? 0.5;
+    return x === 0.5 && y === 0.5 ? void 0 : [x, y];
+  }
   var bild = (el, u) => {
     const slot = el["slot"];
     const schluessel = bildSchluessel(slot);
@@ -2762,7 +2829,8 @@ var ImmoExpose = (() => {
           el.b,
           el.h,
           quelle,
-          zeichenkette(el, "fuellmodus") ?? "cover"
+          zeichenkette(el, "fuellmodus") ?? "cover",
+          bildAnker(el)
         );
       }, zweck);
     } else {
@@ -3250,6 +3318,10 @@ var ImmoExpose = (() => {
       eckradius: 0,
       slot: { art: "ansprechpartner" },
       fuellmodus: "cover",
+      // Der Anker gilt dem Logo, nicht dem Portraet: ein "links" an der
+      // Kontaktkarte darf das Foto nicht in seinem Fenster verschieben.
+      ausrichtung: void 0,
+      vertikal: void 0,
       platzhalter_farbe: el["foto_platzhalter"] ?? { palette: "surf" }
     };
     if (eckig) {
@@ -3579,7 +3651,11 @@ var ImmoExpose = (() => {
   var BEKANNTE_FELDER = new Set(KATALOG.map((f) => f.schluessel));
   var EIGENE_FELDER = /* @__PURE__ */ new Set([
     "bild.lageplan",
-    "bild.asset"
+    "bild.asset",
+    // Wortzeichen oder Bildzeichen. Das rechnet die Funktion aus dem
+    // hochgeladenen Logo aus; die Vorlagen entscheiden damit, wie viel Platz
+    // das Logo bekommt und ob daneben noch der Markenname steht.
+    "firma.logo.form"
   ]);
   function istBekannt(schluessel) {
     if (BEKANNTE_FELDER.has(schluessel)) return true;
@@ -4012,20 +4088,9 @@ var ImmoExpose = (() => {
         const bild2 = z2.bilder.get(s.quelle);
         if (!bild2) return;
         const name = z2.blatt.node.newXObject("Bild", bild2.ref);
-        const skalaX = s.b / bild2.b;
-        const skalaY = s.h / bild2.h;
-        const f = s.fuellmodus === "contain" ? Math.min(skalaX, skalaY) : Math.max(skalaX, skalaY);
-        const bb = bild2.b * f;
-        const hh = bild2.h * f;
+        const k = bildKasten(s, bild2.b, bild2.h);
         z2.blatt.pushOperators(
-          P2.concatTransformationMatrix(
-            bb,
-            0,
-            0,
-            hh,
-            s.x + (s.b - bb) / 2,
-            s.y + (s.h - hh) / 2
-          ),
+          P2.concatTransformationMatrix(k.b, 0, 0, k.h, k.x, k.y),
           P2.drawObject(name)
         );
         return;
@@ -4493,6 +4558,7 @@ var ImmoExpose = (() => {
       const web = text2(firma["web"]);
       if (web) d["objekt.expose_qr_url"] = /^https?:\/\//i.test(web) ? web : "https://" + web;
     }
+    if (q.logo_form) d["firma.logo.form"] = q.logo_form;
     const ki = (q.ki_bilder ?? []).filter((k) => !LEER(k));
     if (ki.length) d["objekt.ki_bilder"] = ki;
     const heute = q.heute ?? /* @__PURE__ */ new Date();

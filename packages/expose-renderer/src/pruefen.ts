@@ -33,6 +33,10 @@ const BEKANNTE_FELDER = new Set(KATALOG.map((f) => f.schluessel));
 /** Felder, die der Renderer selbst stellt und die nicht im Katalog stehen. */
 const EIGENE_FELDER = new Set([
   "bild.lageplan", "bild.asset",
+  // Wortzeichen oder Bildzeichen. Das rechnet die Funktion aus dem
+  // hochgeladenen Logo aus; die Vorlagen entscheiden damit, wie viel Platz
+  // das Logo bekommt und ob daneben noch der Markenname steht.
+  "firma.logo.form",
 ]);
 
 function istBekannt(schluessel: string): boolean {

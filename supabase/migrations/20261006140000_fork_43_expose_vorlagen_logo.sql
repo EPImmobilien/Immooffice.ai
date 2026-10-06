@@ -1,5 +1,5 @@
 -- ===========================================================================
--- fork_38 — die drei Systemvorlagen des Exposé-Baukastens
+-- Stand der Systemvorlagen nachziehen
 --
 -- ERZEUGT von scripts/expose-systemvorlagen.py aus
 -- packages/expose-renderer/vorlagen/*.json. Nicht von Hand aendern: wer
@@ -54,3 +54,27 @@ on conflict (id) do update
       version      = public.expose_vorlagen.version + 1,
       geaendert_am = now();
 
+-- ---------------------------------------------------------------------------
+-- Und die Kopien, die noch nie bearbeitet wurden.
+--
+-- Wer "Kopie anlegen" drueckt, bekommt das Dokument der Systemvorlage mit
+-- version = 1. Solange niemand etwas daran geaendert hat, ist diese Kopie
+-- genau die Systemvorlage unter einem anderen Namen — und soll deren
+-- Korrekturen mitbekommen. Sonst traegt der Mandant die alten Fehler
+-- weiter, ohne je davon zu erfahren.
+--
+-- Ab version > 1 bleibt die Kopie unangetastet: dann hat jemand im Editor
+-- daran gearbeitet, und seine Arbeit zu ueberschreiben waere ein Verlust,
+-- kein Dienst. Diese Mandanten muessen von Hand nachziehen; die
+-- Systemvorlage steht daneben und laesst sich erneut kopieren.
+-- ---------------------------------------------------------------------------
+
+update public.expose_vorlagen k
+   set dokument = s.dokument,
+       geaendert_am = now()
+  from public.expose_vorlagen s
+ where s.mandant_id is null
+   and k.mandant_id is not null
+   and k.basis = s.basis
+   and coalesce(k.version, 1) = 1
+   and k.dokument is distinct from s.dokument;

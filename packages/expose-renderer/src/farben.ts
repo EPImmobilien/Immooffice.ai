@@ -99,6 +99,30 @@ export function themaSignature(dunkel: string, metall: string) {
   };
 }
 
+/**
+ * Haelt eine Schriftfarbe von ihrem Grund fern. Gegeben ist die gewuenschte
+ * Farbe und die Flaeche, auf der sie steht; zurueck kommt dieselbe Farbe,
+ * nur so weit aufgehellt (auf hellem Grund: abgedunkelt), dass man sie
+ * lesen kann.
+ *
+ * Gebraucht wird das, weil die Vorlagen an einigen Stellen die Signalfarbe
+ * des Mandanten auf den Dunkelton setzen. Im Prototyp ist die Signalfarbe
+ * ein helles Blau und der Dunkelton fast schwarz — das traegt. Waehlt ein
+ * Mandant ein dunkles Bordeaux, steht die Beschriftung dunkelrot auf
+ * dunkelgrau und ist weg. Die Schwelle ist bewusst so gesetzt, dass die
+ * Prototypfarben unveraendert durchgehen: hier wird nichts umgestaltet,
+ * hier wird nur ein unlesbarer Fall gerettet.
+ */
+export function abstandHalten(vorn: Farbe, hinten: Farbe, mindest = 0.25): Farbe {
+  const ziel = helligkeit(hinten) > 0.5 ? SCHWARZ : WEISS;
+  if (Math.abs(helligkeit(vorn) - helligkeit(hinten)) >= mindest) return vorn;
+  for (let t = 0.05; t <= 0.9; t += 0.05) {
+    const c = mix(vorn, ziel, t);
+    if (Math.abs(helligkeit(c) - helligkeit(hinten)) >= mindest) return c;
+  }
+  return ziel;
+}
+
 /** Studio: Signalfarbe und Dunkelton. Aus immoOffice_studio_generator.py. */
 export function themaStudio(signal: string, dunkel: string) {
   const s = hx(signal);
@@ -127,6 +151,10 @@ export function themaStudio(signal: string, dunkel: string) {
     muted: mix(d, WEISS, 0.48),
     rule: d,
     hair: mix(d, WEISS, 0.84),
+    // Die Signalfarbe, lesbar auf dem Dunkelton. Die Kontaktseite setzt
+    // ihre Beschriftungen darauf. Mit der Prototypfarbe ist das dieselbe
+    // Farbe wie s; bei einer dunklen Mandantenfarbe eine aufgehellte.
+    s_auf_d: abstandHalten(s, d),
   };
 }
 

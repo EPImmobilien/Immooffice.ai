@@ -58,6 +58,22 @@ const schnittName = (n) => {
 // dieser Stelle etwas, das der Fork bewusst anders schreibt. Der Eintrag
 // ersetzt den Text des Prototyps vor dem Vergleich — Ort, Schnitt,
 // Groesse und Farbe werden weiter voll geprueft.
+// Texte, die der Prototyp setzt und die Vorlage mit Grund NICHT setzt.
+// Dieselbe Buchfuehrung wie bei den abweichenden Texten: eine Luecke gegen
+// den Prototyp muss begruendet im Test stehen, sonst ist sie ein Fehler.
+const WEGGELASSEN = [
+  {
+    vorlage: 'studio',
+    text: 'PORTRÄTFOTO',
+    grund: 'Der Prototyp legt eine Fahne mit dem Wort "Porträtfoto" ueber '
+         + 'das Bildfenster des Ansprechpartners — eine Beschriftung des '
+         + 'Platzhalters, nicht des Inhalts. Im Produkt steht dort das Foto '
+         + 'des Maklers, und darueber stand dann "PORTRÄTFOTO". Am '
+         + '06.10.2026 an einem echten Expose gemeldet.',
+  },
+];
+const weggelassen = new Set(WEGGELASSEN.map((e) => `${e.vorlage}|${e.text}`));
+
 const ABWEICHENDE_TEXTE = [
   {
     vorlage: 'raster',
@@ -630,6 +646,9 @@ for (const name of WELCHE) {
           platzhalterArten.set(s.art, (platzhalterArten.get(s.art) || 0) + 1);
           continue;
         }
+        if (s.art === 'text' && weggelassen.has(`${name}|${String(s.text || '').trim()}`)) {
+          continue;
+        }
         if (s.art === 'text' && imRahmen(s, rahmen, true)) {
           platzhalter++;
           platzhalterArten.set('Beschriftung einer Zeichnung',
@@ -686,6 +705,10 @@ if (doppelt) {
 console.log(`       ${platzhalter} Schritte sind Platzhaltergrafik in Bildrahmen —`);
 console.log(`       laut Auftrag nur Platzhalter, im Produkt stehen dort Fotos:`);
 console.log(`       ${[...platzhalterArten].map(([a, n]) => `${n}x ${a}`).join(', ')}.`);
+for (const e of WEGGELASSEN) {
+  console.log(`       Mit Grund weggelassen: ${e.vorlage} — "${e.text}".`);
+  console.log(`         ${e.grund}`);
+}
 for (const e of ABWEICHENDE_TEXTE) {
   console.log(`       Mit Grund abweichend: ${e.vorlage} — "${e.soll}"`);
   console.log(`         statt dessen "${e.ist}". ${e.grund}`);

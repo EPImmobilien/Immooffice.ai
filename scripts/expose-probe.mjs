@@ -34,6 +34,17 @@ const schalter = new Set(argumente.filter((a) => a.startsWith('--')));
 const gewuenscht = argumente.filter((a) => !a.startsWith('--'));
 const voll = schalter.has('--voll');
 const ohneLogo = schalter.has('--ohne-logo');
+// Ein langer Titel und eine lange Beschreibung — so, wie ein gepflegtes
+// Objekt im Betrieb aussieht. Die Vorlagen sind gegen die kurzen Demodaten
+// der Prototypen vermessen; am 06.10.2026 lief damit der Titel ueber die
+// halbe Titelseite und die Beschreibung ueber die Fusszeile.
+const lang = schalter.has('--lang');
+// Ein Logo als WORTZEICHEN statt als Bildzeichen. Viele Makler haben kein
+// quadratisches Signet, sondern einen Schriftzug — in einem quadratischen
+// Rahmen wird der zu einem Streifen von wenigen Punkten Hoehe. Mit diesem
+// Schalter traegt die Probe ein breites Logo und sagt den Vorlagen auch,
+// dass es breit ist.
+const wortmarke = schalter.has('--wortmarke');
 const zielOrdner = process.env.PROBE_ZIEL || path.join(os.tmpdir(), 'expose-probe');
 
 const namen = (gewuenscht.length ? gewuenscht : fs.readdirSync(VORLAGEN)
@@ -99,7 +110,9 @@ const ansprechpartner = {
 };
 const immobilie = {
   id: 'o1', mandant_id: MANDANT, immo_nr: '1', objektart: 'Haus', vertragsart: 'verkauf',
-  objekttitel: 'Freistehendes Haus mit Garten',
+  objekttitel: lang
+    ? 'Modernisiert und bezugsfertig – Bungalow mit Fussbodenheizung in ruhiger Lage'
+    : 'Freistehendes Haus mit Garten',
   bezeichnung: 'Freistehendes Haus mit Garten',
   strasse: 'Musterweg', hausnummer: '12', plz: '17166', ort: 'Musterstadt',
   ortsteil: voll ? 'Seeviertel' : null,
@@ -109,7 +122,26 @@ const immobilie = {
   energie_warmwasser: false, heizungsart: voll ? 'Waermepumpe' : null,
   energie_traeger: voll ? 'Strom' : null,
   zustand: voll ? 'gepflegt' : null, verfuegbar_ab: voll ? 'nach Vereinbarung' : null,
-  beschreibung_objekt: voll
+  beschreibung_objekt: lang
+    ? ('Dieses gepflegte Einfamilienhaus liegt in einer ruhigen Sackgasse am '
+       + 'Stadtrand und ueberzeugt durch seine naturnahe Umgebung sowie den '
+       + 'freien Blick ins Gruene. Das in massiver Bauweise errichtete '
+       + 'Wohnhaus steht auf einem grosszuegigen Grundstueck mit gepflegtem '
+       + 'Garten. Eine ueberdachte Terrasse mit hochwertigem Plattenbelag '
+       + 'erweitert den Wohnbereich nach aussen.\n\n'
+       + 'Die Wohnflaeche verteilt sich komfortabel auf einer Ebene. Ein '
+       + 'zentraler Flur erschliesst saemtliche Raeume. Das grosszuegige '
+       + 'Wohnzimmer ueberzeugt mit bodentiefen Terrassentueren und einem '
+       + 'angenehmen Lichteinfall; die hochwertige Einbaukueche wurde erst '
+       + 'kuerzlich neu eingebaut und verfuegt ueber moderne Markengeraete.\n\n'
+       + 'Ein besonderes Highlight ist das vollstaendig sanierte Badezimmer. '
+       + 'Im Zuge der Modernisierung wurden saemtliche Wasserleitungen und '
+       + 'Anschluesse erneuert. Das moderne Duschbad verfuegt ueber eine '
+       + 'bodengleiche Glasdusche, ein wandhaengendes WC, einen '
+       + 'grosszuegigen Waschtisch sowie einen Handtuchheizkoerper. Fuer '
+       + 'hohen Wohnkomfort sorgt die im gesamten Haus vorhandene '
+       + 'Fussbodenheizung.')
+    : voll
     ? 'Das Haus liegt am Ende einer ruhigen Strasse.\n\nIm Erdgeschoss liegen '
       + 'Wohnen, Kochen und Essen in einem Raum; nach Sueden oeffnet sich die '
       + 'Terrasse zum Garten. Das Obergeschoss nimmt vier Zimmer auf.'
@@ -129,17 +161,64 @@ const immobilie = {
     ? [{ gruppe: 'Innen', punkte: ['Parkett', 'Fussbodenheizung'] }] : null,
 };
 
+// Ein einfarbiges PNG beliebiger Groesse, zur Laufzeit gebaut. So kann die
+// Probe ein breites Logo mitbringen, ohne eine Bilddatei im Repository.
+function pngFlaeche(breite, hoehe, r, g, b) {
+  const zlib = require('node:zlib');
+  const roh = Buffer.alloc((breite * 3 + 1) * hoehe);
+  for (let y = 0; y < hoehe; y++) {
+    const zeile = y * (breite * 3 + 1);
+    roh[zeile] = 0;                        // Filter "keiner"
+    for (let x = 0; x < breite; x++) {
+      roh[zeile + 1 + x * 3] = r;
+      roh[zeile + 2 + x * 3] = g;
+      roh[zeile + 3 + x * 3] = b;
+    }
+  }
+  const crcTabelle = [];
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+    crcTabelle.push(c >>> 0);
+  }
+  const crc = (puffer) => {
+    let c = 0xffffffff;
+    for (const byte of puffer) c = crcTabelle[(c ^ byte) & 0xff] ^ (c >>> 8);
+    return (c ^ 0xffffffff) >>> 0;
+  };
+  const block = (art, inhalt) => {
+    const kopf = Buffer.alloc(4);
+    kopf.writeUInt32BE(inhalt.length, 0);
+    const mitte = Buffer.concat([Buffer.from(art, 'latin1'), inhalt]);
+    const schluss = Buffer.alloc(4);
+    schluss.writeUInt32BE(crc(mitte), 0);
+    return Buffer.concat([kopf, mitte, schluss]);
+  };
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(breite, 0);
+  ihdr.writeUInt32BE(hoehe, 4);
+  ihdr[8] = 8; ihdr[9] = 2;                // 8 Bit je Kanal, Farbtyp RGB
+  return Buffer.concat([
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    block('IHDR', ihdr),
+    block('IDAT', zlib.deflateSync(roh)),
+    block('IEND', Buffer.alloc(0)),
+  ]);
+}
+
 const bildWerte = {};
 const bilder = new Map();
 bilder.set('foto', new Uint8Array(JPEG));
+bilder.set('wortmarke', new Uint8Array(pngFlaeche(360, 60, 110, 20, 20)));
 for (let i = 1; i <= 13; i++) bildWerte['bild.foto.' + i] = 'foto';
 bildWerte['objekt.hauptbild_url'] = 'foto';
 bildWerte['bild.lageplan'] = 'foto';
 if (voll) { bildWerte['bild.grundriss.1'] = 'foto'; bildWerte['bild.grundriss.2'] = 'foto'; }
 if (voll) bildWerte['ansprechpartner.foto'] = 'foto';
 if (!ohneLogo) {
-  bildWerte['firma.logo.hell'] = 'foto';
-  bildWerte['firma.logo.dunkel'] = 'foto';
+  const logo = wortmarke ? 'wortmarke' : 'foto';
+  bildWerte['firma.logo.hell'] = logo;
+  bildWerte['firma.logo.dunkel'] = logo;
 }
 
 const daten = aufbereiten({
@@ -147,6 +226,7 @@ const daten = aufbereiten({
   annahmen: { notar_prozent: 2.0, zinssatz: 3.9, tilgung: 2.0, eigenkapital_prozent: 20 },
   bilder: bildWerte,
   ki_bilder: [],
+  logo_form: ohneLogo ? undefined : (wortmarke ? 'breit' : 'quadratisch'),
 });
 
 // --- Rendern ----------------------------------------------------------------

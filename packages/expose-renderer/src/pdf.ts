@@ -21,6 +21,7 @@
 import type { PDFDocument, PDFFont, PDFPage, PDFRef } from "pdf-lib";
 import type { Metrik } from "./schrift";
 import type { PfadSchritt, RGBA, Schritt, Seitenbild } from "./schritte";
+import { bildKasten } from "./schritte";
 
 export type PdfWerkzeug = {
   /** pdf-lib, hereingegeben statt importiert — siehe Hinweis unten. */
@@ -221,17 +222,11 @@ function einzeln(s: Schritt, z: Zustand): void {
       const bild = z.bilder.get(s.quelle);
       if (!bild) return;
       const name = z.blatt.node.newXObject("Bild", bild.ref);
-      // "cover": das Bild deckt den Rahmen und wird beschnitten; die
-      // Gruppe darum maskiert ihn. "contain": es passt vollstaendig hinein.
-      const skalaX = s.b / bild.b;
-      const skalaY = s.h / bild.h;
-      const f = s.fuellmodus === "contain"
-        ? Math.min(skalaX, skalaY) : Math.max(skalaX, skalaY);
-      const bb = bild.b * f;
-      const hh = bild.h * f;
+      // Wohin das Bild kommt, rechnet bildKasten — dieselbe Funktion, die
+      // auch die Bearbeitungsflaeche benutzt.
+      const k = bildKasten(s, bild.b, bild.h);
       z.blatt.pushOperators(
-        P.concatTransformationMatrix(bb, 0, 0, hh,
-          s.x + (s.b - bb) / 2, s.y + (s.h - hh) / 2),
+        P.concatTransformationMatrix(k.b, 0, 0, k.h, k.x, k.y),
         P.drawObject(name),
       );
       return;

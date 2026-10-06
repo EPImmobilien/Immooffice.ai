@@ -88,11 +88,17 @@ export function umbrechen(
 }
 
 /** Wie hoch ein Text wird, ohne ihn zu setzen. */
-export function hoehe(zeilen: Zeile[], zeilenhoehe: number, regeln: SatzRegeln): number {
+export function hoehe(zeilen: Zeile[], zeilenhoehe: number, regeln: SatzRegeln,
+                      absatzLuft?: number): number {
   if (zeilen.length === 0) return 0;
   const absaetze = zeilen[zeilen.length - 1].absatz + 1;
-  return zeilen.length * zeilenhoehe
-    + (absaetze - 1) * zeilenhoehe * regeln.absatzFaktor;
+  // Der Absatzabstand kann am Element FEST stehen (die Titelseite von
+  // Studio setzt ihn auf 0: drei Zeilen, kein Luftsprung dazwischen). Dann
+  // gilt dieser Wert und nicht der Faktor der Satzregeln — sonst rechnet
+  // die Verdichtung mit einer Luft, die beim Zeichnen niemand setzt, und
+  // verkleinert einen Text, der passt.
+  const luft = absatzLuft === undefined ? zeilenhoehe * regeln.absatzFaktor : absatzLuft;
+  return zeilen.length * zeilenhoehe + (absaetze - 1) * luft;
 }
 
 export type WortSatz = { x: number; y: number; text: string };
@@ -161,13 +167,26 @@ export function verdichten(
   minGroesse: number,
   zeilenFaktor: number,
   regeln: SatzRegeln,
+  absatzLuft?: number,
+  maxZeilen?: number,
 ): { groesse: number; zeilenhoehe: number; zeilen: Zeile[]; passt: boolean } {
   let g = groesse;
   const schritt = 0.1;
   for (;;) {
     const zh = g * zeilenFaktor;
     const zeilen = umbrechen(m, s, g, maxBreite, regeln);
-    if (hoehe(zeilen, zh, regeln) <= maxHoehe) {
+    // Eine Zeilenhoehe weniger: der Renderer setzt die ERSTE Grundlinie auf
+    // die Oberkante des Rahmens, nicht die Oberlaenge der ersten Zeile. Ein
+    // Block aus n Zeilen reicht damit (n-1) Zeilenhoehen nach unten, nicht
+    // n. Ohne diese Zeile verdichtet der Renderer Texte, die passen — die
+    // Titelseite von Studio setzt drei Zeilen zu 70 Punkt in einen Rahmen
+    // von 140, und das ist genau richtig.
+    // Eine Begrenzung auf n Zeilen gehoert MIT in die Verdichtung. Sonst
+    // verkleinert der Renderer bis die Hoehe stimmt, schneidet danach auf
+    // n Zeilen ab und wirft Text weg, der bei einer Stufe kleiner noch
+    // hineingepasst haette.
+    const zuViele = maxZeilen !== undefined && maxZeilen > 0 && zeilen.length > maxZeilen;
+    if (!zuViele && hoehe(zeilen, zh, regeln, absatzLuft) - zh <= maxHoehe + 1e-9) {
       return { groesse: g, zeilenhoehe: zh, zeilen, passt: true };
     }
     if (g - schritt < minGroesse - 1e-9) {

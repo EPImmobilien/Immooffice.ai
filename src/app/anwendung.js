@@ -31676,6 +31676,15 @@ function ImmobilieSeite({
       typ: "fehler",
       text: "Es gibt ungespeicherte Änderungen — bitte erst speichern, damit das Exposé den aktuellen Stand nutzt."
     });
+    // Die gewaehlte Vorlage. Ohne Wahl wird kein Expose erzeugt: eine
+    // stille Standardvorlage hat am 06.10.2026 Exposes im falschen Design
+    // erzeugt, ohne dass es jemand sehen konnte.
+    const exposeVorlageId = window.ImmoExposeVorlagenwahl
+      ? window.ImmoExposeVorlagenwahl.gewaehlt(t.id) : null;
+    if ("pdf" === e && !exposeVorlageId) return void Me({
+      typ: "fehler",
+      text: "Bitte oben die Exposé-Vorlage wählen — es gibt keine stille Standardvorlage mehr."
+    });
     let n = !1;
     "pdf" === e && (n = confirm("Ist dieses Exposé FINAL und darf an Interessenten versendet werden?\n\nOK = final: wird bei Exposé-Anfragen versendet, ältere Exposé-PDFs des Objekts werden ersetzt.\nAbbrechen = Entwurf: nur intern, bisheriges finales Exposé bleibt gültig.")), Fe(e), Me(null), "pdf" === e && Ne(null);
     try {
@@ -31695,7 +31704,8 @@ function ImmobilieSeite({
       } : await window._sb.functions.invoke("expose-pdf-erzeugen", {
         body: {
           immobilie_id: t.id,
-          modus: e
+          modus: e,
+          vorlage_id: exposeVorlageId || null
         }
       });
       if (r) {
@@ -34090,7 +34100,14 @@ function ImmobilieSeite({
         letterSpacing: "0.05em",
         opacity: Te || !n.length ? .6 : 1
       }
-    }, "pdf" === Te ? "Exposé wird erstellt… (kann bis zu 1 Minute dauern)" : "📄 Exposé-PDF erstellen")), React.createElement("div", {
+    }, "pdf" === Te ? "Exposé wird erstellt… (kann bis zu 1 Minute dauern)" : "📄 Exposé-PDF erstellen")),
+    // Welche Vorlage? Das entscheidet ab fork_43 der Nutzer, hier, vor dem
+    // Erzeugen — nicht mehr eine stille Standardvorlage.
+    // src/eigene/expose-vorlagenwahl.js schreibt die Wahl an das Objekt.
+    window.ImmoExposeVorlagenwahl && React.createElement(window.ImmoExposeVorlagenwahl, {
+      immobilieId: t.id,
+      vorlageId: t.expose_vorlage_id || ""
+    }), React.createElement("div", {
       style: {
         fontSize: 12,
         color: CI.muted,
@@ -41722,12 +41739,22 @@ function AdminGmbHStammdaten({
       ev.target.value = "";
       if (!datei) return;
       try {
-        const endung = (datei.name.split(".").pop() || "png").toLowerCase();
+        // Freistellen anbieten: ein Logo mit weisser Flaeche steht auf den
+        // farbigen und dunklen Expose-Seiten sonst als Kasten.
+        // src/eigene/logo-freistellen.js rechnet im Browser, das Original
+        // verlaesst das Haus nicht. "abbruch" heisst: nichts hochladen.
+        let hochzuladen = datei, endung = (datei.name.split(".").pop() || "png").toLowerCase();
+        if (window.ImmoLogoFreistellen && !/svg/i.test(datei.type || endung)) {
+          const frei = await window.ImmoLogoFreistellen.oeffnen(datei);
+          if (frei === "abbruch") return;
+          if (frei && frei.blob) { hochzuladen = frei.blob; endung = frei.endung || "png"; }
+        }
         // Mandantenrelativ — die Speicher-Huelle stellt die
         // Mandantenkennung voran, die Richtlinie aus fork_09 prueft sie.
         const pfad = "logos/" + e.id + "-" + Date.now() + "." + endung;
         const { error: uErr } = await window._sb.storage.from("branding-assets")
-          .upload(pfad, datei, { upsert: false, contentType: datei.type || undefined });
+          .upload(pfad, hochzuladen, { upsert: false,
+            contentType: hochzuladen === datei ? (datei.type || undefined) : "image/png" });
         if (uErr) throw uErr;
         c(e.id, "logo_pfad", pfad);
         await logAction("upload", "logo", e.id, e.firma_name || "", { pfad });

@@ -63,6 +63,14 @@ export type Quellen = {
    * Prototyp geerbt, dessen Demobilder in dieser Reihenfolge lagen.
    */
   bildtitel?: Record<string, string>;
+  /**
+   * Form des hochgeladenen Logos: "breit" fuer ein Wortzeichen, sonst
+   * "quadratisch". Rechnet der Aufrufer aus der Bilddatei aus — nur er hat
+   * sie. Die Vorlagen geben einem Wortzeichen die ganze Breite des
+   * Markenfelds und lassen den Markennamen daneben entfallen; ein
+   * Bildzeichen bleibt klein und behaelt den Namen neben sich.
+   */
+  logo_form?: "breit" | "quadratisch";
   /** Fuer {{datum}}. Hereingegeben, damit der Test nicht von der Uhr abhaengt. */
   heute?: Date;
 };
@@ -340,6 +348,8 @@ export function aufbereiten(q: Quellen): Daten {
     const web = text(firma["web"]);
     if (web) d["objekt.expose_qr_url"] = /^https?:\/\//i.test(web) ? web : "https://" + web;
   }
+
+  if (q.logo_form) d["firma.logo.form"] = q.logo_form;
 
   const ki = (q.ki_bilder ?? []).filter((k) => !LEER(k));
   if (ki.length) d["objekt.ki_bilder"] = ki;

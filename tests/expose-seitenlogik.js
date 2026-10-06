@@ -23,7 +23,11 @@ execFileSync('tsc', [path.join(WURZEL, 'packages', 'expose-renderer', 'src', 're
              { stdio: 'pipe', cwd: os.tmpdir() });
 const { rendern } = require(path.join(tmp, 'rendern.js'));
 const { metrikLesen } = require(path.join(tmp, 'schrift.js'));
-fs.rmSync(tmp, { recursive: true, force: true });
+const { flach: flachLegen } = require(path.join(tmp, 'schritte.js'));
+const { breite: breiteVon } = require(path.join(tmp, 'schrift.js'));
+// Der Ordner bleibt bis zum Ende: Abschnitt 8 laedt daraus noch bildKasten.
+const tmpSchritte = tmp;
+process.on('exit', () => fs.rmSync(tmp, { recursive: true, force: true }));
 
 const schriften = new Map();
 for (const datei of fs.readdirSync(SCHRIFTEN).filter((f) => f.endsWith('.ttf'))) {
@@ -192,10 +196,129 @@ const pruefe = (bedingung, was) => {
          'Ohne Bild kein Schild — ein Platzhalter ist kein KI-Bild.');
 }
 
+// --- 8. Das Logo: ein Wortzeichen muss lesbar gross werden -------------
+// Am 06.10.2026 kam der Befund von zwei echten Exposés: "das mit den Logos
+// passt nicht". Der Grund: die Vorlagen hatten dem Logo einen
+// quadratischen Rahmen von 20 bis 30 Punkt gegeben — im Prototyp sitzt
+// dort ein Signet. Ein Schriftzug von 6:1 wurde darin auf wenige Punkte
+// Hoehe gequetscht.
+//
+// Geprueft wird darum an den ECHTEN Vorlagen, nicht an einer gebauten:
+// ein breites Logo muss breit gezeichnet werden, ein quadratisches darf
+// sich dadurch nicht verschieben, und neben einem Wortzeichen darf der
+// Markenname nicht ein zweites Mal stehen.
+{
+  const VORLAGEN = path.join(WURZEL, 'packages', 'expose-renderer', 'vorlagen');
+  const basis = {
+    'firma.marken_name': 'Musterimmobilien',
+    'firma.name': 'Musterimmobilien Nord GmbH',
+    'firma.logo.hell': 'logo', 'firma.logo.dunkel': 'logo',
+  };
+  // Welche Kaesten das Logo belegt, sagt bildKasten — dieselbe Funktion,
+  // die auch das PDF und die Bearbeitungsflaeche benutzen.
+  const { bildKasten } = require(path.join(tmpSchritte, 'schritte.js'));
+  const logoKaesten = (vorlage, daten, bb, hh) => {
+    const raus = [];
+    for (const seite of rendern({ vorlage, daten, schriften }).seiten) {
+      for (const schritt of flachLegen(seite.schritte)) {
+        if (schritt.art === 'bild' && schritt.quelle === 'logo') {
+          raus.push(bildKasten(schritt, bb, hh));
+        }
+      }
+    }
+    return raus;
+  };
+  const markennameSteht = (vorlage, daten) => {
+    for (const seite of rendern({ vorlage, daten, schriften }).seiten) {
+      for (const schritt of flachLegen(seite.schritte)) {
+        if (schritt.art === 'text'
+            && String(schritt.text).toUpperCase().includes('MUSTERIMMOBILIEN')) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+  // Ueberschneidet das Logo einen Text? Die Breite einer Zeile rechnet
+  // dieselbe Funktion wie der Renderer; der Schritt traegt schon den
+  // aufgeloesten linken Rand.
+  const ueberschneidungen = (vorlage, daten, bb, hh) => {
+    const raus = [];
+    for (const seite of rendern({ vorlage, daten, schriften }).seiten) {
+      const schritte = flachLegen(seite.schritte);
+      const logos = schritte
+        .filter((s) => s.art === 'bild' && s.quelle === 'logo')
+        .map((s) => bildKasten(s, bb, hh));
+      if (!logos.length) continue;
+      for (const t of schritte.filter((s) => s.art === 'text' && String(s.text).trim())) {
+        const tb = breiteVon(schriften.get(t.schnitt), t.text, t.groesse)
+          + (t.sperrung || 0) * Math.max(0, t.text.length - 1);
+        for (const k of logos) {
+          // Die Grundlinie liegt bei t.y. Nach oben reicht die Zeile bis
+          // zur Versalhoehe (0,72 der Groesse bei diesen drei Familien),
+          // nach unten bis zur Unterlaenge von Komma und "g".
+          const oben = t.y + t.groesse * 0.72, unten = t.y - t.groesse * 0.15;
+          if (k.x < t.x + tb && t.x < k.x + k.b && k.y < oben && unten < k.y + k.h) {
+            raus.push(`"${t.text}" bei (${t.x.toFixed(0)}, ${t.y.toFixed(0)})`);
+          }
+        }
+      }
+    }
+    return raus;
+  };
+
+  for (const datei of fs.readdirSync(VORLAGEN)
+    .filter((f) => f.endsWith('.json') && f !== 'schema.json')) {
+    const name = datei.replace(/\.json$/, '');
+    const vorlage = JSON.parse(fs.readFileSync(path.join(VORLAGEN, datei), 'utf-8'));
+
+    const breit = logoKaesten(vorlage, { ...basis, 'firma.logo.form': 'breit' }, 360, 60);
+    pruefe(breit.length > 0, `${name}: ein hinterlegtes Logo muss gezeichnet werden.`);
+    for (const k of breit) {
+      pruefe(k.b >= 60,
+             `${name}: ein Wortzeichen von 6:1 wird nur ${k.b.toFixed(1)} pt breit `
+             + `gezeichnet — unter 60 pt ist es nicht lesbar.`);
+    }
+
+    // Ein Signet darf durch den breiteren Rahmen nicht wandern: es bleibt
+    // so gross und steht da, wo es vorher stand (der Vergleich mit den
+    // Prototypen prueft genau diesen Ort).
+    const eckig = logoKaesten(vorlage, { ...basis, 'firma.logo.form': 'quadratisch' }, 64, 64);
+    for (const k of eckig) {
+      pruefe(Math.abs(k.b - k.h) < 0.01,
+             `${name}: ein quadratisches Logo muss quadratisch bleiben.`);
+    }
+
+    // Steht der Markenname neben dem Logo, darf er neben einem Schriftzug
+    // nicht noch einmal auftauchen. Wo er UNTER dem Logo steht und Platz
+    // hat, bleibt er — darum nur die Vorlagen pruefen, die ihn ausblenden.
+    const nameBeiBreit = markennameSteht(vorlage, { ...basis, 'firma.logo.form': 'breit' });
+    const nameOhneLogo = markennameSteht(vorlage, {
+      'firma.marken_name': basis['firma.marken_name'], 'firma.name': basis['firma.name'],
+    });
+    pruefe(nameOhneLogo,
+           `${name}: ohne Logo muss der Markenname stehen — sonst ist die Seite anonym.`);
+    pruefe(nameBeiBreit || name !== 'signature',
+           `${name}: auch neben einem Wortzeichen bleibt der Markenname dort, `
+           + `wo er Platz hat.`);
+
+    // Der Kern des Befunds: nichts darf sich mit dem Logo ueberschneiden.
+    for (const kennung of ['breit', 'quadratisch']) {
+      const masse = kennung === 'breit' ? [360, 60] : [64, 64];
+      const treffer = ueberschneidungen(
+        vorlage, { ...basis, 'firma.logo.form': kennung }, masse[0], masse[1]);
+      pruefe(treffer.length === 0,
+             `${name}: das Logo (${kennung}) ueberschneidet ${treffer.length} Text(e): `
+             + `${treffer.slice(0, 3).join(', ')}.`);
+    }
+  }
+}
+
 if (fehler) {
   console.log(`\n  ${fehler} Pruefungen fehlgeschlagen.`);
   process.exit(1);
 }
 console.log('  [ok] Seitenlogik: Bedingungen, Wiederholungen, Abweichungen,');
 console.log('       fehlende Werte, Verdichtung, unbekannte Platzhalter und die');
-console.log('       Kennzeichnung KI-bearbeiteter Bilder.');
+console.log('       Kennzeichnung KI-bearbeiteter Bilder — und dass ein Logo als');
+console.log('       Wortzeichen lesbar gross wird, ohne den Markennamen zu doppeln.');

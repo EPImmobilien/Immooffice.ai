@@ -27,7 +27,7 @@ export type { Farbe, Ableitung } from "./farben";
 export { ersetze, formatiere, platzhalterIn, trifftZu, wert, zahlDe, datumDe } from "./werte";
 export type { Daten } from "./werte";
 export { ELEMENTE } from "./elemente";
-export { flach } from "./schritte";
+export { flach, bildKasten } from "./schritte";
 export type { Schritt, Seitenbild, RGBA } from "./schritte";
 export { A4 } from "./schema";
 export type { Vorlage, Seite, Element, Overrides, Bedingung } from "./schema";

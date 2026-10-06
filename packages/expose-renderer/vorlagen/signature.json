@@ -76,7 +76,8 @@
         "groesse": 52,
         "farbe": "onD",
         "sperrung": -0.5,
-        "ausrichtung": "mitte"
+        "ausrichtung": "mitte",
+        "min_groesse": 26
       },
       "cover_titel_kursiv": {
         "schrift": {
@@ -86,7 +87,8 @@
         "groesse": 52,
         "farbe": "onD",
         "sperrung": -0.5,
-        "ausrichtung": "mitte"
+        "ausrichtung": "mitte",
+        "min_groesse": 26
       },
       "cover_unter": {
         "schrift": {
@@ -136,7 +138,8 @@
         },
         "groesse": 34,
         "farbe": "ink",
-        "sperrung": -0.3
+        "sperrung": -0.3,
+        "min_groesse": 20
       },
       "kapitel_titel_kursiv": {
         "schrift": {
@@ -145,7 +148,8 @@
         },
         "groesse": 34,
         "farbe": "ink",
-        "sperrung": -0.3
+        "sperrung": -0.3,
+        "min_groesse": 20
       },
       "kapitel_titel_hell": {
         "schrift": {
@@ -154,7 +158,8 @@
         },
         "groesse": 34,
         "farbe": "onD",
-        "sperrung": -0.3
+        "sperrung": -0.3,
+        "min_groesse": 20
       },
       "kapitel_titel_hell_kursiv": {
         "schrift": {
@@ -163,7 +168,8 @@
         },
         "groesse": 34,
         "farbe": "onD",
-        "sperrung": -0.3
+        "sperrung": -0.3,
+        "min_groesse": 20
       },
       "zitat_gross": {
         "schrift": {
@@ -190,7 +196,8 @@
         },
         "groesse": 9.2,
         "farbe": "text",
-        "zeilen": 16
+        "zeilen": 16,
+        "min_groesse": 7.0
       },
       "fliesstext_eng": {
         "schrift": {
@@ -199,7 +206,8 @@
         },
         "groesse": 8.9,
         "farbe": "text",
-        "zeilen": 15.2
+        "zeilen": 15.2,
+        "min_groesse": 7.0
       },
       "bild_label": {
         "schrift": {
@@ -220,7 +228,7 @@
         "farbe": "muted",
         "sperrung": 2.2,
         "grossbuchstaben": true,
-        "min_groesse": 6.5
+        "min_groesse": 5.2
       },
       "fuss_marke_hell": {
         "schrift": {
@@ -231,7 +239,7 @@
         "farbe": "onDm",
         "sperrung": 2.2,
         "grossbuchstaben": true,
-        "min_groesse": 6.5
+        "min_groesse": 5.2
       },
       "fuss_seite": {
         "schrift": {
@@ -241,7 +249,8 @@
         "groesse": 10,
         "farbe": "a",
         "sperrung": 1,
-        "ausrichtung": "mitte"
+        "ausrichtung": "mitte",
+        "min_groesse": 10
       },
       "fuss_objekt": {
         "schrift": {
@@ -252,7 +261,8 @@
         "farbe": "muted",
         "sperrung": 2.2,
         "grossbuchstaben": true,
-        "ausrichtung": "rechts"
+        "ausrichtung": "rechts",
+        "min_groesse": 5.2
       },
       "fuss_objekt_hell": {
         "schrift": {
@@ -263,7 +273,8 @@
         "farbe": "onDm",
         "sperrung": 2.2,
         "grossbuchstaben": true,
-        "ausrichtung": "rechts"
+        "ausrichtung": "rechts",
+        "min_groesse": 5.2
       },
       "zitat_klein": {
         "schrift": {
@@ -398,7 +409,8 @@
         "groesse": 10,
         "farbe": "a",
         "sperrung": 1,
-        "ausrichtung": "rechts"
+        "ausrichtung": "rechts",
+        "min_groesse": 10
       },
       "fliesstext_schmal": {
         "schrift": {
@@ -407,7 +419,8 @@
         },
         "groesse": 8.8,
         "farbe": "text",
-        "zeilen": 15
+        "zeilen": 15,
+        "min_groesse": 7.0
       },
       "gruppe_nummer": {
         "schrift": {
@@ -494,7 +507,8 @@
         },
         "groesse": 8.7,
         "farbe": "text",
-        "zeilen": 14.6
+        "zeilen": 14.6,
+        "min_groesse": 7.0
       },
       "dist_name": {
         "schrift": {
@@ -698,7 +712,8 @@
         "groesse": 32,
         "farbe": "onD",
         "sperrung": -0.3,
-        "ausrichtung": "mitte"
+        "ausrichtung": "mitte",
+        "min_groesse": 18
       },
       "kontakt_titel_kursiv": {
         "schrift": {
@@ -708,7 +723,8 @@
         "groesse": 32,
         "farbe": "onD",
         "sperrung": -0.3,
-        "ausrichtung": "mitte"
+        "ausrichtung": "mitte",
+        "min_groesse": 18
       },
       "ap_name_gross": {
         "schrift": {
@@ -911,10 +927,10 @@
         {
           "id": "cover-logo",
           "typ": "bild",
-          "x": 282.64,
-          "y": 775.89,
-          "b": 30,
-          "h": 30,
+          "x": 222.64,
+          "y": 783.0,
+          "b": 150.0,
+          "h": 22.0,
           "slot": {
             "art": "logo",
             "ton": "dunkel"
@@ -1100,7 +1116,7 @@
           "stil": "fliesstext",
           "inhalt": "{{objekt.expose_prolog_rest}}",
           "blocksatz": true,
-          "verdichten": false,
+          "verdichten": true,
           "einzug": 40,
           "einzug_zeilen": 3,
           "sichtbar_wenn": {
@@ -1117,7 +1133,7 @@
           "stil": "fliesstext",
           "inhalt": "{{objekt.expose_prolog}}",
           "blocksatz": true,
-          "verdichten": false,
+          "verdichten": true,
           "sichtbar_wenn": {
             "nicht": {
               "vorhanden": "objekt.expose_prolog_initiale"
@@ -1468,7 +1484,7 @@
           "stil": "fliesstext_eng",
           "inhalt": "{{objekt.beschreibung_objekt}}",
           "blocksatz": true,
-          "verdichten": false
+          "verdichten": true
         },
         {
           "id": "anwesen-strich",
@@ -1603,7 +1619,7 @@
           "stil": "fliesstext_schmal",
           "inhalt": "",
           "blocksatz": true,
-          "verdichten": false
+          "verdichten": true
         }
       ]
     },
@@ -1726,7 +1742,7 @@
           "stil": "fliesstext_schmal",
           "inhalt": "",
           "blocksatz": true,
-          "verdichten": false
+          "verdichten": true
         }
       ]
     },
@@ -2087,7 +2103,7 @@
           "stil": "lage_text",
           "inhalt": "{{objekt.beschreibung_lage}}",
           "blocksatz": true,
-          "verdichten": false
+          "verdichten": true
         },
         {
           "id": "dist-titel",
@@ -2617,10 +2633,10 @@
         {
           "id": "kontakt-logo",
           "typ": "bild",
-          "x": 282.64,
-          "y": 777.89,
-          "b": 30,
-          "h": 30,
+          "x": 222.64,
+          "y": 785.0,
+          "b": 150.0,
+          "h": 22.0,
           "slot": {
             "art": "logo",
             "ton": "dunkel"

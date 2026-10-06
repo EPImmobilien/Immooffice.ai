@@ -182,10 +182,25 @@ const textOhneDrehung: Zeichner = (el, u) => {
           br = u.blatt.sw(t, s.schnitt, groesse, sperrung);
         }
         if (br > el.b) {
+          // Auch bei der kleinsten erlaubten Groesse zu breit: dann wird
+          // gekuerzt und nicht ueberlaufen. Eine Fusszeile, die den
+          // Objekttitel traegt, kann jede Laenge bekommen — am 06.10.2026
+          // stand dort ein 76 Zeichen langer Titel, der bei 4,3 Punkt immer
+          // noch ueber den Rand lief. Drei Punkte sagen dem Leser, dass da
+          // mehr stand; eine Zeile ueber dem Seitenrand sagt ihm nichts.
+          let gekuerzt = t;
+          while (gekuerzt.length > 1
+                 && u.blatt.sw(gekuerzt + "…", s.schnitt, groesse, sperrung) > el.b) {
+            gekuerzt = gekuerzt.slice(0, -1);
+          }
+          gekuerzt = gekuerzt.replace(/[\s,;:–-]+$/, "") + "…";
           warne(u, "gekuerzt", el,
-                `Die Zeile ist auch bei ${groesse.toFixed(1)} Punkt breiter als ihr `
-                + `Rahmen (${br.toFixed(0)} statt ${el.b.toFixed(0)} Punkt) und ragt `
-                + `darueber hinaus. Rahmen breiter machen oder Text kuerzen.`);
+                `Die Zeile passt auch bei ${groesse.toFixed(1)} Punkt nicht in ihren `
+                + `Rahmen (${br.toFixed(0)} statt ${el.b.toFixed(0)} Punkt) und wurde `
+                + `gekuerzt. Rahmen breiter machen oder Text kuerzen.`);
+          u.blatt.T(ankerX(el, s.ausrichtung), el.y + el.h, gekuerzt, s.schnitt,
+                    groesse, s.farbe, sperrung, ankerArt(s.ausrichtung));
+          return;
         } else {
           warne(u, "verdichtet", el,
                 `Von ${s.groesse} auf ${groesse.toFixed(1)} Punkt verkleinert, damit `
@@ -200,10 +215,16 @@ const textOhneDrehung: Zeichner = (el, u) => {
 
   const maxZeilen = zahl(el, "max_zeilen", 0);
   const hoeheFrei = el.h;
+  // (maxZeilen steht absichtlich vor der Verdichtung: sie rechnet damit.)
+  // Der Absatzabstand steht am Element, wenn die Vorlage ihn nennt — und
+  // die Verdichtung muss mit demselben Wert rechnen wie das Zeichnen.
+  const festeLuft = el["absatzabstand"] as number | undefined;
   const v = wahr(el, "verdichten", true)
     ? verdichten(metrik(u, s.schnitt), text, spaltenbreite,
                  hoeheFrei * spalten, s.groesse, s.minGroesse,
-                 schritt / s.groesse, regeln)
+                 schritt / s.groesse, regeln,
+                 typeof festeLuft === "number" ? festeLuft : undefined,
+                 maxZeilen)
     : { groesse: s.groesse, zeilenhoehe: schritt, passt: true,
         zeilen: u.blatt.umbrechen(text, s.schnitt, s.groesse, spaltenbreite, regeln) };
 
@@ -246,6 +267,7 @@ const textOhneDrehung: Zeichner = (el, u) => {
     ? Math.max(1, Math.floor(v.zeilenhoehe > 0 ? el.h / v.zeilenhoehe : schlitze.length))
     : Math.ceil(schlitze.length / spalten);
 
+  let weggelassen = 0;
   for (let sp = 0; sp < spalten; sp++) {
     const teil = schlitze.slice(sp * proSpalte, (sp + 1) * proSpalte);
     if (!teil.length) continue;
@@ -253,12 +275,32 @@ const textOhneDrehung: Zeichner = (el, u) => {
     let y = el.y + el.h;
     for (const schlitz of teil) {
       if (schlitz.zeile) {
-        setzeZeile(u, schlitz.zeile, x + schlitz.zeile.einzug, y,
-                   spaltenbreite - schlitz.zeile.einzug, s, v.groesse,
-                   regeln.blocksatz);
+        // Eine Zeile, deren Grundlinie unter den Rahmen rutscht, wird NICHT
+        // gezeichnet. Vorher lief sie weiter: ueber die Fusszeile, ueber
+        // die Seitenzahl, am 06.10.2026 im Betrieb ueber beides. Die
+        // Warnung sagte das auch ("wird abgeschnitten") — abgeschnitten
+        // wurde aber nichts, und damit war die Warnung eine Luege.
+        //
+        // Wegzulassen ist schlecht; uebereinanderzudrucken ist schlechter:
+        // der Text ist dann auch weg, und die Seite dazu. Die richtige
+        // Loesung ist der Fliesstext ueber Seitengrenzen (Seite.fliessend
+        // im Schema) — bis dahin faellt die Zeile weg und sagt es.
+        if (y < el.y - 0.01) {
+          weggelassen++;
+        } else {
+          setzeZeile(u, schlitz.zeile, x + schlitz.zeile.einzug, y,
+                     spaltenbreite - schlitz.zeile.einzug, s, v.groesse,
+                     regeln.blocksatz);
+        }
       }
       y -= schlitz.luft;
     }
+  }
+  if (weggelassen) {
+    warne(u, "gekuerzt", el,
+          `${weggelassen} Zeile${weggelassen === 1 ? "" : "n"} passt${weggelassen === 1 ? "" : "en"} `
+          + `nicht mehr in den Rahmen und ${weggelassen === 1 ? "wurde" : "wurden"} weggelassen. `
+          + `Rahmen groesser machen, Text kuerzen oder die Schrift kleiner stellen.`);
   }
 };
 
@@ -1152,6 +1194,24 @@ function hakenZeichnen(u: Umgebung, x: number, y: number, aussen: RGBA,
 
 // --------------------------------------------------------------------- bild
 
+const ANKER_X: Record<string, number> = { links: 0, mitte: 0.5, rechts: 1 };
+const ANKER_Y: Record<string, number> = { unten: 0, mitte: 0.5, oben: 1 };
+
+/**
+ * Wo ein Bild in seinem Rahmen sitzt. Ohne Angabe mittig — dann wird kein
+ * Anker in den Zeichenschritt geschrieben, und die Schritte bleiben die
+ * der Prototypen.
+ *
+ * Wichtig fuer Logos: deren Rahmen ist breit, damit ein Wortzeichen gross
+ * genug wird. Ein quadratisches Bildzeichen im selben breiten Rahmen muss
+ * aber am Satzrand stehen bleiben und nicht in die Rahmenmitte rutschen.
+ */
+function bildAnker(el: Element): [number, number] | undefined {
+  const x = ANKER_X[zeichenkette(el, "ausrichtung") ?? ""] ?? 0.5;
+  const y = ANKER_Y[zeichenkette(el, "vertikal") ?? ""] ?? 0.5;
+  return x === 0.5 && y === 0.5 ? undefined : [x, y];
+}
+
 /**
  * Ein Bildslot. Fehlt das Bild, zeichnet der Renderer einen Platzhalter —
  * und sagt es in den Warnungen. Die gezeichneten Haeuser und Villen der
@@ -1175,7 +1235,8 @@ const bild: Zeichner = (el, u) => {
   if (quelle !== undefined) {
     u.blatt.gruppe(maske, [1, 0, 0, 1, 0, 0], (b) => {
       b.bild(el.x, el.y, el.b, el.h, quelle,
-             (zeichenkette(el, "fuellmodus") as "cover" | "contain") ?? "cover");
+             (zeichenkette(el, "fuellmodus") as "cover" | "contain") ?? "cover",
+             bildAnker(el));
     }, zweck);
   } else {
     warne(u, "fehlendes_bild", el,
@@ -1593,6 +1654,10 @@ const kontaktkarte: Zeichner = (el, u) => {
     eckradius: 0,
     slot: { art: "ansprechpartner" },
     fuellmodus: "cover",
+    // Der Anker gilt dem Logo, nicht dem Portraet: ein "links" an der
+    // Kontaktkarte darf das Foto nicht in seinem Fenster verschieben.
+    ausrichtung: undefined,
+    vertikal: undefined,
     platzhalter_farbe: (el["foto_platzhalter"] as unknown) ?? { palette: "surf" },
   } as Element;
   if (eckig) {

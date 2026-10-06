@@ -77,7 +77,8 @@
         },
         "groesse": 78,
         "farbe": "paper",
-        "sperrung": -1
+        "sperrung": -1,
+        "min_groesse": 38
       },
       "cover_unter": {
         "schrift": {
@@ -146,7 +147,8 @@
         "groesse": 50,
         "farbe": "rule",
         "sperrung": -0.5,
-        "grossbuchstaben": true
+        "grossbuchstaben": true,
+        "min_groesse": 26
       },
       "kopf_unter": {
         "schrift": {
@@ -242,7 +244,8 @@
           "schnitt": "Bold"
         },
         "groesse": 9,
-        "farbe": "rule"
+        "farbe": "rule",
+        "min_groesse": 9
       },
       "fuss_mitte": {
         "schrift": {
@@ -259,7 +262,8 @@
         },
         "sperrung": 1.0,
         "grossbuchstaben": true,
-        "ausrichtung": "mitte"
+        "ausrichtung": "mitte",
+        "min_groesse": 6
       },
       "fuss_seite": {
         "schrift": {
@@ -268,7 +272,8 @@
         },
         "groesse": 9,
         "farbe": "rule",
-        "ausrichtung": "rechts"
+        "ausrichtung": "rechts",
+        "min_groesse": 9
       },
       "abschnitt": {
         "schrift": {
@@ -304,7 +309,8 @@
         },
         "groesse": 9.2,
         "farbe": "text",
-        "zeilen": 15
+        "zeilen": 15,
+        "min_groesse": 7.0
       },
       "bild_wort": {
         "schrift": {
@@ -334,7 +340,8 @@
         "farbe": "weiss",
         "sperrung": 1.0,
         "grossbuchstaben": true,
-        "ausrichtung": "mitte"
+        "ausrichtung": "mitte",
+        "min_groesse": 6
       },
       "fuss_seite_hell": {
         "schrift": {
@@ -343,7 +350,8 @@
         },
         "groesse": 9,
         "farbe": "weiss",
-        "ausrichtung": "rechts"
+        "ausrichtung": "rechts",
+        "min_groesse": 9
       },
       "aus_nummer": {
         "schrift": {
@@ -440,7 +448,8 @@
         },
         "groesse": 8.9,
         "farbe": "text",
-        "zeilen": 14.2
+        "zeilen": 14.2,
+        "min_groesse": 7.0
       },
       "wege_titel": {
         "schrift": {
@@ -620,7 +629,8 @@
         },
         "groesse": 6.6,
         "farbe": "muted",
-        "zeilen": 9.4
+        "zeilen": 9.4,
+        "min_groesse": 6.6
       },
       "kontakt_marke": {
         "schrift": {
@@ -671,7 +681,7 @@
           "schnitt": "SemiBold"
         },
         "groesse": 6.4,
-        "farbe": "s",
+        "farbe": "s_auf_d",
         "sperrung": 1.0,
         "grossbuchstaben": true
       },
@@ -705,7 +715,7 @@
           "schnitt": "Bold"
         },
         "groesse": 8.6,
-        "farbe": "s"
+        "farbe": "s_auf_d"
       },
       "ap_wert": {
         "schrift": {
@@ -714,16 +724,6 @@
         },
         "groesse": 8.6,
         "farbe": "weiss"
-      },
-      "foto_label": {
-        "schrift": {
-          "familie": "archivo",
-          "schnitt": "SemiBold"
-        },
-        "groesse": 5.8,
-        "farbe": "weiss",
-        "sperrung": 1,
-        "grossbuchstaben": true
       },
       "recht_titel": {
         "schrift": {
@@ -852,9 +852,9 @@
           "id": "cover-logo",
           "typ": "bild",
           "x": 36.0,
-          "y": 781.0,
-          "b": 20.0,
-          "h": 20.0,
+          "y": 786.0,
+          "b": 84.0,
+          "h": 18.0,
           "slot": {
             "art": "logo",
             "ton": "hell"
@@ -862,7 +862,8 @@
           "fuellmodus": "contain",
           "sichtbar_wenn": {
             "vorhanden": "firma.logo.hell"
-          }
+          },
+          "ausrichtung": "links"
         },
         {
           "id": "cover-marke",
@@ -873,7 +874,13 @@
           "h": 10,
           "stil": "marke",
           "inhalt": "{{firma.marken_name}}.",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "nicht": {
+              "feld": "firma.logo.form",
+              "gleich": "breit"
+            }
+          }
         },
         {
           "id": "cover-marke-zusatz",
@@ -884,7 +891,13 @@
           "h": 5.6,
           "stil": "marke_zusatz",
           "inhalt": "{{firma.linie?}}",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "nicht": {
+              "feld": "firma.logo.form",
+              "gleich": "breit"
+            }
+          }
         },
         {
           "id": "cover-band",
@@ -908,7 +921,7 @@
           "stil": "cover_titel",
           "inhalt": "{{objekt.expose_titel_text}}",
           "zeilenschritt": 70,
-          "verdichten": false,
+          "verdichten": true,
           "absatzabstand": 0
         },
         {
@@ -1289,7 +1302,7 @@
           "stil": "fliesstext",
           "inhalt": "{{objekt.beschreibung_objekt}}",
           "blocksatz": true,
-          "verdichten": false,
+          "verdichten": true,
           "sichtbar_wenn": {
             "vorhanden": "objekt.expose_highlights"
           }
@@ -1304,7 +1317,7 @@
           "stil": "fliesstext",
           "inhalt": "{{objekt.beschreibung_objekt}}",
           "blocksatz": true,
-          "verdichten": false,
+          "verdichten": true,
           "sichtbar_wenn": {
             "nicht": {
               "vorhanden": "objekt.expose_highlights"
@@ -1841,7 +1854,7 @@
           "stil": "lage_text",
           "inhalt": "{{objekt.beschreibung_lage}}",
           "blocksatz": false,
-          "verdichten": false
+          "verdichten": true
         },
         {
           "id": "wege-titel",
@@ -2327,9 +2340,9 @@
           "id": "kontakt-logo",
           "typ": "bild",
           "x": 36.0,
-          "y": 781.0,
-          "b": 20.0,
-          "h": 20.0,
+          "y": 786.0,
+          "b": 84.0,
+          "h": 18.0,
           "slot": {
             "art": "logo",
             "ton": "hell"
@@ -2337,7 +2350,8 @@
           "fuellmodus": "contain",
           "sichtbar_wenn": {
             "vorhanden": "firma.logo.hell"
-          }
+          },
+          "ausrichtung": "links"
         },
         {
           "id": "kontakt-marke",
@@ -2348,7 +2362,13 @@
           "h": 10,
           "stil": "kontakt_marke",
           "inhalt": "{{firma.marken_name}}.",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "nicht": {
+              "feld": "firma.logo.form",
+              "gleich": "breit"
+            }
+          }
         },
         {
           "id": "kontakt-zusatz",
@@ -2359,7 +2379,13 @@
           "h": 5.6,
           "stil": "kontakt_zusatz",
           "inhalt": "{{firma.linie?}}",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "nicht": {
+              "feld": "firma.logo.form",
+              "gleich": "breit"
+            }
+          }
         },
         {
           "id": "kontakt-wort-1",
@@ -2423,17 +2449,6 @@
               0.35
             ]
           },
-          "label": "Porträtfoto",
-          "stil_label": "foto_label",
-          "label_hintergrund": "rule",
-          "label_deckkraft": 1,
-          "label_x": 0,
-          "label_y": 0,
-          "label_hoehe": 15,
-          "label_radius": 0,
-          "label_luft": 12,
-          "label_polster": 6,
-          "label_grundlinie": 5,
           "text_x": 172,
           "name_versatz": 70,
           "funktion_abstand": 18,

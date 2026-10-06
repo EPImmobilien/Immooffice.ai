@@ -139,10 +139,10 @@
     }
     var bb = quelle.naturalWidth || quelle.width || 1;
     var hh = quelle.naturalHeight || quelle.height || 1;
-    var skala = s.fuellmodus === "contain"
-      ? Math.min(s.b / bb, s.h / hh) : Math.max(s.b / bb, s.h / hh);
-    var zb = bb * skala, zh = hh * skala;
-    var zx = s.x + (s.b - zb) / 2, zy = s.y + (s.h - zh) / 2;
+    // Wohin das Bild kommt, rechnet der Renderer — dieselbe Funktion, die
+    // auch das PDF benutzt. Zwei Rechnungen waeren zwei Ergebnisse.
+    var kasten = window.ImmoExpose.bildKasten(s, bb, hh);
+    var zb = kasten.b, zh = kasten.h, zx = kasten.x, zy = kasten.y;
     ctx.save();
     ctx.beginPath();
     ctx.rect(s.x, s.y, s.b, s.h);

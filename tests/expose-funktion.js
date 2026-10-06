@@ -126,7 +126,7 @@ function tabellen(immo) {
 }
 
 function nachbau(daten) {
-  const protokoll = { eingefuegt: [], hochgeladen: [], aufrufe: [] };
+  const protokoll = { eingefuegt: [], hochgeladen: [], aufrufe: [], aktualisiert: [] };
   const bauer = (name) => {
     const zeilen = daten[name] || [];
     let treffer = zeilen.slice();
@@ -145,7 +145,13 @@ function nachbau(daten) {
         const nach = { select: () => nach, single: async () => ({ data: r, error: null }) };
         return Object.assign(Promise.resolve({ data: r, error: null }), nach);
       },
-      update: () => ({ eq: async () => ({ data: null, error: null }) }),
+      update: (r) => ({
+        eq: async (f, v) => {
+          protokoll.aktualisiert.push([name, r, f, v]);
+          (daten[name] || []).forEach((z) => { if (String(z[f]) === String(v)) Object.assign(z, r); });
+          return { data: null, error: null };
+        },
+      }),
       then: (f) => Promise.resolve({ data: treffer, error: null }).then(f),
     };
     return api;
@@ -186,6 +192,10 @@ function blob(b) {
 async function lauf(immo, koerper, basis) {
   const daten = tabellen(immo);
   if (basis) daten.firma_stammdaten[0].expose_vorlage = basis;
+  return laufMit(daten, koerper);
+}
+
+async function laufMit(daten, koerper) {
   const db = nachbau(daten);
   const { laden } = await import('file://' + path.join(tmp, 'huelle.mjs'));
   const handler = await laden({
@@ -374,6 +384,38 @@ const VOLL = {
     }
   }
 
+  // --- 3e. Die Vorlage aus dem Aufruf ------------------------------------
+  // Ab fork_43 waehlt die Oberflaeche die Vorlage vor dem Erzeugen. Der
+  // Aufruf nennt sie; die Funktion muss sie nehmen, am Objekt vermerken —
+  // und eine Vorlage eines ANDEREN Mandanten ablehnen, auch wenn sie in
+  // der Anfrage steht. Der Dienstschluessel sieht sie naemlich.
+  {
+    const v = await lauf(VOLL, { nur_pruefen: true, vorlage_id: 'v-studio' });
+    if (v) {
+      melde('Die im Aufruf genannte Vorlage wird genommen',
+            v.ergebnis.vorlage === 'Studio', String(v.ergebnis.vorlage));
+      const vermerkt = (v.db.protokoll.aktualisiert || [])
+        .filter(([t, r]) => t === 'immobilien' && r && r.expose_vorlage_id === 'v-studio');
+      melde('Die Wahl wird am Objekt vermerkt', vermerkt.length === 1,
+            JSON.stringify((v.db.protokoll.aktualisiert || []).map(([t, r]) => [t, Object.keys(r)])));
+    }
+    // Dieselbe Anfrage, aber die Vorlage gehoert einem fremden Mandanten.
+    const daten = tabellen(VOLL);
+    daten.expose_vorlagen.push({
+      id: 'v-fremd', mandant_id: 'fremder-mandant', name: 'Fremde', basis: 'studio',
+      archiviert: false, ist_standard: false,
+      dokument: daten.expose_vorlagen[2].dokument,
+    });
+    const f = await laufMit(daten, { nur_pruefen: true, vorlage_id: 'v-fremd' });
+    if (f) {
+      melde('Eine Vorlage eines anderen Mandanten wird nicht benutzt',
+            f.ergebnis.vorlage !== 'Fremde', String(f.ergebnis.vorlage));
+      melde('Und es wird gesagt, dass sie abgelehnt wurde',
+            (f.ergebnis.warnungen || []).some((w) => /anderen Mandanten/.test(String(w))),
+            JSON.stringify(f.ergebnis.warnungen || []));
+    }
+  }
+
   // --- 4. Ohne Fotos: eine klare Ansage, kein Abbruch ---------------------
   const d = await lauf({ ...VOLL, expose_titelbild_id: null }, { nur_pruefen: true });
   if (d) melde('Mit Titelbild-Verweis ins Leere laeuft es trotzdem',
@@ -387,5 +429,6 @@ const VOLL = {
   console.log('  [ok] expose-pdf-erzeugen laeuft durch: Vorlage geladen, Schriften,');
   console.log('       Bilder, KI-Kennzeichnung, PDF abgelegt, signierte Verbindung.');
   console.log('       Geprueft mit einem vollstaendigen und einem mageren Objekt,');
-  console.log('       mit allen drei Systemvorlagen.');
+  console.log('       mit allen drei Systemvorlagen — und mit der Vorlage, die der');
+  console.log('       Aufruf nennt, samt Abweisung einer fremden Mandantenvorlage.');
 })();

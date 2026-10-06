@@ -142,9 +142,14 @@ export class Blatt {
   }
 
   bild(x: number, y: number, b: number, h: number, quelle: string,
-       fuellmodus: "cover" | "contain" = "cover"): void {
+       fuellmodus: "cover" | "contain" = "cover",
+       anker?: [number, number]): void {
     this.schritte.push({
-      art: "bild", x, y, b, h, quelle, fuellmodus, matrix: this.matrix,
+      art: "bild", x, y, b, h, quelle, fuellmodus,
+      // Nur eintragen, wenn der Anker von der Mitte abweicht: der
+      // Vergleich mit den Prototypen liest die Schritte Feld fuer Feld.
+      ...(anker ? { anker } : {}),
+      matrix: this.matrix,
     });
   }
 

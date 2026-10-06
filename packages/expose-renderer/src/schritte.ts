@@ -55,7 +55,16 @@ export type Schritt =
   | { art: "radialverlauf"; x: number; y: number; r: number; farben: RGBA[];
       stellen: number[] | null; matrix: Matrix }
   | { art: "bild"; x: number; y: number; b: number; h: number;
-      quelle: string; fuellmodus: "cover" | "contain"; matrix: Matrix }
+      quelle: string; fuellmodus: "cover" | "contain";
+      /**
+       * Wo das Bild im Rahmen sitzt, als Anteil 0..1 in x und y (0 ist
+       * links beziehungsweise unten). Fehlt der Anker, steht es mittig —
+       * so rechnen die Prototypen, und so bleiben ihre Zeichenschritte
+       * unveraendert. Gebraucht wird er fuer Logos: ein breites
+       * Wortzeichen in einem breiten Rahmen muss am linken Satzrand
+       * stehen, nicht in der Rahmenmitte.
+       */
+      anker?: [number, number]; matrix: Matrix }
   | { art: "qr"; x: number; y: number; b: number; h: number; inhalt: string;
       farbe: RGBA | null; matrix: Matrix }
   | { art: "gruppe"; maske: PfadSchritt[] | null; matrix: Matrix;
@@ -102,6 +111,30 @@ export function flach(schritte: Schritt[], eltern: Matrix = EINHEIT): Schritt[] 
     }
   }
   return raus;
+}
+
+/**
+ * Wohin ein Bild in seinem Rahmen kommt. Eine Stelle fuer drei Ausgaenge:
+ * das PDF, die Bearbeitungsflaeche im Browser und die Pruefung. Vorher
+ * rechnete das jeder fuer sich, und ein Logo sass im PDF anders als in der
+ * Vorschau.
+ *
+ * "cover" deckt den Rahmen und wird beschnitten, "contain" passt
+ * vollstaendig hinein. Der Anker sagt, wo das Bild im Rahmen sitzt, als
+ * Anteil 0..1 in x und y; ohne Anker mittig.
+ */
+export function bildKasten(
+  s: { x: number; y: number; b: number; h: number;
+       fuellmodus?: "cover" | "contain"; anker?: [number, number] },
+  bildBreite: number, bildHoehe: number,
+): { x: number; y: number; b: number; h: number } {
+  const bb = bildBreite || 1;
+  const hh = bildHoehe || 1;
+  const sx = s.b / bb, sy = s.h / hh;
+  const f = s.fuellmodus === "contain" ? Math.min(sx, sy) : Math.max(sx, sy);
+  const b = bb * f, h = hh * f;
+  const [ax, ay] = s.anker ?? [0.5, 0.5];
+  return { x: s.x + (s.b - b) * ax, y: s.y + (s.h - h) * ay, b, h };
 }
 
 /** `innen` zuerst, dann `aussen` — wie bei ReportLab translate/rotate. */

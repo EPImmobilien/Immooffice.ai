@@ -4524,3 +4524,68 @@ beiden echten Neubauprojekte der Vorlage, das dritte („Test", leer) nicht:
   Interessenten freigegeben. Ein öffentlicher Weg dorthin besteht nicht,
   und ein Kundenzugang wird dafür nicht benutzt. Sie müssen bei Bedarf von
   Hand hochgeladen werden.
+
+## Logos: Form erkennen statt Rahmen raten (06.10.2026)
+
+Befund an zwei echten Exposés: „das mit den Logos passt nicht". Die drei
+Vorlagen hatten dem Logo einen quadratischen Rahmen von 20 bis 30 Punkt
+gegeben — im Prototyp sitzt dort ein Signet. Ein Schriftzug von 6:1 wurde
+darin auf wenige Punkte Höhe gequetscht.
+
+- Die Funktion **misst das hochgeladene Logo** und gibt der Vorlage
+  `firma.logo.form` (`breit` ab 2,2:1, sonst `quadratisch`). Die Vorlagen
+  entscheiden damit selbst — keine zweite Einstellung, die jemand pflegen
+  muss.
+- Die Logorahmen sind **breit** (Raster 168 pt, Signature 150 pt, Studio
+  84 pt) und haben einen **Anker** (`ausrichtung`, `vertikal`): ein Signet
+  bleibt dadurch genau dort und genau so groß wie vorher, weil `contain`
+  bei einem quadratischen Bild die Höhe begrenzt.
+- Neben einem **Wortzeichen entfällt der Markenname** (Raster, Studio) — er
+  stünde sonst zweimal da. Ohne Logo bleibt er, sonst wäre die Seite anonym.
+- Die Rahmen haben jetzt **Abstand zum Markennamen**. Wie knapp ein Mandant
+  seine Datei beschnitten hat, weiß die Vorlage nicht; deshalb darf der
+  Rahmen den Text nicht berühren. `tests/expose-seitenlogik.js` besteht
+  darauf.
+- `bildKasten()` rechnet an **einer** Stelle, wohin ein Bild im Rahmen
+  kommt — PDF, Bearbeitungsfläche und Prüfung nehmen dieselbe Funktion.
+
+Dazu zwei kleinere Befunde derselben Meldung: die Fahne „PORTRÄTFOTO" über
+dem Bild des Ansprechpartners ist weg (sie beschriftete den Platzhalter des
+Prototyps, nicht den Inhalt), und die Beschriftungen auf der dunklen
+Kontaktfläche von Studio nehmen die neue Palettenfarbe `s_auf_d`: die
+Signalfarbe des Mandanten, so weit aufgehellt, dass sie auf dem Dunkelton
+lesbar ist. Die Prototypfarben gehen unverändert durch.
+
+## Die Vorlage wird gewählt, nicht geerbt (06.10.2026)
+
+Ansage des Betreibers: „ich will, dass man beim Exposé erzeugen sich die
+Vorlage direkt auswählen kann, also nicht dass es eine Standardvorlage
+gibt."
+
+- `src/eigene/expose-vorlagenwahl.js` steht neben dem Knopf „Exposé-PDF
+  erstellen", lädt die Vorlagen des Mandanten samt Systemvorlagen und
+  schreibt die Wahl **sofort an das Objekt** (`immobilien.expose_vorlage_id`).
+  Ohne Wahl erzeugt die Oberfläche kein Exposé.
+- `expose-pdf-erzeugen` nimmt `vorlage_id` aus dem Aufruf, prüft die
+  Mandantengrenze (Systemvorlagen gehören allen) und vermerkt die Wahl am
+  Objekt.
+- Die drei Rückfallstufen **bleiben** für Aufrufe, die keine Vorlage nennen
+  können: Portalexport, Newsletter, Nachbestellung. Ein Aufruf ohne Vorlage
+  darf nicht ohne Exposé enden.
+
+## Logo freistellen im Browser (06.10.2026)
+
+Ansage: „das Firmenlogo soll man auch freistellen können (Hintergrund
+entfernen)."
+
+`src/eigene/logo-freistellen.js` rechnet auf einem Canvas, bevor die Datei
+hochgeladen wird. Die Hintergrundfarbe wird an den vier Ecken abgelesen;
+entfernt wird **von den Rändern her**, damit Weiß innerhalb eines
+Buchstabens stehen bleibt. Wer das Gegenteil braucht, schaltet auf „alle
+Flächen dieser Farbe". Die Kante läuft weich aus, sonst bleibt ein heller
+Saum.
+
+Kein Dienst, keine KI, kein Hochladen zum Prüfen: das Logo verlässt den
+Rechner erst, wenn der Nutzer das Ergebnis gesehen hat. Das Original wird
+nicht verändert — es entsteht eine neue PNG-Datei. Wer lieber das Original
+will, bekommt es (Knopf „Original hochladen").
