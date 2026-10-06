@@ -29,6 +29,15 @@ on:
         default: entwurf
         type: choice
         options: [entwurf, produktion]
+  # Von Hand gestartet — und ausserdem bei jeder Aenderung an der Website
+  # auf dem Entwicklungszweig, dann immer als Entwurf. Grund: GitHub laesst
+  # "Run workflow" erst zu, wenn die Datei auf dem Standardzweig liegt; bis
+  # dahin waere die Auslieferung sonst gar nicht ausloesbar.
+  push:
+    branches: [claude/immooffice-master-prompt-v2-2zci7y]
+    paths:
+      - 'website/**'
+      - '.github/workflows/website-ausliefern.yml'
 
 concurrency:
   group: website-ausliefern
@@ -43,6 +52,8 @@ jobs:
     env:
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
       SITE_NAME: immooffice-ai-web
+      # Beim Push gibt es keine Eingabe — dann ist es ein Entwurf.
+      UMGEBUNG: ${{ github.event.inputs.umgebung || 'entwurf' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -76,7 +87,7 @@ jobs:
           ENDE
 
       - name: Produktion nur mit Impressum
-        if: github.event.inputs.umgebung == 'produktion' && steps.pruefen.outputs.offen != ''
+        if: env.UMGEBUNG == 'produktion' && steps.pruefen.outputs.offen != ''
         run: |
           echo "::error::Fuer die Produktion fehlen Pflichtangaben in website/konfig.js: ${{ steps.pruefen.outputs.offen }}"
           echo "Eine oeffentliche Unternehmenswebsite ohne Impressum ist in Deutschland"
@@ -97,12 +108,16 @@ jobs:
           kopf="Authorization: Bearer $NETLIFY_AUTH_TOKEN"
           # Erst suchen: der Workflow laeuft oefter als einmal, und bei
           # jedem Lauf eine neue Site anzulegen waere eine Sammlung.
+          cat > /tmp/suchen.py <<'ENDE'
+          import json, os, sys
+          name = os.environ["SITE_NAME"]
+          for s in json.load(sys.stdin):
+              if s.get("name") == name or str(s.get("name", "")).startswith(name + "-"):
+                  print(s["id"])
+                  break
+          ENDE
           gefunden=$(curl -sS -H "$kopf" "$api/sites?filter=all&per_page=200" \
-            | python3 -c "import json,sys,os
-name=os.environ['SITE_NAME']
-for s in json.load(sys.stdin):
-    if s.get('name') == name or str(s.get('name','')).startswith(name + '-'):
-        print(s['id']); break")
+            | python3 /tmp/suchen.py)
           if [ -n "$gefunden" ]; then
             echo "Site '$SITE_NAME' gefunden: $gefunden"
             echo "id=$gefunden" >> "$GITHUB_OUTPUT"
@@ -111,9 +126,7 @@ for s in json.load(sys.stdin):
           echo "Keine Site '$SITE_NAME' — sie wird angelegt."
           antwort=$(curl -sS -X POST -H "$kopf" -H "Content-Type: application/json" \
             -d "{\"name\":\"$SITE_NAME\"}" "$api/sites")
-          neu=$(printf '%s' "$antwort" | python3 -c "import json,sys
-d=json.load(sys.stdin)
-print(d.get('id',''))")
+          neu=$(printf '%s' "$antwort" | python3 -c "import json,sys; print(json.load(sys.stdin).get('id',''))")
           if [ -z "$neu" ]; then
             # Der Name kann weltweit vergeben sein. Dann ohne Namen, Netlify
             # denkt sich einen aus; die Adresse steht unten im Bericht.
@@ -140,7 +153,7 @@ print(d.get('id',''))")
           # richtet Next.js ein und hat mit dieser Seite nichts zu tun.
           mkdir -p auslieferung && cp -r website/. auslieferung/
           cd auslieferung
-          if [ "${{ github.event.inputs.umgebung }}" = "produktion" ]; then
+          if [ "$UMGEBUNG" = "produktion" ]; then
             npx netlify deploy --dir . --site "${{ steps.site.outputs.id }}" --prod --json \
               --message "Website ${{ github.sha }}" > ../ausgabe.json
             schluessel=url
@@ -159,7 +172,7 @@ print(d.get('id',''))")
           {
             echo "### Website ausgeliefert"
             echo ""
-            echo "Umgebung: **${{ github.event.inputs.umgebung }}**"
+            echo "Umgebung: **$UMGEBUNG**"
             echo ""
             echo "${{ steps.stellen.outputs.ziel }}"
             echo ""

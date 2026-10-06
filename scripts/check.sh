@@ -428,6 +428,32 @@ else
   fehler=1
 fi
 
+abschnitt "Workflows: YAML gueltig"
+# Am 06.10.2026 ist ein neuer Workflow mit kaputtem YAML auf GitHub
+# gelandet. Die Folge ist unangenehm leise: GitHub meldet beim Starten
+# "Workflow does not have 'workflow_dispatch' trigger" — und man sucht am
+# Ausloeser statt an der Einrueckung. Ursache war ein mehrzeiliges
+# python -c mitten im run-Block; dessen Folgezeilen stehen in Spalte 1 und
+# beenden den Block.
+if python3 - <<'PYENDE'
+import glob, sys, yaml
+schlecht = 0
+for datei in sorted(glob.glob('.github/workflows/*.yml')):
+    try:
+        yaml.safe_load(open(datei, encoding='utf-8'))
+    except Exception as f:
+        schlecht = 1
+        print(f'[FEHLER] {datei}: {str(f)[:200]}')
+if not schlecht:
+    print(f'[ok] {len(glob.glob(".github/workflows/*.yml"))} Workflows, jeder gueltiges YAML.')
+sys.exit(schlecht)
+PYENDE
+then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Website: was sie behaupten darf"
 # Eine Werbeseite ist die Stelle, an der sich Saetze einschleichen, die das
 # Produkt nicht halten kann. CLAUDE.md verbietet genau diese Saetze.
