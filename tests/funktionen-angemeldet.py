@@ -58,6 +58,20 @@ ABGESICHERT = {
         'Mandantengrenze ueberschritten werden koennte — die Einwilligung '
         'gehoert der Person, und die RLS-Richtlinie auf mail_stilprofil '
         'laesst ohnehin nur benutzer_id = auth.uid() zu.'),
+    'abo-checkout': ("profil.role !== \"chef\"",
+        'Nimmt KEINE Kennung aus dem Anfragekoerper, die auf fremde Daten '
+        'zeigen koennte — nur einen Tarif- und einen Paketschluessel aus dem '
+        'Katalog, der fuer alle Mandanten derselbe ist. Der Mandant kommt '
+        'ausschliesslich aus dem Profil des Angemeldeten, und abschliessen '
+        'darf nur die Chef-Rolle: ein Mitarbeiter soll nicht versehentlich '
+        'einen Vertrag fuer das Haus eingehen.'),
+    'abo-verwalten': ("profil.mandant_id",
+        'Dasselbe: jede Abfrage haengt am Mandanten aus dem Profil. Der '
+        'Stand ist fuer alle im Haus lesbar (der Credit-Saldo steht in der '
+        'Kopfzeile), Kuendigung, Zusatznutzer und Kundenportal bleiben der '
+        'Chef-Rolle vorbehalten. Die Stripe-Kennungen kommen aus der '
+        'eigenen Abo-Zeile, nie aus dem Koerper — sonst liesse sich das Abo '
+        'eines fremden Mandanten kuendigen.'),
     'expose-sofortversand': ('mandant_sichern',
         'Sendet das Exposé an eine Adresse aus dem Anfragekoerper. Ohne '
         'Pruefung haette ein angemeldeter Makler das Exposé eines fremden '

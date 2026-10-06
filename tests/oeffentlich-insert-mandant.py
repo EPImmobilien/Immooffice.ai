@@ -39,6 +39,13 @@ FUNKTIONEN = WURZEL / 'supabase' / 'functions'
 OHNE_MANDANT = {
     'storage_umzug_token', 'mandanten', 'mandanten_einstufung',
     'schema_migrations', 'fehler_protokoll',
+    # fork_47: ein Stripe-Ereignis gehoert keinem Mandanten. Es KANN mehrere
+    # betreffen, und seine Kennung ist der Primaerschluessel — genau das ist
+    # die Sperre gegen Doppelverarbeitung. Eine Mandantenspalte waere hier
+    # nicht nur ueberfluessig, sondern irrefuehrend: sie saehe aus wie eine
+    # Grenze und waere keine. Die Tabelle ist als DIENST eingestuft und hat
+    # fuer Angemeldete keine einzige Richtlinie.
+    'stripe_ereignisse',
 }
 
 # Tabellen, deren Mandant seit fork_22 aus dem Elternsatz kommt: ein

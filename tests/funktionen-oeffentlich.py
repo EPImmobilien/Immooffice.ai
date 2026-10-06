@@ -162,6 +162,23 @@ UNBEDENKLICH = {
         'Laedt die Einladung ueber ihren Token und liefert den Namen des '
         'Kandidaten plus einen festen Fragenkatalog. Keine Abfrage, die ueber '
         'diese eine Zeile hinausgeht.',
+    'tarife-oeffentlich':
+        'Liest AUSSCHLIESSLICH aus dem Katalog — plattform_tarife, '
+        'plattform_credit_preise, plattform_credit_pakete, '
+        'plattform_werte. Keine einzige Mandantentabelle. Die einzige Zahl, '
+        'die nicht im Katalog steht, ist die Anzahl freier Gruenderplaetze, '
+        'und die ist eine Anzahl ohne Bezug: sie sagt "noch 37 frei" und '
+        'nicht, wer die anderen dreizehn sind. Stripe-Kennungen gehen '
+        'bewusst NICHT hinaus.',
+    'stripe-webhook':
+        'Oeffentlich, weil Stripe kein Supabase-Token mitbringt. Die '
+        'Echtheit haengt an der Signatur im Kopf, und die rechnet die '
+        'Funktion selbst nach (HMAC-SHA256 mit Zeitfenster gegen '
+        'Wiedereinspielung). Ohne gueltige Signatur passiert NICHTS — nicht '
+        'einmal ein Protokolleintrag, sonst koennte jeder die Tabelle '
+        'vollschreiben. Der Mandant wird nie geraten: er kommt aus den '
+        'Metadaten des Abos oder ueber die Stripe-Kundenkennung aus '
+        'mandant_abo; findet sich keiner, wird mit Grund abgebrochen.',
     'eigentuemer-benachrichtigungen-versenden':
         'Warteschlange ueber alle Mandanten, aber jeder Eintrag haengt allein '
         'an seiner eigentuemer_id: Empfaenger sind dessen eigene Personen, '

@@ -377,6 +377,23 @@ verify_jwt = true
 [functions.mail-stil-lernen]
 verify_jwt = true
 
+# Abrechnung (fork_47). Angemeldet, Chef-Rolle wird in der Funktion geprueft.
+[functions.abo-checkout]
+verify_jwt = true
+
+[functions.abo-verwalten]
+verify_jwt = true
+
+# Oeffentlich, zwangslaeufig: die Preisseite hat kein Konto. Liest
+# ausschliesslich aus dem Katalog, nie aus einer Mandantentabelle.
+[functions.tarife-oeffentlich]
+verify_jwt = false
+
+# Oeffentlich, zwangslaeufig: Stripe bringt kein Supabase-Token mit. Die
+# Echtheit haengt an der Signatur, und die prueft die Funktion selbst.
+[functions.stripe-webhook]
+verify_jwt = false
+
 [functions.postfach-anbieter-start]
 verify_jwt = true
 
