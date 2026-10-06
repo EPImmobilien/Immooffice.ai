@@ -1,0 +1,93 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Leinwand-Probe</title>
+<!--
+  Pruefseite fuer tests/expose-leinwand.js. Sie laedt das Renderer-Buendel
+  und die Leinwand genauso, wie die Auslieferung es tut — als klassische
+  Skripte, ohne Modulsystem —, zeichnet die Vorlage aus dem Hash und legt
+  den Befund in window.__befund ab.
+
+  Kein Produktbestandteil: im Betrieb steckt beides in der einen
+  index.html.
+-->
+<body style="margin:0;background:#eee;font:13px system-ui">
+<div id="blaetter" style="display:flex;gap:10px;padding:8px;flex-wrap:wrap"></div>
+<script src="/packages/expose-renderer/buendel/immo-expose.js"></script>
+<script src="/src/eigene/expose-leinwand.js"></script>
+<script>
+window.ImmoExpose = window.ImmoExpose || ImmoExpose;
+(async function () {
+  try {
+    var name = location.hash.slice(1) || 'raster';
+    var vorlage = await (await fetch('/packages/expose-renderer/vorlagen/' + name + '.json')).json();
+    var namen = new Set();
+    (function sammle(x) {
+      if (Array.isArray(x)) return x.forEach(sammle);
+      if (!x || typeof x !== 'object') return;
+      if (typeof x.familie === 'string' && typeof x.schnitt === 'string') {
+        namen.add(ImmoExpose.schnittName(x));
+      }
+      Object.keys(x).forEach(function (k) { sammle(x[k]); });
+    })(vorlage);
+    var schriften = new Map();
+    var ersteSchrift = null;
+    for (var n of namen) {
+      var buf = await (await fetch('/assets/fonts/expose/' + n + '.ttf')).arrayBuffer();
+      schriften.set(n, ImmoExpose.metrikLesen(new Uint8Array(buf), n));
+      await window.ImmoExposeLeinwand.schriftAnmelden(n, buf.slice(0));
+      if (!ersteSchrift) ersteSchrift = n;
+    }
+    // Daten wie bei einem duenn gepflegten Objekt. Erfunden und neutral.
+    var daten = ImmoExpose.aufbereiten({
+      immobilie: {
+        immo_nr: '1', objektart: 'Haus', vertragsart: 'verkauf',
+        objekttitel: 'Freistehendes Haus mit Garten', ort: 'Musterstadt', plz: '17166',
+        wohnflaeche: 123, grundstueck: 654, zimmer: 5, schlafzimmer: 4, badezimmer: 3,
+        baujahr: 2016, angebotspreis: 1325000, provision_aussen: '3,57',
+        energieausweis_typ: 'Verbrauchsausweis', energie_kennwert: '46',
+        energie_klasse: 'C',
+        beschreibung_objekt: 'Das Haus liegt am Ende einer ruhigen Strasse.',
+      },
+      firma: {
+        firma_name: 'Musterhaus Projektgesellschaft mbH',
+        marken_name: 'MUSTERHAUS PROJEKTE', ort: 'Hamburg',
+        ci_primaer: '#980101', ci_akzent: '#C2C2BD',
+      },
+      ansprechpartner: { name: 'Alex Muster', email: 'alex@musterhaus.example' },
+      bilder: {},
+    });
+    var erg = ImmoExpose.rendern({
+      vorlage: vorlage, daten: daten, schriften: schriften,
+      marke: { primaer: '#980101', akzent: '#C2C2BD' },
+    });
+    var bunt = 0;
+    for (var i = 0; i < Math.min(3, erg.seiten.length); i++) {
+      var c = document.createElement('canvas');
+      document.getElementById('blaetter').appendChild(c);
+      window.ImmoExposeLeinwand.zeichne(c, erg.seiten[i], { massstab: 0.5 });
+      var ctx = c.getContext('2d');
+      var d = ctx.getImageData(0, 0, c.width, c.height).data;
+      // Alles, was nicht reines Weiss ist, zaehlt als Farbe auf dem Blatt.
+      for (var p = 0; p < d.length; p += 4) {
+        if (d[p] !== 255 || d[p + 1] !== 255 || d[p + 2] !== 255) bunt++;
+      }
+    }
+    // Misst der Browser mit der eingebetteten Schrift? Die Ersatzschrift
+    // misst anders; stimmen beide ueberein, wurde sie nicht geladen.
+    var mess = document.createElement('canvas').getContext('2d');
+    mess.font = '40px ' + window.ImmoExposeLeinwand.familie(ersteSchrift) + ', serif';
+    var breiteEigen = mess.measureText('Hamburgefonstiv').width;
+    mess.font = '40px serif';
+    var breiteErsatz = mess.measureText('Hamburgefonstiv').width;
+    window.__befund = {
+      seiten: erg.seiten.length, bunt: bunt,
+      breiteEigen: Math.round(breiteEigen), breiteErsatz: Math.round(breiteErsatz),
+      schriftOk: Math.abs(breiteEigen - breiteErsatz) > 0.5,
+    };
+    window.__fertig = true;
+  } catch (f) {
+    window.__fehler = String((f && f.message) || f);
+    window.__fertig = true;
+  }
+})();
+</script>

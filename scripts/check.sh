@@ -362,6 +362,17 @@ else
   fehler=1
 fi
 
+abschnitt "Expose: malt die Bearbeitungsflaeche im Browser?"
+# Die einzige Stelle des Forks, die ohne Browser nicht laeuft: ein Canvas,
+# eine Schrift als FontFace, ein Zeichenkontext. Ohne Chromium wird der
+# Abschnitt uebersprungen; npm run check muss auch auf einer Maschine ohne
+# Browser durchlaufen.
+if node tests/expose-leinwand.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Expose: laeuft die Edge Function durch?"
 # Die Syntaxpruefung sagt nur, dass die Datei lesbar ist. Hier laeuft der
 # Handler wirklich — mit nachgebautem Supabase, ohne Netz, ohne Deno: aus
