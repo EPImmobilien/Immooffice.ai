@@ -213,17 +213,20 @@ for _f in ('credentials-anzeigen', 'mitarbeiter-loeschen',
     ERWEITERT[_f] = ('Prueft Kennungen aus dem Anfragekoerper gegen den '
                      'Mandanten des Aufrufers (Phase 2)')
 
-# fork_49: die vier Funktionen, die KI erzeugen und deshalb Credits kosten.
-# Sie reservieren vor dem Anbieter, buchen danach und geben bei jedem
-# Abbruch zurueck. In text-korrigieren und ki-bildbearbeitung wandert dabei
-# die verbrauchte Zahl in eine bestehende Antwortzeile — eine Aenderung ohne
-# Kennzeichen, deshalb hier. Geprueft wird die Anbindung von
-# tests/credits.js, das Verhalten der Datenbankseite von
-# tests/abrechnung.sql.
-for _f in ('generate-text', 'text-korrigieren', 'expose-pruefen',
-           'ki-bildbearbeitung'):
-    ERWEITERT[_f] = ('Credits: reserviert vor dem KI-Aufruf, bucht danach, '
-                     'gibt bei jedem Abbruch zurueck (fork_49)')
+# fork_49: die Funktionen, die etwas Kostenpflichtiges tun. Sie reservieren
+# vor der Leistung, buchen danach und geben bei jedem Abbruch zurueck. In
+# text-korrigieren und ki-bildbearbeitung wandert dabei die verbrauchte Zahl
+# in eine bestehende Antwortzeile — eine Aenderung ohne Kennzeichen, deshalb
+# hier. Geprueft wird die Anbindung von tests/credits.js, das Verhalten der
+# Datenbankseite von tests/abrechnung.sql.
+#
+# fork_59 nimmt signatur-vorgang-starten dazu: nicht KI, aber mit einem
+# Preis, der seit fork_47 im Katalog steht und nie abgerechnet wurde.
+KOSTENPFLICHTIG = ('generate-text', 'text-korrigieren', 'expose-pruefen',
+                   'ki-bildbearbeitung', 'signatur-vorgang-starten')
+for _f in KOSTENPFLICHTIG:
+    ERWEITERT[_f] = ('Credits: reserviert vor der Leistung, bucht danach, '
+                     'gibt bei jedem Abbruch zurueck (fork_49/fork_59)')
 
 # Diese eine traegt mehr als eine Erweiterung: ihr Zeichenteil ist ersetzt.
 ERWEITERT['expose-pdf-erzeugen'] = (
@@ -267,8 +270,7 @@ BEIGELEGT = {
 # credits.ts liegt in JEDER Funktion, die Credits kostet — eine Quelle,
 # mehrere Kopien. Welche das sind, sagt GEMEINSAME_BEILAGEN im Erzeuger;
 # tests/credits.js prueft, dass die Kopien byte-gleich sind.
-for _f in ('generate-text', 'text-korrigieren', 'expose-pruefen',
-           'ki-bildbearbeitung'):
+for _f in KOSTENPFLICHTIG:
     BEIGELEGT.setdefault(_f, {})['credits.ts'] = (
         'Credits reservieren, buchen, freigeben (fork_49). Quelle: '
         'supabase/eigene-beilagen/_credits/credits.ts; geprueft von '

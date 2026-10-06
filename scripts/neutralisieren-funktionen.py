@@ -51,6 +51,7 @@ GEMEINSAME_BEILAGEN = {
         'text-korrigieren',
         'expose-pruefen',
         'ki-bildbearbeitung',
+        'signatur-vorgang-starten',
     },
 }
 
@@ -4331,6 +4332,95 @@ NACHBESSERN = [
      '  } catch (e) {\n    console.error("Edge Function Fehler:", e);\n    if (credits) await credits.freigeben("Abbruch: " + (e instanceof Error ? e.message : String(e)));\n    return new Response(\n      JSON.stringify({ error: e instanceof Error ? e.message : String(e) }),\n      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },\n    );',
      'Credits: ein Abbruch gibt die Credits zurueck.',
      {'ki-bildbearbeitung'}),
+
+    # =====================================================================
+    # fork_59 — der Signaturvorgang war im Katalog, aber nicht an der Kasse
+    #
+    # `plattform_credit_preise` kennt `signatur_vorgang` seit fork_47 mit
+    # fuenf Credits. Gefragt hat danach nie jemand: signatur-vorgang-starten
+    # legt den Vorgang an, baut das PDF, verschickt die Links — und zieht
+    # nichts ab. Das ist keine offene Preisfrage wie bei den Parsern, es ist
+    # eine Leistung mit festgesetztem Preis, die verschenkt wird.
+    #
+    # Die Funktion hat genau einen Ausgang auf Erfolg und genau einen catch;
+    # jeder Fehler dazwischen ist ein throw. Deshalb reichen vier
+    # Einhaengungen: reservieren nach der Pruefung der Eingabe, buchen vor
+    # der Erfolgsantwort, freigeben im catch.
+    #
+    # Reserviert wird NACH der Pruefung von vertrag_id und dokument_typ:
+    # eine Anfrage, die an der Form scheitert, soll kein Reservieren und
+    # Freigeben im Ledger hinterlassen. Alles danach kann fehlschlagen und
+    # landet im catch.
+    # =====================================================================
+    ('FORK',
+     'const corsHeaders = {',
+     '// --- Credits (fork_59) ---------------------------------------------------\n'
+     '// Die Abrechnung liegt als Beilage im Ordner dieser Funktion; die Quelle\n'
+     '// steht in supabase/eigene-beilagen/_credits/credits.ts. Sie reserviert\n'
+     '// VOR dem Vorgang und gibt bei einem Fehler von selbst zurueck.\n'
+     'import { kiAbrechnen, abgelehnt } from "./credits.ts";\n'
+     'import type { Abrechnung } from "./credits.ts";\n'
+     '\n'
+     'const corsHeaders = {',
+     'Credits: die Abrechnung wird eingebunden.',
+     {'signatur-vorgang-starten'}),
+    ('FORK',
+     'Deno.serve(async (req) => {\n'
+     '  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });\n'
+     '\n'
+     '  try {',
+     'Deno.serve(async (req) => {\n'
+     '  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });\n'
+     '\n'
+     '  // Die Reservierung muss auch im Fehlerfall erreichbar sein — in dieser\n'
+     '  // Funktion fuehrt JEDER Fehler ueber einen throw in denselben catch.\n'
+     '  let credits: Abrechnung | null = null;\n'
+     '\n'
+     '  try {',
+     'Credits: der Platz fuer die Reservierung, vor dem try.',
+     {'signatur-vorgang-starten'}),
+    ('FORK',
+     '    const emailRe = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;',
+     '    // --- Credits reservieren, bevor der Vorgang entsteht ---------------\n'
+     '    // Erst hier, nicht frueher: eine Anfrage, die schon an der Form\n'
+     '    // scheitert, soll kein Reservieren-und-Freigeben im Ledger\n'
+     '    // hinterlassen. Und nicht spaeter: ab hier wird geschrieben,\n'
+     '    // hochgeladen und verschickt. Geprueft wird dabei auch das Abo —\n'
+     '    // ein gesperrter Mandant startet keinen Signaturvorgang.\n'
+     '    const abr = await kiAbrechnen(req, "signatur_vorgang", vertragId);\n'
+     '    if (!abr.ok) return abgelehnt(abr, corsHeaders);\n'
+     '    credits = abr;\n'
+     '\n'
+     '    const emailRe = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;',
+     'Credits: signatur_vorgang wird vor dem Vorgang reserviert.',
+     {'signatur-vorgang-starten'}),
+    ('FORK',
+     '    return jsonResponse({\n'
+     '      ok: true,\n'
+     '      vorgang_id: vorgang.id,',
+     '    // Gebucht wird erst, wenn der Vorgang steht und die Links heraus\n'
+     '    // sind. Ein Anbieterpreis faellt hier nicht an — die Signatur ist\n'
+     '    // eigene Leistung, keine eingekaufte.\n'
+     '    await abr.buchen(null, dokumentTyp);\n'
+     '\n'
+     '    return jsonResponse({\n'
+     '      ok: true,\n'
+     '      credits: abr.credits,\n'
+     '      vorgang_id: vorgang.id,',
+     'Credits: gebucht wird erst, wenn der Vorgang steht.',
+     {'signatur-vorgang-starten'}),
+    ('FORK',
+     '  } catch (e) {\n'
+     '    const meldung = e instanceof Error ? e.message : String(e);\n'
+     '    console.error("signatur-vorgang-starten:", meldung);',
+     '  } catch (e) {\n'
+     '    const meldung = e instanceof Error ? e.message : String(e);\n'
+     '    console.error("signatur-vorgang-starten:", meldung);\n'
+     '    // Was reserviert war, geht zurueck. CLAUDE.md: fehlgeschlagene\n'
+     '    // Auftraege geben reservierte Credits automatisch frei.\n'
+     '    if (credits) await credits.freigeben("Abbruch: " + meldung);',
+     'Credits: ein Abbruch gibt die Credits zurueck.',
+     {'signatur-vorgang-starten'}),
 ]
 
 
@@ -4439,7 +4529,14 @@ def main():
             # achtzehn Funktionen dazu (neun Zeilen). signatur-vorgang-starten
             # stand bei +162 und lief damit ueber. Die Zahl war gewollt, also
             # steigt die Grenze — nicht die Toleranz.
-            unten, oben = (-2, 180) if erweitert else (-2, 0)
+            # 06.10.2026 von 180 auf 200: fork_59 haengt die Credits in
+            # signatur-vorgang-starten ein — Einbindung, Platzhalter vor dem
+            # try, Reservierung, Buchung, Freigabe, zusammen 31 Zeilen, davon
+            # mehr als die Haelfte Begruendung. Dieselbe Funktion, zum dritten
+            # Mal die Grenze. Sie ist die groesste des Hauses; wenn eine
+            # vierte Erweiterung ansteht, gehoert sie geteilt und nicht die
+            # Zahl wieder angehoben.
+            unten, oben = (-2, 200) if erweitert else (-2, 0)
             if erweitert and ordner.name in KUERZT:
                 unten = KUERZT[ordner.name][0]
             if not unten <= zeilen_delta <= oben:

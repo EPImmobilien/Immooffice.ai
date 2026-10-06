@@ -164,6 +164,29 @@ code"; jetzt steht da, woran es lag, und bei fehlenden Credits ein Satz dazu,
 wo man sie nachkauft. Eine Hülle statt achtzig Aufrufstellen — und sie gilt
 auch für die, die später dazukommen.
 
+### Nachtrag 06.10.2026 — der Signaturvorgang (fork_59)
+
+`plattform_credit_preise` kennt `signatur_vorgang` seit fork_47 mit fünf
+Credits. Gefragt hat danach nie jemand: `signatur-vorgang-starten` legte den
+Vorgang an, baute das PDF, verschickte die Links — und zog nichts ab. Das war
+keine offene Preisfrage wie bei den Parsern, sondern eine Leistung mit
+festgesetztem Preis, die verschenkt wurde.
+
+Jetzt hängt sie an derselben Beilage wie die KI-Aufrufe. Reserviert wird nach
+der Prüfung von `vertrag_id` und `dokument_typ` — eine Anfrage, die an der
+Form scheitert, soll kein Reservieren-und-Freigeben im Ledger hinterlassen —
+und vor der ersten Schreiboperation. Gebucht wird vor der Erfolgsantwort,
+freigegeben im `catch`, der jeden Fehler dieser Funktion auffängt.
+
+Mitgekommen ist die Abo-Prüfung: ein gesperrter Mandant startet keinen
+Signaturvorgang mehr. Das ist eine Verhaltensänderung, und sie ist gewollt —
+`CLAUDE.md` verlangt, dass Rechte serverseitig durchgesetzt werden.
+
+`tests/credits.js` prüft die Reihenfolge jetzt nicht mehr gegen „den
+Anbieter", sondern gegen „die Leistung": für die KI-Funktionen ist das der
+Anbieteraufruf, für den Signaturvorgang die Zeile in `signatur_vorgaenge`.
+Eine Funktion ohne Anbieter wäre sonst ungeprüft geblieben.
+
 ### Was noch NICHT abgerechnet wird
 
 Ehrlich benannt, weil es Geld ist: rund vierzig weitere Edge Functions rufen

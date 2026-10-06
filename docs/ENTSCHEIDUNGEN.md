@@ -5393,3 +5393,32 @@ Anführungszeichen, und eine neunte Hexziffer schließt den Treffer aus.
 **Nachweis:** `tests/marke.py`, Punkt 5 — neun Bereiche des Quelltextes,
 Kommentarzeilen eingeschlossen. Gegenprobe gemacht: alle fünf Schreibweisen
 werden gefunden, auch die im Kommentar.
+
+---
+
+## 2026-10-06 · Der Signaturvorgang stand im Katalog und wurde verschenkt
+
+**Frage:** `plattform_credit_preise` kennt `signatur_vorgang` seit fork_47 mit
+fünf Credits. Abgezogen hat sie nie jemand. Ist das eine offene Preisfrage
+wie bei den Parsern, oder ein Fehler?
+
+**Entscheidung:** Ein Fehler. `signatur-vorgang-starten` hängt seit fork_59
+an derselben Beilage wie die KI-Aufrufe.
+
+**Grund:** Bei den Parsern fehlt der Preis — eine Zahl zu erfinden wäre eine
+Preisentscheidung, und die trifft der Betreiber. Hier ist der Preis
+festgesetzt und steht im Katalog; es wurde nur niemand gefragt. Das ist kein
+offener Punkt, sondern eine Leistung, die ohne Gegenwert hinausgeht.
+
+**Was das kostet:** Eine Verhaltensänderung, und sie ist gewollt — ein
+gesperrter Mandant startet keinen Signaturvorgang mehr. `CLAUDE.md` verlangt,
+dass Rechte serverseitig durchgesetzt werden, und ein Mandant ohne gültiges
+Abo ist genau der Fall.
+
+**Nebenbefund:** `tests/credits.js` prüfte die Reihenfolge gegen „den
+Anbieter" — und wäre an einer Funktion ohne Anbieter blind gewesen. Geprüft
+wird jetzt gegen „die Leistung": für die KI-Funktionen der Anbieteraufruf,
+für den Signaturvorgang die Zeile in `signatur_vorgaenge`, denn ab da
+existiert der Vorgang, das PDF liegt im Speicher und die Links sind
+unterwegs. Gegenprobe gemacht: die Reservierung hinter diese Zeile geschoben,
+der Test schlägt an.

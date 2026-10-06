@@ -79,6 +79,13 @@ function ladeFontkit(): Promise<any> {
   return fontkitPromise;
 }
 
+// --- Credits (fork_59) ---------------------------------------------------
+// Die Abrechnung liegt als Beilage im Ordner dieser Funktion; die Quelle
+// steht in supabase/eigene-beilagen/_credits/credits.ts. Sie reserviert
+// VOR dem Vorgang und gibt bei einem Fehler von selbst zurueck.
+import { kiAbrechnen, abgelehnt } from "./credits.ts";
+import type { Abrechnung } from "./credits.ts";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -680,6 +687,10 @@ const QUELLTABELLE: Record<string, string> = {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  // Die Reservierung muss auch im Fehlerfall erreichbar sein — in dieser
+  // Funktion fuehrt JEDER Fehler ueber einen throw in denselben catch.
+  let credits: Abrechnung | null = null;
+
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -786,6 +797,16 @@ Deno.serve(async (req) => {
     const verkaeuferEingabe: Array<{ name?: string; email?: string }> = Array.isArray(body.verkaeufer) ? body.verkaeufer : [];
     if (!vertragId) throw new Error("vertrag_id ist Pflicht.");
     if (!DOKUMENT_TYPEN.includes(dokumentTyp)) throw new Error("dokument_typ muss 'maklervertrag', 'vollmacht', 'objektnachweis' oder 'reservierung' sein.");
+
+    // --- Credits reservieren, bevor der Vorgang entsteht ---------------
+    // Erst hier, nicht frueher: eine Anfrage, die schon an der Form
+    // scheitert, soll kein Reservieren-und-Freigeben im Ledger
+    // hinterlassen. Und nicht spaeter: ab hier wird geschrieben,
+    // hochgeladen und verschickt. Geprueft wird dabei auch das Abo —
+    // ein gesperrter Mandant startet keinen Signaturvorgang.
+    const abr = await kiAbrechnen(req, "signatur_vorgang", vertragId);
+    if (!abr.ok) return abgelehnt(abr, corsHeaders);
+    credits = abr;
 
     const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const pruefe = (liste: Array<{ name?: string; email?: string }>, bezeichnung: string, pflicht: boolean) => {
@@ -1397,8 +1418,14 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Gebucht wird erst, wenn der Vorgang steht und die Links heraus
+    // sind. Ein Anbieterpreis faellt hier nicht an — die Signatur ist
+    // eigene Leistung, keine eingekaufte.
+    await abr.buchen(null, dokumentTyp);
+
     return jsonResponse({
       ok: true,
+      credits: abr.credits,
       vorgang_id: vorgang.id,
       empfaenger_anzahl: empfaengerEintraege.length,
       kaeufer_anzahl: personen.length,
@@ -1413,6 +1440,9 @@ Deno.serve(async (req) => {
   } catch (e) {
     const meldung = e instanceof Error ? e.message : String(e);
     console.error("signatur-vorgang-starten:", meldung);
+    // Was reserviert war, geht zurueck. CLAUDE.md: fehlgeschlagene
+    // Auftraege geben reservierte Credits automatisch frei.
+    if (credits) await credits.freigeben("Abbruch: " + meldung);
     return jsonResponse({ ok: false, error: meldung });
   }
 });

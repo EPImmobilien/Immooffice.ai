@@ -2,8 +2,8 @@
 //
 // Die Abrechnung aus fork_47 war bis fork_49 Zierde: Töpfe, Ledger und
 // Preise gab es, aber nichts verbrauchte je etwas. Seither hängt sie an den
-// KI-Aufrufen, und zwar als Beilage `credits.ts` in vier Funktionen der
-// Vorlage. Das ist die Stelle, an der zweierlei leise kaputtgehen kann:
+// KI-Aufrufen und — seit fork_59 — am Signaturvorgang, als Beilage
+// `credits.ts` im Ordner der jeweiligen Funktion. Das ist die Stelle, an der zweierlei leise kaputtgehen kann:
 //
 //   1. Eine Kopie der Beilage läuft auseinander. Sie entsteht beim Erzeugen
 //      neu — wer die Kopie statt der Quelle ändert, verliert die Änderung
@@ -109,30 +109,44 @@ for (const name of empfaenger) {
           'sonst kostet die Aktion stillschweigend nichts');
   }
 
-  // Reserviert wird VOR dem Anbieter. Sonst hat der Kunde geliefert
-  // bekommen, bevor jemand nachgesehen hat, ob er darf.
-  const beiReservierung = q.indexOf('kiAbrechnen(');
-  // Gesucht wird erst ab Deno.serve: davor steht hoechstens die DEFINITION
-  // des Anbieter-Aufrufs, und die sagt nichts ueber die Reihenfolge.
-  const abHandler = q.indexOf('Deno.serve(');
-  const anbieter = [
+  // Reserviert wird VOR der Leistung. Sonst hat der Kunde bekommen, wofuer
+  // er zahlen sollte, bevor jemand nachgesehen hat, ob er darf.
+  //
+  // Was "die Leistung" ist, haengt an der Funktion. Bei den KI-Aufrufen ist
+  // es der Anbieter. Bei signatur-vorgang-starten gibt es keinen Anbieter —
+  // die Signatur ist eigene Leistung; der Punkt ohne Wiederkehr ist die
+  // Zeile in signatur_vorgaenge, denn ab da existiert der Vorgang, das PDF
+  // liegt im Speicher und die Links sind unterwegs. Deshalb eine Tabelle
+  // statt einer festen Liste von Anbietern: eine Funktion ohne Anbieter
+  // waere sonst unpruefbar, und "unpruefbar" hiesse hier "ungeprueft".
+  const LEISTUNG = {
+    'signatur-vorgang-starten': [/\.from\("signatur_vorgaenge"\)\.insert\(/],
+  };
+  const ANBIETER = [
     /fetch\("https:\/\/api\.anthropic\.com/,
     /fetch\(ANTHROPIC_API_URL/,
     /await replicateRun\(/,
-  ].map((r) => {
+  ];
+  const beiReservierung = q.indexOf('kiAbrechnen(');
+  // Gesucht wird erst ab Deno.serve: davor steht hoechstens die DEFINITION
+  // des Aufrufs, und die sagt nichts ueber die Reihenfolge.
+  const abHandler = q.indexOf('Deno.serve(');
+  const marken = LEISTUNG[name] || ANBIETER;
+  const wort = LEISTUNG[name] ? 'die Leistung' : 'der Anbieter';
+  const anbieter = marken.map((r) => {
     const i = q.slice(abHandler).search(r);
     return i < 0 ? -1 : i + abHandler;
   }).filter((i) => i >= 0);
-  melde(`${name}: der Anbieter wird erst nach der Reservierung gerufen`,
+  melde(`${name}: ${wort} kommt erst nach der Reservierung`,
         anbieter.length > 0 && anbieter.every((i) => i > beiReservierung),
-        `Reservierung bei ${beiReservierung}, Anbieter bei ${anbieter.join(', ')}`);
+        `Reservierung bei ${beiReservierung}, Leistung bei ${anbieter.join(', ')}`);
 
-  // Gebucht wird genau einmal, und erst nach dem Anbieter.
+  // Gebucht wird genau einmal, und erst nach der Leistung.
   const beiBuchung = q.indexOf('.buchen(');
   melde(`${name}: bucht genau einmal`,
         (q.match(/\.buchen\(/g) || []).length === 1, String(beiBuchung));
-  melde(`${name}: und erst nach dem Anbieter`,
-        beiBuchung > Math.min(...anbieter));
+  melde(`${name}: und erst nach ${wort}`,
+        anbieter.length > 0 && beiBuchung > Math.min(...anbieter));
 
   // Und jeder Rueckweg nach der Reservierung gibt frei — mindestens der
   // Abbruch im catch, der alles auffaengt, was kein eigenes return hat.
@@ -194,7 +208,7 @@ if (fehler) {
   console.log(`\n  ${fehler} von ${geprueft} Pruefungen gescheitert.`);
   process.exit(1);
 }
-console.log(`  [ok] ${geprueft} Pruefungen zu den Credits an den KI-Aufrufen:`);
-console.log(`       ${empfaenger.length} Funktionen reservieren vor dem Anbieter,`);
+console.log(`  [ok] ${geprueft} Pruefungen zu den Credits an den kostenpflichtigen Aufrufen:`);
+console.log(`       ${empfaenger.length} Funktionen reservieren vor der Leistung,`);
 console.log('       buchen erst danach, geben bei jedem Abbruch zurueck — und');
 console.log('       jede Kopie der Beilage ist byte-gleich mit ihrer Quelle.');
