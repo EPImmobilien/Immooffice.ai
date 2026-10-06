@@ -1,7 +1,7 @@
 -- Legt die Selbstregistrierung einen vollstaendigen Mandanten an — und nur
 -- einen?
 --
--- Sieben Fragen:
+-- Acht Fragen:
 --   1. Ohne Anmeldung: abgewiesen.
 --   2. Ohne bestaetigte E-Mail-Adresse: abgewiesen.
 --   3. Mit bestaetigter Adresse: Mandant, Profil als chef, Standort und die
@@ -11,11 +11,14 @@
 --      eigenen Mandanten.
 --   6. Zwei Firmen gleichen Namens bekommen verschiedene Kuerzel.
 --   7. Der neue Chef sieht unter RLS nur seinen eigenen Mandanten.
+--   8. Steht der Schalter `registrierung_offen` auf false, kommt niemand
+--      Neues mehr durch — wer schon ein Profil hat, aber weiterhin.
 
 \set ON_ERROR_STOP on
 \pset pager off
 
-delete from public.mandanten where slug like 'reg-test%' or name = 'Testmakler GmbH';
+delete from public.mandanten where slug like 'reg-test%'
+   or name in ('Testmakler GmbH', 'Ganz Andere AG', 'Zu GmbH');
 delete from auth.users where email like '%@reg.example';
 
 create temporary table befund (nr int generated always as identity, pruefung text,
@@ -184,7 +187,70 @@ begin
           format('sichtbar=%s davon fremd=%s', sichtbar, fremd));
 end $$;
 
-delete from public.mandanten where slug like 'testmakler%' or slug like 'ganz-andere%';
+-- --- 8) Der Schalter registrierung_offen wirkt ----------------------------
+-- fork_57: Ein Schalter, der nichts tut, ist schlimmer als kein Schalter.
+-- Geprueft wird beides: dass er zumacht, und dass er Bestandskunden
+-- nicht mit aussperrt.
+do $$
+declare
+  u_zu uuid := gen_random_uuid();
+  vorher jsonb;
+  zu_abgewiesen boolean;
+  bestand uuid;
+  meldung text;
+begin
+  insert into auth.users (id, email, email_confirmed_at)
+    values (u_zu, 'geschlossen@reg.example', now());
+
+  select wert into vorher from public.plattform_werte
+   where schluessel = 'registrierung_offen';
+  update public.plattform_werte set wert = 'false'::jsonb
+   where schluessel = 'registrierung_offen';
+
+  -- a) Ein Konto ohne Profil wird abgewiesen.
+  perform set_config('request.jwt.claims',
+    json_build_object('sub', u_zu, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  begin
+    perform public.registrierung_abschliessen('Zu GmbH', 'Konrad Zu');
+    zu_abgewiesen := false;
+    meldung := 'durchgelassen';
+  exception when insufficient_privilege then
+    zu_abgewiesen := true;
+    meldung := 'abgewiesen (42501)';
+  when others then
+    zu_abgewiesen := false;
+    meldung := 'falscher Fehler: ' || sqlerrm;
+  end;
+  reset role;
+
+  -- b) Wer schon ein Profil hat, bekommt weiterhin seine Mandantenkennung.
+  perform set_config('request.jwt.claims',
+    json_build_object('sub', (select wert from wer where was='neu'),
+                      'role', 'authenticated')::text, true);
+  set local role authenticated;
+  bestand := public.registrierung_abschliessen('Testmakler GmbH', 'Nina Neu');
+  reset role;
+
+  update public.plattform_werte set wert = coalesce(vorher, 'true'::jsonb)
+   where schluessel = 'registrierung_offen';
+
+  insert into befund (pruefung, bestanden, bemerkung)
+  values ('Geschlossene Registrierung weist ein neues Konto ab',
+          zu_abgewiesen, meldung),
+         ('Geschlossene Registrierung sperrt Bestandskunden nicht aus',
+          bestand is not distinct from (select wert from wer where was='mandant_neu'),
+          coalesce(bestand::text, 'nichts zurueckbekommen')),
+         ('Die geschlossene Registrierung legt nichts an',
+          not exists (select 1 from public.profiles where id = u_zu)
+            and not exists (select 1 from public.mandanten where name = 'Zu GmbH'),
+          format('%s Profil(e), %s Mandant(en) namens "Zu GmbH"',
+                 (select count(*) from public.profiles where id = u_zu),
+                 (select count(*) from public.mandanten where name = 'Zu GmbH')));
+end $$;
+
+delete from public.mandanten where slug like 'testmakler%' or slug like 'ganz-andere%'
+   or name = 'Zu GmbH';
 delete from auth.users where email like '%@reg.example';
 
 select nr, case when bestanden is true then 'ok  ' else 'FEHL' end as ergebnis, pruefung, bemerkung
