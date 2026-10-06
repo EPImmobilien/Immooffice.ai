@@ -41,7 +41,8 @@
         },
         "groesse": 10,
         "farbe": "p",
-        "sperrung": 1.4
+        "sperrung": 1.4,
+        "min_groesse": 6.5
       },
       "marke_name_hell": {
         "schrift": {
@@ -50,7 +51,8 @@
         },
         "groesse": 10,
         "farbe": "weiss",
-        "sperrung": 1.4
+        "sperrung": 1.4,
+        "min_groesse": 6.5
       },
       "marke_zusatz": {
         "schrift": {
@@ -60,7 +62,8 @@
         "groesse": 6,
         "farbe": "muted",
         "sperrung": 2.2,
-        "grossbuchstaben": true
+        "grossbuchstaben": true,
+        "min_groesse": 6.5
       },
       "bild_label": {
         "schrift": {
@@ -660,7 +663,8 @@
           ]
         },
         "sperrung": 2.2,
-        "grossbuchstaben": true
+        "grossbuchstaben": true,
+        "min_groesse": 6.5
       },
       "kontakt_oberzeile": {
         "schrift": {
@@ -869,7 +873,7 @@
           },
           "fuellmodus": "cover",
           "platzhalter_farbe": "surf2",
-          "label": "Titelbild",
+          "label": "{{objekt.hauptbild_url.titel}}",
           "stil_label": "bild_label",
           "label_hintergrund": "weiss"
         },
@@ -897,7 +901,9 @@
           },
           "fuellmodus": "contain",
           "eckradius": 5,
-          "platzhalter_farbe": "a"
+          "sichtbar_wenn": {
+            "vorhanden": "firma.logo.hell"
+          }
         },
         {
           "id": "cover-marke",
@@ -918,7 +924,7 @@
           "b": 150,
           "h": 6,
           "stil": "marke_zusatz",
-          "inhalt": "Immobilien",
+          "inhalt": "{{firma.linie?}}",
           "einzeilig": true
         },
         {
@@ -976,7 +982,7 @@
           "b": 400,
           "h": 10,
           "stil": "cover_ort",
-          "inhalt": "{{objekt.plz_ort}}  ·  {{objekt.ortsteil}}",
+          "inhalt": "{{objekt.plz_ort}}  ·  {{objekt.ortsteil?}}",
           "einzeilig": true
         },
         {
@@ -1323,7 +1329,10 @@
           "h": 7,
           "stil": "abschnitt_label",
           "inhalt": "Highlights",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.expose_highlights"
+          }
         },
         {
           "id": "highlights",
@@ -1411,7 +1420,7 @@
           "fuellmodus": "cover",
           "eckradius": 10,
           "platzhalter_farbe": "surf2",
-          "label": "Wohnbereich",
+          "label": "{{bild.foto.1.titel}}",
           "stil_label": "bild_label",
           "label_hintergrund": "weiss"
         },
@@ -1429,7 +1438,7 @@
           "fuellmodus": "cover",
           "eckradius": 10,
           "platzhalter_farbe": "surf2",
-          "label": "Außenansicht",
+          "label": "{{bild.foto.2.titel}}",
           "stil_label": "bild_label",
           "label_hintergrund": "weiss"
         },
@@ -1540,7 +1549,7 @@
           "b": 471.28,
           "h": 9.5,
           "stil": "kapitel_unter",
-          "inhalt": "Qualität, die man sieht – und im Alltag spürt.",
+          "inhalt": "Die Ausstattung im Überblick.",
           "einzeilig": true
         },
         {
@@ -1557,7 +1566,7 @@
           "fuellmodus": "cover",
           "eckradius": 10,
           "platzhalter_farbe": "surf2",
-          "label": "Küche / Essbereich",
+          "label": "{{bild.foto.3.titel}}",
           "stil_label": "bild_label",
           "label_hintergrund": "weiss"
         },
@@ -1633,7 +1642,7 @@
           "b": 471.28,
           "h": 24,
           "stil": "kapitel_titel",
-          "inhalt": "Ein Zuhause mit Charakter.",
+          "inhalt": "Bilder zum Objekt.",
           "einzeilig": true
         },
         {
@@ -1705,7 +1714,7 @@
           "b": 471.28,
           "h": 24,
           "stil": "kapitel_titel",
-          "inhalt": "Klar gegliedert, flexibel nutzbar.",
+          "inhalt": "Die Grundrisse im Überblick.",
           "einzeilig": true
         },
         {
@@ -1852,7 +1861,17 @@
           "inhalt": "Grundrisse nicht maßstabsgetreu. Flächenangaben ca.-Werte, Berechnung nach WoFlV.",
           "einzeilig": true
         }
-      ]
+      ],
+      "sichtbar_wenn": {
+        "oder": [
+          {
+            "vorhanden": "bild.grundriss.1"
+          },
+          {
+            "vorhanden": "objekt.raumaufteilung"
+          }
+        ]
+      }
     },
     {
       "id": "lage",
@@ -1900,7 +1919,7 @@
           "b": 471.28,
           "h": 24,
           "stil": "kapitel_titel",
-          "inhalt": "Ruhig wohnen, schnell überall.",
+          "inhalt": "Die Lage im Überblick.",
           "einzeilig": true
         },
         {
@@ -1926,7 +1945,10 @@
           "h": 7,
           "stil": "abschnitt_label",
           "inhalt": "Mikrolage",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.beschreibung_lage"
+          }
         },
         {
           "id": "lage-text",
@@ -1949,7 +1971,10 @@
           "h": 7,
           "stil": "abschnitt_label",
           "inhalt": "Entfernungen",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.lage_distanzen"
+          }
         },
         {
           "id": "distanzen",
@@ -2185,6 +2210,9 @@
           "stil": "hinweis_titel",
           "inhalt": "Gut zu wissen",
           "einzeilig": true,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.expose_energie_hinweis"
+          },
           "sichtbar_wenn": {
             "vorhanden": "objekt.expose_energie_hinweis"
           }
@@ -2452,7 +2480,10 @@
           "h": 7,
           "stil": "abschnitt_label",
           "inhalt": "Laufende Kosten (ca. monatlich)",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.laufende_kosten"
+          }
         },
         {
           "id": "laufend",
@@ -2551,7 +2582,9 @@
           },
           "fuellmodus": "contain",
           "eckradius": 5,
-          "platzhalter_farbe": "a"
+          "sichtbar_wenn": {
+            "vorhanden": "firma.logo.dunkel"
+          }
         },
         {
           "id": "kontakt-marke",
@@ -2572,7 +2605,7 @@
           "b": 200,
           "h": 6,
           "stil": "marke_zusatz_hell",
-          "inhalt": "Immobilien",
+          "inhalt": "{{firma.linie?}}",
           "einzeilig": true
         },
         {
@@ -2716,7 +2749,7 @@
           "bloecke": [
             {
               "titel": "Anbieter",
-              "text": "{{firma.name}}\n{{firma.adresse}}\nTel. {{firma.telefon}}\n{{firma.email}}\n{{firma.web}}"
+              "text": "{{firma.name}}\n{{firma.adresse}}\nTel. {{firma.telefon?}}\n{{firma.email?}}\n{{firma.web?}}"
             },
             {
               "titel": "Hinweise",

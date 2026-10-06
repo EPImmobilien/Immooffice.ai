@@ -101,7 +101,19 @@ export function themaSignature(dunkel: string, metall: string) {
 
 /** Studio: Signalfarbe und Dunkelton. Aus immoOffice_studio_generator.py. */
 export function themaStudio(signal: string, dunkel: string) {
-  const s = hx(signal), d = hx(dunkel);
+  const s = hx(signal);
+  const gewaehlt = hx(dunkel);
+  // Studio braucht an dieser Stelle einen DUNKLEN Ton: aus ihm werden die
+  // Markenflaeche, die Linien, der Fliesstext und der gedaempfte Text. Der
+  // Mandant waehlt dafuer seine Akzentfarbe, und die ist nicht zwingend
+  // dunkel. Am 06.10.2026 stand im eigenen Projekt ein helles Grau
+  // (#C2C2BD) — die Markenflaeche wurde hellgrau, die Schrift darauf ist
+  // weiss, und der Firmenname war auf dem Papier praktisch unsichtbar.
+  //
+  // Also abdunkeln statt uebernehmen, und zwar nur dann: ein dunkler Akzent
+  // bleibt unveraendert, die Prototypfarbe (#111318) auch. Dieselbe Art von
+  // Automatik, die der Auftrag fuer on_s ausdruecklich vorsieht.
+  const d = helligkeit(gewaehlt) > 0.5 ? mix(gewaehlt, SCHWARZ, 0.8) : gewaehlt;
   return {
     s, d,
     // Die eine Automatik, die der Auftrag ausdruecklich nennt: Text auf der

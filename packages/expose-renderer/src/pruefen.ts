@@ -39,7 +39,15 @@ function istBekannt(schluessel: string): boolean {
   if (BEKANNTE_FELDER.has(schluessel)) return true;
   if (EIGENE_FELDER.has(schluessel)) return true;
   // Durchnummerierte Bildslots: bild.foto.3, bild.grundriss.2
-  return /^bild\.(foto|grundriss)\.\d+(\.titel)?$/.test(schluessel);
+  if (/^bild\.(foto|grundriss)\.\d+(\.titel)?$/.test(schluessel)) return true;
+  // Nach Kategorie: bild.kategorie.bad.1 — und die Bildunterschrift dazu.
+  if (/^bild\.kategorie\.[^.]+\.\d+(\.titel)?$/.test(schluessel)) return true;
+  // Die Bildunterschrift der Einzelbilder. Sie steht am BILD (immobilie_datei
+  // .titel) und nicht in der Vorlage: eine Vorlage, die "Wohnbereich" unter
+  // ein Bild schreibt, behauptet etwas ueber ein Foto, das sie nie gesehen
+  // hat. Am 06.10.2026 stand so "Seeterrasse" unter einem Schlafzimmer.
+  return schluessel === "bild.lageplan.titel"
+    || schluessel === "objekt.hauptbild_url.titel";
 }
 
 export function vorlagePruefen(v: Vorlage): Befund[] {

@@ -42,7 +42,8 @@
         "groesse": 15,
         "farbe": "onD",
         "sperrung": 5,
-        "ausrichtung": "mitte"
+        "ausrichtung": "mitte",
+        "min_groesse": 6.5
       },
       "marke_linie": {
         "schrift": {
@@ -53,7 +54,8 @@
         "farbe": "a",
         "sperrung": 3.2,
         "grossbuchstaben": true,
-        "ausrichtung": "mitte"
+        "ausrichtung": "mitte",
+        "min_groesse": 6.5
       },
       "cover_oberzeile": {
         "schrift": {
@@ -217,7 +219,8 @@
         "groesse": 5.2,
         "farbe": "muted",
         "sperrung": 2.2,
-        "grossbuchstaben": true
+        "grossbuchstaben": true,
+        "min_groesse": 6.5
       },
       "fuss_marke_hell": {
         "schrift": {
@@ -227,7 +230,8 @@
         "groesse": 5.2,
         "farbe": "onDm",
         "sperrung": 2.2,
-        "grossbuchstaben": true
+        "grossbuchstaben": true,
+        "min_groesse": 6.5
       },
       "fuss_seite": {
         "schrift": {
@@ -813,7 +817,7 @@
           "b": 250,
           "h": 5.2,
           "stil": "fuss_marke",
-          "inhalt": "{{firma.marken_name}}  ·  {{firma.linie}}",
+          "inhalt": "{{firma.marken_name}}  ·  {{firma.linie?}}",
           "einzeilig": true
         },
         {
@@ -905,11 +909,27 @@
           "linienbreite": 0.5
         },
         {
+          "id": "cover-logo",
+          "typ": "bild",
+          "x": 282.64,
+          "y": 775.89,
+          "b": 30,
+          "h": 30,
+          "slot": {
+            "art": "logo",
+            "ton": "dunkel"
+          },
+          "fuellmodus": "contain",
+          "sichtbar_wenn": {
+            "vorhanden": "firma.logo.dunkel"
+          }
+        },
+        {
           "id": "cover-marke",
           "typ": "text",
-          "x": 197.64,
+          "x": 36.0,
           "y": 759.89,
-          "b": 200,
+          "b": 523.28,
           "h": 10,
           "stil": "marke",
           "inhalt": "{{firma.marken_name}}",
@@ -929,9 +949,9 @@
         {
           "id": "cover-marke-zusatz",
           "typ": "text",
-          "x": 197.64,
+          "x": 36.0,
           "y": 745.69,
-          "b": 200,
+          "b": 523.28,
           "h": 5.2,
           "stil": "marke_linie",
           "inhalt": "{{firma.linie}}",
@@ -940,9 +960,9 @@
         {
           "id": "cover-oberzeile",
           "typ": "text",
-          "x": 197.64,
+          "x": 36.0,
           "y": 333.6,
-          "b": 200,
+          "b": 523.28,
           "h": 6.4,
           "stil": "cover_oberzeile",
           "inhalt": "Exposé  ·  {{objekt.objektart}}",
@@ -951,9 +971,9 @@
         {
           "id": "cover-titel-1",
           "typ": "text",
-          "x": 147.64,
+          "x": 36.0,
           "y": 236,
-          "b": 300,
+          "b": 523.28,
           "h": 52,
           "stil": "cover_titel",
           "inhalt": "{{objekt.titel_erste_zeile}}",
@@ -962,9 +982,9 @@
         {
           "id": "cover-titel-2",
           "typ": "text",
-          "x": 147.64,
+          "x": 36.0,
           "y": 190,
-          "b": 300,
+          "b": 523.28,
           "h": 52,
           "stil": "cover_titel_kursiv",
           "inhalt": "{{objekt.titel_zweite_zeile}}",
@@ -984,9 +1004,9 @@
         {
           "id": "cover-unter",
           "typ": "text",
-          "x": 147.64,
+          "x": 36.0,
           "y": 177,
-          "b": 300,
+          "b": 523.28,
           "h": 13,
           "stil": "cover_unter",
           "inhalt": "{{objekt.untertitel}}",
@@ -995,12 +1015,12 @@
         {
           "id": "cover-fuss",
           "typ": "text",
-          "x": 147.64,
+          "x": 36.0,
           "y": 64.2,
-          "b": 300,
+          "b": 523.28,
           "h": 5.8,
           "stil": "cover_fuss",
-          "inhalt": "{{objekt.ort}}   ·   {{objekt.wohnflaeche}} Wohnfläche   ·   {{objekt.grundstueck}} Grundstück",
+          "inhalt": "{{objekt.ort}}   ·   {{objekt.wohnflaeche}} Wohnfläche   ·   {{objekt.grundstueck?}} Grundstück",
           "einzeilig": true
         }
       ]
@@ -1023,9 +1043,9 @@
         {
           "id": "prolog-label",
           "typ": "text",
-          "x": 197.64,
+          "x": 36.0,
           "y": 743.69,
-          "b": 200,
+          "b": 523.28,
           "h": 6.2,
           "stil": "kapitel_label_mitte",
           "inhalt": "I  ·  Prolog",
@@ -1065,7 +1085,10 @@
           "h": 56,
           "stil": "initiale",
           "inhalt": "{{objekt.expose_prolog_initiale}}",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.expose_prolog_initiale"
+          }
         },
         {
           "id": "prolog-text",
@@ -1079,7 +1102,27 @@
           "blocksatz": true,
           "verdichten": false,
           "einzug": 40,
-          "einzug_zeilen": 3
+          "einzug_zeilen": 3,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.expose_prolog_initiale"
+          }
+        },
+        {
+          "id": "prolog-text-ohne-initiale",
+          "typ": "text",
+          "x": 117.64,
+          "y": 440,
+          "b": 360,
+          "h": 149.89,
+          "stil": "fliesstext",
+          "inhalt": "{{objekt.expose_prolog}}",
+          "blocksatz": true,
+          "verdichten": false,
+          "sichtbar_wenn": {
+            "nicht": {
+              "vorhanden": "objekt.expose_prolog_initiale"
+            }
+          }
         },
         {
           "id": "prolog-bild",
@@ -1094,7 +1137,7 @@
           },
           "fuellmodus": "cover",
           "platzhalter_farbe": "paper2",
-          "label": "Seeterrasse",
+          "label": "{{bild.foto.1.titel}}",
           "stil_label": "bild_label",
           "label_hintergrund": "d",
           "label_deckkraft": 0.55,
@@ -1314,15 +1357,15 @@
           "b": 250,
           "h": 5.2,
           "stil": "fuss_marke_hell",
-          "inhalt": "{{firma.marken_name}}  ·  {{firma.linie}}",
+          "inhalt": "{{firma.marken_name}}  ·  {{firma.linie?}}",
           "einzeilig": true
         },
         {
           "id": "fuss-seite-hell",
           "typ": "text",
-          "x": 197.64,
+          "x": 36.0,
           "y": 19,
-          "b": 200,
+          "b": 523.28,
           "h": 10,
           "stil": "fuss_seite",
           "inhalt": "{{seite.nummer_zweistellig}}",
@@ -1370,7 +1413,7 @@
           },
           "fuellmodus": "cover",
           "platzhalter_farbe": "paper2",
-          "label": "Fassade / Entree",
+          "label": "{{bild.foto.2.titel}}",
           "stil_label": "bild_label",
           "label_hintergrund": "d",
           "label_deckkraft": 0.55,
@@ -1442,23 +1485,16 @@
           "id": "anwesen-zitat-1",
           "typ": "text",
           "x": 301.9232,
-          "y": 87,
-          "b": 250,
-          "h": 17,
-          "stil": "zitat_klein",
-          "inhalt": "„Licht, Weite und Ruhe –",
-          "einzeilig": true
-        },
-        {
-          "id": "anwesen-zitat-2",
-          "typ": "text",
-          "x": 301.9232,
           "y": 67,
           "b": 250,
-          "h": 17,
+          "h": 37,
           "stil": "zitat_klein",
-          "inhalt": "jeder Raum mit Blick aufs Wasser.“",
-          "einzeilig": true
+          "inhalt": "„{{objekt.expose_zitat}}“",
+          "umbruch": "saetze",
+          "max_zeilen": 2,
+          "zeilenschritt": 20,
+          "verdichten": false,
+          "absatzabstand": 0
         },
         {
           "id": "fuss-marke",
@@ -1468,7 +1504,7 @@
           "b": 250,
           "h": 5.2,
           "stil": "fuss_marke",
-          "inhalt": "{{firma.marken_name}}  ·  {{firma.linie}}",
+          "inhalt": "{{firma.marken_name}}  ·  {{firma.linie?}}",
           "einzeilig": true
         },
         {
@@ -1512,7 +1548,7 @@
           },
           "fuellmodus": "cover",
           "platzhalter_farbe": "paper2",
-          "label": "Wohnsalon mit Seeblick",
+          "label": "{{bild.foto.3.titel}}",
           "stil_label": "bild_label",
           "label_hintergrund": "d",
           "label_deckkraft": 0.55,
@@ -1543,7 +1579,7 @@
           "b": 250,
           "h": 28,
           "stil": "kapitel_titel_mittel",
-          "inhalt": "Wo der Tag am",
+          "inhalt": "Ein Blick",
           "einzeilig": true
         },
         {
@@ -1554,7 +1590,7 @@
           "b": 250,
           "h": 28,
           "stil": "kapitel_titel_mittel_kursiv",
-          "inhalt": "Wasser beginnt.",
+          "inhalt": "nach innen.",
           "einzeilig": true
         },
         {
@@ -1565,7 +1601,7 @@
           "b": 233.64,
           "h": 132.567,
           "stil": "fliesstext_schmal",
-          "inhalt": "Beschreiben Sie hier, was dieses Bild zeigt.",
+          "inhalt": "",
           "blocksatz": true,
           "verdichten": false
         }
@@ -1599,7 +1635,7 @@
           },
           "fuellmodus": "cover",
           "platzhalter_farbe": "paper2",
-          "label": "Mastersuite",
+          "label": "{{bild.foto.4.titel}}",
           "stil_label": "bild_label",
           "label_hintergrund": "d",
           "label_deckkraft": 0.55,
@@ -1624,7 +1660,7 @@
           },
           "fuellmodus": "cover",
           "platzhalter_farbe": "paper2",
-          "label": "Spa-Bad",
+          "label": "{{bild.foto.5.titel}}",
           "stil_label": "bild_label",
           "label_hintergrund": "d",
           "label_deckkraft": 0.55,
@@ -1644,7 +1680,7 @@
           "b": 260,
           "h": 5.6,
           "stil": "bild_unterzeile",
-          "inhalt": "Mastersuite  —  mit Loggia über dem Wasser",
+          "inhalt": "",
           "einzeilig": true
         },
         {
@@ -1655,7 +1691,7 @@
           "b": 260,
           "h": 5.6,
           "stil": "bild_unterzeile",
-          "inhalt": "Spa-Bad  —  Naturstein & Eiche",
+          "inhalt": "",
           "einzeilig": true
         },
         {
@@ -1688,7 +1724,7 @@
           "b": 487.28,
           "h": 74,
           "stil": "fliesstext_schmal",
-          "inhalt": "Beschreiben Sie hier, was diese Bilder zeigen.",
+          "inhalt": "",
           "blocksatz": true,
           "verdichten": false
         }
@@ -1755,7 +1791,7 @@
           },
           "fuellmodus": "cover",
           "platzhalter_farbe": "paper2",
-          "label": "Küche",
+          "label": "{{bild.foto.6.titel}}",
           "stil_label": "bild_label",
           "label_hintergrund": "d",
           "label_deckkraft": 0.55,
@@ -1968,7 +2004,17 @@
           "inhalt": "Grundrisse nicht maßstabsgetreu. Flächen ca.-Angaben, berechnet nach WoFlV.",
           "einzeilig": true
         }
-      ]
+      ],
+      "sichtbar_wenn": {
+        "oder": [
+          {
+            "vorhanden": "bild.grundriss.1"
+          },
+          {
+            "vorhanden": "objekt.raumaufteilung"
+          }
+        ]
+      }
     },
     {
       "id": "lage",
@@ -2017,7 +2063,7 @@
           "b": 400,
           "h": 34,
           "stil": "kapitel_titel",
-          "inhalt": "Uferhain –",
+          "inhalt": "Die Lage,",
           "einzeilig": true
         },
         {
@@ -2028,7 +2074,7 @@
           "b": 400,
           "h": 34,
           "stil": "kapitel_titel_kursiv",
-          "inhalt": "die stille Adresse.",
+          "inhalt": "kurz gefasst.",
           "einzeilig": true
         },
         {
@@ -2052,7 +2098,10 @@
           "h": 6.2,
           "stil": "tab_titel",
           "inhalt": "Entfernungen",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.lage_distanzen"
+          }
         },
         {
           "id": "dist-linie",
@@ -2566,11 +2615,27 @@
           "richtung": "unten"
         },
         {
+          "id": "kontakt-logo",
+          "typ": "bild",
+          "x": 282.64,
+          "y": 777.89,
+          "b": 30,
+          "h": 30,
+          "slot": {
+            "art": "logo",
+            "ton": "dunkel"
+          },
+          "fuellmodus": "contain",
+          "sichtbar_wenn": {
+            "vorhanden": "firma.logo.dunkel"
+          }
+        },
+        {
           "id": "kon-marke",
           "typ": "text",
-          "x": 197.64,
+          "x": 36.0,
           "y": 761.89,
-          "b": 200,
+          "b": 523.28,
           "h": 10,
           "stil": "marke",
           "inhalt": "{{firma.marken_name}}",
@@ -2590,9 +2655,9 @@
         {
           "id": "kon-marke-zusatz",
           "typ": "text",
-          "x": 197.64,
+          "x": 36.0,
           "y": 747.69,
-          "b": 200,
+          "b": 523.28,
           "h": 5.2,
           "stil": "marke_linie",
           "inhalt": "{{firma.linie}}",
@@ -2601,9 +2666,9 @@
         {
           "id": "kon-ober",
           "typ": "text",
-          "x": 197.64,
+          "x": 36.0,
           "y": 475.69,
-          "b": 200,
+          "b": 523.28,
           "h": 6.2,
           "stil": "kontakt_ober",
           "inhalt": "X  ·  Ihr persönlicher Kontakt",
@@ -2612,9 +2677,9 @@
         {
           "id": "kon-titel-1",
           "typ": "text",
-          "x": 147.64,
+          "x": 36.0,
           "y": 403.89,
-          "b": 300,
+          "b": 523.28,
           "h": 32,
           "stil": "kontakt_titel",
           "inhalt": "Wir freuen uns auf",
@@ -2623,9 +2688,9 @@
         {
           "id": "kon-titel-2",
           "typ": "text",
-          "x": 147.64,
+          "x": 36.0,
           "y": 367.89,
-          "b": 300,
+          "b": 523.28,
           "h": 32,
           "stil": "kontakt_titel_kursiv",
           "inhalt": "Ihren Besuch.",
@@ -2734,7 +2799,7 @@
           "b": 400,
           "h": 5.2,
           "stil": "firma_zeile_eng",
-          "inhalt": "{{firma.telefon}}  ·  {{firma.email}}",
+          "inhalt": "{{firma.telefon?}}  ·  {{firma.email?}}",
           "einzeilig": true
         },
         {
@@ -2762,9 +2827,9 @@
         {
           "id": "kon-seite",
           "typ": "text",
-          "x": 197.64,
+          "x": 36.0,
           "y": 16,
-          "b": 200,
+          "b": 523.28,
           "h": 10,
           "stil": "fuss_seite",
           "inhalt": "{{seite.nummer_zweistellig}}",

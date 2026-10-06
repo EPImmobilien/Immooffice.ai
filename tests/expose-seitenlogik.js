@@ -122,17 +122,29 @@ const pruefe = (bedingung, was) => {
 }
 
 // --- 4. Fehlender Wert laesst den Text entfallen, mit Warnung -----------
+//
+// Das Fragezeichen heisst seit dem 06.10.2026: DIESER Platzhalter darf
+// fehlen, ohne den ganzen Text mitzunehmen — solange im Text noch ein
+// anderer Wert steht. Eine Beschriftung allein ("Etage:") ist kein Text,
+// sondern ein Zeiger ins Leere und entfaellt weiterhin. Und das
+// Trennzeichen vor einem fehlenden Wert geht mit ihm: sonst stand auf neun
+// Seiten der Luxusvorlage ein Mittelpunkt ohne Wort dahinter.
 {
   const v = baue([seite('eins', 'Eins', {}, [
     textEl('pflicht', 'Wohnfläche: {{objekt.wohnflaeche}}'),
-    textEl('freiwillig', 'Etage: {{objekt.etage?}}', { id: 'freiwillig', y: 650 }),
+    textEl('allein', 'Etage: {{objekt.etage?}}', { id: 'allein', y: 650 }),
+    textEl('zusammen', '{{objekt.ort}}  ·  Etage {{objekt.etage?}}',
+           { id: 'zusammen', y: 600 }),
   ])]);
-  const raus = rendern({ vorlage: v, daten: {}, schriften });
+  const raus = rendern({ vorlage: v, daten: { 'objekt.ort': 'Musterstadt' }, schriften });
   const texte = raus.seiten[0].schritte.filter((x) => x.art === 'text').map((x) => x.text);
   pruefe(!texte.some((t) => t.includes('Wohnfläche')),
          `Ohne Wohnflaeche darf die Zeile nicht stehen, gefunden: ${JSON.stringify(texte)}.`);
-  pruefe(texte.some((t) => t.startsWith('Etage:')),
-         `Ein mit ? gekennzeichneter Platzhalter darf fehlen, gefunden: ${JSON.stringify(texte)}.`);
+  pruefe(!texte.some((t) => t.includes('Etage:')),
+         `Eine Beschriftung ohne Wert ist kein Text, gefunden: ${JSON.stringify(texte)}.`);
+  pruefe(texte.includes('Musterstadt'),
+         `Der vorhandene Wert muss bleiben, ohne Trenner und ohne "Etage", `
+         + `gefunden: ${JSON.stringify(texte)}.`);
   pruefe(raus.warnungen.some((w) => w.art === 'fehlender_wert' && w.element === 'pflicht'),
          'Der entfallene Text muss als Warnung erscheinen.');
 }

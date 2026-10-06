@@ -156,18 +156,87 @@ const PLATZHALTER = /\{\{\s*([A-Za-z0-9_.]+\??)\s*\}\}/g;
  * Vorlage den Platzhalter mit einem Fragezeichen: `{{objekt.etage?}}`.
  */
 export function ersetze(daten: Daten, text: string): string | undefined {
-  let etwasFehlt = false;
-  const raus = text.replace(PLATZHALTER, (_treffer, schluessel: string) => {
+  // Der Text zerfaellt in ABSCHNITTE, getrennt an Satzzeichen, die
+  // Angaben voneinander trennen (Mittelpunkt, Schraegstrich, Komma,
+  // Gedankenstrich — oder zwei und mehr Leerzeichen). Ein Abschnitt, in dem
+  // ein Platzhalter steht und kein einziger Wert ankommt, faellt mitsamt
+  // seiner Beschriftung weg; die uebrigen werden mit ihren Trennern wieder
+  // zusammengesetzt.
+  //
+  // Ein EINZELNES Leerzeichen trennt nicht: es bindet die Beschriftung an
+  // ihren Wert ("{{grundstueck?}} Grundstück" ist ein Abschnitt, nicht
+  // zwei). Genau deshalb bleibt bei einer Wohnung ohne Grundstueck weder
+  // eine nackte Zahl noch ein Wort ohne Zahl stehen.
+  //
+  // Vorher entfiel der GANZE Text, sobald ein Platzhalter leer war. Im
+  // Betrieb hiess das am 06.10.2026: die Fusszeile fehlte auf neun Seiten,
+  // weil die Markenlinie nicht gepflegt war, und die Kopfzeile auf sechs,
+  // weil das Objekt keinen Ortsteil hat.
+  type Stueck = { art: "fest"; s: string } | { art: "wert"; s?: string };
+  const stuecke: Stueck[] = [];
+  let zeiger = 0;
+  let pflichtFehlt = false;
+  for (const t of text.matchAll(PLATZHALTER)) {
+    const start = t.index ?? 0;
+    if (start > zeiger) stuecke.push({ art: "fest", s: text.slice(zeiger, start) });
+    const schluessel = t[1];
     const freiwillig = schluessel.endsWith("?");
     const name = freiwillig ? schluessel.slice(0, -1) : schluessel;
     const w = wert(daten, name);
-    if (w === undefined) {
-      if (!freiwillig) etwasFehlt = true;
-      return "";
+    if (w === undefined && !freiwillig) pflichtFehlt = true;
+    stuecke.push({ art: "wert", s: w });
+    zeiger = start + t[0].length;
+  }
+  if (pflichtFehlt) return undefined;
+  if (zeiger < text.length) stuecke.push({ art: "fest", s: text.slice(zeiger) });
+
+  // Zeilenumbrueche sind KEINE Trenner in diesem Sinne: sie sind
+  // Absatzgrenzen, und ein Absatz steht fuer sich.
+  const TRENNER = /([ \t]*[·•/|,;–—-][ \t]*|[ \t]{2,})/;
+  type Abschnitt = { teile: string[]; hatPlatzhalter: boolean; hatWert: boolean };
+  const abschnitte: Abschnitt[] = [];
+  const trenner: string[] = [];
+  let laufend: Abschnitt = { teile: [], hatPlatzhalter: false, hatWert: false };
+  const abschliessen = (t: string) => {
+    abschnitte.push(laufend);
+    trenner.push(t);
+    laufend = { teile: [], hatPlatzhalter: false, hatWert: false };
+  };
+  for (const st of stuecke) {
+    if (st.art === "wert") {
+      laufend.hatPlatzhalter = true;
+      if (st.s !== undefined && st.s.trim() !== "") laufend.hatWert = true;
+      laufend.teile.push(st.s ?? "");
+      continue;
     }
-    return w;
-  });
-  if (etwasFehlt) return undefined;
+    // Das feste Stueck in Text und Trenner zerlegen.
+    const teile = st.s.split(TRENNER);
+    for (let i = 0; i < teile.length; i++) {
+      const stueck = teile[i];
+      if (stueck === undefined || stueck === "") continue;
+      if (i % 2 === 1) {
+        // Ein Trenner ganz am Anfang des Textes hat nichts zu trennen.
+        if (!laufend.teile.length && !abschnitte.length) { laufend.teile.push(stueck); continue; }
+        abschliessen(stueck);
+      } else {
+        laufend.teile.push(stueck);
+      }
+    }
+  }
+  abschnitte.push(laufend);
+
+  const bleibt = abschnitte.map((a) => !a.hatPlatzhalter || a.hatWert);
+  // Kein einziger Abschnitt mit Wert: der Text hat nichts mehr zu sagen.
+  if (abschnitte.some((a) => a.hatPlatzhalter)
+      && !abschnitte.some((a, i) => a.hatPlatzhalter && bleibt[i])) {
+    return undefined;
+  }
+  let raus = "";
+  for (let i = 0; i < abschnitte.length; i++) {
+    if (!bleibt[i]) continue;
+    if (raus !== "" && i > 0) raus += trenner[i - 1] ?? "";
+    raus += abschnitte[i].teile.join("");
+  }
   // Ein Text, der nur noch aus Fuellzeichen besteht, ist auch nichts.
   return raus.trim() === "" ? undefined : raus;
 }

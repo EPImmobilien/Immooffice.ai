@@ -521,7 +521,9 @@ function themaSignature(dunkel, metall) {
   };
 }
 function themaStudio(signal, dunkel) {
-  const s = hx(signal), d = hx(dunkel);
+  const s = hx(signal);
+  const gewaehlt = hx(dunkel);
+  const d = helligkeit(gewaehlt) > 0.5 ? mix(gewaehlt, SCHWARZ, 0.8) : gewaehlt;
   return {
     s,
     d,
@@ -1277,18 +1279,64 @@ function liste(daten, schluessel) {
 }
 var PLATZHALTER = /\{\{\s*([A-Za-z0-9_.]+\??)\s*\}\}/g;
 function ersetze(daten, text3) {
-  let etwasFehlt = false;
-  const raus = text3.replace(PLATZHALTER, (_treffer, schluessel) => {
+  const stuecke = [];
+  let zeiger = 0;
+  let pflichtFehlt = false;
+  for (const t of text3.matchAll(PLATZHALTER)) {
+    const start = t.index ?? 0;
+    if (start > zeiger) stuecke.push({ art: "fest", s: text3.slice(zeiger, start) });
+    const schluessel = t[1];
     const freiwillig = schluessel.endsWith("?");
     const name = freiwillig ? schluessel.slice(0, -1) : schluessel;
     const w = wert(daten, name);
-    if (w === void 0) {
-      if (!freiwillig) etwasFehlt = true;
-      return "";
+    if (w === void 0 && !freiwillig) pflichtFehlt = true;
+    stuecke.push({ art: "wert", s: w });
+    zeiger = start + t[0].length;
+  }
+  if (pflichtFehlt) return void 0;
+  if (zeiger < text3.length) stuecke.push({ art: "fest", s: text3.slice(zeiger) });
+  const TRENNER = /([ \t]*[·•/|,;–—-][ \t]*|[ \t]{2,})/;
+  const abschnitte = [];
+  const trenner = [];
+  let laufend = { teile: [], hatPlatzhalter: false, hatWert: false };
+  const abschliessen = (t) => {
+    abschnitte.push(laufend);
+    trenner.push(t);
+    laufend = { teile: [], hatPlatzhalter: false, hatWert: false };
+  };
+  for (const st of stuecke) {
+    if (st.art === "wert") {
+      laufend.hatPlatzhalter = true;
+      if (st.s !== void 0 && st.s.trim() !== "") laufend.hatWert = true;
+      laufend.teile.push(st.s ?? "");
+      continue;
     }
-    return w;
-  });
-  if (etwasFehlt) return void 0;
+    const teile = st.s.split(TRENNER);
+    for (let i = 0; i < teile.length; i++) {
+      const stueck = teile[i];
+      if (stueck === void 0 || stueck === "") continue;
+      if (i % 2 === 1) {
+        if (!laufend.teile.length && !abschnitte.length) {
+          laufend.teile.push(stueck);
+          continue;
+        }
+        abschliessen(stueck);
+      } else {
+        laufend.teile.push(stueck);
+      }
+    }
+  }
+  abschnitte.push(laufend);
+  const bleibt = abschnitte.map((a) => !a.hatPlatzhalter || a.hatWert);
+  if (abschnitte.some((a) => a.hatPlatzhalter) && !abschnitte.some((a, i) => a.hatPlatzhalter && bleibt[i])) {
+    return void 0;
+  }
+  let raus = "";
+  for (let i = 0; i < abschnitte.length; i++) {
+    if (!bleibt[i]) continue;
+    if (raus !== "" && i > 0) raus += trenner[i - 1] ?? "";
+    raus += abschnitte[i].teile.join("");
+  }
   return raus.trim() === "" ? void 0 : raus;
 }
 function platzhalterIn(text3) {
@@ -1396,6 +1444,8 @@ function gedreht(el, u, zeichner) {
 }
 var textOhneDrehung = (el, u) => {
   const s = stilVon(el, u);
+  const roh = zeichenkette(el, "inhalt");
+  if (roh !== void 0 && roh.trim() === "") return;
   const t = inhalt(el, u, s.grossbuchstaben);
   if (t === void 0) {
     warne(u, "fehlender_wert", el, `Text entfaellt: "${zeichenkette(el, "inhalt") ?? ""}"`);
@@ -1411,14 +1461,46 @@ var textOhneDrehung = (el, u) => {
   regeln.einzugZeilen = zahl(el, "einzug_zeilen", 0);
   const schritt = zahl(el, "zeilenschritt", s.zeilenhoehe);
   if (wahr(el, "einzeilig", false) || spalten === 1 && !t.includes("\n") && u.blatt.sw(t, s.schnitt, s.groesse, s.sperrung) <= el.b) {
+    let groesse = s.groesse;
+    let sperrung = s.sperrung;
+    if (el.b > 0) {
+      let br = u.blatt.sw(t, s.schnitt, groesse, sperrung);
+      if (br > el.b) {
+        const min = Math.min(s.minGroesse, s.groesse);
+        const faktor = Math.max(min / s.groesse, el.b / br);
+        groesse = s.groesse * faktor;
+        sperrung = s.sperrung * faktor;
+        br = u.blatt.sw(t, s.schnitt, groesse, sperrung);
+        while (br > el.b && groesse > min + 1e-9) {
+          groesse = Math.max(min, groesse - 0.2);
+          sperrung = s.sperrung * (groesse / s.groesse);
+          br = u.blatt.sw(t, s.schnitt, groesse, sperrung);
+        }
+        if (br > el.b) {
+          warne(
+            u,
+            "gekuerzt",
+            el,
+            `Die Zeile ist auch bei ${groesse.toFixed(1)} Punkt breiter als ihr Rahmen (${br.toFixed(0)} statt ${el.b.toFixed(0)} Punkt) und ragt darueber hinaus. Rahmen breiter machen oder Text kuerzen.`
+          );
+        } else {
+          warne(
+            u,
+            "verdichtet",
+            el,
+            `Von ${s.groesse} auf ${groesse.toFixed(1)} Punkt verkleinert, damit die Zeile in ihren Rahmen passt.`
+          );
+        }
+      }
+    }
     u.blatt.T(
       ankerX(el, s.ausrichtung),
       el.y + el.h,
       t,
       s.schnitt,
-      s.groesse,
+      groesse,
       s.farbe,
-      s.sperrung,
+      sperrung,
       ankerArt(s.ausrichtung)
     );
     return;
@@ -2824,14 +2906,28 @@ var energieskala = (el, u) => {
   }
   let marke = el.x;
   let vorige = 0;
+  let getroffen = -1;
   for (let i = 0; i < klassen.length; i++) {
     const g = klassen[i].grenze;
     if (kennwertRoh <= g) {
       marke = el.x + i * bw + bw * (kennwertRoh - vorige) / (g - vorige);
+      getroffen = i;
       break;
     }
     vorige = g;
-    if (i === klassen.length - 1) marke = el.x + el.b;
+    if (i === klassen.length - 1) {
+      marke = el.x + el.b;
+      getroffen = i;
+    }
+  }
+  const genannt = String(u.daten["objekt.energie_klasse"] ?? "").trim().toLocaleUpperCase("de-DE");
+  if (genannt && getroffen >= 0 && klassen[getroffen].name.toLocaleUpperCase("de-DE") !== genannt) {
+    warne(
+      u,
+      "gekuerzt",
+      el,
+      `Der Kennwert ${zahlDe(kennwertRoh, 0)} liegt in Klasse ${klassen[getroffen].name}, am Objekt steht aber Klasse ${genannt}. Die Markierung folgt dem Kennwert — bitte den Energieausweis pruefen.`
+    );
   }
   const tinte = farbRef(el, "marke_farbe", u) ?? [0, 0, 0, 1];
   const spitze = zahl(el, "marke_spitze", 4);
@@ -3425,7 +3521,9 @@ var EIGENE_FELDER = /* @__PURE__ */ new Set([
 function istBekannt(schluessel) {
   if (BEKANNTE_FELDER.has(schluessel)) return true;
   if (EIGENE_FELDER.has(schluessel)) return true;
-  return /^bild\.(foto|grundriss)\.\d+(\.titel)?$/.test(schluessel);
+  if (/^bild\.(foto|grundriss)\.\d+(\.titel)?$/.test(schluessel)) return true;
+  if (/^bild\.kategorie\.[^.]+\.\d+(\.titel)?$/.test(schluessel)) return true;
+  return schluessel === "bild.lageplan.titel" || schluessel === "objekt.hauptbild_url.titel";
 }
 function vorlagePruefen(v) {
   const raus = [];
@@ -4219,8 +4317,10 @@ function aufbereiten(q) {
     const prolog = beschreibung.split(/\n\s*\n/)[0].trim();
     if (prolog) {
       d["objekt.expose_prolog"] = prolog;
-      d["objekt.expose_prolog_initiale"] = prolog.slice(0, 1);
-      d["objekt.expose_prolog_rest"] = prolog.slice(1);
+      if (prolog.length >= 180) {
+        d["objekt.expose_prolog_initiale"] = prolog.slice(0, 1);
+        d["objekt.expose_prolog_rest"] = prolog.slice(1);
+      }
     }
   }
   const stellplatzArt = text2(immo["stellplatz_art"]);
@@ -4247,6 +4347,10 @@ function aufbereiten(q) {
   if (!kauf && kalt !== void 0) {
     const warm = kalt + (z(immo["nebenkosten"]) ?? 0) + (z(immo["heizkosten"]) ?? 0);
     if (warm > kalt) d["objekt.warmmiete"] = warm;
+  }
+  for (const [schluessel, titel2] of Object.entries(q.bildtitel ?? {})) {
+    const sauber = typeof titel2 === "string" ? titel2.trim() : "";
+    if (sauber) d[schluessel + ".titel"] = sauber;
   }
   d["objekt.eckdaten"] = eckdaten(immo);
   d["objekt.fakten"] = fakten(immo, d);
@@ -4363,7 +4467,8 @@ function eckdaten(immo) {
   nimm("Zimmer", immo["zimmer"]);
   nimm("Schlafzimmer", immo["schlafzimmer"]);
   nimm("Bäder", immo["badezimmer"]);
-  nimm("Baujahr", immo["baujahr"]);
+  const bj = z(immo["baujahr"]);
+  if (bj !== void 0) aus.push({ label: "Baujahr", wert: String(Math.trunc(bj)) });
   nimm("Nutzfläche", immo["nutzflaeche"], "m²");
   nimm("Etagen", immo["etagen_gesamt"]);
   return aus.slice(0, 6);

@@ -336,14 +336,23 @@ const j = await r.json();
 const text = (j.content || []).filter((c: any) => c.type === "text").map((c: any) => c.text).join(" ");
 return text.replace(/["„“”'`]/g, "").replace(/\s+/g, " ").trim().slice(0, 80);
 }
-const LOGO_CACHE = "expose/logo-weiss-v2.png";
-async function logoWeissLaden(admin: any): Promise<Uint8Array | null> {
+// Der Zwischenspeicher haengt am Pfad des Logos: wer ein neues hochlaedt,
+// bekommt einen neuen Dateinamen (logos/<id>-<zeit>.png) und damit eine
+// neue weisse Fassung. Ein fester Name wuerde das alte Logo weiterreichen.
+// Die Speicher-Huelle stellt ausserdem die Mandantenkennung voran — zwei
+// Mandanten teilen sich diese Datei also nicht.
+function logoCacheName(pfad: string): string {
+const sauber = pfad.replace(/[^A-Za-z0-9._-]/g, "-");
+return "expose/logo-weiss-v3-" + sauber + ".png";
+}
+async function logoWeissLaden(admin: any, pfad: string): Promise<Uint8Array | null> {
+const cacheName = logoCacheName(pfad);
 try {
-const { data: cached } = await admin.storage.from("branding-assets").download(LOGO_CACHE);
+const { data: cached } = await admin.storage.from("branding-assets").download(cacheName);
 if (cached) return new Uint8Array(await cached.arrayBuffer());
 } catch (_e) {}
 try {
-const { data } = await admin.storage.from("branding-assets").download("logo.png");
+const { data } = await admin.storage.from("branding-assets").download(pfad);
 if (!data) return null;
 const img = await Image.decode(new Uint8Array(await data.arrayBuffer()));
 for (let x = 1; x <= img.width; x++) for (let y = 1; y <= img.height; y++) {
@@ -360,7 +369,7 @@ if (lum > 200 && saettigung < 40) img.setPixelAt(x, y, Image.rgbaToColor(0, 0, 0
 else img.setPixelAt(x, y, Image.rgbaToColor(255, 255, 255, a));
 }
 const png = await img.encode();
-try { await admin.storage.from("branding-assets").upload(LOGO_CACHE, png, { contentType: "image/png", upsert: true }); } catch (_e2) {}
+try { await admin.storage.from("branding-assets").upload(cacheName, png, { contentType: "image/png", upsert: true }); } catch (_e2) {}
 return png;
 } catch (_e) { return null; }
 }
@@ -733,6 +742,7 @@ await schritt("schriften-ok", Array.from(gebrauchteSchnitte).join(" "));
 const MAX_KANTE = 1600;
 const bilder = new Map<string, Uint8Array>();
 const bildWerte: Record<string, string> = {};
+const bildTitel: Record<string, string> = {};
 const kiBilder: string[] = [];
 async function bytesVon(d: any): Promise<Uint8Array | null> {
 const webPfad = d.storage_path.replace(/\.[^/.]+$/, "") + "_web.jpg";
@@ -781,6 +791,11 @@ return u;
 }
 async function nimmBild(schluessel: string, d: any): Promise<void> {
 if (!d || !d.storage_path) return;
+// Die Bildunterschrift steht am BILD, nicht in der Vorlage. Eine Vorlage,
+// die "Wohnbereich" unter ein Foto schreibt, behauptet etwas ueber ein
+// Bild, das sie nie gesehen hat — am 06.10.2026 stand so "Seeterrasse"
+// unter einem Schlafzimmer.
+if (typeof d.titel === "string" && d.titel.trim()) bildTitel[schluessel] = d.titel.trim();
 if (!bilder.has(d.storage_path)) {
 let bytes: Uint8Array | null = null;
 try { bytes = await bytesVon(d); }
@@ -820,7 +835,11 @@ for (let i = 0; i < Math.min(liste.length, 4); i++) {
 // Nur auf Bilder zeigen, die auch geladen sind: ein Pfad ohne Bytes
 // waere ein Loch im PDF, nicht einmal ein Platzhalter.
 if (!bilder.has(liste[i].storage_path)) continue;
-bildWerte["bild.kategorie." + k + "." + (i + 1)] = liste[i].storage_path;
+const kschluessel = "bild.kategorie." + k + "." + (i + 1);
+bildWerte[kschluessel] = liste[i].storage_path;
+if (typeof liste[i].titel === "string" && liste[i].titel.trim()) {
+bildTitel[kschluessel] = liste[i].titel.trim();
+}
 }
 }
 }
@@ -836,17 +855,23 @@ bildWerte["ansprechpartner.foto"] = pfad;
 } catch (_e) { warnungen.push("Portraetfoto nicht ladbar."); }
 // Zwei Logos, nicht eines: auf dunklem Grund braucht es die helle Fassung.
 // Die rechnet logoWeissLaden einmal aus und legt sie im Eimer ab.
+const logoPfad = String(firma.logo_pfad || "logo.png");
 try {
-const { data } = await admin.storage.from("branding-assets").download(
-String(firma.logo_pfad || "logo.png"));
+const { data } = await admin.storage.from("branding-assets").download(logoPfad);
 if (data) {
 const pfad = "logo:hell";
 bilder.set(pfad, new Uint8Array(await data.arrayBuffer()));
 bildWerte["firma.logo.hell"] = pfad;
+} else {
+warnungen.push("Kein Logo im Eimer branding-assets unter " + logoPfad
++ " — die Vorlagen setzen stattdessen den Markennamen.");
 }
 } catch (_e) {}
 try {
-const weiss = await logoWeissLaden(admin);
+// Dieselbe Datei, nicht "logo.png": die weisse Fassung entsteht aus dem
+// Logo DIESES Mandanten. Vorher stand hier ein fester Name, den es im
+// eigenen Projekt nicht gibt — die dunklen Seiten blieben ohne Logo.
+const weiss = await logoWeissLaden(admin, logoPfad);
 if (weiss) { bilder.set("logo:dunkel", weiss); bildWerte["firma.logo.dunkel"] = "logo:dunkel"; }
 } catch (_e) {}
 await schritt("bilder-ok", bilder.size + " Bilder, " + kiBilder.length + " mit KI");
@@ -858,6 +883,7 @@ firma,
 ansprechpartner: ap,
 annahmen: finAnn,
 bilder: bildWerte,
+bildtitel: bildTitel,
 ki_bilder: kiBilder,
 });
 

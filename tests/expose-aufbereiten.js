@@ -39,7 +39,7 @@ const melde = (t, ok, zusatz) => {
 // Je Spalte des Katalogs ein Wert. Er wird aus dem Typ erzeugt, damit der
 // Test nicht bei jeder neuen Spalte von Hand nachgezogen werden muss.
 const PROBE = {
-  text: 'Probe', mehrzeilig: 'Erster Absatz.\n\nZweiter Absatz.',
+  text: 'Probe', mehrzeilig: 'Erster Absatz. Er ist mit Absicht lang genug fuer die Initiale der Luxusvorlage: sie ragt ueber drei Zeilen in den Satz hinein und braucht also drei Zeilen, in die sie hineinragen kann. Kuerzer haengt der Buchstabe unter seiner eigenen Zeile.\n\nZweiter Absatz.',
   zahl: 7, flaeche: 112.5, euro: 589000, prozent: 3.57, jahr: 2021,
   datum: '2035-04-30', ja_nein: true, liste: [{ name: 'Eintrag', betrag: 12 }],
   aufzaehlung: 'Punkt eins\nPunkt zwei', bild: 'pfad/zum/bild.jpg',
@@ -112,10 +112,22 @@ melde('objekt.plz_ort ist PLZ und Ort',
 melde('objekt.expose_titel_text nimmt die gepflegten Zeilen',
       voll['objekt.expose_titel_text'] === 'Erste Zeile\nZweite Zeile');
 melde('objekt.expose_prolog ist der erste Absatz der Beschreibung',
-      voll['objekt.expose_prolog'] === 'Erster Absatz.',
+      voll['objekt.expose_prolog'] === PROBE.mehrzeilig.split('\n\n')[0],
       String(voll['objekt.expose_prolog']));
 melde('objekt.expose_prolog_initiale ist ein Buchstabe',
       voll['objekt.expose_prolog_initiale'] === 'E');
+// Ein kurzer Absatz traegt die Initiale nicht: sie ragt ueber drei Zeilen
+// hinein, und die hat er nicht. Am 06.10.2026 stand das "D" einer
+// einsaetzigen Beschreibung UNTER seiner eigenen Zeile.
+{
+  const kurz = R.aufbereiten({
+    immobilie: { beschreibung_objekt: 'Das Haus liegt am Ende einer Strasse.' },
+  });
+  melde('Ein kurzer Prolog bekommt keine Initiale',
+        kurz['objekt.expose_prolog_initiale'] === undefined
+        && kurz['objekt.expose_prolog'] === 'Das Haus liegt am Ende einer Strasse.',
+        String(kurz['objekt.expose_prolog_initiale']));
+}
 melde('objekt.energie_gueltig_kurz ist MM/JJJJ',
       voll['objekt.energie_gueltig_kurz'] === '04/2035',
       String(voll['objekt.energie_gueltig_kurz']));

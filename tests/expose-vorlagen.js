@@ -85,12 +85,160 @@ const ABWEICHENDE_TEXTE = [
   {
     vorlage: 'studio',
     soll: 'Neubaustandard 2021 – durchdacht und sofort bezugsfertig.',
-    ist: 'Durchdacht und sofort bezugsfertig.',
-    grund: 'Die Unterzeile einer Seite steht in der Vorlage und gilt damit '
-         + 'fuer jedes Objekt, das sie benutzt. "Neubaustandard 2021" ist eine '
-         + 'Aussage ueber EIN Objekt; als Vorgabe waere sie fuer jedes andere '
-         + 'eine erfundene Angabe (CLAUDE.md: keine erfundenen Objektdaten). '
-         + 'Der Makler kann sie im Editor jederzeit so schreiben.',
+    ist: 'Die Ausstattung im Überblick.',
+    grund: 'Eine Ueberschrift der Vorlage gilt fuer JEDES Objekt, das sie '
+         + 'benutzt. Der Prototyp schreibt hier etwas ueber das eine '
+         + 'Objekt seiner Demodaten — ein Haus am See, neu gebaut, in '
+         + 'ruhiger Lage. Fuer jedes andere waere das eine erfundene '
+         + 'Angabe (CLAUDE.md: keine erfundenen Objektdaten). Die Vorlage '
+         + 'sagt darum nur noch, was die Seite zeigt; den Satz dazu '
+         + 'schreibt der Makler im Editor.',
+  },
+  {
+    vorlage: 'studio',
+    soll: 'LUST AUF',
+    ist: 'LERNEN SIE',
+    grund: 'Eine Ueberschrift der Vorlage gilt fuer JEDES Objekt, das sie '
+         + 'benutzt. Der Prototyp schreibt hier etwas ueber das eine '
+         + 'Objekt seiner Demodaten — ein Haus am See, neu gebaut, in '
+         + 'ruhiger Lage. Fuer jedes andere waere das eine erfundene '
+         + 'Angabe (CLAUDE.md: keine erfundenen Objektdaten). Die Vorlage '
+         + 'sagt darum nur noch, was die Seite zeigt; den Satz dazu '
+         + 'schreibt der Makler im Editor. "Lust auf Aussicht?" verspricht '
+         + 'eine Aussicht.',
+  },
+  {
+    vorlage: 'studio',
+    soll: 'AUSSICHT?',
+    ist: 'ES KENNEN.',
+    grund: 'Eine Ueberschrift der Vorlage gilt fuer JEDES Objekt, das sie '
+         + 'benutzt. Der Prototyp schreibt hier etwas ueber das eine '
+         + 'Objekt seiner Demodaten — ein Haus am See, neu gebaut, in '
+         + 'ruhiger Lage. Fuer jedes andere waere das eine erfundene '
+         + 'Angabe (CLAUDE.md: keine erfundenen Objektdaten). Die Vorlage '
+         + 'sagt darum nur noch, was die Seite zeigt; den Satz dazu '
+         + 'schreibt der Makler im Editor.',
+  },
+  {
+    vorlage: 'studio',
+    soll: 'Rufen Sie an oder scannen Sie den Code – wir zeigen Ihnen die Wohnung gern persönlich.',
+    ist: 'Rufen Sie an oder scannen Sie den Code – wir zeigen Ihnen das Objekt gern persönlich.',
+    grund: 'Die Vorlage steht auch ueber einem Haus, einem Grundstueck und '
+         + 'einer Gewerbeflaeche. "die Wohnung" waere dort schlicht '
+         + 'falsch.',
+  },
+  {
+    vorlage: 'raster',
+    soll: 'Qualität, die man sieht – und im Alltag spürt.',
+    ist: 'Die Ausstattung im Überblick.',
+    grund: 'Eine Ueberschrift der Vorlage gilt fuer JEDES Objekt, das sie '
+         + 'benutzt. Der Prototyp schreibt hier etwas ueber das eine '
+         + 'Objekt seiner Demodaten — ein Haus am See, neu gebaut, in '
+         + 'ruhiger Lage. Fuer jedes andere waere das eine erfundene '
+         + 'Angabe (CLAUDE.md: keine erfundenen Objektdaten). Die Vorlage '
+         + 'sagt darum nur noch, was die Seite zeigt; den Satz dazu '
+         + 'schreibt der Makler im Editor.',
+  },
+  {
+    vorlage: 'raster',
+    soll: 'Ein Zuhause mit Charakter.',
+    ist: 'Bilder zum Objekt.',
+    grund: 'Eine Ueberschrift der Vorlage gilt fuer JEDES Objekt, das sie '
+         + 'benutzt. Der Prototyp schreibt hier etwas ueber das eine '
+         + 'Objekt seiner Demodaten — ein Haus am See, neu gebaut, in '
+         + 'ruhiger Lage. Fuer jedes andere waere das eine erfundene '
+         + 'Angabe (CLAUDE.md: keine erfundenen Objektdaten). Die Vorlage '
+         + 'sagt darum nur noch, was die Seite zeigt; den Satz dazu '
+         + 'schreibt der Makler im Editor.',
+  },
+  {
+    vorlage: 'raster',
+    soll: 'Klar gegliedert, flexibel nutzbar.',
+    ist: 'Die Grundrisse im Überblick.',
+    grund: 'Eine Ueberschrift der Vorlage gilt fuer JEDES Objekt, das sie '
+         + 'benutzt. Der Prototyp schreibt hier etwas ueber das eine '
+         + 'Objekt seiner Demodaten — ein Haus am See, neu gebaut, in '
+         + 'ruhiger Lage. Fuer jedes andere waere das eine erfundene '
+         + 'Angabe (CLAUDE.md: keine erfundenen Objektdaten). Die Vorlage '
+         + 'sagt darum nur noch, was die Seite zeigt; den Satz dazu '
+         + 'schreibt der Makler im Editor.',
+  },
+  {
+    vorlage: 'raster',
+    soll: 'Ruhig wohnen, schnell überall.',
+    ist: 'Die Lage im Überblick.',
+    grund: 'Eine Ueberschrift der Vorlage gilt fuer JEDES Objekt, das sie '
+         + 'benutzt. Der Prototyp schreibt hier etwas ueber das eine '
+         + 'Objekt seiner Demodaten — ein Haus am See, neu gebaut, in '
+         + 'ruhiger Lage. Fuer jedes andere waere das eine erfundene '
+         + 'Angabe (CLAUDE.md: keine erfundenen Objektdaten). Die Vorlage '
+         + 'sagt darum nur noch, was die Seite zeigt; den Satz dazu '
+         + 'schreibt der Makler im Editor.',
+  },
+  {
+    vorlage: 'signature',
+    soll: 'Wo der Tag am',
+    ist: 'Ein Blick',
+    grund: 'Eine Ueberschrift der Vorlage gilt fuer JEDES Objekt, das sie '
+         + 'benutzt. Der Prototyp schreibt hier etwas ueber das eine '
+         + 'Objekt seiner Demodaten — ein Haus am See, neu gebaut, in '
+         + 'ruhiger Lage. Fuer jedes andere waere das eine erfundene '
+         + 'Angabe (CLAUDE.md: keine erfundenen Objektdaten). Die Vorlage '
+         + 'sagt darum nur noch, was die Seite zeigt; den Satz dazu '
+         + 'schreibt der Makler im Editor.',
+  },
+  {
+    vorlage: 'signature',
+    soll: 'Wasser beginnt.',
+    ist: 'nach innen.',
+    grund: 'Eine Ueberschrift der Vorlage gilt fuer JEDES Objekt, das sie '
+         + 'benutzt. Der Prototyp schreibt hier etwas ueber das eine '
+         + 'Objekt seiner Demodaten — ein Haus am See, neu gebaut, in '
+         + 'ruhiger Lage. Fuer jedes andere waere das eine erfundene '
+         + 'Angabe (CLAUDE.md: keine erfundenen Objektdaten). Die Vorlage '
+         + 'sagt darum nur noch, was die Seite zeigt; den Satz dazu '
+         + 'schreibt der Makler im Editor.',
+  },
+  {
+    vorlage: 'signature',
+    soll: 'Uferhain –',
+    ist: 'Die Lage,',
+    grund: 'Eine Ueberschrift der Vorlage gilt fuer JEDES Objekt, das sie '
+         + 'benutzt. Der Prototyp schreibt hier etwas ueber das eine '
+         + 'Objekt seiner Demodaten — ein Haus am See, neu gebaut, in '
+         + 'ruhiger Lage. Fuer jedes andere waere das eine erfundene '
+         + 'Angabe (CLAUDE.md: keine erfundenen Objektdaten). Die Vorlage '
+         + 'sagt darum nur noch, was die Seite zeigt; den Satz dazu '
+         + 'schreibt der Makler im Editor. "Uferhain" ist obendrein ein '
+         + 'Ortsname.',
+  },
+  {
+    vorlage: 'signature',
+    soll: 'die stille Adresse.',
+    ist: 'kurz gefasst.',
+    grund: 'Eine Ueberschrift der Vorlage gilt fuer JEDES Objekt, das sie '
+         + 'benutzt. Der Prototyp schreibt hier etwas ueber das eine '
+         + 'Objekt seiner Demodaten — ein Haus am See, neu gebaut, in '
+         + 'ruhiger Lage. Fuer jedes andere waere das eine erfundene '
+         + 'Angabe (CLAUDE.md: keine erfundenen Objektdaten). Die Vorlage '
+         + 'sagt darum nur noch, was die Seite zeigt; den Satz dazu '
+         + 'schreibt der Makler im Editor.',
+  },
+  {
+    vorlage: 'signature',
+    soll: '„Licht, Weite und Ruhe –',
+    ist: '„Manche Häuser bewohnt man.',
+    grund: 'Das Zitat steht jetzt in immobilien.expose_zitat und kommt als '
+         + 'Wert in die Vorlage. Der Prototyp hat es fest eingebaut — und '
+         + 'damit eine Aussage ueber ein Haus am Wasser in jedes Expose '
+         + 'gesetzt. Hier steht das Zitat der Demodaten, an derselben '
+         + 'Stelle, in derselben Schrift.',
+  },
+  {
+    vorlage: 'signature',
+    soll: 'jeder Raum mit Blick aufs Wasser.“',
+    ist: 'In anderen kommt man an.“',
+    grund: 'Zweite Zeile desselben Zitats. ',
   },
 ];
 

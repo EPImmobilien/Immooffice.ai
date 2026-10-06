@@ -51,6 +51,18 @@ export type Quellen = {
    * Vorlagenautor ansprechen (und damit umgehen) kann, ist keine.
    */
   ki_bilder?: string[];
+  /**
+   * Bildunterschriften: Schluessel wie "bild.foto.3" -> Titel des Bildes
+   * (immobilie_datei.titel). Sie landen als "bild.foto.3.titel" in den
+   * Daten; fehlt einer, entfaellt die Unterschrift am Bild.
+   *
+   * Warum nicht in der Vorlage: eine Unterschrift sagt, was auf DIESEM
+   * Foto zu sehen ist. Die Vorlage kennt das Foto nicht. Am 06.10.2026
+   * stand darum "Seeterrasse" unter einem Schlafzimmer und "Wohnbereich"
+   * unter einer Kueche — die Vorlage hatte die Beschriftungen aus dem
+   * Prototyp geerbt, dessen Demobilder in dieser Reihenfolge lagen.
+   */
+  bildtitel?: Record<string, string>;
   /** Fuer {{datum}}. Hereingegeben, damit der Test nicht von der Uhr abhaengt. */
   heute?: Date;
 };
@@ -176,8 +188,19 @@ export function aufbereiten(q: Quellen): Daten {
     const prolog = beschreibung.split(/\n\s*\n/)[0].trim();
     if (prolog) {
       d["objekt.expose_prolog"] = prolog;
-      d["objekt.expose_prolog_initiale"] = prolog.slice(0, 1);
-      d["objekt.expose_prolog_rest"] = prolog.slice(1);
+      // Die Initiale ragt ueber drei Zeilen in den Absatz hinein. Ein Absatz,
+      // der keine drei Zeilen hat, kann sie nicht tragen: der Buchstabe haengt
+      // dann UNTER seiner eigenen Zeile und steht quer im Satz. Genau so im
+      // Betrieb gesehen am 06.10.2026, bei einer Beschreibung aus einem Satz.
+      //
+      // 180 Zeichen sind die drei Zeilen: der Satzspiegel der Luxusvorlage ist
+      // 360 Punkt breit, der Fliesstext 9 Punkt — das sind rund 60 Zeichen je
+      // Zeile. Darunter bleibt der Absatz ungeteilt, und die Vorlage setzt ihn
+      // ohne Initiale und ohne Einzug.
+      if (prolog.length >= 180) {
+        d["objekt.expose_prolog_initiale"] = prolog.slice(0, 1);
+        d["objekt.expose_prolog_rest"] = prolog.slice(1);
+      }
     }
   }
 
@@ -214,6 +237,12 @@ export function aufbereiten(q: Quellen): Daten {
   if (!kauf && kalt !== undefined) {
     const warm = kalt + (z(immo["nebenkosten"]) ?? 0) + (z(immo["heizkosten"]) ?? 0);
     if (warm > kalt) d["objekt.warmmiete"] = warm;
+  }
+
+  // Bildunterschriften, am Bild gepflegt.
+  for (const [schluessel, titel] of Object.entries(q.bildtitel ?? {})) {
+    const sauber = typeof titel === "string" ? titel.trim() : "";
+    if (sauber) d[schluessel + ".titel"] = sauber;
   }
 
   // --- 4. Die zusammengesetzten Listen -------------------------------------
@@ -371,7 +400,11 @@ function eckdaten(immo: Record<string, unknown>): { label: string; wert: unknown
   nimm("Zimmer", immo["zimmer"]);
   nimm("Schlafzimmer", immo["schlafzimmer"]);
   nimm("Bäder", immo["badezimmer"]);
-  nimm("Baujahr", immo["baujahr"]);
+  // Ein Baujahr ist eine Jahreszahl und keine Menge: "2.016" stand am
+  // 06.10.2026 gross auf der Datenseite, waehrend die Tabelle darunter
+  // richtig "2016" zeigte.
+  const bj = z(immo["baujahr"]);
+  if (bj !== undefined) aus.push({ label: "Baujahr", wert: String(Math.trunc(bj)) });
   nimm("Nutzfläche", immo["nutzflaeche"], "m²");
   nimm("Etagen", immo["etagen_gesamt"]);
   return aus.slice(0, 6);

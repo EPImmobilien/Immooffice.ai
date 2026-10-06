@@ -23,6 +23,25 @@ function rohzahl(s) {
 function raster(D) {
   const ap = D.ap || {};
   return {
+    // Der Prototyp setzt unter den Markennamen das feste Wort
+    // "Immobilien". In der Vorlage steht dafuer jetzt die Markenlinie des
+    // Mandanten: ein Sachverstaendigenbuero ist kein Immobilienmakler.
+    'firma.linie': 'Immobilien',
+    // Das Logo. Der Prototyp malt an dieser Stelle einen Platzhalter
+    // (gerundetes Quadrat mit Haussymbol); im Produkt steht dort die Datei
+    // aus branding-assets.
+    'firma.logo.hell': 'logo-hell',
+    'firma.logo.dunkel': 'logo-dunkel',
+    // Bildunterschriften. Im Prototyp stehen sie fest im Zeichencode, in
+    // der Vorlage stand bis zum 06.10.2026 dasselbe — eine Vorlage, die
+    // "Wohnbereich" unter ein Foto schreibt, behauptet etwas ueber ein
+    // Bild, das sie nie gesehen hat. Jetzt kommen sie aus
+    // immobilie_datei.titel; hier stehen die des Prototyps, damit der
+    // Vergleich dieselben Worte an derselben Stelle findet.
+    'objekt.hauptbild_url.titel': 'Titelbild',
+    'bild.foto.1.titel': 'Wohnbereich',
+    'bild.foto.2.titel': 'Außenansicht',
+    'bild.foto.3.titel': 'Küche / Essbereich',
     'firma.name': D.firma,
     'firma.marken_name': D.firma_kurz,
     'firma.adresse': D.firma_adr,
@@ -138,6 +157,16 @@ function studio(D) {
   const zahl = (v, n) => v.toFixed(n).replace('.', ',');
   const eck = (D.eck || []).map(([wert, einheit, label]) => ({ label, wert, einheit }));
   return {
+    // Siehe raster: "Immobilien" ist die Markenlinie des Mandanten.
+    'firma.linie': 'Immobilien',
+    'firma.logo.hell': 'logo-hell',
+    'firma.logo.dunkel': 'logo-dunkel',
+    // Siehe raster: die Unterschrift gehoert ans Bild, nicht in die Vorlage.
+    'bild.foto.1.titel': 'Wohnen / Dachterrasse',
+    'bild.foto.2.titel': 'Wohnbereich',
+    'bild.foto.3.titel': 'Küche',
+    'bild.foto.4.titel': 'Bad',
+    'bild.foto.5.titel': 'Bad / Detail',
     'firma.name': D.firma,
     'firma.marken_name': D.marke,
     'firma.adresse': D.firma_adr,
@@ -224,6 +253,15 @@ function signature(D) {
   const zahl = (v, n) => v.toFixed(n).replace('.', ',');
   const paare = (liste) => (liste || []).map(([label, wert]) => ({ label, wert }));
   return {
+    'firma.logo.hell': 'logo-hell',
+    'firma.logo.dunkel': 'logo-dunkel',
+    // Siehe raster: die Unterschrift gehoert ans Bild, nicht in die Vorlage.
+    'bild.foto.1.titel': 'Seeterrasse',
+    'bild.foto.2.titel': 'Fassade / Entree',
+    'bild.foto.3.titel': 'Wohnsalon mit Seeblick',
+    'bild.foto.4.titel': 'Mastersuite',
+    'bild.foto.5.titel': 'Spa-Bad',
+    'bild.foto.6.titel': 'Küche',
     'firma.name': D.firma,
     'firma.marken_name': D.marke,
     'firma.linie': D.linie,
@@ -298,6 +336,18 @@ const UEBERSETZER = { raster, studio, signature };
 // immobilien.expose_overrides; die Vorlage haelt nur einen neutralen
 // Vorschlag bereit.
 const UEBERNAHMEN = {
+  studio: {
+    texte: {
+      // Die Fussnote der Zahlenseite nennt im Prototyp ein konkretes
+      // Hausgeld (95 €/Monat) und behauptet, die Wohnung sei bezugsfrei.
+      // Beides sind Angaben zu EINEM Objekt und haben in einer Vorlage
+      // nichts zu suchen; die Vorlage sagt jetzt dasselbe ohne Zahlen.
+      'zahlen-fussnote':
+        '* auf Gesamtaufwand, abzgl. nicht umlagefähigem Hausgeld (95 €/Monat).  '
+        + '** Marktmiete laut Mietspiegel-Einschätzung, Wohnung ist bezugsfrei. '
+        + 'Alle Werte ohne Gewähr, keine Anlage- oder Steuerberatung.',
+    },
+  },
   signature: {
     texte: {
       'strecke-text':
@@ -305,6 +355,10 @@ const UEBERNAHMEN = {
         + 'rahmenlose Glasfront vollständig zur Seeterrasse. Morgens fällt das '
         + 'Licht über das Wasser bis tief in den Raum, abends spiegeln sich die '
         + 'Ufer im ruhigen See.',
+      // Die Unterzeilen am Diptychon: im Prototyp fest, im Produkt eine
+      // Bildbeschreibung je Objekt. Die Vorlage haelt nur den Platz.
+      'dip-links-zeile': 'Mastersuite  —  mit Loggia über dem Wasser',
+      'dip-rechts-zeile': 'Spa-Bad  —  Naturstein & Eiche',
       'diptychon-text':
         'Vier Schlafzimmer, jedes mit eigenem Bad, schaffen private Räume für '
         + 'Familie und Gäste. Die Mastersuite nimmt das gesamte Westende des '

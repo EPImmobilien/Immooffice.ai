@@ -40,7 +40,8 @@
           "schnitt": "Bold"
         },
         "groesse": 15,
-        "farbe": "paper"
+        "farbe": "paper",
+        "min_groesse": 6.5
       },
       "marke_zusatz": {
         "schrift": {
@@ -56,7 +57,8 @@
           ]
         },
         "sperrung": 1.0,
-        "grossbuchstaben": true
+        "grossbuchstaben": true,
+        "min_groesse": 6.5
       },
       "seitenband": {
         "schrift": {
@@ -320,7 +322,8 @@
           "schnitt": "Bold"
         },
         "groesse": 9,
-        "farbe": "weiss"
+        "farbe": "weiss",
+        "min_groesse": 6.5
       },
       "fuss_mitte_hell": {
         "schrift": {
@@ -625,7 +628,8 @@
           "schnitt": "Bold"
         },
         "groesse": 15,
-        "farbe": "weiss"
+        "farbe": "weiss",
+        "min_groesse": 6.5
       },
       "kontakt_zusatz": {
         "schrift": {
@@ -845,11 +849,27 @@
           "fuell": "rule"
         },
         {
+          "id": "cover-logo",
+          "typ": "bild",
+          "x": 36.0,
+          "y": 781.0,
+          "b": 20.0,
+          "h": 20.0,
+          "slot": {
+            "art": "logo",
+            "ton": "hell"
+          },
+          "fuellmodus": "contain",
+          "sichtbar_wenn": {
+            "vorhanden": "firma.logo.hell"
+          }
+        },
+        {
           "id": "cover-marke",
           "typ": "text",
-          "x": 36,
+          "x": 36.0,
           "y": 762.89,
-          "b": 90,
+          "b": 90.0,
           "h": 10,
           "stil": "marke",
           "inhalt": "{{firma.marken_name}}.",
@@ -858,12 +878,12 @@
         {
           "id": "cover-marke-zusatz",
           "typ": "text",
-          "x": 36,
+          "x": 36.0,
           "y": 754.29,
-          "b": 90,
+          "b": 90.0,
           "h": 5.6,
           "stil": "marke_zusatz",
-          "inhalt": "Immobilien",
+          "inhalt": "{{firma.linie?}}",
           "einzeilig": true
         },
         {
@@ -875,7 +895,7 @@
           "h": 6.6,
           "drehung": 90,
           "stil": "seitenband",
-          "inhalt": "Exposé  /  {{objekt.vertragsart}}  /  {{objekt.immo_nr}}",
+          "inhalt": "Exposé  /  {{objekt.vertragsart}}  /  {{objekt.immo_nr?}}",
           "einzeilig": true
         },
         {
@@ -982,7 +1002,7 @@
           "b": 400,
           "h": 6.6,
           "stil": "kopf_label",
-          "inhalt": "{{objekt.objektart}}  /  {{objekt.ort}}-{{objekt.ortsteil}}",
+          "inhalt": "{{objekt.objektart}}  /  {{objekt.ort}}-{{objekt.ortsteil?}}",
           "einzeilig": true
         },
         {
@@ -1166,7 +1186,7 @@
           "b": 400,
           "h": 6.6,
           "stil": "kopf_label",
-          "inhalt": "{{objekt.objektart}}  /  {{objekt.ort}}-{{objekt.ortsteil}}",
+          "inhalt": "{{objekt.objektart}}  /  {{objekt.ort}}-{{objekt.ortsteil?}}",
           "einzeilig": true
         },
         {
@@ -1214,7 +1234,7 @@
           "label_luft": 12,
           "label_polster": 6,
           "label_grundlinie": 5,
-          "label": "Wohnen / Dachterrasse"
+          "label": "{{bild.foto.1.titel}}"
         },
         {
           "id": "hl-flaeche",
@@ -1224,7 +1244,10 @@
           "b": 186,
           "h": 329.89,
           "form": "rechteck",
-          "fuell": "tint"
+          "fuell": "tint",
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.expose_highlights"
+          }
         },
         {
           "id": "hl-label",
@@ -1235,7 +1258,10 @@
           "h": 6.6,
           "stil": "abschnitt",
           "inhalt": "Highlights",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.expose_highlights"
+          }
         },
         {
           "id": "highlights",
@@ -1263,7 +1289,28 @@
           "stil": "fliesstext",
           "inhalt": "{{objekt.beschreibung_objekt}}",
           "blocksatz": true,
-          "verdichten": false
+          "verdichten": false,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.expose_highlights"
+          }
+        },
+        {
+          "id": "objekt-text-breit",
+          "typ": "text",
+          "x": 36.0,
+          "y": 62,
+          "b": 523.28,
+          "h": 307.89,
+          "stil": "fliesstext",
+          "inhalt": "{{objekt.beschreibung_objekt}}",
+          "blocksatz": true,
+          "verdichten": false,
+          "sichtbar_wenn": {
+            "nicht": {
+              "vorhanden": "objekt.expose_highlights"
+            }
+          },
+          "spalten": 2
         }
       ]
     },
@@ -1306,7 +1353,7 @@
           "label_luft": 12,
           "label_polster": 6,
           "label_grundlinie": 5,
-          "label": "Wohnbereich"
+          "label": "{{bild.foto.2.titel}}"
         },
         {
           "id": "bild-links",
@@ -1331,7 +1378,7 @@
           "label_luft": 12,
           "label_polster": 6,
           "label_grundlinie": 5,
-          "label": "Küche"
+          "label": "{{bild.foto.3.titel}}"
         },
         {
           "id": "bild-rechts",
@@ -1356,7 +1403,7 @@
           "label_luft": 12,
           "label_polster": 6,
           "label_grundlinie": 5,
-          "label": "Bad"
+          "label": "{{bild.foto.4.titel}}"
         },
         {
           "id": "bild-signal",
@@ -1415,9 +1462,9 @@
         {
           "id": "fuss-objekt-hell",
           "typ": "text",
-          "x": 197.64,
+          "x": 36.0,
           "y": 25,
-          "b": 200,
+          "b": 523.28,
           "h": 6,
           "stil": "fuss_mitte_hell",
           "inhalt": "Objekt {{objekt.immo_nr}}",
@@ -1470,7 +1517,7 @@
           "b": 400,
           "h": 6.6,
           "stil": "kopf_label",
-          "inhalt": "{{objekt.objektart}}  /  {{objekt.ort}}-{{objekt.ortsteil}}",
+          "inhalt": "{{objekt.objektart}}  /  {{objekt.ort}}-{{objekt.ortsteil?}}",
           "einzeilig": true
         },
         {
@@ -1503,7 +1550,7 @@
           "b": 523.28,
           "h": 9,
           "stil": "kopf_unter",
-          "inhalt": "Durchdacht und sofort bezugsfertig.",
+          "inhalt": "Die Ausstattung im Überblick.",
           "einzeilig": true
         },
         {
@@ -1551,7 +1598,7 @@
           "label_luft": 12,
           "label_polster": 6,
           "label_grundlinie": 5,
-          "label": "Bad / Detail"
+          "label": "{{bild.foto.5.titel}}"
         }
       ]
     },
@@ -1589,7 +1636,7 @@
           "b": 400,
           "h": 6.6,
           "stil": "kopf_label",
-          "inhalt": "{{objekt.objektart}}  /  {{objekt.ort}}-{{objekt.ortsteil}}",
+          "inhalt": "{{objekt.objektart}}  /  {{objekt.ort}}-{{objekt.ortsteil?}}",
           "einzeilig": true
         },
         {
@@ -1647,7 +1694,10 @@
           "h": 20,
           "stil": "block_titel",
           "inhalt": "Flächen",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.raumaufteilung"
+          }
         },
         {
           "id": "flaechen-linie",
@@ -1658,7 +1708,10 @@
           "h": 0,
           "form": "linie",
           "strich": "rule",
-          "linienbreite": 1.2
+          "linienbreite": 1.2,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.raumaufteilung"
+          }
         },
         {
           "id": "raeume",
@@ -1694,7 +1747,17 @@
           "inhalt": "Grundriss nicht maßstabsgetreu. Terrasse zu ¼ angerechnet, Berechnung nach WoFlV.",
           "einzeilig": true
         }
-      ]
+      ],
+      "sichtbar_wenn": {
+        "oder": [
+          {
+            "vorhanden": "bild.grundriss.1"
+          },
+          {
+            "vorhanden": "objekt.raumaufteilung"
+          }
+        ]
+      }
     },
     {
       "id": "lage",
@@ -1730,7 +1793,7 @@
           "b": 400,
           "h": 6.6,
           "stil": "kopf_label",
-          "inhalt": "{{objekt.objektart}}  /  {{objekt.ort}}-{{objekt.ortsteil}}",
+          "inhalt": "{{objekt.objektart}}  /  {{objekt.ort}}-{{objekt.ortsteil?}}",
           "einzeilig": true
         },
         {
@@ -1789,7 +1852,10 @@
           "h": 14,
           "stil": "wege_titel",
           "inhalt": "Wege in Minuten",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.expose_wege"
+          }
         },
         {
           "id": "wege",
@@ -1865,7 +1931,7 @@
           "b": 400,
           "h": 6.6,
           "stil": "kopf_label",
-          "inhalt": "{{objekt.objektart}}  /  {{objekt.ort}}-{{objekt.ortsteil}}",
+          "inhalt": "{{objekt.objektart}}  /  {{objekt.ort}}-{{objekt.ortsteil?}}",
           "einzeilig": true
         },
         {
@@ -1910,7 +1976,10 @@
           "h": 16,
           "stil": "block_titel_klein",
           "inhalt": "Nebenkosten",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "vorhanden": "rechnung.kaufpreis"
+          }
         },
         {
           "id": "nk-linie",
@@ -1979,7 +2048,23 @@
           "h": 16,
           "stil": "block_titel_klein",
           "inhalt": "Als Kapitalanlage",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "oder": [
+              {
+                "vorhanden": "rechnung.bruttorendite"
+              },
+              {
+                "vorhanden": "rechnung.nettorendite"
+              },
+              {
+                "vorhanden": "rechnung.kaufpreisfaktor"
+              },
+              {
+                "vorhanden": "objekt.miete_ist"
+              }
+            ]
+          }
         },
         {
           "id": "ka-linie",
@@ -2208,7 +2293,7 @@
           "h": 20,
           "stil": "fussnote",
           "verdichten": false,
-          "inhalt": "* auf Gesamtaufwand, abzgl. nicht umlagefähigem Hausgeld (95 €/Monat).  ** Marktmiete laut Mietspiegel-Einschätzung, Wohnung ist bezugsfrei. Alle Werte ohne Gewähr, keine Anlage- oder Steuerberatung."
+          "inhalt": "* auf den Gesamtaufwand, abzüglich nicht umlagefähiger Kosten.  ** Marktmiete als Einschätzung. Alle Werte ohne Gewähr, keine Anlage- oder Steuerberatung."
         }
       ]
     },
@@ -2239,11 +2324,27 @@
           "fuell": "rule"
         },
         {
+          "id": "kontakt-logo",
+          "typ": "bild",
+          "x": 36.0,
+          "y": 781.0,
+          "b": 20.0,
+          "h": 20.0,
+          "slot": {
+            "art": "logo",
+            "ton": "hell"
+          },
+          "fuellmodus": "contain",
+          "sichtbar_wenn": {
+            "vorhanden": "firma.logo.hell"
+          }
+        },
+        {
           "id": "kontakt-marke",
           "typ": "text",
-          "x": 36,
+          "x": 36.0,
           "y": 762.89,
-          "b": 90,
+          "b": 90.0,
           "h": 10,
           "stil": "kontakt_marke",
           "inhalt": "{{firma.marken_name}}.",
@@ -2257,7 +2358,7 @@
           "b": 90,
           "h": 5.6,
           "stil": "kontakt_zusatz",
-          "inhalt": "Immobilien",
+          "inhalt": "{{firma.linie?}}",
           "einzeilig": true
         },
         {
@@ -2268,7 +2369,7 @@
           "b": 520,
           "h": 0,
           "stil": "kontakt_wort",
-          "inhalt": "Lust auf",
+          "inhalt": "Lernen Sie",
           "einzeilig": true
         },
         {
@@ -2279,7 +2380,7 @@
           "b": 520,
           "h": 0,
           "stil": "kontakt_wort",
-          "inhalt": "Aussicht?",
+          "inhalt": "es kennen.",
           "einzeilig": true
         },
         {
@@ -2290,7 +2391,7 @@
           "b": 520,
           "h": 0,
           "stil": "kontakt_lead",
-          "inhalt": "Rufen Sie an oder scannen Sie den Code – wir zeigen Ihnen die Wohnung gern persönlich.",
+          "inhalt": "Rufen Sie an oder scannen Sie den Code – wir zeigen Ihnen das Objekt gern persönlich.",
           "einzeilig": true
         },
         {
@@ -2405,7 +2506,7 @@
           "bloecke": [
             {
               "titel": "Anbieter",
-              "text": "{{firma.name}}, {{firma.adresse}}, Tel. {{firma.telefon}}, {{firma.email}}"
+              "text": "{{firma.name}}, {{firma.adresse}}, Tel. {{firma.telefon?}}, {{firma.email?}}"
             },
             {
               "titel": "Provision",
@@ -2453,9 +2554,9 @@
         {
           "id": "fuss-objekt-hell",
           "typ": "text",
-          "x": 197.64,
+          "x": 36.0,
           "y": 25,
-          "b": 200,
+          "b": 523.28,
           "h": 6,
           "stil": "fuss_mitte_hell",
           "inhalt": "Objekt {{objekt.immo_nr}}",

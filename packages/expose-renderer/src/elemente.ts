@@ -122,6 +122,13 @@ function gedreht(el: Element, u: Umgebung, zeichner: Zeichner): void {
 
 const textOhneDrehung: Zeichner = (el, u) => {
   const s = stilVon(el, u);
+  // Ein LEERER Vorgabetext ist kein fehlender Wert, sondern ein freier
+  // Platz: die Vorlage haelt den Rahmen bereit, und was darin steht,
+  // schreibt der Makler je Objekt (expose_overrides.texte). Eine
+  // Arbeitsanweisung als Vorgabe ("Beschreiben Sie hier …") stand sonst im
+  // fertigen PDF — am 06.10.2026 zweimal in der Luxusvorlage.
+  const roh = zeichenkette(el, "inhalt");
+  if (roh !== undefined && roh.trim() === "") return;
   const t = inhalt(el, u, s.grossbuchstaben);
   if (t === undefined) {
     warne(u, "fehlender_wert", el, `Text entfaellt: "${zeichenkette(el, "inhalt") ?? ""}"`);
@@ -150,8 +157,44 @@ const textOhneDrehung: Zeichner = (el, u) => {
   // Umbruch wuerde bei "rechts" die Zeile anders setzen.
   if (wahr(el, "einzeilig", false) || (spalten === 1 && !t.includes("\n") &&
       u.blatt.sw(t, s.schnitt, s.groesse, s.sperrung) <= el.b)) {
-    u.blatt.T(ankerX(el, s.ausrichtung), el.y + el.h, t, s.schnitt, s.groesse,
-              s.farbe, s.sperrung, ankerArt(s.ausrichtung));
+    // Eine Zeile, die breiter ist als ihr Rahmen, lief bisher einfach
+    // weiter — ueber den Nachbarn, ueber das Bild, ueber den Seitenrand.
+    // Am 06.10.2026 im Betrieb gesehen: der Markenname eines Mandanten ist
+    // laenger als der, gegen den die Vorlage vermessen wurde, und stand
+    // quer ueber dem Titelbild. Die Vorlage KANN das nicht wissen; der
+    // Renderer kann es messen. Also verkleinern statt ueberlaufen — bis zur
+    // Mindestgroesse des Stils, danach bleibt nur die Warnung.
+    let groesse = s.groesse;
+    let sperrung = s.sperrung;
+    if (el.b > 0) {
+      let br = u.blatt.sw(t, s.schnitt, groesse, sperrung);
+      if (br > el.b) {
+        const min = Math.min(s.minGroesse, s.groesse);
+        // Erster Schuss proportional, danach in kleinen Schritten: die
+        // Sperrung skaliert mit, sonst steht sie bei kleiner Schrift zu weit.
+        const faktor = Math.max(min / s.groesse, el.b / br);
+        groesse = s.groesse * faktor;
+        sperrung = s.sperrung * faktor;
+        br = u.blatt.sw(t, s.schnitt, groesse, sperrung);
+        while (br > el.b && groesse > min + 1e-9) {
+          groesse = Math.max(min, groesse - 0.2);
+          sperrung = s.sperrung * (groesse / s.groesse);
+          br = u.blatt.sw(t, s.schnitt, groesse, sperrung);
+        }
+        if (br > el.b) {
+          warne(u, "gekuerzt", el,
+                `Die Zeile ist auch bei ${groesse.toFixed(1)} Punkt breiter als ihr `
+                + `Rahmen (${br.toFixed(0)} statt ${el.b.toFixed(0)} Punkt) und ragt `
+                + `darueber hinaus. Rahmen breiter machen oder Text kuerzen.`);
+        } else {
+          warne(u, "verdichtet", el,
+                `Von ${s.groesse} auf ${groesse.toFixed(1)} Punkt verkleinert, damit `
+                + `die Zeile in ihren Rahmen passt.`);
+        }
+      }
+    }
+    u.blatt.T(ankerX(el, s.ausrichtung), el.y + el.h, t, s.schnitt, groesse,
+              s.farbe, sperrung, ankerArt(s.ausrichtung));
     return;
   }
 
@@ -1305,14 +1348,30 @@ const energieskala: Zeichner = (el, u) => {
   }
   let marke = el.x;
   let vorige = 0;
+  let getroffen = -1;
   for (let i = 0; i < klassen.length; i++) {
     const g = klassen[i].grenze;
     if (kennwertRoh <= g) {
       marke = el.x + i * bw + (bw * (kennwertRoh - vorige)) / (g - vorige);
+      getroffen = i;
       break;
     }
     vorige = g;
-    if (i === klassen.length - 1) marke = el.x + el.b;
+    if (i === klassen.length - 1) { marke = el.x + el.b; getroffen = i; }
+  }
+  // Kennwert und Klasse koennen sich widersprechen — beides sind gepflegte
+  // Felder, und der Ausweis sagt nur eines davon. Die Markierung folgt dem
+  // Kennwert; der Makler soll aber erfahren, dass daneben eine andere Klasse
+  // steht. Am 06.10.2026 zeigte dieselbe Immobilie in der einen Vorlage "C"
+  // (aus dem Feld) und in der anderen die Markierung bei "A" (aus 46 kWh).
+  const genannt = String(u.daten["objekt.energie_klasse"] ?? "").trim()
+    .toLocaleUpperCase("de-DE");
+  if (genannt && getroffen >= 0
+      && klassen[getroffen].name.toLocaleUpperCase("de-DE") !== genannt) {
+    warne(u, "gekuerzt", el,
+          `Der Kennwert ${zahlDe(kennwertRoh, 0)} liegt in Klasse `
+          + `${klassen[getroffen].name}, am Objekt steht aber Klasse ${genannt}. `
+          + `Die Markierung folgt dem Kennwert — bitte den Energieausweis pruefen.`);
   }
 
   const tinte = farbRef(el, "marke_farbe", u) ?? [0, 0, 0, 1];
