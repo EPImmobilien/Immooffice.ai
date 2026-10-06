@@ -48,6 +48,34 @@ const MIME = {
   '.js': 'text/javascript; charset=utf-8',
 };
 
+// Der Preisbereich holt seinen Stand aus `tarife-oeffentlich`. Hier wird die
+// Anfrage abgefangen und mit ABSICHTLICH anderen Zahlen beantwortet als im
+// HTML stehen: nur so zeigt sich, ob die Seite wirklich den Katalog nimmt
+// und nicht die Rueckfallwerte. Ausserdem geht so keine Anfrage aus dem Test
+// ins Netz — der Proxy dieser Maschine laesst Supabase ohnehin nicht durch.
+const PREIS_STAND = {
+  ok: true, stand: '2026-10-06T12:00:00.000Z', waehrung: 'EUR', ust_prozent: 19,
+  tarife: [
+    { schluessel: 'starter', name: 'Starter', hinweis: 'Pruefhinweis A',
+      preis_monat_cent: 4444, preis_jahr_cent: 44444, inkl_nutzer: 1,
+      credits_monat: 555, merkmale: ['Pruefmerkmal eins', 'Pruefmerkmal zwei'] },
+    { schluessel: 'professional', name: 'Professional', hinweis: 'Pruefhinweis B',
+      preis_monat_cent: 11111, preis_jahr_cent: 111111, inkl_nutzer: 3,
+      credits_monat: 1555, merkmale: ['Pruefmerkmal drei'] },
+    { schluessel: 'business', name: 'Business', hinweis: 'Pruefhinweis C',
+      preis_monat_cent: 22222, preis_jahr_cent: 222222, inkl_nutzer: 8,
+      credits_monat: 3555, merkmale: ['Pruefmerkmal vier'] },
+  ],
+  zusatznutzer: { schluessel: 'zusatznutzer', name: 'Zusatznutzer',
+    preis_monat_cent: 1111, preis_jahr_cent: 11111 },
+  credit_pakete: [{ schluessel: 'pruef_250', name: '250 Credits', credits: 250,
+    preis_cent: 777, gueltig_monate: 12 }],
+  credit_preise: [{ aktion: 'pruef_aktion', name: 'Pruefaktion', credits: 7,
+    beschreibung: 'nur fuer den Test' }],
+  testphase_tage: 28, testphase_credits: 300, mindestlaufzeit_monate: 6,
+  gruender: { plaetze: 50, frei: 37, rabatt_cent: 1000, tarif: 'starter' },
+};
+
 (async () => {
   const exe = browserPfad();
   if (exe === null) {
@@ -81,6 +109,12 @@ const MIME = {
     const fehlend = [];
     seite.on('response', (r) => {
       if (r.status() >= 400) fehlend.push(`${r.status()} ${r.url()}`);
+    });
+    let standGefragt = 0;
+    await seite.route('**/tarife-oeffentlich*', (weg) => {
+      standGefragt++;
+      weg.fulfill({ status: 200, contentType: 'application/json',
+                    body: JSON.stringify(PREIS_STAND) });
     });
     await seite.goto(`http://127.0.0.1:${port}/`, { waitUntil: 'load' });
     await seite.waitForTimeout(700);
@@ -192,6 +226,77 @@ const MIME = {
       melde(`${name}: breit steht alles offen`, zu === 0, `${zu} zugeklappt`);
     }
 
+    // --- Der Preisbereich -------------------------------------------------
+    // Zwei Dinge sind hier entscheidend, und beide sind schon einmal an
+    // anderen Stellen schiefgegangen: dass die Seite den KATALOG zeigt und
+    // nicht die Zahlen aus dem HTML, und dass der Umschalter rechnet statt
+    // Text zu tauschen.
+    melde(`${name}: der Preisstand wurde geholt`, standGefragt === 1,
+          `${standGefragt} Anfragen`);
+    const preise = await seite.evaluate(() => {
+      const w = document.querySelector('[data-preise]');
+      const karte = w.querySelector('[data-tarif="starter"]');
+      return {
+        betrag: karte.querySelector('[data-betrag]').textContent.trim(),
+        takt: karte.querySelector('[data-taktwort]').textContent.trim(),
+        zweit: karte.querySelector('[data-zweitpreis]').textContent.trim(),
+        credits: karte.querySelector('[data-credits]').textContent.trim(),
+        hinweis: karte.querySelector('[data-hinweis]').textContent.trim(),
+        merkmale: Array.from(karte.querySelectorAll('[data-merkmale] li')).map((l) => l.textContent.trim()),
+        zusatz: w.querySelector('[data-zusatznutzer] [data-betrag]').textContent.trim(),
+        paket: w.querySelector('.paketliste li').textContent.trim(),
+        tabelle: w.querySelector('[data-credittabelle] tbody').textContent.trim(),
+        gruenderOffen: !w.querySelector('[data-gruender]').hidden,
+        gruenderFrei: w.querySelector('[data-gruender-frei]').textContent.trim(),
+        fuss: w.querySelector('[data-preisfuss]').textContent.replace(/\s+/g, ' ').trim(),
+        cta: karte.querySelector('[data-cta]').getAttribute('href'),
+      };
+    });
+    melde(`${name}: der Betrag kommt aus dem Katalog`, preise.betrag === '44,44',
+          preise.betrag);
+    melde(`${name}: und auch Nutzerzahl, Credits und Merkmale`,
+          preise.credits === '555' && preise.hinweis === 'Pruefhinweis A'
+          && preise.merkmale.join('|') === 'Pruefmerkmal eins|Pruefmerkmal zwei',
+          JSON.stringify([preise.credits, preise.hinweis, preise.merkmale]));
+    melde(`${name}: der Zusatznutzer auch`, preise.zusatz === '11,11', preise.zusatz);
+    melde(`${name}: die Credit-Pakete auch`, /250 Credits/.test(preise.paket)
+          && /7,77/.test(preise.paket), preise.paket);
+    melde(`${name}: die Credit-Tabelle auch`, /Pruefaktion/.test(preise.tabelle),
+          preise.tabelle.slice(0, 60));
+    melde(`${name}: die Fristen stehen in der Fusszeile`,
+          /19 % USt/.test(preise.fuss) && /6 Monate/.test(preise.fuss)
+          && /28 Tage/.test(preise.fuss) && /300/.test(preise.fuss), preise.fuss);
+    melde(`${name}: der Gruenderzaehler zeigt die freien Plaetze`,
+          preise.gruenderOffen && preise.gruenderFrei === '37',
+          `${preise.gruenderOffen} / ${preise.gruenderFrei}`);
+    melde(`${name}: der Knopf nimmt Tarif und Takt mit`,
+          /tarif=starter/.test(preise.cta) && /intervall=monat/.test(preise.cta),
+          preise.cta);
+    // 44444 statt 12 x 4444 = 53328 — das sind 16 %, abgerundet.
+    melde(`${name}: der Jahresvorteil ist gerechnet, nicht behauptet`,
+          /spart 16 %/.test(preise.zweit), preise.zweit);
+
+    await seite.click('[data-takt="jahr"]');
+    await seite.waitForTimeout(150);
+    const jahr = await seite.evaluate(() => {
+      const karte = document.querySelector('[data-tarif="starter"]');
+      return {
+        betrag: karte.querySelector('[data-betrag]').textContent.trim(),
+        takt: karte.querySelector('[data-taktwort]').textContent.trim(),
+        zweit: karte.querySelector('[data-zweitpreis]').textContent.trim(),
+        cta: karte.querySelector('[data-cta]').getAttribute('href'),
+      };
+    });
+    melde(`${name}: der Umschalter zeigt den Jahrespreis`,
+          jahr.betrag === '444,44' && /Jahr/.test(jahr.takt),
+          `${jahr.betrag} ${jahr.takt}`);
+    melde(`${name}: und rechnet den Monatswert dazu`,
+          /entspricht 37,04/.test(jahr.zweit), jahr.zweit);
+    melde(`${name}: der Knopf merkt sich den Takt`, /intervall=jahr/.test(jahr.cta),
+          jahr.cta);
+    await seite.click('[data-takt="monat"]');
+    await seite.waitForTimeout(120);
+
     // Und der Weg in die Anwendung muss stimmen.
     const ziele = await seite.evaluate(() =>
       ['anmelden-oben', 'anmelden-buehne', 'anmelden-unten', 'anmelden-fuss']
@@ -204,6 +309,55 @@ const MIME = {
           ziele.length === 4 && ziele.every((z) => ohneStrich(z) === ohneStrich(soll)),
           JSON.stringify(ziele));
 
+    await seite.close();
+  }
+
+  // Das engste Telefon, das noch zaehlt: 375 px (iPhone SE, iPhone 13 mini).
+  // Dort bricht ein Preisgitter zuerst — drei Karten nebeneinander haetten
+  // je 110 px. Geprueft wird deshalb genau das: untereinander, die
+  // empfohlene oben, der Umschalter in EINER Zeile, nichts ueber dem Rand.
+  {
+    const seite = await browser.newPage({ viewport: { width: 375, height: 667 } });
+    await seite.route('**/tarife-oeffentlich*', (weg) => weg.fulfill({
+      status: 200, contentType: 'application/json', body: JSON.stringify(PREIS_STAND) }));
+    const pannen = [];
+    seite.on('pageerror', (f) => pannen.push(String(f.message)));
+    await seite.goto(`http://127.0.0.1:${port}/#preise`, { waitUntil: 'load' });
+    await seite.waitForTimeout(700);
+    melde('375 px: kein Fehler im Browser', pannen.length === 0, pannen[0]);
+    const eng = await seite.evaluate(() => {
+      const w = document.querySelector('[data-preise]');
+      const karten = Array.from(w.querySelectorAll('[data-tarif]'));
+      const kaesten = karten.map((k) => k.getBoundingClientRect());
+      return {
+        ueber: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        // Nach Lage sortiert, nicht nach Reihenfolge im HTML: die
+        // empfohlene Karte wird per CSS nach oben gezogen.
+        untereinander: kaesten.slice().sort((a, b) => a.top - b.top)
+          .every((k, i, f) => i === 0 || k.top >= f[i - 1].bottom - 1),
+        empfohlenOben: karten.length > 1
+          && karten.find((k) => k.classList.contains('empfohlen')).getBoundingClientRect().top
+             === Math.min(...kaesten.map((k) => k.top)),
+        taktHoehe: Math.round(w.querySelector('.takt').getBoundingClientRect().height),
+        breiteste: Math.max(...kaesten.map((k) => Math.round(k.width))),
+        tabelleUeber: (() => {
+          const t = w.querySelector('.credittabelle');
+          return t ? Math.round(t.scrollWidth - t.clientWidth) : 0;
+        })(),
+      };
+    });
+    melde('375 px: nichts haengt ueber den rechten Rand', eng.ueber <= 2, `${eng.ueber} px`);
+    melde('375 px: die Tarife stehen untereinander', eng.untereinander);
+    melde('375 px: die empfohlene Karte steht oben', eng.empfohlenOben);
+    melde('375 px: der Umschalter bleibt zweizeilig oder knapper',
+          eng.taktHoehe < 110, `${eng.taktHoehe} px`);
+    melde('375 px: die Karten passen in die Bahn', eng.breiteste <= 375 - 40,
+          `${eng.breiteste} px`);
+    // Die Credit-Tabelle ist das einzige breite Element im Abschnitt. Haengt
+    // sie ueber, scrollt die ganze Seite waagerecht — und das faellt oben
+    // schon auf; hier steht, WORAN es lag.
+    melde('375 px: die Credit-Tabelle passt', eng.tabelleUeber <= 2,
+          `${eng.tabelleUeber} px zu breit`);
     await seite.close();
   }
 

@@ -39,12 +39,16 @@ VERBOTEN = [
      "unten, wenn er wörtlich dort steht."),
     (r"gutachterlich",
      "Eine Marktpreiseinschätzung ist keine gutachterliche Aussage."),
-    (r"\bkostenlos\b|\bgratis\b",
-     "Preise stehen nirgends fest; eine Zusage auf der Website wäre eine "
-     "Zusage."),
-    (r"€\s?\d|\d+\s?(euro|eur)\b",
-     "Keine Preise auf der Website: sie stehen im Plattform-Admin und "
-     "nirgends sonst."),
+    (r"\bgratis\b|\bkostenlos\b",
+     "Zu billig. Was nichts kostet, heisst hier \"kostenfrei\" und steht in "
+     "der Credit-Tabelle mit einer Null daneben — eine Werbezeile ist es "
+     "nicht."),
+    (r"\b(unbegrenzt|unlimitiert|flat)\b.{0,20}(credit|ki|text|bild)",
+     "Credits sind begrenzt, und zwar je Tarif. \"Unbegrenzt\" waere eine "
+     "Zusage, die die Abrechnung nicht haelt."),
+    (r"ab\s*sofort\s*(kuendbar|kündbar)|jederzeit\s*k(ue|ü)ndbar",
+     "Es gibt eine Mindestlaufzeit (plattform_werte.mindestlaufzeit_monate). "
+     "\"Jederzeit kuendbar\" waere falsch."),
 ]
 
 # Wörtliche Ausnahmen: der Pflichthinweis selbst darf (und muss) die Wörter
@@ -55,6 +59,29 @@ ERLAUBT = [
     "ersetzt kein Verkehrswertgutachten nach § 194 BauGB",
     "einfache</strong> elektronische Signatur, keine qualifizierte",
     'Wir behaupten keine „vollständige DSGVO-Konformität"',
+]
+
+# --- Der Preisbereich -----------------------------------------------------
+# Preise DUERFEN auf der Seite stehen — der Auftrag vom 06.10.2026 verlangt
+# den Abschnitt ausdruecklich. Verboten ist nur, sie dort zu PFLEGEN: wer
+# einen Preis aendert, aendert ihn im Plattform-Admin, und die Seite holt
+# ihn. Was im HTML steht, ist Rueckfall und muss als solcher markiert sein.
+#
+# Deshalb diese Regel und keine Verbotszeile mehr: jeder Eurobetrag im HTML
+# muss im Abschnitt #preise stehen. Ein Preis in der Buehne, in einer
+# Modulkachel oder im Fuss ist genau der Fall, der spaeter auseinanderlaeuft,
+# weil ihn niemand mitpflegt.
+PREIS_PFLICHT = [
+    ('id="preise"', "der Preisbereich selbst"),
+    ('href="#preise"', "ein Weg dorthin (Navigation)"),
+    ("data-preise", "die Marke, an der seite.js den Bereich findet"),
+    ("data-betrag", "die Stellen, die der Katalog ueberschreibt"),
+    ("data-takt", "der Umschalter Monat/Jahr"),
+    ("data-cta", "der Knopf, der Tarif und Takt mitnimmt"),
+    ("Nettopreise zzgl.", "der Pflichthinweis auf die Umsatzsteuer"),
+    ("Mindestlaufzeit", "die Mindestlaufzeit"),
+    ("Ein Credit ist eine interne Nutzungseinheit",
+     "was ein Credit ist — CLAUDE.md: kein Euro-Guthaben"),
 ]
 
 
@@ -134,8 +161,32 @@ def main() -> int:
             fehler += 1
             print(f"[FEHLER] {name} laedt website/konfig.js nicht.")
 
-    # Der Anmelde-Knopf
+    # --- Der Preisbereich -------------------------------------------------
     start = (SEITE / "index.html").read_text(encoding="utf-8")
+    for marke, was in PREIS_PFLICHT:
+        if marke not in start:
+            fehler += 1
+            print(f"[FEHLER] index.html: {was} fehlt (\"{marke}\").")
+
+    # Jeder Eurobetrag MUSS im Preisbereich stehen.
+    anfang = start.find('id="preise"')
+    ende = start.find("</section>", anfang) if anfang >= 0 else -1
+    for treffer in re.finditer(r"\d[\d.]*,\d\d\s*€|€\s?\d", start):
+        if anfang >= 0 and anfang < treffer.start() < ende:
+            continue
+        fehler += 1
+        print(f"[FEHLER] index.html: der Betrag \"{treffer.group(0)}\" steht "
+              f"ausserhalb von #preise. Preise gehoeren in den einen "
+              f"Abschnitt, der sie aus dem Katalog holt — sonst pflegt sie "
+              f"dort niemand mit.")
+
+    # Der Endpunkt gehoert nach konfig.js, nicht ins HTML.
+    if re.search(r"functions/v1/tarife-oeffentlich", start):
+        fehler += 1
+        print("[FEHLER] index.html nennt die Adresse des Preis-Endpunkts "
+              "selbst — sie gehoert nach website/konfig.js.")
+
+    # Der Anmelde-Knopf
     if 'id="anmelden-buehne"' not in start or "k.anwendung" not in start:
         fehler += 1
         print("[FEHLER] index.html: der Anmelde-Knopf nimmt die Adresse nicht "
@@ -143,7 +194,7 @@ def main() -> int:
 
     konfig = (SEITE / "konfig.js").read_text(encoding="utf-8")
     for feld in ["firma", "strasse", "plz_ort", "vertreten_durch", "email",
-                 "telefon", "anwendung"]:
+                 "telefon", "anwendung", "preise"]:
         if not re.search(feld + r"\s*:", konfig):
             fehler += 1
             print(f"[FEHLER] konfig.js fuehrt das Feld \"{feld}\" nicht.")
@@ -161,9 +212,9 @@ def main() -> int:
                          "email", "telefon"]
              if not (re.search(f + r'\s*:\s*"([^"]*)"', konfig) or [""])
              or not re.search(f + r'\s*:\s*"([^"]*)"', konfig).group(1).strip()]
-    print(f"[ok] {geprueft} Seiten: wohlgeformt, keine Preise, keine erfundene "
-          f"Anschrift,")
-    print("     keine Zusage, die das Produkt nicht halten kann.")
+    print(f"[ok] {geprueft} Seiten: wohlgeformt, keine erfundene Anschrift,")
+    print("     keine Zusage, die das Produkt nicht halten kann, und jeder")
+    print("     Preis im einen Abschnitt, der ihn aus dem Katalog holt.")
     if offen:
         print(f"     HINWEIS: Impressum noch unvollstaendig ({', '.join(offen)}) — "
               f"die\n     Auslieferung laesst dann nur eine Vorschau zu, keine Produktion.")

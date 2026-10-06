@@ -27,6 +27,7 @@
     <nav>
       <a class="punkt" href="#module">Module</a>
       <a class="punkt" href="#ablauf">So arbeitet es</a>
+      <a class="punkt" href="#preise">Preise</a>
       <a class="punkt" href="#sicherheit">Sicherheit</a>
       <a class="punkt" href="#fragen">Fragen</a>
       <a class="knopf klein" id="anmelden-oben" href="#">Anmelden</a>
@@ -946,6 +947,175 @@
   </div>
 </section>
 
+<!-- ------------------------------------------------------------------ Preise -->
+<!-- Die Zahlen hier sind RUECKFALL, nicht Quelle. Maßgeblich ist
+     plattform_tarife; seite.js holt den Stand beim Laden über die Funktion
+     `tarife-oeffentlich` und schreibt ihn in die mit data-… markierten
+     Stellen. Steht der Endpunkt nicht in website/konfig.js oder antwortet er
+     nicht, bleibt das hier Geschriebene stehen — eine Preisseite ohne Preise
+     wäre schlimmer als eine mit dem Stand von gestern. Wer Preise ändert,
+     ändert sie im Plattform-Admin; diese Datei muss dafür niemand anfassen.
+     Das Datum des Stands steht unten in der Fußzeile des Abschnitts. -->
+<section id="preise" data-preise>
+  <div class="bahn">
+    <div class="kopfzeile auf">
+      <div class="augenbraue">Preise</div>
+      <h2>Ein Preis, der mitwächst</h2>
+      <p>
+        Drei Tarife, dazu Nutzer und Credits nach Bedarf. Alle Beträge sind
+        Nettopreise zzgl. USt.
+      </p>
+    </div>
+
+    <!-- Gründerpreis. Bleibt verborgen, bis der Zähler wirklich etwas sagt:
+         eine Seite, die „noch 50 Plätze frei" behauptet, ohne nachgesehen zu
+         haben, wirbt mit einer Zahl, die sie nicht kennt. -->
+    <div class="gruenderband auf" data-gruender hidden>
+      <div>
+        <strong>Gründerpreis</strong>
+        <span data-gruender-satz></span>
+      </div>
+      <div class="zaehlwerk"><b data-gruender-frei>—</b><span>Plätze frei</span></div>
+    </div>
+
+    <div class="takt auf" role="group" aria-label="Abrechnungszeitraum">
+      <button type="button" data-takt="monat" class="an" aria-pressed="true">Monatlich</button>
+      <button type="button" data-takt="jahr" aria-pressed="false">
+        Jährlich <span class="spar" data-sparen>spart 8 %</span>
+      </button>
+    </div>
+
+    <div class="preisgitter" data-tarife>
+      <article class="tarif auf" data-tarif="starter"
+               data-monat-cent="4999" data-jahr-cent="54989" data-nutzer-zahl="1" data-credits-zahl="500">
+        <h3>Starter</h3>
+        <p class="wen" data-hinweis>Für Einzelmakler</p>
+        <p class="betrag">
+          <b data-betrag>49,99</b><span class="einheit"> €<span data-taktwort> / Monat</span></span>
+        </p>
+        <p class="zweitpreis" data-zweitpreis>549,89 € im Jahr</p>
+        <p class="inkl"><b data-nutzer>1</b> Nutzer · <b data-credits>500</b> Credits im Monat</p>
+        <ul class="haken" data-merkmale>
+          <li>Objekte, Exposés und Portale</li>
+          <li>Ein Postfach anbinden</li>
+          <li>KI-Texte und Exposé-Vorlagen</li>
+          <li>Eigentümer-Portal</li>
+        </ul>
+        <a class="knopf leer" data-cta href="#">28 Tage testen</a>
+      </article>
+
+      <article class="tarif empfohlen auf v1" data-tarif="professional"
+               data-monat-cent="12999" data-jahr-cent="142989" data-nutzer-zahl="3" data-credits-zahl="1500">
+        <div class="siegel">Empfohlen</div>
+        <h3>Professional</h3>
+        <p class="wen" data-hinweis>Für kleine Büros</p>
+        <p class="betrag">
+          <b data-betrag>129,99</b><span class="einheit"> €<span data-taktwort> / Monat</span></span>
+        </p>
+        <p class="zweitpreis" data-zweitpreis>1.429,89 € im Jahr</p>
+        <p class="inkl"><b data-nutzer>3</b> Nutzer · <b data-credits>1.500</b> Credits im Monat</p>
+        <ul class="haken" data-merkmale>
+          <li>Alles aus Starter</li>
+          <li>Bis zu drei Nutzer</li>
+          <li>Akquise, Pipeline und Automationen</li>
+          <li>Verträge, Nachweise und Bewertung</li>
+          <li>Rechnungen und Liquidität</li>
+        </ul>
+        <a class="knopf" data-cta href="#">28 Tage testen</a>
+      </article>
+
+      <article class="tarif auf v2" data-tarif="business"
+               data-monat-cent="29999" data-jahr-cent="329989" data-nutzer-zahl="8" data-credits-zahl="3000">
+        <h3>Business</h3>
+        <p class="wen" data-hinweis>Für Teams</p>
+        <p class="betrag">
+          <b data-betrag>299,99</b><span class="einheit"> €<span data-taktwort> / Monat</span></span>
+        </p>
+        <p class="zweitpreis" data-zweitpreis>3.299,89 € im Jahr</p>
+        <p class="inkl"><b data-nutzer>8</b> Nutzer · <b data-credits>3.000</b> Credits im Monat</p>
+        <ul class="haken" data-merkmale>
+          <li>Alles aus Professional</li>
+          <li>Bis zu acht Nutzer</li>
+          <li>Mehrere Standorte und Gesellschaften</li>
+          <li>Arbeitszeit und Team-Verwaltung</li>
+          <li>Vorrangiger Support</li>
+        </ul>
+        <a class="knopf leer" data-cta href="#">28 Tage testen</a>
+      </article>
+    </div>
+
+    <div class="anbau">
+      <div class="karte auf" data-zusatznutzer data-monat-cent="2999" data-jahr-cent="32989">
+        <div class="zeichen">＋</div>
+        <h3>Weiterer Nutzer</h3>
+        <p class="betrag klein">
+          <b data-betrag>29,99</b><span class="einheit"> €<span data-taktwort> / Monat</span></span>
+        </p>
+        <p>
+          Zubuchbar zu jedem Tarif, beliebig oft. Im laufenden Abo jederzeit
+          änderbar — abgerechnet wird anteilig.
+        </p>
+      </div>
+
+      <div class="karte auf v1" data-pakete>
+        <div class="zeichen">◆</div>
+        <h3>Credits nachkaufen</h3>
+        <p>
+          Wenn die Inklusiv-Credits eines Monats nicht reichen: einmalig
+          kaufen, 12 Monate gültig, kein Abo.
+        </p>
+        <ul class="paketliste">
+          <li><span>250 Credits</span><b>9,99 €</b></li>
+          <li><span>1.000 Credits</span><b>29,99 €</b></li>
+          <li><span>3.000 Credits</span><b>69,99 €</b></li>
+        </ul>
+      </div>
+    </div>
+
+    <details class="frage aufklapp auf" id="credits">
+      <summary>Was ein Credit ist — und was welche Aktion kostet</summary>
+      <p>
+        Ein Credit ist eine interne Nutzungseinheit, kein Euro-Guthaben. Er
+        wird verbraucht, wenn die KI etwas <strong>erzeugt</strong>. Was nur
+        ausgegeben, heruntergeladen oder von Hand bearbeitet wird, verbraucht
+        nichts — auch nicht beim zweiten Mal.
+      </p>
+      <table class="credittabelle" data-credittabelle>
+        <thead>
+          <tr><th scope="col">Aktion</th><th scope="col">Credits</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Einzelner KI-Text / Variante<span>Eine Überschrift, ein Absatz, eine Variante</span></td><td>2</td></tr>
+          <tr><td>Vollständiger Exposé-Text<span>Alle Textbausteine eines Exposés auf einmal</span></td><td>10</td></tr>
+          <tr><td>Social-Media-/Marketing-Paket<span>Texte für mehrere Kanäle aus einem Objekt</span></td><td>5</td></tr>
+          <tr><td>Einfache KI-Bildoptimierung<span>Licht, Farbe, Entrauschen</span></td><td>10</td></tr>
+          <tr><td>Homestaging / umfangreiche Bildbearbeitung<span>Möblierung, Entrümpelung, Umbau der Szene</span></td><td>30</td></tr>
+          <tr><td>Grundrissvisualisierung<span>Aus dem Grundriss wird eine Ansicht</span></td><td>30</td></tr>
+          <tr><td>E-Signatur-Vorgang je Paket<span>Ein Vorgang mit allen Empfängern</span></td><td>5</td></tr>
+          <tr><td>Exposé-Prüfer<span>Prüft ein Exposé auf Pflichtangaben</span></td><td>2</td></tr>
+          <tr><td>PDF-Export bestehender Inhalte<span>Es entsteht nichts Neues</span></td><td>0</td></tr>
+          <tr><td>Web-Exposé ohne neue KI<span>Es entsteht nichts Neues</span></td><td>0</td></tr>
+          <tr><td>Erneuter Download</td><td>0</td></tr>
+        </tbody>
+      </table>
+      <p class="tabellenfuss">
+        Bricht ein KI-Auftrag ab, kommen die reservierten Credits von selbst
+        zurück. Inklusiv-Credits gelten im Monat ihrer Zuteilung und sind in
+        den unmittelbar folgenden Monat übertragbar, höchstens bis zu einem
+        regulären Monatskontingent. Gekaufte Credits sind 12 Monate gültig und
+        werden nach den Inklusiv-Credits verbraucht, die ältesten zuerst.
+      </p>
+    </details>
+
+    <p class="preisfuss" data-preisfuss>
+      Nettopreise zzgl. <span data-ust>19</span> % USt. ·
+      Mindestlaufzeit <span data-mindest>6</span> Monate ·
+      <span data-test>28</span> Tage testen mit <span data-testcredits>300</span>
+      Credits, ohne Zahlungsmittel
+    </p>
+  </div>
+</section>
+
 <!-- ------------------------------------------------------------- Sicherheit -->
 <section class="hell" id="sicherheit">
   <div class="bahn">
@@ -1029,7 +1199,37 @@
       </details>
       <details class="frage auf">
         <summary>Was kostet es?</summary>
-        <p>Preise und Leistungsumfang auf Anfrage — sprechen Sie uns an.</p>
+        <p>Drei Tarife, dazu weitere Nutzer und Credits nach Bedarf — die
+          Beträge stehen im Abschnitt <a href="#preise">Preise</a>, und zwar
+          nur dort: sie kommen aus demselben Katalog, aus dem auch die
+          Rechnung entsteht. Eine Zahl, die hier noch einmal stünde, wäre
+          irgendwann die falsche.</p>
+      </details>
+      <details class="frage auf">
+        <summary>Was ist ein Credit?</summary>
+        <p>Eine interne Nutzungseinheit für das, was die KI
+          <strong>erzeugt</strong> — einen Text, ein bearbeitetes Bild, eine
+          Visualisierung. Kein Euro-Guthaben. Was nur ausgegeben,
+          heruntergeladen oder von Hand bearbeitet wird, verbraucht nichts,
+          auch nicht beim zweiten Mal. Jeder Tarif bringt Credits im Monat
+          mit; wer mehr braucht, kauft sie einmalig nach. Bricht ein Auftrag
+          ab, kommen die reservierten Credits von selbst zurück.</p>
+      </details>
+      <details class="frage auf">
+        <summary>Was passiert nach den 28 Testtagen?</summary>
+        <p>Die Testphase läuft ohne Zahlungsmittel und endet von selbst — es
+          wird nichts stillschweigend in ein Abo überführt. Wählen Sie bis
+          dahin einen Tarif, geht es ohne Unterbrechung weiter. Tun Sie es
+          nicht, bleiben Ihre Daten zunächst lesbar; was dann gilt, steht im
+          Abschnitt „Preise".</p>
+      </details>
+      <details class="frage auf">
+        <summary>Kann ich monatlich kündigen?</summary>
+        <p>Die Mindestlaufzeit beträgt sechs Monate; danach endet das Abo zum
+          Ende der laufenden Abrechnungsperiode. Gekündigt wird in der
+          Anwendung unter „Abo &amp; Abrechnung", und Sie sehen vorher, auf
+          welchen Tag die Kündigung fällt. Nach dem Ende bleiben Ihre Daten
+          30 Tage lesbar, damit Sie exportieren können, was Sie brauchen.</p>
       </details>
     </div>
   </div>
@@ -1068,6 +1268,7 @@
         <strong>Produkt</strong>
         <a href="#module">Module</a>
         <a href="#ablauf">So arbeitet es</a>
+        <a href="#preise">Preise</a>
         <a href="#sicherheit">Sicherheit</a>
         <a href="#fragen">Fragen</a>
         <a id="anmelden-fuss" href="#">Anmelden</a>

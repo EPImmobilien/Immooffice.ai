@@ -33,4 +33,12 @@ window.IMMO_WEB = {
   // --- Wohin der Anmelde-Knopf führt -----------------------------------
   // Die ausgelieferte Oberfläche. Später die eigene Domain.
   anwendung: "https://immoofficeeai.netlify.app",
+
+  // --- Woher die Preise kommen -----------------------------------------
+  // Der öffentliche, nur lesende Endpunkt `tarife-oeffentlich`. Er liefert
+  // den Stand aus plattform_tarife — damit zeigt die Website, was auch
+  // abgerechnet wird, und niemand muss HTML anfassen, um einen Preis zu
+  // ändern. Leer gelassen bleiben die Rückfallwerte im HTML stehen; sie
+  // können dann vom Katalog abweichen.
+  preise: "https://usguiggfciavwzkdfjgt.supabase.co/functions/v1/tarife-oeffentlich",
 };
