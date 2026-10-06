@@ -428,6 +428,17 @@ else
   fehler=1
 fi
 
+abschnitt "Postfaecher je Anbieter: Microsoft, Google, IMAP"
+# Die beiden Funktionen, die ein Postfach verbinden, laufen hier wirklich —
+# gegen ein nachgebautes Supabase und einen nachgebauten Anbieter. Geprueft
+# wird, was im Betrieb niemand halb ausprobieren kann: Einmaligkeit des
+# Zustands, Mandant und Nutzer aus dem Vorgang, verschluesselte Tokens.
+if node tests/postfach-anbieter.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Umgebungsvariablen: jede gelesene ist dokumentiert"
 # CLAUDE.md: keine Geheimnisse im Repository, nur Umgebungsvariablen,
 # dokumentiert in .env.example. Am 06.10.2026 nannte die Datei drei

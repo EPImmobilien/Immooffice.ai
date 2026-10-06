@@ -4437,6 +4437,16 @@ WOERTLICH = [
      'kuenftige Expose des Hauses. Die SQL-Fassung in fork_37 fuehrt '
      'dieselbe Liste; tests/rechte.sql haelt beide zusammen.'),
 
+    # --- Postfaecher verbinden: Microsoft, Google (06.10.2026) ------------
+    # Mehrere Postfaecher konnte die Vorlage schon; was fehlte, war die
+    # Anmeldung ohne Passwort. Die Knoepfe stehen in
+    # src/eigene/postfach-anbieter.js, das Formular der Vorlage bleibt
+    # darunter fuer jedes andere Postfach.
+    ('FORK',
+     '  }, "📧 E-Mail-Postfächer"), l && React.createElement("div", {',
+     '  }, "📧 E-Mail-Postfächer"),\n  // Microsoft und Google verbinden sich ueber OAuth, nicht mit Passwort\n  // (fork_44). Die Ansicht dazu steht in src/eigene/postfach-anbieter.js;\n  // das Formular fuer jedes andere Postfach bleibt darunter.\n  window.ImmoPostfachAnbieter && React.createElement(window.ImmoPostfachAnbieter, {\n    user: e\n  }), l && React.createElement("div", {',
+     'Postfaecher: Microsoft und Google verbinden sich ueber OAuth (fork_44).'),
+
     # --- Vorlagenwahl, Logo freistellen, Produkthinweis (06.10.2026) ------
     # Drei Aenderungen aus derselben Ansage des Betreibers. Sie stehen hier
     # als Regel und nicht von Hand in src/: dieses Skript schreibt

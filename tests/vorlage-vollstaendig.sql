@@ -263,6 +263,25 @@ zuwachs(bereich, mehr, grund) as (values
   ('Spalten', 1, 'fork_39: firma_stammdaten.marken_linie — die zweite Markenzeile der Luxusvorlage')
   -- fork_40 aendert nur eine Bedingung IN den gespeicherten Vorlagen —
   -- kein Schema, also keine Kennzahl.
+  -- fork_41 bis fork_43 aendern ebenfalls nur gespeicherte Vorlagen.
+  ,
+  -- fork_44: Postfaecher je Anbieter (Microsoft, Google, IMAP).
+  ('Spalten', 8, 'fork_44: mail_postfaecher bekommt anbieter, oauth_konto, '
+                 'oauth_refresh_verschluesselt, oauth_zugriff_verschluesselt, '
+                 'oauth_gueltig_bis, oauth_bereiche, oauth_verbunden_am, oauth_fehler'),
+  ('Pruefbedingungen', 1, 'fork_44: mail_postfaecher.anbieter auf imap/microsoft/google'),
+  ('Tabellen', 1, 'fork_44: mail_oauth_vorgaenge — der angefangene Verbindungsvorgang'),
+  ('Tabellen mit RLS', 1, 'dieselbe'),
+  ('Spalten', 9, 'fork_44: mail_oauth_vorgaenge: id, mandant_id, benutzer_id, '
+                 'anbieter, zustand, postfach_id, weiter_zu, erstellt_am, verbraucht_am'),
+  ('Primaer- und Eindeutigkeitsschluessel', 2,
+     'fork_44: mail_oauth_vorgaenge Primaerschluessel und zustand eindeutig'),
+  ('Pruefbedingungen', 1, 'fork_44: mail_oauth_vorgaenge.anbieter'),
+  ('Fremdschluessel', 3, 'fork_44: mail_oauth_vorgaenge auf mandanten, profiles '
+                         'und mail_postfaecher'),
+  ('Indizes ohne Constraint', 2, 'fork_44: offene Vorgaenge und mandant_id'),
+  ('Richtlinien', 2, 'fork_44: eigene Vorgaenge und die restriktive Mandantentrennung'),
+  ('Funktionen', 1, 'fork_44: mail_oauth_aufraeumen()')
 ),
 soll(bereich, soll) as (
   select v.bereich,

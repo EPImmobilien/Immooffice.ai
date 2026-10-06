@@ -994,3 +994,43 @@ reservierte Domain (RFC 2606).
   2 Minuten) und `unterlagen-link` `aufraeumen` (abgelaufene Transfers
   löschen, Vorlage täglich 01:17). Ohne die zweite bleiben Dateien
   abgelaufener Transfers im Eimer `transfer-dateien` liegen.
+
+## Postfächer bei Microsoft und Google freischalten
+
+Technisch fertig (`fork_44`, 06.10.2026): ein Kunde kann beliebig viele
+Postfächer anbinden, Microsoft 365 und Google über OAuth2, jedes andere über
+IMAP/SMTP mit Passwort. Was fehlt, sind **zwei Registrierungen beim
+Anbieter** — die kann nur der Betreiber vornehmen, und ohne sie bleiben die
+beiden Knöpfe grau (mit Begründung in der Oberfläche).
+
+**1. Microsoft (Entra ID / Azure Portal)**
+
+- App registrieren, Kontotypen: „Accounts in any organizational directory
+  and personal Microsoft accounts".
+- Rückleitung (Web): `https://<projekt>.supabase.co/functions/v1/postfach-anbieter-rueckruf`
+- Delegierte Berechtigungen: `IMAP.AccessAsUser.All`, `SMTP.Send`,
+  `offline_access`, `openid`, `email`, `profile`.
+- Geheimnis erzeugen; beides als `MICROSOFT_CLIENT_ID` und
+  `MICROSOFT_CLIENT_SECRET` in die Umgebung der Edge Functions.
+- Hinweis: der IT-Administrator des Kunden kann eine Freigabe („admin
+  consent") verlangen. Das ist normal und betrifft den Kunden, nicht uns.
+
+**2. Google (Cloud Console)**
+
+- OAuth-Client (Webanwendung) mit derselben Rückleitung; Werte als
+  `GOOGLE_CLIENT_ID` und `GOOGLE_CLIENT_SECRET`.
+- **Die Hürde:** `https://mail.google.com/` ist ein *restricted scope*. Für
+  den Produktivbetrieb prüft Google die Anwendung, einschließlich einer
+  Sicherheitsbewertung durch einen zugelassenen Prüfer (CASA). Das kostet
+  Zeit und Geld. Ohne die Prüfung funktioniert die Verbindung nur für
+  Konten, die in der Cloud Console als Testnutzer eingetragen sind — für
+  eine Vorführung genug, für den Verkauf nicht.
+- Zwischenlösung für Gmail-Kunden ohne Google-Prüfung: ein App-Passwort im
+  Google-Konto erzeugen und das Postfach über IMAP/SMTP mit Passwort
+  anbinden (`imap.gmail.com:993`, `smtp.gmail.com:465`). Geht heute, braucht
+  aber Zwei-Faktor im Kundenkonto.
+
+**Was danach von selbst läuft:** `mail-postfach-pull` holt alle fünf Minuten
+auch die OAuth-Postfächer ab, erneuert Tokens selbst und schreibt bei einem
+Fehlschlag `oauth_fehler` an das Postfach; die Oberfläche bietet dann
+„neu verbinden" an.

@@ -42926,7 +42926,13 @@ function MailPostfachKarte({
       textTransform: "uppercase",
       marginBottom: 12
     }
-  }, "📧 E-Mail-Postfächer"), l && React.createElement("div", {
+  }, "📧 E-Mail-Postfächer"),
+  // Microsoft und Google verbinden sich ueber OAuth, nicht mit Passwort
+  // (fork_44). Die Ansicht dazu steht in src/eigene/postfach-anbieter.js;
+  // das Formular fuer jedes andere Postfach bleibt darunter.
+  window.ImmoPostfachAnbieter && React.createElement(window.ImmoPostfachAnbieter, {
+    user: e
+  }), l && React.createElement("div", {
     style: {
       marginBottom: 12,
       padding: 10,

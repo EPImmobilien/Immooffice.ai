@@ -366,6 +366,16 @@ verify_jwt = true
 [functions.parse-zaehler]
 verify_jwt = true
 
+[functions.postfach-anbieter-start]
+verify_jwt = true
+
+# Oeffentlich, und zwar zwangslaeufig: Microsoft und Google schicken den
+# BROWSER des Nutzers hierher zurueck, nicht die Anwendung — ein
+# Anmeldekopf kann dabei nicht mitkommen. Den Mandanten nimmt die Funktion
+# aus dem einmaligen Vorgang, den postfach-anbieter-start angelegt hat.
+[functions.postfach-anbieter-rueckruf]
+verify_jwt = false
+
 [functions.portal-export]
 verify_jwt = true
 

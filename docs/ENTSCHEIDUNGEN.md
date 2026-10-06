@@ -4643,3 +4643,61 @@ Geraten wird dabei zwangsläufig, deshalb gilt für jeden Schritt: er schlägt
 vor, er entscheidet nicht. Was er getan hat, steht im Befund, „Platzhalter
 zurücknehmen" stellt den Nachbau wieder her, und auf der Bearbeitungsfläche
 ist jedes Feld noch zu ändern.
+
+## Postfächer je Anbieter: Microsoft, Google, IMAP (06.10.2026)
+
+Ansage des Betreibers: „dass die Kunden mehrere Postfächer anbinden können,
+sei es jetzt Microsoft oder Gmail oder whatever, was sie halt nutzen an
+Plattformen."
+
+**Mehrere Postfächer konnte die Vorlage schon** — `mail_postfaecher` hängt an
+der Nutzerkennung, mit Reihenfolge, Standard und eigener Signatur je
+Postfach. Was fehlte, war die **Anmeldung**: die Tabelle kannte nur Server,
+Benutzer und Passwort, und genau das nehmen die beiden größten Anbieter nicht
+mehr an. Microsoft 365 hat Basic Auth für IMAP und SMTP abgeschaltet; Google
+verlangt ein App-Passwort (nur mit Zwei-Faktor) oder OAuth2.
+
+### Die Entscheidung: eine schmale Anbieter-Schicht
+
+Abruf bleibt IMAP, Versand bleibt SMTP — **bei allen drei Anbietern**. Nur
+die Anmeldung wechselt von `LOGIN` auf `XOAUTH2`.
+
+Der Grund steht in `mail-postfach-pull`: 870 Zeilen für Ordner, Flags,
+Anhänge, große Mails, Rückstände und den Gelesen-Abgleich, jede Zeile an
+einem echten Postfach gelernt. Eine zweite Fassung über Microsoft Graph und
+eine dritte über die Gmail-API wären drei Fassungen, von denen zwei
+veralten. IMAP mit XOAUTH2 ist bei beiden Anbietern ausdrücklich
+unterstützt und lässt diesen Teil unangetastet.
+
+Was dafür entstand:
+
+| | |
+|---|---|
+| `fork_44` | `mail_postfaecher.anbieter` (`imap`/`microsoft`/`google`) plus Tokenfelder; `mail_oauth_vorgaenge` für den angefangenen Verbindungsvorgang |
+| `postfach-anbieter-start` | angemeldet; legt den Vorgang an und gibt die Zustimmungs-Adresse zurück |
+| `postfach-anbieter-rueckruf` | **öffentlich** (der Anbieter schickt den Browser); tauscht den Code, legt das Postfach an |
+| `anbieter.ts` | die Schicht selbst: Anbieter-Tabelle, Verschlüsselung, Tokenerneuerung, XOAUTH2 — in sechs Ordnern byte-gleich |
+| `mail-postfach-pull`, `mail-senden` | fünf beziehungsweise drei Regeln: Token holen, XOAUTH2 anmelden |
+| `src/eigene/postfach-anbieter.js` | die beiden Knöpfe, über dem bisherigen Formular |
+
+### Drei Entscheidungen im Detail
+
+1. **Der Zustand steht in der Datenbank, nicht im Browser.** Der Rückruf ist
+   öffentlich und hat keinen angemeldeten Nutzer. Mandant und Nutzer kommen
+   aus dem Vorgang: einmalig (`verbraucht_am` wird beim Einlösen gesetzt),
+   zehn Minuten gültig. Ein abgefangener Rückruf ist nach dem ersten
+   Gebrauch wertlos.
+2. **Ein Postfach gehört einem Menschen, nicht einem Haus.** Beim
+   Neuverbinden wird `postfach_id` gegen den **angemeldeten Nutzer** geprüft,
+   nicht nur gegen den Mandanten — sonst hätte ein Kollege das Token eines
+   anderen überschreiben können.
+3. **Googles Erneuerungs-Token bleibt stehen.** Microsoft dreht es bei jeder
+   Erneuerung mit und entwertet das alte, Google schickt keines mit. Wer das
+   Feld blind überschreibt, beendet jede Gmail-Verbindung nach einer Stunde.
+   `tests/postfach-anbieter.js` prüft beide Fälle.
+
+### Was der Betreiber noch tun muss
+
+Ohne registrierte Anwendungen bleiben die beiden Knöpfe grau und sagen
+warum — siehe `docs/OFFEN.md`. Bei Google kommt eine Prüfung durch den
+Anbieter dazu (`https://mail.google.com/` ist ein „restricted scope").

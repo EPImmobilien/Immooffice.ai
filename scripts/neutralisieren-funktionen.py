@@ -31,6 +31,9 @@ ZIEL = WURZEL / 'supabase' / 'functions'
 # sie woanders liegen und danach hereinkopiert werden. Siehe
 # supabase/eigene/README.md.
 EIGENE = WURZEL / 'supabase' / 'eigene'
+# Dateien, die NEBEN eine uebernommene Funktion gehoeren — gemeinsamer
+# Quelltext, den mehrere brauchen (siehe supabase/eigene-beilagen/README.md).
+BEILAGEN = WURZEL / 'supabase' / 'eigene-beilagen'
 
 # --------------------------------------------------------------- Phase 1.4
 # Vier Funktionen entfallen ersatzlos. jotform-* ist der Formular-Sync des
@@ -3908,6 +3911,61 @@ NACHBESSERN = [
      'Objekttitel im Hausstil: energisch, konkret.',
      'Texterzeugung: der letzte Stilverweis ohne Firmennamen.',
      {'generate-text'}),
+
+    # =====================================================================
+    # FORK — Postfaecher je Anbieter (06.10.2026)
+    #
+    # Ansage des Betreibers: "dass die Kunden mehrere Postfaecher anbinden
+    # koennen, sei es jetzt Microsoft oder Gmail oder whatever". Mehrere
+    # Postfaecher konnte die Vorlage schon; was fehlte, war die Anmeldung —
+    # Microsoft hat Basic Auth fuer IMAP/SMTP abgeschaltet, Google baut die
+    # App-Passwoerter ab. Beide nehmen OAuth2 mit XOAUTH2.
+    #
+    # Abruf und Versand bleiben IMAP und SMTP, fuer alle drei Anbieter. Nur
+    # die Anmeldung wechselt. Die Anbieter-Schicht selbst liegt in
+    # supabase/eigene-beilagen/<funktion>/anbieter.ts und wird nach dem
+    # Neuaufbau dazugelegt (siehe die Beilagen am Ende dieses Skripts).
+    # =====================================================================
+    ('FORK',
+     'import { createClient } from "jsr:@supabase/supabase-js@2";',
+     'import { createClient } from "jsr:@supabase/supabase-js@2";\n// Die Anbieter-Schicht der Postfaecher (Microsoft, Google, IMAP). Sie\n// liegt als Beilage im Ordner dieser Funktion; die Quelle steht in\n// supabase/eigene-beilagen/mail-postfach-pull/anbieter.ts.\nimport { xoauth2, zugriffstoken } from "./anbieter.ts";',
+     'Postfach-Anbieter: die Anbieter-Schicht wird eingebunden.',
+     {'mail-postfach-pull'}),
+    ('FORK',
+     '  constructor(private host: string, private port: number, private user: string, private pass: string) {}',
+     '  // Bei einem OAuth2-Postfach steht hier die fertige XOAUTH2-Zeichenkette\n  // statt eines Passworts. Microsoft nimmt LOGIN nicht mehr an, Google\n  // nur noch mit App-Passwort — der Abruf selbst bleibt derselbe.\n  constructor(private host: string, private port: number, private user: string,\n              private pass: string, private xoauth: string | null = null) {}',
+     'Postfach-Anbieter: SimpleImap nimmt eine XOAUTH2-Zeichenkette.',
+     {'mail-postfach-pull'}),
+    ('FORK',
+     '  async login(): Promise<void> {\n    const escUser = this.user.replace(/"/g, \'\\\\"\');\n    const escPass = this.pass.replace(/\\\\/g, "\\\\\\\\").replace(/"/g, \'\\\\"\');\n    await this.cmd(`LOGIN "${escUser}" "${escPass}"`);\n  }',
+     '  async login(): Promise<void> {\n    if (this.xoauth) {\n      // AUTHENTICATE XOAUTH2 laeuft anders als LOGIN: lehnt der Server ab,\n      // schickt er "+" und eine base64-kodierte Begruendung und wartet\n      // dann auf eine LEERE Zeile. Ohne sie bleibt die Verbindung haengen,\n      // bis der Zeitgeber zuschlaegt — und die Begruendung waere verloren.\n      const tag = this.nextTag();\n      await this.send(`${tag} AUTHENTICATE XOAUTH2 ${this.xoauth}`);\n      const fertig = new RegExp(`^${tag} (OK|NO|BAD)`, "m");\n      let antwort = await this.readUntil(new RegExp(`(^${tag} (OK|NO|BAD))|(^\\\\+)`, "m"), 20000);\n      if (!fertig.test(antwort)) {\n        await this.send("");\n        antwort += await this.readUntil(fertig, 20000);\n      }\n      if (new RegExp(`^${tag} (NO|BAD)`, "m").test(antwort)) {\n        throw new Error(`XOAUTH2 abgelehnt: ${antwort.substring(0, 300)}`);\n      }\n      return;\n    }\n    const escUser = this.user.replace(/"/g, \'\\\\"\');\n    const escPass = this.pass.replace(/\\\\/g, "\\\\\\\\").replace(/"/g, \'\\\\"\');\n    await this.cmd(`LOGIN "${escUser}" "${escPass}"`);\n  }',
+     'Postfach-Anbieter: Anmeldung per XOAUTH2, wenn ein Token da ist.',
+     {'mail-postfach-pull'}),
+    ('FORK',
+     '        if (!pf.imap_server || !pf.imap_passwort_verschluesselt) {\n          log.fehler_text = "imap_server oder Passwort fehlt";\n          ergebnisse.push(log);\n          continue;\n        }\n\n        const passwort = await entschluessele(pf.imap_passwort_verschluesselt);',
+     '        // Drei Anbieter, ein Abruf. "imap" meldet sich mit Passwort an,\n        // "microsoft" und "google" mit einem Token, das hier bei Bedarf\n        // erneuert wird. Scheitert das, bleibt der Grund am Postfach\n        // stehen (oauth_fehler) — die Oberflaeche bietet dann "Verbindung\n        // erneuern" an, statt den Nutzer raten zu lassen.\n        const perOauth = pf.anbieter && pf.anbieter !== "imap";\n        if (!pf.imap_server || (!perOauth && !pf.imap_passwort_verschluesselt)) {\n          log.fehler_text = "imap_server oder Passwort fehlt";\n          ergebnisse.push(log);\n          continue;\n        }\n\n        let passwort = "";\n        let xoauthZeile: string | null = null;\n        if (perOauth) {\n          try {\n            const t = await zugriffstoken(pf);\n            if (t.neu) await admin.from("mail_postfaecher").update(t.neu).eq("id", pf.id);\n            xoauthZeile = xoauth2(t.adresse, t.token);\n          } catch (e) {\n            const grund = e instanceof Error ? e.message : String(e);\n            await admin.from("mail_postfaecher")\n              .update({ oauth_fehler: grund.slice(0, 500) }).eq("id", pf.id);\n            log.fehler_text = grund;\n            ergebnisse.push(log);\n            continue;\n          }\n        } else {\n          passwort = await entschluessele(pf.imap_passwort_verschluesselt);\n        }',
+     'Postfach-Anbieter: Zugangsdaten je Anbieter, Token wird erneuert.',
+     {'mail-postfach-pull'}),
+    ('FORK',
+     '          imap = new SimpleImap(pf.imap_server, Number(pf.imap_port || 993), pf.imap_user || pf.email_adresse, passwort);',
+     '          imap = new SimpleImap(pf.imap_server, Number(pf.imap_port || 993),\n                                pf.imap_user || pf.email_adresse, passwort, xoauthZeile);',
+     'Postfach-Anbieter: die IMAP-Verbindung bekommt das Token.',
+     {'mail-postfach-pull'}),
+    ('FORK',
+     'import { createClient } from "jsr:@supabase/supabase-js@2";',
+     'import { createClient } from "jsr:@supabase/supabase-js@2";\n// Die Anbieter-Schicht der Postfaecher. Quelle:\n// supabase/eigene-beilagen/mail-senden/anbieter.ts.\nimport { zugriffstoken } from "./anbieter.ts";',
+     'Postfach-Anbieter: die Anbieter-Schicht wird eingebunden (Versand).',
+     {'mail-senden'}),
+    ('FORK',
+     '    const perSmtp = async () => {\n      if (!postfach.smtp_passwort_verschluesselt) throw new Error("Postfach hat kein SMTP-Passwort hinterlegt");\n      let passwort: string;\n      try { passwort = await entschluessele(postfach.smtp_passwort_verschluesselt); }\n      catch (e) { throw new Error("Passwort konnte nicht entschluesselt werden"); }\n      const istSslDirekt = Number(postfach.smtp_port) === 465 || postfach.smtp_security === "ssl";\n      const transporter = nodemailer.createTransport({\n        host: postfach.smtp_server,\n        port: Number(postfach.smtp_port),\n        secure: istSslDirekt,\n        auth: { user: postfach.smtp_user, pass: passwort },',
+     '    const perSmtp = async () => {\n      // Drei Anbieter, ein Versand. Microsoft und Google nehmen kein\n      // Passwort mehr an; dort wird ein Zugriffs-Token geholt (und bei\n      // Bedarf erneuert) und per XOAUTH2 angemeldet. nodemailer kann das\n      // selbst, wenn man ihm Typ und Token gibt.\n      const perOauth = postfach.anbieter && postfach.anbieter !== "imap";\n      let anmeldung: Record<string, unknown>;\n      if (perOauth) {\n        const t = await zugriffstoken(postfach);\n        if (t.neu) await admin.from("mail_postfaecher").update(t.neu).eq("id", postfach.id);\n        anmeldung = { type: "OAuth2", user: t.adresse, accessToken: t.token };\n      } else {\n        if (!postfach.smtp_passwort_verschluesselt) throw new Error("Postfach hat kein SMTP-Passwort hinterlegt");\n        let passwort: string;\n        try { passwort = await entschluessele(postfach.smtp_passwort_verschluesselt); }\n        catch (e) { throw new Error("Passwort konnte nicht entschluesselt werden"); }\n        anmeldung = { user: postfach.smtp_user, pass: passwort };\n      }\n      const istSslDirekt = Number(postfach.smtp_port) === 465 || postfach.smtp_security === "ssl";\n      const transporter = nodemailer.createTransport({\n        host: postfach.smtp_server,\n        port: Number(postfach.smtp_port),\n        secure: istSslDirekt,\n        auth: anmeldung,',
+     'Postfach-Anbieter: SMTP meldet sich per XOAUTH2 an, wenn kein Passwort da ist.',
+     {'mail-senden'}),
+    ('FORK',
+     '    const reihenfolge = ics && postfach.smtp_passwort_verschluesselt ? [perSmtp, perResend] : [perResend, perSmtp];',
+     '    // Ein eigenes Postfach ist immer der bessere Absender: die Mail steht\n    // danach im Gesendet-Ordner des Nutzers und kommt von seiner Adresse.\n    // "Hat ein Passwort" war dafuer das Kennzeichen — ein OAuth-Postfach\n    // hat keines und waere damit aussortiert worden.\n    const eigenerVersand = !!postfach.smtp_passwort_verschluesselt\n      || (postfach.anbieter && postfach.anbieter !== "imap");\n    const reihenfolge = ics && eigenerVersand ? [perSmtp, perResend] : [perResend, perSmtp];',
+     'Postfach-Anbieter: auch ein OAuth-Postfach sendet zuerst selbst.',
+     {'mail-senden'}),
 ]
 
 
@@ -4052,6 +4110,34 @@ def main():
               f'uebernommen: {", ".join(eigene)}')
         print('        Sie haben keine Entsprechung in der Vorlage und werden '
               'deshalb\n        nicht gegen sie verglichen.')
+
+    # --- Beilagen zu uebernommenen Funktionen ---------------------------
+    # Gemeinsamer Quelltext, der in den Ordner einer Funktion der Vorlage
+    # gehoert. Jede Datei wird genannt: eine Beilage, die stillschweigend
+    # dazukommt, ist eine Aenderung an einer fremden Funktion, von der
+    # niemand weiss.
+    beilagen = []
+    if BEILAGEN.is_dir():
+        for ordner in sorted(BEILAGEN.iterdir()):
+            if not ordner.is_dir():
+                continue
+            ziel_ordner = ZIEL / ordner.name
+            if not ziel_ordner.is_dir():
+                sys.exit(f'ABBRUCH: Beilage fuer {ordner.name}, aber diese '
+                         'Funktion gibt es nicht. Entweder ist der Name falsch '
+                         'oder die Funktion ist gestrichen (ENTFAELLT).')
+            for datei in sorted(ordner.rglob('*')):
+                if datei.is_dir():
+                    continue
+                ziel = ziel_ordner / datei.relative_to(ordner)
+                ziel.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(datei, ziel)
+                beilagen.append(f'{ordner.name}/{datei.relative_to(ordner)}')
+    if beilagen:
+        print(f'\n[BEILAGE] {len(beilagen)} Datei(en) zu Funktionen der Vorlage '
+              f'gelegt:')
+        for b in beilagen:
+            print(f'          {b}')
 
     print(f'{uebernommen} Funktionen aus der Vorlage und {len(eigene)} eigene '
           f'geschrieben nach {ZIEL}')

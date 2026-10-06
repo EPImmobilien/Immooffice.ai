@@ -216,6 +216,21 @@ ERWEITERT['expose-pdf-erzeugen'] = (
 # keine Entsprechung in der Vorlage und sind trotzdem kein Befund — sie sind
 # Erzeugnis, und wer sie erzeugt, steht dabei.
 BEIGELEGT = {
+    # Die Anbieter-Schicht der Postfaecher. Sie liegt in
+    # supabase/eigene-beilagen/<funktion>/ und wird vom Erzeuger nach dem
+    # Neuaufbau dazugelegt; tests/postfach-anbieter.js prueft, dass alle
+    # vier Kopien byte-gleich sind.
+    'mail-postfach-pull': {
+        'anbieter.ts':
+            'Anbieter-Schicht der Postfaecher (Microsoft, Google, IMAP): '
+            'Token erneuern und XOAUTH2 bilden. Quelle: '
+            'supabase/eigene-beilagen/mail-postfach-pull/anbieter.ts.',
+    },
+    'mail-senden': {
+        'anbieter.ts':
+            'Dieselbe Anbieter-Schicht fuer den Versand. Quelle: '
+            'supabase/eigene-beilagen/mail-senden/anbieter.ts.',
+    },
     'expose-pdf-erzeugen': {
         'schriften.mjs':
             'Die zwanzig Exposé-Schnitte, gepackt und base64-kodiert, '

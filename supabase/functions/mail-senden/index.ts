@@ -35,6 +35,9 @@ declare const EdgeRuntime: { waitUntil?: (p: Promise<unknown>) => void } | undef
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+// Die Anbieter-Schicht der Postfaecher. Quelle:
+// supabase/eigene-beilagen/mail-senden/anbieter.ts.
+import { zugriffstoken } from "./anbieter.ts";
 
 // --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
 // Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
@@ -400,16 +403,29 @@ Deno.serve(async (req) => {
 
     // ---- Weg B: SMTP des Postfachs (All-Inkl) ----
     const perSmtp = async () => {
-      if (!postfach.smtp_passwort_verschluesselt) throw new Error("Postfach hat kein SMTP-Passwort hinterlegt");
-      let passwort: string;
-      try { passwort = await entschluessele(postfach.smtp_passwort_verschluesselt); }
-      catch (e) { throw new Error("Passwort konnte nicht entschluesselt werden"); }
+      // Drei Anbieter, ein Versand. Microsoft und Google nehmen kein
+      // Passwort mehr an; dort wird ein Zugriffs-Token geholt (und bei
+      // Bedarf erneuert) und per XOAUTH2 angemeldet. nodemailer kann das
+      // selbst, wenn man ihm Typ und Token gibt.
+      const perOauth = postfach.anbieter && postfach.anbieter !== "imap";
+      let anmeldung: Record<string, unknown>;
+      if (perOauth) {
+        const t = await zugriffstoken(postfach);
+        if (t.neu) await admin.from("mail_postfaecher").update(t.neu).eq("id", postfach.id);
+        anmeldung = { type: "OAuth2", user: t.adresse, accessToken: t.token };
+      } else {
+        if (!postfach.smtp_passwort_verschluesselt) throw new Error("Postfach hat kein SMTP-Passwort hinterlegt");
+        let passwort: string;
+        try { passwort = await entschluessele(postfach.smtp_passwort_verschluesselt); }
+        catch (e) { throw new Error("Passwort konnte nicht entschluesselt werden"); }
+        anmeldung = { user: postfach.smtp_user, pass: passwort };
+      }
       const istSslDirekt = Number(postfach.smtp_port) === 465 || postfach.smtp_security === "ssl";
       const transporter = nodemailer.createTransport({
         host: postfach.smtp_server,
         port: Number(postfach.smtp_port),
         secure: istSslDirekt,
-        auth: { user: postfach.smtp_user, pass: passwort },
+        auth: anmeldung,
         tls: { rejectUnauthorized: false },
         connectionTimeout: 15000, greetingTimeout: 15000, socketTimeout: 60000,
       });
@@ -419,7 +435,13 @@ Deno.serve(async (req) => {
     };
 
     // Reihenfolge: Einladungen bevorzugt per SMTP (echte Kalenderteile), sonst Resend zuerst.
-    const reihenfolge = ics && postfach.smtp_passwort_verschluesselt ? [perSmtp, perResend] : [perResend, perSmtp];
+    // Ein eigenes Postfach ist immer der bessere Absender: die Mail steht
+    // danach im Gesendet-Ordner des Nutzers und kommt von seiner Adresse.
+    // "Hat ein Passwort" war dafuer das Kennzeichen — ein OAuth-Postfach
+    // hat keines und waere damit aussortiert worden.
+    const eigenerVersand = !!postfach.smtp_passwort_verschluesselt
+      || (postfach.anbieter && postfach.anbieter !== "imap");
+    const reihenfolge = ics && eigenerVersand ? [perSmtp, perResend] : [perResend, perSmtp];
     for (const weg of reihenfolge) {
       try { await weg(); break; }
       catch (e) { const m = e instanceof Error ? e.message : String(e); fehler.push(m); console.error("Versandweg fehlgeschlagen:", m); }

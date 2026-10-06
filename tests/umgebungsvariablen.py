@@ -46,10 +46,6 @@ VON_SUPABASE = {
 # Der Eintrag ist die Begruendung: eine dokumentierte Variable, die niemand
 # liest, ist sonst ein falsches Versprechen (siehe MAIL_API_KEY).
 GEPLANT = {
-    "GOOGLE_CLIENT_ID": "Kalender-Synchronisation, Phase 6",
-    "GOOGLE_CLIENT_SECRET": "Kalender-Synchronisation, Phase 6",
-    "MICROSOFT_CLIENT_ID": "Postfach und Kalender ueber Microsoft 365, Phase 6",
-    "MICROSOFT_CLIENT_SECRET": "Postfach und Kalender ueber Microsoft 365, Phase 6",
     "OPENAI_API_KEY": "zweiter KI-Anbieter, Anbieter-Schicht",
     "OPENAI_TEXTMODELL": "zweiter KI-Anbieter, Anbieter-Schicht",
     "OPENAI_BILDMODELL": "zweiter KI-Anbieter, Anbieter-Schicht",
@@ -82,6 +78,21 @@ def gelesen() -> dict[str, set[str]]:
     return raus
 
 
+def erwaehnt() -> set[str]:
+    """Namen, die im Quelltext der Funktionen VORKOMMEN, aber nicht als
+    Deno.env.get("…") — die Anbieter-Schicht der Postfaecher liest ihre
+    Variablen ueber eine Tabelle (Deno.env.get(a.umgebung.id)). Fuer die
+    Richtung "dokumentiert, aber unbenutzt" zaehlt das als benutzt; fuer die
+    andere Richtung nicht, denn ein Name in einem Kommentar richtet nichts
+    ein."""
+    raus: set[str] = set()
+    for datei in sorted(FUNKTIONEN.glob("*/*.ts")):
+        text = datei.read_text(encoding="utf-8")
+        for name in re.findall(r'"([A-Z][A-Z0-9_]{4,})"', text):
+            raus.add(name)
+    return raus
+
+
 def dokumentiert() -> set[str]:
     text = BEISPIEL.read_text(encoding="utf-8")
     return set(re.findall(r"^([A-Z0-9_]+)=", text, re.M))
@@ -93,6 +104,7 @@ def main() -> int:
         return 0
     benutzt = gelesen()
     steht = dokumentiert()
+    genannt = erwaehnt()
     fehler = 0
 
     fehlend = sorted(n for n in benutzt if n not in steht and n not in VON_SUPABASE)
@@ -108,8 +120,9 @@ def main() -> int:
 
     verirrt = sorted(
         n for n in steht
-        if n not in benutzt and n not in GEPLANT and n not in VON_DER_OBERFLAECHE
-        and n not in VON_SUPABASE and not PREIS_MUSTER.match(n)
+        if n not in benutzt and n not in genannt and n not in GEPLANT
+        and n not in VON_DER_OBERFLAECHE and n not in VON_SUPABASE
+        and not PREIS_MUSTER.match(n)
     )
     if verirrt:
         fehler = 1
@@ -123,7 +136,8 @@ def main() -> int:
 
     if fehler:
         return 1
-    print(f"[ok] {len(benutzt)} Variablen lesen die Funktionen, alle dokumentiert;")
+    print(f"[ok] {len(benutzt)} Variablen lesen die Funktionen unmittelbar, "
+          f"alle dokumentiert;")
     print(f"     {len(GEPLANT)} weitere sind mit Grund fuer eine spaetere Phase")
     print("     vorgemerkt. Keine erfundenen Namen in .env.example.")
     return 0

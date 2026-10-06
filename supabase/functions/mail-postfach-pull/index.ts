@@ -46,6 +46,10 @@
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+// Die Anbieter-Schicht der Postfaecher (Microsoft, Google, IMAP). Sie
+// liegt als Beilage im Ordner dieser Funktion; die Quelle steht in
+// supabase/eigene-beilagen/mail-postfach-pull/anbieter.ts.
+import { xoauth2, zugriffstoken } from "./anbieter.ts";
 
 // --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
 // Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
@@ -228,7 +232,11 @@ class SimpleImap {
   private buffer = "";
   private tagCounter = 0;
 
-  constructor(private host: string, private port: number, private user: string, private pass: string) {}
+  // Bei einem OAuth2-Postfach steht hier die fertige XOAUTH2-Zeichenkette
+  // statt eines Passworts. Microsoft nimmt LOGIN nicht mehr an, Google
+  // nur noch mit App-Passwort — der Abruf selbst bleibt derselbe.
+  constructor(private host: string, private port: number, private user: string,
+              private pass: string, private xoauth: string | null = null) {}
 
   private nextTag(): string {
     this.tagCounter++;
@@ -280,6 +288,24 @@ class SimpleImap {
   }
 
   async login(): Promise<void> {
+    if (this.xoauth) {
+      // AUTHENTICATE XOAUTH2 laeuft anders als LOGIN: lehnt der Server ab,
+      // schickt er "+" und eine base64-kodierte Begruendung und wartet
+      // dann auf eine LEERE Zeile. Ohne sie bleibt die Verbindung haengen,
+      // bis der Zeitgeber zuschlaegt — und die Begruendung waere verloren.
+      const tag = this.nextTag();
+      await this.send(`${tag} AUTHENTICATE XOAUTH2 ${this.xoauth}`);
+      const fertig = new RegExp(`^${tag} (OK|NO|BAD)`, "m");
+      let antwort = await this.readUntil(new RegExp(`(^${tag} (OK|NO|BAD))|(^\\+)`, "m"), 20000);
+      if (!fertig.test(antwort)) {
+        await this.send("");
+        antwort += await this.readUntil(fertig, 20000);
+      }
+      if (new RegExp(`^${tag} (NO|BAD)`, "m").test(antwort)) {
+        throw new Error(`XOAUTH2 abgelehnt: ${antwort.substring(0, 300)}`);
+      }
+      return;
+    }
     const escUser = this.user.replace(/"/g, '\\"');
     const escPass = this.pass.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
     await this.cmd(`LOGIN "${escUser}" "${escPass}"`);
@@ -551,17 +577,41 @@ Deno.serve(async (req) => {
       let imap: SimpleImap | null = null;
 
       try {
-        if (!pf.imap_server || !pf.imap_passwort_verschluesselt) {
+        // Drei Anbieter, ein Abruf. "imap" meldet sich mit Passwort an,
+        // "microsoft" und "google" mit einem Token, das hier bei Bedarf
+        // erneuert wird. Scheitert das, bleibt der Grund am Postfach
+        // stehen (oauth_fehler) — die Oberflaeche bietet dann "Verbindung
+        // erneuern" an, statt den Nutzer raten zu lassen.
+        const perOauth = pf.anbieter && pf.anbieter !== "imap";
+        if (!pf.imap_server || (!perOauth && !pf.imap_passwort_verschluesselt)) {
           log.fehler_text = "imap_server oder Passwort fehlt";
           ergebnisse.push(log);
           continue;
         }
 
-        const passwort = await entschluessele(pf.imap_passwort_verschluesselt);
+        let passwort = "";
+        let xoauthZeile: string | null = null;
+        if (perOauth) {
+          try {
+            const t = await zugriffstoken(pf);
+            if (t.neu) await admin.from("mail_postfaecher").update(t.neu).eq("id", pf.id);
+            xoauthZeile = xoauth2(t.adresse, t.token);
+          } catch (e) {
+            const grund = e instanceof Error ? e.message : String(e);
+            await admin.from("mail_postfaecher")
+              .update({ oauth_fehler: grund.slice(0, 500) }).eq("id", pf.id);
+            log.fehler_text = grund;
+            ergebnisse.push(log);
+            continue;
+          }
+        } else {
+          passwort = await entschluessele(pf.imap_passwort_verschluesselt);
+        }
         console.log(`Verbinde zu ${pf.imap_server}:${pf.imap_port}...`);
         let aktuellerOrdner: string | null = null;
         const verbinden = async () => {
-          imap = new SimpleImap(pf.imap_server, Number(pf.imap_port || 993), pf.imap_user || pf.email_adresse, passwort);
+          imap = new SimpleImap(pf.imap_server, Number(pf.imap_port || 993),
+                                pf.imap_user || pf.email_adresse, passwort, xoauthZeile);
           await imap.connect();
           await imap.login();
           if (aktuellerOrdner) await imap.selectFolder(aktuellerOrdner);

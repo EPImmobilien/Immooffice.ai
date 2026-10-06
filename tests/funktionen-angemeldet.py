@@ -50,6 +50,14 @@ ABGESICHERT = {
         'Positionen und Betraegen.'),
     'mail-gelesen-setzen': ('immoMandantSichern',
         'Fremde Mails als gelesen markieren.'),
+    'postfach-anbieter-start': ('benutzer_id !== u.user.id',
+        'Startet die Verbindung eines Postfachs bei Microsoft oder Google. '
+        'Die einzige Kennung aus dem Koerper ist postfach_id (ein '
+        'bestehendes Postfach neu verbinden) — und die wird gegen den '
+        'ANGEMELDETEN NUTZER geprueft, nicht nur gegen den Mandanten: ein '
+        'Postfach gehoert einem Menschen, nicht einem Haus. Mit der Pruefung '
+        'auf den Mandanten allein haette ein Kollege das Token eines anderen '
+        'ueberschreiben koennen.'),
     'mail-anhaenge-extrahieren': ('immoMandantSichern',
         'Anhaenge aus einer fremden Mail auslesen und ablegen.'),
     'eigentuemer-nachricht-senden': ('immoMandantSichern',

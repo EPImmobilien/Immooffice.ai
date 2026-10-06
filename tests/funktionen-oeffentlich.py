@@ -36,6 +36,14 @@ ABGESICHERT = {
         'Schreibt Dateien; Mandant aus Immobilie beziehungsweise Dateisatz.'),
     'signatur-unterschreiben': ('immoSetzeMandant',
         'Mandant aus dem Signaturvorgang, den der Token benennt.'),
+    'postfach-anbieter-rueckruf': ('mail_oauth_vorgaenge',
+        'Die Rueckleitung von Microsoft oder Google. Oeffentlich zwangslaeufig: '
+        'der Anbieter schickt den BROWSER des Nutzers hierher, ein '
+        'Anmeldekopf kann dabei nicht mitkommen. Den Mandanten nimmt sie '
+        'aus dem Vorgang, den postfach-anbieter-start angelegt hat — '
+        'einmalig, zehn Minuten gueltig, an Nutzer und Mandant gebunden. '
+        'Das angelegte Postfach bekommt mandant_id und benutzer_id aus '
+        'diesem Vorgang, nie aus dem Aufruf.'),
     'objekt-landing': ('immoStandortDesObjekts',
         'Oeffentliche Objektseite. Impressum, Absenderadresse und neue '
         'Interessentenkontakte kommen aus dem Mandanten DES OBJEKTS, nicht '
