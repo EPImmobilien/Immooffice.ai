@@ -52,6 +52,16 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// Pflichtangabe. Fehlt sie, geht NICHTS hinaus: ein Rueckfall auf
+// eine Adresse, die niemandem gehoert, sieht aus wie Betrieb, kommt
+// aber nirgends an. Begruendung in docs/OFFEN.md.
+function immoFehlt(was: string): never {
+  throw new Error(was + " fehlt (siehe docs/SECRETS.md). Ohne diese " +
+    "Angabe ginge eine Nachricht mit einer Adresse hinaus, die " +
+    "niemandem gehoert \u2014 deshalb geht gar keine.");
+}
+
+
 // --- Firmenname des Mandanten (Phase 2.4) ---------------------------------
 // Die Neutralisierung hat den Namen der Referenz ueberall durch den des
 // Demo-Mandanten ersetzt. Fuer das Neutralitaets-Gate war das richtig; fuer
@@ -75,7 +85,7 @@ const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers
 // Die drei Rechtsadressen stehen in firma_stammdaten (fork_32), nicht
 // hier: sie gehoeren dem Mandanten, nicht der Plattform. Ohne Eintrag
 // bleibt der Wert leer und die Oberflaeche laesst den Link weg.
-const OBJEKT_BASIS = (Deno.env.get("PORTAL_URL") || "https://immooffice.example").replace(/\/?$/, "") + "/objekt.html?t=";
+const OBJEKT_BASIS = (Deno.env.get("PORTAL_URL") || immoFehlt("PORTAL_URL")).replace(/\/?$/, "") + "/objekt.html?t=";
 const BUCKET = "immobilie-dateien";
 const OEFFENTLICH = `${Deno.env.get("SUPABASE_URL")}/storage/v1/object/public/${BUCKET}/`;
 const FRAGEN_TAG = 20;
@@ -410,7 +420,7 @@ Deno.serve(async (req) => {
         if (!fr || !imr) { await db.from("landing_fragen").update({ makler_info_am: new Date().toISOString() }).in("id", fragen.map((q: any) => q.id)); continue; }
         const { data: mk } = imr.zustaendig_id ? await db.from("profiles").select("name, email").eq("id", imr.zustaendig_id).maybeSingle() : { data: null as any };
         const fi = await immoStandortDesObjekts(db, imr.mandant_id, fr.firma_slug || null);
-        const firmaMail = fi?.email || "info@immooffice.example";
+        const firmaMail = fi?.email || immoFehlt("eine Absenderadresse (Postfach, Firmenstammdaten oder SMTP_FROM_EMAIL)");
         const titel2 = imr.objekttitel || imr.bezeichnung || "Immobilie"; const nr2 = imr.immo_nr ? ` (Nr. ${imr.immo_nr})` : ""; const wer2 = fr.name || fr.email;
         const n = fragen.length;
         const liste = fragen.map((q: any) => `• ${new Date(q.created_at).toLocaleString("de-DE", { timeZone: "Europe/Berlin", hour: "2-digit", minute: "2-digit" })} Uhr: „${q.frage}“${q.antwort && !/weitergeleitet/.test(q.antwort) ? "\n   (Assistent vorläufig: " + q.antwort.replace(/\s*Ich habe Ihre Frage an .*$/, "") + ")" : ""}`).join("\n");

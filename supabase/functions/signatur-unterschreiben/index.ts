@@ -36,13 +36,23 @@ async function immoFirmenName(db: any, mandant: unknown): Promise<string> {
 import { PDFDocument, rgb, StandardFonts } from "npm:pdf-lib@1.17.1";
 import nodemailer from "npm:nodemailer@6.9.16";
 
+// Pflichtangabe. Fehlt sie, geht NICHTS hinaus: ein Rueckfall auf
+// eine Adresse, die niemandem gehoert, sieht aus wie Betrieb, kommt
+// aber nirgends an. Begruendung in docs/OFFEN.md.
+function immoFehlt(was: string): never {
+  throw new Error(was + " fehlt (siehe docs/SECRETS.md). Ohne diese " +
+    "Angabe ginge eine Nachricht mit einer Adresse hinaus, die " +
+    "niemandem gehoert \u2014 deshalb geht gar keine.");
+}
+
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const PORTAL_URL = Deno.env.get("PORTAL_URL") || "https://immooffice.example";
+const PORTAL_URL = Deno.env.get("PORTAL_URL") || immoFehlt("PORTAL_URL");
 
 const QUELLTABELLE: Record<string, string> = {
   maklervertrag: "vertraege",

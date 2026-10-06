@@ -1018,14 +1018,25 @@ Verweis im Datenschutzhinweis. Das ist gewollt, aber es heißt auch: die
 Exposé-Freigabe verlangt dann keine AGB-Bestätigung mehr. Wer das Modul
 rechtlich nutzen will, muss die drei Adressen eintragen.
 
-### 2. Mailadressen als Rückfall
+### 2. Mailadressen als Rückfall — **erledigt am 06.10.2026**
 
-`info@immooffice.example` steht als Rückfall hinter `firma.email`,
-`SMTP_FROM_EMAIL` und `BUCHHALTUNG_EMAIL`, dazu in einigen kundenlesbaren
-Texten („schreiben Sie uns an …"). Ein Rückfall auf eine Adresse, die
-niemandem gehört, ist schlechter als keiner: die Mail geht raus und kommt
-nirgends an. Richtig wäre: ohne Absenderadresse **nicht senden** und das
-protokollieren.
+~~`info@immooffice.example` steht als Rückfall hinter `firma.email`,
+`SMTP_FROM_EMAIL` und `BUCHHALTUNG_EMAIL`.~~ Umgesetzt wie hier
+vorgeschlagen: **ohne Absenderadresse wird nicht gesendet.** An die Stelle
+des Rückfalls ist `immoFehlt(...)` getreten — eine Funktion, die wirft statt
+eine Adresse zu erfinden. Auf Modulebene heißt das: die Edge Function lädt
+gar nicht erst, es geht nichts hinaus, und im Protokoll steht, welche Angabe
+fehlt und wo sie einzutragen ist.
+
+39 Stellen in 26 Dateien. `tests/pflichtangaben.py` hält es fest, und
+`funktionen-ausrollen.yml` sagt beim Ausrollen, welche der vier
+Pflichtangaben noch fehlt — damit es nicht erst beim Kunden auffällt.
+
+**Offen bleibt** der zweite Teil: `info@immooffice.example` steht weiter in
+einigen **kundenlesbaren Texten** („schreiben Sie uns an …", Widerrufs­
+belehrung, Mail-Fußzeilen). Das ist kein Rückfall, sondern ein verdrahteter
+Wert, und er gehört nach `firma_stammdaten` — dieselbe Aufgabe wie der
+verdrahtete Firmenname, Phase 2.4.
 
 ### 3. Die Adresse der Plattform selbst
 

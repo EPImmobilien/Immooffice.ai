@@ -14,6 +14,16 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// Pflichtangabe. Fehlt sie, geht NICHTS hinaus: ein Rueckfall auf
+// eine Adresse, die niemandem gehoert, sieht aus wie Betrieb, kommt
+// aber nirgends an. Begruendung in docs/OFFEN.md.
+function immoFehlt(was: string): never {
+  throw new Error(was + " fehlt (siehe docs/SECRETS.md). Ohne diese " +
+    "Angabe ginge eine Nachricht mit einer Adresse hinaus, die " +
+    "niemandem gehoert \u2014 deshalb geht gar keine.");
+}
+
+
 // --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
 // Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
 // und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist
@@ -58,7 +68,7 @@ async function immoMandantDesAufrufers(req: Request): Promise<string | null> {
 }
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
-const LINK_BASIS = (Deno.env.get("EXPOSE_FREIGABE_BASIS") || "https://immooffice.example/?expose=").replace(/\/\?expose=$/, "/freigabe.html?expose=");
+const LINK_BASIS = (Deno.env.get("EXPOSE_FREIGABE_BASIS") || immoFehlt("EXPOSE_FREIGABE_BASIS")).replace(/\/\?expose=$/, "/freigabe.html?expose=");
 const OBJEKT_BASIS = LINK_BASIS.replace(/freigabe\.html\?expose=$/, "objekt.html?t=");
 
 function token(): string { const b = new Uint8Array(24); crypto.getRandomValues(b); return Array.from(b).map((x) => x.toString(16).padStart(2, "0")).join(""); }

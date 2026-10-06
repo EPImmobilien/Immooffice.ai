@@ -10,6 +10,16 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// Pflichtangabe. Fehlt sie, geht NICHTS hinaus: ein Rueckfall auf
+// eine Adresse, die niemandem gehoert, sieht aus wie Betrieb, kommt
+// aber nirgends an. Begruendung in docs/OFFEN.md.
+function immoFehlt(was: string): never {
+  throw new Error(was + " fehlt (siehe docs/SECRETS.md). Ohne diese " +
+    "Angabe ginge eine Nachricht mit einer Adresse hinaus, die " +
+    "niemandem gehoert \u2014 deshalb geht gar keine.");
+}
+
+
 // --- Firmenname des Mandanten (Phase 2.4) ---------------------------------
 // Die Neutralisierung hat den Namen der Referenz ueberall durch den des
 // Demo-Mandanten ersetzt. Fuer das Neutralitaets-Gate war das richtig; fuer
@@ -50,7 +60,7 @@ function immoEigeneAdresse(adresse: unknown, eigene: unknown): boolean {
 }
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
-const LINK_BASIS = (Deno.env.get("EXPOSE_FREIGABE_BASIS") || "https://immooffice.example/?expose=").replace(/\/\?expose=$/, "/freigabe.html?expose=");
+const LINK_BASIS = (Deno.env.get("EXPOSE_FREIGABE_BASIS") || immoFehlt("EXPOSE_FREIGABE_BASIS")).replace(/\/\?expose=$/, "/freigabe.html?expose=");
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
@@ -85,7 +95,7 @@ Deno.serve(async (req) => {
         const text = `${anrede},\n\nvor Kurzem haben Sie sich für „${titel}“${ort ? ` in ${ort}` : ""} interessiert. Ihr persönlicher Exposé-Link wurde bisher noch nicht genutzt – daher möchte ich ihn Ihnen noch einmal zusenden:\n\n${LINK_BASIS}${f.token}\n\nMit einem Klick bestätigen Sie die Pflichtangaben und können das Exposé mit allen Details, Grundrissen und Bildern sofort herunterladen. ${f.provisionsmodell === "kaeufer" ? "Eine Provision fällt ausschließlich dann an, wenn es tatsächlich zu einem notariellen Kaufvertrag kommt – Exposé, Besichtigung und Beratung sind für Sie kostenfrei." : "Für Sie entstehen dabei keine Kosten."}\n\nSollte die Immobilie für Sie nicht mehr infrage kommen, freue ich mich über eine kurze Rückmeldung – gern suche ich dann nach einer passenden Alternative für Sie.\n\nMit freundlichen Grüßen\n${makler?.name || firma?.firma_name || "Ihr Maklerteam"}${makler?.telefon ? "\nTelefon " + makler.telefon : ""}\n${firma?.firma_name || ""}${firma ? `\n${firma.strasse}, ${firma.plz} ${firma.ort}` : ""}`;
         if (body.trocken) { erg.push({ id: f.id, an: f.email, trocken: true }); continue; }
         if (!resendKey) throw new Error("RESEND_API_KEY fehlt");
-        const absender = makler?.email && immoEigeneAdresse(makler.email, firma?.email) ? `${makler.name} <${makler.email}>` : `${firma?.firma_name || "Ihr Makler"} <${firma?.email || "info@immooffice.example"}>`;
+        const absender = makler?.email && immoEigeneAdresse(makler.email, firma?.email) ? `${makler.name} <${makler.email}>` : `${firma?.firma_name || "Ihr Makler"} <${firma?.email || immoFehlt("eine Absenderadresse (Postfach, Firmenstammdaten oder SMTP_FROM_EMAIL)")}>`;
         const r = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
           body: JSON.stringify({ from: absender, to: [f.email], reply_to: makler?.email || firma?.email, subject: `Ihr Exposé zu „${titel}“ wartet auf Sie`, text }) });
         if (!r.ok) throw new Error(`Resend ${r.status}: ${await r.text()}`);

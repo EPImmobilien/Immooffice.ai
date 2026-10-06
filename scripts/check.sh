@@ -490,6 +490,17 @@ else
   fehler=1
 fi
 
+abschnitt "Pflichtangaben: kein Rueckfall ins Leere"
+# immooffice.example gehoert niemandem. Als Ersatz fuer die Domain der
+# Referenz ist das richtig; als Rueckfall hinter einer fehlenden Angabe
+# falsch — die Mail geht hinaus und kommt nirgends an. Seit 06.10.2026
+# verweigern die Funktionen stattdessen den Versand.
+if python3 tests/pflichtangaben.py; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Schreibstil und Antwort-Absichten"
 # Die Schwaerzung ist die eine Stelle, an der entschieden wird, was den
 # Server Richtung KI-Anbieter verlaesst. Rutscht dort eine Nummer durch,

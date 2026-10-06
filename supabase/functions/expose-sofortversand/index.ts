@@ -59,7 +59,17 @@ const cors = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const LINK_BASIS = (Deno.env.get("EXPOSE_FREIGABE_BASIS") || "https://immooffice.example/?expose=")
+// Pflichtangabe. Fehlt sie, geht NICHTS hinaus: ein Rueckfall auf eine
+// Adresse, die niemandem gehoert, sieht aus wie Betrieb, kommt aber nirgends
+// an. Begruendung in docs/OFFEN.md. Dieselbe Regel gilt fuer die
+// uebernommenen Funktionen — dort setzt sie scripts/neutralisieren-funktionen.py.
+function immoFehlt(was: string): never {
+  throw new Error(was + " fehlt (siehe docs/SECRETS.md). Ohne diese " +
+    "Angabe ginge eine Nachricht mit einer Adresse hinaus, die " +
+    "niemandem gehoert \u2014 deshalb geht gar keine.");
+}
+
+const LINK_BASIS = (Deno.env.get("EXPOSE_FREIGABE_BASIS") || immoFehlt("EXPOSE_FREIGABE_BASIS"))
   .replace(/\/\?expose=$/, "/freigabe.html?expose=");
 const OBJEKT_BASIS = LINK_BASIS.replace(/freigabe\.html\?expose=$/, "objekt.html?t=");
 

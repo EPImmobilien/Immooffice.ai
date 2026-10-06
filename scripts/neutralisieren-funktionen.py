@@ -1538,6 +1538,7 @@ ERSETZUNGEN = [
      r'const STIL_PROFIL_LASSE = `[\s\S]*?\n`;\n',
      'import { ABSICHTEN, absichtBlock, stilProfil } from "./stil.ts";\n',
      'Stilprofil einer Person der Referenz durch stil.ts ersetzt.'),
+
 ]
 
 # Drei Funktionen verdrahten die Portal-Adresse fest, statt sie wie alle
@@ -4272,7 +4273,11 @@ def main():
             # frisst, faellt sonst nicht auf. Wo bewusst gross gekuerzt
             # wird, steht es in KUERZT, mit Grund. Eine Ausnahme mit
             # Begruendung ist etwas anderes als eine gelockerte Grenze.
-            unten, oben = (-2, 170) if erweitert else (-2, 0)
+            # 06.10.2026 von 170 auf 180: der Helfer immoFehlt() kommt in
+            # achtzehn Funktionen dazu (neun Zeilen). signatur-vorgang-starten
+            # stand bei +162 und lief damit ueber. Die Zahl war gewollt, also
+            # steigt die Grenze — nicht die Toleranz.
+            unten, oben = (-2, 180) if erweitert else (-2, 0)
             if erweitert and ordner.name in KUERZT:
                 unten = KUERZT[ordner.name][0]
             if not unten <= zeilen_delta <= oben:
@@ -4360,7 +4365,120 @@ def main():
 
     print(f'{uebernommen} Funktionen aus der Vorlage und {len(eigene)} eigene '
           f'geschrieben nach {ZIEL}')
+    rueckfaelle_ohne_domain()
+    pflicht_helfer_ergaenzen()
     rueckschritt_warnen()
+
+
+# Rueckfaelle auf immooffice.example — Suchtext, Ersatz, Grund.
+#
+# immooffice.example ist nach RFC 2606 reserviert und gehoert niemandem. Als
+# ERSATZ fuer die Domain der Referenz ist sie richtig (HOST oben). Als
+# RUECKFALL hinter einer fehlenden Angabe ist sie falsch: die Nachricht geht
+# hinaus, der Absender existiert nicht, der Link fuehrt ins Leere. Das sieht
+# aus wie Betrieb. docs/OFFEN.md sagt, was stattdessen gilt: „ohne
+# Absenderadresse NICHT senden und das protokollieren."
+#
+# WARUM EIN NACHLAUF UND KEINE REGEL: einige dieser Zeilen setzen FORK-Regeln
+# selbst ein, und die laufen nach den ERSETZUNGEN. Eine Regel davor fand sie
+# nicht; eine Regel danach gibt es nicht. Der Nachlauf laeuft als Letztes und
+# sieht, was wirklich dasteht — an der Reihenfolge der Regeln kann er nicht
+# mehr scheitern. Dreimal ist mir genau das heute passiert.
+RUECKFAELLE = [
+    ('|| "https://immooffice.example/?expose="',
+     '|| immoFehlt("EXPOSE_FREIGABE_BASIS")',
+     'Adresse der Freigabeseite'),
+    ('|| "https://immooffice.example/#zugang"',
+     '|| immoFehlt("die Adresse des Eigentuemer-Zugangs")',
+     'Zugangslink in der Einladung'),
+    ('|| "https://immooffice.example/"',
+     '|| immoFehlt("PORTAL_URL")',
+     'Adresse der Anwendung, mit Schraegstrich'),
+    ('|| "https://immooffice.example"',
+     '|| immoFehlt("PORTAL_URL")',
+     'Adresse der Anwendung'),
+    ('|| "buchhaltung@immooffice.example"',
+     '|| immoFehlt("BUCHHALTUNG_EMAIL")',
+     'Empfaenger weitergeleiteter Rechnungen'),
+    # Zwei Faelle, zwei Meldungen: wer sie nachts liest, soll wissen, wo er
+    # etwas eintragen muss — in den Secrets oder in den Firmenstammdaten.
+    ('Deno.env.get("SMTP_FROM_EMAIL") || "info@immooffice.example"',
+     'Deno.env.get("SMTP_FROM_EMAIL") || immoFehlt("SMTP_FROM_EMAIL")',
+     'Absenderadresse aus der Umgebung'),
+    ('|| "info@immooffice.example"',
+     '|| immoFehlt("eine Absenderadresse (Postfach, Firmenstammdaten oder SMTP_FROM_EMAIL)")',
+     'Absenderadresse aus den Stammdaten'),
+    # Kein Rueckfall, sondern eine erfundene Angabe: die Webadresse wird im
+    # PDF ABGEDRUCKT. Hat der Mandant keine, steht dort besser nichts als
+    # eine Domain, die ihm nicht gehoert.
+    ('String(firma.web || "www.immooffice.example")',
+     'String(firma.web || "")',
+     'Webadresse im PDF: leer statt erfunden'),
+]
+
+
+def rueckfaelle_ohne_domain():
+    """Ersetzt die Rueckfaelle auf die Platzhalter-Domain. Laeuft zuletzt."""
+    gezaehlt = {}
+    for datei in sorted(ZIEL.rglob('*.ts')):
+        inhalt = datei.read_text(encoding='utf-8')
+        neu = inhalt
+        for suche, ersatz, grund in RUECKFAELLE:
+            n = neu.count(suche)
+            if n:
+                neu = neu.replace(suche, ersatz)
+                gezaehlt[grund] = gezaehlt.get(grund, 0) + n
+        if neu != inhalt:
+            datei.write_text(neu, encoding='utf-8')
+    if gezaehlt:
+        print('\n[FREMD] Rueckfaelle auf die Platzhalter-Domain ersetzt:')
+        for grund, n in sorted(gezaehlt.items(), key=lambda g: -g[1]):
+            print(f'        {n:3d}x  {grund}')
+
+
+def pflicht_helfer_ergaenzen():
+    """Legt immoFehlt() in jede Datei, die es benutzt und nicht hat.
+
+    Warum ein Nachlauf und keine Liste von Hand: der Austausch der
+    Platzhalter-Domain greift ueber regulaere Ausdruecke und trifft damit
+    auch Stellen, die beim Schreiben der Regel niemand auf dem Zettel hatte.
+    Am 06.10.2026 waren es sieben Dateien mehr als gedacht — darunter vier
+    Beilagen in Unterordnern. Sie haetten den Aufruf enthalten, aber nicht
+    die Funktion, und waeren beim Laden gescheitert.
+
+    Eine Liste von Hand laeuft der naechsten Regel immer hinterher. Dieser
+    Nachlauf nicht: er sieht nach, was wirklich dasteht.
+    """
+    helfer = (
+        '\n'
+        '// Pflichtangabe. Fehlt sie, geht NICHTS hinaus: ein Rueckfall auf\n'
+        '// eine Adresse, die niemandem gehoert, sieht aus wie Betrieb, kommt\n'
+        '// aber nirgends an. Begruendung in docs/OFFEN.md.\n'
+        'function immoFehlt(was: string): never {\n'
+        '  throw new Error(was + " fehlt (siehe docs/SECRETS.md). Ohne diese " +\n'
+        '    "Angabe ginge eine Nachricht mit einer Adresse hinaus, die " +\n'
+        '    "niemandem gehoert \\u2014 deshalb geht gar keine.");\n'
+        '}\n')
+    ergaenzt = []
+    for datei in sorted(ZIEL.rglob('*.ts')):
+        inhalt = datei.read_text(encoding='utf-8')
+        if 'immoFehlt(' not in inhalt or 'function immoFehlt' in inhalt:
+            continue
+        # Hinter die letzte Importzeile am Dateianfang — vor dem ersten
+        # Gebrauch, und nicht mitten in eine Funktion.
+        zeilen = inhalt.split('\n')
+        letzte = 0
+        for i, z in enumerate(zeilen[:60]):
+            if z.startswith('import ') or z.startswith('} from "'):
+                letzte = i
+        zeilen.insert(letzte + 1, helfer)
+        datei.write_text('\n'.join(zeilen), encoding='utf-8')
+        ergaenzt.append(str(datei.relative_to(ZIEL)))
+    if ergaenzt:
+        print(f'\n[FREMD] immoFehlt() in {len(ergaenzt)} Datei(en) ergaenzt, '
+              f'die es benutzen:')
+        for e in ergaenzt:
+            print(f'        {e}')
 
 
 def rueckschritt_warnen():

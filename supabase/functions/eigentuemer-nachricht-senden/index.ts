@@ -7,6 +7,16 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// Pflichtangabe. Fehlt sie, geht NICHTS hinaus: ein Rueckfall auf
+// eine Adresse, die niemandem gehoert, sieht aus wie Betrieb, kommt
+// aber nirgends an. Begruendung in docs/OFFEN.md.
+function immoFehlt(was: string): never {
+  throw new Error(was + " fehlt (siehe docs/SECRETS.md). Ohne diese " +
+    "Angabe ginge eine Nachricht mit einer Adresse hinaus, die " +
+    "niemandem gehoert \u2014 deshalb geht gar keine.");
+}
+
+
 // --- Firmenname des Mandanten (Phase 2.4) ---------------------------------
 // Die Neutralisierung hat den Namen der Referenz ueberall durch den des
 // Demo-Mandanten ersetzt. Fuer das Neutralitaets-Gate war das richtig; fuer
@@ -94,7 +104,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
-    const portalUrl = Deno.env.get("PORTAL_URL") || "https://immooffice.example";
+    const portalUrl = Deno.env.get("PORTAL_URL") || immoFehlt("PORTAL_URL");
 
     const jwt = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
     const { data: userData, error: userErr } = await supabase.auth.getUser(jwt);
@@ -134,7 +144,7 @@ Deno.serve(async (req) => {
       || kandidaten[0]
       || null;
 
-    const fromEmail = gewaehlt?.email_adresse || Deno.env.get("SMTP_FROM_EMAIL") || "info@immooffice.example";
+    const fromEmail = gewaehlt?.email_adresse || Deno.env.get("SMTP_FROM_EMAIL") || immoFehlt("SMTP_FROM_EMAIL");
     const fromName = gewaehlt?.absender_name || absender || firmaName || Deno.env.get("SMTP_FROM_NAME") || "";
 
     // ---- Versandweg: Resend bevorzugt, sonst SMTP wie bisher ----

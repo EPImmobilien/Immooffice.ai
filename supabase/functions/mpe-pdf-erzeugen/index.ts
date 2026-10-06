@@ -789,7 +789,7 @@ else warnungen.push("Kein Profilfoto beim Ansprechpartner hinterlegt.");
 const kontakt: Array<[string, string]> = [
 ["TELEFON", ap.telefon || firma.telefon || ""],
 ["E-MAIL", ap.email || firma.email || ""],
-["WEB", String(firma.web || "www.immooffice.example").replace(/^https?:\/\//, "")],
+["WEB", String(firma.web || "").replace(/^https?:\/\//, "")],
 ["ADRESSE", [firma.firma_name, firma.strasse, (firma.plz || "") + " " + (firma.ort || "")].filter(Boolean).join(" · ")],
 ].filter((k) => k[1]) as Array<[string, string]>;
 {
@@ -1617,7 +1617,7 @@ page.drawImage(logoWeiss, { x: (W - lw) / 2, y: (H - lh) / 2 + 26, width: lw, he
 }
 page.drawRectangle({ x: W / 2 - 30, y: H / 2 - 92, width: 60, height: 1.4, color: GOLD });
 text(standorte.map((s: any) => (s.ort || "").toUpperCase()).filter(Boolean).join("  ·  ") || "", W / 2, H / 2 - 122, fSB, 8.5, GOLDHELL, 2.2, "c");
-text(String(firma.web || "www.immooffice.example").replace(/^https?:\/\//, ""), W / 2, H / 2 - 146, fL, 9, rgb(0.843, 0.859, 0.910), 0.2, "c");
+text(String(firma.web || "").replace(/^https?:\/\//, ""), W / 2, H / 2 - 146, fL, 9, rgb(0.843, 0.859, 0.910), 0.2, "c");
 const pdfBytes = await pdf.save({ useObjectStreams: false });
 const slug = String(bew.titel || adresse || "Objekt").replace(/[^a-zA-Z0-9]/g, "_").slice(0, 40);
 const dateiname = "Marktpreiseinschaetzung_" + slug + "_" + new Date().toISOString().slice(0, 10) + ".pdf";

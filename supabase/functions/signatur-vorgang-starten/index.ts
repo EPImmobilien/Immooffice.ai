@@ -56,6 +56,16 @@ async function immoMandantDesAufrufers(req: Request): Promise<string | null> {
 }
 import { PDFDocument, rgb, PageSizes, StandardFonts } from "npm:pdf-lib@1.17.1";
 
+// Pflichtangabe. Fehlt sie, geht NICHTS hinaus: ein Rueckfall auf
+// eine Adresse, die niemandem gehoert, sieht aus wie Betrieb, kommt
+// aber nirgends an. Begruendung in docs/OFFEN.md.
+function immoFehlt(was: string): never {
+  throw new Error(was + " fehlt (siehe docs/SECRETS.md). Ohne diese " +
+    "Angabe ginge eine Nachricht mit einer Adresse hinaus, die " +
+    "niemandem gehoert \u2014 deshalb geht gar keine.");
+}
+
+
 let fontkitPromise: Promise<any> | null = null;
 function ladeFontkit(): Promise<any> {
   if (!fontkitPromise) {
@@ -95,7 +105,7 @@ const CI = {
   hellGrau: rgb(0.96, 0.96, 0.94),
 };
 
-const PORTAL_URL = Deno.env.get("PORTAL_URL") || "https://immooffice.example";
+const PORTAL_URL = Deno.env.get("PORTAL_URL") || immoFehlt("PORTAL_URL");
 const GUELTIGKEIT_TAGE = 14;
 
 function sanitizeGlyphs(s: string | null | undefined): string {

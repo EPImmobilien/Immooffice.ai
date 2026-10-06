@@ -6,6 +6,16 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import nodemailer from "npm:nodemailer@6.9.16";
 
+// Pflichtangabe. Fehlt sie, geht NICHTS hinaus: ein Rueckfall auf
+// eine Adresse, die niemandem gehoert, sieht aus wie Betrieb, kommt
+// aber nirgends an. Begruendung in docs/OFFEN.md.
+function immoFehlt(was: string): never {
+  throw new Error(was + " fehlt (siehe docs/SECRETS.md). Ohne diese " +
+    "Angabe ginge eine Nachricht mit einer Adresse hinaus, die " +
+    "niemandem gehoert \u2014 deshalb geht gar keine.");
+}
+
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -16,7 +26,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
-    const portalUrl = Deno.env.get("PORTAL_URL") || "https://immooffice.example";
+    const portalUrl = Deno.env.get("PORTAL_URL") || immoFehlt("PORTAL_URL");
 
     const jwt = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
     const { data: userData, error: userErr } = await supabase.auth.getUser(jwt);
@@ -79,7 +89,7 @@ Deno.serve(async (req) => {
     // ---- Versand: Resend bevorzugt, sonst SMTP (SMTP_*-Secrets) ----
     const resendKey = Deno.env.get("RESEND_API_KEY");
     const fromName = Deno.env.get("SMTP_FROM_NAME") || "Eigent\u00fcmer-Portal";
-    const fromEmail = Deno.env.get("SMTP_FROM_EMAIL") || "info@immooffice.example";
+    const fromEmail = Deno.env.get("SMTP_FROM_EMAIL") || immoFehlt("SMTP_FROM_EMAIL");
 
     let transporter: any = null;
     if (!resendKey) {

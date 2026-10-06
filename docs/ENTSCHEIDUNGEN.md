@@ -5181,3 +5181,59 @@ vier Bildschirmhöhen, Filterleiste einzeilig, Bereiche zugeklappt, jede
 Zeile mit ihrer Zahl — und dass ein Tipp wirklich aufklappt. Eine Liste,
 die nur zuklappt, wäre schlimmer als gar keine. Gegengeprüft: ohne das
 Zuklappen schlagen drei Prüfungen an.
+
+## 2026-10-06 · Kein Rückfall auf eine Adresse, die niemandem gehört
+
+`immooffice.example` ist nach RFC 2606 reserviert. Als **Ersatz** für die
+Domain des Referenzunternehmens ist sie richtig: sie führt bewusst
+nirgendwohin, und genau das soll ein neutralisierter Name tun. Als
+**Rückfall** hinter einer fehlenden Angabe ist sie falsch:
+
+```ts
+const fromEmail = Deno.env.get("SMTP_FROM_EMAIL") || "info@immooffice.example";
+const portalUrl = Deno.env.get("PORTAL_URL")      || "https://immooffice.example";
+```
+
+Fehlt die Variable, geht die Mail trotzdem hinaus — mit einem Absender, den
+es nicht gibt, und einem Link, der ins Leere führt. **Niemand merkt es: es
+sieht aus wie Betrieb.** `docs/OFFEN.md` hatte das benannt und gleich das
+Richtige gesagt; umgesetzt war es nicht.
+
+**Jetzt:** `immoFehlt(...)` statt des Rückfalls — eine Funktion, die wirft.
+Auf Modulebene heißt das: die Funktion lädt nicht, es geht nichts hinaus,
+und die Meldung nennt die Angabe und wo sie einzutragen ist. 39 Stellen in
+26 Dateien.
+
+Zwei Meldungen, je nach Fall, weil sie jemand nachts liest: fehlt die
+**Umgebungsvariable**, nennt sie deren Namen; fehlt die **Adresse des
+Mandanten**, nennt sie Postfach und Firmenstammdaten.
+
+Mitgenommen: `firma.web || "www.immooffice.example"` im MPE-PDF. Das war
+kein Rückfall, sondern eine **erfundene Angabe im Druck**. Hat der Mandant
+keine Webadresse, steht dort jetzt nichts.
+
+**Was das kostet:** Funktionen, die bisher „liefen" (und ins Leere sendeten),
+scheitern jetzt sichtbar, solange die vier Werte nicht gesetzt sind —
+`PORTAL_URL`, `EXPOSE_FREIGABE_BASIS`, `SMTP_FROM_EMAIL`,
+`BUCHHALTUNG_EMAIL`. Das ist der Zweck. Damit es nicht beim Kunden auffällt,
+sagt `funktionen-ausrollen.yml` beim Ausrollen, welche fehlt —
+`supabase secrets list` nennt nur Namen, nie Werte.
+
+### Ein Nachlauf statt einer Regel — und warum
+
+Der Austausch läuft **nach** allen Regeln, nicht als Regel. Grund: einige
+dieser Zeilen setzen FORK-Regeln selbst ein, und NACHBESSERN läuft nach
+ERSETZUNGEN. Eine Regel davor fand sie nicht, eine Regel danach gibt es
+nicht.
+
+Dieselbe Reihenfolge-Falle ist mir heute **dreimal** zugelaufen — beim
+Stilprofil, bei den beiden Tafeln unter den Postfächern und hier. Jedes Mal
+sah die Regel richtig aus und griff ins Leere. Der Nachlauf sieht nach, was
+wirklich dasteht; an der Reihenfolge der Regeln kann er nicht mehr
+scheitern.
+
+Dasselbe gilt für `pflicht_helfer_ergaenzen()`: es legt `immoFehlt()` in
+jede Datei, die es benutzt. Eine Liste von Hand hatte sieben Dateien
+übersehen — darunter vier Beilagen in Unterordnern. Sie hätten den Aufruf
+enthalten, aber nicht die Funktion, und wären beim Laden gescheitert.
+Eine Liste von Hand läuft der nächsten Regel immer hinterher.

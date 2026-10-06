@@ -18,6 +18,16 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { einladungVersenden } from "./einladung-mail.ts";
 
+// Pflichtangabe. Fehlt sie, geht NICHTS hinaus: ein Rueckfall auf
+// eine Adresse, die niemandem gehoert, sieht aus wie Betrieb, kommt
+// aber nirgends an. Begruendung in docs/OFFEN.md.
+function immoFehlt(was: string): never {
+  throw new Error(was + " fehlt (siehe docs/SECRETS.md). Ohne diese " +
+    "Angabe ginge eine Nachricht mit einer Adresse hinaus, die " +
+    "niemandem gehoert \u2014 deshalb geht gar keine.");
+}
+
+
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const antwort = (b: unknown, status = 200) => new Response(JSON.stringify(b), { status, headers: { ...cors, "Content-Type": "application/json" } });
 const JE_ADRESSE_MINUTEN = 10, JE_STUNDE_GESAMT = 30;
@@ -33,7 +43,7 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const email = String(body?.email || "").trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return antwort({ ok: false, error: "Bitte eine gültige E-Mail-Adresse angeben." }, 400);
-    const portalUrl = (Deno.env.get("PORTAL_URL") || "https://immooffice.example").replace(/\/?$/, "/");
+    const portalUrl = (Deno.env.get("PORTAL_URL") || immoFehlt("PORTAL_URL")).replace(/\/?$/, "/");
     const still = (grund: string) => { console.log(`zugang-anfordern ${email}: ${grund}`); return antwort({ ok: true }); };
 
     // Drosselung

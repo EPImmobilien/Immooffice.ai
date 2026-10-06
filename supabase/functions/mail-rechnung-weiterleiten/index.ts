@@ -13,6 +13,16 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// Pflichtangabe. Fehlt sie, geht NICHTS hinaus: ein Rueckfall auf
+// eine Adresse, die niemandem gehoert, sieht aus wie Betrieb, kommt
+// aber nirgends an. Begruendung in docs/OFFEN.md.
+function immoFehlt(was: string): never {
+  throw new Error(was + " fehlt (siehe docs/SECRETS.md). Ohne diese " +
+    "Angabe ginge eine Nachricht mit einer Adresse hinaus, die " +
+    "niemandem gehoert \u2014 deshalb geht gar keine.");
+}
+
+
 // --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
 // Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
 // und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist
@@ -57,7 +67,7 @@ async function immoMandantDesAufrufers(req: Request): Promise<string | null> {
 }
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
-const ZIEL_STANDARD = Deno.env.get("BUCHHALTUNG_EMAIL") || "buchhaltung@immooffice.example";
+const ZIEL_STANDARD = Deno.env.get("BUCHHALTUNG_EMAIL") || immoFehlt("BUCHHALTUNG_EMAIL");
 const VORFILTER = /rechnung|invoice|receipt|beleg|gutschrift|zahlungserinnerung|mahnung|quittung|abrechnung|kassenbeleg|honorarnote|payment confirmation|your order|ihre bestellung|zahlungsbestätigung|bill\b|billing|gebührenbescheid|kostenbescheid|gebühren/i;
 const AUSSCHLUSS = /newsletter|kontoauszug|objektstatistik|wg: ref\.-nr|infoanfrage|portalanfrage|anfrage zu ihrem objekt|exposé-beauftragung/i;
 const MARKER = "Automatisch weitergeleitete Rechnung (ImmoOffice)";
@@ -209,7 +219,7 @@ async function verarbeiten(db: any, mail: any, erzwingen: boolean) {
   const gesamt = anhaenge.reduce((s, a) => s + a.content.length, 0);
   const mitAnhang = gesamt <= 35 * 1024 * 1024;
   const body: any = {
-    from: `${pf?.absender_name || "ImmoOffice"} <${pf?.email_adresse || "info@immooffice.example"}>`, to: ziel.an, reply_to: absender || undefined,
+    from: `${pf?.absender_name || "ImmoOffice"} <${pf?.email_adresse || immoFehlt("eine Absenderadresse (Postfach, Firmenstammdaten oder SMTP_FROM_EMAIL)")}>`, to: ziel.an, reply_to: absender || undefined,
     subject: `WG: ${mail.betreff || "(ohne Betreff)"}`,
     text: kopf + text,
     html: mail.html ? `<pre style="font-family:Arial,sans-serif;font-size:13px;white-space:pre-wrap;background:#f3f4f8;padding:10px;border-left:3px solid #D4A567">${kopf.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>` + mail.html : undefined,

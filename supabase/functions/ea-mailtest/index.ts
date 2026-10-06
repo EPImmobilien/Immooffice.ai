@@ -47,6 +47,16 @@ async function immoMandantDesAufrufers(req: Request): Promise<string | null> {
 }
 import nodemailer from "npm:nodemailer@6.9.16";
 
+// Pflichtangabe. Fehlt sie, geht NICHTS hinaus: ein Rueckfall auf
+// eine Adresse, die niemandem gehoert, sieht aus wie Betrieb, kommt
+// aber nirgends an. Begruendung in docs/OFFEN.md.
+function immoFehlt(was: string): never {
+  throw new Error(was + " fehlt (siehe docs/SECRETS.md). Ohne diese " +
+    "Angabe ginge eine Nachricht mit einer Adresse hinaus, die " +
+    "niemandem gehoert \u2014 deshalb geht gar keine.");
+}
+
+
 async function entschluessele(v: string): Promise<string> {
   const secret = Deno.env.get("MAIL_SECRET_KEY");
   if (!secret) throw new Error("MAIL_SECRET_KEY nicht gesetzt");
@@ -64,7 +74,7 @@ Deno.serve(async (req) => {
   const log: Record<string, unknown> = {};
   try {
     const b = await req.json().catch(() => ({}));
-    const an = String(b.an || "info@immooffice.example");
+    const an = String(b.an || immoFehlt("eine Absenderadresse (Postfach, Firmenstammdaten oder SMTP_FROM_EMAIL)"));
 
     // Nahm das erste aktive Postfach der ganzen Plattform und verschickte
     // damit an eine Adresse aus dem Anfragekoerper — ein Versandweg ueber

@@ -8,6 +8,16 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// Pflichtangabe. Fehlt sie, geht NICHTS hinaus: ein Rueckfall auf
+// eine Adresse, die niemandem gehoert, sieht aus wie Betrieb, kommt
+// aber nirgends an. Begruendung in docs/OFFEN.md.
+function immoFehlt(was: string): never {
+  throw new Error(was + " fehlt (siehe docs/SECRETS.md). Ohne diese " +
+    "Angabe ginge eine Nachricht mit einer Adresse hinaus, die " +
+    "niemandem gehoert \u2014 deshalb geht gar keine.");
+}
+
+
 // --- Gehoert diese Adresse zum Mandanten selbst? (Phase 2.4) ------------
 // Hier stand die Mail-Domain der Referenz im Quelltext. Die
 // Neutralisierung hat daraus eine Domain gemacht, die es nicht gibt
@@ -82,7 +92,7 @@ Deno.serve(async (req) => {
   try {
     const url = Deno.env.get("SUPABASE_URL")!, key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const admin = createClient(url, key, { auth: { persistSession: false } });
-    const portalUrl = (Deno.env.get("PORTAL_URL") || "https://immooffice.example").replace(/\/?$/, "/");
+    const portalUrl = (Deno.env.get("PORTAL_URL") || immoFehlt("PORTAL_URL")).replace(/\/?$/, "/");
     const resendKey = Deno.env.get("RESEND_API_KEY") || "";
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
     const body = await req.json().catch(() => ({}));
@@ -117,7 +127,7 @@ Deno.serve(async (req) => {
       const info: any = { eigentuemer_id: einl.eigentuemer_id, email: einl.email };
       const firmaRow = await firmaFuer(einl.mandant_id || null);
       const firma = firmaRow?.firma_name || "";
-      const fromEmail = Deno.env.get("SMTP_FROM_EMAIL") || firmaRow?.email || "info@immooffice.example";
+      const fromEmail = Deno.env.get("SMTP_FROM_EMAIL") || firmaRow?.email || immoFehlt("eine Absenderadresse (Postfach, Firmenstammdaten oder SMTP_FROM_EMAIL)");
       try {
         const { data: eig } = await admin.from("eigentuemer").select("id, anrede, titel, vorname, nachname, email, user_id, aktiv").eq("id", einl.eigentuemer_id).maybeSingle();
         if (!eig || eig.aktiv === false || !eig.email) { uebersprungen++; info.grund = "Eigentümer inaktiv oder ohne E-Mail"; details.push(info); continue; }

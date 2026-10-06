@@ -131,6 +131,53 @@ jobs:
             exit 1
           fi
 
+      - name: Pflichtangaben gesetzt?
+        # Seit dem 06.10.2026 erfinden die Funktionen keine Adresse mehr,
+        # wenn eine Pflichtangabe fehlt — sie senden dann GAR NICHT (siehe
+        # tests/pflichtangaben.py und docs/OFFEN.md). Das ist richtig, aber
+        # es faellt erst beim ersten Versand auf. Also hier nachsehen,
+        # solange noch jemand hinschaut.
+        #
+        # `supabase secrets list` nennt nur NAMEN und Pruefsummen, nie Werte
+        # — hier geht kein Geheimnis durch das Protokoll.
+        #
+        # Das bricht den Lauf NICHT ab: ein Ausrollen ohne gesetzte Adresse
+        # ist zulaessig (man richtet eine neue Installation nun einmal in
+        # dieser Reihenfolge ein). Es steht nur gross im Bericht.
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          supabase secrets list --project-ref "$PROJEKT" -o json > geheim.json || echo '[]' > geheim.json
+          python3 - <<'ENDE' >> "$GITHUB_STEP_SUMMARY"
+          import json, os
+          PFLICHT = {
+              "PORTAL_URL": "Adresse der Anwendung — steckt in jedem Einladungs- und Freigabelink",
+              "EXPOSE_FREIGABE_BASIS": "Adresse der Exposé-Freigabeseite",
+              "SMTP_FROM_EMAIL": "Absenderadresse des Systemversands",
+              "BUCHHALTUNG_EMAIL": "Empfänger weitergeleiteter Rechnungen",
+          }
+          try:
+              gesetzt = {e.get("name") for e in json.load(open("geheim.json"))}
+          except Exception:
+              gesetzt = set()
+          fehlen = [n for n in PFLICHT if n not in gesetzt]
+          if not fehlen:
+              print("### Pflichtangaben")
+              print("")
+              print("Alle vier gesetzt.")
+          else:
+              print("### :warning: Pflichtangaben fehlen")
+              print("")
+              print("Diese Funktionen **senden nicht**, solange die Angabe fehlt —")
+              print("statt eine Adresse zu erfinden, die niemandem gehört:")
+              print("")
+              for n in fehlen:
+                  print(f"- `{n}` — {PFLICHT[n]}")
+              print("")
+              print("Einzutragen unter Project Settings → Edge Functions → Secrets.")
+              print("Die Liste steht in `docs/SECRETS.md`.")
+          ENDE
+
       - name: Ausrollen
         if: github.event.inputs.loeschen == ''
         run: |

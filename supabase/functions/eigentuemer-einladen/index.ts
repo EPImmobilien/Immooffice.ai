@@ -16,6 +16,16 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+// Pflichtangabe. Fehlt sie, geht NICHTS hinaus: ein Rueckfall auf
+// eine Adresse, die niemandem gehoert, sieht aus wie Betrieb, kommt
+// aber nirgends an. Begruendung in docs/OFFEN.md.
+function immoFehlt(was: string): never {
+  throw new Error(was + " fehlt (siehe docs/SECRETS.md). Ohne diese " +
+    "Angabe ginge eine Nachricht mit einer Adresse hinaus, die " +
+    "niemandem gehoert \u2014 deshalb geht gar keine.");
+}
+
+
 // --- Mandantengrenze fuer Kennungen aus dem Anfragekoerper -----------------
 // Diese Funktion prueft das JWT, arbeitet danach aber mit dem service_role —
 // und fuer den gilt RLS nicht. Eine Kennung, die der Aufrufer mitschickt, ist
@@ -109,7 +119,7 @@ Deno.serve(async (req) => {
     const ansprechpartnerId = body.ansprechpartner_id || aktuellerUserId;
     await immoMandantSichern(req, [["vertraege", String(maklervertragId || "")],
                                    ["profiles", String(ansprechpartnerId || "")]]);
-    const redirectTo     = body.redirect_to || Deno.env.get("PORTAL_URL") || "https://immooffice.example/";
+    const redirectTo     = body.redirect_to || Deno.env.get("PORTAL_URL") || immoFehlt("PORTAL_URL");
 
     if (!email || !email.includes("@")) throw new Error("Ungültige E-Mail-Adresse.");
 

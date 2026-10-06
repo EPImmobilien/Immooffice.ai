@@ -6,6 +6,16 @@
 // die Supabase-Auth-Mail (inviteUserByEmail bzw. signInWithOtp), versandweg "supabase-auth".
 import { createClient, type SupabaseClient } from "jsr:@supabase/supabase-js@2";
 
+// Pflichtangabe. Fehlt sie, geht NICHTS hinaus: ein Rueckfall auf
+// eine Adresse, die niemandem gehoert, sieht aus wie Betrieb, kommt
+// aber nirgends an. Begruendung in docs/OFFEN.md.
+function immoFehlt(was: string): never {
+  throw new Error(was + " fehlt (siehe docs/SECRETS.md). Ohne diese " +
+    "Angabe ginge eine Nachricht mit einer Adresse hinaus, die " +
+    "niemandem gehoert \u2014 deshalb geht gar keine.");
+}
+
+
 export const esc = (s: string) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 export function anredeZeile(anrede: string, titel: string, vorname: string, nachname: string) {
@@ -17,11 +27,11 @@ export function anredeZeile(anrede: string, titel: string, vorname: string, nach
 
 /** Adresse der Selbsthilfe „Neuen Anmeldelink anfordern“ (Anmeldeseite des Portals mit #zugang). */
 export function zugangUrlAus(redirectTo: string) {
-  return String(redirectTo || "https://immooffice.example/").replace(/[#?].*$/, "").replace(/\/?$/, "/") + "#zugang";
+  return String(redirectTo || immoFehlt("PORTAL_URL")).replace(/[#?].*$/, "").replace(/\/?$/, "/") + "#zugang";
 }
 
 export function baueEinladungsMail(o: { anrede: string; link: string; makler: string; telefon: string; firma: string; web: string; erneut: boolean; zugangUrl?: string }) {
-  const zugangUrl = o.zugangUrl || "https://immooffice.example/#zugang";
+  const zugangUrl = o.zugangUrl || immoFehlt("die Adresse des Eigentuemer-Zugangs");
   const betreff = o.erneut ? "Ihr Zugang zum Eigentümer-Portal – neuer Anmeldelink" : "Ihr persönlicher Zugang zum Eigentümer-Portal";
   const einleitung = o.erneut
     ? "Sie haben einen persönlichen Zugang zum Eigentümer-Portal – hier ist Ihr neuer Anmeldelink."

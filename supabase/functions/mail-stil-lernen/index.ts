@@ -102,6 +102,11 @@ export function schwaerzen(roh: string): string {
   const regeln: Array<[RegExp, string]> = [
     [/[\w.+-]+@[\w-]+\.[a-zA-Z]{2,}/g, "[MAIL]"],
     [/https?:\/\/\S+/g, "[LINK]"],
+    // Die IBAN zuerst: in "DE74 1001 0123 6085" steckt mit
+    // "0123 6085…" eine Folge, die wie eine Rufnummer aussieht.
+    // Wer zuerst greift, gewinnt — und eine halb geschwaerzte IBAN
+    // ist immer noch eine IBAN. tests/mail-stil.js hat das gefunden.
+    [/\bDE\d{2}[\s]?(?:\w{4}[\s]?){4}\w{0,4}\b/g, "[IBAN]"],
     [/\b(?:\+49|0)[\s/()-]?\d(?:[\s/()-]?\d){5,14}\b/g, "[TELEFON]"],
     [/\b\d{1,3}(?:\.\d{3})+(?:,\d{2})?\s*(?:€|EUR|Euro)/gi, "[BETRAG]"],
     [/\b\d+(?:[.,]\d+)?\s*(?:€|EUR|Euro)/gi, "[BETRAG]"],
@@ -109,7 +114,6 @@ export function schwaerzen(roh: string): string {
     [/\b[A-ZÄÖÜ][a-zäöüß-]*(?:straße|strasse|str\.|weg|allee|platz|ring|damm|gasse|ufer)\s*\d+\s*[a-zA-Z]?/gi, "[ANSCHRIFT]"],
     [/\b\d{1,2}\.\d{1,2}\.(?:\d{2,4})?\b/g, "[DATUM]"],
     [/\b\d{1,2}:\d{2}\s*(?:Uhr)?/g, "[UHRZEIT]"],
-    [/\bDE\d{2}[\s]?(?:\w{4}[\s]?){4}\w{0,4}\b/g, "[IBAN]"],
     // Anreden mit Namen: der Name ist der Teil, der weg muss — die Anrede
     // selbst ist genau das, was der Stil ausmacht, und bleibt.
     [/\b(Herr|Herrn|Frau|Familie)\s+(?:Dr\.\s+|Prof\.\s+)?[A-ZÄÖÜ][\wäöüß-]+(?:\s+[A-ZÄÖÜ][\wäöüß-]+)?/g, "$1 [NAME]"],
