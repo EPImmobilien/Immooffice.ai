@@ -1034,3 +1034,22 @@ beiden Knöpfe grau (mit Begründung in der Oberfläche).
 auch die OAuth-Postfächer ab, erneuert Tokens selbst und schreibt bei einem
 Fehlschlag `oauth_fehler` an das Postfach; die Oberfläche bietet dann
 „neu verbinden" an.
+
+## Onboarding-Schritt für Microsoft-365-Kunden
+
+Entschieden am 06.10.2026 (`docs/ENTSCHEIDUNGEN.md`): der Versand läuft
+auch bei Microsoft über SMTP. Das heißt, bei **jedem** Microsoft-Kunden
+gehört ein Schritt in die Einrichtung:
+
+> Ein Administrator des Hauses schaltet **„Authentifiziertes SMTP"** frei —
+> `admin.microsoft.com` → Einstellungen → Organisationseinstellungen →
+> Moderne Authentifizierung, und am Postfach unter Benutzer → Aktive
+> Benutzer → [Konto] → E-Mail → E-Mail-Apps verwalten. Wirkt nach bis zu
+> einer Stunde.
+
+Ohne diesen Schritt werden Mails **abgerufen**, aber nicht **gesendet**.
+Die Oberfläche sagt das beim Verbinden, und die Fehlermeldung beim
+Versandversuch wiederholt es mit dem Weg dorthin — der Schritt ist also
+nicht versteckt, aber er bleibt ein Schritt.
+
+Betrifft nur Microsoft. Gmail und eigene Mailserver brauchen ihn nicht.

@@ -165,6 +165,24 @@
         ? e("div", { key: "f", style: { fontSize: 12, color: CI.danger, marginTop: 8 } },
             stand.fehler)
         : null,
+      // Der eine Satz, der einem Microsoft-Kunden sonst erst beim ersten
+      // gescheiterten Versand begegnet. Microsoft liefert Postfaecher mit
+      // abgeschaltetem SMTP aus; der Abruf geht trotzdem, das Senden nicht.
+      // Besser vorher lesen als hinterher suchen.
+      (stand.anbieter || []).some(function (a) { return a.name === "microsoft" && a.bereit; })
+        ? e("div", { key: "ms", style: {
+            fontSize: 11.5, color: CI.muted, marginTop: 10, lineHeight: 1.55,
+            borderLeft: "3px solid " + CI.border, paddingLeft: 9,
+          } },
+            "Microsoft 365: Das Abrufen der Mails geht sofort. Zum SENDEN muss "
+            + "im Microsoft-Konto einmal „Authentifiziertes SMTP“ freigeschaltet "
+            + "sein — das macht ein Administrator eures Hauses unter "
+            + "admin.microsoft.com → Einstellungen → Organisationseinstellungen → "
+            + "Moderne Authentifizierung, und am Postfach selbst unter "
+            + "Benutzer → E-Mail-Apps verwalten. Microsoft liefert neue Konten "
+            + "mit abgeschaltetem SMTP aus; das lässt sich von hier aus nicht "
+            + "ändern.")
+        : null,
       // Was der Betreiber noch nicht eingerichtet hat, steht als Grund da —
       // der Nutzer kann daran nichts aendern, soll aber wissen, warum der
       // Knopf grau ist.

@@ -4701,3 +4701,43 @@ Was dafür entstand:
 Ohne registrierte Anwendungen bleiben die beiden Knöpfe grau und sagen
 warum — siehe `docs/OFFEN.md`. Bei Google kommt eine Prüfung durch den
 Anbieter dazu (`https://mail.google.com/` ist ein „restricted scope").
+
+## Versand bleibt bei SMTP, auch bei Microsoft (06.10.2026)
+
+Beim ersten echten Microsoft-Postfach lief der **Abruf sofort** (OAuth über
+IMAP, 15 Ordner, Mails kamen an), der **Versand** scheiterte an einer
+Einstellung im Microsoft-Konto des Kunden:
+
+```
+535 5.7.139 Authentication unsuccessful,
+SmtpClientAuthentication is disabled for the Tenant
+```
+
+Microsoft liefert Tenants seit Jahren mit abgeschaltetem SMTP AUTH aus. Den
+Schalter kann **nur ein Administrator des Kunden** umlegen — automatisch
+geht das nicht, und es soll auch nicht gehen: dafür bräuchte die Software
+das Recht, fremde Tenant-Einstellungen zu ändern. Das darf ein
+Mailprogramm nicht verlangen.
+
+**Vorgeschlagen war**, den Versand für Microsoft-Postfächer über Microsoft
+Graph (`Mail.Send`) zu führen; damit entfällt der Schalter, weil die
+Zustimmung des Nutzers genügt. **Entscheidung des Betreibers: nein, es
+bleibt bei SMTP.** Der Aufwand (ein halber Tag, dazu eine zusätzliche
+Zeile auf der Zustimmungsseite und ein erneutes Verbinden aller
+bestehenden Postfächer) wiegt den gesparten Onboarding-Schritt derzeit
+nicht auf.
+
+**Was daraus folgt — und was dafür gebaut ist:**
+
+- Jeder Microsoft-Kunde legt den Schalter einmal um. Das gehört in das
+  Onboarding (`docs/OFFEN.md`).
+- Die Fehlermeldung sagt genau das, mit dem Weg dorthin, statt
+  „non-2xx status code".
+- Die Postfach-Ansicht sagt es **vorher**, nicht erst nach dem ersten
+  gescheiterten Versand.
+- Gilt nur für Microsoft. Bei Gmail gibt es kein Gegenstück.
+
+Sollte Microsoft SMTP AUTH weiter einschränken — die Richtung ist seit
+Jahren dieselbe —, ist Graph der nächste Schritt. Die Anbieter-Schicht ist
+dafür vorbereitet: der Versandweg hängt am Anbieter des Postfachs, nicht
+an einer Annahme im Code.
