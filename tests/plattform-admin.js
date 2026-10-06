@@ -92,6 +92,44 @@ melde('die Werte werden EINZELN uebernommen, nicht durchgereicht',
       /for \(const s of spalten\)/.test(q),
       'ein Object.assign auf body.werte waere die Luecke');
 
+// --- 2b. Jede Spalte, die geschrieben wird, gibt es auch --------------------
+// Eine Spalte, die der Code setzt und das Schema nicht kennt, sieht beim
+// Lesen richtig aus und bricht beim ersten Klick. Genau so stand hier einmal
+// `geaendert_von` fuer alle vier Katalogtabellen — drei von ihnen fuehren
+// die Spalte nicht.
+const SCHEMA = path.join(WURZEL, 'supabase', 'migrations',
+  '20261006210000_fork_47_abrechnung.sql');
+if (aenderbar && fs.existsSync(SCHEMA)) {
+  const schema = fs.readFileSync(SCHEMA, 'utf8');
+  const spaltenVon = (tabelle) => {
+    const m = schema.match(new RegExp(
+      `create table if not exists public\\.${tabelle} \\(([\\s\\S]*?)\\n\\);`));
+    if (!m) return null;
+    return new Set(Array.from(m[1].matchAll(/^\s{2}([a-z_]+)\s+[a-z]/gm)).map((x) => x[1]));
+  };
+  const bloecke = aenderbar[0].split(/\n  (?=[a-z_]+:)/).slice(1);
+  for (const b of bloecke) {
+    const tabelle = b.match(/^([a-z_]+):/)[1];
+    const spalten = spaltenVon(tabelle);
+    melde(`das Schema kennt ${tabelle}`, !!spalten);
+    if (!spalten) continue;
+    for (const sp of b.matchAll(/"([a-z_]+)"/g)) {
+      melde(`${tabelle}.${sp[1]} gibt es wirklich`, spalten.has(sp[1]),
+            'sonst bricht das Speichern beim ersten Klick');
+    }
+    // Und die beiden, die der Code von sich aus setzt.
+    melde(`${tabelle} fuehrt geaendert_am`, spalten.has('geaendert_am'));
+  }
+  const vonTabellen = Array.from(q.matchAll(
+    /tabelle === "([a-z_]+)"\) neu\.geaendert_von/g)).map((m) => m[1]);
+  for (const t of vonTabellen) {
+    const spalten = spaltenVon(t);
+    melde(`${t} fuehrt geaendert_von`, !!spalten && spalten.has('geaendert_von'));
+  }
+  melde('geaendert_von wird nur dort gesetzt, wo es die Spalte gibt',
+        vonTabellen.length > 0, 'sonst wird sie fuer alle gesetzt');
+}
+
 // --- 3. Jede Aenderung steht im Protokoll ---------------------------------
 melde('es gibt ein Protokoll', /plattform_protokoll/.test(q));
 for (const [muster, was] of [

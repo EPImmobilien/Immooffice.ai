@@ -108,7 +108,11 @@ Deno.serve(async (req) => {
       }
       if (!Object.keys(neu).length) return antwort({ ok: false, fehler: "Nichts zu aendern." }, 400);
       neu.geaendert_am = new Date().toISOString();
-      if (tabelle !== "plattform_werte") neu.geaendert_von = u.user.id;
+      // `geaendert_von` führt NUR plattform_tarife. Die übrigen drei
+      // Katalogtabellen haben die Spalte nicht, und ein Update darauf
+      // scheitert mit „column does not exist" — eine Zeile, die beim Lesen
+      // des Codes richtig aussieht und beim ersten Klick bricht.
+      if (tabelle === "plattform_tarife") neu.geaendert_von = u.user.id;
 
       const spalte = SCHLUESSELSPALTE[tabelle];
       const { data: vorher } = await db.from(tabelle).select("*").eq(spalte, schluessel).maybeSingle();
