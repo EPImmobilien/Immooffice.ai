@@ -56,22 +56,27 @@ if (!fs.existsSync(ref)) {
   console.error('Prototypen gibt es nichts zu zeigen.');
   process.exit(1);
 }
+// Die Social-Vorlagen (fork_56) haben keinen Prototypen — sie sind nicht aus
+// einem Vorbild uebersetzt. Fuer die Vorschau zaehlt aber nur, woher die
+// DEMODATEN und die beiden Markenfarben kommen, und die holt sich eine
+// Social-Vorlage von ihrer Handschrift: social-raster-feed von raster.
+const grundlage = name.startsWith('social-') ? name.split('-')[1] : name;
 const aufzeichnung = JSON.parse(execFileSync(
-  'python3', [path.join(WURZEL, 'tests', 'expose-aufzeichnung.py'), name],
-  { encoding: 'utf-8', maxBuffer: 256 << 20 }))[name];
+  'python3', [path.join(WURZEL, 'tests', 'expose-aufzeichnung.py'), grundlage],
+  { encoding: 'utf-8', maxBuffer: 256 << 20 }))[grundlage];
 const { daten } = require(path.join(WURZEL, 'tests', 'expose-vorlagen-daten.js'));
 
 const vorlage = JSON.parse(fs.readFileSync(vorlagePfad, 'utf-8'));
 const farbe = (c) => (c ? hex({ r: c[0], g: c[1], b: c[2] }) : undefined);
 const ergebnis = rendern({
   vorlage,
-  daten: daten(name, aufzeichnung.daten),
+  daten: daten(grundlage, aufzeichnung.daten),
   schriften,
   // Raster fuehrt die beiden Vorlagenfarben als p/a, Signature als d/a,
   // Studio als s/d.
   marke: (() => {
     const paare = { raster: ['p', 'a'], signature: ['d', 'a'], studio: ['s', 'd'] };
-    const [x, y] = paare[name] ?? ['p', 'a'];
+    const [x, y] = paare[grundlage] ?? ['p', 'a'];
     return { primaer: farbe(aufzeichnung.farben[x]), akzent: farbe(aufzeichnung.farben[y]) };
   })(),
 });

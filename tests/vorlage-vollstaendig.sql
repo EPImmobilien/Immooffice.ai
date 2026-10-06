@@ -375,7 +375,13 @@ zuwachs(bereich, mehr, grund) as (values
 
   -- fork_55: der Systemzustand fuer den Betreiber.
   ('Funktionen', 2, 'fork_55: cron_zustand und fehler_uebersicht — beide fuer '
-     'anon und authenticated gesperrt, erreichbar nur ueber plattform-admin')
+     'anon und authenticated gesperrt, erreichbar nur ueber plattform-admin'),
+
+  -- fork_56: die Social-Vorlagen liegen in derselben Tabelle wie die
+  -- Exposé-Vorlagen; unterschieden werden sie ueber eine neue Spalte.
+  ('Spalten', 1, 'fork_56: expose_vorlagen.art'),
+  ('Pruefbedingungen', 1, 'fork_56: art ist expose oder social'),
+  ('Indizes ohne Constraint', 1, 'fork_56: nach art')
 ),
 soll(bereich, soll) as (
   select v.bereich,

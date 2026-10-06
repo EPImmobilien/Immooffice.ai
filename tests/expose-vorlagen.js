@@ -289,8 +289,17 @@ const { daten: datenFuer, uebernahmen } = require('./expose-vorlagen-daten.js');
 
 // --- Prototypen aufzeichnen ----------------------------------------------
 // schema.json ist das Schema, keine Vorlage.
+//
+// Die Social-Vorlagen (fork_56) bleiben aussen vor, und zwar nicht aus
+// Bequemlichkeit: dieser Test prueft EINE Sache — dass der Renderer die drei
+// Python-Prototypen auf den Punkt genau nachzeichnet, weil der Auftrag sie
+// als verbindlich benennt. Fuer die Social-Vorlagen gibt es keinen
+// Prototypen; sie sind in derselben Sprache geschrieben, aber nicht aus
+// einem Vorbild uebersetzt. Ihre Form prueft tests/expose-schema.js, ihre
+// Vollstaendigkeit tests/social-vorlagen.js.
 const WELCHE = fs.readdirSync(VORLAGEN)
-  .filter((f) => f.endsWith('.json') && f !== 'schema.json')
+  .filter((f) => f.endsWith('.json') && f !== 'schema.json'
+                 && !f.startsWith('social-'))
   .map((f) => f.replace(/\.json$/, ''));
 if (!WELCHE.length) {
   console.log('  Noch keine Vorlage in packages/expose-renderer/vorlagen/.');

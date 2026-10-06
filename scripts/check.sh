@@ -348,6 +348,17 @@ else
   fehler=1
 fi
 
+abschnitt "Social-Vorlagen: Erzeuger, Dateien und Migration stimmen ueberein"
+# Drei Stellen, eine Wahrheit: scripts/social-vorlagen.py erzeugt die sechs
+# JSON-Dateien, scripts/social-systemvorlagen.py die Migration, die sie
+# einspielt. Wer eine Datei von Hand aendert, faellt hier auf.
+if python3 scripts/social-vorlagen.py --pruefen \
+   && python3 scripts/social-systemvorlagen.py --pruefen; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Expose-Vorlagen: zeichnet der Renderer wie die Prototypen?"
 # Schrittweiser Vergleich gegen die aufgezeichneten Prototypen: Ort auf
 # 2 pt, dazu Schnitt, Groesse, Sperrung und Farbe. Ohne reference/
