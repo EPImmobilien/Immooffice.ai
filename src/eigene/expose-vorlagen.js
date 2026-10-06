@@ -312,7 +312,12 @@
     var laden = React.useCallback(function () {
       setDaten({ lade: true, liste: [], fehler: "" });
       window._sb.from("expose_vorlagen")
-        .select("id,mandant_id,name,beschreibung,basis,version,ist_standard,archiviert,geaendert_am,dokument")
+        .select("id,mandant_id,name,beschreibung,basis,art,version,ist_standard,archiviert,geaendert_am,dokument")
+        // Nur Exposé-Vorlagen. Seit fork_56 liegen die Social-Vorlagen in
+        // derselben Tabelle — dasselbe Format, andere Verwendung. Ohne den
+        // Filter staenden sechs Instagram-Kacheln in der Vorlagenliste des
+        // Exposé-Baukastens.
+        .eq("art", "expose")
         .order("mandant_id", { ascending: true, nullsFirst: true })
         .order("name", { ascending: true })
         .then(function (a) {
@@ -395,6 +400,10 @@
       window._sb.from("expose_vorlagen").insert({
         name: name, beschreibung: reihe.beschreibung,
         basis: reihe.basis || "leer", dokument: reihe.dokument,
+        // Die Art wandert mit. Der Vorgabewert der Spalte ist "expose";
+        // ohne diese Zeile landete die Kopie einer Social-Vorlage in der
+        // Exposé-Liste — mit 540x675 Punkten Format.
+        art: reihe.art || "expose",
       }).select("id").single().then(function (a) {
         setArbeit("");
         if (a.error) { window.alert("Kopie nicht angelegt: " + a.error.message); return; }

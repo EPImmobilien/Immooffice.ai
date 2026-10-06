@@ -210,13 +210,16 @@ function nachbau(reihen) {
 const vorlagen = ['raster', 'signature', 'studio'].map((b) => ({
   id: 'v-' + b, mandant_id: null, name: b[0].toUpperCase() + b.slice(1),
   beschreibung: 'Systemvorlage ' + b, basis: b, version: 1,
+  // Seit fork_56 liegen auch die Social-Vorlagen in dieser Tabelle; die
+  // Oberflaeche filtert deshalb auf art. Ohne das Feld faende sie nichts.
+  art: 'expose',
   ist_standard: false, archiviert: false,
   dokument: JSON.parse(fs.readFileSync(path.join(VORLAGEN, b + '.json'), 'utf-8')),
 }));
 const reihen = {
   expose_vorlagen: vorlagen.concat([{
     id: 'v-eigen', mandant_id: 'm1', name: 'Hausvorlage', beschreibung: 'Kopie von Raster',
-    basis: 'raster', version: 3, ist_standard: true, archiviert: false,
+    basis: 'raster', art: 'expose', version: 3, ist_standard: true, archiviert: false,
     dokument: vorlagen[0].dokument,
   }]),
   firma_stammdaten: [{ firma_name: 'Beispiel GmbH', marken_name: 'Beispiel',

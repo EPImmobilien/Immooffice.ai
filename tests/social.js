@@ -212,6 +212,30 @@ if (fs.existsSync(TAFEL)) {
         /Kostet keine Credits/.test(q));
 }
 
+// --- 4. Die Expose-Auswahl zeigt KEINE Social-Vorlagen ---------------------
+// Beide liegen in derselben Tabelle. Ohne Filter staenden sechs
+// Instagram-Kacheln in der Vorlagenliste des Exposé-Baukastens — und
+// jemand waehlte versehentlich eine 540x675-Vorlage fuer ein A4-Exposé.
+for (const datei of ['expose-vorlagen.js', 'expose-vorlagenwahl.js']) {
+  const pfad = path.join(WURZEL, 'src', 'eigene', datei);
+  if (!fs.existsSync(pfad)) continue;
+  const q = fs.readFileSync(pfad, 'utf-8');
+  melde(`${datei} filtert auf art = expose`,
+        /\.eq\("art", "expose"\)/.test(q),
+        'sonst stehen die Social-Vorlagen in der Exposé-Auswahl');
+}
+{
+  // Und eine Kopie behaelt ihre Art. Der Vorgabewert der Spalte ist
+  // "expose"; ohne diese Zeile landete die Kopie einer Social-Vorlage in
+  // der Exposé-Liste — mit 540x675 Punkten Format.
+  const q = fs.readFileSync(path.join(WURZEL, 'src', 'eigene', 'expose-vorlagen.js'), 'utf-8');
+  melde('eine Kopie behaelt ihre Art',
+        /art: reihe\.art \|\| "expose"/.test(q));
+  melde('und die Liste holt die Art ueberhaupt',
+        /select\("id,mandant_id,name,beschreibung,basis,art,/.test(q),
+        'was nicht geladen wird, kann die Kopie auch nicht weitergeben');
+}
+
 if (fehler) {
   console.log(`\n  ${fehler} von ${geprueft} Pruefungen gescheitert.`);
   process.exit(1);

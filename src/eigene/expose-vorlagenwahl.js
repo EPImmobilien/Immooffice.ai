@@ -46,6 +46,8 @@
     laeuft = window._sb.from("expose_vorlagen")
       .select("id,name,beschreibung,basis,mandant_id,ist_standard,archiviert")
       .eq("archiviert", false)
+      // Nur Exposé-Vorlagen (fork_56).
+      .eq("art", "expose")
       .then(function (antwort) {
         laeuft = null;
         if (antwort.error) throw antwort.error;
