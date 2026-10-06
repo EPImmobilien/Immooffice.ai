@@ -355,7 +355,23 @@ zuwachs(bereich, mehr, grund) as (values
   ('Fremdschluessel', 1, 'fork_53: auf mandanten'),
   ('Indizes ohne Constraint', 2, 'fork_53: nach Mandant und nach Zeit'),
   ('Richtlinien', 2, 'fork_53: lesen und die restriktive Mandantentrennung'),
-  ('Cron-Jobs', 1, 'fork_53: testphase-erinnerung-taeglich')
+  ('Cron-Jobs', 1, 'fork_53: testphase-erinnerung-taeglich'),
+
+  -- fork_54: der protokollierte Supportzugriff.
+  ('Tabellen', 1, 'fork_54: support_sitzungen'),
+  ('Tabellen mit RLS', 1, 'fork_54: auch diese'),
+  ('Spalten', 8, 'fork_54: id, admin_id, mandant_id, grund, schreiben, '
+     'begonnen_am, gueltig_bis, beendet_am'),
+  ('Primaer- und Eindeutigkeitsschluessel', 1, 'fork_54: der Primaerschluessel'),
+  ('Pruefbedingungen', 2, 'fork_54: ein Grund ist Pflicht, hoechstens vier Stunden'),
+  ('Fremdschluessel', 2, 'fork_54: auf profiles und mandanten'),
+  ('Indizes ohne Constraint', 2, 'fork_54: offene Sitzungen und je Mandant'),
+  ('Richtlinien', 198, 'fork_54: eine Lesesicht auf support_sitzungen und 197 '
+     'Loeschsperren — eine je Tabelle mit Mandantentrennung. `with check` '
+     'gilt nicht fuer DELETE, also braucht das Loeschen eine eigene '
+     'restriktive Richtlinie; sonst koennte eine Lese-Sitzung alles '
+     'loeschen, was sie sehen darf'),
+  ('Funktionen', 3, 'fork_54: support_sitzung, mandant_id_schreiben, registrierung_offen')
 ),
 soll(bereich, soll) as (
   select v.bereich,

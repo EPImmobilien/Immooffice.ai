@@ -155,6 +155,15 @@ else
   fehler=1
 fi
 
+abschnitt "Supportzugriff: sehen duerfen, ohne heimlich zu sehen"
+# Die heikelste Pruefung des Forks: fork_54 hat aktuelle_mandant_id()
+# veraendert, und daran haengt die ganze Mandantentrennung.
+if scripts/lokale-db.sh psql -q -f tests/supportzugriff.sql; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Abrechnung: Credits, Ledger, Limits"
 if scripts/lokale-db.sh psql -q -f tests/abrechnung.sql; then
   :
