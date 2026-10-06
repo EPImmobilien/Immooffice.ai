@@ -104,12 +104,41 @@ jobs:
           version="${{ steps.stand.outputs.version }}"
           name=$(basename "$DATEI" .sql)
           name="${name#${version}_}"
-          jq -n --arg v "$version" --arg n "$name" \
-            '{query: ("insert into supabase_migrations.schema_migrations (version, name) values (" + ($v|@text|tojson) + ", " + ($n|@text|tojson) + ") on conflict (version) do nothing")}' \
+          # SQL-Zeichenkette, nicht tojson: tojson setzt DOPPELTE
+          # Anfuehrungszeichen, und die sind in SQL ein Bezeichner, keine
+          # Zeichenkette. Der Eintrag scheiterte deshalb lautlos — die
+          # Historie stand monatelang auf dem Stand von fork_50.
+          # "\u0027" ist das einfache Anfuehrungszeichen; so geschrieben,
+          # weil der ganze jq-Ausdruck selbst in einfachen steht.
+          jq -n --arg v "$version" --arg n "$name" '
+            def sql: "\u0027" + gsub("\u0027"; "\u0027\u0027") + "\u0027";
+            {query: ("insert into supabase_migrations.schema_migrations (version, name) "
+                     + "values (" + ($v|sql) + ", " + ($n|sql) + ") "
+                     + "on conflict (version) do nothing")}' > vormerken.json
+          code=$(curl -sS -o vormerk-antwort.json -w '%{http_code}' \
+            -X POST "https://api.supabase.com/v1/projects/$PROJEKT/database/query" \
+            -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            -H "Content-Type: application/json" --data @vormerken.json)
+          echo "HTTP $code"; head -c 500 vormerk-antwort.json; echo
+          if [ "$code" != "200" ] && [ "$code" != "201" ]; then
+            echo "::error::Der Eintrag in die Historie schlug fehl (HTTP $code)."
+            exit 1
+          fi
+          # Und nachsehen, ob die Zeile wirklich steht. Ein Schritt, der nur
+          # abschickt und nie nachschaut, meldet Erfolg, wenn gar nichts
+          # passiert ist.
+          steht=$(jq -n --arg v "$version" '
+              def sql: "\u0027" + gsub("\u0027"; "\u0027\u0027") + "\u0027";
+              {query: ("select version from supabase_migrations.schema_migrations "
+                       + "where version = " + ($v|sql))}' \
             | curl -sS -X POST "https://api.supabase.com/v1/projects/$PROJEKT/database/query" \
                 -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-                -H "Content-Type: application/json" --data @- | head -c 500
-          echo
+                -H "Content-Type: application/json" --data @- | jq 'length')
+          if [ "$steht" != "1" ]; then
+            echo "::error::Version $version steht nach dem Eintrag nicht in der Historie."
+            exit 1
+          fi
+          echo "Historie: $version $name steht."
 
       - name: Nachsehen
         run: |

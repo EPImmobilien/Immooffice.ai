@@ -5329,3 +5329,35 @@ zwei Richtliniensätze. Die Spalte kostet einen Filter in zwei Abfragen.
 **Was das kostet:** Wer eine der beiden Listen baut und den Filter vergisst,
 sieht die Vorlagen der anderen. Genau das ist beim ersten Lauf passiert und
 steht jetzt in `tests/social.js`.
+
+---
+
+## 2026-10-06 · Die Migrationshistorie wurde seit fork_50 lautlos nicht fortgeschrieben
+
+**Frage:** `supabase_migrations.schema_migrations` endete auf dem eigenen
+Projekt bei `fork_50`, obwohl fork_47, 48, 52, 53, 54, 55 und 56 längst
+eingespielt und wirksam waren. Warum?
+
+**Entscheidung:** Ursache behoben, Historie nachgetragen.
+
+**Grund:** Der Schritt „In der Historie vormerken" in
+`.github/workflows/migrationen-einspielen.yml` baute das SQL mit `tojson`.
+`tojson` setzt **doppelte** Anführungszeichen — in SQL ist das ein
+Bezeichner, keine Zeichenkette. Die Anweisung lautete also
+`values ("20261006250000", "fork_54_supportzugriff")` und scheiterte an
+einer Spalte, die es nicht gibt. Gesehen hat das niemand, weil `curl` ohne
+`-f` lief und die Antwort nach `head -c 500` verschwand: der Schritt meldete
+Erfolg, egal was zurückkam.
+
+Jetzt baut der Schritt eine echte SQL-Zeichenkette (mit verdoppeltem
+Apostroph), prüft den HTTP-Code **und** liest hinterher nach, ob die Zeile
+wirklich steht. Die neun fehlenden Einträge sind mit der Version aus dem
+Dateinamen nachgetragen.
+
+**Was das kostet:** Nichts an der Datenbank — die Migrationen waren alle
+angewendet, nur nicht vermerkt. Offen bleibt: die über den
+Model-Context-Server eingespielten Migrationen stehen mit der Zeitmarke des
+Werkzeugs in der Historie, nicht mit der aus dem Dateinamen. Die Namen
+stimmen, die Versionen nicht. Das wird nicht nachträglich geradegezogen —
+eine Historie umzuschreiben, um sie hübscher zu machen, verliert mehr, als
+sie gewinnt.
