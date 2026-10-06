@@ -152,6 +152,8 @@
     var fZ = React.useState(""), fehler = fZ[0], setzeFehler = fZ[1];
     var hZ = React.useState([]), hinweise = hZ[0], setzeHinweise = hZ[1];
     var kZ = React.useState(null), stoff = kZ[0], setzeStoff = kZ[1];
+    var bZ = React.useState(null), beitragstext = bZ[0], setzeBeitragstext = bZ[1];
+    var btZ = React.useState(false), textLaeuft = btZ[0], setzeTextLaeuft = btZ[1];
 
     React.useEffect(function () {
       var weg = false;
@@ -207,6 +209,41 @@
       setzeLaedt(false);
     }
 
+    /**
+     * Die Bildunterschrift. Das Bild selbst kostet nichts — der Text
+     * schon: hier erzeugt die KI etwas, und dafuer gelten dieselben
+     * Credits wie ueberall sonst. Der Knopf sagt das, BEVOR er gedrueckt
+     * wird; eine Ueberraschung auf der Abrechnung waere schlimmer als ein
+     * Satz mehr auf dem Knopf.
+     */
+    async function textVorschlagen(verkauft) {
+      setzeTextLaeuft(true); setzeFehler("");
+      try {
+        var im = stoff.immobilie;
+        var a = await window._sb.functions.invoke("generate-text", {
+          body: {
+            textart: verkauft ? "instagram_caption_verkauft" : "instagram_caption",
+            daten: {
+              objektart: im.objektart || "", ort: im.ort || "",
+              ortsteil: im.ortsteil || "", plz: im.plz || "",
+              wohnflaeche: im.wohnflaeche ? String(im.wohnflaeche) : "",
+              grundstueck: im.grundstueck ? String(im.grundstueck) : "",
+              zimmer: im.zimmer ? String(im.zimmer) : "",
+              baujahr: im.baujahr ? String(im.baujahr) : "",
+              kaufpreis: im.angebotspreis ? String(im.angebotspreis) : "",
+              besonderheiten: im.expose_slogan || "",
+              titel_basis: im.objekttitel || im.bezeichnung || "",
+            },
+            mitHashtags: true,
+          },
+        });
+        if (a.error) throw a.error;
+        if (!a.data || !a.data.text) throw new Error("Die KI hat keinen Text geliefert.");
+        setzeBeitragstext({ text: a.data.text, credits: a.data.credits || null });
+      } catch (f) { setzeFehler(f.message || String(f)); }
+      setzeTextLaeuft(false);
+    }
+
     function malen(canvas, seite) {
       if (!canvas || !seite || !stoff) return;
       try {
@@ -257,7 +294,8 @@
         "Beitrag, Karussell und Story aus den Daten des Objekts — in der "
         + "Handschrift, die auch das Exposé trägt, mit Ihren Farben und Ihrem "
         + "Logo. Es wird nichts dazugedichtet: was im Objekt fehlt, bleibt auf "
-        + "dem Bild leer. Kostet keine Credits."),
+        + "dem Bild leer. Die Bilder kosten keine Credits; nur ein Text von "
+        + "der KI kostet welche, und der Knopf sagt es vorher."),
 
       E("div", { style: { display: "flex", gap: 10, flexWrap: "wrap", margin: "16px 0" } },
         E("select", { style: feld, value: wahlObjekt,
@@ -314,10 +352,50 @@
             + Math.round(s.hoehe * EXPORT) + ")"));
       })) : null,
 
-      seiten ? E("p", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.7, marginTop: 18 } },
-        "Die Bilder entstehen in Ihrem Browser und werden nirgends "
-        + "zwischengespeichert. Wer einen Beitrag ändern will, ändert das "
-        + "Objekt oder die Vorlage — nicht das fertige Bild.") : null);
+      seiten ? E("div", { style: {
+        background: CI.card, border: "1px solid " + CI.border, borderRadius: 12,
+        padding: 18, marginTop: 20,
+      } },
+        E("div", { style: {
+          fontSize: 11, fontWeight: 700, color: CI.gold, letterSpacing: "0.08em",
+          textTransform: "uppercase", marginBottom: 10,
+        } }, "Bildunterschrift"),
+        E("p", { style: { fontSize: 13, color: CI.muted, lineHeight: 1.7, marginTop: 0 } },
+          "Das Bild kostet nichts — ein Text von der KI schon. Er wird "
+          + "vorgeschlagen, nicht veröffentlicht: lesen, ändern, erst dann "
+          + "benutzen. Der Hinweis auf die KI-Erzeugung hängt die Funktion "
+          + "selbst an."),
+        E("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } },
+          E("button", { type: "button", style: knopfLeer, disabled: textLaeuft,
+            onClick: function () { textVorschlagen(false); } },
+            textLaeuft ? "Schreibt …" : "Text vorschlagen (kostet Credits)"),
+          E("button", { type: "button", style: knopfLeer, disabled: textLaeuft,
+            onClick: function () { textVorschlagen(true); } },
+            "Text für „Verkauft\u201c")),
+        beitragstext ? E("div", { style: { marginTop: 14 } },
+          E("textarea", { value: beitragstext.text, rows: 10, readOnly: false,
+            onChange: function (e) {
+              setzeBeitragstext({ text: e.target.value, credits: beitragstext.credits });
+            },
+            style: { width: "100%", boxSizing: "border-box", fontFamily: "inherit",
+                     fontSize: 13.5, lineHeight: 1.6, color: CI.blau, padding: 12,
+                     border: "1px solid " + CI.border, borderRadius: 8,
+                     resize: "vertical" } }),
+          E("div", { style: { display: "flex", gap: 8, alignItems: "center",
+                              marginTop: 8, flexWrap: "wrap" } },
+            E("button", { type: "button", style: knopfLeer,
+              onClick: function () {
+                try { navigator.clipboard.writeText(beitragstext.text); } catch (x) { /* dann von Hand */ }
+              } }, "In die Zwischenablage"),
+            beitragstext.credits
+              ? E("span", { style: { fontSize: 11.5, color: CI.muted } },
+                  beitragstext.credits + " Credits verbraucht")
+              : null)) : null,
+
+        E("p", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.7, marginTop: 16, marginBottom: 0 } },
+          "Die Bilder entstehen in Ihrem Browser und werden nirgends "
+          + "zwischengespeichert. Wer einen Beitrag ändern will, ändert das "
+          + "Objekt oder die Vorlage — nicht das fertige Bild.")) : null);
   }
 
   window.ImmoSocial = ImmoSocial;

@@ -192,10 +192,9 @@ const duenn = Expose.aufbereiten({
 // --- 3. Die Zusagen der Tafel ----------------------------------------------
 if (fs.existsSync(TAFEL)) {
   const q = fs.readFileSync(TAFEL, 'utf-8');
-  melde('die Tafel reserviert keine Credits',
+  melde('die Tafel rechnet nicht selbst ab',
         !/credits_reservieren|kiAbrechnen/.test(q),
-        'hier entsteht nichts durch KI — CLAUDE.md zaehlt den Export zu den '
-        + 'kostenfreien Aktionen');
+        'das Reservieren gehoert in die Edge Function, nicht in die Oberflaeche');
   melde('sie laedt nichts hoch',
         !/\.upload\(/.test(q), 'die Bilder entstehen im Browser');
   melde('sie nimmt die Vorlagen aus der Datenbank, nicht aus dem Code',
@@ -208,8 +207,18 @@ if (fs.existsSync(TAFEL)) {
         '540 pt × 2 = 1080 px, die Breite, die Instagram erwartet');
   melde('sie sagt, dass nichts erfunden wird',
         /nichts dazugedichtet/.test(q));
-  melde('sie sagt, dass es keine Credits kostet',
-        /Kostet keine Credits/.test(q));
+  // Das BILD kostet nichts, ein KI-Text schon. Beides muss dastehen — und
+  // zwar bevor jemand drueckt. Eine Ueberraschung auf der Abrechnung waere
+  // schlimmer als ein Satz mehr auf dem Knopf.
+  melde('sie sagt, dass die Bilder nichts kosten',
+        /Bilder kosten keine Credits/.test(q));
+  melde('und dass ein KI-Text etwas kostet',
+        /kostet Credits/.test(q) && /Das Bild kostet nichts/.test(q));
+  melde('der Text wird vorgeschlagen, nicht veroeffentlicht',
+        /vorgeschlagen, nicht veröffentlicht/.test(q));
+  melde('und er ist editierbar',
+        /textarea/.test(q) && /readOnly: false/.test(q),
+        'CLAUDE.md: alle KI-Texte editierbar und freigabepflichtig');
 }
 
 // --- 4. Die Expose-Auswahl zeigt KEINE Social-Vorlagen ---------------------

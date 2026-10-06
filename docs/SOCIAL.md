@@ -82,11 +82,24 @@ leer, wenn nur `bezeichnung` gepflegt war und die Spalte `objekttitel` nicht.
 An der größten Stelle der Seite stand dann nichts. Der Renderer fällt jetzt
 auf die Bezeichnung zurück.
 
+## Die Bildunterschrift
+
+Unter der Vorschau steht ein Knopf, der einen Beitragstext vorschlägt —
+über `generate-text`, textart `instagram_caption` (oder
+`instagram_caption_verkauft`). Zwei Dinge sind daran keine
+Gestaltungsfrage:
+
+- **Das Bild kostet nichts, der Text schon.** Hier erzeugt die KI etwas, und
+  dafür gelten dieselben Credits wie überall. Der Knopf sagt es, bevor er
+  gedrückt wird; eine Überraschung auf der Abrechnung wäre schlimmer als ein
+  Satz mehr auf dem Knopf.
+- **Vorgeschlagen, nicht veröffentlicht.** Der Text steht in einem Feld, das
+  sich ändern lässt, und wird nirgendwohin geschickt. CLAUDE.md: alle
+  KI-Texte editierbar und freigabepflichtig. Den Hinweis auf die
+  KI-Erzeugung hängt `generate-text` selbst an.
+
 ## Was noch fehlt
 
-- **Texte für die Beiträge.** Die Bildunterschrift schreibt heute der Makler
-  selbst. Die KI-Textfunktion kann sie erzeugen (`generate-text`, textart
-  `instagram_caption`) — verbunden ist beides noch nicht.
 - **Direkt veröffentlichen.** Die Bilder werden heruntergeladen und von Hand
   hochgeladen. Eine Anbindung an Meta oder LinkedIn ist eine eigene
   Entscheidung mit eigenen Zugangsdaten.
