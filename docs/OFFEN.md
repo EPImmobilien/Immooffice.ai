@@ -1128,3 +1128,34 @@ Versandversuch wiederholt es mit dem Weg dorthin — der Schritt ist also
 nicht versteckt, aber er bleibt ein Schritt.
 
 Betrifft nur Microsoft. Gmail und eigene Mailserver brauchen ihn nicht.
+
+## Abrechnung: was ohne Stripe-Konto offen bleibt
+
+Stand 06.10.2026. Der Auftrag „Tarife, Abos & Credits" ist gebaut, geprüft
+und ausgerollt; die vollständige Beschreibung steht in `docs/BILLING.md`.
+Drei Dinge kann nur der Betreiber tun, und bis dahin ist der Zahlungsweg
+nicht begehbar:
+
+1. **Stripe einrichten.** `STRIPE_SECRET_KEY` (nur `sk_test_…`), dann
+   `node scripts/stripe-einrichten.mjs`, dann den Webhook-Endpunkt bei
+   Stripe anlegen und `STRIPE_WEBHOOK_SECRET` setzen. Ohne das antwortet
+   die Kasse mit „Der Tarif ist bei Stripe noch nicht angelegt" — richtig,
+   aber eben keine Kasse.
+2. **Die Abnahme mit Testkarten** (`docs/BILLING.md`, Abschnitt 10.2). Alles
+   Übrige ist hier geprüft: Credit-Logik, Mandantentrennung, Ledger,
+   Zugriffsstufen und Fristen gegen eine echte Postgres-Instanz, die
+   Oberflächen gegen ein nachgebautes React.
+3. **`RESEND_API_KEY` und `SMTP_FROM_EMAIL`** für die Testphasen-Erinnerung.
+   Beide sind schon für andere Mails nötig; fehlen sie, meldet der Lauf das
+   und verschickt nichts — statt stillschweigend auszufallen.
+
+**Nicht abgerechnet** werden rund vierzig weitere KI-Funktionen: den Parsern
+und Auslesefunktionen fehlt ein Preis im Katalog (eine Preisentscheidung des
+Betreibers), den Hintergrundläufen fehlt ein angemeldeter Nutzer, dem sich
+der Verbrauch zuordnen liesse. Beides ist in `docs/BILLING.md`, Abschnitt 5,
+namentlich aufgeführt, damit es nicht in Vergessenheit gerät.
+
+**Die Testphase der beiden Bestandsmandanten** endet Anfang November
+(`fork_50`). Bis dahin muss ein Tarif gewählt sein, sonst greift zuerst der
+Lesezugriff und danach die Sperre — für die eigenen Häuser des Betreibers
+genauso wie für jeden Kunden.
