@@ -572,3 +572,67 @@ Mandant das in seinem Tenant erlaubt.
 6. **Keine Anbieter-Schicht.** IMAP/SMTP ist fest eingebaut, nicht ein
    Adapter unter mehreren. Der Auftrag beschreibt in Abschnitt 4b genau das
    für Postfächer; Microsoft 365 und Google wären dann Adapter daneben.
+
+---
+
+## Nachtrag 06.10.2026, Abend — Abrechnung, Plattform-Bereich, Social
+
+Drei Dinge sind an diesem Tag entstanden und ausgerollt. Alles unten läuft
+auf dem eigenen Projekt `usguiggfciavwzkdfjgt`; `npm run check` ist grün.
+
+### 1. Abrechnung (fork_47 bis fork_53)
+
+Datenmodell, Credit-Werk, Stripe-Schicht, Preisbereich auf der Website,
+Kundenbereich „Abo & Abrechnung", Plattform-Katalog, Testphasen-Erinnerung
+und das Band über jeder Seite. Vollständig beschrieben in
+[`docs/BILLING.md`](BILLING.md).
+
+**Credits werden seit fork_49 wirklich verbraucht:** vier KI-Funktionen
+reservieren vor dem Anbieter, buchen danach und geben bei jedem Abbruch
+zurück. Rund vierzig weitere rechnen noch nicht ab — mit Grund, namentlich
+aufgeführt.
+
+**Offen bleibt alles, was an Stripes API hängt.** Dieser Container kommt
+weder an Stripe noch an Supabase über HTTPS; die Abnahme mit Testkarten
+steht in `docs/BILLING.md`, Abschnitt 10.2, und ist Sache des Betreibers.
+
+### 2. Plattform-Bereich (fork_52, fork_54, fork_55)
+
+Der Bereich des Betreibers: Zahlen, Mandanten mit Einzeltafel, Konten über
+alle Häuser, Katalog, Systemzustand und Protokoll. Dazu der **protokollierte
+Supportzugriff** — befristet, begründet, standardmäßig nur lesend und für
+den betroffenen Mandanten nachlesbar. Beschrieben in
+[`docs/PLATTFORM.md`](PLATTFORM.md).
+
+Zwei Befunde, die ohne den Test niemand gefunden hätte und die beide die
+Mandantentrennung betrafen:
+
+- Während einer Support-Sitzung fiel die **eigene Profilzeile** aus der
+  Sicht, und fast jede freigebende Richtlinie fragt nach der eigenen Rolle.
+- **`with check` gilt nicht für DELETE.** Eine Lese-Sitzung hätte löschen
+  können, was sie sehen darf. 197 Tabellen tragen jetzt eine zweite
+  restriktive Richtlinie nur fürs Löschen.
+
+`tests/supportzugriff.sql` hält beides fest, 22 Prüfungen.
+
+### 3. Social-Media-Baukasten (fork_56)
+
+Neun Vorlagen aus den drei gelieferten Entwurfssätzen — Beitrag, Story und
+Quadrat je Handschrift —, erzeugt aus einer Beschreibung und gezeichnet vom
+vorhandenen Exposé-Renderer. Dazu eine Kachel im Marketing-Modul.
+Beschrieben in [`docs/SOCIAL.md`](SOCIAL.md).
+
+Dabei ist ein Fehler aufgefallen, der **jedes Exposé** betraf:
+`objekt.objekttitel` blieb leer, wenn nur `bezeichnung` gepflegt war. An der
+größten Stelle der Seite stand dann nichts.
+
+### Was der Betreiber noch tun muss
+
+1. Stripe einrichten und die Abnahme durchspielen (`docs/BILLING.md`, 10.2).
+2. `RESEND_API_KEY` und `SMTP_FROM_EMAIL` prüfen — ohne sie verschickt die
+   Testphasen-Erinnerung nichts und sagt es.
+3. Entscheiden, wann die Anwendung in **Produktion** geht. Ausgeliefert ist
+   bisher nur der Entwurf; die Edge Functions und die Datenbank sind auf
+   dem neuen Stand.
+4. Die sechs Impressum-Felder in `website/konfig.js` füllen — bis dahin
+   lässt die Auslieferung der Website nur eine Vorschau zu.
