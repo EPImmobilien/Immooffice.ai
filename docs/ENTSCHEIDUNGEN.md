@@ -4501,3 +4501,26 @@ einmalige Übernahme, kein Abgleich. Die Vorlage wurde dabei nur gelesen.
   öffentlichen Ablage geholt — nur in vorgemerkte Datensätze, jeden genau
   einmal. Sie ist danach abgeschaltet worden (Antwort 410). Siehe
   `docs/OFFEN.md`.
+
+### Nachtrag: zwei Neubauprojekte (06.10.2026)
+
+Zweiter Auftrag: „nochmal einige Projekte übertragen". Übernommen sind die
+beiden echten Neubauprojekte der Vorlage, das dritte („Test", leer) nicht:
+
+| Kennung (`slug`) | Projekt | Einheiten | Ordner |
+|---|---|---|---|
+| `test-luebsche-burg` | Wohnquartier Lübsche Burg, Wismar (Kauf) | 16 | 7 |
+| `test-muehlenblick-teterow` | Wohnquartier Mühlenblick, Teterow (Miete) | 24 | 0 |
+
+- **Mit:** Projektname, Untertitel, Ort, Vermarktungsart, alle Einheiten
+  (Nummer, Zimmer, Geschoss, Fläche, Kaufpreis bzw. Miete, Hausgeld,
+  Ausrichtung, Status), die Ordnerstruktur.
+- **Ohne:** Kundenzugänge, Aktivitäten, Anfragen, Merklisten, Nachrichten,
+  Kontakte der Gewerke — alles personenbezogen. Ohne die Domain der
+  Projektseite (`oeffentliche_url` leer).
+- **Ohne Dateien.** Die 26 Unterlagen der Lübschen Burg (Visualisierungen,
+  Grundrisse, Baubeschreibung, Energieausweis, Auskünfte) liegen in der
+  Vorlage in einem privaten Eimer und sind nur für angemeldete
+  Interessenten freigegeben. Ein öffentlicher Weg dorthin besteht nicht,
+  und ein Kundenzugang wird dafür nicht benutzt. Sie müssen bei Bedarf von
+  Hand hochgeladen werden.
