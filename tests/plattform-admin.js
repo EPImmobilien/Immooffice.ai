@@ -45,8 +45,12 @@ const ERLAUBT = new Set([
   // Der Katalog der Plattform — ihr eigenes Regal.
   'plattform_admins', 'plattform_tarife', 'plattform_credit_preise',
   'plattform_credit_pakete', 'plattform_werte', 'plattform_protokoll',
-  // Die Vertragsbeziehung.
-  'mandanten', 'mandant_abo', 'credit_buchungen',
+  // Die Vertragsbeziehung. `credit_konten` und `credit_buchungen` sind das
+  // Guthaben und seine Bewegungen — sie gehoeren zur Abrechnung, nicht zur
+  // Arbeit des Hauses. `abo_erinnerungen` haelt fest, welche Fristmeldung
+  // schon hinausging; `support_sitzungen` ist der Zugriff selbst.
+  'mandanten', 'mandant_abo', 'credit_buchungen', 'credit_konten',
+  'abo_erinnerungen', 'support_sitzungen',
   // Nur, um Nutzer zu ZAEHLEN. Die Abfrage holt ausschliesslich mandant_id.
   'profiles',
 ]);
@@ -144,6 +148,36 @@ melde('eine Gutschrift ist gegen den doppelten Klick gesichert',
       /referenz/.test(q) && /credits_gutschreiben/.test(q),
       'credits_gutschreiben ist ueber die Referenz idempotent');
 melde('die Gutschrift hat eine Obergrenze', /100000/.test(q));
+
+// --- 3b. Die Verwaltungsaktionen -------------------------------------------
+for (const [name, muster] of [
+  ['ein Mandant laesst sich oeffnen', /aktion === "mandant"/],
+  ['und aendern', /aktion === "mandant_speichern"/],
+  ['und loeschen', /aktion === "mandant_loeschen"/],
+  ['Konten ueber alle Haeuser', /aktion === "nutzer"/],
+  ['Plattform-Recht vergeben', /aktion === "admin_setzen"/],
+  ['Supportzugriff beginnen', /aktion === "support_start"/],
+  ['und beenden', /aktion === "support_ende"/],
+]) {
+  melde(name, muster.test(q));
+}
+melde('das Loeschen verlangt den ausgeschriebenen Namen',
+      /bestaetigung !== m\.name/.test(q),
+      'ein Knopf allein ist keine Sperre fuer etwas Unwiderrufliches');
+melde('vor dem Loeschen steht der Protokolleintrag',
+      q.indexOf('protokoll("mandant_geloescht"') < q.indexOf('.delete().eq("id", id)'),
+      'nachher ist die Kennung weg');
+melde('der letzte Plattform-Administrator kann sich nicht selbst entfernen',
+      /letzte Plattform-Administrator/.test(q),
+      'sonst kaeme niemand mehr in diesen Bereich');
+melde('ein entzogenes Recht beendet laufende Sitzungen',
+      /admin_setzen[\s\S]*?from\("support_sitzungen"\)\s*\n?\s*\.update\(\{ beendet_am/.test(q));
+melde('eine neue Sitzung beendet die vorherige',
+      /aktion === "support_start"[\s\S]{0,1600}?is\("beendet_am", null\)[\s\S]{0,400}?\.insert\(\{/.test(q),
+      'zwei gleichzeitige Sitzungen waeren eine Regel, die niemand sieht');
+melde('die Dauer ist nach oben begrenzt', /Math\.min\(240/.test(q));
+melde('ein Supportzugriff verlangt einen Grund, den der Mandant lesen kann',
+      /der Mandant kann ihn nachlesen/.test(q));
 
 // --- 4. Die Schranke steht vor jeder Aktion -------------------------------
 const beiPruefung = q.indexOf('plattform_admins');

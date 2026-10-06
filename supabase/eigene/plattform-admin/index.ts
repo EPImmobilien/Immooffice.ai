@@ -285,6 +285,247 @@ Deno.serve(async (req) => {
       return antwort({ ok: true, referenz });
     }
 
+    // --- Ein Mandant im Einzelnen ------------------------------------------
+    // Wieder NUR die Vertragsbeziehung. Dazu die Konten des Hauses (Name,
+    // Adresse, Rolle) — ohne sie liesse sich ein Kunde nicht betreuen, und
+    // sie sind das, was der Betreiber ohnehin in seiner eigenen
+    // Rechnungsstellung führt.
+    if (aktion === "mandant") {
+      const id = String(body.mandant_id || "");
+      if (!id) return antwort({ ok: false, fehler: "Kein Mandant." }, 400);
+      const [{ data: m }, { data: abo }, { data: nutzer }, { data: konten },
+             { data: buchungen }, { data: erinnerungen }, { data: sitzungen }] =
+        await Promise.all([
+          db.from("mandanten").select("*").eq("id", id).maybeSingle(),
+          db.from("mandant_abo").select("*").eq("mandant_id", id).maybeSingle(),
+          db.from("profiles").select("id, name, email, role, funktion, stufe").eq("mandant_id", id),
+          db.from("credit_konten")
+            .select("quelle, credits, verbraucht, gueltig_von, gueltig_bis, referenz, erstellt_am")
+            .eq("mandant_id", id).order("erstellt_am", { ascending: false }).limit(50),
+          db.from("credit_buchungen")
+            .select("aktion, credits, quelle, status, ki_kosten_eur, erstellt_am")
+            .eq("mandant_id", id).order("erstellt_am", { ascending: false }).limit(50),
+          db.from("abo_erinnerungen").select("*").eq("mandant_id", id),
+          db.from("support_sitzungen").select("*").eq("mandant_id", id)
+            .order("begonnen_am", { ascending: false }).limit(20),
+        ]);
+      if (!m) return antwort({ ok: false, fehler: "Unbekannter Mandant." }, 404);
+      const [{ data: saldo }, { data: zugriff }, { data: limit }] = await Promise.all([
+        db.rpc("credits_saldo", { p_mandant: id }),
+        db.rpc("abo_zugriff", { p_mandant: id }),
+        db.rpc("nutzer_limit", { p_mandant: id }),
+      ]);
+      return antwort({
+        ok: true, mandant: m, abo, nutzer: nutzer || [], konten: konten || [],
+        buchungen: buchungen || [], erinnerungen: erinnerungen || [],
+        sitzungen: sitzungen || [],
+        saldo: Number(saldo ?? 0), zugriff, nutzer_limit: Number(limit ?? 0),
+      });
+    }
+
+    // --- Einen Mandanten verwalten -----------------------------------------
+    // Hier wird der VERTRAGSSTAND gesetzt, nicht der von Stripe. Beides kann
+    // auseinandergehen, und dann gilt, was Stripe meldet: der Webhook
+    // überschreibt diese Werte beim nächsten Ereignis. Deshalb steht in der
+    // Antwort, ob bei Stripe ein Abo läuft — wer dort einen Vertrag hat,
+    // ändert ihn dort und nicht hier.
+    if (aktion === "mandant_speichern") {
+      const id = String(body.mandant_id || "");
+      const grund = String(body.grund || "").trim();
+      if (!id) return antwort({ ok: false, fehler: "Kein Mandant." }, 400);
+      if (grund.length < 5) {
+        return antwort({ ok: false, fehler:
+          "Bitte einen Grund angeben — er steht im Protokoll." }, 400);
+      }
+      const { data: vorher } = await db.from("mandanten").select("*").eq("id", id).maybeSingle();
+      if (!vorher) return antwort({ ok: false, fehler: "Unbekannter Mandant." }, 404);
+
+      const m: Record<string, unknown> = {};
+      if (typeof body.name === "string" && body.name.trim().length >= 2) {
+        m.name = body.name.trim().slice(0, 120);
+      }
+      if (body.testphase_bis !== undefined) {
+        m.testphase_bis = body.testphase_bis ? new Date(body.testphase_bis).toISOString() : null;
+      }
+      if (body.gesperrt !== undefined) {
+        m.gesperrt_am = body.gesperrt ? new Date().toISOString() : null;
+        m.gesperrt_grund = body.gesperrt ? grund.slice(0, 500) : null;
+        m.abo_status = body.gesperrt ? "gesperrt"
+          : (vorher.abo_status === "gesperrt" ? "aktiv" : vorher.abo_status);
+      }
+      if (Object.keys(m).length) {
+        m.geaendert_am = new Date().toISOString();
+        const { error } = await db.from("mandanten").update(m).eq("id", id);
+        if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      }
+
+      // Der Tarif: im Abo, nicht am Mandanten.
+      const a: Record<string, unknown> = {};
+      if (typeof body.tarif === "string" && body.tarif) {
+        const { data: t } = await db.from("plattform_tarife")
+          .select("schluessel, ist_zusatznutzer").eq("schluessel", body.tarif).maybeSingle();
+        if (!t || t.ist_zusatznutzer) return antwort({ ok: false, fehler: "Unbekannter Tarif." }, 400);
+        a.tarif = body.tarif;
+      }
+      if (typeof body.abo_status === "string"
+          && ["test", "aktiv", "gekuendigt", "zahlung_offen", "abgelaufen"].includes(body.abo_status)) {
+        a.status = body.abo_status;
+      }
+      if (body.zusatznutzer !== undefined) {
+        a.zusatznutzer = Math.max(0, Math.min(500, Number(body.zusatznutzer) || 0));
+      }
+      if (body.mindestlaufzeit_bis !== undefined) {
+        a.mindestlaufzeit_bis = body.mindestlaufzeit_bis
+          ? new Date(body.mindestlaufzeit_bis).toISOString() : null;
+      }
+      let stripeLaeuft = false;
+      if (Object.keys(a).length) {
+        const { data: abo } = await db.from("mandant_abo")
+          .select("stripe_subscription_id").eq("mandant_id", id).maybeSingle();
+        stripeLaeuft = !!abo?.stripe_subscription_id;
+        a.geaendert_am = new Date().toISOString();
+        const { error } = await db.from("mandant_abo")
+          .upsert({ mandant_id: id, ...a }, { onConflict: "mandant_id" });
+        if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      }
+
+      await protokoll("mandant_geaendert", id, { vorher, mandant: m, abo: a, grund });
+      return antwort({ ok: true, stripe_laeuft: stripeLaeuft });
+    }
+
+    // --- Einen Mandanten loeschen ------------------------------------------
+    // Das Schwerste, was dieser Bereich kann: alles geht mit — Objekte,
+    // Kontakte, Mails, Dateien, Ledger. Deshalb drei Sperren: ein Grund, der
+    // ausgeschriebene Name des Hauses als Bestaetigung, und ein Protokoll,
+    // das bleibt. Rueckgaengig gibt es nicht.
+    if (aktion === "mandant_loeschen") {
+      const id = String(body.mandant_id || "");
+      const grund = String(body.grund || "").trim();
+      const bestaetigung = String(body.bestaetigung || "").trim();
+      const { data: m } = await db.from("mandanten").select("*").eq("id", id).maybeSingle();
+      if (!m) return antwort({ ok: false, fehler: "Unbekannter Mandant." }, 404);
+      if (grund.length < 5) {
+        return antwort({ ok: false, fehler: "Bitte einen Grund angeben." }, 400);
+      }
+      if (bestaetigung !== m.name) {
+        return antwort({ ok: false, fehler:
+          `Zur Bestätigung bitte den Namen des Hauses eingeben: „${m.name}".` }, 400);
+      }
+      const { count: nutzer } = await db.from("profiles")
+        .select("id", { count: "exact", head: true }).eq("mandant_id", id);
+      // Erst ins Protokoll, dann loeschen: nachher ist die Kennung weg, und
+      // ein Protokolleintrag, der das Loeschen nicht ueberlebt, ist keiner.
+      await protokoll("mandant_geloescht", id,
+        { name: m.name, slug: m.slug, nutzer: nutzer || 0, grund });
+      const { error } = await db.from("mandanten").delete().eq("id", id);
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      return antwort({ ok: true, name: m.name });
+    }
+
+    // --- Konten ueber alle Mandanten ---------------------------------------
+    if (aktion === "nutzer") {
+      const { data } = await db.from("profiles")
+        .select("id, name, email, role, mandant_id");
+      const { data: mandanten } = await db.from("mandanten").select("id, name");
+      const { data: admins } = await db.from("plattform_admins").select("benutzer_id");
+      const nameVon = new Map((mandanten || []).map((m) => [String(m.id), m.name]));
+      const istAdmin = new Set((admins || []).map((a) => String(a.benutzer_id)));
+      return antwort({ ok: true, nutzer: (data || []).map((p) => ({
+        ...p, haus: nameVon.get(String(p.mandant_id)) || null,
+        plattform_admin: istAdmin.has(String(p.id)),
+      })) });
+    }
+
+    // --- Plattform-Recht vergeben und entziehen ----------------------------
+    if (aktion === "admin_setzen") {
+      const nutzerId = String(body.benutzer_id || "");
+      const an = !!body.an;
+      const grund = String(body.grund || "").trim();
+      if (!nutzerId) return antwort({ ok: false, fehler: "Kein Konto." }, 400);
+      if (grund.length < 5) return antwort({ ok: false, fehler: "Bitte einen Grund angeben." }, 400);
+      // Sich selbst das Recht zu entziehen ist erlaubt — aber nicht, wenn
+      // danach niemand mehr eines hat. Dann kaeme niemand mehr hinein.
+      if (!an) {
+        const { count } = await db.from("plattform_admins")
+          .select("benutzer_id", { count: "exact", head: true });
+        if ((count || 0) <= 1) {
+          return antwort({ ok: false, fehler:
+            "Das ist der letzte Plattform-Administrator. Erst einen zweiten "
+            + "ernennen, sonst kommt niemand mehr in diesen Bereich." }, 409);
+        }
+      }
+      if (an) {
+        const { error } = await db.from("plattform_admins")
+          .upsert({ benutzer_id: nutzerId, notiz: grund.slice(0, 300) },
+                  { onConflict: "benutzer_id" });
+        if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      } else {
+        await db.from("plattform_admins").delete().eq("benutzer_id", nutzerId);
+        // Laufende Sitzungen enden mit dem Recht. Die Datenbankfunktion
+        // prueft das ohnehin bei jedem Zugriff; hier wird es auch sichtbar.
+        await db.from("support_sitzungen")
+          .update({ beendet_am: new Date().toISOString() })
+          .eq("admin_id", nutzerId).is("beendet_am", null);
+      }
+      await protokoll(an ? "admin_ernannt" : "admin_entzogen", nutzerId, { grund });
+      return antwort({ ok: true });
+    }
+
+    // --- Supportzugriff ----------------------------------------------------
+    if (aktion === "support_start") {
+      const id = String(body.mandant_id || "");
+      const grund = String(body.grund || "").trim();
+      const schreiben = !!body.schreiben;
+      if (!id) return antwort({ ok: false, fehler: "Kein Mandant." }, 400);
+      if (grund.length < 5) {
+        return antwort({ ok: false, fehler:
+          "Bitte einen Grund angeben — der Mandant kann ihn nachlesen." }, 400);
+      }
+      const { data: w } = await db.from("plattform_werte")
+        .select("wert").eq("schluessel", "support_dauer_minuten").maybeSingle();
+      const minuten = Math.max(5, Math.min(240,
+        Number(String(w?.wert ?? "60").replace(/"/g, "")) || 60));
+      // Nur eine Sitzung auf einmal. Zwei gleichzeitige waeren in der
+      // Datenbank nicht entscheidbar — sie nimmt die juengste, und das waere
+      // eine Regel, die niemand sieht.
+      await db.from("support_sitzungen")
+        .update({ beendet_am: new Date().toISOString() })
+        .eq("admin_id", u.user.id).is("beendet_am", null);
+      const { data: neu, error } = await db.from("support_sitzungen").insert({
+        admin_id: u.user.id, mandant_id: id, grund: grund.slice(0, 500),
+        schreiben,
+        gueltig_bis: new Date(Date.now() + minuten * 60000).toISOString(),
+      }).select("id, gueltig_bis, schreiben").single();
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll("support_begonnen", id,
+        { grund, schreiben, minuten, sitzung: neu?.id });
+      return antwort({ ok: true, sitzung: neu });
+    }
+
+    if (aktion === "support_ende") {
+      const { data: offen } = await db.from("support_sitzungen")
+        .select("id, mandant_id").eq("admin_id", u.user.id).is("beendet_am", null);
+      await db.from("support_sitzungen")
+        .update({ beendet_am: new Date().toISOString() })
+        .eq("admin_id", u.user.id).is("beendet_am", null);
+      for (const s of offen || []) {
+        await protokoll("support_beendet", String(s.mandant_id), { sitzung: s.id });
+      }
+      return antwort({ ok: true, beendet: (offen || []).length });
+    }
+
+    if (aktion === "support_stand") {
+      const { data } = await db.from("support_sitzungen")
+        .select("id, mandant_id, grund, schreiben, begonnen_am, gueltig_bis")
+        .eq("admin_id", u.user.id).is("beendet_am", null)
+        .gt("gueltig_bis", new Date().toISOString())
+        .order("begonnen_am", { ascending: false }).limit(1).maybeSingle();
+      if (!data) return antwort({ ok: true, sitzung: null });
+      const { data: m } = await db.from("mandanten")
+        .select("name").eq("id", data.mandant_id).maybeSingle();
+      return antwort({ ok: true, sitzung: { ...data, mandant_name: m?.name || null } });
+    }
+
     // --- Das Protokoll ------------------------------------------------------
     if (aktion === "protokoll") {
       const { data } = await db.from("plattform_protokoll")

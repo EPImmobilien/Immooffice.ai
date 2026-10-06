@@ -178,8 +178,11 @@
                 m.cancel_at ? E("div", null, "endet " + datum(m.cancel_at)) : null,
                 m.mindestlaufzeit_bis ? E("div", null, "Mindestlaufzeit bis " + datum(m.mindestlaufzeit_bis)) : null),
               E("td", { style: zelle },
-                E("button", { type: "button", style: knopfLeer,
-                  onClick: function () { setzeGeschenk(m); } }, "Credits")));
+                E("div", { style: { display: "flex", gap: 6, flexWrap: "wrap" } },
+                  E("button", { type: "button", style: knopfLeer,
+                    onClick: function () { p.oeffnen(m.id); } }, "Öffnen"),
+                  E("button", { type: "button", style: knopfLeer,
+                    onClick: function () { setzeGeschenk(m); } }, "Credits"))));
           })))),
       E("p", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.7 } },
         "Diese Liste zeigt die Vertragsbeziehung, nicht die Arbeit der Häuser. "
@@ -209,6 +212,280 @@
           E("p", { style: { fontSize: 11.5, color: CI.muted, marginTop: 10, lineHeight: 1.6 } },
             "Gutgeschriebene Credits sind zwölf Monate gültig und werden nach "
             + "den Inklusiv-Credits verbraucht."))) : null);
+  }
+
+  // --- Ein Mandant im Einzelnen ----------------------------------------------
+  // Alles, was der Betreiber zu einem Haus wissen und ändern können muss —
+  // und nichts darüber hinaus. Was das Haus mit der Software TUT, steht
+  // hier nicht; dafür gibt es den Supportzugriff, und der ist befristet,
+  // begründet und für den Kunden nachlesbar.
+  function MandantTafel(p) {
+    var eZ = React.useState({}), entwurf = eZ[0], setzeEntwurf = eZ[1];
+    var gZ = React.useState(""), grund = gZ[0], setzeGrund = gZ[1];
+    var bZ = React.useState(""), busy = bZ[0], setzeBusy = bZ[1];
+    var lZ = React.useState(""), loeschwort = lZ[0], setzeLoeschwort = lZ[1];
+    var sZ = React.useState({ grund: "", schreiben: false }), sup = sZ[0], setzeSup = sZ[1];
+    var d = p.daten;
+    if (!d) return E("div", { style: { color: CI.muted } }, "Lade Mandant …");
+    var m = d.mandant, a = d.abo || {};
+
+    function feldwert(name, aus) {
+      return Object.prototype.hasOwnProperty.call(entwurf, name) ? entwurf[name] : aus;
+    }
+    function setzen(name, w) {
+      var n = {}; n[name] = w;
+      setzeEntwurf(Object.assign({}, entwurf, n));
+    }
+    async function speichern() {
+      setzeBusy("speichern");
+      try {
+        var r = await ruf("mandant_speichern", Object.assign({}, entwurf,
+          { mandant_id: m.id, grund: grund }));
+        setzeEntwurf({}); setzeGrund("");
+        p.melden(r.stripe_laeuft
+          ? "Gespeichert. ACHTUNG: dieser Mandant hat ein laufendes "
+            + "Stripe-Abo — der nächste Webhook überschreibt den Vertragsstand "
+            + "wieder mit dem, was Stripe meldet."
+          : "Gespeichert.", r.stripe_laeuft ? "warnung" : "ok");
+        p.neuLaden();
+      } catch (f) { p.melden(f.message || String(f), "fehler"); }
+      setzeBusy("");
+    }
+    async function loeschen() {
+      setzeBusy("loeschen");
+      try {
+        await ruf("mandant_loeschen",
+          { mandant_id: m.id, grund: grund, bestaetigung: loeschwort });
+        p.melden("„" + m.name + "\u201c wurde mit allen Daten gelöscht.", "ok");
+        p.zurueck();
+      } catch (f) { p.melden(f.message || String(f), "fehler"); }
+      setzeBusy("");
+    }
+    async function supportStarten() {
+      setzeBusy("support");
+      try {
+        var r = await ruf("support_start",
+          { mandant_id: m.id, grund: sup.grund, schreiben: sup.schreiben });
+        p.melden("Supportzugriff läuft bis "
+          + zeit(r.sitzung && r.sitzung.gueltig_bis)
+          + (sup.schreiben ? " — MIT Schreibrecht." : " — nur lesend.")
+          + " Der Mandant kann den Zugriff nachlesen.", "warnung");
+        setzeSup({ grund: "", schreiben: false });
+        p.supportNeu();
+        p.neuLaden();
+      } catch (f) { p.melden(f.message || String(f), "fehler"); }
+      setzeBusy("");
+    }
+
+    var geaendert = Object.keys(entwurf).length > 0;
+    var tarife = (p.katalog && p.katalog.tarife) || [];
+
+    return E("div", null,
+      E("button", { type: "button", style: knopfLeer, onClick: p.zurueck },
+        "\u2190 Zurück zur Liste"),
+      E("div", { style: Object.assign({}, kasten, { marginTop: 14 }) },
+        Ueberschrift("Haus"),
+        E("div", { style: { fontSize: 20, fontWeight: 700, color: CI.blau, marginBottom: 4 } },
+          m.name),
+        E("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 14 } },
+          m.slug + " · angelegt am " + datum(m.erstellt_am) + " · Zugriff: " + d.zugriff),
+        E("div", { style: { display: "grid", gap: 12,
+          gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" } },
+          E("div", null,
+            E("label", { style: { fontSize: 12, color: CI.muted, display: "block" } }, "Name"),
+            E("input", { style: feld, value: feldwert("name", m.name),
+              onChange: function (e) { setzen("name", e.target.value); } })),
+          E("div", null,
+            E("label", { style: { fontSize: 12, color: CI.muted, display: "block" } }, "Tarif"),
+            E("select", { style: feld, value: feldwert("tarif", a.tarif || ""),
+              onChange: function (e) { setzen("tarif", e.target.value); } },
+              E("option", { value: "" }, "— keiner —"),
+              tarife.filter(function (t) { return !t.ist_zusatznutzer; }).map(function (t) {
+                return E("option", { key: t.schluessel, value: t.schluessel }, t.name);
+              }))),
+          E("div", null,
+            E("label", { style: { fontSize: 12, color: CI.muted, display: "block" } }, "Abo-Status"),
+            E("select", { style: feld, value: feldwert("abo_status", a.status || ""),
+              onChange: function (e) { setzen("abo_status", e.target.value); } },
+              ["", "test", "aktiv", "gekuendigt", "zahlung_offen", "abgelaufen"]
+                .map(function (w) { return E("option", { key: w, value: w }, w || "— unverändert —"); }))),
+          E("div", null,
+            E("label", { style: { fontSize: 12, color: CI.muted, display: "block" } }, "Testphase bis"),
+            E("input", { type: "date", style: feld,
+              value: String(feldwert("testphase_bis", m.testphase_bis) || "").slice(0, 10),
+              onChange: function (e) { setzen("testphase_bis", e.target.value || null); } })),
+          E("div", null,
+            E("label", { style: { fontSize: 12, color: CI.muted, display: "block" } }, "Zusatznutzer"),
+            E("input", { type: "number", min: 0, style: feld,
+              value: feldwert("zusatznutzer", a.zusatznutzer || 0),
+              onChange: function (e) { setzen("zusatznutzer", e.target.value); } })),
+          E("div", null,
+            E("label", { style: { fontSize: 12, color: CI.muted, display: "block" } }, "Mindestlaufzeit bis"),
+            E("input", { type: "date", style: feld,
+              value: String(feldwert("mindestlaufzeit_bis", a.mindestlaufzeit_bis) || "").slice(0, 10),
+              onChange: function (e) { setzen("mindestlaufzeit_bis", e.target.value || null); } }))),
+        E("label", { style: { display: "flex", alignItems: "center", gap: 8, marginTop: 14, fontSize: 13.5 } },
+          E("input", { type: "checkbox", checked: !!feldwert("gesperrt", !!m.gesperrt_am),
+            onChange: function (e) { setzen("gesperrt", e.target.checked); } }),
+          "Gesperrt — der Zugang ist sofort zu, für alle im Haus"),
+        m.gesperrt_am ? E("div", { style: { fontSize: 12, color: CI.danger, marginTop: 4 } },
+          "Gesperrt seit " + datum(m.gesperrt_am)
+          + (m.gesperrt_grund ? ": " + m.gesperrt_grund : "")) : null,
+        geaendert ? E("div", { style: { marginTop: 14 } },
+          E("label", { style: { fontSize: 12, color: CI.muted, display: "block", marginBottom: 4 } },
+            "Grund — steht im Protokoll"),
+          E("input", { style: feld, value: grund,
+            onChange: function (e) { setzeGrund(e.target.value); } }),
+          E("button", { type: "button", style: Object.assign({}, knopf, { marginTop: 10 }),
+            disabled: !!busy || grund.trim().length < 5, onClick: speichern },
+            busy === "speichern" ? "Speichert …" : "Änderungen speichern")) : null,
+        a.stripe_customer_id || a.stripe_subscription_id
+          ? E("p", { style: { fontSize: 11.5, color: CI.muted, marginTop: 12, lineHeight: 1.6 } },
+              "Dieser Mandant hat ein Konto bei Stripe. Was hier gesetzt wird, "
+              + "ist der Vertragsstand in der Datenbank — der nächste Webhook "
+              + "überschreibt ihn mit dem, was Stripe meldet. Dauerhafte "
+              + "Änderungen gehören deshalb nach Stripe.")
+          : null),
+
+      E("div", { style: kasten },
+        Ueberschrift("Credits"),
+        E("div", { style: { fontSize: 24, fontWeight: 700, color: CI.blau } },
+          zahl(d.saldo), E("span", { style: { fontSize: 13, fontWeight: 400, color: CI.muted } }, " verfügbar")),
+        (d.konten || []).length
+          ? E("table", { style: { width: "100%", borderCollapse: "collapse", marginTop: 10 } },
+              E("thead", null, E("tr", null, ["Topf", "Gutgeschrieben", "Verbraucht", "Gültig bis", "Herkunft"]
+                .map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
+              E("tbody", null, d.konten.map(function (k, i) {
+                return E("tr", { key: i },
+                  E("td", { style: zelle }, k.quelle),
+                  E("td", { style: zelle }, zahl(k.credits)),
+                  E("td", { style: zelle }, zahl(k.verbraucht)),
+                  E("td", { style: zelle }, k.gueltig_bis ? datum(k.gueltig_bis) : "—"),
+                  E("td", { style: Object.assign({}, zelle, { fontSize: 11.5, color: CI.muted }) },
+                    k.referenz || "—"));
+              })))
+          : E("div", { style: { fontSize: 13, color: CI.muted, marginTop: 8 } }, "Keine Töpfe.")),
+
+      E("div", { style: kasten },
+        Ueberschrift("Konten im Haus (" + zahl((d.nutzer || []).length)
+          + " von " + zahl(d.nutzer_limit) + ")"),
+        E("table", { style: { width: "100%", borderCollapse: "collapse" } },
+          E("thead", null, E("tr", null, ["Name", "Adresse", "Rolle", "Funktion"]
+            .map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
+          E("tbody", null, (d.nutzer || []).map(function (n) {
+            return E("tr", { key: n.id },
+              E("td", { style: zelle }, n.name || "—"),
+              E("td", { style: zelle }, n.email),
+              E("td", { style: zelle }, n.role),
+              E("td", { style: zelle }, n.funktion || "—"));
+          })))),
+
+      E("div", { style: kasten },
+        Ueberschrift("In dieses Haus hineinsehen"),
+        E("p", { style: { fontSize: 13, color: CI.muted, lineHeight: 1.7, marginTop: 0 } },
+          "Ein Supportzugriff gilt befristet, verlangt einen Grund, steht im "
+          + "Protokoll — und der Mandant kann ihn selbst nachlesen. Ohne "
+          + "Schreibrecht wird nur gelesen; auch gelöscht werden kann dann "
+          + "nichts."),
+        E("input", { style: feld, value: sup.grund,
+          placeholder: "Grund, z. B. „Kunde meldet fehlende Bilder (Ticket 214)"
+            + "\u201c",
+          onChange: function (e) { setzeSup(Object.assign({}, sup, { grund: e.target.value })); } }),
+        E("label", { style: { display: "flex", alignItems: "center", gap: 8, margin: "10px 0", fontSize: 13.5 } },
+          E("input", { type: "checkbox", checked: sup.schreiben,
+            onChange: function (e) { setzeSup(Object.assign({}, sup, { schreiben: e.target.checked })); } }),
+          "Auch ändern dürfen (nur, wenn der Kunde darum gebeten hat)"),
+        E("button", { type: "button", style: knopf,
+          disabled: !!busy || sup.grund.trim().length < 5, onClick: supportStarten },
+          busy === "support" ? "Beginnt …" : "Supportzugriff beginnen"),
+        (d.sitzungen || []).length
+          ? E("div", { style: { marginTop: 14 } },
+              E("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 6 } },
+                "Bisherige Zugriffe"),
+              (d.sitzungen || []).map(function (sz) {
+                return E("div", { key: sz.id, style: { fontSize: 12.5, color: CI.muted, padding: "3px 0" } },
+                  zeit(sz.begonnen_am) + " · " + (sz.schreiben ? "lesen und ändern" : "nur lesen")
+                  + " · " + sz.grund);
+              }))
+          : null),
+
+      E("div", { style: Object.assign({}, kasten, { borderColor: "#e8c4c0" }) },
+        Ueberschrift("Haus löschen"),
+        E("p", { style: { fontSize: 13, color: CI.muted, lineHeight: 1.7, marginTop: 0 } },
+          "Alles geht mit: Objekte, Kontakte, Mails, Dateien, Rechnungen und "
+          + "das Credit-Ledger. Rückgängig gibt es nicht. Zur Bestätigung den "
+          + "Namen des Hauses eintragen."),
+        E("input", { style: feld, value: loeschwort, placeholder: m.name,
+          onChange: function (e) { setzeLoeschwort(e.target.value); } }),
+        E("input", { style: Object.assign({}, feld, { marginTop: 8 }), value: grund,
+          placeholder: "Grund — steht im Protokoll, auch nach dem Löschen",
+          onChange: function (e) { setzeGrund(e.target.value); } }),
+        E("button", { type: "button",
+          style: Object.assign({}, knopf, { marginTop: 10, background: CI.danger, borderColor: CI.danger }),
+          disabled: !!busy || loeschwort !== m.name || grund.trim().length < 5,
+          onClick: loeschen },
+          busy === "loeschen" ? "Löscht …" : "Unwiderruflich löschen")));
+  }
+
+  // --- Konten über alle Mandanten ---------------------------------------------
+  function Konten(p) {
+    var gZ = React.useState(""), grund = gZ[0], setzeGrund = gZ[1];
+    var bZ = React.useState(""), busy = bZ[0], setzeBusy = bZ[1];
+    var fZ = React.useState(""), filter = fZ[0], setzeFilter = fZ[1];
+    if (!p.daten) return E("div", { style: { color: CI.muted } }, "Lade Konten …");
+
+    async function setzen(n, an) {
+      setzeBusy(n.id);
+      try {
+        await ruf("admin_setzen", { benutzer_id: n.id, an: an, grund: grund });
+        p.melden(an ? "Plattform-Recht vergeben." : "Plattform-Recht entzogen.");
+        setzeGrund("");
+        p.neuLaden();
+      } catch (f) { p.melden(f.message || String(f), "fehler"); }
+      setzeBusy("");
+    }
+
+    var suche = filter.trim().toLowerCase();
+    var zeilen = p.daten.filter(function (n) {
+      if (!suche) return true;
+      return [n.name, n.email, n.haus].some(function (w) {
+        return String(w || "").toLowerCase().indexOf(suche) >= 0;
+      });
+    });
+
+    return E("div", null,
+      E("div", { style: { display: "flex", gap: 10, marginBottom: 12, flexWrap: "wrap" } },
+        E("input", { style: Object.assign({}, feld, { maxWidth: 280 }), value: filter,
+          placeholder: "Name, Adresse oder Haus",
+          onChange: function (e) { setzeFilter(e.target.value); } }),
+        E("input", { style: Object.assign({}, feld, { maxWidth: 360 }), value: grund,
+          placeholder: "Grund für eine Rechteänderung — steht im Protokoll",
+          onChange: function (e) { setzeGrund(e.target.value); } })),
+      E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+        E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 760 } },
+          E("thead", null, E("tr", null, ["Name", "Adresse", "Haus", "Rolle", "Plattform", ""]
+            .map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
+          E("tbody", null, zeilen.map(function (n) {
+            return E("tr", { key: n.id },
+              E("td", { style: zelle }, n.name || "—"),
+              E("td", { style: zelle }, n.email),
+              E("td", { style: zelle }, n.haus || "—"),
+              E("td", { style: zelle }, n.role),
+              E("td", { style: Object.assign({}, zelle, {
+                color: n.plattform_admin ? CI.gold : CI.muted,
+                fontWeight: n.plattform_admin ? 700 : 400,
+              }) }, n.plattform_admin ? "Administrator" : "—"),
+              E("td", { style: zelle },
+                E("button", { type: "button", style: knopfLeer,
+                  disabled: !!busy || grund.trim().length < 5,
+                  onClick: function () { setzen(n, !n.plattform_admin); } },
+                  n.plattform_admin ? "Recht entziehen" : "Zum Administrator machen")));
+          })))),
+      E("p", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.7 } },
+        "Ein Plattform-Administrator pflegt den Katalog und verwaltet die "
+        + "Häuser. In die Daten eines Hauses sieht er damit NICHT — dafür "
+        + "braucht es einen Supportzugriff, und der ist befristet, begründet "
+        + "und für den Kunden nachlesbar."));
   }
 
   // --- Katalog ---------------------------------------------------------------
@@ -360,32 +637,70 @@
     var dZ = React.useState({}), daten = dZ[0], setzeDaten = dZ[1];
     var fZ = React.useState(""), fehler = fZ[0], setzeFehler = fZ[1];
     var mZ = React.useState(null), meldung = mZ[0], setzeMeldung = mZ[1];
+    var oZ = React.useState(null), offen = oZ[0], setzeOffen = oZ[1];
+    var supZ = React.useState(null), support = supZ[0], setzeSupport = supZ[1];
 
-    var laden = React.useCallback(function (welcher) {
+    var laden = React.useCallback(function (welcher, id) {
       var aktion = welcher === "zahlen" ? "uebersicht"
         : welcher === "mandanten" ? "mandanten"
-        : welcher === "katalog" ? "katalog" : "protokoll";
-      ruf(aktion).then(function (d) {
+        : welcher === "katalog" ? "katalog"
+        : welcher === "konten" ? "nutzer"
+        : welcher === "mandant" ? "mandant" : "protokoll";
+      ruf(aktion, welcher === "mandant" ? { mandant_id: id } : null).then(function (d) {
         var n = {};
         n[welcher] = welcher === "mandanten" ? d.mandanten
+          : welcher === "konten" ? d.nutzer
           : welcher === "protokoll" ? d.eintraege : d;
         setzeDaten(function (alt) { return Object.assign({}, alt, n); });
       }).catch(function (f) { setzeFehler(f.message || String(f)); });
     }, []);
 
-    React.useEffect(function () { setzeFehler(""); laden(reiter); }, [reiter, laden]);
+    var supportLaden = React.useCallback(function () {
+      ruf("support_stand").then(function (d) { setzeSupport(d.sitzung || null); })
+        .catch(function () { /* ohne Anzeige laeuft der Rest weiter */ });
+    }, []);
+
+    React.useEffect(function () {
+      setzeFehler("");
+      if (offen) laden("mandant", offen); else laden(reiter);
+      supportLaden();
+    }, [reiter, offen, laden, supportLaden]);
+
+    // Der Katalog wird fuer die Tarifauswahl in der Mandantentafel gebraucht.
+    React.useEffect(function () {
+      if (offen && !daten.katalog) laden("katalog");
+    }, [offen, daten.katalog, laden]);
 
     function melden(text, art) { setzeMeldung({ text: text, art: art || "ok" }); }
 
+    async function supportBeenden() {
+      try { await ruf("support_ende"); setzeSupport(null);
+        melden("Supportzugriff beendet."); }
+      catch (f) { melden(f.message || String(f), "fehler"); }
+    }
+
     var reiterListe = [["zahlen", "Zahlen"], ["mandanten", "Mandanten"],
-      ["katalog", "Katalog"], ["protokoll", "Protokoll"]];
+      ["konten", "Konten"], ["katalog", "Katalog"], ["protokoll", "Protokoll"]];
 
     return E("div", null,
+      // Ein laufender Supportzugriff muss sichtbar sein, immer. Wer vergisst,
+      // dass er in fremden Daten steht, haelt sie fuer seine eigenen.
+      support ? E("div", { "data-support-band": "1", style: {
+        background: "#fff7e6", border: "1px solid #f0dcb0", color: "#6b4e13",
+        padding: "10px 14px", marginBottom: 16, fontSize: 13.5, borderRadius: 8,
+        display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap",
+      } },
+        E("strong", null, "Supportzugriff läuft"),
+        E("span", null, (support.mandant_name || support.mandant_id)
+          + " · " + (support.schreiben ? "lesen und ändern" : "nur lesen")
+          + " · bis " + zeit(support.gueltig_bis)),
+        E("button", { type: "button", style: knopfLeer, onClick: supportBeenden },
+          "Jetzt beenden")) : null,
       E("div", { style: { display: "flex", borderBottom: "1px solid " + CI.border, marginBottom: 20, flexWrap: "wrap" } },
         reiterListe.map(function (r) {
-          var an = reiter === r[0];
+          var an = reiter === r[0] && !offen;
           return E("button", { key: r[0], type: "button",
-            onClick: function () { setzeReiter(r[0]); },
+            onClick: function () { setzeOffen(null); setzeReiter(r[0]); },
             style: {
               background: "transparent", border: "none", padding: "10px 16px", fontSize: 14,
               fontWeight: an ? 600 : 400, color: an ? CI.blau : CI.muted,
@@ -404,9 +719,16 @@
         padding: "10px 14px", marginBottom: 16, fontSize: 13, borderRadius: 8,
       } }, meldung.text) : null,
 
-      reiter === "zahlen" ? E(Zahlen, { daten: daten.zahlen })
+      offen ? E(MandantTafel, { daten: daten.mandant, katalog: daten.katalog,
+            melden: melden, supportNeu: supportLaden,
+            neuLaden: function () { laden("mandant", offen); },
+            zurueck: function () { setzeOffen(null); laden("mandanten"); } })
+        : reiter === "zahlen" ? E(Zahlen, { daten: daten.zahlen })
         : reiter === "mandanten" ? E(Mandanten, { daten: daten.mandanten, melden: melden,
+            oeffnen: function (id) { setzeOffen(id); },
             neuLaden: function () { laden("mandanten"); } })
+        : reiter === "konten" ? E(Konten, { daten: daten.konten, melden: melden,
+            neuLaden: function () { laden("konten"); } })
         : reiter === "katalog" ? E(Katalog, { daten: daten.katalog, melden: melden,
             neuLaden: function () { laden("katalog"); } })
         : E(Protokoll, { daten: daten.protokoll }));
