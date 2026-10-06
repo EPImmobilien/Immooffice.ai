@@ -77,6 +77,43 @@
     return null;
   }
 
+  // --- Supportzugriff: das Band, das nicht fehlen darf ---------------------
+  // Wer vergisst, dass er gerade in den Daten eines Kunden steht, haelt sie
+  // fuer seine eigenen — und aendert dort etwas, was er in seinem eigenen
+  // Haus aendern wollte. Deshalb steht es ueber jeder Seite, in der Farbe,
+  // die auffaellt, und es laesst sich nicht wegklicken.
+  function ImmoSupportBand() {
+    var sZ = React.useState(null), sitzung = sZ[0], setzeSitzung = sZ[1];
+    React.useEffect(function () {
+      if (!window.IMMO_PLATTFORM_ADMIN || !window._sb) return;
+      var weg = false;
+      function fragen() {
+        window._sb.functions.invoke("plattform-admin", { body: { aktion: "support_stand" } })
+          .then(function (a) {
+            if (weg || !a || !a.data || a.data.ok === false) return;
+            setzeSitzung(a.data.sitzung || null);
+          })
+          .catch(function () { /* ohne Band laeuft der Rest weiter */ });
+      }
+      fragen();
+      // Eine Sitzung laeuft von selbst ab. Das Band muss dann verschwinden,
+      // sonst behauptet es etwas, das nicht mehr gilt.
+      var uhr = setInterval(fragen, 60000);
+      return function () { weg = true; clearInterval(uhr); };
+    }, []);
+    if (!sitzung) return null;
+    return E("div", { "data-support-band": "1", style: {
+      background: "#6b2f2f", color: "#fff", fontSize: 13.5,
+      padding: "9px 16px", display: "flex", gap: 12, alignItems: "center",
+      flexWrap: "wrap", justifyContent: "center",
+    } },
+      E("strong", null, "Supportzugriff"),
+      E("span", null, "Sie sehen gerade die Daten von "
+        + (sitzung.mandant_name || "einem anderen Haus")
+        + " \u2014 " + (sitzung.schreiben ? "lesen und ändern" : "nur lesen")
+        + ". Grund: " + sitzung.grund));
+  }
+
   function ImmoAboBanner(p) {
     var sZ = React.useState(null), stand = sZ[0], setzeStand = sZ[1];
     var zZ = React.useState(""), zu = zZ[0], setzeZu = zZ[1];
@@ -146,4 +183,5 @@
   }
 
   window.ImmoAboBanner = ImmoAboBanner;
+  window.ImmoSupportBand = ImmoSupportBand;
 })();

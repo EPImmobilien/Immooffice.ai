@@ -180,6 +180,27 @@ if (fs.existsSync(BAND)) {
   // werden darf er hier nicht: dann braeuchte diese Datei den Tarif, und den
   // bekommt ein Mitarbeiter mit Absicht nicht zu sehen.
   const ohneKommentare = quelle.replace(/\/\/[^\n]*/g, '');
+  // --- Das Supportband -----------------------------------------------------
+  // Es ist das einzige Band, das sich NICHT wegklicken laesst. Wer vergisst,
+  // dass er in fremden Daten steht, haelt sie fuer seine eigenen.
+  melde('es gibt ein Supportband', /window\.ImmoSupportBand = /.test(quelle));
+  // Nur der Rumpf der Funktion, nicht die ganze Datei: localStorage steht
+  // weiter unten im Abo-Band, und dort gehoert es hin.
+  const supportRumpf = (quelle.match(
+    /function ImmoSupportBand\(\)[\s\S]*?\n  \}\n\n  function ImmoAboBanner/) || [''])[0];
+  melde('der Rumpf des Supportbands ist auffindbar', supportRumpf.length > 200);
+  melde('es laesst sich nicht wegklicken',
+        !/localStorage/.test(supportRumpf) && !/schliessbar/.test(supportRumpf));
+  melde('es nennt das Haus, den Umfang und den Grund',
+        /mandant_name/.test(quelle) && /schreiben \? "lesen und ändern"/.test(quelle)
+        && /Grund: " \+ sitzung\.grund/.test(quelle));
+  melde('es fragt nur, wenn der Angemeldete Plattform-Administrator ist',
+        /if \(!window\.IMMO_PLATTFORM_ADMIN/.test(quelle),
+        'sonst bekaeme jeder Nutzer bei jedem Seitenaufruf eine 403');
+  melde('es faellt weg, wenn die Sitzung ablaeuft',
+        /setInterval\(fragen/.test(quelle),
+        'sonst behauptet es etwas, das nicht mehr gilt');
+
   melde('das Band rechnet "knapp" nicht selbst',
         !/warnung_rest_prozent|credits_monat/.test(ohneKommentare),
         'der Anteil steht im Katalog und wird in abo-verwalten gerechnet');

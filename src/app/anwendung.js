@@ -890,6 +890,16 @@ async function getProfile(e) {
   // darauf eingerichtet: die Feiertagsrechnung nimmt dann die neun
   // bundesweiten, und das ist besser als falsche.
   window.IMMO_MANDANT_ID = (t && t.mandant_id) || null;
+  // fork_54: gefragt wird die DATENBANK, nicht nur das Profil. Waehrend
+  // eines Supportzugriffs zeigt `aktuelle_mandant_id()` auf den Mandanten,
+  // um den es geht — und genau dieser Wert muss hier stehen. Sonst laesen
+  // die Abfragen die Daten des Kunden, die Storage-Pfade truegen aber das
+  // Praefix des Administrators, und keine einzige Datei waere zu sehen.
+  // Faellt die Abfrage aus, bleibt es beim Profil; das ist der Normalfall.
+  try {
+    const { data: wirksam } = await window._sb.rpc("aktuelle_mandant_id");
+    if (wirksam) window.IMMO_MANDANT_ID = wirksam;
+  } catch (f) { /* dann eben das Profil */ }
   // fork_52: Ist der Angemeldete Plattform-Administrator? Die Antwort
   // steuert nur, OB die Kachel erscheint. Was sie zeigt, entscheidet die
   // Edge Function `plattform-admin` noch einmal — gegen dieselbe Liste.
@@ -2710,6 +2720,7 @@ function PageShell({
   // dass etwas nicht mehr geht — Testphase laeuft aus, Zahlung offen,
   // Lesezugriff oder Sperre, Credits knapp. Sonst ist es nicht da; ein
   // Band, das immer steht, liest niemand mehr.
+  window.ImmoSupportBand && React.createElement(window.ImmoSupportBand, null),
   window.ImmoAboBanner && React.createElement(window.ImmoAboBanner, {
     onNavigate: i
   }), c && i && React.createElement(MobileBurgerMenu, {
