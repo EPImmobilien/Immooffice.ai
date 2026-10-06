@@ -8,8 +8,8 @@
 |---|---|
 | 1 — Renderer, Schema, drei Start-Vorlagen | **fertig** |
 | 2 — Edge Function und Datenbank auf den Renderer umstellen | **fertig** |
-| 3 — Editor Basis | Liste, Kopie, Vorschau und **Texte bearbeiten** fertig; Elemente verschieben offen |
-| 4 — Editor Komfort | offen |
+| 3 — Editor Basis | **fertig**: Liste, Kopie, Vorschau, Texte bearbeiten, Felder festlegen |
+| 4 — Editor Komfort | teils: Fangen, Raster, Tastatur, Reihenfolge; Rückgängig und Vorschaubilder offen |
 | 5 — Objektmodus mit Abweichungen | Renderer-Seite fertig, Oberfläche offen |
 | 6 — E2E-Tests, Neutralitäts-Gate, dieser Bericht | Gates stehen, Playwright offen |
 
@@ -319,3 +319,48 @@ Markenname. Genau das konnte `scripts/expose-vorschau.mjs` nicht zeigen,
 weil in den Demodaten der Prototypen jedes Feld steht. Beim ersten Lauf 55
 Warnungen, jetzt 38 — und die übrigen sind ehrliche Hinweise auf fehlende
 Angaben, keine Fehler.
+
+## Felder festlegen (06.10.2026)
+
+> „Wir brauchen einen Editor, wo man die Text- und Bildfelder selber
+> festlegt."
+
+Die Flächenansicht in [`src/eigene/expose-bearbeiten.js`](../src/eigene/expose-bearbeiten.js)
+zeigt eine Seite der Vorlage in Originalgestalt, jedes Feld als Rahmen
+darauf. Was damit geht:
+
+- **anfassen und verschieben**, an acht Griffen größer ziehen;
+- **Pfeiltasten** um einen Punkt, mit Umschalt um zehn;
+- **Maße als Zahl** eintragen (x, y, Breite, Höhe);
+- **Einrasten** an den Kanten der Nachbarn und am Satzspiegel, Alt schaltet
+  es aus;
+- **neue Text- und Bildfelder** anlegen, verdoppeln, in der Reihenfolge
+  schieben, löschen;
+- bei einem Bildfeld sagen, **welches** Bild es zeigt — Foto nach Nummer,
+  nach Kategorie, Grundriss, Lageplan, Porträt, Logo hell oder dunkel — und
+  ob es den Rahmen füllt oder ganz hineinpasst;
+- bei einem Textfeld den Text und den Textstil wählen.
+
+**Gesperrte Felder** bleiben gesperrt: sie tragen die Gestaltung der Seite
+(die Farbfläche des Covers, das Band am Rand). Die Sperre lässt sich
+aufheben, aber nicht aus Versehen.
+
+**Gemalt** wird mit [`src/eigene/expose-leinwand.js`](../src/eigene/expose-leinwand.js)
+aus derselben Schrittliste, die auch ins PDF geht —
+`packages/expose-renderer/src/schritte.ts` nennt genau das als zweiten
+Grund für die Schrittliste. Es gibt also keine zweite Fassung der Seite,
+die auseinanderlaufen könnte. Die Schriften werden dafür zusätzlich als
+Webschrift angemeldet; es sind dieselben Dateien, die schon für die Maße
+geladen werden.
+
+**Geprüft** wird beides: `tests/expose-editor.js` zieht ein Feld wirklich
+(Zeigerereignisse am Fenster, wie im Browser) und misst das Ergebnis am
+gespeicherten Dokument; `tests/expose-leinwand.js` öffnet Chromium, lässt
+alle drei Vorlagen zeichnen und sieht nach, ob Farbe auf dem Blatt liegt
+und ob die eingebettete Schrift benutzt wurde.
+
+**Offen bleibt:** Rückgängig (bisher nur „Verwerfen" für alles),
+Vorschaubilder der Seiten statt einer Auswahlliste, mehrere Felder
+zugleich auswählen, Bedingungen (`sichtbar_wenn`) im Editor ändern — und
+der Objektmodus, in dem dieselbe Fläche die Abweichungen EINES Objekts
+bearbeitet statt der Vorlage (Etappe 5).
