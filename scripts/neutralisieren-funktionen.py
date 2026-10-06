@@ -35,6 +35,23 @@ EIGENE = WURZEL / 'supabase' / 'eigene'
 # Quelltext, den mehrere brauchen (siehe supabase/eigene-beilagen/README.md).
 BEILAGEN = WURZEL / 'supabase' / 'eigene-beilagen'
 
+# Beilagen, die in MEHRERE Funktionen gehoeren. Links die Datei unter
+# supabase/eigene-beilagen/, rechts die Funktionen, in deren Ordner sie
+# gelegt wird. Eine Datei, zwoelf Kopien — und nur hier steht, wohin.
+#
+# credits.ts geht an jede Funktion, die KI erzeugt und deshalb Credits
+# kostet (fork_49). Wer eine Funktion dazunimmt, nimmt sie HIER dazu und
+# schreibt die passende FORK-Regel; ohne beides faende der Import keine
+# Datei und die Funktion liesse sich nicht mehr laden.
+GEMEINSAME_BEILAGEN = {
+    '_credits/credits.ts': {
+        'generate-text',
+        'text-korrigieren',
+        'expose-pruefen',
+        'ki-bildbearbeitung',
+    },
+}
+
 # --------------------------------------------------------------- Phase 1.4
 # Vier Funktionen entfallen ersatzlos. jotform-* ist der Formular-Sync des
 # Referenzunternehmens, yodeck-* ist Digital Signage / Shop-TV. Beides steht
@@ -4179,6 +4196,139 @@ NACHBESSERN = [
      '    // ---- Wenn alles scheitert: sagen, was zu tun ist ----\n    const versandFehlerErklaeren = (roh: string, pf: any): string => {\n      const t = String(roh || "");\n      const adresse = pf?.email_adresse ? ` (${pf.email_adresse})` : "";\n      // Microsoft 365: SMTP-Anmeldung ist im Tenant abgeschaltet. Der\n      // Standard seit Jahren, und nichts, was diese Software aendern kann\n      // — der Schalter gehoert dem Kunden.\n      if (/SmtpClientAuthentication is disabled/i.test(t) || /5\\.7\\.139/.test(t)) {\n        return "Microsoft nimmt den Versand über dieses Postfach" + adresse\n          + " nicht an: In eurem Microsoft-365-Konto ist \\u201eAuthentifiziertes SMTP\\u201c "\n          + "abgeschaltet. Das muss ein Administrator eures Hauses einschalten "\n          + "(admin.microsoft.com → Einstellungen → Organisationseinstellungen → "\n          + "Moderne Authentifizierung), danach dauert es bis zu einer Stunde. "\n          + "Der Abruf der Mails ist davon nicht betroffen. [" + t + "]";\n      }\n      if (/Authentication unsuccessful|Invalid login|535/i.test(t)) {\n        return "Der Mailserver hat die Anmeldung für dieses Postfach" + adresse\n          + " abgelehnt. Bei einem verbundenen Microsoft- oder Google-Konto hilft "\n          + "\\u201eneu verbinden\\u201c in den Einstellungen; bei einem Postfach mit "\n          + "Passwort stimmen Benutzername oder Passwort nicht mehr. [" + t + "]";\n      }\n      if (/Resend nicht eingerichtet/i.test(t) && !/\\|/.test(t)) {\n        return "Für dieses Postfach ist kein Versandweg eingerichtet: weder ein "\n          + "eigener SMTP-Zugang noch der Versand über die Plattform. "\n          + "[" + t + "]";\n      }\n      return "Versand fehlgeschlagen: " + t;\n    };\n\n    // ---- Weg B: SMTP des Postfachs (All-Inkl) ----',
      'Versandfehler: der Helfer, der die haeufigen Faelle uebersetzt.',
      {'mail-senden'}),
+
+    # =====================================================================
+    # fork_49 — Credits an den KI-Aufrufen
+    # ---------------------------------------------------------------------
+    # Ohne diese Regeln waere die Abrechnung Zierde: Toepfe, Ledger und
+    # Preise gaebe es, aber nichts wuerde je verbraucht. Reserviert wird
+    # VOR dem Anbieter, gebucht danach, freigegeben bei jedem Abbruch.
+    #
+    # Die Abrechnung selbst steht in der Beilage credits.ts — hier wird
+    # sie nur an drei bis fuenf Stellen je Funktion eingehaengt. Welche
+    # Funktion die Beilage bekommt, steht in GEMEINSAME_BEILAGEN ganz
+    # oben; beides muss zusammenpassen, sonst findet der Import nichts.
+    # =====================================================================
+    ('FORK',
+     'import "https://deno.land/x/xhr@0.1.0/mod.ts";',
+     'import "https://deno.land/x/xhr@0.1.0/mod.ts";\n// --- Credits (fork_49) ---------------------------------------------------\n// Die Abrechnung liegt als Beilage im Ordner dieser Funktion; die Quelle\n// steht in supabase/eigene-beilagen/_credits/credits.ts. Sie reserviert\n// VOR dem Aufruf und gibt bei einem Fehler von selbst zurueck.\nimport { kiAbrechnen, abgelehnt } from "./credits.ts";\nimport type { Abrechnung } from "./credits.ts";',
+     'Credits: die Abrechnung wird eingebunden.',
+     {'generate-text'}),
+    ('FORK',
+     'Deno.serve(async (req: Request) => {\n  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });\n\n  try {\n    const apiKey = Deno.env.get("ANTHROPIC_API_KEY");',
+     'Deno.serve(async (req: Request) => {\n  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });\n\n  // Die Reservierung muss auch im Fehlerfall erreichbar sein — deshalb\n  // steht sie VOR dem try und nicht darin.\n  let credits: Abrechnung | null = null;\n  try {\n    const apiKey = Deno.env.get("ANTHROPIC_API_KEY");',
+     'Credits: der Platz fuer die Reservierung, vor dem try.',
+     {'generate-text'}),
+    ('FORK',
+     '    const { system, user } = buildPrompt(body);',
+     '    // --- Credits reservieren, bevor etwas erzeugt wird ----------------\n    // Hier und nicht spaeter: wer erst nach dem Aufruf abrechnet, hat\n    // bei jedem Abbruch geliefert und nichts genommen — und kann nicht\n    // verhindern, dass zehn gleichzeitige Aufrufe denselben Rest\n    // ausgeben. Geprueft wird dabei auch das Abo: ein gesperrter\n    // Mandant kommt nicht an die KI.\n    const abr = await kiAbrechnen(req, "ki_text", body.textart);\n    if (!abr.ok) return abgelehnt(abr, corsHeaders);\n    credits = abr;\n\n    const { system, user } = buildPrompt(body);',
+     'Credits: ki_text wird vor dem Aufruf reserviert.',
+     {'generate-text'}),
+    ('FORK',
+     '    if (!anthropicResponse.ok) {\n      const errText = await anthropicResponse.text();\n      console.error("Anthropic API Fehler:", anthropicResponse.status, errText);',
+     '    if (!anthropicResponse.ok) {\n      const errText = await anthropicResponse.text();\n      console.error("Anthropic API Fehler:", anthropicResponse.status, errText);\n      await abr.freigeben("Anthropic " + anthropicResponse.status);',
+     'Credits: ein abgelehnter Aufruf gibt die Credits zurueck.',
+     {'generate-text'}),
+    ('FORK',
+     '    const rohText = result?.content?.[0]?.text || "";\n    if (!rohText) {',
+     '    const rohText = result?.content?.[0]?.text || "";\n    if (!rohText) {\n      await abr.freigeben("Anthropic hat keinen Text geliefert");',
+     'Credits: eine leere Antwort gibt die Credits zurueck.',
+     {'generate-text'}),
+    ('FORK',
+     '    return new Response(JSON.stringify({ text }),\n      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });',
+     '    // Gebucht wird erst, wenn wirklich ein Text da ist. Die Kosten des\n    // Anbieters stehen hier nicht: Anthropic liefert Token, keinen\n    // Preis, und ein geschaetzter Betrag waere eine erfundene Zahl.\n    await abr.buchen(null, body.textart);\n\n    return new Response(JSON.stringify({ text, credits: abr.credits }),\n      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });',
+     'Credits: gebucht wird erst, wenn ein Text vorliegt.',
+     {'generate-text'}),
+    ('FORK',
+     '  } catch (e) {\n    console.error("Edge Function Fehler:", e);\n    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : String(e) }),\n      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });',
+     '  } catch (e) {\n    console.error("Edge Function Fehler:", e);\n    // Was reserviert war, geht zurueck. CLAUDE.md: fehlgeschlagene\n    // KI-Auftraege geben reservierte Credits automatisch frei.\n    if (credits) await credits.freigeben("Abbruch: " + (e instanceof Error ? e.message : String(e)));\n    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : String(e) }),\n      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });',
+     'Credits: ein Abbruch gibt die Credits zurueck.',
+     {'generate-text'}),
+    ('FORK',
+     'const corsHeaders = {',
+     '// --- Credits (fork_49) ---------------------------------------------------\n// Die Abrechnung liegt als Beilage im Ordner dieser Funktion; die Quelle\n// steht in supabase/eigene-beilagen/_credits/credits.ts. Sie reserviert\n// VOR dem Aufruf und gibt bei einem Fehler von selbst zurueck.\nimport { kiAbrechnen, abgelehnt } from "./credits.ts";\nimport type { Abrechnung } from "./credits.ts";\n\nconst corsHeaders = {',
+     'Credits: die Abrechnung wird eingebunden.',
+     {'text-korrigieren'}),
+    ('FORK',
+     'Deno.serve(async (req) => {\n  if (req.method === "OPTIONS") {\n    return new Response(null, { status: 204, headers: corsHeaders });\n  }',
+     'Deno.serve(async (req) => {\n  // Die Reservierung muss auch im Fehlerfall erreichbar sein — in dieser\n  // Funktion fuehrt JEDER Fehler ueber einen throw in denselben catch.\n  let credits: Abrechnung | null = null;\n  if (req.method === "OPTIONS") {\n    return new Response(null, { status: 204, headers: corsHeaders });\n  }',
+     'Credits: der Platz fuer die Reservierung, vor dem try.',
+     {'text-korrigieren'}),
+    ('FORK',
+     '    const systemPrompt = modus === "mail" ? SYSTEM_PROMPT_MAIL : SYSTEM_PROMPT_BASIS + (HINWEISE_MODUS[modus] || "");',
+     '    // --- Credits reservieren, bevor etwas erzeugt wird ----------------\n    const abr = await kiAbrechnen(req, "ki_text", modus ? String(modus) : null);\n    if (!abr.ok) return abgelehnt(abr, corsHeaders);\n    credits = abr;\n\n    const systemPrompt = modus === "mail" ? SYSTEM_PROMPT_MAIL : SYSTEM_PROMPT_BASIS + (HINWEISE_MODUS[modus] || "");',
+     'Credits: ki_text wird vor dem Aufruf reserviert.',
+     {'text-korrigieren'}),
+    ('FORK',
+     '    return new Response(\n      JSON.stringify({ ok: true, korrigiert: modus === "mail" ? korrigiert.replace(/^\\n+|\\n+$/g, "") : korrigiert.trim() }),\n      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },\n    );\n  } catch (e) {\n    return new Response(\n      JSON.stringify({ ok: false, error: String(e?.message || e) }),\n      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },\n    );',
+     '    await abr.buchen(null, modus ? String(modus) : null);\n\n    return new Response(\n      JSON.stringify({ ok: true, credits: abr.credits, korrigiert: modus === "mail" ? korrigiert.replace(/^\\n+|\\n+$/g, "") : korrigiert.trim() }),\n      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },\n    );\n  } catch (e) {\n    // Was reserviert war, geht zurueck — auch bei einem Fehler, der\n    // schon vor dem Anbieter auftrat.\n    if (credits) await credits.freigeben("Abbruch: " + String(e?.message || e));\n    return new Response(\n      JSON.stringify({ ok: false, error: String(e?.message || e) }),\n      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },\n    );',
+     'Credits: gebucht nach der Korrektur, zurueck bei jedem Abbruch.',
+     {'text-korrigieren'}),
+    ('FORK',
+     'const corsHeaders = {',
+     '// --- Credits (fork_49) ---------------------------------------------------\n// Die Abrechnung liegt als Beilage im Ordner dieser Funktion; die Quelle\n// steht in supabase/eigene-beilagen/_credits/credits.ts. Sie reserviert\n// VOR dem Aufruf und gibt bei einem Fehler von selbst zurueck.\nimport { kiAbrechnen, abgelehnt } from "./credits.ts";\nimport type { Abrechnung } from "./credits.ts";\n\nconst corsHeaders = {',
+     'Credits: die Abrechnung wird eingebunden.',
+     {'expose-pruefen'}),
+    ('FORK',
+     'Deno.serve(async (req: Request) => {\n  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });\n\n  try {\n    const apiKey = Deno.env.get("ANTHROPIC_API_KEY");',
+     'Deno.serve(async (req: Request) => {\n  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });\n\n  // Die Reservierung muss auch im Fehlerfall erreichbar sein.\n  let credits: Abrechnung | null = null;\n  try {\n    const apiKey = Deno.env.get("ANTHROPIC_API_KEY");',
+     'Credits: der Platz fuer die Reservierung, vor dem try.',
+     {'expose-pruefen'}),
+    ('FORK',
+     '    const anthropicResponse = await fetch("https://api.anthropic.com/v1/messages", {',
+     '    // --- Credits reservieren, bevor geprueft wird ---------------------\n    // Erst hier: bis hierher ist nur gelesen und zugeordnet worden, und\n    // ein Zugriffsfehler darf keine Credits kosten.\n    const abr = await kiAbrechnen(req, "expose_pruefer", body.immobilie_id || null);\n    if (!abr.ok) return abgelehnt(abr, corsHeaders);\n    credits = abr;\n\n    const anthropicResponse = await fetch("https://api.anthropic.com/v1/messages", {',
+     'Credits: expose_pruefer wird vor dem Aufruf reserviert.',
+     {'expose-pruefen'}),
+    ('FORK',
+     '      return new Response(JSON.stringify({ error: `Anthropic-API: ${anthropicResponse.status} - ${errText.substring(0, 300)}` }),\n        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });\n    }\n\n    const result = await anthropicResponse.json();\n    const toolBlock = (result?.content || []).find((b: any) => b.type === "tool_use" && b.name === "pruefbericht_abgeben");\n    if (!toolBlock?.input) {\n      return new Response(JSON.stringify({ error: "Kein strukturierter Prüfbericht in der Antwort." }),',
+     '      await abr.freigeben("Anthropic " + anthropicResponse.status);\n      return new Response(JSON.stringify({ error: `Anthropic-API: ${anthropicResponse.status} - ${errText.substring(0, 300)}` }),\n        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });\n    }\n\n    const result = await anthropicResponse.json();\n    const toolBlock = (result?.content || []).find((b: any) => b.type === "tool_use" && b.name === "pruefbericht_abgeben");\n    if (!toolBlock?.input) {\n      await abr.freigeben("Kein strukturierter Bericht");\n      return new Response(JSON.stringify({ error: "Kein strukturierter Prüfbericht in der Antwort." }),',
+     'Credits: ein gescheiterter Pruefer gibt die Credits zurueck.',
+     {'expose-pruefen'}),
+    ('FORK',
+     '    return new Response(JSON.stringify({\n      pruefung_id: pruefungId,\n      ampel,',
+     '    await abr.buchen(null, "expose-pruefung");\n\n    return new Response(JSON.stringify({\n      pruefung_id: pruefungId,\n      credits: abr.credits,\n      ampel,',
+     'Credits: gebucht, wenn ein Bericht vorliegt.',
+     {'expose-pruefen'}),
+    ('FORK',
+     '  } catch (e) {\n    console.error("Edge Function Fehler:", e);\n    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : String(e) }),\n      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });',
+     '  } catch (e) {\n    console.error("Edge Function Fehler:", e);\n    if (credits) await credits.freigeben("Abbruch: " + (e instanceof Error ? e.message : String(e)));\n    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : String(e) }),\n      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });',
+     'Credits: ein Abbruch gibt die Credits zurueck.',
+     {'expose-pruefen'}),
+    ('FORK',
+     'const corsHeaders = {',
+     '// --- Credits (fork_49) ---------------------------------------------------\n// Die Abrechnung liegt als Beilage im Ordner dieser Funktion; die Quelle\n// steht in supabase/eigene-beilagen/_credits/credits.ts. Sie reserviert\n// VOR dem Aufruf und gibt bei einem Fehler von selbst zurueck.\nimport { kiAbrechnen, abgelehnt, inEuro } from "./credits.ts";\nimport type { Abrechnung } from "./credits.ts";\n\nconst corsHeaders = {',
+     'Credits: die Abrechnung wird eingebunden.',
+     {'ki-bildbearbeitung'}),
+    ('FORK',
+     'Deno.serve(async (req: Request) => {\n  // CORS-Preflight\n  if (req.method === "OPTIONS") {\n    return new Response("ok", { headers: corsHeaders });\n  }\n\n  try {',
+     'Deno.serve(async (req: Request) => {\n  // CORS-Preflight\n  if (req.method === "OPTIONS") {\n    return new Response("ok", { headers: corsHeaders });\n  }\n\n  // Die Reservierung muss auch im Fehlerfall erreichbar sein.\n  let credits: Abrechnung | null = null;\n  try {',
+     'Credits: der Platz fuer die Reservierung, vor dem try.',
+     {'ki-bildbearbeitung'}),
+    ('FORK',
+     '    // ---- Input fuer Replicate bauen ----',
+     '    // --- Credits reservieren, bevor das Bild entsteht -----------------\n    // Homestaging ist die teure Aktion (ein ganzer Raum wird neu\n    // gerechnet), Retusche und Himmel sind die guenstigen. Welche Zahl\n    // dahintersteht, entscheidet der Plattform-Admin, nicht dieser Code.\n    const abrAktion = body.funktion === "staging" ? "bild_homestaging" : "bild_optimieren";\n    const abr = await kiAbrechnen(req, abrAktion, body.dateiname || null);\n    if (!abr.ok) return abgelehnt(abr, corsHeaders);\n    credits = abr;\n\n    // ---- Input fuer Replicate bauen ----',
+     'Credits: bild_homestaging oder bild_optimieren wird reserviert.',
+     {'ki-bildbearbeitung'}),
+    ('FORK',
+     '      const built = await buildInput(body, supabaseAdmin, userId, mandant);\n      input = built.input;\n      modellName = built.modellName;\n      finalerPrompt = built.finalerPrompt;\n    } catch (e) {\n      const meldung = e instanceof Error ? e.message : String(e);\n      return new Response(',
+     '      const built = await buildInput(body, supabaseAdmin, userId, mandant);\n      input = built.input;\n      modellName = built.modellName;\n      finalerPrompt = built.finalerPrompt;\n    } catch (e) {\n      const meldung = e instanceof Error ? e.message : String(e);\n      await abr.freigeben("Eingabe unbrauchbar: " + meldung);\n      return new Response(',
+     'Credits: eine unbrauchbare Eingabe gibt die Credits zurueck.',
+     {'ki-bildbearbeitung'}),
+    ('FORK',
+     '      } catch (_) { /* Log-Fehler ignorieren */ }\n\n      return new Response(\n        JSON.stringify({ error: meldung }),\n        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },\n      );\n    }',
+     '      } catch (_) { /* Log-Fehler ignorieren */ }\n\n      // Replicate hat nicht geliefert: die Credits gehen zurueck.\n      await abr.freigeben("Replicate: " + meldung.substring(0, 200));\n      return new Response(\n        JSON.stringify({ error: meldung }),\n        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },\n      );\n    }',
+     'Credits: ein gescheiterter Bildauftrag gibt die Credits zurueck.',
+     {'ki-bildbearbeitung'}),
+    ('FORK',
+     '    // ---- Antwort ----\n    return new Response(\n      JSON.stringify({\n        storage_path: path,\n        public_url: publicUrl,\n        modell: modellName,\n        kosten_usd: modell.kosten_usd,\n      }),',
+     '    // Gebucht wird mit den tatsaechlichen Anbieterkosten. Sie stehen in\n    // Dollar am Modell; der Kurs ist ein Wert des Plattform-Admins, kein\n    // Wert im Code — siehe plattform_werte.usd_eur_kurs.\n    await abr.buchen(await inEuro(modell.kosten_usd), body.funktion);\n\n    // ---- Antwort ----\n    return new Response(\n      JSON.stringify({\n        storage_path: path,\n        public_url: publicUrl,\n        modell: modellName,\n        credits: abr.credits,\n        kosten_usd: modell.kosten_usd,\n      }),',
+     'Credits: gebucht mit den Anbieterkosten, wenn das Bild da ist.',
+     {'ki-bildbearbeitung'}),
+    ('FORK',
+     '  } catch (e) {\n    console.error("Edge Function Fehler:", e);\n    return new Response(\n      JSON.stringify({ error: e instanceof Error ? e.message : String(e) }),\n      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },\n    );',
+     '  } catch (e) {\n    console.error("Edge Function Fehler:", e);\n    if (credits) await credits.freigeben("Abbruch: " + (e instanceof Error ? e.message : String(e)));\n    return new Response(\n      JSON.stringify({ error: e instanceof Error ? e.message : String(e) }),\n      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },\n    );',
+     'Credits: ein Abbruch gibt die Credits zurueck.',
+     {'ki-bildbearbeitung'}),
 ]
 
 
@@ -4344,6 +4494,28 @@ def main():
     if BEILAGEN.is_dir():
         for ordner in sorted(BEILAGEN.iterdir()):
             if not ordner.is_dir():
+                continue
+            # Ordner mit Unterstrich sind GEMEINSAME Beilagen: sie gehoeren
+            # nicht zu einer Funktion, sondern zu mehreren. Welche das sind,
+            # steht in GEMEINSAME_BEILAGEN — an einer Stelle und nicht in
+            # vierzehn Ordnernamen.
+            if ordner.name.startswith('_'):
+                for datei in sorted(ordner.rglob('*')):
+                    if datei.is_dir():
+                        continue
+                    schluessel = f'{ordner.name}/{datei.relative_to(ordner)}'
+                    empfaenger = GEMEINSAME_BEILAGEN.get(schluessel)
+                    if not empfaenger:
+                        sys.exit(f'ABBRUCH: {schluessel} liegt als gemeinsame '
+                                 'Beilage da, aber GEMEINSAME_BEILAGEN sagt '
+                                 'nicht, welche Funktionen sie bekommen.')
+                    for name in sorted(empfaenger):
+                        ziel_ordner = ZIEL / name
+                        if not ziel_ordner.is_dir():
+                            sys.exit(f'ABBRUCH: {schluessel} soll nach {name}, '
+                                     'aber diese Funktion gibt es nicht.')
+                        shutil.copy2(datei, ziel_ordner / datei.name)
+                        beilagen.append(f'{name}/{datei.name}  (gemeinsam)')
                 continue
             ziel_ordner = ZIEL / ordner.name
             if not ziel_ordner.is_dir():

@@ -125,6 +125,13 @@ interface RequestBody {
 // ----------------------------------------------------------------------------
 // CORS
 // ----------------------------------------------------------------------------
+// --- Credits (fork_49) ---------------------------------------------------
+// Die Abrechnung liegt als Beilage im Ordner dieser Funktion; die Quelle
+// steht in supabase/eigene-beilagen/_credits/credits.ts. Sie reserviert
+// VOR dem Aufruf und gibt bei einem Fehler von selbst zurueck.
+import { kiAbrechnen, abgelehnt, inEuro } from "./credits.ts";
+import type { Abrechnung } from "./credits.ts";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "*, authorization, x-client-info, apikey, content-type",
@@ -769,6 +776,8 @@ Deno.serve(async (req: Request) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  // Die Reservierung muss auch im Fehlerfall erreichbar sein.
+  let credits: Abrechnung | null = null;
   try {
     // ---- Auth pruefen ----
     const authHeader = req.headers.get("Authorization") || "";
@@ -879,6 +888,15 @@ Deno.serve(async (req: Request) => {
       }
     }
 
+    // --- Credits reservieren, bevor das Bild entsteht -----------------
+    // Homestaging ist die teure Aktion (ein ganzer Raum wird neu
+    // gerechnet), Retusche und Himmel sind die guenstigen. Welche Zahl
+    // dahintersteht, entscheidet der Plattform-Admin, nicht dieser Code.
+    const abrAktion = body.funktion === "staging" ? "bild_homestaging" : "bild_optimieren";
+    const abr = await kiAbrechnen(req, abrAktion, body.dateiname || null);
+    if (!abr.ok) return abgelehnt(abr, corsHeaders);
+    credits = abr;
+
     // ---- Input fuer Replicate bauen ----
     // Wir brauchen den Service-Role-Client schon hier, weil buildInput Bild
     // und Maske in den Temp-Storage hochlaedt.
@@ -897,6 +915,7 @@ Deno.serve(async (req: Request) => {
       finalerPrompt = built.finalerPrompt;
     } catch (e) {
       const meldung = e instanceof Error ? e.message : String(e);
+      await abr.freigeben("Eingabe unbrauchbar: " + meldung);
       return new Response(
         JSON.stringify({ error: meldung }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -926,6 +945,8 @@ Deno.serve(async (req: Request) => {
         });
       } catch (_) { /* Log-Fehler ignorieren */ }
 
+      // Replicate hat nicht geliefert: die Credits gehen zurueck.
+      await abr.freigeben("Replicate: " + meldung.substring(0, 200));
       return new Response(
         JSON.stringify({ error: meldung }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -954,12 +975,18 @@ Deno.serve(async (req: Request) => {
       status: "ok",
     });
 
+    // Gebucht wird mit den tatsaechlichen Anbieterkosten. Sie stehen in
+    // Dollar am Modell; der Kurs ist ein Wert des Plattform-Admins, kein
+    // Wert im Code — siehe plattform_werte.usd_eur_kurs.
+    await abr.buchen(await inEuro(modell.kosten_usd), body.funktion);
+
     // ---- Antwort ----
     return new Response(
       JSON.stringify({
         storage_path: path,
         public_url: publicUrl,
         modell: modellName,
+        credits: abr.credits,
         kosten_usd: modell.kosten_usd,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -967,6 +994,7 @@ Deno.serve(async (req: Request) => {
 
   } catch (e) {
     console.error("Edge Function Fehler:", e);
+    if (credits) await credits.freigeben("Abbruch: " + (e instanceof Error ? e.message : String(e)));
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : String(e) }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },

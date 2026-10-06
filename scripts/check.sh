@@ -540,6 +540,16 @@ else
   fehler=1
 fi
 
+abschnitt "Credits an den KI-Aufrufen"
+# Ohne diese Pruefung waere die Abrechnung Zierde: Toepfe und Preise gaebe
+# es, aber nichts wuerde verbraucht. Geprueft wird am Quelltext, weil eine
+# Edge Function hier weder laufen noch an Supabase kann.
+if node tests/credits.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Umgebungsvariablen: jede gelesene ist dokumentiert"
 # CLAUDE.md: keine Geheimnisse im Repository, nur Umgebungsvariablen,
 # dokumentiert in .env.example. Am 06.10.2026 nannte die Datei drei

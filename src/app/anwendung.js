@@ -87,6 +87,44 @@ window._sb = window.supabase.createClient(window.IMMO_SUPABASE_URL, window.IMMO_
     return huelle;
   };
 })();
+
+// --- Credits: „nicht genug“ wird lesbar ------------------------------
+//
+// supabase-js meldet jeden Nicht-2xx-Status als "Edge Function returned a
+// non-2xx status code" und wirft den Koerper weg. Genau darin steht aber,
+// WORAN es lag — zu wenig Credits, beendetes Abo, fehlende Anmeldung — und
+// das ist die einzige Fehlermeldung dieser Art, die der Makler selbst
+// beheben kann.
+//
+// Hier und nicht an den Aufrufstellen: es sind ueber achtzig, jede mit
+// eigener Fehlerbehandlung. Eine Huelle am Aufruf trifft alle, auch die,
+// die spaeter dazukommen.
+(function () {
+  const echt = window._sb.functions.invoke.bind(window._sb.functions);
+  window._sb.functions.invoke = async function (name, optionen) {
+    const antwort = await echt(name, optionen);
+    const f = antwort && antwort.error;
+    const r = f && f.context;
+    // `context` ist die Antwort selbst. Gelesen wird eine KOPIE: wer sie
+    // auswertet, soll sie danach noch lesen koennen.
+    if (!r || typeof r.clone !== "function") return antwort;
+    let koerper = null;
+    try { koerper = await r.clone().json(); } catch (e) { return antwort; }
+    if (!koerper || !koerper.credits_grund) return antwort;
+    let satz = String(koerper.error || "");
+    if (koerper.credits_grund === "credits") {
+      satz += " Credits lassen sich unter „Abo & Abrechnung“ nachkaufen.";
+    }
+    f.message = satz;
+    f.credits = koerper;
+    // Damit die Kopfzeile ihren Stand auffrischen kann, ohne dass jede
+    // Aufrufstelle davon wissen muss.
+    try {
+      window.dispatchEvent(new CustomEvent("immo-credits", { detail: koerper }));
+    } catch (e) { /* aeltere Browser: dann eben ohne */ }
+    return antwort;
+  };
+})();
 const htmlZuText = e => {
     if (!e) return "";
     try {

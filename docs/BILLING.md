@@ -86,7 +86,9 @@ Verhalten der Vorlage und den Regeln in `CLAUDE.md` am nächsten kommt.
 | 11 | Anbieterkosten (`ki_kosten_eur`) | anteilig auf die Ledger-Zeilen verteilt | Ein Vorgang über zwei Töpfe erzeugt zwei Zeilen; die Summe muss die Kosten wieder ergeben, sonst ist der Deckungsbeitrag falsch. |
 | 12 | Neuer Tarif im Admin | erscheint auf der Website **nicht** von selbst | Eine Preiskarte ist Text und Haltung, nicht nur eine Zahl. Beträge, Nutzerzahl, Credits und Merkmale kommen aus dem Katalog; die Karte selbst schreibt ein Mensch. |
 | 13 | Stripe-Kennungen auf der Website | gehen **nicht** hinaus | Sie sind kein Geheimnis im engen Sinn, aber wer sie hat, kann Zahlungsvorgänge anlegen — und die Werbeseite braucht sie nicht. |
-| 14 | Preise im Client | kein Wert wird dem Frontend geglaubt | `abo-checkout` schreibt **nie** einen Status. Was gilt, entscheidet der Webhook. Käme der Status von der Kasse, stünde er schon dann in der Datenbank, wenn jemand nur die Kasse geöffnet und abgebrochen hat. |
+| 14 | Abrechnung im Hintergrundlauf | **vorerst nicht** — nur Aufrufe mit angemeldetem Nutzer kosten | Ein Zeitplan-Lauf, der einem Mandanten unbemerkt Credits abzieht, muss vorher angekündigt sein. Siehe Abschnitt 5. |
+| 15 | Dollar in Euro | Kurs aus `plattform_werte.usd_eur_kurs`, ohne gültigen Wert **keine** Kostenangabe | Ein fest verdrahteter Kurs ist irgendwann still falsch. Lieber eine leere Spalte als eine erfundene Zahl. |
+| 16 | Preise im Client | kein Wert wird dem Frontend geglaubt | `abo-checkout` schreibt **nie** einen Status. Was gilt, entscheidet der Webhook. Käme der Status von der Kasse, stünde er schon dann in der Datenbank, wenn jemand nur die Kasse geöffnet und abgebrochen hat. |
 
 ---
 
@@ -119,7 +121,73 @@ wieder gelöscht, damit Stripes Wiederholung eine Chance hat.
 
 ---
 
-## 5. Die Preise auf der Website
+## 5. Wo Credits wirklich verbraucht werden (fork_49)
+
+Bis hierher war die Abrechnung Zierde: Töpfe, Ledger und Preise gab es,
+aber nichts verbrauchte je etwas. Seit fork_49 hängt sie an den KI-Aufrufen.
+
+Die Abrechnung liegt als **Beilage** `credits.ts` im Ordner der jeweiligen
+Funktion; die Quelle ist `supabase/eigene-beilagen/_credits/credits.ts`, und
+`tests/credits.js` besteht darauf, dass alle Kopien byte-gleich sind. Welche
+Funktion sie bekommt, steht an einer Stelle: `GEMEINSAME_BEILAGEN` in
+`scripts/neutralisieren-funktionen.py`.
+
+| Funktion | Aktion | Credits |
+|---|---|---|
+| `generate-text` | `ki_text` | 2 |
+| `text-korrigieren` | `ki_text` | 2 |
+| `expose-pruefen` | `expose_pruefer` | 2 |
+| `ki-bildbearbeitung` (Retusche, Himmel) | `bild_optimieren` | 10 |
+| `ki-bildbearbeitung` (Homestaging) | `bild_homestaging` | 30 |
+
+Die Reihenfolge ist in jeder dieser Funktionen dieselbe und wird von
+`tests/credits.js` erzwungen:
+
+1. **Reservieren**, bevor der Anbieter gerufen wird. Wer erst hinterher
+   abrechnet, hat bei jedem Abbruch geliefert und nichts genommen — und kann
+   nicht verhindern, dass zehn gleichzeitige Aufrufe denselben Rest ausgeben.
+2. **Buchen**, wenn ein Ergebnis vorliegt — mit den Anbieterkosten, soweit
+   sie bekannt sind. Replicate nennt Dollar; der Kurs steht in
+   `plattform_werte.usd_eur_kurs` und wird vom Betreiber gepflegt. Fehlt er,
+   bleibt die Kostenspalte leer: lieber keine Zahl als eine erfundene.
+   Anthropic liefert Token, keinen Preis — dort bleibt sie ebenfalls leer.
+3. **Freigeben** auf jedem Rückweg dazwischen und im `catch`. Der Test zählt
+   Rückwege und Freigaben paarweise ab; eine gelöschte Freigabe fällt auf.
+
+Dabei wird **auch das Abo geprüft** (`abo_zugriff`). Ein Mandant im
+Lesezugriff oder gesperrt kommt nicht an die KI — serverseitig, nicht durch
+einen ausgeblendeten Knopf.
+
+In der Oberfläche liest eine Hülle um `functions.invoke` den Antwortkörper
+aus. Ohne sie zeigte supabase-js „Edge Function returned a non-2xx status
+code"; jetzt steht da, woran es lag, und bei fehlenden Credits ein Satz dazu,
+wo man sie nachkauft. Eine Hülle statt achtzig Aufrufstellen — und sie gilt
+auch für die, die später dazukommen.
+
+### Was noch NICHT abgerechnet wird
+
+Ehrlich benannt, weil es Geld ist: rund vierzig weitere Edge Functions rufen
+KI, ohne Credits zu verbrauchen. Zwei Gründe, und beide sind keine
+Nachlässigkeit:
+
+- **Kein Preis im Katalog.** Die Parser (`parse-*`), die Auslesefunktionen
+  (`energieausweis-auslesen`, `grundriss-ki-lesen`, `objekt-wissen-auslesen`,
+  `sprachmemo-auswerten`) und die kleinen Helfer (`bild-beschriften`,
+  `datei-namen-ki`) haben keinen Eintrag in `plattform_credit_preise`. Einen
+  zu erfinden wäre eine Preisentscheidung — die trifft der Betreiber im
+  Plattform-Admin, nicht dieser Code. Danach sind es je Funktion drei
+  Einhängungen und ein Eintrag in `GEMEINSAME_BEILAGEN`.
+- **Kein Nutzer, dem man es zuordnen könnte.** Die Hintergrundläufe
+  (`mail-postfach-pull`, `mail-anfrage-verarbeiten`, `akq-mail-leads`,
+  `besichtigung-nachfassen`, `news-briefing-erstellen` und Geschwister)
+  laufen aus einem Zeitplan heraus, ohne Anmeldekopf. Sie bräuchten einen
+  anderen Weg: Mandant aus dem Datensatz statt aus dem Konto. Das ist
+  machbar, aber eine eigene Entscheidung — ein Hintergrundlauf, der einem
+  Mandanten unbemerkt Credits abzieht, muss vorher angekündigt sein.
+
+---
+
+## 6. Die Preise auf der Website
 
 Ein Abschnitt `#preise` in der bestehenden Landingpage, keine eigene
 Preisseite. Die Zahlen im HTML sind **Rückfall**, nicht Quelle: `seite.js`
@@ -146,9 +214,9 @@ in den Fragen ist genau der, den später niemand mitpflegt.
 
 ---
 
-## 6. Abnahme
+## 7. Abnahme
 
-### 6.1 Hier geprüft — `tests/abrechnung.sql`, Teil von `npm run check`
+### 7.1 Hier geprüft — `tests/abrechnung.sql`, Teil von `npm run check`
 
 34 Prüfungen gegen eine echte Postgres-Instanz, alle grün:
 
@@ -164,13 +232,20 @@ in den Fragen ist genau der, den später niemand mitpflegt.
 | Zugriff | aktiv → `voll` · nach Kündigungstermin → `nur_lesen` · danach → `gesperrt` · Sperre wirkt sofort |
 | Gründer | ein Platz wird vergeben, ein zweiter Aufruf vergibt keinen zweiten, der Zähler zählt genau einen herunter |
 
+Dazu `tests/credits.js` (62 Prüfungen): jede Kopie der Beilage ist byte-gleich
+mit ihrer Quelle, jeder Aktionsschlüssel steht im Katalog, reserviert wird vor
+dem Anbieter, gebucht danach, und zwischen Reservierung und Buchung gibt jeder
+Rückweg frei. Die letzte Prüfung ist die wichtigste — sie ist die, die eine
+gelöschte Freigabe findet, und sie wurde erst dann geschrieben, als die erste
+Fassung genau das **nicht** bemerkt hat.
+
 Dazu `tests/website.py` und `tests/website-browser.js`: der Preisbereich
 holt den Stand wirklich (geprüft mit **abweichenden** Zahlen im Stub — sonst
 sähe man nicht, ob die Seite den Katalog oder den Rückfall zeigt), der
 Umschalter rechnet, der Knopf nimmt Tarif und Takt mit, und bei 375 px Breite
 steht nichts über dem Rand.
 
-### 6.2 Nicht hier prüfbar — Abnahme beim Betreiber
+### 7.2 Nicht hier prüfbar — Abnahme beim Betreiber
 
 Dieser Container kommt **weder an Stripe noch an Supabase über HTTPS** heran,
 und einen Stripe-Schlüssel gibt es hier nicht. Die folgenden Punkte muss der
@@ -195,18 +270,18 @@ Betreiber einmal durchspielen. Die Reihenfolge ist die sinnvolle.
 8. **Gründerpreis** → der Coupon greift nur auf dem dafür bestimmten Tarif,
    und der Zähler auf der Website zählt herunter.
 9. **Zwei Mandanten nebeneinander** → Mandant A sieht in der Oberfläche
-   nichts von B. (Die Datenbankseite ist unter 6.1 geprüft; hier geht es um
+   nichts von B. (Die Datenbankseite ist unter 7.1 geprüft; hier geht es um
    den Weg durch die Anwendung.)
 
-Ergebnisse gehören in dieses Dokument, Abschnitt 6.3.
+Ergebnisse gehören in dieses Dokument, Abschnitt 7.3.
 
-### 6.3 Ergebnisse der Abnahme beim Betreiber
+### 7.3 Ergebnisse der Abnahme beim Betreiber
 
-Noch keine. Einzutragen, sobald die Punkte aus 6.2 durchgespielt sind.
+Noch keine. Einzutragen, sobald die Punkte aus 7.2 durchgespielt sind.
 
 ---
 
-## 7. Was der Betreiber setzen muss
+## 8. Was der Betreiber setzen muss
 
 Supabase → Edge Functions → Secrets (siehe `docs/SECRETS.md` und
 `.env.example`):
@@ -222,7 +297,7 @@ Danach `website/konfig.js` → `preise` auf die eigene Projektadresse prüfen.
 
 ---
 
-## 8. Gate 3 — bevor es live geht
+## 9. Gate 3 — bevor es live geht
 
 Dieses Gate ist ein **Stopp**, kein Haken. Vor der Umstellung auf Live-Keys:
 

@@ -204,6 +204,18 @@ for _f in ('credentials-anzeigen', 'mitarbeiter-loeschen',
     ERWEITERT[_f] = ('Prueft Kennungen aus dem Anfragekoerper gegen den '
                      'Mandanten des Aufrufers (Phase 2)')
 
+# fork_49: die vier Funktionen, die KI erzeugen und deshalb Credits kosten.
+# Sie reservieren vor dem Anbieter, buchen danach und geben bei jedem
+# Abbruch zurueck. In text-korrigieren und ki-bildbearbeitung wandert dabei
+# die verbrauchte Zahl in eine bestehende Antwortzeile — eine Aenderung ohne
+# Kennzeichen, deshalb hier. Geprueft wird die Anbindung von
+# tests/credits.js, das Verhalten der Datenbankseite von
+# tests/abrechnung.sql.
+for _f in ('generate-text', 'text-korrigieren', 'expose-pruefen',
+           'ki-bildbearbeitung'):
+    ERWEITERT[_f] = ('Credits: reserviert vor dem KI-Aufruf, bucht danach, '
+                     'gibt bei jedem Abbruch zurueck (fork_49)')
+
 # Diese eine traegt mehr als eine Erweiterung: ihr Zeichenteil ist ersetzt.
 ERWEITERT['expose-pdf-erzeugen'] = (
     'Zeichnet nicht mehr selbst. Statt siebenhundert Zeilen Querformat laedt '
@@ -241,6 +253,19 @@ BEIGELEGT = {
             'supabase/eigene-beilagen/mail-ki-vorschlag/stil.ts; geprueft '
             'von tests/mail-stil.js.',
     },
+}
+
+# credits.ts liegt in JEDER Funktion, die Credits kostet — eine Quelle,
+# mehrere Kopien. Welche das sind, sagt GEMEINSAME_BEILAGEN im Erzeuger;
+# tests/credits.js prueft, dass die Kopien byte-gleich sind.
+for _f in ('generate-text', 'text-korrigieren', 'expose-pruefen',
+           'ki-bildbearbeitung'):
+    BEIGELEGT.setdefault(_f, {})['credits.ts'] = (
+        'Credits reservieren, buchen, freigeben (fork_49). Quelle: '
+        'supabase/eigene-beilagen/_credits/credits.ts; geprueft von '
+        'tests/credits.js.')
+
+BEIGELEGT.update({
     'expose-pdf-erzeugen': {
         'schriften.mjs':
             'Die zwanzig Exposé-Schnitte, gepackt und base64-kodiert, '
@@ -253,7 +278,7 @@ BEIGELEGT = {
             'Funktion, weil `supabase functions deploy` den Ordner ausrollt; '
             'npm run check vergleicht es mit der Quelle.',
     },
-}
+})
 
 BLOCKZEILEN = {
     'mpe-pdf-erzeugen': {

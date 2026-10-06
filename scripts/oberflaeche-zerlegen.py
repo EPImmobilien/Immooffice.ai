@@ -4586,6 +4586,18 @@ WOERTLICH = [
      '  // bei den eigenen Postfaechern und nicht in den Firmenvorgaben.\n'
      '  window.ImmoMailStil && React.createElement(window.ImmoMailStil, null),',
      'Sofortversand und Schreibstil unter den E-Mail-Postfaechern.'),
+
+    # =====================================================================
+    # fork_49 — die Credit-Antwort der Edge Functions wird lesbar
+    # ---------------------------------------------------------------------
+    # Die Regel haengt sich an das ENDE der Storage-Huelle. Sie steht am
+    # Schluss dieser Liste, weil ihr Anker von einer frueheren Regel
+    # gesetzt wird — eine Regel davor fuende ihn nicht.
+    # =====================================================================
+    ('FORK',
+     '    return huelle;\n  };\n})();',
+     '    return huelle;\n  };\n})();\n\n// --- Credits: „nicht genug“ wird lesbar ------------------------------\n//\n// supabase-js meldet jeden Nicht-2xx-Status als "Edge Function returned a\n// non-2xx status code" und wirft den Koerper weg. Genau darin steht aber,\n// WORAN es lag — zu wenig Credits, beendetes Abo, fehlende Anmeldung — und\n// das ist die einzige Fehlermeldung dieser Art, die der Makler selbst\n// beheben kann.\n//\n// Hier und nicht an den Aufrufstellen: es sind ueber achtzig, jede mit\n// eigener Fehlerbehandlung. Eine Huelle am Aufruf trifft alle, auch die,\n// die spaeter dazukommen.\n(function () {\n  const echt = window._sb.functions.invoke.bind(window._sb.functions);\n  window._sb.functions.invoke = async function (name, optionen) {\n    const antwort = await echt(name, optionen);\n    const f = antwort && antwort.error;\n    const r = f && f.context;\n    // `context` ist die Antwort selbst. Gelesen wird eine KOPIE: wer sie\n    // auswertet, soll sie danach noch lesen koennen.\n    if (!r || typeof r.clone !== "function") return antwort;\n    let koerper = null;\n    try { koerper = await r.clone().json(); } catch (e) { return antwort; }\n    if (!koerper || !koerper.credits_grund) return antwort;\n    let satz = String(koerper.error || "");\n    if (koerper.credits_grund === "credits") {\n      satz += " Credits lassen sich unter „Abo & Abrechnung“ nachkaufen.";\n    }\n    f.message = satz;\n    f.credits = koerper;\n    // Damit die Kopfzeile ihren Stand auffrischen kann, ohne dass jede\n    // Aufrufstelle davon wissen muss.\n    try {\n      window.dispatchEvent(new CustomEvent("immo-credits", { detail: koerper }));\n    } catch (e) { /* aeltere Browser: dann eben ohne */ }\n    return antwort;\n  };\n})();',
+     'Credits: die Antwort "nicht genug" wird eine lesbare Meldung.'),
 ]
 
 

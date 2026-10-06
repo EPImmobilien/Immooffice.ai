@@ -28,6 +28,13 @@ async function immoMandantDesAufrufers(req: Request): Promise<string | null> {
   return prof?.mandant_id ? String(prof.mandant_id) : null;
 }
 
+// --- Credits (fork_49) ---------------------------------------------------
+// Die Abrechnung liegt als Beilage im Ordner dieser Funktion; die Quelle
+// steht in supabase/eigene-beilagen/_credits/credits.ts. Sie reserviert
+// VOR dem Aufruf und gibt bei einem Fehler von selbst zurueck.
+import { kiAbrechnen, abgelehnt } from "./credits.ts";
+import type { Abrechnung } from "./credits.ts";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -177,6 +184,8 @@ function bytesZuBase64(bytes: Uint8Array): string {
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  // Die Reservierung muss auch im Fehlerfall erreichbar sein.
+  let credits: Abrechnung | null = null;
   try {
     const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
     if (!apiKey) {
@@ -246,6 +255,13 @@ Deno.serve(async (req: Request) => {
     }
 
     const modell = "claude-sonnet-4-6";
+    // --- Credits reservieren, bevor geprueft wird ---------------------
+    // Erst hier: bis hierher ist nur gelesen und zugeordnet worden, und
+    // ein Zugriffsfehler darf keine Credits kosten.
+    const abr = await kiAbrechnen(req, "expose_pruefer", body.immobilie_id || null);
+    if (!abr.ok) return abgelehnt(abr, corsHeaders);
+    credits = abr;
+
     const anthropicResponse = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -280,6 +296,7 @@ Deno.serve(async (req: Request) => {
           erstellt_von: userId,
         });
       }
+      await abr.freigeben("Anthropic " + anthropicResponse.status);
       return new Response(JSON.stringify({ error: `Anthropic-API: ${anthropicResponse.status} - ${errText.substring(0, 300)}` }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
@@ -287,6 +304,7 @@ Deno.serve(async (req: Request) => {
     const result = await anthropicResponse.json();
     const toolBlock = (result?.content || []).find((b: any) => b.type === "tool_use" && b.name === "pruefbericht_abgeben");
     if (!toolBlock?.input) {
+      await abr.freigeben("Kein strukturierter Bericht");
       return new Response(JSON.stringify({ error: "Kein strukturierter Prüfbericht in der Antwort." }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
@@ -324,8 +342,11 @@ Deno.serve(async (req: Request) => {
       console.error("ki_pruefungen insert exception:", e);
     }
 
+    await abr.buchen(null, "expose-pruefung");
+
     return new Response(JSON.stringify({
       pruefung_id: pruefungId,
+      credits: abr.credits,
       ampel,
       gesamturteil,
       checkliste: bericht.checkliste || {},
@@ -336,6 +357,7 @@ Deno.serve(async (req: Request) => {
 
   } catch (e) {
     console.error("Edge Function Fehler:", e);
+    if (credits) await credits.freigeben("Abbruch: " + (e instanceof Error ? e.message : String(e)));
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : String(e) }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }

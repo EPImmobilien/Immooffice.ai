@@ -23,6 +23,13 @@ const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-sonnet-4-6";
 
+// --- Credits (fork_49) ---------------------------------------------------
+// Die Abrechnung liegt als Beilage im Ordner dieser Funktion; die Quelle
+// steht in supabase/eigene-beilagen/_credits/credits.ts. Sie reserviert
+// VOR dem Aufruf und gibt bei einem Fehler von selbst zurueck.
+import { kiAbrechnen, abgelehnt } from "./credits.ts";
+import type { Abrechnung } from "./credits.ts";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -64,6 +71,9 @@ const HINWEISE_MODUS: Record<string, string> = {
 };
 
 Deno.serve(async (req) => {
+  // Die Reservierung muss auch im Fehlerfall erreichbar sein — in dieser
+  // Funktion fuehrt JEDER Fehler ueber einen throw in denselben catch.
+  let credits: Abrechnung | null = null;
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
@@ -86,6 +96,11 @@ Deno.serve(async (req) => {
     if (text.length > 20000) {
       throw new Error("Text ist zu lang (max. 20000 Zeichen)");
     }
+
+    // --- Credits reservieren, bevor etwas erzeugt wird ----------------
+    const abr = await kiAbrechnen(req, "ki_text", modus ? String(modus) : null);
+    if (!abr.ok) return abgelehnt(abr, corsHeaders);
+    credits = abr;
 
     const systemPrompt = modus === "mail" ? SYSTEM_PROMPT_MAIL : SYSTEM_PROMPT_BASIS + (HINWEISE_MODUS[modus] || "");
 
@@ -118,11 +133,16 @@ Deno.serve(async (req) => {
       throw new Error("Leere Antwort von der KI");
     }
 
+    await abr.buchen(null, modus ? String(modus) : null);
+
     return new Response(
-      JSON.stringify({ ok: true, korrigiert: modus === "mail" ? korrigiert.replace(/^\n+|\n+$/g, "") : korrigiert.trim() }),
+      JSON.stringify({ ok: true, credits: abr.credits, korrigiert: modus === "mail" ? korrigiert.replace(/^\n+|\n+$/g, "") : korrigiert.trim() }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
+    // Was reserviert war, geht zurueck — auch bei einem Fehler, der
+    // schon vor dem Anbieter auftrat.
+    if (credits) await credits.freigeben("Abbruch: " + String(e?.message || e));
     return new Response(
       JSON.stringify({ ok: false, error: String(e?.message || e) }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },

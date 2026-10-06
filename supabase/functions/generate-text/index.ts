@@ -14,6 +14,12 @@
 // v5.9.11: "instagram_caption" / "instagram_caption_verkauft".
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
+// --- Credits (fork_49) ---------------------------------------------------
+// Die Abrechnung liegt als Beilage im Ordner dieser Funktion; die Quelle
+// steht in supabase/eigene-beilagen/_credits/credits.ts. Sie reserviert
+// VOR dem Aufruf und gibt bei einem Fehler von selbst zurueck.
+import { kiAbrechnen, abgelehnt } from "./credits.ts";
+import type { Abrechnung } from "./credits.ts";
 
 interface Daten {
   objektart?: string;
@@ -535,6 +541,9 @@ Verkaufswirkung (wichtig):
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  // Die Reservierung muss auch im Fehlerfall erreichbar sein — deshalb
+  // steht sie VOR dem try und nicht darin.
+  let credits: Abrechnung | null = null;
   try {
     const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
     if (!apiKey) {
@@ -547,6 +556,16 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: "Ungültige Anfrage: textart fehlt." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
+
+    // --- Credits reservieren, bevor etwas erzeugt wird ----------------
+    // Hier und nicht spaeter: wer erst nach dem Aufruf abrechnet, hat
+    // bei jedem Abbruch geliefert und nichts genommen — und kann nicht
+    // verhindern, dass zehn gleichzeitige Aufrufe denselben Rest
+    // ausgeben. Geprueft wird dabei auch das Abo: ein gesperrter
+    // Mandant kommt nicht an die KI.
+    const abr = await kiAbrechnen(req, "ki_text", body.textart);
+    if (!abr.ok) return abgelehnt(abr, corsHeaders);
+    credits = abr;
 
     const { system, user } = buildPrompt(body);
 
@@ -597,6 +616,7 @@ Deno.serve(async (req: Request) => {
     if (!anthropicResponse.ok) {
       const errText = await anthropicResponse.text();
       console.error("Anthropic API Fehler:", anthropicResponse.status, errText);
+      await abr.freigeben("Anthropic " + anthropicResponse.status);
       return new Response(JSON.stringify({ error: `Anthropic-API: ${anthropicResponse.status} - ${errText.substring(0, 300)}` }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
@@ -604,6 +624,7 @@ Deno.serve(async (req: Request) => {
     const result = await anthropicResponse.json();
     const rohText = result?.content?.[0]?.text || "";
     if (!rohText) {
+      await abr.freigeben("Anthropic hat keinen Text geliefert");
       return new Response(JSON.stringify({ error: "Anthropic hat keinen Text zurückgegeben." }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
@@ -614,11 +635,19 @@ Deno.serve(async (req: Request) => {
     const kiHinweisTextarten = ["instagram_caption", "instagram_caption_verkauft", "news_caption"];
     const text = kiHinweisTextarten.includes(body.textart) ? kiHinweisEinfuegen(rohText) : rohText;
 
-    return new Response(JSON.stringify({ text }),
+    // Gebucht wird erst, wenn wirklich ein Text da ist. Die Kosten des
+    // Anbieters stehen hier nicht: Anthropic liefert Token, keinen
+    // Preis, und ein geschaetzter Betrag waere eine erfundene Zahl.
+    await abr.buchen(null, body.textart);
+
+    return new Response(JSON.stringify({ text, credits: abr.credits }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
   } catch (e) {
     console.error("Edge Function Fehler:", e);
+    // Was reserviert war, geht zurueck. CLAUDE.md: fehlgeschlagene
+    // KI-Auftraege geben reservierte Credits automatisch frei.
+    if (credits) await credits.freigeben("Abbruch: " + (e instanceof Error ? e.message : String(e)));
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : String(e) }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
