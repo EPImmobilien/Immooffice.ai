@@ -127,6 +127,17 @@ else
   fehler=1
 fi
 
+abschnitt "Funktionsrechte: wer darf eine RPC rufen?"
+# Supabase vergibt EXECUTE auf alles in public an PUBLIC, und PostgREST
+# macht jede Funktion dort erreichbar. Am 06.10.2026 durfte anon 147 von
+# 153 rufen, darunter fuenf, die Credits gutschreiben und nichts pruefen
+# (fork_63).
+if scripts/lokale-db.sh psql -q -f tests/funktionsrechte.sql; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Sichten: halten sie die Mandantengrenze?"
 # Die uebrigen Mandantentests pruefen Tabellen. Eine Sicht ohne
 # security_invoker laeuft mit den Rechten ihres Eigners und hebt die

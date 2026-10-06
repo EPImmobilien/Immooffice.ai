@@ -5514,3 +5514,56 @@ Richtlinie (`rls_enabled_no_policy`, INFO). Alle neun sind in
 `mandanten_einstufung` als `DIENST` eingetragen — RLS an und keine Richtlinie
 heisst: niemand kommt heran ausser dem Dienstschlüssel. Das ist die Absicht,
 nicht ein Versäumnis.
+
+---
+
+## 2026-10-06 · Die Kasse hatte keine Tür — anon durfte 147 Funktionen rufen
+
+**Befund:** Zweiter Fund derselben Runde wie `fork_62`, und der schwerere.
+Supabase vergibt als Vorgabe `EXECUTE` auf alles in `public` an `PUBLIC`, und
+PostgREST macht jede Funktion dort als `/rest/v1/rpc/<name>` erreichbar.
+`anon` konnte damit **147 von 153** Funktionen aufrufen — 100 davon als
+`SECURITY DEFINER`, also mit den Rechten des Eigners und ohne
+Row-Level-Security.
+
+Fünf davon prüfen **nichts** und verändern Geld:
+`credits_gutschreiben`, `credits_tarif_zuteilen`, `credits_buchen`,
+`credits_freigeben`, `gruender_platz_vergeben`.
+
+Mit dem öffentlichen anon-Schlüssel — er steht im Browser jeder Auslieferung
+und ist kein Geheimnis — und einer Mandantenkennung hätte sich jeder beliebig
+viele Credits gutschreiben können.
+
+**Nachgewiesen, nicht vermutet.** Die Gegenprobe in `tests/funktionsrechte.sql`
+gibt `anon` das Recht zurück und ruft die Funktion: Saldo vorher 0, nachher
+**99 999**. Das Privileg war das Einzige, was dazwischenstand.
+
+**Entscheidung:** `EXECUTE` von `PUBLIC` und `anon` zurückgenommen, für
+**jede** Funktion in `public`; `authenticated` und `service_role` bekommen es
+ausdrücklich; und `authenticated` verliert die acht, die nur der
+Dienstschlüssel rufen darf (die fünf oben, `credits_reservieren` — sie nimmt
+Mandant und Nutzer als Parameter — und die beiden Geheimnis-Prüfer
+`diagnose_secret_pruefen` und `intern_secret_pruefen`).
+
+**Warum „alle" und nicht „die fünf":** die nächste Funktion entstünde sonst
+wieder offen. Die Vorgabe sitzt in `alter default privileges` und lässt sich
+nicht wegdiskutieren, nur regelmäßig zurücknehmen — deshalb läuft die Prüfung
+über alle Funktionen und bei jedem Commit.
+
+**Vorher nachgesehen, ob es etwas bricht:** die vier anon-Seiten
+(`freigabe.html`, `objekt.html`, `sonnenverlauf.html`, `unterlagen.html`) und
+die Website sprechen **ausschließlich** mit Edge Functions über
+`functions/v1/…`. Keine einzige RPC, keine einzige Tabellenabfrage. Das war
+die entscheidende Frage: eine restriktive Richtlinie ruft
+`aktuelle_mandant_id()`, und ohne `EXECUTE` darauf hätte eine
+anon-Tabellenabfrage einen Fehler geliefert statt einer leeren Antwort.
+
+Die Anwendung ruft 28 RPCs als angemeldeter Nutzer — keine davon ist unter
+den acht. Nachgewiesen durch `npm run check` gegen eine von Null migrierte
+Datenbank: alle Mandanten- und Rechte-Tests laufen als `authenticated` und
+bleiben grün.
+
+**Was beide Funde zusammen zeigen:** die eigenen Gates prüfen Tabellen und
+Richtlinien. Sichten und Funktionsrechte — zwei ganze Zugriffswege — hat
+keines angesehen. Gefunden hat beides der Sicherheitsberater von Supabase.
+Er gehört von jetzt an in die Runde.
