@@ -231,6 +231,22 @@ create table if not exists cron.job (
   jobname text unique
 );
 
+-- Die Laufhistorie. Bleibt hier leer — nichts wird ausgefuehrt —, muss aber
+-- existieren: `public.cron_zustand()` (fork_55) liest sie, und eine Funktion,
+-- die lokal gar nicht erst anlegbar ist, laesst sich auch nicht pruefen.
+create table if not exists cron.job_run_details (
+  jobid bigint,
+  runid bigserial primary key,
+  job_pid integer,
+  database text,
+  username text,
+  command text,
+  status text,
+  return_message text,
+  start_time timestamptz,
+  end_time timestamptz
+);
+
 create or replace function cron.schedule(job_name text, schedule text, command text)
 returns bigint language plpgsql as $$
 declare kennung bigint;

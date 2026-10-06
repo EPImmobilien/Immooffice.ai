@@ -228,11 +228,47 @@ if (fs.existsSync(TAFEL)) {
     protokoll: [{ id: '1', erstellt_am: '2026-10-06T10:00:00Z',
       aktion: 'credits_geschenkt', gegenstand: 'a',
       einzelheiten: { credits: 100, grund: 'Ausgleich fuer die Stoerung' } }],
+    konten: [{ id: 'u1', name: 'Chefin', email: 'chefin@pruef.example',
+      role: 'chef', haus: 'Alpha GmbH', plattform_admin: true },
+      { id: 'u2', name: 'Mitarbeiter', email: 'mit@pruef.example',
+        role: 'mitarbeiter', haus: 'Alpha GmbH', plattform_admin: false }],
+    system: {
+      tage: 7,
+      cron: [{ jobname: 'mail-postfach-pull-5min', zeitplan: '*/5 * * * *',
+        aktiv: true, letzter_lauf: '2026-10-06T11:55:00Z', letzter_stand: 'succeeded',
+        laeufe_24h: 288, fehler_24h: 0 },
+        { jobname: 'akq-mail-leads-20min', zeitplan: '8,28,48 * * * *', aktiv: true,
+          letzter_lauf: '2026-10-06T11:48:00Z', letzter_stand: 'failed',
+          laeufe_24h: 72, fehler_24h: 9 }],
+      fehler: [{ mandant_id: 'a', mandant_name: 'Alpha GmbH', schluessel: 'PGRST116',
+        quelle: 'kalender', anzahl: 47, offen: 47, zuletzt: '2026-10-06T10:00:00Z' }],
+    },
+    mandant: {
+      mandant: { id: 'a', name: 'Alpha GmbH', slug: 'alpha', erstellt_am: '2026-01-02',
+        testphase_bis: null, gesperrt_am: null },
+      abo: { tarif: 'starter', status: 'aktiv', intervall: 'monat', zusatznutzer: 1,
+        mindestlaufzeit_bis: '2027-03-01' },
+      nutzer: [{ id: 'u1', name: 'Chefin', email: 'chefin@pruef.example',
+        role: 'chef', funktion: 'Inhaberin' }],
+      konten: [{ quelle: 'tarif', credits: 500, verbraucht: 80,
+        gueltig_bis: '2026-11-01', referenz: 'tarif:2026-10' }],
+      buchungen: [], erinnerungen: [],
+      sitzungen: [{ id: 's1', begonnen_am: '2026-10-05T09:00:00Z', schreiben: false,
+        grund: 'Kunde meldet fehlende Bilder' }],
+      saldo: 420, zugriff: 'voll', nutzer_limit: 2,
+    },
   };
 
-  for (const reiter of ['zahlen', 'mandanten', 'katalog', 'protokoll']) {
+  for (const reiter of ['zahlen', 'mandanten', 'konten', 'katalog', 'system',
+                        'protokoll', 'DETAIL']) {
     let i = 0;
-    const zustaende = [reiter, DATEN, '', null];
+    const detail = reiter === 'DETAIL';
+    // Reihenfolge der useState-Aufrufe: reiter, daten, fehler, meldung,
+    // offen, support.
+    const zustaende = [detail ? 'mandanten' : reiter, DATEN, '', null,
+                       detail ? 'a' : null,
+                       detail ? { mandant_name: 'Alpha GmbH', schreiben: false,
+                                  gueltig_bis: '2026-10-06T12:00:00Z' } : null];
     const React = {
       createElement: (typ, props, ...kinder) => ({ typ,
         props: Object.assign({}, props || {},
@@ -295,6 +331,35 @@ if (fs.existsSync(TAFEL)) {
     }
     if (reiter === 'protokoll') {
       melde('Protokoll: der Grund steht da', /Ausgleich/.test(text));
+    }
+    if (reiter === 'konten') {
+      melde('Konten: beide Zeilen stehen da',
+            /Chefin/.test(text) && /Mitarbeiter/.test(text));
+      melde('Konten: der Plattform-Administrator ist erkennbar',
+            /Administrator/.test(text));
+      melde('Konten: und der Hinweis, was das Recht NICHT oeffnet',
+            /Supportzugriff/.test(text), text.slice(-220));
+    }
+    if (reiter === 'system') {
+      melde('System: der gescheiterte Job faellt auf',
+            /akq-mail-leads-20min/.test(text) && /failed/.test(text));
+      melde('System: die Fehler eines Hauses stehen da',
+            /PGRST116/.test(text) && /47/.test(text));
+      melde('System: und es wird gesagt, warum der Wortlaut fehlt',
+            /Supportzugriff/.test(text), text.slice(-200));
+    }
+    if (detail) {
+      melde('Detail: das Haus steht da', /Alpha GmbH/.test(text));
+      melde('Detail: der Saldo auch', /420/.test(text));
+      melde('Detail: die Konten des Hauses auch', /Inhaberin/.test(text));
+      melde('Detail: bisherige Supportzugriffe stehen da',
+            /Kunde meldet fehlende Bilder/.test(text));
+      melde('Detail: ein laufender Zugriff wird oben angezeigt',
+            /Supportzugriff läuft/.test(text), text.slice(0, 200));
+      melde('Detail: das Loeschen verlangt den Namen',
+            /Namen des Hauses eintragen/.test(text));
+      melde('Detail: und sagt, was mitgeht',
+            /Objekte, Kontakte, Mails, Dateien/.test(text));
     }
   }
 

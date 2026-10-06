@@ -526,6 +526,29 @@ Deno.serve(async (req) => {
       return antwort({ ok: true, sitzung: { ...data, mandant_name: m?.name || null } });
     }
 
+    // --- Systemzustand ------------------------------------------------------
+    // Laufen die Hintergrundjobs, und wo brennt es in den Oberflächen?
+    //
+    // Die Fehlerübersicht gibt Meldung und Stapelspur NICHT heraus — dort
+    // steht, woran ein Kunde gerade gearbeitet hat. Sie sagt, wie oft welcher
+    // Fehler in welchem Haus auftrat, und das ist die Frage. Wer den Wortlaut
+    // braucht, beginnt einen Supportzugriff.
+    if (aktion === "system") {
+      const tage = Math.max(1, Math.min(90, Number(body.tage ?? 7)));
+      const [{ data: cron, error: cFehler }, { data: fehlerliste, error: fFehler }] =
+        await Promise.all([
+          db.rpc("cron_zustand"),
+          db.rpc("fehler_uebersicht", { p_tage: tage }),
+        ]);
+      // Die beiden Funktionen gibt es erst seit fork_55. Fehlen sie, soll
+      // der Bereich trotzdem aufgehen und sagen, was fehlt.
+      return antwort({
+        ok: true, tage,
+        cron: cron || [], cron_fehler: cFehler?.message || null,
+        fehler: fehlerliste || [], fehler_fehler: fFehler?.message || null,
+      });
+    }
+
     // --- Das Protokoll ------------------------------------------------------
     if (aktion === "protokoll") {
       const { data } = await db.from("plattform_protokoll")

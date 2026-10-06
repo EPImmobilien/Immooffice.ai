@@ -371,7 +371,11 @@ zuwachs(bereich, mehr, grund) as (values
      'gilt nicht fuer DELETE, also braucht das Loeschen eine eigene '
      'restriktive Richtlinie; sonst koennte eine Lese-Sitzung alles '
      'loeschen, was sie sehen darf'),
-  ('Funktionen', 3, 'fork_54: support_sitzung, mandant_id_schreiben, registrierung_offen')
+  ('Funktionen', 3, 'fork_54: support_sitzung, mandant_id_schreiben, registrierung_offen'),
+
+  -- fork_55: der Systemzustand fuer den Betreiber.
+  ('Funktionen', 2, 'fork_55: cron_zustand und fehler_uebersicht — beide fuer '
+     'anon und authenticated gesperrt, erreichbar nur ueber plattform-admin')
 ),
 soll(bereich, soll) as (
   select v.bereich,

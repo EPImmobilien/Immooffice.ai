@@ -610,6 +610,88 @@
         + "und rechtlich das Richtige."));
   }
 
+  // --- Systemzustand ----------------------------------------------------------
+  function System(p) {
+    var d = p.daten;
+    if (!d) return E("div", { style: { color: CI.muted } }, "Lade Systemzustand …");
+    var cron = d.cron || [];
+    var kaputt = cron.filter(function (j) { return Number(j.fehler_24h) > 0; });
+    var still = cron.filter(function (j) {
+      return j.aktiv && Number(j.laeufe_24h) === 0;
+    });
+    return E("div", null,
+      E("div", { style: { display: "grid", gap: 14,
+        gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", marginBottom: 18 } },
+        [
+          ["Zeitplan-Jobs", zahl(cron.length), "angelegt"],
+          ["Mit Fehlern (24 h)", zahl(kaputt.length),
+            kaputt.length ? "nachsehen" : "nichts zu tun"],
+          ["Still (24 h)", zahl(still.length),
+            "aktiv, aber kein Lauf — kann richtig sein, wenn der Takt länger ist"],
+          ["Oberflächenfehler", zahl((d.fehler || []).reduce(function (a, f) {
+            return a + Number(f.anzahl || 0); }, 0)), "in " + zahl(d.tage) + " Tagen"],
+        ].map(function (k, i) {
+          return E("div", { key: i, style: kasten },
+            E("div", { style: { fontSize: 11, color: CI.muted, letterSpacing: "0.06em", textTransform: "uppercase" } }, k[0]),
+            E("div", { style: { fontSize: 26, fontWeight: 700, color: CI.blau, margin: "6px 0 4px" } }, k[1]),
+            E("div", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.5 } }, k[2]));
+        })),
+
+      E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+        E("div", { style: { padding: "16px 18px 0" } }, Ueberschrift("Zeitplan-Jobs")),
+        d.cron_fehler
+          ? E("div", { style: { padding: "0 18px 16px", fontSize: 13, color: CI.danger } },
+              d.cron_fehler)
+          : E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 700 } },
+              E("thead", null, E("tr", null, ["Job", "Takt", "Aktiv", "Letzter Lauf", "Ausgang", "Läufe 24 h", "Fehler 24 h"]
+                .map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
+              E("tbody", null, cron.map(function (j) {
+                var schlimm = Number(j.fehler_24h) > 0;
+                return E("tr", { key: j.jobname },
+                  E("td", { style: zelle }, j.jobname),
+                  E("td", { style: Object.assign({}, zelle, { fontFamily: "ui-monospace, monospace", fontSize: 11.5 }) }, j.zeitplan),
+                  E("td", { style: zelle }, j.aktiv ? "ja" : "nein"),
+                  E("td", { style: zelle }, j.letzter_lauf ? zeit(j.letzter_lauf) : "—"),
+                  E("td", { style: Object.assign({}, zelle, {
+                    color: j.letzter_stand === "succeeded" ? CI.success
+                      : j.letzter_stand ? CI.danger : CI.muted,
+                  }) }, j.letzter_stand || "—"),
+                  E("td", { style: zelle }, zahl(j.laeufe_24h)),
+                  E("td", { style: Object.assign({}, zelle, {
+                    color: schlimm ? CI.danger : CI.muted,
+                    fontWeight: schlimm ? 700 : 400,
+                  }) }, zahl(j.fehler_24h)));
+              })))),
+
+      E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+        E("div", { style: { padding: "16px 18px 0" } },
+          Ueberschrift("Oberflächenfehler der letzten " + zahl(d.tage) + " Tage")),
+        d.fehler_fehler
+          ? E("div", { style: { padding: "0 18px 16px", fontSize: 13, color: CI.danger } },
+              d.fehler_fehler)
+          : !(d.fehler || []).length
+            ? E("div", { style: { padding: "0 18px 16px", fontSize: 13, color: CI.muted } },
+                "Nichts gemeldet.")
+            : E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 700 } },
+                E("thead", null, E("tr", null, ["Haus", "Schlüssel", "Quelle", "Anzahl", "Offen", "Zuletzt"]
+                  .map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
+                E("tbody", null, d.fehler.map(function (f, i) {
+                  return E("tr", { key: i },
+                    E("td", { style: zelle }, f.mandant_name || "—"),
+                    E("td", { style: Object.assign({}, zelle, { fontFamily: "ui-monospace, monospace", fontSize: 11.5 }) },
+                      f.schluessel),
+                    E("td", { style: Object.assign({}, zelle, { fontSize: 11.5, color: CI.muted }) }, f.quelle),
+                    E("td", { style: zelle }, zahl(f.anzahl)),
+                    E("td", { style: zelle }, zahl(f.offen)),
+                    E("td", { style: zelle }, zeit(f.zuletzt)));
+                })))),
+      E("p", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.7 } },
+        "Der Wortlaut einer Fehlermeldung und ihre Stapelspur stehen hier "
+        + "NICHT: dort steht, woran ein Kunde gerade gearbeitet hat. Wer ihn "
+        + "braucht, beginnt beim betroffenen Haus einen Supportzugriff — "
+        + "befristet, begründet und für den Kunden nachlesbar."));
+  }
+
   // --- Protokoll -------------------------------------------------------------
   function Protokoll(p) {
     if (!p.daten) return E("div", { style: { color: CI.muted } }, "Lade Protokoll …");
@@ -645,6 +727,7 @@
         : welcher === "mandanten" ? "mandanten"
         : welcher === "katalog" ? "katalog"
         : welcher === "konten" ? "nutzer"
+        : welcher === "system" ? "system"
         : welcher === "mandant" ? "mandant" : "protokoll";
       ruf(aktion, welcher === "mandant" ? { mandant_id: id } : null).then(function (d) {
         var n = {};
@@ -680,7 +763,8 @@
     }
 
     var reiterListe = [["zahlen", "Zahlen"], ["mandanten", "Mandanten"],
-      ["konten", "Konten"], ["katalog", "Katalog"], ["protokoll", "Protokoll"]];
+      ["konten", "Konten"], ["katalog", "Katalog"], ["system", "System"],
+      ["protokoll", "Protokoll"]];
 
     return E("div", null,
       // Ein laufender Supportzugriff muss sichtbar sein, immer. Wer vergisst,
@@ -731,6 +815,7 @@
             neuLaden: function () { laden("konten"); } })
         : reiter === "katalog" ? E(Katalog, { daten: daten.katalog, melden: melden,
             neuLaden: function () { laden("katalog"); } })
+        : reiter === "system" ? E(System, { daten: daten.system })
         : E(Protokoll, { daten: daten.protokoll }));
   }
 
