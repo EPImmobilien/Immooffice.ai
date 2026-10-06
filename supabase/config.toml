@@ -372,6 +372,11 @@ verify_jwt = true
 [functions.expose-sofortversand]
 verify_jwt = true
 
+# Stilanalyse: immer angemeldet. Die Einwilligung gehoert der Person, und
+# die Funktion arbeitet ausschliesslich auf deren eigenen Mails.
+[functions.mail-stil-lernen]
+verify_jwt = true
+
 [functions.postfach-anbieter-start]
 verify_jwt = true
 

@@ -80,7 +80,7 @@ const FONT_MONTSERRAT_BOLD    = "fonts/Montserrat-Bold.ttf";
 const FONT_MARCELLUS          = "fonts/Marcellus-Regular.ttf";
 const FONT_SCHREIBSCHRIFT     = "fonts/GreatVibes-Regular.ttf";
 const LOGO_PFAD               = "logo.png";
-const MAKLER_SIGNATUR_PFADE   = ["unterschrift-lasse.png", "unterschrift.png"];
+const MAKLER_SIGNATUR_PFADE   = ["unterschrift.png"];
 
 const CI = {
   // Hier standen bis zum 28.09.2026 rgb(0.149, 0.192, 0.349) und

@@ -490,6 +490,17 @@ else
   fehler=1
 fi
 
+abschnitt "Schreibstil und Antwort-Absichten"
+# Die Schwaerzung ist die eine Stelle, an der entschieden wird, was den
+# Server Richtung KI-Anbieter verlaesst. Rutscht dort eine Nummer durch,
+# merkt es niemand — einem Stilprofil sieht man nicht an, woraus es
+# entstanden ist. Also Zeile fuer Zeile.
+if node tests/mail-stil.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Exposé-Sofortversand"
 # Der erste Automatismus, der ohne Zuschauer Post an Fremde schickt. Was
 # dabei schiefgeht, merkt der Interessent und nicht der Makler. Die Funktion

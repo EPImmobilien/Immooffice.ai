@@ -295,7 +295,20 @@ zuwachs(bereich, mehr, grund) as (values
   ('Fremdschluessel', 5, 'fork_45: auf mandanten, immobilien, kontakte, '
      'expose_freigaben und mail_eingang'),
   ('Indizes ohne Constraint', 3, 'fork_45: mandant_id, Sperrfrist, Tageslimit'),
-  ('Richtlinien', 2, 'fork_45: Lesen im Haus und die restriktive Mandantentrennung')
+  ('Richtlinien', 2, 'fork_45: Lesen im Haus und die restriktive Mandantentrennung'),
+
+  -- fork_46: Schreibstil aus den eigenen Mails, mit Einwilligung.
+  ('Tabellen', 1, 'fork_46: mail_stilprofil — Einwilligung und abgeleiteter Stil'),
+  ('Tabellen mit RLS', 1, 'fork_46: mail_stilprofil'),
+  ('Spalten', 15, 'fork_46: mail_stilprofil: id, mandant_id, benutzer_id, '
+     'einwilligung_am, einwilligung_text, widerrufen_am, profil_text, '
+     'mails_ausgewertet, zeitraum_von, zeitraum_bis, gelernt_am, modell, '
+     'fehler_text, created_at, updated_at'),
+  ('Primaer- und Eindeutigkeitsschluessel', 2,
+     'fork_46: mail_stilprofil Primaerschluessel und benutzer_id eindeutig'),
+  ('Fremdschluessel', 2, 'fork_46: mail_stilprofil auf mandanten und profiles'),
+  ('Indizes ohne Constraint', 1, 'fork_46: mandant_id'),
+  ('Richtlinien', 2, 'fork_46: eigenes Profil und die restriktive Mandantentrennung')
 ),
 soll(bereich, soll) as (
   select v.bereich,

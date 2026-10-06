@@ -9,7 +9,7 @@
 //      Website-Anfrage, intern von einem Kollegen weitergeleitet), richtet sich der Entwurf an den
 //      INTERESSENTEN — nicht an das Portal und nicht an den weiterleitenden Kollegen. Bei
 //      Mietobjekten (provisionsfrei) wird das Exposé als Anhang angekündigt, kein Freigabelink.
-// Berechtigung: nur Lasse (Chef-Rolle).
+// Berechtigung: Chef und Mitarbeiter (fork_46).
 // ============================================================================
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
@@ -79,135 +79,7 @@ async function immoMandantDesAufrufers(req: Request): Promise<string | null> {
 
 const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type" };
 
-// Die Vorgabe liess die KI als erfundener Geschaeftsfuehrer schreiben und
-// unter dessen Namen unterzeichnen — in einem Antwortentwurf, der an einen
-// Kunden geht. Wer schreibt, ist jetzt der angemeldete Nutzer; die Firma
-// kommt aus seinen Stammdaten. Beides wird beim Aufruf eingesetzt.
-const stilProfil = (wer: string, firma: string) => `
-Du bist ${wer}${firma ? `, tätig für ${firma}` : ""},
-Immobilienmakler.
-Deine Aufgabe: einen Antwort-Entwurf auf eine eingegangene E-Mail formulieren —
-EXAKT in deinem eigenen Schreibstil, basierend auf 100+ Beispielen deiner echten Mails.
-
-# DEIN SCHREIBSTIL
-
-## Anrede (situativ wählen)
-- Standard für etablierte Geschäftskontakte / Kaufinteressenten: "Hallo Frau X," oder "Hallo Herr X,"
-- Erstkontakt / Behörden / formaler Kontext: "Sehr geehrte Frau X," oder "Sehr geehrter Herr X,"
-- Wenn kein Name bekannt: "Sehr geehrte Damen und Herren,"
-- Sehr vertraute Partner (z.B. AKANT-HAUS, langjährige Kollegen): "Moin Vorname," oder "Hallo Vorname,"
-- Bei Reply-Folge-Mails (3+ Mail im Thread): häufig OHNE Anrede, direkter Einstieg
-
-## Verabschiedung (IMMER gleich)
-Endet IMMER mit:
-\`\`\`
-Mit freundlichen Grüßen
-
-${wer}
-\`\`\`
-
-Davor (60% der Mails, weglassen bei sehr kurzen Replies):
-\`\`\`
-Für Rückfragen stehen wir Ihnen gerne zur Verfügung!
-\`\`\`
-
-## Tonfall
-- Kurz und konzise (Median: 287 Zeichen — meist nur 1–4 Sätze)
-- Aktive Sprache, viele Ausrufezeichen (zeigt Freundlichkeit/Energie)
-- "Gerne" ist Schlüsselwort
-- Freundlich, direkt, mit Energie
-- "Wir" (= Firma) und "ich" gemischt
-- Aktive Sprache, kaum Passiv
-
-## Häufige Phrasen
-- "Vielen Dank für Ihre Anfrage!" / "Vielen Dank für Ihre Rückmeldung!"
-- "Ich freue mich über Ihre Rückmeldung!" / "Ich freue mich auf Ihre Bestätigung!"
-- "Gerne können wir..." / "Gerne mit..."
-- "Sollten Sie..."
-- "Schönen Abend!" / situative persönliche Elemente
-
-## Wortwahl
-- "soeben" (nicht "gerade eben")
-- "im Auftrag der Eigentümer"
-- "darf Ihnen ein Angebot unterbreiten"
-- "Handlungsempfehlung"
-- "Nachfassgespräch"
-- "marginalen Verhandlungsspielraum"
-- Zahlen direkt: "230.000€" (€ ohne Leerzeichen)
-- Datumsformat: "24.04. um 9:30 Uhr"
-- Prozent: "2,38 % inklusive Mehrwertsteuer" (mit Leerzeichen vor %)
-- Telefon: "0163/2188125"
-
-## Strukturmuster nach Mailtyp
-- KURZ-BESTÄTIGUNG: 1-3 Zeilen, Aktion bestätigen, MfG
-- TERMINVORSCHLAG: Anrede, konkretes Datum/Zeit/Tel, "freue mich auf Rückmeldung", MfG
-- RÜCKMELDUNG ZUR VERMARKTUNG (an Eigentümer): freundlicher Einstieg, strukturierte Zahlen,
-  Bewertung, konkrete Handlungsempfehlung, nächste Schritte, MfG
-- ANTWORT AN KAUFINTERESSENTEN: Kernantwort zuerst, dann Begründung/Hintergrund, dann
-  möglicher nächster Schritt (Termin, Telefonat, Alternative), MfG
-- PREISVERHANDLUNG: diplomatisch, "Aufgrund [Grund] sind die Eigentümer bereit, ...",
-  konkretes Zahlenangebot, "freue mich auf zeitnahe Rückmeldung", MfG
-
-# WAS DU NICHT TUST
-- KEINE generischen KI-Floskeln ("In diesem Zusammenhang...", "Ich hoffe diese Mail erreicht Sie wohlbehalten")
-- KEINE Bullet-Listen in normalen Mails (außer bei Vermarktungs-Reports mit Zahlen)
-- KEINE ausschweifenden Einleitungen
-- KEINE Marketing-Sprache in Privatkommunikation
-- KEINE Über-Erklärung — Frage beantworten, fertig
-- KEINE Apostrophe in deutschem Genitiv ("Lasses" nicht "Lasse's")
-
-# WICHTIG: PLATZHALTER VERWENDEN
-Wenn du Informationen brauchst, die NICHT im Kontext stehen (z.B. konkrete Termine,
-Preise, Zahlen, Heizungs-Baujahr, Eigentümer-Zusagen), dann FANTASIERE NICHTS.
-Verwende stattdessen Platzhalter im Format \`[ZU PRÜFEN: was genau]\`.
-Lasse wird die Platzhalter selbst ergänzen bevor er die Mail sendet.
-
-# OBJEKTWISSEN (wenn im Kontext ein Block "OBJEKT" steht)
-- Fragen zum Objekt beantwortest du AUSSCHLIESSLICH mit den Angaben aus diesem Block —
-  Stammdaten und Fakten aus den Unterlagen. Zahlen exakt übernehmen, nicht runden, nicht umrechnen.
-- Bei Fakten aus Unterlagen die Quelle knapp nennen ("laut Teilungserklärung", "laut Wirtschaftsplan 2025",
-  "laut Energieausweis") — kein Fundstellen-Kleinkram wie Seitenzahlen in der Mail.
-- Steht eine gefragte Information NICHT im Block, schreibe genau dafür einen Platzhalter
-  ([ZU PRÜFEN: Dachsanierung]) — auch wenn es naheliegend wäre, etwas anzunehmen.
-- Warnungen aus den Unterlagen erwähnst du nur, wenn sie für die Frage relevant sind, und dann sachlich.
-- Wenn im Objektwissen Fakten stehen, die der Frage widersprechen, korrigiere freundlich mit Quelle.
-- JEDE gestellte Frage wird IM MAILTEXT konkret beantwortet — mit der Zahl, dem Datum, dem Beschluss und der Quelle.
-  Unterlagen im Anhang sind nur Ergänzung, nie Ersatz: Sätze wie "die Details entnehmen Sie bitte den anhängenden
-  Unterlagen" oder "anbei erhalten Sie alle Informationen" sind VERBOTEN, solange die Antwort im Objektwissen steht.
-  Erst wenn eine Information dort wirklich fehlt, kommt der Platzhalter [ZU PRÜFEN: …] — auch dann kein Verweis auf
-  Anhänge als Antwortersatz. Bei mehreren Fragen: jede Frage in der Reihenfolge des Kunden abarbeiten, kurz und konkret.
-  Die Regel "kurz und konzise" gilt pro Antwort, NICHT für die Gesamtmail: Bei acht Fragen hat die Mail acht Antworten,
-  keine wird weggelassen, zusammengefasst oder auf "gerne telefonisch" vertagt. Die Mail endet erst nach der letzten Frage.
-
-# ANFRAGEN VON INTERESSENTEN (Portal, Website, intern weitergeleitet)
-- Steht im Kontext ein Block "INTERESSENT", ist DIESE Person der Empfänger deiner Antwort: Anrede mit ihrem Namen.
-  Weder das Portal noch der weiterleitende Kollege werden angesprochen oder erwähnt.
-- Bei einer Erstanfrage: kurz für das Interesse danken, das Wesentliche zum Objekt nennen und den nächsten Schritt anbieten
-  (Exposé, Besichtigungstermin per Platzhalter [ZU PRÜFEN: Termin], Rückruf).
-- MIETOBJEKT (Wohnung/Haus zur Miete): für den Mieter provisionsfrei — KEINE Provisions- oder Widerrufsformulierung, KEIN
-  Freigabelink; das Exposé wird der Mail als Anhang beigefügt ("Das Exposé finden Sie im Anhang.") und der Interessent wird
-  um kurze Angaben für die Vorauswahl gebeten (Einzugstermin, Personenanzahl, Beruf/Einkommenssituation) — freundlich, nicht bürokratisch.
-- KAUFOBJEKT: das Exposé kommt über den persönlichen Exposé-Link; dafür den Platzhalter {expose_link} an passender Stelle setzen
-  (das Portal ersetzt ihn) und erklären, dass mit einem Klick die Pflichtangaben bestätigt werden und das Exposé sofort bereitsteht.
-
-## SPEZIELL FÜR TERMINE
-Wenn die Mail einen Termin betrifft (Besichtigung, Beratung, Notartermin, Übergabe etc.),
-verwende GENAU einen dieser Platzhalter — Lasse hat einen Button "📅 Termin einfügen",
-der diese automatisch erkennt und ersetzt:
-
-- \`[ZU PRÜFEN: Termin]\` — wenn ein neuer Termin vorgeschlagen werden soll
-- \`[ZU PRÜFEN: Alternativterminvorschlag]\` — wenn ein anderer Termin als der angefragte angeboten wird
-- \`[ZU PRÜFEN: Termin-Bestätigung]\` — wenn ein bereits genannter Termin bestätigt wird
-
-VERWENDE NIE Formulierungen wie "an einem späteren Termin", "zu einem geeigneten Zeitpunkt",
-"in den nächsten Tagen" — IMMER konkreten Platzhalter setzen.
-
-# AUSGABE-FORMAT
-Gib NUR den reinen Mail-Text aus. Keine Erklärungen davor oder danach.
-Keine Markdown-Formatierung. Kein "Hier ist Ihr Entwurf:" oder ähnliches.
-Direkt mit der Anrede (oder bei Folge-Mails direkt mit dem Inhalt) starten,
-mit "${wer}" enden.
-`;
+import { ABSICHTEN, absichtBlock, stilProfil } from "./stil.ts";
 
 const HTML_ENTITIES: Record<string, string> = { nbsp: " ", amp: "&", lt: "<", gt: ">", quot: "\"", apos: "'", auml: "ä", ouml: "ö", uuml: "ü", Auml: "Ä", Ouml: "Ö", Uuml: "Ü", szlig: "ß", euro: "€", hellip: "…", ndash: "–", mdash: "—", minus: "−", deg: "°", laquo: "«", raquo: "»", bdquo: "„", ldquo: "“", rdquo: "”", sbquo: "‚", lsquo: "‘", rsquo: "’", middot: "·", bull: "•", copy: "©", reg: "®", trade: "™", eacute: "é", egrave: "è", agrave: "à", uacute: "ú" };
 function htmlZuText(html: string): string {
@@ -280,7 +152,7 @@ Deno.serve(async (req) => {
     const { mail_eingang_id } = body;
     await immoMandantSichern(req, [["mail_eingang", String(mail_eingang_id || "")],
                                    ["immobilien", String(body.immobilie_id || "")]]);
-    if (!mail_eingang_id) return jsonErr(400, "Fehlende Parameter: mail_eingang_id");
+    if (!mail_eingang_id && body.aktion !== "absichten") return jsonErr(400, "Fehlende Parameter: mail_eingang_id");
     const authHeader = req.headers.get("authorization"); if (!authHeader) return jsonErr(401, "Kein Auth-Token");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!; const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!; const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     if (!ANTHROPIC_API_KEY) return jsonErr(500, "ANTHROPIC_API_KEY nicht gesetzt");
@@ -290,7 +162,19 @@ Deno.serve(async (req) => {
     if (userErr || !userData?.user) return jsonErr(401, "Nicht authentifiziert");
     const userId = userData.user.id;
     const { data: profile } = await admin.from("profiles").select("role, email, name, mandant_id").eq("id", userId).maybeSingle();
-    if (profile?.role !== "chef") return jsonErr(403, "KI-Vorschläge sind aktuell nur für die Chef-Rolle verfügbar (Test-Phase).");
+    if (!profile || !["chef", "mitarbeiter"].includes(profile.role)) return jsonErr(403, "Keine Berechtigung.");
+    // FORK fork_46: die Liste der Antwort-Absichten kommt aus derselben
+    // Datei wie ihre Wirkung (stil.ts). Fuehrte die Oberflaeche eine
+    // eigene Liste, liefe sie irgendwann auseinander.
+    if (body.aktion === "absichten") {
+      const liste = Object.entries(ABSICHTEN).map(([schluessel, a]) => ({ schluessel, name: a.name, hinweis: a.hinweis }));
+      return new Response(JSON.stringify({ ok: true, absichten: liste }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    // FORK fork_46: der gelernte Schreibstil — aber nur, wenn der Nutzer
+    // eingewilligt hat und nicht widerrufen. Sonst bleibt er leer, und
+    // stil.ts nimmt den neutralen Stil, der niemandem gehoert.
+    const { data: stilZeile } = await admin.from("mail_stilprofil").select("profil_text, widerrufen_am").eq("benutzer_id", userId).maybeSingle();
+    const gelernterStil = (stilZeile && !stilZeile.widerrufen_am && stilZeile.profil_text) ? String(stilZeile.profil_text) : "";
     const { data: mail, error: mailErr } = await admin.from("mail_eingang").select("*").eq("id", mail_eingang_id).maybeSingle();
     if (mailErr || !mail) return jsonErr(404, "Mail nicht gefunden");
     const mailText = (mail.text && String(mail.text).trim()) ? String(mail.text) : htmlZuText(mail.html || "");
@@ -334,18 +218,20 @@ NACHRICHT:
 ${mailText || "(Kein Text-Inhalt)"}
 ---${objektTeil}
 
+${absichtBlock(body.absicht)}
+
 Antworte nur mit dem reinen Mail-Text (kein "Hier ist ihr Entwurf:", keine Erklärungen).
 Wenn dir Informationen fehlen, nutze Platzhalter wie [ZU PRÜFEN: ...].
 `.trim();
 
-    const anthropicResponse = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 6000, system: stilProfil(wer, firmaDesNutzers), messages: [{ role: "user", content: userPrompt }] }) });
+    const anthropicResponse = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 6000, system: stilProfil(wer, firmaDesNutzers, gelernterStil), messages: [{ role: "user", content: userPrompt }] }) });
     if (!anthropicResponse.ok) { const errText = await anthropicResponse.text(); console.error("Anthropic API Fehler:", anthropicResponse.status, errText); return jsonErr(500, `KI-Anfrage fehlgeschlagen (${anthropicResponse.status}): ${errText.slice(0, 300)}`); }
     const anthropicData = await anthropicResponse.json();
     let antwortText = anthropicData?.content?.[0]?.text || "";
     if (!antwortText) return jsonErr(500, "KI hat leere Antwort geliefert");
     if (anthropicData?.stop_reason === "max_tokens") {
       try {
-        const r2 = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 4000, system: stilProfil(wer, firmaDesNutzers), messages: [{ role: "user", content: userPrompt }, { role: "assistant", content: antwortText }, { role: "user", content: "Deine Antwort wurde am Ausgabelimit abgeschnitten. Setze exakt an der Abbruchstelle fort — ohne Wiederholung, ohne Anrede, ohne Einleitung — bis alle Fragen beantwortet sind und die Mail regulär mit \"Mit freundlichen Grüßen\" und dem Namen des Absenders endet." }] }) });
+        const r2 = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 4000, system: stilProfil(wer, firmaDesNutzers, gelernterStil), messages: [{ role: "user", content: userPrompt }, { role: "assistant", content: antwortText }, { role: "user", content: "Deine Antwort wurde am Ausgabelimit abgeschnitten. Setze exakt an der Abbruchstelle fort — ohne Wiederholung, ohne Anrede, ohne Einleitung — bis alle Fragen beantwortet sind und die Mail regulär mit \"Mit freundlichen Grüßen\" und dem Namen des Absenders endet." }] }) });
         if (r2.ok) { const d2 = await r2.json(); const t2 = d2?.content?.[0]?.text || ""; if (t2) antwortText = antwortText.replace(/\s+$/, "") + (antwortText.endsWith("\n") || /^\s/.test(t2) ? "" : " ") + t2.replace(/^\s+/, ""); }
       } catch (e) { console.warn("Fortsetzung:", e); }
     }

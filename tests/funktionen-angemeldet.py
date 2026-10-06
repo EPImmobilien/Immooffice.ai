@@ -50,6 +50,14 @@ ABGESICHERT = {
         'Positionen und Betraegen.'),
     'mail-gelesen-setzen': ('immoMandantSichern',
         'Fremde Mails als gelesen markieren.'),
+    'mail-stil-lernen': ('eq("benutzer_id", nutzer)',
+        'Arbeitet ausschliesslich auf den eigenen Mails und dem eigenen '
+        'Stilprofil des Angemeldeten: jede Abfrage haengt an seiner '
+        'Benutzerkennung aus dem Token, keine einzige an einer Kennung aus '
+        'dem Anfragekoerper. Es gibt damit nichts, worueber die '
+        'Mandantengrenze ueberschritten werden koennte — die Einwilligung '
+        'gehoert der Person, und die RLS-Richtlinie auf mail_stilprofil '
+        'laesst ohnehin nur benutzer_id = auth.uid() zu.'),
     'expose-sofortversand': ('mandant_sichern',
         'Sendet das Exposé an eine Adresse aus dem Anfragekoerper. Ohne '
         'Pruefung haette ein angemeldeter Makler das Exposé eines fremden '

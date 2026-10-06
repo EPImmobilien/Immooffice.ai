@@ -56,8 +56,28 @@ STAMM="$(printf %s 'dijDtnxcXHUwMGY2fG9lKWdlbnRlaWNofEhSQjE2NTk4fERFMzcwMTAwMDc4
 # Dokumenterzeugung; die ist seither auf markierte Stellen umgestellt, und
 # damit duerfen sie hier stehen, ohne das Gate rot zu faerben.
 ORTE="$(printf %s 'XGJyb3N0b2NrfFxic2Nod2VyaW58d2FybmVtKMO8fFxcdTAwZmN8dWUpbmRlfFxiMTgwNTVcYnxcYjE4MDU3XGJ8XGIxOTA1NVxifHNhbmRkb3Jud2VnfGtyKMO2fG9lKXBlbGluZXJ8YmFkID9kb2JlcmFufFxiMTgyMDlcYnxcYjE5MzcwXGJ8XGIxOTM4NlxifFxicGFyY2hpbVxifFxicGFzc293XGJ8XGIxODM1NlxifFxiYmFydGhcYnxkb2JiZXJ0aW58ZG9iZXJhbmVy' | base64 -d)"
+# Personenbezogene Kennzeichen — Vorname eines Mitarbeiters in Bezeichnern
+# und Dateinamen, seine Mobilnummer, der Name eines echten Geschaeftspartners.
+#
+# Am 06.10.2026 gefunden, nicht vom Gate: in mail-ki-vorschlag stand ein fest
+# verdrahtetes Stilprofil EINER PERSON der Referenz — ihr Vorname an fuenf
+# Stellen, ihre Mobilnummer, ein Partnername. Jeder Mandant haette in ihrem
+# Stil geschrieben, mit ihrer Telefonnummer im Beispiel. Das Gate sah es
+# nicht, weil auf der Blockliste Firmennamen stehen und keine Vornamen.
+#
+# Der Vorname steht NICHT allein im Muster: "lasse" ist ein gewoehnliches
+# deutsches Verb und faerbte jede zweite Datei rot. Gesucht wird er dort, wo
+# er ein Kennzeichen ist — in Bezeichnern, Dateinamen und neben dem
+# Nachnamen. Kodiert wie STAMM und ORTE.
+PERSONEN="$(printf %s 'dW50ZXJzY2hyaWZ0Wy1fXT9sYXNzZXxTVElMX1BST0ZJTF9MQVNTRXxsYXNzZVsgXy1dP2VuZ2Zlcnxha2FudFstIF0/aGF1c3wwMTYzWyAvLi1dKjIxODgxMjU=' | base64 -d)"
 # Fremdes Supabase-Projekt.
 FREMD='yazwkzzjiquprtjpurur'
+# NICHT GEPRUEFT: Rufnummern allgemein. Ein Muster, das jede deutsche
+# Nummer findet, trifft im Quelltext auch Koordinaten, Zeitstempel,
+# Farbwerte und Beispielnummern — am 06.10.2026 ausprobiert: ueber
+# siebzig Treffer, kein einziger echter. Ein Gate, das man ignoriert, ist
+# kein Gate. Die eine bekannte Nummer steht oben in PERSONEN; der
+# allgemeine Fall ist in docs/OFFEN.md vermerkt.
 # Dienste, die Phase 1.4 des Auftrags ersatzlos streicht. Geprueft wird nur
 # der Code, der sie aufrufen wuerde — Oberflaeche und Edge Functions. NICHT
 # das Schema: Phase 9 verbietet das Entfernen von Tabellen und Spalten, und
@@ -108,6 +128,7 @@ pruefe_genau() {
 
 echo "=== Neutralitaets-Gate ==="
 pruefe "Keine Kennzeichen des Referenzunternehmens" "$MARKEN"
+pruefe "Keine personenbezogenen Kennzeichen der Referenz" "$PERSONEN"
 pruefe "Keine Stammdaten des Referenzunternehmens"  "$STAMM"
 pruefe "Kein Verweis auf das fremde Supabase-Projekt" "$FREMD"
 pruefe_genau "Kein Vorsatz EP_ in Bezeichnern" '\bEP_[A-Z]'

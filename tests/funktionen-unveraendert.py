@@ -231,6 +231,16 @@ BEIGELEGT = {
             'Dieselbe Anbieter-Schicht fuer den Versand. Quelle: '
             'supabase/eigene-beilagen/mail-senden/anbieter.ts.',
     },
+    'mail-ki-vorschlag': {
+        'stil.ts':
+            'Schreibstil und Antwort-Absichten (fork_46). In der Vorlage '
+            'stand hier ein fest verdrahtetes Stilprofil EINER Person des '
+            'Referenzunternehmens — Vorname, Mobilnummer, Partnername. '
+            'Jetzt der gelernte Stil des Nutzers oder ein neutraler, dazu '
+            'die zehn Antwort-Absichten. Quelle: '
+            'supabase/eigene-beilagen/mail-ki-vorschlag/stil.ts; geprueft '
+            'von tests/mail-stil.js.',
+    },
     'expose-pdf-erzeugen': {
         'schriften.mjs':
             'Die zwanzig Exposé-Schnitte, gepackt und base64-kodiert, '

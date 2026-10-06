@@ -1515,6 +1515,29 @@ ERSETZUNGEN = [
      'Akquise-Protokoll: den Mandanten merken, sobald er feststeht.',
      {'akq-lead-eingang'}),
 
+    # =====================================================================
+    # MARKE/FORK fork_46 — der Schreibstil EINER PERSON der Referenz
+    # =====================================================================
+    # In mail-ki-vorschlag stand ein fest verdrahtetes Stilprofil, und zwar
+    # das einer bestimmten Person des Referenzunternehmens: ihr Vorname an
+    # fuenf Stellen, ihre Mobilnummer (0163/...), der Name eines echten
+    # Geschaeftspartners, ihre Lieblingswendungen. Jeder Mandant haette in
+    # ihrem Stil geschrieben, mit ihrer Telefonnummer im Beispiel.
+    #
+    # CLAUDE.md ist eindeutig: "an keiner Stelle ... Ansprechpartner,
+    # Telefonnummer, Beispieldaten". Das Neutralitaets-Gate hat es nicht
+    # gefunden, weil auf der Blockliste Firmennamen stehen und keine
+    # Vornamen — der Befund steht in docs/ENTSCHEIDUNGEN.md.
+    #
+    # Der ganze Block wandert nach supabase/eigene-beilagen/
+    # mail-ki-vorschlag/stil.ts: dort ohne Person, mit dem GELERNTEN Stil
+    # des Nutzers (fork_46, mail-stil-lernen) und mit den Antwort-Absichten.
+    # Was am Block Produktwissen war — Platzhalterregeln, Objektwissen,
+    # Miet-/Kaufobjekt, Termine — ist woertlich mitgegangen.
+    ('MARKE',
+     r'const STIL_PROFIL_LASSE = `[\s\S]*?\n`;\n',
+     'import { ABSICHTEN, absichtBlock, stilProfil } from "./stil.ts";\n',
+     'Stilprofil einer Person der Referenz durch stil.ts ersetzt.'),
 ]
 
 # Drei Funktionen verdrahten die Portal-Adresse fest, statt sie wie alle
@@ -1526,7 +1549,81 @@ ERSETZUNGEN = [
 # STANDORTE["rostock"] ist als Ausdruck eine Zeichenklasse — es wuerde quer
 # durch die Datei einzelne Buchstaben treffen. Genau das ist beim Schreiben
 # dieses Skripts passiert.
+# Funktionen, bei denen eine FORK-Regel bewusst GROSS kuerzt. Ohne Eintrag
+# haelt die Notbremse unten an — und das ist richtig so: eine Regel, die
+# versehentlich halbe Funktionen frisst, sieht von aussen genauso aus.
+KUERZT = {
+    'mail-ki-vorschlag': (-130,
+        'fork_46: das fest verdrahtete Stilprofil einer Person des '
+        'Referenzunternehmens — 125 Zeilen mit Vorname, Mobilnummer und '
+        'dem Namen eines echten Geschaeftspartners — wandert in die '
+        'Beilage stil.ts und wird dort durch den gelernten Stil des '
+        'Nutzers oder einen neutralen ersetzt.'),
+}
+
 NACHBESSERN = [
+    # --- MARKE: der Dateiname traegt den Vornamen einer realen Person -----
+    # MAKLER_SIGNATUR_PFADE sucht erst "unterschrift-lasse.png", dann
+    # "unterschrift.png". Der erste Name ist der einer bestimmten Person des
+    # Referenzunternehmens; CLAUDE.md nennt den DATEINAMEN ausdruecklich als
+    # Kennzeichen, das nirgends erscheinen darf. Im Fork bleibt der zweite —
+    # er ist der allgemeine, und mehr als einen braucht es nicht.
+    ('MARKE',
+     'const MAKLER_SIGNATUR_PFADE   = ["unterschrift-lasse.png", "unterschrift.png"];',
+     'const MAKLER_SIGNATUR_PFADE   = ["unterschrift.png"];',
+     'Signatur-Dateiname ohne den Vornamen einer realen Person: signatur-vorgang-starten.',
+     {'signatur-vorgang-starten'}),
+    # --- FORK fork_46: Antwort-Absichten und gelernter Schreibstil --------
+    # Ansage des Betreibers vom 06.10.2026: „dass wir mit Klick auf den
+    # Button auswaehlen koennen, was fuer eine Antwort verschickt werden
+    # soll. Zum Beispiel eine Zusage, Absage etc."
+    ('FORK',
+     '    if (!mail_eingang_id) return jsonErr(400, "Fehlende Parameter: mail_eingang_id");',
+     '    if (!mail_eingang_id && body.aktion !== "absichten") return jsonErr(400, "Fehlende Parameter: mail_eingang_id");',
+     'Die Liste der Absichten braucht keine Mail: mail-ki-vorschlag.',
+     {'mail-ki-vorschlag'}),
+
+    # Die Rolle: in der Vorlage war der KI-Entwurf auf "chef" beschraenkt —
+    # mit dem Kommentar "nur Lasse (Chef-Rolle)", also auf EINE Person einer
+    # EINEN Firma. Fuer ein mandantenfaehiges Produkt ist das falsch: der
+    # Entwurf ist das Werkzeug des Maklers, nicht ein Vorrecht des Chefs.
+    # Dieselbe Rollenprueung wie ueberall sonst im Haus.
+    ('FORK',
+     '    if (profile?.role !== "chef") return jsonErr(403, "KI-Vorschläge sind aktuell nur für die Chef-Rolle verfügbar (Test-Phase).");',
+     '    if (!profile || !["chef", "mitarbeiter"].includes(profile.role)) return jsonErr(403, "Keine Berechtigung.");\n'
+     '    // FORK fork_46: die Liste der Antwort-Absichten kommt aus derselben\n'
+     '    // Datei wie ihre Wirkung (stil.ts). Fuehrte die Oberflaeche eine\n'
+     '    // eigene Liste, liefe sie irgendwann auseinander.\n'
+     '    if (body.aktion === "absichten") {\n'
+     '      const liste = Object.entries(ABSICHTEN).map(([schluessel, a]) => ({ schluessel, name: a.name, hinweis: a.hinweis }));\n'
+     '      return new Response(JSON.stringify({ ok: true, absichten: liste }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });\n'
+     '    }\n'
+     '    // FORK fork_46: der gelernte Schreibstil — aber nur, wenn der Nutzer\n'
+     '    // eingewilligt hat und nicht widerrufen. Sonst bleibt er leer, und\n'
+     '    // stil.ts nimmt den neutralen Stil, der niemandem gehoert.\n'
+     '    const { data: stilZeile } = await admin.from("mail_stilprofil").select("profil_text, widerrufen_am").eq("benutzer_id", userId).maybeSingle();\n'
+     '    const gelernterStil = (stilZeile && !stilZeile.widerrufen_am && stilZeile.profil_text) ? String(stilZeile.profil_text) : "";',
+     'Rolle wie ueberall, Absichtenliste und gelernter Stil: mail-ki-vorschlag.',
+     {'mail-ki-vorschlag'}),
+
+    # Der gelernte Stil geht in den Auftrag. Beide Aufrufe — der zweite ist
+    # die Fortsetzung, wenn die Antwort am Ausgabelimit abgeschnitten wurde,
+    # und ein anderer Stil mitten in der Mail waere sichtbar.
+    # Die gewaehlte Absicht geht in den Auftrag.
+    ('FORK',
+     'Antworte nur mit dem reinen Mail-Text (kein "Hier ist ihr Entwurf:", keine Erklärungen).',
+     '${absichtBlock(body.absicht)}\n'
+     '\n'
+     'Antworte nur mit dem reinen Mail-Text (kein "Hier ist ihr Entwurf:", keine Erklärungen).',
+     'Die gewaehlte Antwort-Absicht geht in den Auftrag: mail-ki-vorschlag.',
+     {'mail-ki-vorschlag'}),
+
+    # Der Kommentar im Kopf nennt die Person ebenfalls.
+    ('MARKE',
+     '// Berechtigung: nur Lasse (Chef-Rolle).',
+     '// Berechtigung: Chef und Mitarbeiter (fork_46).',
+     'Person der Referenz aus dem Kopfkommentar: mail-ki-vorschlag.',
+     {'mail-ki-vorschlag'}),
     # =====================================================================
     # FORK fork_45 — Exposé-Sofortversand
     # =====================================================================
@@ -3925,11 +4022,6 @@ NACHBESSERN = [
      {'generate-text'}),
 
     ('FORK',
-     'const STIL_PROFIL_LASSE = `\nDu bist Lasse Musterhaus, Geschäftsführer von Musterhaus Immobilien GmbH,\nSachverständiger für Immobilienbewertung (Bewertungsdienst) und Makler.',
-     '// Die Vorgabe liess die KI als erfundener Geschaeftsfuehrer schreiben und\n// unter dessen Namen unterzeichnen — in einem Antwortentwurf, der an einen\n// Kunden geht. Wer schreibt, ist jetzt der angemeldete Nutzer; die Firma\n// kommt aus seinen Stammdaten. Beides wird beim Aufruf eingesetzt.\nconst stilProfil = (wer: string, firma: string) => `\nDu bist ${wer}${firma ? `, tätig für ${firma}` : ""},\nImmobilienmakler.',
-     'Mail-Vorschlag: die KI schreibt als der angemeldete Nutzer.',
-     {'mail-ki-vorschlag'}),
-    ('FORK',
      'Mit freundlichen Grüßen\n\nLasse Musterhaus\n',
      'Mit freundlichen Grüßen\n\n${wer}\n',
      'Mail-Vorschlag: die Unterschrift ist die des Nutzers.',
@@ -3946,12 +4038,12 @@ NACHBESSERN = [
      {'mail-ki-vorschlag'}),
     ('FORK',
      'system: STIL_PROFIL_LASSE, messages: [{ role: "user", content: userPrompt }] })',
-     'system: stilProfil(wer, firmaDesNutzers), messages: [{ role: "user", content: userPrompt }] })',
+     'system: stilProfil(wer, firmaDesNutzers, gelernterStil), messages: [{ role: "user", content: userPrompt }] })',
      'Mail-Vorschlag: die Vorgabe wird mit Nutzer und Firma gebaut.',
      {'mail-ki-vorschlag'}),
     ('FORK',
      'system: STIL_PROFIL_LASSE, messages: [{ role: "user", content: userPrompt }, { role: "assistant", content: antwortText }',
-     'system: stilProfil(wer, firmaDesNutzers), messages: [{ role: "user", content: userPrompt }, { role: "assistant", content: antwortText }',
+     'system: stilProfil(wer, firmaDesNutzers, gelernterStil), messages: [{ role: "user", content: userPrompt }, { role: "assistant", content: antwortText }',
      'Mail-Vorschlag: auch die Fortsetzung.',
      {'mail-ki-vorschlag'}),
     ('FORK',
@@ -4175,7 +4267,14 @@ def main():
             # +144 angehalten und damit genau getan, wozu sie da ist — die
             # Zahl war gewollt, also steigt die Grenze, nicht die Toleranz.
             zeilen_delta = inhalt.count('\n') - zeilen_vorher
+            # 06.10.2026: nach unten ist der Rahmen eng, und das soll so
+            # bleiben — eine Regel, die versehentlich halbe Funktionen
+            # frisst, faellt sonst nicht auf. Wo bewusst gross gekuerzt
+            # wird, steht es in KUERZT, mit Grund. Eine Ausnahme mit
+            # Begruendung ist etwas anderes als eine gelockerte Grenze.
             unten, oben = (-2, 170) if erweitert else (-2, 0)
+            if erweitert and ordner.name in KUERZT:
+                unten = KUERZT[ordner.name][0]
             if not unten <= zeilen_delta <= oben:
                 sys.exit(f'ABBRUCH: {datei} hat {zeilen_delta:+d} Zeilen '
                          f'(erlaubt: {unten} bis {oben}). '

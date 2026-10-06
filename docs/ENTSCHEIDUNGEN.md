@@ -4968,3 +4968,103 @@ ausgerollt worden.
 um mehr als 200 Zeilen vom eingecheckten Stand abweicht. Verhindern kann es
 nichts: ob der eingecheckte oder der erzeugte Stand der richtige ist, weiß
 das Skript nicht. Aber es sagt es, statt es stillschweigend zu tun.
+
+## 2026-10-06 · KI-Antworten: Absichten, gelernter Stil — und ein Fund (fork_46)
+
+### Der Fund kommt zuerst, weil er schwer wiegt
+
+In `mail-ki-vorschlag` stand ein fest verdrahtetes Stilprofil — und zwar das
+**einer bestimmten Person des Referenzunternehmens**: ihr Vorname an fünf
+Stellen, ihre Mobilnummer als Beispiel für das Telefonformat, der Name eines
+echten Geschäftspartners als Beispiel für vertraute Anreden, ihre
+Lieblingswendungen. Die Konstante hieß `STIL_PROFIL_LASSE` und begann mit
+„Du bist \<Vorname Nachname\>, Geschäftsführer von \<Firma\> in \<Stadt\>".
+
+**Jeder Mandant hätte in ihrem Stil geschrieben, mit ihrer Telefonnummer im
+Beispiel.** Das verstößt gegen die nicht verhandelbare Abgrenzung in
+`CLAUDE.md`: „an keiner Stelle … Ansprechpartner, Telefonnummer,
+Beispieldaten". Dazu ein Dateiname `unterschrift-lasse.png` in
+`signatur-vorgang-starten`.
+
+Warum das Gate es nicht gefunden hat: auf der Blockliste stehen Firmennamen,
+keine Vornamen. Eine bestehende Regel hatte den **Kopf** des Blocks
+neutralisiert (aus der Person wurde „der angemeldete Nutzer") — die
+restlichen 125 Zeilen blieben stehen. Die Regel sah aus, als hätte sie die
+Arbeit getan.
+
+`scripts/neutral.sh` prüft jetzt eine eigene Gruppe **personenbezogener**
+Kennzeichen, kodiert wie die übrigen. Ein allgemeiner Rufnummern-Test wurde
+ausprobiert und wieder verworfen: über siebzig Treffer, kein einziger echter
+— ein Gate, das man ignoriert, ist kein Gate. Vermerkt in `docs/OFFEN.md`.
+
+### Was an die Stelle tritt
+
+**Der eigene Schreibstil, gelernt aus den eigenen Mails** — genau das, was
+der Betreiber am selben Tag angeregt hat. Das ist kein Zusatz, das ist die
+Reparatur: ein Stil, der niemandem gehört, oder der eigene. Kein dritter.
+
+`mail-stil-lernen` liest bis zu 30 selbst versendete Mails, schwärzt sie und
+leitet ein Stilprofil ab. Ohne Einwilligung passiert nichts. Ohne gelerntes
+Profil gilt ein neutraler Geschäftsstil aus
+`supabase/eigene-beilagen/mail-ki-vorschlag/stil.ts`.
+
+### Datenschutz — die Würdigung steht in einem eigenen Dokument
+
+`docs/DATENSCHUTZ-STILANALYSE.md`. Die Punkte, die die Technik trägt:
+
+- **Einwilligung je Nutzer, nicht je Mandant.** Der Chef kann sie nicht für
+  seine Leute erteilen; die RLS-Richtlinie lässt nur
+  `benutzer_id = auth.uid()` zu.
+- **Der Wortlaut wird mitgespeichert**, nicht nur ein Häkchen (Art. 7
+  Abs. 1: Nachweis).
+- **Der Widerruf löscht** das Profil, er merkt es nicht nur vor.
+- **Geschwärzt wird vor der Übermittlung**: Mailadressen, Links,
+  Telefonnummern, Beträge, PLZ+Ort, Anschriften, Datum, Uhrzeit, IBAN, Namen
+  nach Anrede, Objektnummern und jede verbliebene Ziffernfolge ab vier
+  Stellen. Dazu fallen Zitat und Signaturblock weg.
+- **Nur eigene Mails**, keine automatisch erzeugten.
+- **Gespeichert wird nur das Profil**, kein Mailtext.
+
+Die Punkte, die die Technik **nicht** tragen kann und die deshalb beim
+Mandanten bleiben: § 26 BDSG (Freiwilligkeit im Arbeitsverhältnis), § 87
+Abs. 1 Nr. 6 BetrVG (Mitbestimmung), Art. 13/14 (Information der Empfänger),
+der Auftragsverarbeitungsvertrag und die Abwägung nach Art. 6 Abs. 1 lit. f
+für die Daten Dritter. **Es wird nicht behauptet, dass die Verarbeitung
+zulässig ist** — nur, worauf die Umsetzung beruht.
+
+`tests/mail-stil.js` prüft die Schwärzung Zeile für Zeile: 59 Prüfungen,
+Teil von `npm run check`. Sie hat beim ersten Lauf einen echten Fehler
+gefunden — die Telefonregel fraß die IBAN an, bevor die IBAN-Regel drankam,
+und eine halb geschwärzte IBAN ist immer noch eine IBAN.
+
+### Antwort-Absichten
+
+Ansage: „dass wir mit Klick auf den Button auswählen können, was für eine
+Antwort verschickt werden soll. Zum Beispiel eine Zusage, Absage etc."
+
+Zwölf Absichten in `stil.ts`: frei antworten · Exposé/Unterlagen senden ·
+Besichtigung vorschlagen · Termin bestätigen · Termin absagen oder
+verschieben · Zusage · Absage weil vergeben · Absage gegen den Interessenten
+· Nachfassen · Rückfrage · Eigentümer-Bericht · auf ein Preisangebot
+reagieren.
+
+Zwei davon tragen eine Regel, die mehr ist als Formulierung:
+
+- **Die Absage gegen einen Interessenten nennt keinen Grund.** Weder
+  Bonität noch Haushaltsgröße, Herkunft, Beruf oder Alter. Das ist nicht
+  Höflichkeit: eine begründete Absage kann ein Indiz nach dem Allgemeinen
+  Gleichbehandlungsgesetz sein.
+- **Die Zusage sichert nichts zu, was nicht dasteht.** Kein Preis, keine
+  Finanzierung, kein Notartermin, keine Formulierung, die wie eine
+  verbindliche Reservierung klingt. Alles andere wird Platzhalter.
+
+Die Liste kommt über `aktion: "absichten"` aus derselben Datei wie ihre
+Wirkung — führte die Oberfläche eine eigene, liefe sie auseinander.
+
+### Nebenbei: die Rolle
+
+Der KI-Entwurf war auf die Rolle „chef" beschränkt, mit dem Kommentar „nur
+\<Vorname\> (Chef-Rolle)" — also auf **eine Person einer Firma**. Für ein
+mandantenfähiges Produkt ist das falsch: der Entwurf ist das Werkzeug des
+Maklers, nicht ein Vorrecht des Chefs. Jetzt dieselbe Rollenprüfung wie
+überall sonst.

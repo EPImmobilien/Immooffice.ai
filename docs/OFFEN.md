@@ -3,6 +3,34 @@
 Was ohne Verhaltensänderung, ohne fehlende Zugangsdaten oder ohne Netzzugang
 nicht lösbar ist. Nach Auftrag Abschnitt 9.
 
+## Kein allgemeiner Test auf Rufnummern im Quelltext
+
+Am 06.10.2026 stand eine echte Mobilnummer eines Mitarbeiters der Referenz
+im Quelltext (`mail-ki-vorschlag`, siehe `docs/ENTSCHEIDUNGEN.md`). Sie ist
+weg, und das Neutralitäts-Gate sucht sie jetzt — aber nur sie.
+
+Ein **allgemeines** Muster für deutsche Rufnummern wurde ausprobiert und
+wieder verworfen: über siebzig Treffer in `src/` und `supabase/functions/`,
+kein einziger echter. Es trifft Koordinaten, Zeitstempel, Farbwerte,
+Versionsnummern und Beispielnummern. Ein Gate, das man ignoriert, ist kein
+Gate.
+
+Was helfen würde: Rufnummern nur dort suchen, wo ein Schlüsselwort daneben
+steht (`tel`, `telefon`, `mobil`, `fon`), und Platzhalter mit lauter Nullen
+ausnehmen. Das ist machbar, aber es ist eine eigene Runde mit eigener
+Gegenprobe.
+
+## Auftragsverarbeitungsvertrag fehlt
+
+Die Stilanalyse (fork_46) verarbeitet Korrespondenz der Mandanten im
+Auftrag. Dafür braucht es einen Auftragsverarbeitungsvertrag zwischen
+Mandant und Plattform, in dem der KI-Anbieter als Unterauftragsverarbeiter
+benannt ist. Beides gibt es noch nicht. Die vollständige Liste steht in
+`docs/DATENSCHUTZ-STILANALYSE.md`, Abschnitt 8.
+
+Bis dahin bleibt die Funktion das, was sie technisch ist: ausgeschaltet,
+solange niemand einwilligt.
+
 ## Druckdateien der Marke tragen die Farben der Lieferung
 
 `assets/marke/quelle/*.pdf` sind DeviceCMYK-Vektoren in Blau `#263159` und
