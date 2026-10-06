@@ -53,6 +53,15 @@
       }).then(function (buf) {
         var m = window.ImmoExpose.metrikLesen(new Uint8Array(buf), name);
         schriftCache.set(name, m);
+        // Dieselbe Datei auch als Webschrift anmelden: die
+        // Bearbeitungsflaeche malt mit dem Canvas, und das Canvas kennt
+        // nur Schriften, die der Browser geladen hat. Ohne das staende
+        // dort eine Ersatzschrift, und die Rahmen saessen zwar richtig,
+        // die Buchstaben darin aber nicht.
+        if (window.ImmoExposeLeinwand) {
+          try { window.ImmoExposeLeinwand.schriftAnmelden(name, buf.slice(0)); }
+          catch (x) { /* ohne Webschrift bleibt die Vorschau als PDF richtig */ }
+        }
         return [name, m];
       });
     })).then(function (paare) {
@@ -273,17 +282,22 @@
     var daten = zustand[0], setDaten = zustand[1];
     var gewaehltS = React.useState(null);
     var gewaehlt = gewaehltS[0], setGewaehlt = gewaehltS[1];
-    var vorschauS = React.useState({ url: "", laeuft: false, fehler: "", warnungen: [], seiten: 0 });
+    var vorschauS = React.useState({ url: "", laeuft: false, fehler: "", warnungen: [], seiten: 0, seitenbilder: [] });
     var vorschau = vorschauS[0], setVorschau = vorschauS[1];
     var firmaS = React.useState(null);
     var firma = firmaS[0], setFirma = firmaS[1];
     var arbeitS = React.useState("");
     var arbeit = arbeitS[0], setArbeit = arbeitS[1];
-    // Offene Textaenderungen, Schluessel: Seitennummer \0 Pfad als JSON.
-    var entwurfS = React.useState({});
+    // Der offene Entwurf: das GANZE Dokument, nicht eine Liste von
+    // Flicken. Zwei Editoren arbeiten daran — die Textliste und die
+    // Bearbeitungsflaeche —, und beide sollen dasselbe sehen.
+    var entwurfS = React.useState(null);
     var entwurf = entwurfS[0], setEntwurf = entwurfS[1];
-    var texteOffenS = React.useState(false);
-    var texteOffen = texteOffenS[0], setTexteOffen = texteOffenS[1];
+    // "" = nur Vorschau, "texte" = Textliste, "felder" = Flaeche.
+    var modusS = React.useState("");
+    var modus = modusS[0], setModus = modusS[1];
+    var seiteS = React.useState(0);
+    var seite = seiteS[0], setSeite = seiteS[1];
 
     var laden = React.useCallback(function () {
       setDaten({ lade: true, liste: [], fehler: "" });
@@ -311,9 +325,8 @@
     // Eine andere Vorlage heisst: andere Texte. Ein Entwurf, der zur
     // vorigen gehoerte, darf nicht in die naechste rutschen.
     React.useEffect(function () {
-      // Nur leeren, wenn etwas drinsteht: ein neues leeres Objekt waere eine
-      // neue Abhaengigkeit, und die Vorschau zeichnete jedes Mal zweimal.
-      setEntwurf(function (alt) { return Object.keys(alt).length ? {} : alt; });
+      setEntwurf(null);
+      setSeite(0);
     }, [gewaehlt]);
 
     // Die Vorschau entsteht neu, sobald eine andere Vorlage gewaehlt wird.
@@ -322,13 +335,13 @@
       var reihe = (daten.liste || []).filter(function (v) { return v.id === gewaehlt; })[0];
       if (!reihe || !reihe.dokument) return;
       var alt = vorschau.url;
-      setVorschau({ url: "", laeuft: true, fehler: "", warnungen: [], seiten: 0 });
+      setVorschau({ url: "", laeuft: true, fehler: "", warnungen: [], seiten: 0, seitenbilder: vorschau.seitenbilder || [] });
       if (alt) try { URL.revokeObjectURL(alt); } catch (x) {}
       var marke = firma ? { primaer: firma.ci_primaer || undefined, akzent: firma.ci_akzent || undefined } : {};
       // Mit den offenen Aenderungen: wer eine Ueberschrift tippt, soll sie
       // sehen, bevor er speichert.
-      var offen = Object.keys(entwurf).length;
-      var dok = offen ? texteEinsetzen(reihe.dokument, entwurf) : reihe.dokument;
+      var offen = !!(entwurf && entwurf.id === gewaehlt);
+      var dok = offen ? entwurf.dokument : reihe.dokument;
       // Beim Tippen nicht bei jedem Anschlag zeichnen: ein Durchlauf
       // dauert knapp eine Sekunde, und zehn Buchstaben waeren zehn
       // Durchlaeufe, von denen neun niemand sieht.
@@ -337,10 +350,12 @@
         pdfBauen(dok, beispielDaten(firma), marke).then(function (r) {
           if (abgebrochen) return;
           var url = URL.createObjectURL(new Blob([r.bytes], { type: "application/pdf" }));
-          setVorschau({ url: url, laeuft: false, fehler: "", warnungen: r.warnungen, seiten: r.seiten.length });
+          setVorschau({ url: url, laeuft: false, fehler: "", warnungen: r.warnungen,
+                        seiten: r.seiten.length, seitenbilder: r.seiten });
         }).catch(function (f) {
           if (abgebrochen) return;
-          setVorschau({ url: "", laeuft: false, fehler: String(f && f.message || f), warnungen: [], seiten: 0 });
+          setVorschau({ url: "", laeuft: false, fehler: String(f && f.message || f),
+                        warnungen: [], seiten: 0, seitenbilder: [] });
         });
       }, offen ? 600 : 0);
       return function () { abgebrochen = true; clearTimeout(zeit); };
@@ -403,10 +418,9 @@
      * waere die alte Fassung weg.
      */
     function texteSpeichern(reihe) {
-      var offen = Object.keys(entwurf);
-      if (!offen.length) return;
+      if (!entwurf || entwurf.id !== reihe.id) return;
       setArbeit("texte");
-      var neuesDokument = texteEinsetzen(reihe.dokument, entwurf);
+      var neuesDokument = entwurf.dokument;
       window._sb.from("expose_vorlagen_versionen").insert({
         vorlage_id: reihe.id, version: reihe.version || 1,
         dokument: reihe.dokument, geaendert_von: user.id || null,
@@ -419,7 +433,7 @@
       }).then(function (a) {
         setArbeit("");
         if (a && a.error) { window.alert("Nicht gespeichert: " + a.error.message); return; }
-        setEntwurf({});
+        setEntwurf(null);
         laden();
       });
     }
@@ -500,13 +514,24 @@
     // --- Die Texte der gewaehlten Vorlage ---------------------------------
     var gewaehlteReihe = (daten.liste || []).filter(function (v) { return v.id === gewaehlt; })[0];
     var eigenGewaehlt = !!(gewaehlteReihe && gewaehlteReihe.mandant_id);
+    var offeneAenderung = !!(entwurf && gewaehlteReihe && entwurf.id === gewaehlteReihe.id);
 
-    function textFeld(eintrag) {
+    /** Das Dokument, an dem gerade gearbeitet wird. */
+    function arbeitsDokument() {
+      if (offeneAenderung) return entwurf.dokument;
+      return gewaehlteReihe && gewaehlteReihe.dokument;
+    }
+
+    /** Eine Aenderung von einem der beiden Editoren uebernehmen. */
+    function dokumentAendern(neuesDokument) {
+      if (!gewaehlteReihe) return;
+      setEntwurf({ id: gewaehlteReihe.id, dokument: neuesDokument });
+    }
+
+    function textFeld(eintrag, urtext) {
       var schluessel = eintrag.seite + "\u0000" + JSON.stringify(eintrag.pfad);
-      var wert = Object.prototype.hasOwnProperty.call(entwurf, schluessel)
-        ? entwurf[schluessel] : eintrag.wert;
-      var geaendert = Object.prototype.hasOwnProperty.call(entwurf, schluessel)
-        && entwurf[schluessel] !== eintrag.wert;
+      var wert = eintrag.wert;
+      var geaendert = urtext !== undefined && urtext !== wert;
       var zeilen = Math.min(4, Math.max(1, Math.ceil(wert.length / 46)));
       return e("div", { key: schluessel, style: { marginBottom: 10 } }, [
         e("div", { key: "l", style: {
@@ -519,10 +544,9 @@
         e("textarea", {
           key: "f", value: wert, rows: zeilen,
           onChange: function (ev) {
-            var neu = {};
-            Object.keys(entwurf).forEach(function (k) { neu[k] = entwurf[k]; });
-            neu[schluessel] = ev.target.value;
-            setEntwurf(neu);
+            var ding = {};
+            ding[schluessel] = ev.target.value;
+            dokumentAendern(texteEinsetzen(arbeitsDokument(), ding));
           },
           style: {
             width: "100%", boxSizing: "border-box", padding: "7px 9px",
@@ -543,12 +567,22 @@
         } }, "Systemvorlagen gehören der Plattform und lassen sich nicht ändern. "
            + "Lege eine Kopie an — in ihr sind alle Texte frei bearbeitbar.");
       }
-      var eintraege = texteSammeln(gewaehlteReihe.dokument);
-      var offen = Object.keys(entwurf).filter(function (k) { return true; }).length;
-      if (!texteOffen) {
-        return e("div", { key: "zu", style: { marginTop: 14 } },
+      var eintraege = texteSammeln(arbeitsDokument());
+      var urtexte = {};
+      texteSammeln(gewaehlteReihe.dokument).forEach(function (x) {
+        urtexte[x.seite + "\u0000" + JSON.stringify(x.pfad)] = x.wert;
+      });
+      var offen = offeneAenderung;
+      if (modus !== "texte") {
+        return e("div", { key: "zu", style: { marginTop: 14, display: "flex", gap: 6, flexWrap: "wrap" } }, [
           knopf("Texte bearbeiten (" + eintraege.length + ")",
-                function () { setTexteOffen(true); }, "haupt", false));
+                function () { setModus("texte"); }, modus === "felder" ? "zweit" : "haupt", false),
+          knopf("Felder festlegen", function () { setModus("felder"); },
+                modus === "felder" ? "haupt" : "zweit", false),
+          offen ? knopf("Speichern", function () { texteSpeichern(gewaehlteReihe); },
+                        "haupt", arbeit === "texte") : null,
+          offen ? knopf("Verwerfen", function () { setEntwurf(null); }, "zweit", !!arbeit) : null,
+        ].filter(Boolean));
       }
       var nachSeite = [];
       eintraege.forEach(function (x) {
@@ -573,7 +607,8 @@
             offen ? knopf("Speichern", function () { texteSpeichern(gewaehlteReihe); },
                           "haupt", arbeit === "texte") : null,
             offen ? knopf("Verwerfen", function () { setEntwurf({}); }, "zweit", !!arbeit) : null,
-            knopf("Schließen", function () { setTexteOffen(false); }, "zweit", false),
+            knopf("Felder festlegen", function () { setModus("felder"); }, "zweit", false),
+            knopf("Schließen", function () { setModus(""); }, "zweit", false),
           ].filter(Boolean)),
         ]),
         e("div", { key: "h", style: { fontSize: 12, color: CI.muted, lineHeight: 1.55, marginBottom: 12 } },
@@ -586,8 +621,7 @@
         offen ? e("div", { key: "w", style: {
           background: "#fff8e6", border: "1px solid #f0e0b8", borderRadius: 7,
           padding: "7px 10px", fontSize: 12, marginBottom: 12,
-        } }, offen + (offen === 1 ? " Änderung ist" : " Änderungen sind")
-           + " noch nicht gespeichert.") : null,
+        } }, "Die Änderungen sind noch nicht gespeichert.") : null,
         e("div", { key: "l", style: { maxHeight: "52vh", overflowY: "auto" } },
           nachSeite.map(function (gruppe) {
             return e("div", { key: "s" + gruppe.seite, style: { marginBottom: 16 } }, [
@@ -595,7 +629,9 @@
                 fontSize: 11, fontWeight: 700, color: CI.ink, marginBottom: 6,
                 borderBottom: "1px solid " + CI.border, paddingBottom: 4,
               } }, (gruppe.seite + 1) + "  ·  " + gruppe.name),
-              e("div", { key: "f" }, gruppe.eintraege.map(textFeld)),
+              e("div", { key: "f" }, gruppe.eintraege.map(function (x) {
+                return textFeld(x, urtexte[x.seite + "\u0000" + JSON.stringify(x.pfad)]);
+              })),
             ]);
           })),
       ]);
@@ -643,6 +679,27 @@
         e("div", { key: "hinweis", style: { fontSize: 12, color: CI.muted, marginBottom: 10, lineHeight: 1.5 } },
           "Die Werte sind Beispiele. Im Exposé stehen dort die Angaben des "
           + "Objekts; fehlt eine, entfällt die Zeile — erfunden wird nichts."),
+        // Die Bearbeitungsflaeche tritt an die Stelle der Vorschau: beide
+        // zeigen dieselbe Seite, aber in die eine kann man hineinfassen.
+        (modus === "felder" && eigenGewaehlt && window.ImmoExposeBearbeiten)
+          ? e(window.ImmoExposeBearbeiten, {
+              key: "bearbeiten",
+              dokument: arbeitsDokument(),
+              seite: seite,
+              setSeite: setSeite,
+              aendern: dokumentAendern,
+              bild: (function () {
+                var dok = arbeitsDokument();
+                var s = dok && dok.seiten && dok.seiten[seite];
+                if (!s) return null;
+                return ((vorschau.seitenbilder || []).filter(function (b) {
+                  return b.id === s.id;
+                })[0]) || null;
+              })(),
+              bilder: null,
+              qr: qrFeld,
+            })
+          : null,
         !gewaehlt ? e("div", { key: "nichts", style: {
           border: "1px dashed " + CI.border, borderRadius: 10, padding: "40px 20px",
           textAlign: "center", color: CI.muted, fontSize: 13,
@@ -655,7 +712,7 @@
           background: "#fdecea", border: "1px solid #f5c6cb", color: CI.danger,
           padding: "10px 12px", borderRadius: 8, fontSize: 12.5, lineHeight: 1.5,
         } }, vorschau.fehler) : null,
-        vorschau.url ? e("iframe", {
+        (vorschau.url && modus !== "felder") ? e("iframe", {
           key: "rahmen", src: vorschau.url, title: "Vorschau",
           style: {
             width: "100%", height: "70vh", minHeight: 420, border: "1px solid " + CI.border,
