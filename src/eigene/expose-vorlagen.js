@@ -1002,5 +1002,16 @@
     ]);
   }
 
+  // Dieselben Werkzeuge braucht das Social-Modul (fork_56): Schriften
+  // laden, die Schnitte einer Vorlage sammeln, einen QR-Code bauen. Sie
+  // hier herzugeben ist besser, als sie dort ein zweites Mal zu schreiben —
+  // zwei Fassungen eines Schriftladers laufen auseinander, und man merkt es
+  // erst an einer Ersatzschrift in einem fertigen Beitrag.
+  window.ImmoExposeWerkzeug = {
+    schriftenLaden: schriftenLaden,
+    schnitteIn: schnitteIn,
+    qrFeld: qrFeld,
+  };
+
   window.ImmoExposeVorlagen = ExposeVorlagen;
 })();

@@ -4657,6 +4657,23 @@ WOERTLICH = [
      '  }, [u, n?.id]), React.createElement("div", {\n    style: {\n      minHeight: "100vh",\n      background: CI.bg,\n      fontFamily: FONT\n    }\n  }, c && i && React.createElement(MobileBurgerMenu, {',
      '  }, [u, n?.id]), React.createElement("div", {\n    style: {\n      minHeight: "100vh",\n      background: CI.bg,\n      fontFamily: FONT\n    }\n  },\n  // fork_53: das Band ueber der Anwendung. Es erscheint nur in den vier\n  // Lagen, in denen jemand etwas erfahren MUSS, bevor er es daran merkt,\n  // dass etwas nicht mehr geht — Testphase laeuft aus, Zahlung offen,\n  // Lesezugriff oder Sperre, Credits knapp. Sonst ist es nicht da; ein\n  // Band, das immer steht, liest niemand mehr.\n  window.ImmoSupportBand && React.createElement(window.ImmoSupportBand, null),\n  window.ImmoAboBanner && React.createElement(window.ImmoAboBanner, {\n    onNavigate: i\n  }), c && i && React.createElement(MobileBurgerMenu, {',
      'Abo-Band: erscheint ueber jeder Seite, wenn es etwas zu sagen gibt.'),
+
+    # =====================================================================
+    # fork_56 — Social-Media-Beitraege aus dem Objekt
+    # ---------------------------------------------------------------------
+    # Eine Kachel im Marketing-Modul und die Tafel dahinter. Die alten
+    # Vorlagen bleiben: sie arbeiten auf BILDERN (zuschneiden, Text
+    # darueberlegen), die neuen auf DATEN. Das eine ersetzt das andere
+    # nicht — wer ein Foto beschriften will, will keine Kennzahlleiste.
+    # =====================================================================
+    ('FORK',
+     '  }, {\n    id: "bildeditor",\n    title: "Bild-Editor",\n    subtitle: "Zuschneiden, weichzeichnen, Text & Logo",\n    icon: ImageIcon,\n    num: "05"\n  }].filter(e => "ki" !== e.id).map((e, t) => ({',
+     '  }, {\n    id: "bildeditor",\n    title: "Bild-Editor",\n    subtitle: "Zuschneiden, weichzeichnen, Text & Logo",\n    icon: ImageIcon,\n    num: "05"\n  }, {\n    // fork_56: Beitrag, Karussell und Story aus den Objektdaten, in der\n    // Handschrift des Exposés. Steht neben den alten Vorlagen und ersetzt\n    // sie nicht — die arbeiten auf Bildern, diese auf Daten.\n    id: "social",\n    title: "Social aus dem Objekt",\n    subtitle: "Beitrag, Karussell und Story aus den Objektdaten",\n    icon: ImageIcon,\n    num: "06"\n  }].filter(e => "ki" !== e.id).map((e, t) => ({',
+     'Marketing: Kachel fuer den Social-Baukasten.'),
+    ('FORK',
+     '"vorlagen" === t && React.createElement(MarketingVorlagen, {\n    user: e\n  }), "ablage" === t && React.createElement(MarketingAblage, {',
+     '"vorlagen" === t && React.createElement(MarketingVorlagen, {\n    user: e\n  }), "social" === t && (window.ImmoSocial\n    ? React.createElement(window.ImmoSocial, { user: e })\n    : React.createElement("div", {\n        style: { padding: 24, color: CI.muted }\n      }, "Der Social-Baukasten konnte nicht geladen werden.")),\n  "ablage" === t && React.createElement(MarketingAblage, {',
+     'Marketing: die Tafel hinter der Kachel.'),
 ]
 
 

@@ -348,6 +348,17 @@ else
   fehler=1
 fi
 
+abschnitt "Social-Baukasten: zeichnen die Vorlagen, und erfinden sie nichts?"
+# Gezeichnet wird mit demselben Renderer wie in der Oberflaeche, nur ohne
+# Browser. Die Frage ist nicht, wie es aussieht, sondern ob auf jedem
+# Beitrag Marke, Titel und Preis stehen — und ob ein Objekt ohne Angaben
+# welche dazubekommt.
+if node tests/social.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Social-Vorlagen: Erzeuger, Dateien und Migration stimmen ueberein"
 # Drei Stellen, eine Wahrheit: scripts/social-vorlagen.py erzeugt die sechs
 # JSON-Dateien, scripts/social-systemvorlagen.py die Migration, die sie

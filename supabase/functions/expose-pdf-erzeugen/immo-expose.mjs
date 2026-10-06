@@ -4364,6 +4364,7 @@ function aufbereiten(q) {
     if (!d["objekt.objekttitel"]) d["objekt.objekttitel"] = zeilenTitel.join(" ");
   } else if (titel) {
     d["objekt.expose_titel_text"] = titel;
+    if (!d["objekt.objekttitel"]) d["objekt.objekttitel"] = titel;
     const m = titel.match(/^(.{6,}?)\s*[–—-]\s*(.+)$/) ?? titel.match(/^(.{6,}?),\s*(.+)$/);
     d["objekt.titel_erste_zeile"] = m ? m[1] : titel;
     if (m) d["objekt.titel_zweite_zeile"] = m[2];

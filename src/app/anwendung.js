@@ -56597,6 +56597,15 @@ function MarketingPage({
     subtitle: "Zuschneiden, weichzeichnen, Text & Logo",
     icon: ImageIcon,
     num: "05"
+  }, {
+    // fork_56: Beitrag, Karussell und Story aus den Objektdaten, in der
+    // Handschrift des Exposés. Steht neben den alten Vorlagen und ersetzt
+    // sie nicht — die arbeiten auf Bildern, diese auf Daten.
+    id: "social",
+    title: "Social aus dem Objekt",
+    subtitle: "Beitrag, Karussell und Story aus den Objektdaten",
+    icon: ImageIcon,
+    num: "06"
   }].filter(e => "ki" !== e.id).map((e, t) => ({
     ...e,
     num: String(t + 1).padStart(2, "0")
@@ -56712,7 +56721,12 @@ function MarketingPage({
     }
   }, "· ", r?.title)), "vorlagen" === t && React.createElement(MarketingVorlagen, {
     user: e
-  }), "ablage" === t && React.createElement(MarketingAblage, {
+  }), "social" === t && (window.ImmoSocial
+    ? React.createElement(window.ImmoSocial, { user: e })
+    : React.createElement("div", {
+        style: { padding: 24, color: CI.muted }
+      }, "Der Social-Baukasten konnte nicht geladen werden.")),
+  "ablage" === t && React.createElement(MarketingAblage, {
     user: e,
     onZurueckZurVorlage: () => n("vorlagen")
   }), "ki" === t && React.createElement(KiBildbearbeitung, {

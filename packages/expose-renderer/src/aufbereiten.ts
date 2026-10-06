@@ -168,6 +168,12 @@ export function aufbereiten(q: Quellen): Daten {
     if (!d["objekt.objekttitel"]) d["objekt.objekttitel"] = zeilenTitel.join(" ");
   } else if (titel) {
     d["objekt.expose_titel_text"] = titel;
+    // Und der Titel selbst, falls die Spalte `objekttitel` leer ist und nur
+    // die Bezeichnung gepflegt wurde. Ohne das stuende auf jeder Vorlage,
+    // die {{objekt.objekttitel}} benutzt — und das sind alle —, an der
+    // groessten Stelle der Seite nichts. Gefunden hat das tests/social.js:
+    // der Beitrag zeigte Kennzahlen und Marke, aber keine Ueberschrift.
+    if (!d["objekt.objekttitel"]) d["objekt.objekttitel"] = titel;
     // Zweizeilig setzen, ohne zu raten: getrennt wird an einem Gedankenstrich
     // oder Komma, wenn es eines gibt — sonst steht alles in der ersten Zeile
     // und die zweite entfaellt.
