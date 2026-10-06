@@ -150,8 +150,12 @@ jobs:
               --message "immoOffice.ai ${{ github.sha }}" > ../ausgabe.json
             schluessel=url
           else
+            # --alias: der Entwurf bekommt eine FESTE Adresse
+            # (https://entwurf--<site>.netlify.app) statt einer neuen je
+            # Lauf. Sonst zeigt ein einmal weitergegebener Link spaeter auf
+            # einen alten Stand, ohne das zu sagen.
             npx netlify deploy --dir . --site "$NETLIFY_SITE_ID" --json \
-              --message "Entwurf ${{ github.sha }}" > ../ausgabe.json
+              --alias entwurf --message "Entwurf ${{ github.sha }}" > ../ausgabe.json
             schluessel=deploy_url
           fi
           cd ..
