@@ -5285,3 +5285,47 @@ Preis gehört in `plattform_credit_preise`, nicht in einen Codekommentar.
 **Was das kostet:** Anbieterkosten, die niemandem zugeordnet werden. Sie
 stehen in `docs/BILLING.md`, Abschnitt 5, namentlich — damit sie nicht in
 Vergessenheit geraten.
+
+---
+
+## 2026-10-06 · Supportzugriff statt Vollzugriff
+
+**Frage:** Der Auftrag lautet: „Lege info@engferundpartner.de als admin an,
+der alle anderen Kunden verwalten wird und Rechte über alle hat." CLAUDE.md
+sagt gleichzeitig: „Plattform-Administratoren erhalten keinen automatischen
+Zugriff auf Mandantendaten; Supportzugriff nur protokolliert und nach dem
+Prinzip der geringsten Rechte."
+
+**Entscheidung:** Beides, und zwar getrennt. **Verwalten** — Tarif, Sperre,
+Credits, Konten, Katalog, Löschen — läuft über `plattform-admin` mit dem
+Dienstschlüssel und berührt die Mandantentrennung gar nicht; dort hat der
+Administrator volle Macht. **Hineinsehen** verlangt eine Support-Sitzung:
+mit Grund, höchstens vier Stunden, im Protokoll, standardmäßig nur lesend
+und für den betroffenen Mandanten nachlesbar.
+
+**Grund:** „Rechte über alle" heißt nicht „unbemerkt in fremden Daten". Die
+Fassung mit Sitzung gibt dem Betreiber alles, was er braucht, und gibt dem
+Kunden, was er verlangen darf: zu wissen, wer wann in seinen Unterlagen war.
+Ein Supportzugriff, den der Betroffene nicht nachlesen kann, ist kein
+protokollierter Zugriff.
+
+**Was das kostet:** einen Klick mehr, bevor man in ein fremdes Haus sieht.
+
+---
+
+## 2026-10-06 · Social-Vorlagen in derselben Tabelle wie die Exposé-Vorlagen
+
+**Frage:** Die sechs Social-Vorlagen haben dasselbe Dokumentformat wie die
+Exposé-Vorlagen und werden vom selben Renderer gezeichnet. Eigene Tabelle
+oder dieselbe?
+
+**Entscheidung:** Dieselbe Tabelle, unterschieden über eine neue Spalte
+`art` (`expose` | `social`).
+
+**Grund:** Zwei Tabellen für dasselbe Format wären zwei Stellen, an denen
+derselbe Fehler zu beheben wäre — und zwei Editoren, zwei Kopierfunktionen,
+zwei Richtliniensätze. Die Spalte kostet einen Filter in zwei Abfragen.
+
+**Was das kostet:** Wer eine der beiden Listen baut und den Filter vergisst,
+sieht die Vorlagen der anderen. Genau das ist beim ersten Lauf passiert und
+steht jetzt in `tests/social.js`.
