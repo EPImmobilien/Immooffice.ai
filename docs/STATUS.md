@@ -509,3 +509,66 @@ Firmennamen im Quelltext trugen — behoben, der Briefkopf kommt jetzt aus
 `.env.example` dokumentiert, keiner liegt im Repository. Siehe
 `docs/OFFEN.md`, Abschnitt „Die drei eigenen Funktionen sind geschrieben,
 aber nicht erprobt".
+
+## Nachtrag 06.10.2026 — die E-Mail-Schnittstellen, Stand
+
+Gefragt: „was ist mit den ganzen E-Mail-Schnittstellen?" Hier der Stand, in
+drei Teilen: was es gibt, was läuft, was fehlt.
+
+### Was es gibt
+
+| Weg | Technik | Wofür |
+|---|---|---|
+| **Postfach des Mandanten** | IMAP direkt über `Deno.connectTls()` (`mail-postfach-pull`, 870 Zeilen), SMTP über nodemailer (`mail-senden`) | Posteingang: Abruf, eigene Ordner, Gelesen-Abgleich in beide Richtungen, Senden aus dem eigenen Postfach mit Gesendet-Kopie |
+| **Plattform-Versand** | Resend (`RESEND_API_KEY`), Rückfall SMTP der Plattform | Mails ohne Postfach: Einladungen, Erinnerungen, Freigabe- und Meldemails, Newsletter |
+| **Eingangsverarbeitung** | 14 Funktionen (`mail-anfrage-verarbeiten`, `mail-anhaenge-extrahieren`, `mail-zu-todo`, `mail-zu-mietanfrage`, `mail-rechnung-weiterleiten`, `mail-abwesenheit-verarbeiten`, `mail-ki-vorschlag`, `akq-mail-leads` …) | Portalanfragen erkennen, Anhänge an das Objekt legen, ToDos und Mietanfragen erzeugen, Rechnungen an die Buchhaltung, Abwesenheiten, KI-Antwortvorschläge |
+| **Datenhaltung** | `mail_postfaecher`, `mail_eingang`, `mail_versendet`, `mail_ordner`, `mail_regeln`, `mail_vorlagen`, `mail_kategorien`, `mail_termineinladungen`, `mail_ki_log` | alles je Mandant, RLS geprüft (`tests/mandant-rundumschlag.sql`) |
+
+Das Postfach spricht **IMAP und SMTP** — nicht Microsoft Graph. Ein
+Microsoft-365-Postfach über OAuth gibt es **nicht**; `MICROSOFT_CLIENT_*` ist
+für Phase 6 vorgemerkt. Microsoft-Code existiert nur für die
+Dokumentenablage (`eigentuemer-dokument-onedrive-push`). Ein
+Exchange-Postfach lässt sich heute über IMAP/SMTP anbinden, sofern der
+Mandant das in seinem Tenant erlaubt.
+
+### Was läuft
+
+- **121 Funktionen sind ausgerollt**, die Mailfunktionen darunter.
+- **Sechs Cron-Jobs sind aktiv** und fehlerfrei (letzte 24 h, keine
+  Fehlläufe): `mail-postfach-pull-5min`, `mail-anfragen-5min`,
+  `mail-abwesenheit-5min`, `mail-rechnungen-10min`, `akq-mail-leads-20min`,
+  `suchkriterien-newsletter-montags`.
+- **Noch kein Postfach eingerichtet:** alle `mail_*`-Tabellen sind leer
+  (`mail_postfaecher` 0 Zeilen). Die Jobs laufen also durch und finden
+  nichts. Das ist der erwartete Zustand — ein Postfach ist ein
+  Mandantenzugang, kein Plattformwert.
+
+### Was fehlt
+
+1. **Die Geheimnisse sind nicht gesetzt.** Ohne `RESEND_API_KEY` oder die
+   `SMTP_*`-Werte geht keine Plattformmail hinaus; ohne `MAIL_SECRET_KEY`
+   lässt sich kein Postfach-Passwort entschlüsseln, also auch keines
+   einrichten. Beides sind Zugangsdaten des Betreibers.
+2. ~~**`.env.example` nannte die falschen Namen.**~~ **Behoben am
+   06.10.2026.** Die Datei dokumentierte `MAIL_API_KEY`, `MAIL_ABSENDER`,
+   `MAIL_ABSENDER_NAME` und `VERSCHLUESSELUNG_SCHLUESSEL` — vier Namen, die
+   keine Funktion liest. Wer sie setzte, hatte den Versand scheinbar
+   eingerichtet, und nichts ging hinaus. Die 17 Variablen, die die
+   Funktionen wirklich lesen, stehen jetzt dort;
+   `tests/umgebungsvariablen.py` hält beide Richtungen fest und ist Teil
+   von `npm run check`.
+3. **Absenderadresse je Mandant** steht aus (Phase 6, siehe
+   `docs/OFFEN.md`): heute wechseln nur Anzeigename und Antwortadresse, die
+   Absenderdomain ist die der Plattform. Ein Versanddienst verschickt nur
+   von einer Domain, die ihm per SPF/DKIM nachgewiesen ist.
+4. **`immooffice.example` als Rückfall** steht noch an 83 Stellen in 45
+   Funktionen (Absender, Empfängerlisten, Links). Die Endung ist nach
+   RFC 2606 reserviert und existiert nicht — Absicht, damit es auffällt,
+   aber vor dem Livebetrieb zu ersetzen.
+5. **`energieausweis-anfrage` ist nicht mandantenfähig:** ein öffentliches
+   Formular ohne Anmeldung, das heute „das erste aktive Postfach" nimmt.
+   Bei einem Mandanten stimmt das, bei zweien rät es. Entwurfsfrage, nicht
+   Quelltextfrage — siehe `docs/OFFEN.md`.
+6. **Keine Anbieter-Schicht.** IMAP/SMTP ist fest eingebaut, nicht ein
+   Adapter unter mehreren. Der Auftrag beschreibt in Abschnitt 4b genau das
+   für Postfächer; Microsoft 365 und Google wären dann Adapter daneben.

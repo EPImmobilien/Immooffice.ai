@@ -428,6 +428,17 @@ else
   fehler=1
 fi
 
+abschnitt "Umgebungsvariablen: jede gelesene ist dokumentiert"
+# CLAUDE.md: keine Geheimnisse im Repository, nur Umgebungsvariablen,
+# dokumentiert in .env.example. Am 06.10.2026 nannte die Datei drei
+# erfundene Mail-Variablen und keine der neun echten — der Mailversand
+# liess sich damit nicht einrichten.
+if python3 tests/umgebungsvariablen.py; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Edge Functions: verify_jwt fuer jede festgelegt"
 if python3 tests/funktionen-config.py; then
   :
