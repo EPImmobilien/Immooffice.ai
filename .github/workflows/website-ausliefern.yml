@@ -43,6 +43,15 @@ concurrency:
   group: website-ausliefern
   cancel-in-progress: false
 
+# Nur zwei Rechte: lesen, und die ausgelieferte Adresse als Status an den
+# Commit haengen. Die Adresse stand bisher ausschliesslich im Protokoll des
+# Laufs — wer sie wissen wollte, musste sie dort suchen, und von aussen
+# (ueber die GitHub-API) war sie gar nicht zu bekommen. Als Commit-Status
+# steht sie am Commit, sichtbar in der Liste und abfragbar.
+permissions:
+  contents: read
+  statuses: write
+
 jobs:
   ausliefern:
     # Feste Abbildung statt ubuntu-latest, aus demselben Grund wie bei den
@@ -158,14 +167,40 @@ jobs:
               --message "Website ${{ github.sha }}" > ../ausgabe.json
             schluessel=url
           else
+            # --alias: der Entwurf bekommt eine FESTE Adresse
+            # (https://entwurf--<site>.netlify.app) statt einer neuen je
+            # Lauf. Sonst muss nach jeder Auslieferung ein neuer Link
+            # weitergegeben werden, und der alte zeigt auf einen alten
+            # Stand, ohne das zu sagen.
             npx netlify deploy --dir . --site "${{ steps.site.outputs.id }}" --json \
-              --message "Entwurf ${{ github.sha }}" > ../ausgabe.json
+              --alias entwurf --message "Entwurf ${{ github.sha }}" > ../ausgabe.json
             schluessel=deploy_url
           fi
           cd ..
           ziel=$(python3 -c "import json; print(json.load(open('ausgabe.json'))['$schluessel'])")
           echo "ziel=$ziel" >> "$GITHUB_OUTPUT"
           echo "Ausgeliefert nach $ziel"
+
+      - name: Adresse an den Commit haengen
+        if: always() && steps.stellen.outputs.ziel != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ZIEL: ${{ steps.stellen.outputs.ziel }}
+        run: |
+          set -euo pipefail
+          curl -sS -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}" \
+            -d "$(python3 -c "
+          import json, os
+          print(json.dumps({
+            'state': 'success',
+            'context': 'Website (' + os.environ['UMGEBUNG'] + ')',
+            'description': 'Ausgeliefert: ' + os.environ['ZIEL'],
+            'target_url': os.environ['ZIEL'],
+          }))")" > /dev/null
+          echo "Status gesetzt: $ZIEL"
 
       - name: Bericht
         run: |
