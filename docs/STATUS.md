@@ -636,3 +636,74 @@ größten Stelle der Seite stand dann nichts.
    dem neuen Stand.
 4. Die sechs Impressum-Felder in `website/konfig.js` füllen — bis dahin
    lässt die Auslieferung der Website nur eine Vorschau zu.
+
+---
+
+## Nachtrag 06.10.2026, Nacht — Neutralität, Abrechnung, Buchführung
+
+Sieben Runden, alle mit grünem `npm run check`, jede mit Gegenprobe.
+
+### 1. Die Farben der Referenz sind weg (fork_58)
+
+Am 28.09.2026 war der Farb-Block der Anwendung auf die Plattform-CI
+umgestellt worden — und sonst nichts. **392 Stellen** trugen die Farben der
+Vorlage weiter: 269 in Hexschreibweise, 123 in Dezimal- und
+Fließkommaschreibweise, verteilt auf Farbwähler, Grundriss-Zeichner,
+PDF-Erzeuger, Mailvorlagen und Nebenseiten. Dazu zwei Spaltenvorgaben im
+Schema.
+
+Getauscht hat sie ein gemeinsamer Nachlauf (`scripts/farben.py`), den alle
+drei Erzeuger nach ihren Regeln laufen lassen. Die fünfte Schreibweise war
+der eigentliche Fund: `rgb(0.831, 0.647, 0.404)` ist das Gold der Referenz,
+wie `pdf-lib` es verlangt — darin steht nirgends `D4A567`, und so sind die
+PDF-Erzeuger durch jede bisherige Prüfung gefallen.
+
+Geprüft wird jetzt an drei Stellen, eine davon einschließlich
+Kommentarzeilen. Einzelheiten in `docs/NEUTRALITAET.md`, Abschnitt 4a.
+
+### 2. Rufnummern-Gate
+
+`tests/rufnummern.py` sucht Rufnummern nur dort, wo ein Telefon-Wort
+danebensteht. Aus über siebzig Treffern ohne einen echten werden damit
+sieben, alle erklärbar. Der allgemeine Fall war seit dem Vormittag als
+unlösbar vermerkt — er war es nicht, es fehlte nur der Umkreis.
+
+### 3. Der Signaturvorgang wird abgerechnet (fork_59)
+
+`signatur_vorgang` stand seit fork_47 mit fünf Credits im Katalog und wurde
+nie abgezogen. Keine offene Preisfrage, sondern eine Leistung mit
+festgesetztem Preis, die verschenkt wurde.
+
+### 4. Drei Preise ohne Aktion (fork_60)
+
+Die Gegenrichtung: `expose_text`, `social_paket` und `grundriss_visual`
+standen auf der öffentlichen Preisseite und versprachen etwas, das die
+Software nicht tut. Abgeschaltet, nicht gelöscht — der Betreiber setzt ein
+Häkchen, sobald es die Aktion gibt.
+
+### 5. Abo-Schranke vor den dreißig KI-Aufrufen ohne Preis (fork_61)
+
+Dass der Preis fehlt, ist eine offene Frage. Dass der Zugang offen stand,
+war keine: ein Mandant ohne gültiges Abo konnte dreißig Funktionen lang ein
+Sprachmodell rufen, auf Kosten des Betreibers. Die Schranke fällt im Zweifel
+offen aus — abgewiesen wird nur der eindeutige Fall.
+
+### 6. Der Schalter für die Selbstregistrierung wirkt (fork_57)
+
+`registrierung_offen` war angelegt, und niemand las ihn. Ein Schalter, der
+nichts tut, ist schlimmer als keiner.
+
+### 7. Die Migrationshistorie wurde wieder fortgeschrieben
+
+`supabase_migrations.schema_migrations` stand seit fork_50 still, obwohl acht
+Migrationen angewendet waren. Der Workflow baute sein SQL mit `tojson`, und
+doppelte Anführungszeichen sind in SQL ein Bezeichner, keine Zeichenkette —
+der Eintrag scheiterte lautlos, weil `curl` ohne `-f` lief. Behoben,
+nachgetragen, und der Schritt liest jetzt nach, ob die Zeile wirklich steht.
+
+### Was der Betreiber noch tun muss
+
+Unverändert die vier Punkte oben. Dazu neu: entscheiden, ob es einen
+Sammelpreis für das ganze Exposé geben soll (zehn Credits) oder ob es bei
+zwei je Baustein bleibt — und ob die Parser und Auslesefunktionen einen Preis
+bekommen. Bis dahin sind sie kostenlos, aber nicht mehr frei zugänglich.
