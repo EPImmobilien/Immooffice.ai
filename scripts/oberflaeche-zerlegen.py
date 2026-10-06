@@ -3863,6 +3863,44 @@ def B64(s):
 
 
 WOERTLICH = [
+
+    # --- FORK fork_46: die Absicht geht in den Aufruf ---------------------
+    ('FORK',
+     '  const ca = async e => {\n'
+     '    ia(e), Je(!0);',
+     '  // fork_46: zweites Argument ist die gewaehlte Antwort-Absicht\n'
+     '  // (Zusage, Absage, Termin …). Ohne Angabe bleibt es beim bisherigen\n'
+     '  // Verhalten: offen antworten.\n'
+     '  const ca = async (e, absicht) => {\n'
+     '    ia(e), Je(!0);',
+     'Der KI-Entwurf nimmt eine Antwort-Absicht entgegen.'),
+    ('FORK',
+     '        body: {\n'
+     '          mail_eingang_id: e.id,\n'
+     '          immobilie_id: e.immobilie_id || null\n'
+     '        }\n'
+     '      });',
+     '        body: {\n'
+     '          mail_eingang_id: e.id,\n'
+     '          immobilie_id: e.immobilie_id || null,\n'
+     '          absicht: absicht || "frei"\n'
+     '        }\n'
+     '      });',
+     'Die Absicht wird an mail-ki-vorschlag mitgegeben.'),
+    ('FORK',
+     '    onClick: () => ca(v),\n'
+     '    disabled: Ye,\n'
+     '    title: "Öffnet die Antwort und lässt die KI direkt einen Entwurf in deinem Schreibstil schreiben",',
+     '    // fork_46: erst fragen, was die Antwort erreichen soll — dann\n'
+     '    // schreiben lassen. Ist die Auswahl nicht geladen, laeuft es wie\n'
+     '    // vorher: ein Werkzeug, das wegen einer fehlenden Nebenabfrage\n'
+     '    // gar nicht mehr arbeitet, ist schlimmer als eines ohne Auswahl.\n'
+     '    onClick: () => window.ImmoAbsichtWaehlen\n'
+     '      ? window.ImmoAbsichtWaehlen(a => ca(v, a))\n'
+     '      : ca(v),\n'
+     '    disabled: Ye,\n'
+     '    title: "Fragt erst, was die Antwort erreichen soll — Zusage, Absage, Termin — und schreibt dann einen Entwurf in deinem Schreibstil",',
+     'Vor dem KI-Entwurf wird die Antwort-Absicht gewaehlt.'),
     # --- Die Marke des Produkts ------------------------------------------
     # In der Vorlage standen hier vier Logos der Referenz als Base64; die
     # MARKE-Regel oben hat sie geleert, und seitdem gab Logo() eine
@@ -4523,6 +4561,31 @@ WOERTLICH = [
      '  }, "Noch kein Konto? ", React.createElement("a", {\n    href: "#",\n    onClick: ev => { ev.preventDefault(); immoSetzeModus("registrieren"); },\n    style: { color: CI.blau, fontWeight: 600 }\n  }, "Firma registrieren")), React.createElement(ZugangLinkAnfordern, null), "Mitarbeiter: Passwort vergessen?", React.createElement("br", null), "Bitte wenden Sie sich an Ihren Ansprechpartner."))))',
      '  }, "Noch kein Konto? ", React.createElement("a", {\n    href: "#",\n    onClick: ev => { ev.preventDefault(); immoSetzeModus("registrieren"); },\n    style: { color: CI.blau, fontWeight: 600 }\n  }, "Firma registrieren")), React.createElement(ZugangLinkAnfordern, null), "Mitarbeiter: Passwort vergessen?", React.createElement("br", null), "Bitte wenden Sie sich an Ihren Ansprechpartner.", React.createElement("div", {\n    style: { marginTop: 14, fontSize: 10.5, color: CI.muted, letterSpacing: "0.08em" }\n  }, "Immobiliensoftware mit immoOffice.ai")))))',
      'Dezenter Produkthinweis unter der Anmeldung.'),
+    # --- FORK fork_45/46: die beiden Tafeln unter den Postfaechern --------
+    # ANS ENDE DER LISTE, mit Absicht: die Postfach-Tafel, an die sich
+    # diese beiden haengen, wird selbst von einer Regel weiter oben erst
+    # eingesetzt. Stuende der Block vorne, faende er seinen Anker nicht.
+    # Beide gehoeren genau dorthin. Der Sofortversand braucht eine
+    # Absenderadresse — wer sie nicht findet, hat sie eine Zeile hoeher
+    # noch nicht eingerichtet. Und der Schreibstil wird aus den Mails
+    # DIESES Postfachs gelernt.
+    ('FORK',
+     '  window.ImmoPostfachAnbieter && React.createElement(window.ImmoPostfachAnbieter, {\n'
+     '    user: e\n'
+     '  }),',
+     '  window.ImmoPostfachAnbieter && React.createElement(window.ImmoPostfachAnbieter, {\n'
+     '    user: e\n'
+     '  }),\n'
+     '  // fork_45: Exposé-Sofortversand. Steht unter den Postfaechern, weil\n'
+     '  // die Absenderadresse seine Bedingung ist.\n'
+     '  window.ImmoSofortversand && React.createElement(window.ImmoSofortversand, {\n'
+     '    user: e\n'
+     '  }),\n'
+     '  // fork_46: der eigene Schreibstil fuer die KI-Entwuerfe. Die\n'
+     '  // Einwilligung gehoert der Person, nicht dem Haus — deshalb hier\n'
+     '  // bei den eigenen Postfaechern und nicht in den Firmenvorgaben.\n'
+     '  window.ImmoMailStil && React.createElement(window.ImmoMailStil, null),',
+     'Sofortversand und Schreibstil unter den E-Mail-Postfaechern.'),
 ]
 
 

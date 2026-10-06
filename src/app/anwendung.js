@@ -42932,7 +42932,16 @@ function MailPostfachKarte({
   // das Formular fuer jedes andere Postfach bleibt darunter.
   window.ImmoPostfachAnbieter && React.createElement(window.ImmoPostfachAnbieter, {
     user: e
-  }), l && React.createElement("div", {
+  }),
+  // fork_45: Exposé-Sofortversand. Steht unter den Postfaechern, weil
+  // die Absenderadresse seine Bedingung ist.
+  window.ImmoSofortversand && React.createElement(window.ImmoSofortversand, {
+    user: e
+  }),
+  // fork_46: der eigene Schreibstil fuer die KI-Entwuerfe. Die
+  // Einwilligung gehoert der Person, nicht dem Haus — deshalb hier
+  // bei den eigenen Postfaechern und nicht in den Firmenvorgaben.
+  window.ImmoMailStil && React.createElement(window.ImmoMailStil, null), l && React.createElement("div", {
     style: {
       marginBottom: 12,
       padding: 10,
@@ -80998,7 +81007,10 @@ function PosteingangPage({
     const e = window._mailEntwurf;
     e && (e.betreff || e.body || e.an) && (B(e.an || ""), j(e.betreff || ""), M(e.body || ""), $e(null), ht(null), vt(Array.isArray(e.anhaenge) ? e.anhaenge : []), K(e.cc || ""), F(e.bcc || ""), U("neu"), C(!0), e.postfach_id && L(e.postfach_id), window._mailEntwurf = null)
   }, []);
-  const ca = async e => {
+  // fork_46: zweites Argument ist die gewaehlte Antwort-Absicht
+  // (Zusage, Absage, Termin …). Ohne Angabe bleibt es beim bisherigen
+  // Verhalten: offen antworten.
+  const ca = async (e, absicht) => {
     ia(e), Je(!0);
     try {
       const {
@@ -81007,7 +81019,8 @@ function PosteingangPage({
       } = await window._sb.functions.invoke("mail-ki-vorschlag", {
         body: {
           mail_eingang_id: e.id,
-          immobilie_id: e.immobilie_id || null
+          immobilie_id: e.immobilie_id || null,
+          absicht: absicht || "frei"
         }
       });
       if (t && t.ok && (tt(t.objekt || null), da(t, e.immobilie_id)), n) throw n;
@@ -82627,9 +82640,15 @@ function PosteingangPage({
       fontFamily: FONT
     }
   }, "↩ Antworten") : null, "versendet" !== v._typ && "entwuerfe" !== v.ordner ? React.createElement("button", {
-    onClick: () => ca(v),
+    // fork_46: erst fragen, was die Antwort erreichen soll — dann
+    // schreiben lassen. Ist die Auswahl nicht geladen, laeuft es wie
+    // vorher: ein Werkzeug, das wegen einer fehlenden Nebenabfrage
+    // gar nicht mehr arbeitet, ist schlimmer als eines ohne Auswahl.
+    onClick: () => window.ImmoAbsichtWaehlen
+      ? window.ImmoAbsichtWaehlen(a => ca(v, a))
+      : ca(v),
     disabled: Ye,
-    title: "Öffnet die Antwort und lässt die KI direkt einen Entwurf in deinem Schreibstil schreiben",
+    title: "Fragt erst, was die Antwort erreichen soll — Zusage, Absage, Termin — und schreibt dann einen Entwurf in deinem Schreibstil",
     style: {
       flex: t ? 1 : "0 0 auto",
       background: CI.gold,

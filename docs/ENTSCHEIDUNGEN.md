@@ -5108,3 +5108,27 @@ als fertig. `tests/website.py` erzwingt das weiterhin.
 ist, dass **jeder** Bereich konkrete Funktionen nennt (ein Bereich ohne
 Liste wäre genau die leere Kachel, die ersetzt werden sollte), dass der
 Filter ausblendet — und dass „Alle Bereiche" alles zurückholt.
+
+### Nachtrag: die Oberfläche zu fork_45 und fork_46 (06.10.2026)
+
+Ein Schalter, den nur eine Datenbankzeile umlegt, ist kein Feature. Drei
+Stücke Oberfläche, alle in `src/eigene/` (Handarbeit, klassische Laufzeit):
+
+- **`sofortversand.js`** — unter den E-Mail-Postfächern, weil die
+  Absenderadresse seine Bedingung ist: ein- und ausschalten, Absender
+  wählen, Sperrfrist, Tageslimit, Betreff und Text mit Platzhaltern. Darunter
+  die letzten zehn Protokollzeilen — **auch die, bei denen nichts
+  hinausging**, mit Grund. Nur für die Chef-Rolle sichtbar; erzwungen wird
+  das nicht hier, sondern von der Richtlinie `portal_einstellungen_chef` in
+  der Datenbank.
+- **`mail-stil.js`** — daneben, denn der Stil wird aus den Mails genau
+  dieses Postfachs gelernt. Der Einwilligungstext steht **vollständig** da,
+  bevor der Knopf kommt, und er kommt von der Funktion, nicht aus der Datei:
+  zwei Fassungen, eine angezeigt und eine gespeichert, wären schlimmer als
+  keine. Der Widerruf steht gleich daneben — Art. 7 Abs. 3 verlangt, dass
+  er so einfach ist wie die Erteilung.
+- **`absicht-waehlen.js`** — der Knopf „Mit KI antworten" fragt jetzt zuerst,
+  was die Antwort erreichen soll. Die Liste kommt von der Funktion, nicht aus
+  der Datei. Lässt sie sich nicht laden, läuft es wie vorher weiter: ein
+  Werkzeug, das wegen einer fehlgeschlagenen Nebenabfrage gar nicht mehr
+  arbeitet, ist schlimmer als eines ohne Auswahl.
