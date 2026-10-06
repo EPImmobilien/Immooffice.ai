@@ -246,6 +246,60 @@ const ANFRAGE = {
     melde('Das Protokoll nennt den Auslöser', prot && prot.ausgeloest_von === 'anfrage');
   }
 
+  // --- 1b. Der Absender ist, wer das Objekt betreut ------------------------
+  // Der Interessent ANTWORTET auf diese Mail. Kommt sie aus dem
+  // Sammelpostfach, muss die Antwort von Hand weitergereicht werden.
+  {
+    const db = nachbau();
+    // Ein zweites, als Standard markiertes Postfach einer ANDEREN Person.
+    db.zeilen.mail_postfaecher.unshift({
+      id: 'pf-sammel', mandant_id: 'mandant-1', benutzer_id: 'makler-2', aktiv: true,
+      email_adresse: 'info@makler.test', absender_name: 'Zentrale',
+      standard_zum_senden: true, ist_standard: true, reihenfolge: 0,
+    });
+    db.zeilen.mail_postfaecher[1].standard_zum_senden = false;
+    const r = await ruf(db, ANFRAGE);
+    const mail = db.gesendet.find((g) => g.name === 'mail-senden');
+    melde('Es sendet das Postfach der zuständigen Person, nicht das Sammelpostfach',
+          mail && mail.body.postfach_id === 'pf-1', mail && mail.body.postfach_id);
+    melde('Und die Antwort sagt, warum dieses Postfach',
+          /zustaendig/i.test(r.inhalt.absender_grund || ''), r.inhalt.absender_grund);
+  }
+
+  // --- 1c. Hat die zuständige Person kein Postfach, greift das des Hauses --
+  {
+    const db = nachbau();
+    db.zeilen.mail_postfaecher[0].benutzer_id = 'makler-2';
+    const r = await ruf(db, ANFRAGE);
+    const mail = db.gesendet.find((g) => g.name === 'mail-senden');
+    melde('Ohne eigenes Postfach sendet das Standard-Postfach des Hauses',
+          mail && mail.body.postfach_id === 'pf-1', mail && mail.body.postfach_id);
+    melde('Und im Namen von dessen Besitzer', mail && mail.body.als_benutzer_id === 'makler-2',
+          mail && mail.body.als_benutzer_id);
+    melde('Der Grund steht dabei', /Haus/i.test(r.inhalt.absender_grund || ''),
+          r.inhalt.absender_grund);
+  }
+
+  // --- 1d. "fest" nimmt immer dasselbe Postfach ---------------------------
+  {
+    const db = nachbau();
+    db.zeilen.mail_postfaecher.unshift({
+      id: 'pf-sammel', mandant_id: 'mandant-1', benutzer_id: 'makler-2', aktiv: true,
+      email_adresse: 'info@makler.test', absender_name: 'Zentrale',
+      standard_zum_senden: false, ist_standard: false, reihenfolge: 0,
+    });
+    db.zeilen.portal_einstellungen[0].wert = {
+      aktiv: true, absender_regel: 'fest', postfach_id: 'pf-sammel',
+      sperrfrist_stunden: 24, max_pro_tag: 3,
+    };
+    const r = await ruf(db, ANFRAGE);
+    const mail = db.gesendet.find((g) => g.name === 'mail-senden');
+    melde('Mit "fest" gewinnt das eingestellte Postfach',
+          mail && mail.body.postfach_id === 'pf-sammel', mail && mail.body.postfach_id);
+    melde('Auch wenn die zuständige Person ein eigenes hätte',
+          /eingestellt/i.test(r.inhalt.absender_grund || ''), r.inhalt.absender_grund);
+  }
+
   // --- 2. Bei Provision trägt die Freigabe den Hinweis ---------------------
   {
     const db = nachbau();

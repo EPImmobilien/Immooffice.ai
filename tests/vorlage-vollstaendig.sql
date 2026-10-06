@@ -308,7 +308,32 @@ zuwachs(bereich, mehr, grund) as (values
      'fork_46: mail_stilprofil Primaerschluessel und benutzer_id eindeutig'),
   ('Fremdschluessel', 2, 'fork_46: mail_stilprofil auf mandanten und profiles'),
   ('Indizes ohne Constraint', 1, 'fork_46: mandant_id'),
-  ('Richtlinien', 2, 'fork_46: eigenes Profil und die restriktive Mandantentrennung')
+  ('Richtlinien', 2, 'fork_46: eigenes Profil und die restriktive Mandantentrennung'),
+
+  -- fork_47: Tarife, Abos, Credits. Neun Tabellen — vier Katalog, eine
+  -- Admin-Liste, drei je Mandant, eine fuer die Stripe-Ereignisse.
+  ('Tabellen', 9, 'fork_47: plattform_admins, plattform_tarife, '
+     'plattform_credit_preise, plattform_credit_pakete, plattform_werte, '
+     'mandant_abo, credit_konten, credit_buchungen, stripe_ereignisse'),
+  ('Tabellen mit RLS', 9, 'fork_47: alle neun'),
+  ('Spalten', 87, 'fork_47: die Spalten dieser neun Tabellen'),
+  ('Primaer- und Eindeutigkeitsschluessel', 9, 'fork_47: je ein Primaerschluessel'),
+  ('Pruefbedingungen', 13, 'fork_47: Status, Intervall, Mengen und Preise'),
+  ('Fremdschluessel', 8, 'fork_47: auf mandanten, profiles, tarife und konten'),
+  ('Indizes ohne Constraint', 11, 'fork_47: Mandant, Status, Verbrauchsreihenfolge, '
+     'Gruendernummer, Abonnement, Vorgang, Zeit'),
+  ('Richtlinien', 15, 'fork_47: Katalog lesen und pflegen (8), Abo, Konten, '
+     'Ledger und drei Mandantentrennungen'),
+  ('Funktionen', 14, 'fork_47: ist_plattform_admin, credits_saldo, credits_kosten, '
+     'credits_reservieren, credits_buchen, credits_freigeben, credits_gutschreiben, '
+     'credits_tarif_zuteilen, nutzer_limit, nutzer_platz_frei, abo_zugriff, '
+     'gruender_plaetze_frei, gruender_platz_vergeben, credit_buchung_unveraenderlich'),
+  ('Trigger', 1, 'fork_47: das Ledger ist unveraenderlich'),
+
+  -- fork_48: die Buckets, die keine einzige Richtlinie hatten.
+  ('Storage-Richtlinien', 13, 'fork_48: sieben Buckets ohne jede Richtlinie — '
+     'transfer-dateien, scan-dateien, objektbilder, objektdokumente und '
+     'energieausweis je drei, importe zwei, briefe-pdf eine')
 ),
 soll(bereich, soll) as (
   select v.bereich,

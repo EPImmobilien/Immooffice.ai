@@ -33,6 +33,7 @@
 
   var VORGABE = {
     aktiv: false,
+    absender_regel: "zustaendig",
     postfach_id: null,
     sperrfrist_stunden: 24,
     max_pro_tag: 200,
@@ -208,7 +209,21 @@
         }, "Kein aktives E-Mail-Postfach. Der Sofortversand braucht eine "
          + "Absenderadresse — eine Zeile höher einzurichten.") : null,
 
-        feld("Absender",
+        feld("Wer sendet?",
+          React.createElement("select", {
+            style: eingabe, value: cfg.absender_regel || "zustaendig",
+            onChange: function (e) { aendern("absender_regel", e.target.value); },
+          },
+            React.createElement("option", { value: "zustaendig" },
+              "Wer das Objekt betreut (empfohlen)"),
+            React.createElement("option", { value: "fest" },
+              "Immer dasselbe Postfach")),
+          "Der Interessent antwortet auf diese Mail. Kommt sie aus dem "
+          + "Sammelpostfach, muss die Antwort von Hand weitergereicht werden — "
+          + "kommt sie von der Person, die das Objekt betreut, ist der Faden "
+          + "geknüpft. Hat sie kein eigenes Postfach, greift das des Hauses."),
+
+        feld(cfg.absender_regel === "fest" ? "Postfach" : "Postfach des Hauses (Rückfall)",
           React.createElement("select", {
             style: eingabe, value: cfg.postfach_id || "",
             onChange: function (e) { aendern("postfach_id", e.target.value || null); },
@@ -218,7 +233,7 @@
               return React.createElement("option", { key: p.id, value: p.id },
                 p.email_adresse + (p.absender_name ? " (" + p.absender_name + ")" : ""));
             })),
-          "Über dieses Postfach geht die Mail hinaus — mit Ihrer Adresse, nicht mit einer fremden."),
+          "Jedes Postfach wird je Person verbunden — eine Zeile höher."),
 
         React.createElement("div", {
           style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 },

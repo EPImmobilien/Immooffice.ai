@@ -80,6 +80,14 @@ const SCHLUESSEL = "expose_sofortversand";
 // Ein Automatismus, der sich selbst einschaltet, ist eine Zumutung.
 const VORGABE = {
   aktiv: false,
+  // "zustaendig" — das Postfach dessen, der das Objekt betreut. Das ist die
+  //   Vorgabe, und zwar aus einem Grund, der nichts mit Technik zu tun hat:
+  //   der Interessent ANTWORTET auf diese Mail. Kommt sie von info@, landet
+  //   die Antwort im Sammelpostfach und muss von Hand weitergereicht werden.
+  //   Kommt sie von der Person, die das Objekt betreut, ist der Faden
+  //   geknüpft. Genau danach hat der Betreiber am 06.10.2026 gefragt.
+  // "fest"      — immer dasselbe Postfach, egal welches Objekt.
+  absender_regel: "zustaendig" as "zustaendig" | "fest",
   postfach_id: null as string | null,
   sperrfrist_stunden: 24,
   max_pro_tag: 200,
@@ -215,14 +223,29 @@ Deno.serve(async (req) => {
     // Entweder das ausdrücklich gewählte Postfach oder das Standardpostfach
     // des Mandanten. Keines davon: kein Versand, und zwar mit Ansage.
     let postfach: any = null;
-    if (cfg.postfach_id) {
+    let absenderGrund = "";
+
+    // 1. Das Postfach dessen, der das Objekt betreut.
+    if (cfg.absender_regel !== "fest" && im.zustaendig_id) {
+      const { data } = await db.from("mail_postfaecher")
+        .select("id, email_adresse, absender_name, aktiv, benutzer_id, mandant_id")
+        .eq("benutzer_id", im.zustaendig_id).eq("mandant_id", mandant).eq("aktiv", true)
+        .order("standard_zum_senden", { ascending: false })
+        .order("reihenfolge", { ascending: true })
+        .limit(1);
+      postfach = (data || [])[0] || null;
+      if (postfach) absenderGrund = "Postfach der zustaendigen Person";
+    }
+
+    if (!postfach && cfg.postfach_id) {
       const { data } = await db.from("mail_postfaecher")
         .select("id, email_adresse, absender_name, aktiv, mandant_id, benutzer_id")
         .eq("id", cfg.postfach_id).eq("mandant_id", mandant).maybeSingle();
       postfach = data;
       if (!postfach) return await abbruch("Das eingestellte Absender-Postfach gibt es nicht mehr.");
       if (!postfach.aktiv) return await abbruch(`Das Absender-Postfach ${postfach.email_adresse} ist abgeschaltet.`);
-    } else {
+      absenderGrund = "eingestelltes Postfach";
+    } else if (!postfach) {
       const { data } = await db.from("mail_postfaecher")
         .select("id, email_adresse, absender_name, aktiv, benutzer_id, standard_zum_senden, ist_standard, reihenfolge")
         .eq("mandant_id", mandant).eq("aktiv", true)
@@ -234,8 +257,10 @@ Deno.serve(async (req) => {
       if (!postfach) {
         return await abbruch(
           "Kein Absender-Postfach hinterlegt. Der Sofortversand braucht eine " +
-          "Absenderadresse — Einstellungen → E-Mail-Postfächer.");
+          "Absenderadresse — Einstellungen → E-Mail-Postfächer. Verbunden wird " +
+          "sie je Person; wer ein Objekt betreut, sendet daraus.");
       }
+      absenderGrund = "Standard-Postfach des Hauses";
     }
 
     // --- Das Exposé --------------------------------------------------------
@@ -301,7 +326,8 @@ Deno.serve(async (req) => {
       return antwort({
         ok: true, probe: true, gesendet: false,
         wuerde_senden: true,
-        absender: postfach.email_adresse, empfaenger: email,
+        absender: postfach.email_adresse, absender_grund: absenderGrund,
+        empfaenger: email,
         objekt: objektName, expose: expose.name, dokumente: dokumente.length,
         provisionsmodell: modell, weg,
       });
@@ -375,7 +401,8 @@ Deno.serve(async (req) => {
     await buchen(db, { ...grundlage, status: "gesendet", freigabe_id: freigabe.id, weg });
     return antwort({
       ok: true, gesendet: true, url, freigabe_id: freigabe.id,
-      absender: postfach.email_adresse, empfaenger: email,
+      absender: postfach.email_adresse, absender_grund: absenderGrund,
+      empfaenger: email,
       provisionsmodell: modell, weg, dokumente: dokumente.length,
     });
   } catch (e) {
