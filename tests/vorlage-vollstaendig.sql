@@ -281,7 +281,21 @@ zuwachs(bereich, mehr, grund) as (values
                          'und mail_postfaecher'),
   ('Indizes ohne Constraint', 2, 'fork_44: offene Vorgaenge und mandant_id'),
   ('Richtlinien', 2, 'fork_44: eigene Vorgaenge und die restriktive Mandantentrennung'),
-  ('Funktionen', 1, 'fork_44: mail_oauth_aufraeumen()')
+  ('Funktionen', 1, 'fork_44: mail_oauth_aufraeumen()'),
+
+  -- fork_45: Exposé-Sofortversand. Eine Tabelle, die das Protokoll führt —
+  -- und damit die Sperre gegen Doppelversand und das Tageslimit trägt.
+  ('Tabellen', 1, 'fork_45: expose_sofortversand — das Protokoll'),
+  ('Tabellen mit RLS', 1, 'fork_45: expose_sofortversand'),
+  ('Spalten', 12, 'fork_45: expose_sofortversand: id, mandant_id, immobilie_id, '
+     'kontakt_id, email, freigabe_id, mail_eingang_id, status, grund, weg, '
+     'ausgeloest_von, created_at'),
+  ('Primaer- und Eindeutigkeitsschluessel', 1, 'fork_45: expose_sofortversand Primaerschluessel'),
+  ('Pruefbedingungen', 2, 'fork_45: status und weg'),
+  ('Fremdschluessel', 5, 'fork_45: auf mandanten, immobilien, kontakte, '
+     'expose_freigaben und mail_eingang'),
+  ('Indizes ohne Constraint', 3, 'fork_45: mandant_id, Sperrfrist, Tageslimit'),
+  ('Richtlinien', 2, 'fork_45: Lesen im Haus und die restriktive Mandantentrennung')
 ),
 soll(bereich, soll) as (
   select v.bereich,

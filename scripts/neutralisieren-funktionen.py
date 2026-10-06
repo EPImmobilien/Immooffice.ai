@@ -1527,6 +1527,109 @@ ERSETZUNGEN = [
 # durch die Datei einzelne Buchstaben treffen. Genau das ist beim Schreiben
 # dieses Skripts passiert.
 NACHBESSERN = [
+    # =====================================================================
+    # FORK fork_45 — Exposé-Sofortversand
+    # =====================================================================
+    # Zwei Eingriffe, beide klein, beide noetig, damit die Kette
+    # „Anfrage erkannt -> Freigabe angelegt -> Mail raus" ohne Zuschauer
+    # laeuft. Die Funktion selbst ist eigen und steht in
+    # supabase/eigene/expose-sofortversand/.
+
+    # --- 1. mail-senden: ein zweiter, enger Weg herein --------------------
+    # mail-senden verlangt ein Nutzer-Token, und das ist richtig: es prueft
+    # damit, wem das Postfach gehoert. Ein Automatismus hat aber keinen
+    # angemeldeten Menschen.
+    #
+    # Die bestehenden automatischen Versender (expose-erinnerung,
+    # upload-benachrichtigung-versenden, eigentuemer-benachrichtigungen-
+    # versenden) umgehen das, indem sie an mail-senden VORBEI senden: Resend
+    # oder SMTP aus Umgebungsvariablen, mit einer festen Absenderadresse. Fuer
+    # ein mandantenfaehiges Produkt ist das falsch — die Mail traegt dann die
+    # Adresse des Betreibers und nicht die des Maklers. Genau darauf zielt die
+    # Ansage „fuer diesen Sofortversand muss eine E-Mail-Adresse hinterlegt
+    # sein".
+    #
+    # Also der andere Weg: mit dem DIENSTSCHLUESSEL darf der Aufrufer sagen,
+    # in wessen Namen gesendet wird. Drei Dinge halten das eng:
+    #   * Nur mit dem Dienstschluessel. Ein Nutzer-Token kann es nicht.
+    #     Den Dienstschluessel haben nur unsere eigenen Funktionen.
+    #   * Der genannte Nutzer muss existieren und zum Mandanten des
+    #     Postfachs gehoeren. Sonst schickte ein Automatismus Post ueber
+    #     das Postfach eines fremden Mandanten.
+    #   * Die Eigentuemerpruefung darunter bleibt unveraendert in Kraft.
+    # Mehr Rechte entstehen nicht; es entsteht nur ein Name fuer den
+    # Absender, wo vorher keiner war.
+    ('FORK',
+     '    const userClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {\n'
+     '      global: { headers: { Authorization: authHeader } },\n'
+     '    });\n'
+     '    const { data: userData, error: userErr } = await userClient.auth.getUser();\n'
+     '    if (userErr || !userData?.user) return antwort({ ok: false, error: "Nicht authentifiziert" }, 401);\n'
+     '    const userId = userData.user.id;',
+     '    // FORK fork_45: Automatismen haben keinen angemeldeten Menschen.\n'
+     '    // Mit dem Dienstschluessel — und NUR mit ihm — darf der Aufrufer\n'
+     '    // sagen, in wessen Namen gesendet wird. Die Eigentuemerpruefung\n'
+     '    // weiter unten bleibt unveraendert in Kraft.\n'
+     '    let userId: string;\n'
+     '    if (authHeader.replace(/^Bearer\\s+/i, "") === SERVICE_ROLE_KEY) {\n'
+     '      const alsBenutzer = String(body.als_benutzer_id || "");\n'
+     '      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(alsBenutzer)) {\n'
+     '        return antwort({ ok: false, error: "als_benutzer_id fehlt oder ist keine Kennung." }, 400);\n'
+     '      }\n'
+     '      const { data: alsProfil } = await admin.from("profiles").select("id, mandant_id").eq("id", alsBenutzer).maybeSingle();\n'
+     '      if (!alsProfil) return antwort({ ok: false, error: "als_benutzer_id gibt es nicht." }, 400);\n'
+     '      const { data: pfMandant } = await admin.from("mail_postfaecher").select("mandant_id").eq("id", postfach_id).maybeSingle();\n'
+     '      const mandantPostfach = String(pfMandant?.mandant_id || "");\n'
+     '      const mandantBenutzer = String(alsProfil.mandant_id || "");\n'
+     '      // Unbekannt auf einer der beiden Seiten zaehlt als verschieden.\n'
+     '      if (!mandantPostfach || !mandantBenutzer || mandantPostfach !== mandantBenutzer) {\n'
+     '        return antwort({ ok: false, error: "Postfach und Benutzer gehoeren zu verschiedenen Mandanten." }, 403);\n'
+     '      }\n'
+     '      userId = alsBenutzer;\n'
+     '    } else {\n'
+     '      const userClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {\n'
+     '        global: { headers: { Authorization: authHeader } },\n'
+     '      });\n'
+     '      const { data: userData, error: userErr } = await userClient.auth.getUser();\n'
+     '      if (userErr || !userData?.user) return antwort({ ok: false, error: "Nicht authentifiziert" }, 401);\n'
+     '      userId = userData.user.id;\n'
+     '    }',
+     'Automatismen duerfen mit dem Dienstschluessel einen Absender benennen: mail-senden.',
+     {'mail-senden'}),
+
+    # --- 2. mail-anfrage-verarbeiten: die Kette schliessen ----------------
+    # Hier endet die Erkennung: Objekt zugeordnet, Kontakt gefunden oder
+    # angelegt, beide verknuepft. Genau hier faengt der Sofortversand an.
+    #
+    # Nebenlaeufig (EdgeRuntime.waitUntil) und mit verschlucktem Fehler: die
+    # Erkennung darf nicht scheitern, weil ein Postfach klemmt. Was der
+    # Sofortversand getan oder gelassen hat, steht im Protokoll
+    # expose_sofortversand — nicht in der Antwort dieser Funktion.
+    ('FORK',
+     '  await db.from("mail_eingang").update(patchMail).eq("id", mail.id);\n'
+     '  return ergebnis;',
+     '  await db.from("mail_eingang").update(patchMail).eq("id", mail.id);\n'
+     '\n'
+     '  // FORK fork_45: Exposé-Sofortversand. Nur fuer Interessenten (eine\n'
+     '  // Bewertungsanfrage eines Eigentuemers ist keine Exposé-Anfrage),\n'
+     '  // nur mit Objekt und Mailadresse. Alles Weitere — ob eingeschaltet,\n'
+     '  // ob ein Exposé da ist, ob die Adresse das schon bekommen hat —\n'
+     '  // entscheidet expose-sofortversand und protokolliert es.\n'
+     '  const sofortEmail = patchMail.kontakt_email;\n'
+     '  if (!istEigentuemer && immobilieId && kontakt && sofortEmail) {\n'
+     '    const lauf = db.functions.invoke("expose-sofortversand", {\n'
+     '      body: {\n'
+     '        immobilie_id: immobilieId, kontakt_id: kontakt.id, email: sofortEmail,\n'
+     '        name: patchMail.kontakt_name || null, mail_eingang_id: mail.id,\n'
+     '        ausgeloest_von: "anfrage",\n'
+     '      },\n'
+     '    }).then((r: any) => { ergebnis.sofortversand = r?.data ?? null; })\n'
+     '      .catch((e: any) => { console.error("expose-sofortversand:", e?.message || e); });\n'
+     '    try { (globalThis as any).EdgeRuntime?.waitUntil?.(lauf); } catch { /* ohne waitUntil laeuft es einfach mit */ }\n'
+     '  }\n'
+     '  return ergebnis;',
+     'Sofortversand anstossen, wenn Objekt und Interessent feststehen: mail-anfrage-verarbeiten.',
+     {'mail-anfrage-verarbeiten'}),
     # --- FORK: die letzten Schreibstellen.
     ('FORK',
      '      const pfad = "immobilien/" + z.immobilie_id + "/" + Date.now() + "_" + name.replace(/[^A-Za-z0-9._-]+/g, "_");',
@@ -4158,6 +4261,58 @@ def main():
 
     print(f'{uebernommen} Funktionen aus der Vorlage und {len(eigene)} eigene '
           f'geschrieben nach {ZIEL}')
+    rueckschritt_warnen()
+
+
+def rueckschritt_warnen():
+    """Warnt, wenn das Erzeugnis hinter den eingecheckten Stand zurueckfaellt.
+
+    Der Grund ist die Bauweise: reference/ ist NICHT versioniert (CLAUDE.md).
+    Jeder Container holt sich seinen eigenen Stand, und wenn der aelter ist
+    als der, aus dem die eingecheckten Dateien entstanden sind, macht dieses
+    Skript die Fork-Arbeit still rueckgaengig — die Datei sieht hinterher
+    aus wie die Vorlage und nicht wie das, was ausgerollt ist.
+
+    Am 06.10.2026 ist genau das passiert: expose-pdf-erzeugen fiel um 1190
+    Zeilen auf eine Fassung VOR dem Umbau des Renderers zurueck, und erst
+    tests/expose-funktion.js hat es gemerkt ("rgb is not defined"). Ohne
+    diesen Test waere eine kaputte Funktion ausgerollt worden.
+
+    Hier wird nichts verhindert — nur laut gesagt. Ob der eingecheckte oder
+    der erzeugte Stand der richtige ist, kann dieses Skript nicht wissen.
+    """
+    import subprocess
+    try:
+        erg = subprocess.run(
+            ['git', 'diff', '--numstat', '--', str(ZIEL)],
+            cwd=WURZEL, capture_output=True, text=True, timeout=30)
+    except Exception:
+        return
+    if erg.returncode != 0:
+        return
+    gross = []
+    for zeile in erg.stdout.splitlines():
+        teile = zeile.split('\t')
+        if len(teile) != 3 or not teile[0].isdigit() or not teile[1].isdigit():
+            continue
+        plus, minus, datei = int(teile[0]), int(teile[1]), teile[2]
+        if plus + minus >= 200:
+            gross.append((plus, minus, datei))
+    if not gross:
+        return
+    print('\n' + '=' * 72)
+    print('ACHTUNG: grosse Abweichung zum eingecheckten Stand')
+    print('=' * 72)
+    for plus, minus, datei in sorted(gross, key=lambda g: -(g[0] + g[1])):
+        print(f'  +{plus:<6d} -{minus:<6d} {datei}')
+    print('\nDas kann zweierlei heissen:')
+    print('  * eine gewollte Aenderung an den Regeln — dann ist alles gut;')
+    print('  * reference/ ist AELTER als der eingecheckte Stand — dann hat')
+    print('    dieses Skript gerade Fork-Arbeit zurueckgedreht.')
+    print('\nreference/ ist nicht versioniert. Im Zweifel:')
+    print('  git diff -- ' + str(ZIEL))
+    print('  git checkout -- <datei>   (eingecheckten Stand behalten)')
+    print('=' * 72)
 
 
 if __name__ == '__main__':

@@ -366,6 +366,12 @@ verify_jwt = true
 [functions.parse-zaehler]
 verify_jwt = true
 
+# Sofortversand: angemeldet (Knopf, Probelauf) ODER mit dem
+# Dienstschluessel aus mail-anfrage-verarbeiten. Beide bringen einen
+# Anmeldekopf mit, also bleibt die Pruefung an.
+[functions.expose-sofortversand]
+verify_jwt = true
+
 [functions.postfach-anbieter-start]
 verify_jwt = true
 

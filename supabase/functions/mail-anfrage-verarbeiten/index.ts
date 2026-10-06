@@ -218,6 +218,24 @@ async function verarbeiten(db: any, mail: any, userId: string | null, erzwingen:
   };
   if (immobilieId && !mail.immobilie_id) { patchMail.immobilie_id = immobilieId; patchMail.immobilie_id_ki_konfidenz = 95; }
   await db.from("mail_eingang").update(patchMail).eq("id", mail.id);
+
+  // FORK fork_45: Exposé-Sofortversand. Nur fuer Interessenten (eine
+  // Bewertungsanfrage eines Eigentuemers ist keine Exposé-Anfrage),
+  // nur mit Objekt und Mailadresse. Alles Weitere — ob eingeschaltet,
+  // ob ein Exposé da ist, ob die Adresse das schon bekommen hat —
+  // entscheidet expose-sofortversand und protokolliert es.
+  const sofortEmail = patchMail.kontakt_email;
+  if (!istEigentuemer && immobilieId && kontakt && sofortEmail) {
+    const lauf = db.functions.invoke("expose-sofortversand", {
+      body: {
+        immobilie_id: immobilieId, kontakt_id: kontakt.id, email: sofortEmail,
+        name: patchMail.kontakt_name || null, mail_eingang_id: mail.id,
+        ausgeloest_von: "anfrage",
+      },
+    }).then((r: any) => { ergebnis.sofortversand = r?.data ?? null; })
+      .catch((e: any) => { console.error("expose-sofortversand:", e?.message || e); });
+    try { (globalThis as any).EdgeRuntime?.waitUntil?.(lauf); } catch { /* ohne waitUntil laeuft es einfach mit */ }
+  }
   return ergebnis;
 }
 

@@ -490,6 +490,16 @@ else
   fehler=1
 fi
 
+abschnitt "Exposé-Sofortversand"
+# Der erste Automatismus, der ohne Zuschauer Post an Fremde schickt. Was
+# dabei schiefgeht, merkt der Interessent und nicht der Makler. Die Funktion
+# laeuft hier wirklich, gegen ein nachgebautes Supabase.
+if node tests/expose-sofortversand.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Postfaecher je Anbieter: Microsoft, Google, IMAP"
 # Die beiden Funktionen, die ein Postfach verbinden, laufen hier wirklich —
 # gegen ein nachgebautes Supabase und einen nachgebauten Anbieter. Geprueft

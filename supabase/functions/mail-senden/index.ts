@@ -295,12 +295,34 @@ Deno.serve(async (req) => {
     const authHeader = req.headers.get("authorization");
     if (!authHeader) return antwort({ ok: false, error: "Kein Auth-Token" }, 401);
 
-    const userClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {
-      global: { headers: { Authorization: authHeader } },
-    });
-    const { data: userData, error: userErr } = await userClient.auth.getUser();
-    if (userErr || !userData?.user) return antwort({ ok: false, error: "Nicht authentifiziert" }, 401);
-    const userId = userData.user.id;
+    // FORK fork_45: Automatismen haben keinen angemeldeten Menschen.
+    // Mit dem Dienstschluessel — und NUR mit ihm — darf der Aufrufer
+    // sagen, in wessen Namen gesendet wird. Die Eigentuemerpruefung
+    // weiter unten bleibt unveraendert in Kraft.
+    let userId: string;
+    if (authHeader.replace(/^Bearer\s+/i, "") === SERVICE_ROLE_KEY) {
+      const alsBenutzer = String(body.als_benutzer_id || "");
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(alsBenutzer)) {
+        return antwort({ ok: false, error: "als_benutzer_id fehlt oder ist keine Kennung." }, 400);
+      }
+      const { data: alsProfil } = await admin.from("profiles").select("id, mandant_id").eq("id", alsBenutzer).maybeSingle();
+      if (!alsProfil) return antwort({ ok: false, error: "als_benutzer_id gibt es nicht." }, 400);
+      const { data: pfMandant } = await admin.from("mail_postfaecher").select("mandant_id").eq("id", postfach_id).maybeSingle();
+      const mandantPostfach = String(pfMandant?.mandant_id || "");
+      const mandantBenutzer = String(alsProfil.mandant_id || "");
+      // Unbekannt auf einer der beiden Seiten zaehlt als verschieden.
+      if (!mandantPostfach || !mandantBenutzer || mandantPostfach !== mandantBenutzer) {
+        return antwort({ ok: false, error: "Postfach und Benutzer gehoeren zu verschiedenen Mandanten." }, 403);
+      }
+      userId = alsBenutzer;
+    } else {
+      const userClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: userData, error: userErr } = await userClient.auth.getUser();
+      if (userErr || !userData?.user) return antwort({ ok: false, error: "Nicht authentifiziert" }, 401);
+      userId = userData.user.id;
+    }
 
     // Gleich darunter hebt die Rolle "chef" die Eigentuemerpruefung auf.
     // Ohne Mandantengrenze davor haette ein Chef Post ueber das Postfach

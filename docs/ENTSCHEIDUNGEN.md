@@ -4895,3 +4895,76 @@ Farbwählern, im Grundriss-Zeichner, in PDF-Erzeugern und in Mailvorlagen.
 Das ist derselbe Befund, nur in groß, und es ist ein eigener Durchgang mit
 eigener Prüfung (PDFs und Mails lassen sich nicht nebenbei nachsehen). In
 den Logo-Einbau gehört er nicht.
+
+## 2026-10-06 · Exposé-Sofortversand (fork_45)
+
+Ansage: „wir müssen auf jeden Fall den Exposé-Sofortversand reinnehmen …
+für diesen Sofortversand muss eine E-Mail-Adresse hinterlegt sein … da
+geht's darum, dass die Kunden quasi 24/7 auf die Dateien zugreifen können."
+
+**Nichts davon wurde neu erfunden — es war nur nicht verbunden:**
+
+| Teil | war schon da |
+|---|---|
+| Freigabe-Token, Provisionstext, Bestätigung, Download-Zähler | `expose_freigaben` |
+| Erkennung von Portal- und Website-Anfragen | `mail-anfrage-verarbeiten` |
+| Versand über das Postfach des Mandanten | `mail-senden` |
+| Rund-um-die-Uhr-Zugriff auf die Dateien | der Freigabe-Link selbst |
+
+Was fehlte, war die **Verkettung**: Anfrage erkannt → Freigabe angelegt →
+Mail raus, ohne dass jemand zusieht. Genau das ist der Sofortversand, und
+„verkettete Arbeitsschritte statt Insellösungen" ist eines der sechs
+Architektur-Grundprinzipien aus `CLAUDE.md`.
+
+**Link, nie Anhang — und das kann der Mandant nicht einstellen.** Zwei
+Gründe, von denen jeder für sich reicht:
+
+1. Bei Provision muss der Hinweis den Käufer in Textform erreichen. Das
+   leistet die Bestätigungsseite am Link, nicht ein Anhang. (Kein Rechtsrat:
+   § 656a BGB und die Frage, wann ein Maklervertrag zustande kommt, bleiben
+   beim Mandanten; die Musterformulierungen sind anwaltlich ungeprüft.)
+2. Auch ohne Provision: `expose_freigaben` weiß, wer wann heruntergeladen
+   hat. Darauf bauen Nachfassen und Erinnerung auf. Ein Anhang ist nach dem
+   Senden blind.
+
+**Die E-Mail-Adresse als Bedingung** ist Code, nicht Dokumentation: ohne
+aktives Postfach des Mandanten geht nichts hinaus, und der Grund steht im
+Protokoll. Der Sofortversand geht ausdrücklich **über das Postfach des
+Mandanten**, nicht über eine Absenderadresse aus einer Umgebungsvariablen.
+Die bestehenden automatischen Versender (`expose-erinnerung`,
+`upload-benachrichtigung-versenden`,
+`eigentuemer-benachrichtigungen-versenden`) tun Letzteres noch — ein
+Einmandanten-Rest, der in `docs/OFFEN.md` steht.
+
+**Dafür ein zweiter, enger Weg in `mail-senden`.** Es verlangt ein
+Nutzer-Token, weil es prüft, wem das Postfach gehört; ein Automatismus hat
+aber keinen angemeldeten Menschen. Jetzt darf der Aufrufer **mit dem
+Dienstschlüssel und nur mit ihm** sagen, in wessen Namen gesendet wird.
+Drei Dinge halten das eng: nur der Dienstschlüssel kann es, der genannte
+Nutzer muss zum Mandanten des Postfachs gehören, und die Eigentümerprüfung
+darunter bleibt in Kraft. Mehr Rechte entstehen nicht.
+
+**Vier Sperren, jede mit Protokolleintrag:** nicht eingeschaltet · kein
+Postfach / kein Exposé / keine Adresse · dieselbe Adresse zum selben Objekt
+innerhalb der Sperrfrist (Portale stellen Anfragen doppelt zu) ·
+Tageslimit. Ein stiller Nicht-Versand wäre von einem Fehler nicht zu
+unterscheiden — deshalb steht **jeder** Fall mit Grund in
+`expose_sofortversand`.
+
+`tests/expose-sofortversand.js` lässt die Funktion wirklich laufen, gegen
+ein nachgebautes Supabase: 48 Prüfungen, Teil von `npm run check`.
+
+### Nebenbefund: der Funktionsgenerator kann Fork-Arbeit zurückdrehen
+
+Beim Regenerieren von `supabase/functions/` fiel `expose-pdf-erzeugen` um
+1190 Zeilen auf eine Fassung **vor** dem Umbau des Renderers zurück. Grund:
+`reference/` ist nicht versioniert (so gewollt, `CLAUDE.md`), und der Stand
+in diesem Container ist älter als der, aus dem die eingecheckten Dateien
+entstanden sind. Gemerkt hat es `tests/expose-funktion.js`
+(`rgb is not defined`) — ohne diesen Test wäre eine kaputte Funktion
+ausgerollt worden.
+
+`scripts/neutralisieren-funktionen.py` warnt jetzt laut, wenn das Erzeugnis
+um mehr als 200 Zeilen vom eingecheckten Stand abweicht. Verhindern kann es
+nichts: ob der eingecheckte oder der erzeugte Stand der richtige ist, weiß
+das Skript nicht. Aber es sagt es, statt es stillschweigend zu tun.

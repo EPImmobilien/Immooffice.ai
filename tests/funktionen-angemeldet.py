@@ -50,6 +50,15 @@ ABGESICHERT = {
         'Positionen und Betraegen.'),
     'mail-gelesen-setzen': ('immoMandantSichern',
         'Fremde Mails als gelesen markieren.'),
+    'expose-sofortversand': ('mandant_sichern',
+        'Sendet das Exposé an eine Adresse aus dem Anfragekoerper. Ohne '
+        'Pruefung haette ein angemeldeter Makler das Exposé eines fremden '
+        'Mandanten an eine beliebige Adresse geschickt — und die Mail waere '
+        'ueber dessen Postfach hinausgegangen. Geprueft wird die '
+        'immobilie_id; Postfach, Freigabe und Protokoll haengen danach alle '
+        'am Mandanten DES OBJEKTS, nicht an einer zweiten Angabe aus dem '
+        'Koerper. Der Dienstschluessel-Weg (mail-anfrage-verarbeiten) hat '
+        'keinen Mandanten und arbeitet ebenfalls auf dem des Objekts.'),
     'postfach-anbieter-start': ('benutzer_id !== u.user.id',
         'Startet die Verbindung eines Postfachs bei Microsoft oder Google. '
         'Die einzige Kennung aus dem Koerper ist postfach_id (ein '
