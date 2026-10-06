@@ -6,9 +6,19 @@ nicht lösbar ist. Nach Auftrag Abschnitt 9.
 ## Edge Function `testbilder-holen` entfernen
 
 Einmalige Hilfsfunktion für die drei Testobjekte (`docs/ENTSCHEIDUNGEN.md`,
-06.10.2026). Sie ist abgeschaltet und antwortet nur noch mit 410. Das
-Werkzeug dieser Umgebung kann Funktionen nicht löschen; bitte im Dashboard
-unter Edge Functions entfernen. Sie liegt nicht im Repository.
+06.10.2026). Sie ist abgeschaltet und antwortet nur noch mit 410. Sie liegt
+nicht im Repository, und solange sie auf dem Projekt liegt, endet
+`funktionen-ausrollen.yml` rot — der Schritt „Nachzählen" vergleicht
+Projekt und Repository.
+
+Der Weg dafür ist da: `funktionen-ausrollen.yml` von Hand starten und
+`loeschen = testbilder-holen` setzen. **Am 06.10.2026 ab 07:25 UTC
+beantwortet Supabase sowohl das Ausrollen als auch das Löschen zeitweise mit
+`500 FGA Authentication Error. Unauthorized`** — ein Fehler der Plattform,
+nicht des Tokens: dieselbe Datei, dasselbe Geheimnis, derselbe Lauf ging um
+08:02 durch (expose-pdf-erzeugen, Fassung 56) und das Löschen um 08:05 und
+08:08 nicht. Also später noch einmal starten; sonst im Dashboard unter Edge
+Functions entfernen.
 
 ## Umgebung
 
