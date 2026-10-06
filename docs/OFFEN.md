@@ -3,22 +3,25 @@
 Was ohne Verhaltensänderung, ohne fehlende Zugangsdaten oder ohne Netzzugang
 nicht lösbar ist. Nach Auftrag Abschnitt 9.
 
-## Kein allgemeiner Test auf Rufnummern im Quelltext
+## ~~Kein allgemeiner Test auf Rufnummern im Quelltext~~ — erledigt am 06.10.2026
 
-Am 06.10.2026 stand eine echte Mobilnummer eines Mitarbeiters der Referenz
-im Quelltext (`mail-ki-vorschlag`, siehe `docs/ENTSCHEIDUNGEN.md`). Sie ist
-weg, und das Neutralitäts-Gate sucht sie jetzt — aber nur sie.
+`tests/rufnummern.py`, Teil von `npm run check`. Der Unterschied zum
+verworfenen Versuch ist der Umkreis: eine Ziffernfolge gilt nur dann als
+Rufnummer, wenn in ihrer Nähe steht, dass sie eine ist (`telefon`, `mobil`,
+`fax`, `rufnummer`, `tel`, `durchwahl`). Aus über siebzig Treffern ohne
+einen echten werden damit sieben, und jeder davon ist erklärbar:
+Platzhalter mit lauter Nullen, eine Zählfolge in einem Eingabefeld und ein
+Datum, das zufällig neben dem Wort „Telefon" steht. Für genau diese drei
+Arten gibt es Ausnahmen — eng genug, dass eine echte Nummer sie nicht
+trifft.
 
-Ein **allgemeines** Muster für deutsche Rufnummern wurde ausprobiert und
-wieder verworfen: über siebzig Treffer in `src/` und `supabase/functions/`,
-kein einziger echter. Es trifft Koordinaten, Zeitstempel, Farbwerte,
-Versionsnummern und Beispielnummern. Ein Gate, das man ignoriert, ist kein
-Gate.
+Kommentarzeilen zählen mit; das allgemeine Gate überliest sie, und die eine
+gefundene Nummer stand in einer Anweisung an das Sprachmodell, also in
+Prosa. Gegenprobe gemacht: drei erfundene, aber plausible Nummern werden
+gefunden, eine davon im Kommentar.
 
-Was helfen würde: Rufnummern nur dort suchen, wo ein Schlüsselwort daneben
-steht (`tel`, `telefon`, `mobil`, `fon`), und Platzhalter mit lauter Nullen
-ausnehmen. Das ist machbar, aber es ist eine eigene Runde mit eigener
-Gegenprobe.
+Die Liste erlaubter Nummern im Test ist leer — im Quelltext steht keine
+einzige erreichbare Rufnummer.
 
 ## Auftragsverarbeitungsvertrag fehlt
 

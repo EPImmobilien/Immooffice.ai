@@ -127,6 +127,13 @@ else
   fehler=1
 fi
 
+abschnitt "Rufnummern: nur dort suchen, wo eine steht"
+if python3 tests/rufnummern.py; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Mandantentrennung: Rundumschlag ueber alle Tabellen"
 if scripts/lokale-db.sh psql -q -f tests/mandant-rundumschlag.sql; then
   :
