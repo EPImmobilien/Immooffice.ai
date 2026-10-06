@@ -4741,3 +4741,51 @@ Sollte Microsoft SMTP AUTH weiter einschränken — die Richtung ist seit
 Jahren dieselbe —, ist Graph der nächste Schritt. Die Anbieter-Schicht ist
 dafür vorbereitet: der Versandweg hängt am Anbieter des Postfachs, nicht
 an einer Annahme im Code.
+
+## Eine eigene Website für immoOffice.ai (06.10.2026)
+
+Auftrag: „kannst du eine HTML-Website für immoOffice.ai erstellen und diese
+zusätzlich über Netlify ausspielen, sodass man dort notwendige Informationen
+zu immoOffice.ai findet und sich dort einloggt".
+
+**Getrennt von der Anwendung**, nicht als weitere Seite darin:
+
+| | Anwendung | Website |
+|---|---|---|
+| Quelle | `src/` → `dist/` | `website/` |
+| Auslieferung | `oberflaeche-ausliefern.yml` | `website-ausliefern.yml` |
+| Ändert sich | wenn entwickelt wird | wenn getextet wird |
+
+Zusammengelegt hieße: für ein Komma im Werbetext die Software neu ausrollen.
+Die Website ist drei Dateien groß (HTML, CSS, eine Konfigurationsdatei),
+ohne Framework und ohne Bauschritt.
+
+**Drei Entscheidungen, die mehr sind als Geschmack:**
+
+1. **Die Angaben des Betreibers stehen an genau einer Stelle**
+   (`website/konfig.js`): Firma, Anschrift, Vertretung, Kontakt und die
+   Adresse der Anwendung. Impressum und Datenschutzseite lesen von dort.
+   `tests/website.py` verbietet eine Anschrift, Telefonnummer oder
+   Mailadresse im HTML — zwei Fassungen derselben Angabe laufen auseinander.
+2. **Nichts erfunden.** Die Pflichtfelder sind leer, und solange sie leer
+   sind, zeigt das Impressum sichtbar, was fehlt, und
+   `website-ausliefern.yml` lässt **nur eine Vorschau** zu, keine
+   Produktion. Eine Unternehmenswebsite ohne Impressum ist in Deutschland
+   abmahnfähig (§ 5 DDG); eine mit erfundenem Impressum wäre schlimmer.
+3. **Keine Zusage, die das Produkt nicht halten kann.** `tests/website.py`
+   ist Teil von `npm run check` und schlägt an bei „100 % DSGVO-konform",
+   „rechtssicher", „qualifizierte Signatur", bei Preisen und bei
+   „gutachterlich". Die Pflichthinweise (Marktpreiseinschätzung statt
+   Verkehrswertgutachten, einfache statt qualifizierter Signatur) stehen
+   ausdrücklich **auf** der Seite, nicht im Kleingedruckten.
+
+Die Datenschutzseite ist ein **Gerüst** und sagt das auch: sie beschreibt,
+was die Seite und die Anwendung technisch tun (Hosting in Frankfurt, keine
+Cookies auf der Website, Google Fonts, verbundene Postfächer, KI-Funktionen)
+und nennt am Ende die Punkte, die eine geprüfte Fassung ergänzen muss.
+Eine Datenschutzerklärung kann diese Software nicht schreiben.
+
+Die Netlify-Site wird beim ersten Lauf über ihren Namen gesucht und, wenn
+es sie nicht gibt, angelegt — damit niemand von Hand eine Site anlegen und
+eine Kennung eintragen muss. Wer lieber selbst eine anlegt, setzt
+`NETLIFY_SITE_ID_WEBSITE`.

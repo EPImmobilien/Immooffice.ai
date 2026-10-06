@@ -1,0 +1,36 @@
+// ============================================================================
+// Die Angaben des Betreibers für die Website
+// ----------------------------------------------------------------------------
+// EINE Stelle für alles, was das Haus betrifft: Impressum, Kontakt, Adresse
+// der Anwendung. Die Seiten lesen von hier — niemand muss HTML anfassen, um
+// eine Telefonnummer zu ändern.
+//
+// Solange die Pflichtfelder leer sind, zeigt jede Seite einen sichtbaren
+// Hinweis, und .github/workflows/website-ausliefern.yml lässt NUR eine
+// Vorschau zu, keine Produktion. Grund: eine öffentliche Website eines
+// Unternehmens braucht in Deutschland ein Impressum (§ 5 DDG, früher TMG).
+// Eine Seite mit erfundenen oder fehlenden Angaben online zu stellen wäre
+// schlechter, als sie noch nicht online zu stellen.
+//
+// ERFINDEN IST KEINE OPTION. Hier steht nichts Ausgedachtes; was fehlt,
+// bleibt leer und fällt auf.
+// ============================================================================
+window.IMMO_WEB = {
+  // --- Pflicht für die Produktion -------------------------------------
+  firma: "",              // z. B. "Musterbetrieb GmbH"
+  strasse: "",            // "Musterweg 1"
+  plz_ort: "",            // "20095 Hamburg"
+  vertreten_durch: "",    // Geschäftsführer / Inhaber
+  email: "",              // Kontaktadresse
+  telefon: "",            // mit Vorwahl
+
+  // --- Freiwillig ------------------------------------------------------
+  registergericht: "",    // "Amtsgericht Musterstadt"
+  hrb: "",                // "HRB 12345"
+  ust_id: "",             // "DE123456789"
+  aufsichtsbehoerde: "",  // bei erlaubnispflichtiger Tätigkeit (§ 34c GewO)
+
+  // --- Wohin der Anmelde-Knopf führt -----------------------------------
+  // Die ausgelieferte Oberfläche. Später die eigene Domain.
+  anwendung: "https://immoofficeeai.netlify.app",
+};

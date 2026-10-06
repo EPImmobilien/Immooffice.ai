@@ -1,0 +1,179 @@
+# Stellt die Website aus website/ auf eine EIGENE Netlify-Site.
+#
+# Zwei Dinge liegen bei Netlify, und sie haben nichts miteinander zu tun:
+#
+#   * die ANWENDUNG (dist/, oberflaeche-ausliefern.yml) — dort melden sich
+#     Makler an und arbeiten;
+#   * die WEBSITE (website/, diese Datei) — dort steht, was immoOffice.ai
+#     ist, und ein Knopf, der zur Anwendung führt.
+#
+# Getrennt, weil sie sich getrennt ändern: an der Website wird getextet,
+# an der Anwendung entwickelt. Eine gemeinsame Auslieferung hiesse, fuer
+# einen Komma-Fehler im Werbetext die Software neu auszurollen.
+#
+# Die Site wird beim ersten Lauf ANGELEGT, wenn es sie noch nicht gibt —
+# gesucht wird nach dem Namen. Wer lieber selbst eine anlegt, setzt das
+# Repository-Geheimnis NETLIFY_SITE_ID_WEBSITE; dann wird genau die
+# benutzt und nichts gesucht.
+#
+# Voraussetzung ist nur NETLIFY_AUTH_TOKEN — dasselbe Geheimnis, mit dem
+# auch die Anwendung ausgeliefert wird.
+name: Website ausliefern
+
+on:
+  workflow_dispatch:
+    inputs:
+      umgebung:
+        description: 'entwurf (eigene Vorschau-Adresse) oder produktion'
+        required: true
+        default: entwurf
+        type: choice
+        options: [entwurf, produktion]
+
+concurrency:
+  group: website-ausliefern
+  cancel-in-progress: false
+
+jobs:
+  ausliefern:
+    # Feste Abbildung statt ubuntu-latest, aus demselben Grund wie bei den
+    # anderen Workflows: GitHub stellt das Etikett ab dem 19.10.2026 um,
+    # und ein Bau, der sich ueber Nacht aendert, ist kein Bau.
+    runs-on: ubuntu-24.04
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      SITE_NAME: immooffice-ai-web
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Geheimnis vorhanden?
+        run: |
+          if [ -z "${NETLIFY_AUTH_TOKEN:-}" ]; then
+            echo "::error::NETLIFY_AUTH_TOKEN fehlt (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+
+      - name: Pflichtangaben pruefen
+        id: pruefen
+        run: |
+          set -euo pipefail
+          # Eine geschaeftsmaessige Website braucht in Deutschland ein
+          # Impressum (§ 5 DDG). Fehlt eine Pflichtangabe, geht nur eine
+          # Vorschau hinaus — nicht die Produktion. Erfunden wird nichts.
+          python3 - <<'ENDE'
+          import re, sys, os
+          quelle = open('website/konfig.js', encoding='utf-8').read()
+          pflicht = ['firma', 'strasse', 'plz_ort', 'vertreten_durch', 'email', 'telefon']
+          offen = []
+          for feld in pflicht:
+              treffer = re.search(feld + r'\s*:\s*"([^"]*)"', quelle)
+              if not treffer or not treffer.group(1).strip():
+                  offen.append(feld)
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write('offen=' + ','.join(offen) + '\n')
+          if offen:
+              print('::warning::Impressum unvollstaendig: ' + ', '.join(offen))
+          ENDE
+
+      - name: Produktion nur mit Impressum
+        if: github.event.inputs.umgebung == 'produktion' && steps.pruefen.outputs.offen != ''
+        run: |
+          echo "::error::Fuer die Produktion fehlen Pflichtangaben in website/konfig.js: ${{ steps.pruefen.outputs.offen }}"
+          echo "Eine oeffentliche Unternehmenswebsite ohne Impressum ist in Deutschland"
+          echo "abmahnfaehig. Felder ausfuellen, dann noch einmal starten."
+          exit 1
+
+      - name: Site finden oder anlegen
+        id: site
+        run: |
+          set -euo pipefail
+          vorgabe="${{ secrets.NETLIFY_SITE_ID_WEBSITE }}"
+          if [ -n "$vorgabe" ]; then
+            echo "Benutze die Site aus NETLIFY_SITE_ID_WEBSITE."
+            echo "id=$vorgabe" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          api="https://api.netlify.com/api/v1"
+          kopf="Authorization: Bearer $NETLIFY_AUTH_TOKEN"
+          # Erst suchen: der Workflow laeuft oefter als einmal, und bei
+          # jedem Lauf eine neue Site anzulegen waere eine Sammlung.
+          gefunden=$(curl -sS -H "$kopf" "$api/sites?filter=all&per_page=200" \
+            | python3 -c "import json,sys,os
+name=os.environ['SITE_NAME']
+for s in json.load(sys.stdin):
+    if s.get('name') == name or str(s.get('name','')).startswith(name + '-'):
+        print(s['id']); break")
+          if [ -n "$gefunden" ]; then
+            echo "Site '$SITE_NAME' gefunden: $gefunden"
+            echo "id=$gefunden" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "Keine Site '$SITE_NAME' — sie wird angelegt."
+          antwort=$(curl -sS -X POST -H "$kopf" -H "Content-Type: application/json" \
+            -d "{\"name\":\"$SITE_NAME\"}" "$api/sites")
+          neu=$(printf '%s' "$antwort" | python3 -c "import json,sys
+d=json.load(sys.stdin)
+print(d.get('id',''))")
+          if [ -z "$neu" ]; then
+            # Der Name kann weltweit vergeben sein. Dann ohne Namen, Netlify
+            # denkt sich einen aus; die Adresse steht unten im Bericht.
+            echo "Name belegt, Site ohne Namen anlegen."
+            antwort=$(curl -sS -X POST -H "$kopf" -H "Content-Type: application/json" \
+              -d '{}' "$api/sites")
+            neu=$(printf '%s' "$antwort" | python3 -c "import json,sys; print(json.load(sys.stdin).get('id',''))")
+          fi
+          if [ -z "$neu" ]; then
+            echo "::error::Site konnte nicht angelegt werden: $antwort"
+            exit 1
+          fi
+          echo "Angelegt: $neu"
+          echo "id=$neu" >> "$GITHUB_OUTPUT"
+          echo "neu=ja" >> "$GITHUB_OUTPUT"
+
+      - name: Auf Netlify stellen
+        id: stellen
+        run: |
+          set -euo pipefail
+          npm install --no-save netlify-cli@17
+          # Aus einem eigenen Verzeichnis, damit die netlify.toml des
+          # Altbestands im Wurzelverzeichnis nicht mitgelesen wird — sie
+          # richtet Next.js ein und hat mit dieser Seite nichts zu tun.
+          mkdir -p auslieferung && cp -r website/. auslieferung/
+          cd auslieferung
+          if [ "${{ github.event.inputs.umgebung }}" = "produktion" ]; then
+            npx netlify deploy --dir . --site "${{ steps.site.outputs.id }}" --prod --json \
+              --message "Website ${{ github.sha }}" > ../ausgabe.json
+            schluessel=url
+          else
+            npx netlify deploy --dir . --site "${{ steps.site.outputs.id }}" --json \
+              --message "Entwurf ${{ github.sha }}" > ../ausgabe.json
+            schluessel=deploy_url
+          fi
+          cd ..
+          ziel=$(python3 -c "import json; print(json.load(open('ausgabe.json'))['$schluessel'])")
+          echo "ziel=$ziel" >> "$GITHUB_OUTPUT"
+          echo "Ausgeliefert nach $ziel"
+
+      - name: Bericht
+        run: |
+          {
+            echo "### Website ausgeliefert"
+            echo ""
+            echo "Umgebung: **${{ github.event.inputs.umgebung }}**"
+            echo ""
+            echo "${{ steps.stellen.outputs.ziel }}"
+            echo ""
+            echo "Site-ID: \`${{ steps.site.outputs.id }}\`"
+            if [ "${{ steps.site.outputs.neu }}" = "ja" ]; then
+              echo ""
+              echo "Diese Site wurde gerade angelegt. Sie wird bei jedem Lauf"
+              echo "ueber ihren Namen wiedergefunden; wer sichergehen will,"
+              echo "traegt die ID als Geheimnis NETLIFY_SITE_ID_WEBSITE ein."
+            fi
+            if [ -n "${{ steps.pruefen.outputs.offen }}" ]; then
+              echo ""
+              echo "**Impressum unvollstaendig:** ${{ steps.pruefen.outputs.offen }}"
+              echo "Die Produktion bleibt gesperrt, bis die Felder in"
+              echo "\`website/konfig.js\` ausgefuellt sind."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

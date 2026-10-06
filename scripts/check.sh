@@ -428,6 +428,15 @@ else
   fehler=1
 fi
 
+abschnitt "Website: was sie behaupten darf"
+# Eine Werbeseite ist die Stelle, an der sich Saetze einschleichen, die das
+# Produkt nicht halten kann. CLAUDE.md verbietet genau diese Saetze.
+if python3 tests/website.py; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Postfaecher je Anbieter: Microsoft, Google, IMAP"
 # Die beiden Funktionen, die ein Postfach verbinden, laufen hier wirklich —
 # gegen ein nachgebautes Supabase und einen nachgebauten Anbieter. Geprueft

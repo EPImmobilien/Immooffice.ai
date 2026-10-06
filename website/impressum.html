@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Impressum — immoOffice.ai</title>
+<meta name="robots" content="index, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="stil.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231B2A47'/><text x='16' y='23' font-family='Georgia,serif' font-size='19' fill='%23B5934F' text-anchor='middle'>i</text></svg>">
+<script src="konfig.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="bahn">
+    <a class="marke" href="/">immoOffice<span>.ai</span></a>
+    <nav><a class="knopf klein leer" href="/">Zurück</a></nav>
+  </div>
+</header>
+
+<div class="bahn rechtsseite">
+  <h1 style="font-size:36px">Impressum</h1>
+  <div id="warnung"></div>
+
+  <h2>Angaben gemäß § 5 DDG</h2>
+  <dl id="angaben"></dl>
+
+  <h2>Verantwortlich für den Inhalt</h2>
+  <p id="verantwortlich"></p>
+
+  <h2>Haftung für Inhalte</h2>
+  <p>
+    Die Inhalte dieser Seiten wurden mit Sorgfalt erstellt. Für die
+    Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir
+    jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir für eigene
+    Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich;
+    wir sind jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde
+    Informationen zu überwachen.
+  </p>
+
+  <h2>Haftung für Links</h2>
+  <p>
+    Unser Angebot enthält Links zu externen Websites Dritter, auf deren
+    Inhalte wir keinen Einfluss haben. Für die Inhalte der verlinkten Seiten
+    ist stets der jeweilige Anbieter verantwortlich. Zum Zeitpunkt der
+    Verlinkung waren keine Rechtsverstöße erkennbar.
+  </p>
+
+  <h2>Urheberrecht</h2>
+  <p>
+    Die durch den Betreiber erstellten Inhalte und Werke auf diesen Seiten
+    unterliegen dem deutschen Urheberrecht. Beiträge Dritter sind als solche
+    gekennzeichnet.
+  </p>
+</div>
+
+<footer>
+  <div class="bahn">
+    <div class="schluss">
+      <a href="/">Startseite</a>
+      <a href="datenschutz.html">Datenschutz</a>
+      <span>© <span id="jahr"></span> immoOffice.ai</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var k = window.IMMO_WEB || {};
+  var esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"]/g, function (z) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[z];
+    });
+  };
+  var fehlt = '<span class="fehlt">noch nicht hinterlegt</span>';
+  var zeile = function (titel, wert) {
+    return "<dt>" + esc(titel) + "</dt><dd>" + (wert ? esc(wert) : fehlt) + "</dd>";
+  };
+
+  var pflicht = ["firma", "strasse", "plz_ort", "vertreten_durch", "email", "telefon"];
+  var offen = pflicht.filter(function (f) { return !k[f]; });
+  var w = document.getElementById("warnung");
+  if (w && offen.length) {
+    w.innerHTML = '<div class="warnung"><strong>Diese Seite ist noch nicht '
+      + 'vollständig.</strong> Es fehlen: ' + esc(offen.join(", "))
+      + '. Die Angaben stehen in <code>website/konfig.js</code>. Eine '
+      + 'geschäftsmäßige Website braucht in Deutschland ein vollständiges '
+      + 'Impressum (§ 5 DDG) — hier steht bewusst nichts Erfundenes.</div>';
+  }
+
+  var dl = document.getElementById("angaben");
+  if (dl) {
+    var html = zeile("Anbieter", k.firma)
+      + zeile("Anschrift", [k.strasse, k.plz_ort].filter(Boolean).join(", "))
+      + zeile("Vertreten durch", k.vertreten_durch)
+      + zeile("E-Mail", k.email)
+      + zeile("Telefon", k.telefon);
+    if (k.registergericht || k.hrb) {
+      html += zeile("Registereintrag",
+        [k.registergericht, k.hrb].filter(Boolean).join(", "));
+    }
+    if (k.ust_id) html += zeile("Umsatzsteuer-Identifikationsnummer", k.ust_id);
+    if (k.aufsichtsbehoerde) html += zeile("Aufsichtsbehörde", k.aufsichtsbehoerde);
+    dl.innerHTML = html;
+  }
+
+  var v = document.getElementById("verantwortlich");
+  if (v) {
+    v.innerHTML = k.vertreten_durch
+      ? esc(k.vertreten_durch) + (k.strasse ? ", " + esc(k.strasse) : "")
+        + (k.plz_ort ? ", " + esc(k.plz_ort) : "")
+      : fehlt;
+  }
+  var jahr = document.getElementById("jahr");
+  if (jahr) jahr.textContent = String(new Date().getFullYear());
+})();
+</script>
+</body>
+</html>
