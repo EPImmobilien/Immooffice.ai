@@ -91,13 +91,52 @@ def erzeugen():
     return "".join(teile)
 
 
+NACHZIEHEN = """\
+-- ---------------------------------------------------------------------------
+-- Und die Kopien, die noch nie bearbeitet wurden.
+--
+-- Wer "Kopie anlegen" drueckt, bekommt das Dokument der Systemvorlage mit
+-- version = 1. Solange niemand etwas daran geaendert hat, ist diese Kopie
+-- genau die Systemvorlage unter einem anderen Namen — und soll deren
+-- Korrekturen mitbekommen. Sonst traegt der Mandant die alten Fehler
+-- weiter, ohne je davon zu erfahren.
+--
+-- Ab version > 1 bleibt die Kopie unangetastet: dann hat jemand im Editor
+-- daran gearbeitet, und seine Arbeit zu ueberschreiben waere ein Verlust,
+-- kein Dienst. Diese Mandanten muessen von Hand nachziehen; die
+-- Systemvorlage steht daneben und laesst sich erneut kopieren.
+-- ---------------------------------------------------------------------------
+
+update public.expose_vorlagen k
+   set dokument = s.dokument,
+       geaendert_am = now()
+  from public.expose_vorlagen s
+ where s.mandant_id is null
+   and k.mandant_id is not null
+   and k.basis = s.basis
+   and coalesce(k.version, 1) = 1
+   and k.dokument is distinct from s.dokument;
+"""
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--pruefen", action="store_true",
                    help="nur vergleichen, nichts schreiben")
+    p.add_argument("--stand", metavar="DATEI",
+                   help="zusaetzlich eine Migration schreiben, die den "
+                        "heutigen Stand auf ein bestehendes Projekt bringt "
+                        "(Systemvorlagen und unbearbeitete Kopien)")
     a = p.parse_args()
 
     neu = erzeugen()
+    if a.stand:
+        ziel = os.path.join(STAMM, "supabase", "migrations", a.stand)
+        with open(ziel, "w", encoding="utf-8") as f:
+            f.write(neu.replace("fork_38 — die drei Systemvorlagen des Exposé-Baukastens",
+                                "Stand der Systemvorlagen nachziehen")
+                    + NACHZIEHEN)
+        print(f"[ok] {os.path.relpath(ziel, STAMM)} geschrieben.")
     if not a.pruefen:
         with open(ZIEL, "w", encoding="utf-8") as f:
             f.write(neu)

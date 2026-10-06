@@ -1,0 +1,121 @@
+# Spielt eine Migration aus supabase/migrations/ auf das eigene Projekt ein.
+#
+# Warum ueber GitHub Actions: der Netzfilter der Arbeitsumgebung beantwortet
+# jede Verbindung zu api.supabase.com mit 403. Was von dort aus geht, ist das
+# Supabase-Werkzeug ueber den Model-Context-Server — aber dabei muss der
+# INHALT der Migration durch die Werkzeugaufrufe wandern. Bei 110 KiB JSON
+# (den drei Systemvorlagen des Exposé-Baukastens) ist das eine Abschrift,
+# keine Uebertragung: jedes Zeichen wird einmal gelesen und einmal wieder
+# getippt, und ein Tippfehler faellt erst in der Datenbank auf.
+#
+# Ein Runner hat freien Ausgang und schickt die Datei so, wie sie im
+# Repository liegt — byte-genau.
+#
+# Geschickt wird an die Verwaltungs-API, Endpunkt database/query. Das ist
+# derselbe Weg, den der SQL-Editor im Dashboard nimmt. Voraussetzung ist
+# dasselbe Geheimnis wie beim Ausrollen der Funktionen:
+# SUPABASE_ACCESS_TOKEN.
+#
+# Von Hand gestartet, nie automatisch. Eine Migration einzuspielen ist nichts,
+# was bei einem Push von selbst passieren soll.
+name: Migration einspielen
+
+on:
+  workflow_dispatch:
+    inputs:
+      datei:
+        description: 'Dateiname in supabase/migrations/ (ohne Pfad)'
+        required: true
+      vormerken:
+        description: 'In supabase_migrations.schema_migrations eintragen?'
+        type: boolean
+        default: true
+
+concurrency:
+  group: migrationen-einspielen
+  cancel-in-progress: false
+
+jobs:
+  einspielen:
+    # Feste Abbildung statt ubuntu-latest, und zwar aus EINEM Grund: GitHub
+    # stellt dieses Etikett ab dem 19.10.2026 auf Ubuntu 26 um, und ein Bau,
+    # der sich ueber Nacht aendert, ist kein Bau.
+    runs-on: ubuntu-24.04
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJEKT: usguiggfciavwzkdfjgt
+      DATEI: ${{ inputs.datei }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Zugangstoken und Datei vorhanden?
+        run: |
+          set -euo pipefail
+          if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
+            echo "::error::Das Repository-Geheimnis SUPABASE_ACCESS_TOKEN fehlt."
+            exit 1
+          fi
+          # Nur ein Dateiname, kein Pfad: sonst liesse sich jede Datei des
+          # Repositorys als SQL an die Datenbank schicken.
+          case "$DATEI" in
+            */*|..*|"") echo "::error::Nur der Dateiname, ohne Pfad."; exit 1;;
+          esac
+          if [ ! -f "supabase/migrations/$DATEI" ]; then
+            echo "::error::supabase/migrations/$DATEI gibt es nicht."
+            ls supabase/migrations | tail -20
+            exit 1
+          fi
+          echo "Datei: supabase/migrations/$DATEI ($(wc -c < "supabase/migrations/$DATEI") Bytes)"
+
+      - name: Schon eingespielt?
+        id: stand
+        run: |
+          set -euo pipefail
+          version="${DATEI%%_*}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          antwort=$(jq -n --arg q "select version from supabase_migrations.schema_migrations where version = '$version'" '{query:$q}' \
+            | curl -sS -X POST "https://api.supabase.com/v1/projects/$PROJEKT/database/query" \
+                -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+                -H "Content-Type: application/json" --data @-)
+          echo "$antwort"
+          if [ "$(echo "$antwort" | jq 'length')" != "0" ]; then
+            echo "::warning::Version $version steht schon in der Historie. Der Lauf spielt sie trotzdem ein — die Migrationen dieses Projekts sind so geschrieben, dass das nichts kaputt macht."
+          fi
+
+      - name: Einspielen
+        run: |
+          set -euo pipefail
+          jq -Rs '{query: .}' < "supabase/migrations/$DATEI" > koerper.json
+          code=$(curl -sS -o antwort.json -w '%{http_code}' \
+            -X POST "https://api.supabase.com/v1/projects/$PROJEKT/database/query" \
+            -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            -H "Content-Type: application/json" --data @koerper.json)
+          echo "HTTP $code"
+          head -c 2000 antwort.json; echo
+          if [ "$code" != "200" ] && [ "$code" != "201" ]; then
+            echo "::error::Die Migration wurde nicht eingespielt (HTTP $code)."
+            exit 1
+          fi
+
+      - name: In der Historie vormerken
+        if: ${{ inputs.vormerken }}
+        run: |
+          set -euo pipefail
+          version="${{ steps.stand.outputs.version }}"
+          name=$(basename "$DATEI" .sql)
+          name="${name#${version}_}"
+          jq -n --arg v "$version" --arg n "$name" \
+            '{query: ("insert into supabase_migrations.schema_migrations (version, name) values (" + ($v|@text|tojson) + ", " + ($n|@text|tojson) + ") on conflict (version) do nothing")}' \
+            | curl -sS -X POST "https://api.supabase.com/v1/projects/$PROJEKT/database/query" \
+                -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+                -H "Content-Type: application/json" --data @- | head -c 500
+          echo
+
+      - name: Nachsehen
+        run: |
+          set -euo pipefail
+          jq -n '{query: "select name, basis, version, md5(dokument::text) as pruefsumme, mandant_id is null as system from public.expose_vorlagen order by system desc, name"}' \
+            | curl -sS -X POST "https://api.supabase.com/v1/projects/$PROJEKT/database/query" \
+                -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+                -H "Content-Type: application/json" --data @- | jq -r '.[] | [.name, .basis, .version, .pruefsumme, .system] | @tsv' \
+            | tee -a "$GITHUB_STEP_SUMMARY"
