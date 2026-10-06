@@ -214,6 +214,59 @@
     }, text);
   }
 
+
+  // --- Die festen Texte einer Vorlage ------------------------------------
+  // Welche Texte kann der Makler aendern? Alle, die in der VORLAGE stehen
+  // und nicht aus den Daten kommen: Kapitelzeilen, Ueberschriften,
+  // Rechtshinweise, die Beschriftung einer Tabellenspalte. Was ein
+  // Platzhalter liefert ({{objekt.wohnflaeche}}), gehoert dem Objekt und
+  // bleibt stehen — der Makler kann es umstellen, aber nicht ueberschreiben.
+  //
+  // Gesucht wird am Dokument selbst, nicht an einer gepflegten Liste: eine
+  // Liste waere am Tag nach der naechsten Vorlagenaenderung falsch.
+  var TEXTFELDER = ["inhalt", "label", "titel", "text", "zeile1", "zeile2",
+                    "fahne_text", "einheit", "nachsatz", "unterzeile"];
+
+  function texteSammeln(dokument) {
+    var raus = [];
+    (dokument && dokument.seiten || []).forEach(function (seite, si) {
+      (function gehe(x, pfad) {
+        if (Array.isArray(x)) {
+          x.forEach(function (v, i) { gehe(v, pfad.concat([i])); });
+          return;
+        }
+        if (!x || typeof x !== "object") return;
+        TEXTFELDER.forEach(function (feld) {
+          if (typeof x[feld] !== "string" || x[feld] === "") return;
+          raus.push({
+            seite: si, seiten_id: seite.id, seiten_name: seite.name || seite.id,
+            element: x.id || (pfad.length ? pfad.join(".") : "?"),
+            pfad: pfad.concat([feld]), feld: feld, wert: x[feld],
+          });
+        });
+        Object.keys(x).forEach(function (k) {
+          if (TEXTFELDER.indexOf(k) >= 0) return;
+          gehe(x[k], pfad.concat([k]));
+        });
+      })(seite.elemente || [], ["elemente"]);
+    });
+    return raus;
+  }
+
+  /** Eine Kopie des Dokuments mit geaenderten Texten. */
+  function texteEinsetzen(dokument, aenderungen) {
+    var neu = JSON.parse(JSON.stringify(dokument));
+    Object.keys(aenderungen).forEach(function (schluessel) {
+      var teile = schluessel.split("\u0000");
+      var si = Number(teile[0]);
+      var ziel = neu.seiten[si];
+      var pfad = JSON.parse(teile[1]);
+      for (var i = 0; i < pfad.length - 1; i++) ziel = ziel[pfad[i]];
+      ziel[pfad[pfad.length - 1]] = aenderungen[schluessel];
+    });
+    return neu;
+  }
+
   function ExposeVorlagen(props) {
     var user = props.user || {};
     var zustand = React.useState({ lade: true, liste: [], fehler: "" });
@@ -226,6 +279,11 @@
     var firma = firmaS[0], setFirma = firmaS[1];
     var arbeitS = React.useState("");
     var arbeit = arbeitS[0], setArbeit = arbeitS[1];
+    // Offene Textaenderungen, Schluessel: Seitennummer \0 Pfad als JSON.
+    var entwurfS = React.useState({});
+    var entwurf = entwurfS[0], setEntwurf = entwurfS[1];
+    var texteOffenS = React.useState(false);
+    var texteOffen = texteOffenS[0], setTexteOffen = texteOffenS[1];
 
     var laden = React.useCallback(function () {
       setDaten({ lade: true, liste: [], fehler: "" });
@@ -250,6 +308,14 @@
         .then(function (a) { if (a.data) setFirma(a.data); });
     }, [laden]);
 
+    // Eine andere Vorlage heisst: andere Texte. Ein Entwurf, der zur
+    // vorigen gehoerte, darf nicht in die naechste rutschen.
+    React.useEffect(function () {
+      // Nur leeren, wenn etwas drinsteht: ein neues leeres Objekt waere eine
+      // neue Abhaengigkeit, und die Vorschau zeichnete jedes Mal zweimal.
+      setEntwurf(function (alt) { return Object.keys(alt).length ? {} : alt; });
+    }, [gewaehlt]);
+
     // Die Vorschau entsteht neu, sobald eine andere Vorlage gewaehlt wird.
     React.useEffect(function () {
       if (!gewaehlt) return;
@@ -259,14 +325,27 @@
       setVorschau({ url: "", laeuft: true, fehler: "", warnungen: [], seiten: 0 });
       if (alt) try { URL.revokeObjectURL(alt); } catch (x) {}
       var marke = firma ? { primaer: firma.ci_primaer || undefined, akzent: firma.ci_akzent || undefined } : {};
-      pdfBauen(reihe.dokument, beispielDaten(firma), marke).then(function (r) {
-        var url = URL.createObjectURL(new Blob([r.bytes], { type: "application/pdf" }));
-        setVorschau({ url: url, laeuft: false, fehler: "", warnungen: r.warnungen, seiten: r.seiten.length });
-      }).catch(function (f) {
-        setVorschau({ url: "", laeuft: false, fehler: String(f && f.message || f), warnungen: [], seiten: 0 });
-      });
+      // Mit den offenen Aenderungen: wer eine Ueberschrift tippt, soll sie
+      // sehen, bevor er speichert.
+      var offen = Object.keys(entwurf).length;
+      var dok = offen ? texteEinsetzen(reihe.dokument, entwurf) : reihe.dokument;
+      // Beim Tippen nicht bei jedem Anschlag zeichnen: ein Durchlauf
+      // dauert knapp eine Sekunde, und zehn Buchstaben waeren zehn
+      // Durchlaeufe, von denen neun niemand sieht.
+      var abgebrochen = false;
+      var zeit = setTimeout(function () {
+        pdfBauen(dok, beispielDaten(firma), marke).then(function (r) {
+          if (abgebrochen) return;
+          var url = URL.createObjectURL(new Blob([r.bytes], { type: "application/pdf" }));
+          setVorschau({ url: url, laeuft: false, fehler: "", warnungen: r.warnungen, seiten: r.seiten.length });
+        }).catch(function (f) {
+          if (abgebrochen) return;
+          setVorschau({ url: "", laeuft: false, fehler: String(f && f.message || f), warnungen: [], seiten: 0 });
+        });
+      }, offen ? 600 : 0);
+      return function () { abgebrochen = true; clearTimeout(zeit); };
       // eslint-disable-next-line
-    }, [gewaehlt, firma, daten.liste]);
+    }, [gewaehlt, firma, daten.liste, entwurf]);
 
     function kopieAnlegen(reihe) {
       var name = window.prompt("Name der neuen Vorlage", reihe.name + " (Kopie)");
@@ -313,6 +392,36 @@
           if (a && a.error) { window.alert("Nicht gesetzt: " + a.error.message); return; }
           laden();
         });
+    }
+
+    /**
+     * Die geaenderten Texte speichern.
+     *
+     * Erst die bisherige Fassung in die Historie, dann die neue in die
+     * Vorlage — in dieser Reihenfolge: bricht der zweite Schritt ab, steht
+     * in der Historie eine Fassung zu viel, und das ist harmlos. Umgekehrt
+     * waere die alte Fassung weg.
+     */
+    function texteSpeichern(reihe) {
+      var offen = Object.keys(entwurf);
+      if (!offen.length) return;
+      setArbeit("texte");
+      var neuesDokument = texteEinsetzen(reihe.dokument, entwurf);
+      window._sb.from("expose_vorlagen_versionen").insert({
+        vorlage_id: reihe.id, version: reihe.version || 1,
+        dokument: reihe.dokument, geaendert_von: user.id || null,
+      }).then(function () {
+        return window._sb.from("expose_vorlagen").update({
+          dokument: neuesDokument,
+          version: (reihe.version || 1) + 1,
+          geaendert_am: new Date().toISOString(),
+        }).eq("id", reihe.id);
+      }).then(function (a) {
+        setArbeit("");
+        if (a && a.error) { window.alert("Nicht gespeichert: " + a.error.message); return; }
+        setEntwurf({});
+        laden();
+      });
     }
 
     function archivieren(reihe, zurueck) {
@@ -387,6 +496,111 @@
       ]);
     }
 
+
+    // --- Die Texte der gewaehlten Vorlage ---------------------------------
+    var gewaehlteReihe = (daten.liste || []).filter(function (v) { return v.id === gewaehlt; })[0];
+    var eigenGewaehlt = !!(gewaehlteReihe && gewaehlteReihe.mandant_id);
+
+    function textFeld(eintrag) {
+      var schluessel = eintrag.seite + "\u0000" + JSON.stringify(eintrag.pfad);
+      var wert = Object.prototype.hasOwnProperty.call(entwurf, schluessel)
+        ? entwurf[schluessel] : eintrag.wert;
+      var geaendert = Object.prototype.hasOwnProperty.call(entwurf, schluessel)
+        && entwurf[schluessel] !== eintrag.wert;
+      var zeilen = Math.min(4, Math.max(1, Math.ceil(wert.length / 46)));
+      return e("div", { key: schluessel, style: { marginBottom: 10 } }, [
+        e("div", { key: "l", style: {
+          fontSize: 10.5, color: CI.muted, marginBottom: 3,
+          display: "flex", justifyContent: "space-between", gap: 8,
+        } }, [
+          e("span", { key: "a" }, eintrag.element + (eintrag.feld === "inhalt" ? "" : "  ·  " + eintrag.feld)),
+          geaendert ? e("span", { key: "b", style: { color: CI.gold, fontWeight: 700 } }, "geändert") : null,
+        ]),
+        e("textarea", {
+          key: "f", value: wert, rows: zeilen,
+          onChange: function (ev) {
+            var neu = {};
+            Object.keys(entwurf).forEach(function (k) { neu[k] = entwurf[k]; });
+            neu[schluessel] = ev.target.value;
+            setEntwurf(neu);
+          },
+          style: {
+            width: "100%", boxSizing: "border-box", padding: "7px 9px",
+            border: "1px solid " + (geaendert ? CI.gold : CI.border),
+            borderRadius: 7, fontSize: 12.5, lineHeight: 1.45, resize: "vertical",
+            fontFamily: "inherit", color: CI.ink, background: "#fff",
+          },
+        }),
+      ]);
+    }
+
+    function texteBereich() {
+      if (!gewaehlteReihe) return null;
+      if (!eigenGewaehlt) {
+        return e("div", { key: "systemhinweis", style: {
+          background: "#fff8e6", border: "1px solid #f0e0b8", borderRadius: 8,
+          padding: "10px 12px", fontSize: 12.5, lineHeight: 1.6, marginTop: 14,
+        } }, "Systemvorlagen gehören der Plattform und lassen sich nicht ändern. "
+           + "Lege eine Kopie an — in ihr sind alle Texte frei bearbeitbar.");
+      }
+      var eintraege = texteSammeln(gewaehlteReihe.dokument);
+      var offen = Object.keys(entwurf).filter(function (k) { return true; }).length;
+      if (!texteOffen) {
+        return e("div", { key: "zu", style: { marginTop: 14 } },
+          knopf("Texte bearbeiten (" + eintraege.length + ")",
+                function () { setTexteOffen(true); }, "haupt", false));
+      }
+      var nachSeite = [];
+      eintraege.forEach(function (x) {
+        var letzte = nachSeite[nachSeite.length - 1];
+        if (!letzte || letzte.seite !== x.seite) {
+          nachSeite.push({ seite: x.seite, name: x.seiten_name, eintraege: [x] });
+        } else letzte.eintraege.push(x);
+      });
+      return e("div", { key: "texte", style: {
+        marginTop: 14, border: "1px solid " + CI.border, borderRadius: 10,
+        background: CI.card, padding: "14px 16px",
+      } }, [
+        e("div", { key: "kopf", style: {
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          gap: 10, marginBottom: 8,
+        } }, [
+          e("div", { key: "t", style: {
+            fontSize: 10.5, fontWeight: 700, letterSpacing: "0.12em",
+            color: CI.muted, textTransform: "uppercase",
+          } }, "Texte der Vorlage"),
+          e("div", { key: "k", style: { display: "flex", gap: 6 } }, [
+            offen ? knopf("Speichern", function () { texteSpeichern(gewaehlteReihe); },
+                          "haupt", arbeit === "texte") : null,
+            offen ? knopf("Verwerfen", function () { setEntwurf({}); }, "zweit", !!arbeit) : null,
+            knopf("Schließen", function () { setTexteOffen(false); }, "zweit", false),
+          ].filter(Boolean)),
+        ]),
+        e("div", { key: "h", style: { fontSize: 12, color: CI.muted, lineHeight: 1.55, marginBottom: 12 } },
+          "Hier stehen die Texte, die in der VORLAGE stehen und damit für jedes "
+          + "Objekt gelten: Kapitelzeilen, Überschriften, Hinweise. Was in "
+          + "doppelten geschweiften Klammern steht, ist ein Platzhalter — er "
+          + "wird beim Erzeugen durch die Angabe des Objekts ersetzt und "
+          + "entfällt, wenn sie fehlt. Die Vorschau rechts zeigt die Änderung, "
+          + "bevor du speicherst."),
+        offen ? e("div", { key: "w", style: {
+          background: "#fff8e6", border: "1px solid #f0e0b8", borderRadius: 7,
+          padding: "7px 10px", fontSize: 12, marginBottom: 12,
+        } }, offen + (offen === 1 ? " Änderung ist" : " Änderungen sind")
+           + " noch nicht gespeichert.") : null,
+        e("div", { key: "l", style: { maxHeight: "52vh", overflowY: "auto" } },
+          nachSeite.map(function (gruppe) {
+            return e("div", { key: "s" + gruppe.seite, style: { marginBottom: 16 } }, [
+              e("div", { key: "n", style: {
+                fontSize: 11, fontWeight: 700, color: CI.ink, marginBottom: 6,
+                borderBottom: "1px solid " + CI.border, paddingBottom: 4,
+              } }, (gruppe.seite + 1) + "  ·  " + gruppe.name),
+              e("div", { key: "f" }, gruppe.eintraege.map(textFeld)),
+            ]);
+          })),
+      ]);
+    }
+
     var warnArten = {};
     (vorschau.warnungen || []).forEach(function (w) {
       warnArten[w.art] = (warnArten[w.art] || 0) + 1;
@@ -404,6 +618,7 @@
           + "nicht ändern. Eine Kopie gehört dir und ist frei bearbeitbar.", system, "system"),
         abschnitt("Eigene Vorlagen", "", eigene, "eigen"),
         abschnitt("Archiv", "", archiv, "archiv"),
+        texteBereich(),
         !daten.lade && !system.length && !eigene.length ? e("div", { key: "leer", style: {
           background: "#fff8e6", border: "1px solid #f0e0b8", borderRadius: 8,
           padding: "12px 14px", fontSize: 12.5, lineHeight: 1.6,

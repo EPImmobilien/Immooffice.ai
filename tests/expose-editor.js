@@ -141,7 +141,15 @@ function nachbau(reihen) {
         protokoll.push(['insert', tabelle, r]);
         const neu = Object.assign({ id: 'neu-' + protokoll.length, mandant_id: 'm1' }, r);
         (reihen[tabelle] = reihen[tabelle] || []).push(neu);
-        const nach = { select: () => nach, single: () => Promise.resolve({ data: neu, error: null }) };
+        // supabase-js gibt hier ein Objekt zurueck, das BEIDES kann:
+        // .select().single() fuer die eingefuegte Zeile und .then() fuer
+        // "einfach einfuegen". Der Nachbau muss das auch koennen, sonst
+        // prueft der Test einen Weg, den es so nicht gibt.
+        const nach = {
+          select: () => nach,
+          single: () => Promise.resolve({ data: neu, error: null }),
+          then: (f, g) => Promise.resolve({ data: neu, error: null }).then(f, g),
+        };
         return nach;
       },
       update: (r) => {
@@ -318,11 +326,98 @@ if (fehler) { console.log(`\n  ${fehler} Pruefung(en) gescheitert.`); process.ex
     melde('Es gibt eine Vorlage, die noch nicht Standard ist', false);
   }
 
+  // --- 5. Die Texte der Vorlage bearbeiten -------------------------------
+  // Das war die Beschwerde vom 06.10.2026: "Man kann manche Überschriften
+  // nicht bearbeiten." Sie standen fest im Dokument, und das Dokument war
+  // nur lesbar. Jetzt listet die Ansicht jeden festen Text der Vorlage,
+  // schreibt die Aenderung in die Vorschau und beim Speichern in die
+  // Datenbank — mit der vorigen Fassung in der Historie.
+  //
+  // Wieder die EIGENE Vorlage waehlen: Schritt 3 und 4 haben die Auswahl
+  // auf die eben angelegte Kopie gezogen.
+  baum = hol();
+  const eigene = knotenMit(baum, 'div').filter((k) => k.props && k.props.onClick
+    && texte(k).join(' ').includes('Hausvorlage'));
+  if (eigene.length) eigene[0].props.onClick();
+  await warte(40);
+  baum = hol();
+  melde('Eine eigene Vorlage bietet "Texte bearbeiten"',
+        druecke(baum, 'Texte bearbeiten'), texte(baum).join(' | ').slice(-200));
+  await warte();
+  baum = hol();
+  const felder = knotenMit(baum, 'textarea');
+  melde('Jeder feste Text der Vorlage hat ein Feld', felder.length > 40,
+        String(felder.length));
+  const ueberschrift = felder.filter((f) => f.props.value === 'Die wichtigsten Fakten.');
+  melde('Die Ueberschrift der Seite steht darunter', ueberschrift.length === 1,
+        JSON.stringify(felder.slice(0, 8).map((f) => f.props.value)));
+
+  if (ueberschrift.length) {
+    const blobsVorher = blobs.length;
+    ueberschrift[0].props.onChange({ target: { value: 'Alles auf einen Blick.' } });
+    await warte(60);
+    baum = hol();
+    const alles5 = texte(baum).join(' | ');
+    melde('Die Aenderung ist als offen gekennzeichnet',
+          alles5.includes('nicht gespeichert'), alles5.slice(-200));
+    melde('Die Vorschau wird mit der Aenderung neu gezeichnet',
+          blobs.length === blobsVorher + 1, `${blobsVorher} -> ${blobs.length}`);
+    if (blobs.length > blobsVorher) {
+      const bytes = new Uint8Array(await blobs[blobs.length - 1].arrayBuffer());
+      const doc = await require('pdf-lib').PDFDocument.load(bytes, { updateMetadata: false });
+      melde('Das neue PDF hat weiterhin zehn Seiten', doc.getPageCount() === 10,
+            String(doc.getPageCount()));
+    }
+
+    const vorher5 = db.protokoll.length;
+    druecke(baum, 'Speichern');
+    await warte(20);
+    const neu5 = db.protokoll.slice(vorher5);
+    const fassung = neu5.filter((p) => p[0] === 'insert' && p[1] === 'expose_vorlagen_versionen');
+    const geschrieben = neu5.filter((p) => p[0] === 'update' && 'dokument' in p[2]);
+    melde('Die bisherige Fassung geht in die Historie', fassung.length === 1,
+          JSON.stringify(neu5.map((p) => [p[0], p[1]])));
+    melde('Die Historie traegt die alte Versionsnummer',
+          fassung.length === 1 && fassung[0][2].version === 3,
+          fassung.length ? String(fassung[0][2].version) : '-');
+    melde('Die neue Fassung wird gespeichert und zaehlt hoch',
+          geschrieben.length === 1 && geschrieben[0][2].version === 4,
+          JSON.stringify(geschrieben.map((p) => p[2].version)));
+    if (geschrieben.length) {
+      const dok = geschrieben[0][2].dokument;
+      const drin = JSON.stringify(dok).includes('Alles auf einen Blick.');
+      const alt = JSON.stringify(dok).includes('Die wichtigsten Fakten.');
+      melde('Der neue Text steht im Dokument', drin && !alt,
+            JSON.stringify([drin, alt]));
+      melde('Das Dokument bleibt vollstaendig',
+            Array.isArray(dok.seiten) && dok.seiten.length === 10,
+            String(dok.seiten && dok.seiten.length));
+    }
+    // Die Historie bekommt das Dokument VOR der Aenderung.
+    if (fassung.length) {
+      melde('Die Historie traegt die Fassung vor der Aenderung',
+            JSON.stringify(fassung[0][2].dokument).includes('Die wichtigsten Fakten.'));
+    }
+  }
+
+  // Eine Systemvorlage bleibt unberuehrbar.
+  baum = hol();
+  const systemkarte = knotenMit(baum, 'div').filter((k) => k.props && k.props.onClick
+    && texte(k).join(' ').includes('SYSTEMVORLAGE'));
+  if (systemkarte.length) systemkarte[0].props.onClick();
+  await warte(30);
+  baum = hol();
+  const allesSys = texte(baum).join(' | ');
+  melde('Eine Systemvorlage laesst sich nicht bearbeiten',
+        allesSys.includes('lassen sich nicht ändern')
+        && !knotenMit(baum, 'textarea').length, allesSys.slice(-200));
+
   if (fehler) {
     console.log(`\n  ${fehler} Pruefung(en) gescheitert.`);
     process.exit(1);
   }
   console.log('  [ok] Der Exposé-Editor laeuft: Liste, Auswahl, Vorschau als echtes');
   console.log('       PDF (10 Seiten) mit den ausgelieferten Schriften, Kopie,');
-  console.log('       Umbenennen und Standard setzen.');
+  console.log('       Umbenennen, Standard setzen — und die Texte der Vorlage');
+  console.log('       aendern, in der Vorschau sehen und mit Historie speichern.');
 })();
