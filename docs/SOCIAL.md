@@ -22,6 +22,11 @@ es dieselbe Schrittliste ist.
 |---|---|---|
 | `social-{raster,signature,studio}-feed.json` | 540 × 675 pt (1080 × 1350 px) | Neu im Angebot · Verkauft · vier Karussellseiten |
 | `social-{raster,signature,studio}-story.json` | 540 × 960 pt (1080 × 1920 px) | Neu im Angebot · Verkauft |
+| `social-{raster,signature,studio}-quadrat.json` | 540 × 540 pt (1080 × 1080 px) | Neu im Angebot · Verkauft |
+
+Das Quadrat ist kein vierter Entwurf, sondern der Beitrag gestaucht: alles
+oberhalb der Textzone rückt nach, das Foto wird flacher. Ränder,
+Schriftgrößen und Abstände bleiben die des Entwurfs.
 
 Zwei Pixel je Punkt — Instagram rechnet in Pixeln, der Baukasten in Punkten.
 
@@ -103,5 +108,5 @@ Gestaltungsfrage:
 - **Direkt veröffentlichen.** Die Bilder werden heruntergeladen und von Hand
   hochgeladen. Eine Anbindung an Meta oder LinkedIn ist eine eigene
   Entscheidung mit eigenen Zugangsdaten.
-- **Weitere Formate.** Quadrat (1080 × 1080) und Querformat fehlen; sie sind
-  im Erzeuger zwei weitere Einträge.
+- **Querformat.** 1200 × 630 für geteilte Links fehlt; im Erzeuger ist das
+  ein weiterer Eintrag.

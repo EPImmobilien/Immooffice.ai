@@ -471,6 +471,28 @@ Deno.serve(async (req) => {
       return antwort({ ok: true });
     }
 
+    // --- Ein Konto wieder hineinlassen -------------------------------------
+    // Der haeufigste Supportfall ueberhaupt: jemand kommt nicht mehr rein.
+    // Verschickt wird eine Zuruecksetzen-Mail an die hinterlegte Adresse —
+    // NICHT an eine, die im Aufruf steht. Sonst liesse sich mit dieser
+    // Aktion jedes Konto auf eine fremde Adresse umleiten.
+    if (aktion === "passwort_zuruecksetzen") {
+      const nutzerId = String(body.benutzer_id || "");
+      const grund = String(body.grund || "").trim();
+      if (!nutzerId) return antwort({ ok: false, fehler: "Kein Konto." }, 400);
+      if (grund.length < 5) return antwort({ ok: false, fehler: "Bitte einen Grund angeben." }, 400);
+      const { data: profil } = await db.from("profiles")
+        .select("email, name").eq("id", nutzerId).maybeSingle();
+      if (!profil?.email) return antwort({ ok: false, fehler: "Konto ohne Adresse." }, 404);
+      const zurueck = (Deno.env.get("PORTAL_URL") || "").replace(/\/$/, "");
+      const { error } = await db.auth.resetPasswordForEmail(String(profil.email),
+        zurueck ? { redirectTo: zurueck } : undefined);
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll("passwort_zuruecksetzen", nutzerId,
+        { an: profil.email, grund });
+      return antwort({ ok: true, an: profil.email });
+    }
+
     // --- Supportzugriff ----------------------------------------------------
     if (aktion === "support_start") {
       const id = String(body.mandant_id || "");

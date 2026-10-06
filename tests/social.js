@@ -113,11 +113,13 @@ function texte(seiten) {
 }
 
 // --- 1. Jede Vorlage zeichnet ---------------------------------------------
-const ERWARTET = { feed: [540, 675], story: [540, 960] };
+const ERWARTET = { feed: [540, 675], story: [540, 960], quadrat: [540, 540] };
+const SEITENZAHL = { feed: 6, story: 2, quadrat: 2 };
 for (const datei of namen.sort()) {
   const name = datei.replace(/\.json$/, '');
   const vorlage = JSON.parse(fs.readFileSync(path.join(VORLAGEN, datei), 'utf-8'));
-  const art = name.endsWith('-story') ? 'story' : 'feed';
+  const art = name.endsWith('-story') ? 'story'
+    : name.endsWith('-quadrat') ? 'quadrat' : 'feed';
 
   melde(`${name}: das Format stimmt`,
         vorlage.format.breite === ERWARTET[art][0]
@@ -134,7 +136,7 @@ for (const datei of namen.sort()) {
   }
   melde(`${name}: zeichnet sich`, true);
   melde(`${name}: hat die erwarteten Seiten`,
-        erg.seiten.length === (art === 'story' ? 2 : 6),
+        erg.seiten.length === SEITENZAHL[art],
         `${erg.seiten.length} Seiten`);
 
   const alle = texte(erg.seiten);

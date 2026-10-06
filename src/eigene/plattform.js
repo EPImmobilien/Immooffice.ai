@@ -445,6 +445,17 @@
       setzeBusy("");
     }
 
+    async function passwort(n) {
+      if (!window.confirm("Eine Zurücksetzen-Mail an " + n.email + " senden?")) return;
+      setzeBusy(n.id);
+      try {
+        var r = await ruf("passwort_zuruecksetzen", { benutzer_id: n.id, grund: grund });
+        p.melden("Die Mail ist an " + r.an + " unterwegs.");
+        setzeGrund("");
+      } catch (f) { p.melden(f.message || String(f), "fehler"); }
+      setzeBusy("");
+    }
+
     var suche = filter.trim().toLowerCase();
     var zeilen = p.daten.filter(function (n) {
       if (!suche) return true;
@@ -476,16 +487,23 @@
                 fontWeight: n.plattform_admin ? 700 : 400,
               }) }, n.plattform_admin ? "Administrator" : "—"),
               E("td", { style: zelle },
-                E("button", { type: "button", style: knopfLeer,
-                  disabled: !!busy || grund.trim().length < 5,
-                  onClick: function () { setzen(n, !n.plattform_admin); } },
-                  n.plattform_admin ? "Recht entziehen" : "Zum Administrator machen")));
+                E("div", { style: { display: "flex", gap: 6, flexWrap: "wrap" } },
+                  E("button", { type: "button", style: knopfLeer,
+                    disabled: !!busy || grund.trim().length < 5,
+                    onClick: function () { setzen(n, !n.plattform_admin); } },
+                    n.plattform_admin ? "Recht entziehen" : "Zum Administrator machen"),
+                  E("button", { type: "button", style: knopfLeer,
+                    disabled: !!busy || grund.trim().length < 5,
+                    onClick: function () { passwort(n); } },
+                    "Passwort zurücksetzen"))));
           })))),
       E("p", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.7 } },
         "Ein Plattform-Administrator pflegt den Katalog und verwaltet die "
         + "Häuser. In die Daten eines Hauses sieht er damit NICHT — dafür "
         + "braucht es einen Supportzugriff, und der ist befristet, begründet "
-        + "und für den Kunden nachlesbar."));
+        + "und für den Kunden nachlesbar. Die Zurücksetzen-Mail geht immer an "
+        + "die hinterlegte Adresse, nie an eine andere: sonst liesse sich mit "
+        + "dieser Aktion ein Konto übernehmen."));
   }
 
   // --- Katalog ---------------------------------------------------------------

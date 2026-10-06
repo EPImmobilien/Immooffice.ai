@@ -32,6 +32,12 @@ ZIEL = os.path.join(STAMM, "packages", "expose-renderer", "vorlagen")
 
 FEED_B, FEED_H = 540.0, 675.0
 STORY_B, STORY_H = 540.0, 960.0
+# Das Quadrat ist kein eigener Entwurf, sondern der Beitrag auf 540x540
+# gestaucht: Instagram zeigt es in der Profilansicht, LinkedIn und Facebook
+# nehmen es lieber als das Hochformat. Gestaucht wird NICHT das Bild,
+# sondern der Platz — die Kennzahlleiste bleibt, der Titel bekommt eine
+# Zeile weniger, und das Foto wird flacher.
+QUAD_B, QUAD_H = 540.0, 540.0
 
 
 def jak(s):
@@ -702,9 +708,61 @@ SEITENBAU = {
 }
 
 
+def quadrat(h, post):
+    """Den Beitrag auf 540x540 bringen. Statt eine vierte Anordnung je
+    Handschrift zu schreiben, wird die vorhandene gestaucht: alles, was
+    oberhalb der Textzone liegt, rueckt um die Differenz nach unten, und
+    das Foto verliert dieselbe Hoehe. So bleiben Raender, Schriftgroessen
+    und Abstaende die des Entwurfs — nur das Bild wird flacher."""
+    weniger = FEED_H - QUAD_H
+    seiten = []
+    for verkauft in (False, True):
+        s = post(h, verkauft)
+        neue = []
+        for el in s["elemente"]:
+            e = dict(el)
+            # Was unterhalb von 300 pt liegt, ist die Textzone und bleibt.
+            # Was darueber liegt, wandert mit; das Foto schrumpft.
+            if e["id"] == "grund":
+                e["h"] = QUAD_H
+            elif e["id"] in ("foto", "foto-scrim", "abdunkler"):
+                # Zwoelf Punkt mehr als noetig: sonst sitzt die Augenbraue
+                # direkt auf der Unterkante des Fotos.
+                e["h"] = max(40.0, e["h"] - weniger - 12)
+                if e["y"] >= 300:
+                    e["y"] = e["y"] - weniger
+            elif e["y"] >= 300:
+                e["y"] = e["y"] - weniger
+            neue.append(e)
+        s["elemente"] = neue
+        seiten.append(s)
+    return seiten
+
+
 def vorlage(schluessel, art):
     h = HANDSCHRIFT[schluessel]
     post, karussell, story = SEITENBAU[schluessel]
+    if art == "quadrat":
+        b, hh = QUAD_B, QUAD_H
+        seiten = quadrat(h, post)
+        name = h["name"] + " — Quadrat"
+        beschr = ("Quadrat 1080×1080 für Profilansicht, LinkedIn und Facebook. "
+                  + h["beschreibung"])
+        return {
+            "schema": 1, "name": name, "beschreibung": beschr, "basis": schluessel,
+            "format": {"breite": b, "hoehe": hh, "ausrichtung": "hoch"},
+            "stil": {
+                "farben": {"f1": "ci.primaer", "f2": "ci.akzent",
+                           "ableitung": h["ableitung"]},
+                "schriften": {
+                    "headline": h["stile"]["titel"]["schrift"],
+                    "text": h["stile"]["unterzeile"]["schrift"],
+                    "label": h["stile"]["kz_label"]["schrift"],
+                },
+                "textstile": h["stile"],
+            },
+            "seiten": seiten,
+        }
     if art == "feed":
         b, hh = FEED_B, FEED_H
         seiten = [post(h, False), post(h, True)] + [karussell(h, n) for n in (1, 2, 3, 4)]
@@ -744,7 +802,7 @@ def main():
 
     abweichung = 0
     for schluessel in ("raster", "signature", "studio"):
-        for art in ("feed", "story"):
+        for art in ("feed", "story", "quadrat"):
             datei = os.path.join(ZIEL, "social-%s-%s.json" % (schluessel, art))
             inhalt = json.dumps(vorlage(schluessel, art), ensure_ascii=False,
                                 indent=2) + "\n"

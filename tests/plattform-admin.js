@@ -156,6 +156,7 @@ for (const [name, muster] of [
   ['und loeschen', /aktion === "mandant_loeschen"/],
   ['Konten ueber alle Haeuser', /aktion === "nutzer"/],
   ['Plattform-Recht vergeben', /aktion === "admin_setzen"/],
+  ['ein Passwort zuruecksetzen', /aktion === "passwort_zuruecksetzen"/],
   ['Supportzugriff beginnen', /aktion === "support_start"/],
   ['und beenden', /aktion === "support_ende"/],
 ]) {
@@ -178,6 +179,13 @@ melde('eine neue Sitzung beendet die vorherige',
 melde('die Dauer ist nach oben begrenzt', /Math\.min\(240/.test(q));
 melde('ein Supportzugriff verlangt einen Grund, den der Mandant lesen kann',
       /der Mandant kann ihn nachlesen/.test(q));
+// Die Zurueckseten-Mail geht an die HINTERLEGTE Adresse. Eine Adresse aus
+// dem Aufruf waere ein Weg, jedes Konto zu uebernehmen.
+melde('die Zuruecksetzen-Mail geht an die hinterlegte Adresse',
+      /from\("profiles"\)[\s\S]{0,200}?select\("email, name"\)[\s\S]{0,400}?resetPasswordForEmail\(String\(profil\.email\)/.test(q),
+      'eine Adresse aus dem Aufruf waere ein Weg, ein Konto zu uebernehmen');
+melde('und sie wird protokolliert',
+      /protokoll\("passwort_zuruecksetzen"/.test(q));
 
 // --- 4. Die Schranke steht vor jeder Aktion -------------------------------
 const beiPruefung = q.indexOf('plattform_admins');

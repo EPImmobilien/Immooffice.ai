@@ -52,7 +52,10 @@ Grund.
 
 **Konten.** Alle Konten über alle Häuser, mit Suche. Das Plattform-Recht
 lässt sich vergeben und entziehen — aber nicht dem letzten, der es hat:
-sonst käme niemand mehr in diesen Bereich.
+sonst käme niemand mehr in diesen Bereich. Dazu der häufigste Supportfall
+überhaupt: eine Zurücksetzen-Mail fürs Passwort. Sie geht **immer an die
+hinterlegte Adresse**, nie an eine aus dem Aufruf — sonst liesse sich mit
+dieser Aktion ein Konto übernehmen.
 
 **Katalog.** Tarife, Credit-Preise, Credit-Pakete und die Plattformwerte
 (Fristen, Grenzen, Sätze). Änderbar ist nur, was in einer Liste steht; keine

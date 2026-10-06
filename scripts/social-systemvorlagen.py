@@ -34,6 +34,9 @@ KENNUNG = {
     "social-signature-story": "a7c21d58-3e44-4f90-9b61-2d8e7c015a04",
     "social-studio-feed":     "a7c21d58-3e44-4f90-9b61-2d8e7c015a05",
     "social-studio-story":    "a7c21d58-3e44-4f90-9b61-2d8e7c015a06",
+    "social-raster-quadrat":    "a7c21d58-3e44-4f90-9b61-2d8e7c015a07",
+    "social-signature-quadrat": "a7c21d58-3e44-4f90-9b61-2d8e7c015a08",
+    "social-studio-quadrat":    "a7c21d58-3e44-4f90-9b61-2d8e7c015a09",
 }
 
 KOPF = """\
@@ -108,8 +111,8 @@ update public.expose_vorlagen k
    and k.mandant_id is not null
    and k.art = 'social'
    and k.basis = s.basis
-   -- Beitrag (675 pt) und Story (960 pt) tragen dieselbe Basis. Ohne die
-   -- Hoehe zoege diese Anweisung eine Story auf einen Beitrag.
+   -- Beitrag (675 pt), Story (960 pt) und Quadrat (540 pt) tragen dieselbe
+   -- Basis. Ohne die Hoehe zoege diese Anweisung eine Story auf einen Beitrag.
    and (k.dokument->'format'->>'hoehe') = (s.dokument->'format'->>'hoehe')
    and coalesce(k.version, 1) = 1
    and k.dokument is distinct from s.dokument;
