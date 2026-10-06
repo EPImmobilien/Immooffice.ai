@@ -401,6 +401,35 @@ Deno.serve(async (req) => {
       versandWeg = "resend";
     };
 
+    // ---- Wenn alles scheitert: sagen, was zu tun ist ----
+    const versandFehlerErklaeren = (roh: string, pf: any): string => {
+      const t = String(roh || "");
+      const adresse = pf?.email_adresse ? ` (${pf.email_adresse})` : "";
+      // Microsoft 365: SMTP-Anmeldung ist im Tenant abgeschaltet. Der
+      // Standard seit Jahren, und nichts, was diese Software aendern kann
+      // — der Schalter gehoert dem Kunden.
+      if (/SmtpClientAuthentication is disabled/i.test(t) || /5\.7\.139/.test(t)) {
+        return "Microsoft nimmt den Versand über dieses Postfach" + adresse
+          + " nicht an: In eurem Microsoft-365-Konto ist \u201eAuthentifiziertes SMTP\u201c "
+          + "abgeschaltet. Das muss ein Administrator eures Hauses einschalten "
+          + "(admin.microsoft.com → Einstellungen → Organisationseinstellungen → "
+          + "Moderne Authentifizierung), danach dauert es bis zu einer Stunde. "
+          + "Der Abruf der Mails ist davon nicht betroffen. [" + t + "]";
+      }
+      if (/Authentication unsuccessful|Invalid login|535/i.test(t)) {
+        return "Der Mailserver hat die Anmeldung für dieses Postfach" + adresse
+          + " abgelehnt. Bei einem verbundenen Microsoft- oder Google-Konto hilft "
+          + "\u201eneu verbinden\u201c in den Einstellungen; bei einem Postfach mit "
+          + "Passwort stimmen Benutzername oder Passwort nicht mehr. [" + t + "]";
+      }
+      if (/Resend nicht eingerichtet/i.test(t) && !/\|/.test(t)) {
+        return "Für dieses Postfach ist kein Versandweg eingerichtet: weder ein "
+          + "eigener SMTP-Zugang noch der Versand über die Plattform. "
+          + "[" + t + "]";
+      }
+      return "Versand fehlgeschlagen: " + t;
+    };
+
     // ---- Weg B: SMTP des Postfachs (All-Inkl) ----
     const perSmtp = async () => {
       // Drei Anbieter, ein Versand. Microsoft und Google nehmen kein
@@ -465,7 +494,13 @@ Deno.serve(async (req) => {
         status: "fehler",
         fehler_text: fehlerText,
       });
-      return antwort({ ok: false, error: "Versand fehlgeschlagen: " + fehlerText }, 500);
+      // Der Fehler des Anbieters im Wortlaut ist fuer den Makler keine
+      // Auskunft ("535 5.7.139 SmtpClientAuthentication is disabled for
+      // the Tenant"). Die haeufigen Faelle bekommen darum einen Satz,
+      // der sagt, WER etwas tun muss und WAS. Der Wortlaut bleibt
+      // darunter stehen und im Protokoll — ohne ihn kaeme die Diagnose
+      // nicht weiter.
+      return antwort({ ok: false, error: versandFehlerErklaeren(fehlerText, postfach) }, 500);
     }
     console.log(`Versand erfolgreich (${versandWeg}):`, messageId, resendId ? `resend:${resendId}` : "");
 

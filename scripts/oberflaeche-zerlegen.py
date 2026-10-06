@@ -4437,6 +4437,20 @@ WOERTLICH = [
      'kuenftige Expose des Hauses. Die SQL-Fassung in fork_37 fuehrt '
      'dieselbe Liste; tests/rechte.sql haelt beide zusammen.'),
 
+    # --- Versandfehler lesbar machen (06.10.2026) ------------------------
+    # supabase-js wirft bei einer Antwort ausserhalb 2xx einen Fehler, dessen
+    # message nur "Edge Function returned a non-2xx status code" lautet. Der
+    # Satz, den die Funktion geschrieben hat, steht im Rumpf. Beim Expose
+    # liest die Oberflaeche ihn schon so; beim Mailversand jetzt auch.
+    ('FORK',
+     '      } catch (e) {\n        alert("Fehler beim Versenden: " + (e.message || e))\n      }\n      N(!1)',
+     '      } catch (e) {\n        // Den Grund aus der Antwort holen: "non-2xx status code" sagt dem\n        // Makler nichts, der Satz darunter schon.\n        let m = (e && e.message) || String(e);\n        try { const b = await e.context.json(); b && b.error && (m = b.error) } catch (f) {}\n        alert("Fehler beim Versenden: " + m)\n      }\n      N(!1)',
+     'Posteingang: beim Versandfehler den Grund aus der Antwort zeigen.'),
+    ('FORK',
+     '          } catch (e) {\n            alert("Fehler beim Versenden: " + (e.message || e))\n          }\n          T(!1)',
+     '          } catch (e) {\n            let m = (e && e.message) || String(e);\n            try { const b = await e.context.json(); b && b.error && (m = b.error) } catch (f) {}\n            alert("Fehler beim Versenden: " + m)\n          }\n          T(!1)',
+     'Kontakt-Mail: derselbe Grund aus der Antwort.'),
+
     # --- Postfaecher verbinden: Microsoft, Google (06.10.2026) ------------
     # Mehrere Postfaecher konnte die Vorlage schon; was fehlte, war die
     # Anmeldung ohne Passwort. Die Knoepfe stehen in

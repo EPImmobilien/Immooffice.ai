@@ -84637,7 +84637,11 @@ function PosteingangPage({
           o = Array.isArray(n && n.todos_vorschlag) ? n.todos_vorschlag : [];
         p("✓ Antwort versendet" + (i.length ? " · " + i.length + " ToDo" + (1 === i.length ? "" : "s") + " automatisch erledigt" : "") + (o.length ? " · " + o.length + " ToDo" + (1 === o.length ? "" : "s") + " zum Prüfen markiert" : "")), C(!1), await We(), setTimeout(() => p(""), 5e3)
       } catch (e) {
-        alert("Fehler beim Versenden: " + (e.message || e))
+        // Den Grund aus der Antwort holen: "non-2xx status code" sagt dem
+        // Makler nichts, der Satz darunter schon.
+        let m = (e && e.message) || String(e);
+        try { const b = await e.context.json(); b && b.error && (m = b.error) } catch (f) {}
+        alert("Fehler beim Versenden: " + m)
       }
       N(!1)
     },
@@ -87321,7 +87325,9 @@ function MietanfrageForm({
             if (!e?.ok) throw new Error(e?.error || "Unbekannter Fehler");
             alert("✓ E-Mail erfolgreich versendet!"), z(), W(!1)
           } catch (e) {
-            alert("Fehler beim Versenden: " + (e.message || e))
+            let m = (e && e.message) || String(e);
+            try { const b = await e.context.json(); b && b.error && (m = b.error) } catch (f) {}
+            alert("Fehler beim Versenden: " + m)
           }
           T(!1)
         } else alert("Bitte zuerst ein Postfach auswählen oder im Profil einrichten.");

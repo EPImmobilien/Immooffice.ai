@@ -3966,6 +3966,23 @@ NACHBESSERN = [
      '    // Ein eigenes Postfach ist immer der bessere Absender: die Mail steht\n    // danach im Gesendet-Ordner des Nutzers und kommt von seiner Adresse.\n    // "Hat ein Passwort" war dafuer das Kennzeichen — ein OAuth-Postfach\n    // hat keines und waere damit aussortiert worden.\n    const eigenerVersand = !!postfach.smtp_passwort_verschluesselt\n      || (postfach.anbieter && postfach.anbieter !== "imap");\n    const reihenfolge = ics && eigenerVersand ? [perSmtp, perResend] : [perResend, perSmtp];',
      'Postfach-Anbieter: auch ein OAuth-Postfach sendet zuerst selbst.',
      {'mail-senden'}),
+
+    # --- FORK: Versandfehler erklaeren statt melden (06.10.2026) ----------
+    # Beim ersten echten Microsoft-Postfach kam beim Senden nur "Edge
+    # Function returned a non-2xx status code" an. Darunter lag
+    # "535 5.7.139 SmtpClientAuthentication is disabled for the Tenant" —
+    # ein Schalter im Microsoft-Konto des Kunden, den wir nicht umlegen
+    # koennen. Der Makler soll lesen, WER was tun muss.
+    ('FORK',
+     '      return antwort({ ok: false, error: "Versand fehlgeschlagen: " + fehlerText }, 500);',
+     '      // Der Fehler des Anbieters im Wortlaut ist fuer den Makler keine\n      // Auskunft ("535 5.7.139 SmtpClientAuthentication is disabled for\n      // the Tenant"). Die haeufigen Faelle bekommen darum einen Satz,\n      // der sagt, WER etwas tun muss und WAS. Der Wortlaut bleibt\n      // darunter stehen und im Protokoll — ohne ihn kaeme die Diagnose\n      // nicht weiter.\n      return antwort({ ok: false, error: versandFehlerErklaeren(fehlerText, postfach) }, 500);',
+     'Versandfehler: die haeufigen Faelle werden erklaert, nicht nur gemeldet.',
+     {'mail-senden'}),
+    ('FORK',
+     '    // ---- Weg B: SMTP des Postfachs (All-Inkl) ----',
+     '    // ---- Wenn alles scheitert: sagen, was zu tun ist ----\n    const versandFehlerErklaeren = (roh: string, pf: any): string => {\n      const t = String(roh || "");\n      const adresse = pf?.email_adresse ? ` (${pf.email_adresse})` : "";\n      // Microsoft 365: SMTP-Anmeldung ist im Tenant abgeschaltet. Der\n      // Standard seit Jahren, und nichts, was diese Software aendern kann\n      // — der Schalter gehoert dem Kunden.\n      if (/SmtpClientAuthentication is disabled/i.test(t) || /5\\.7\\.139/.test(t)) {\n        return "Microsoft nimmt den Versand über dieses Postfach" + adresse\n          + " nicht an: In eurem Microsoft-365-Konto ist \\u201eAuthentifiziertes SMTP\\u201c "\n          + "abgeschaltet. Das muss ein Administrator eures Hauses einschalten "\n          + "(admin.microsoft.com → Einstellungen → Organisationseinstellungen → "\n          + "Moderne Authentifizierung), danach dauert es bis zu einer Stunde. "\n          + "Der Abruf der Mails ist davon nicht betroffen. [" + t + "]";\n      }\n      if (/Authentication unsuccessful|Invalid login|535/i.test(t)) {\n        return "Der Mailserver hat die Anmeldung für dieses Postfach" + adresse\n          + " abgelehnt. Bei einem verbundenen Microsoft- oder Google-Konto hilft "\n          + "\\u201eneu verbinden\\u201c in den Einstellungen; bei einem Postfach mit "\n          + "Passwort stimmen Benutzername oder Passwort nicht mehr. [" + t + "]";\n      }\n      if (/Resend nicht eingerichtet/i.test(t) && !/\\|/.test(t)) {\n        return "Für dieses Postfach ist kein Versandweg eingerichtet: weder ein "\n          + "eigener SMTP-Zugang noch der Versand über die Plattform. "\n          + "[" + t + "]";\n      }\n      return "Versand fehlgeschlagen: " + t;\n    };\n\n    // ---- Weg B: SMTP des Postfachs (All-Inkl) ----',
+     'Versandfehler: der Helfer, der die haeufigen Faelle uebersetzt.',
+     {'mail-senden'}),
 ]
 
 
