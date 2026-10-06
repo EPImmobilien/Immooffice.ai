@@ -138,7 +138,36 @@
     starten();
   }
 
-  // --- 4. Erscheinen beim Scrollen ---------------------------------------
+  // --- 4. Filter des Modul-Katalogs ---------------------------------------
+  // 27 Bereiche auf einmal sind eine Wand. Der Filter blendet aus, was
+  // gerade nicht gefragt ist — er laedt nichts nach. Ohne JavaScript steht
+  // alles da, und das ist die richtige Rueckfallebene: lieber alles sehen
+  // als nichts.
+  var chips = Array.prototype.slice.call(document.querySelectorAll(".chip[data-filter]"));
+  var module = Array.prototype.slice.call(document.querySelectorAll(".modul[data-gruppe]"));
+  if (chips.length && module.length) {
+    chips.forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        var wahl = chip.getAttribute("data-filter");
+        chips.forEach(function (c) {
+          var an = c === chip;
+          c.classList.toggle("an", an);
+          c.setAttribute("aria-pressed", an ? "true" : "false");
+        });
+        module.forEach(function (m) {
+          var zeigen = wahl === "alle" || m.getAttribute("data-gruppe") === wahl;
+          // hidden statt display:none im Stil: so faellt der Bereich auch
+          // aus dem Vorlesefluss und aus der Tabulator-Reihenfolge.
+          if (zeigen) m.removeAttribute("hidden"); else m.setAttribute("hidden", "");
+        });
+        // Was gerade sichtbar geworden ist, soll auch erscheinen.
+        if (typeof planen === "function") planen();
+      });
+      chip.setAttribute("aria-pressed", chip.classList.contains("an") ? "true" : "false");
+    });
+  }
+
+  // --- 5. Erscheinen beim Scrollen ---------------------------------------
   // Bewusst ueber die Scroll-Position und nicht ueber einen
   // IntersectionObserver: der meldet nur, was den Blick WIRKLICH kreuzt.
   // Wer im Menue auf einen Punkt springt, mit der Ende-Taste ans Seitenende

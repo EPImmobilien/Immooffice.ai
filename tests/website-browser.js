@@ -111,6 +111,44 @@ const MIME = {
       Array.from(document.querySelectorAll('.auf')).filter((e) => !e.classList.contains('da')).length);
     melde(`${name}: alle Abschnitte erscheinen`, unsichtbar === 0, `${unsichtbar} blieben aus`);
 
+    // Der Modul-Katalog. 27 Bereiche sind das Alleinstellungsmerkmal — wenn
+    // der Filter sie versteckt und nicht wiederbringt, ist das Gegenteil
+    // erreicht. Geprueft wird deshalb beides: dass er filtert UND dass
+    // "Alle Bereiche" alles zurueckholt.
+    const katalog = await seite.evaluate(() => ({
+      module: document.querySelectorAll('.modul[data-gruppe]').length,
+      chips: document.querySelectorAll('.chip[data-filter]').length,
+      punkte: Array.from(document.querySelectorAll('.modul li')).length,
+      ohneListe: Array.from(document.querySelectorAll('.modul'))
+        .filter((m) => m.querySelectorAll('li').length === 0).length,
+    }));
+    melde(`${name}: der Modul-Katalog ist vollstaendig`, katalog.module >= 20,
+          `${katalog.module} Bereiche`);
+    melde(`${name}: jeder Bereich nennt konkrete Funktionen`, katalog.ohneListe === 0,
+          `${katalog.ohneListe} ohne Liste`);
+    melde(`${name}: es gibt Filterknoepfe`, katalog.chips >= 5, String(katalog.chips));
+
+    if (katalog.chips) {
+      await seite.click('.chip[data-filter="vermarktung"]');
+      await seite.waitForTimeout(150);
+      const gefiltert = await seite.evaluate(() => ({
+        sichtbar: Array.from(document.querySelectorAll('.modul')).filter((m) => !m.hasAttribute('hidden')).length,
+        alleGleich: Array.from(document.querySelectorAll('.modul:not([hidden])'))
+          .every((m) => m.dataset.gruppe === 'vermarktung'),
+      }));
+      melde(`${name}: der Filter blendet aus`,
+            gefiltert.sichtbar > 0 && gefiltert.sichtbar < katalog.module,
+            `${gefiltert.sichtbar} von ${katalog.module}`);
+      melde(`${name}: und zeigt nur die gewaehlte Gruppe`, gefiltert.alleGleich);
+
+      await seite.click('.chip[data-filter="alle"]');
+      await seite.waitForTimeout(150);
+      const zurueck = await seite.evaluate(() =>
+        Array.from(document.querySelectorAll('.modul')).filter((m) => !m.hasAttribute('hidden')).length);
+      melde(`${name}: "Alle Bereiche" holt alles zurueck`, zurueck === katalog.module,
+            `${zurueck} von ${katalog.module}`);
+    }
+
     // Und der Weg in die Anwendung muss stimmen.
     const ziele = await seite.evaluate(() =>
       ['anmelden-oben', 'anmelden-buehne', 'anmelden-unten', 'anmelden-fuss']

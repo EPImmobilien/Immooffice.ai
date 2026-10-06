@@ -316,31 +316,327 @@
 </section>
 
 <!-- ------------------------------------------------------------------ Module -->
-<section class="hell">
+<section class="hell" id="module-katalog">
   <div class="bahn">
     <div class="kopfzeile auf">
-      <div class="augenbraue">Module</div>
-      <h2>Was Sie damit tun</h2>
+      <div class="augenbraue">Der volle Umfang</div>
+      <h2>27 Bereiche. Ein Datenbestand.<br>Keine zweite Software.</h2>
+      <p class="fuehrung">
+        Die meisten Büros arbeiten mit vier Programmen nebeneinander: eines für die
+        Objekte, eines für die Post, eines für die Buchhaltung, dazu ein Ordner mit
+        Vorlagen. Was dazwischen liegt, macht ein Mensch — jedes Mal neu, jedes Mal
+        von Hand. Hier liegt es in einem Haus, und ein Arbeitsschritt kennt den nächsten.
+      </p>
     </div>
-    <div class="gitter">
-      <div class="karte auf"><span class="zeichen">🏠</span><h3>Objekte &amp; Vermarktung</h3>
-        <p>Alle Daten eines Objekts an einer Stelle, mit Status, Bildern, Grundrissen und Lage.</p></div>
-      <div class="karte auf v1"><span class="zeichen">📄</span><h3>Exposé-Baukasten</h3>
-        <p>Vorlagen wählen, Felder verschieben, eigenes Design hochladen. PDF und Web-Exposé.</p></div>
-      <div class="karte auf v2"><span class="zeichen">✉️</span><h3>Posteingang</h3>
-        <p>Mehrere Postfächer je Mitarbeiter — Microsoft 365, Google oder eigener Server.</p></div>
-      <div class="karte auf"><span class="zeichen">👥</span><h3>Adressbuch &amp; Akquise</h3>
-        <p>Kontakte, Eigentümer, Interessenten mit Suchkriterien und automatischem Abgleich.</p></div>
-      <div class="karte auf v1"><span class="zeichen">📅</span><h3>Termine &amp; Aufgaben</h3>
-        <p>Kalender mit Einladungen, Fahrzeiten zwischen Terminen, Erinnerungen, ToDos aus Mails.</p></div>
-      <div class="karte auf v2"><span class="zeichen">🔑</span><h3>Eigentümerportal</h3>
-        <p>Eigener Zugang für Eigentümer: Stand, Besichtigungen, Unterlagen, Nachrichten.</p></div>
-      <div class="karte auf"><span class="zeichen">🏗️</span><h3>Neubauprojekte</h3>
-        <p>Projekte mit Einheitenliste, Reservierungen und eigener Projektseite.</p></div>
-      <div class="karte auf v1"><span class="zeichen">📤</span><h3>Portalexport &amp; Objektseite</h3>
-        <p>Objektdaten als OpenImmo, öffentliche Objektseite und Freigabelinks.</p></div>
-      <div class="karte auf v2"><span class="zeichen">🤖</span><h3>KI, die nichts erfindet</h3>
-        <p>Textvorschläge und Bildbearbeitung — editierbar, freigabepflichtig, gekennzeichnet.</p></div>
+
+    <div class="chips auf" role="tablist" aria-label="Bereiche filtern">
+      <button type="button" class="chip an" data-filter="alle">Alle Bereiche</button>
+      <button type="button" class="chip" data-filter="vermarktung">Vermarktung</button>
+      <button type="button" class="chip" data-filter="kommunikation">Kommunikation</button>
+      <button type="button" class="chip" data-filter="kunden">Kunden & Akquise</button>
+      <button type="button" class="chip" data-filter="arbeit">Tägliche Arbeit</button>
+      <button type="button" class="chip" data-filter="geschaeft">Geschäft & Recht</button>
+      <button type="button" class="chip" data-filter="haus">Ihr Haus</button>
+    </div>
+
+    <div class="module">
+      <article class="modul auf" data-gruppe="vermarktung">
+        <span class="zeichen">🏠</span>
+        <h3>Objekte & Bestand</h3>
+        <p>Das Objekt ist der Drehpunkt — alles andere hängt daran.</p>
+        <ul>
+        <li>Stammdaten, Status, Preise, Energieausweis</li>
+        <li>Bilder mit Web-Variante, Originale bleiben unberührt</li>
+        <li>Grundrisse, Lage, Umfeld</li>
+        <li>Zuständigkeit je Objekt und Standort</li>
+        <li>Neubauprojekte mit Einheitenliste und Reservierungen</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="vermarktung">
+        <span class="zeichen">📄</span>
+        <h3>Exposé-Schmiede</h3>
+        <p>Texte entstehen am Objekt, nicht im leeren Blatt.</p>
+        <ul>
+        <li>KI-Textbausteine aus den Objektdaten</li>
+        <li>Jeder Text editierbar und freigabepflichtig</li>
+        <li>Fehlende Angaben werden markiert, nicht erfunden</li>
+        <li>Mehrsprachige Fassungen</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="vermarktung">
+        <span class="zeichen">🎨</span>
+        <h3>Exposé-Vorlagen</h3>
+        <p>Der Baukasten für das Layout — Felder setzen Sie selbst.</p>
+        <ul>
+        <li>Vorlage beim Erzeugen auswählen, keine Zwangsvorlage</li>
+        <li>Text- und Bildfelder frei platzieren</li>
+        <li>Eigenes Exposé hochladen, Design wird nachgebaut</li>
+        <li>Firmenlogo freistellen (Hintergrund entfernen)</li>
+        <li>PDF und Web-Exposé aus derselben Vorlage</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="vermarktung">
+        <span class="zeichen">📤</span>
+        <h3>Portale & Objektseite</h3>
+        <p>Einmal gepflegt, überall ausgespielt.</p>
+        <ul>
+        <li>OpenImmo-Export</li>
+        <li>Öffentliche Objektseite je Objekt</li>
+        <li>Freigabelink mit Provisionsbestätigung in Textform</li>
+        <li>Download-Zähler je Interessent</li>
+        <li>Immowelt und Kleinanzeigen vorbereitet</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="vermarktung">
+        <span class="zeichen">⚡</span>
+        <h3>Exposé-Sofortversand</h3>
+        <p>Die Anfrage kommt an — das Exposé geht raus.</p>
+        <ul>
+        <li>Portal- und Website-Anfragen werden ausgewertet</li>
+        <li>Kontakt und Objekt automatisch zugeordnet</li>
+        <li>Exposé geht über Ihr eigenes Postfach hinaus</li>
+        <li>Rund um die Uhr abrufbar, auch nachts um drei</li>
+        <li>Kein Doppelversand, Tageslimit, lückenloses Protokoll</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="vermarktung">
+        <span class="zeichen">📰</span>
+        <h3>Newsletter</h3>
+        <p>Kampagnen an den eigenen Bestand.</p>
+        <ul>
+        <li>Empfängerlisten aus dem Adressbuch</li>
+        <li>Anmeldung und Abmeldung</li>
+        <li>Auswertung je Versand</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="kommunikation">
+        <span class="zeichen">✉️</span>
+        <h3>Posteingang</h3>
+        <p>Mehrere Postfächer je Mitarbeiter, in einer Ansicht.</p>
+        <ul>
+        <li>Microsoft 365 und Outlook</li>
+        <li>Google Workspace und Gmail</li>
+        <li>Jeder andere IMAP-Server</li>
+        <li>Gesendetes landet auch in Ihrem Outlook</li>
+        <li>Abwesenheitsnotiz je Postfach</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="kommunikation">
+        <span class="zeichen">🤖</span>
+        <h3>KI-Antworten</h3>
+        <p>Sie wählen, was die Antwort erreichen soll.</p>
+        <ul>
+        <li>Zwölf Absichten: Zusage, Absage, Termin, Rückfrage …</li>
+        <li>Antwort im eigenen Schreibstil, auf Wunsch gelernt</li>
+        <li>Fehlende Angaben als Platzhalter, nie erfunden</li>
+        <li>Objektwissen aus den Unterlagen fließt ein</li>
+        <li>Jeder Entwurf wird vor dem Senden freigegeben</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="kommunikation">
+        <span class="zeichen">📥</span>
+        <h3>Anfragen & Leads</h3>
+        <p>Aus einer Mail wird ein Vorgang.</p>
+        <ul>
+        <li>Portal- und Formularanfragen werden gelesen</li>
+        <li>Kontakt gefunden oder angelegt, Objekt verknüpft</li>
+        <li>Aufgaben aus Mails</li>
+        <li>Rechnungen aus dem Posteingang weiterleiten</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="kommunikation">
+        <span class="zeichen">✍️</span>
+        <h3>Briefe & Signatur</h3>
+        <p>Post im eigenen Erscheinungsbild.</p>
+        <ul>
+        <li>Geschäftsbriefe im Corporate Design</li>
+        <li>Einfache elektronische Signatur</li>
+        <li>Protokoll über jeden Vorgang</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="kunden">
+        <span class="zeichen">👥</span>
+        <h3>Adressbuch</h3>
+        <p>Interessenten, Eigentümer, Notare, Dienstleister.</p>
+        <ul>
+        <li>Suchprofile und automatischer Objektabgleich</li>
+        <li>Rollen je Kontakt</li>
+        <li>Werbe- und Newsletter-Kennzeichen</li>
+        <li>Verknüpfung Kontakt ↔ Objekt mit Verlauf</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="kunden">
+        <span class="zeichen">🔑</span>
+        <h3>Eigentümer-Portal</h3>
+        <p>Der Eigentümer sieht, was läuft — ohne Anruf.</p>
+        <ul>
+        <li>Eigener Zugang je Eigentümer</li>
+        <li>Stand der Vermarktung, Besichtigungen, Rückmeldungen</li>
+        <li>Unterlagen hoch- und herunterladen</li>
+        <li>Nachrichten an den Makler</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="kunden">
+        <span class="zeichen">🤝</span>
+        <h3>Käuferportal</h3>
+        <p>Nach dem Zuschlag geht es weiter.</p>
+        <ul>
+        <li>Eigener Zugang je Käufer</li>
+        <li>Unterlagen und Fristen</li>
+        <li>Nachrichten und Benachrichtigungen</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="kunden">
+        <span class="zeichen">🎯</span>
+        <h3>Akquise</h3>
+        <p>Eigentümer-Leads von der Quelle bis zum Auftrag.</p>
+        <ul>
+        <li>Leads, Pipeline, Automationen</li>
+        <li>Auswertung und Karte</li>
+        <li>Wertindikation als PDF</li>
+        <li>Nachfass-Ketten statt Zettel</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="arbeit">
+        <span class="zeichen">📅</span>
+        <h3>Termine</h3>
+        <p>Kalender, der die Fahrzeit kennt.</p>
+        <ul>
+        <li>Echte Termineinladungen wie in Outlook</li>
+        <li>Fahrzeiten zwischen Terminen</li>
+        <li>Serientermine</li>
+        <li>Besichtigungen mit Wunschterminen der Interessenten</li>
+        <li>Urlaubs- und Abwesenheitshinweise</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="arbeit">
+        <span class="zeichen">✅</span>
+        <h3>ToDos & Arbeitsketten</h3>
+        <p>Ein Schritt löst den nächsten aus.</p>
+        <ul>
+        <li>Aufgaben aus Mails und Vorgängen</li>
+        <li>Nachfassen mit Frist</li>
+        <li>Verkettete Schritte statt Einzelaufgaben</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="arbeit">
+        <span class="zeichen">⏱️</span>
+        <h3>Arbeitszeit</h3>
+        <p>Für Büros mit Angestellten.</p>
+        <ul>
+        <li>Arbeitszeitkonto</li>
+        <li>Überstunden und Fehltage</li>
+        <li>Urlaubsplanung</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="arbeit">
+        <span class="zeichen">🗂️</span>
+        <h3>Dokumentenablage</h3>
+        <p>Unterlagen am Objekt, nicht im Mailanhang.</p>
+        <ul>
+        <li>Ablage je Objekt und Vorgang</li>
+        <li>Freigabe einzelner Unterlagen für Interessenten</li>
+        <li>Download-Links mit Passwort und Ablauf</li>
+        <li>OneDrive als Firmen-Ablage</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="arbeit">
+        <span class="zeichen">🧰</span>
+        <h3>Werkzeuge</h3>
+        <p>Das Kleinzeug, für das sonst drei Programme offen sind.</p>
+        <ul>
+        <li>Grundriss-Editor</li>
+        <li>Raumscan vom Telefon</li>
+        <li>Wohnflächenberechnung mit Abgleich</li>
+        <li>PDF zuschneiden, drehen, zusammenfügen</li>
+        <li>Bilder: Zuschnitt, Pfeile, Weichzeichnen, Text, Logo</li>
+        <li>Sonnenverlauf in 3D</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="geschaeft">
+        <span class="zeichen">⚖️</span>
+        <h3>Verkauf & Verträge</h3>
+        <p>Vom Auftrag bis zum Notartermin.</p>
+        <ul>
+        <li>Maklerverträge aus Mustern</li>
+        <li>Objektnachweise</li>
+        <li>Reservierungen</li>
+        <li>Jedes Muster mit dem Hinweis auf anwaltliche Prüfung</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="geschaeft">
+        <span class="zeichen">🏘️</span>
+        <h3>Vermietung</h3>
+        <p>Mietverträge und Übergabe.</p>
+        <ul>
+        <li>Mietverträge aus Mustern</li>
+        <li>Übergabeprotokolle</li>
+        <li>Mietanfragen aus dem Posteingang</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="geschaeft">
+        <span class="zeichen">📐</span>
+        <h3>Objektbewertung</h3>
+        <p>Offene Rechenblätter statt Blackbox.</p>
+        <ul>
+        <li>Vergleichs-, Ertrags- und Sachwert nachvollziehbar</li>
+        <li>Jeder Ansatz editierbar und begründbar</li>
+        <li>KI nur für Textbausteine, nie für den Wert</li>
+        <li>Pflichthinweis: Marktpreiseinschätzung, ersetzt kein Verkehrswertgutachten nach § 194 BauGB</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="geschaeft">
+        <span class="zeichen">🧾</span>
+        <h3>Rechnungen</h3>
+        <p>Rechnung, Freigabe, Nummernkreis.</p>
+        <ul>
+        <li>Belegnummern ohne Lücke</li>
+        <li>Freigabe durch die benannte Person</li>
+        <li>Zahlungsbedingungen aus den Stammdaten</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="geschaeft">
+        <span class="zeichen">💶</span>
+        <h3>Liquidität & Finanzen</h3>
+        <p>Was reinkommt, was rausgeht.</p>
+        <ul>
+        <li>Übersicht für die Geschäftsleitung</li>
+        <li>Offene Posten</li>
+        <li>Provisionsabrechnung</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="haus">
+        <span class="zeichen">👤</span>
+        <h3>Team & Rechte</h3>
+        <p>Vorlage plus Einzelhäkchen — und zwar ernst gemeint.</p>
+        <ul>
+        <li>Rollen als Vorlage, Rechte einzeln nachschärfen</li>
+        <li>Serverseitig erzwungen, nicht nur ausgeblendet</li>
+        <li>Mehrere Standorte und Gesellschaften</li>
+        <li>Bewerber und Einstellungstests</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="haus">
+        <span class="zeichen">⚙️</span>
+        <h3>Einstellungen</h3>
+        <p>Alles, was Ihr Haus ausmacht, an einer Stelle.</p>
+        <ul>
+        <li>Firma, Standorte, Gesellschaften</li>
+        <li>Logo, Farben, Schriften</li>
+        <li>Signatur und Grußformeln</li>
+        <li>Vorgaben für Verträge und Exposés</li>
+        <li>E-Mail-Postfächer</li>
+        </ul>
+      </article>
+      <article class="modul auf" data-gruppe="haus">
+        <span class="zeichen">📊</span>
+        <h3>Branchen-News</h3>
+        <p>Ein kurzes Briefing, täglich.</p>
+        <ul>
+        <li>Was in der Branche passiert ist</li>
+        <li>Zusammengefasst, mit Quelle</li>
+        </ul>
+      </article>
     </div>
   </div>
 </section>

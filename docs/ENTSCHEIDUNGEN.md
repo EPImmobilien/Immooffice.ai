@@ -5068,3 +5068,43 @@ Der KI-Entwurf war auf die Rolle „chef" beschränkt, mit dem Kommentar „nur
 mandantenfähiges Produkt ist das falsch: der Entwurf ist das Werkzeug des
 Maklers, nicht ein Vorrecht des Chefs. Jetzt dieselbe Rollenprüfung wie
 überall sonst.
+
+## 2026-10-06 · Website: der volle Umfang statt neun Kacheln
+
+Rückmeldung: „auf der Webseite sollte viel mehr dargestellt werden, welche
+umfangreichen Tools wir haben … schau dir doch bitte einfach mal jede Kachel
+an, welche Funktionen dahinterstecken … weil bisher sehe ich da kein
+Alleinstellungsmerkmal."
+
+Der Befund stimmte. Die Seite zeigte neun allgemeine Kacheln („Objekte &
+Vermarktung", „Termine & Aufgaben") — Sätze, die jede Maklersoftware über
+sich schreiben kann. Die Anwendung hat **33 Bereiche**.
+
+**Jetzt: ein Katalog aus 27 Bereichen**, gruppiert in Vermarktung ·
+Kommunikation · Kunden & Akquise · Tägliche Arbeit · Geschäft & Recht · Ihr
+Haus. Jeder nennt vier bis sechs **konkrete** Funktionen statt einer
+Beschreibung. Eine Filterleiste blendet aus; ohne JavaScript steht alles da.
+
+**Warum 27 und nicht 33:** die Bereiche der Anwendung sind teils
+Unteransichten desselben Themas (Verkauf enthält Maklerverträge,
+Objektnachweise und Bewertung; Kundenportal enthält Eigentümer- und
+Käuferportal). Fasst man sie, wie ein Besucher sie sieht, bleiben 27. Keiner
+ist weggelassen.
+
+**Die Alleinstellung ist nicht die Zahl**, sondern die Verkettung — und so
+steht es auch da: „Die meisten Büros arbeiten mit vier Programmen
+nebeneinander … Was dazwischen liegt, macht ein Mensch, jedes Mal neu. Hier
+liegt es in einem Haus, und ein Arbeitsschritt kennt den nächsten."
+
+**Was nicht behauptet wird.** Jeder Punkt im Katalog ist im Quelltext
+belegbar; nichts steht da, was es nicht gibt. Die Bewertung trägt den
+Pflichthinweis („Marktpreiseinschätzung, ersetzt kein Verkehrswertgutachten
+nach § 194 BauGB"), Vertragsmuster tragen den Hinweis auf anwaltliche
+Prüfung, die Signatur heißt „einfache elektronische Signatur". Die beiden
+Anbindungen hinter dem Funktionsschalter stehen als „vorbereitet" da, nicht
+als fertig. `tests/website.py` erzwingt das weiterhin.
+
+`tests/website-browser.js` prüft den Katalog jetzt mit: dass er vollständig
+ist, dass **jeder** Bereich konkrete Funktionen nennt (ein Bereich ohne
+Liste wäre genau die leere Kachel, die ersetzt werden sollte), dass der
+Filter ausblendet — und dass „Alle Bereiche" alles zurückholt.

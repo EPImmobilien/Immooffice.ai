@@ -483,3 +483,57 @@ footer .schluss {
   .auf { opacity: 1; transform: none; }
   .ansicht { transform: none; }
 }
+
+/* ------------------------------------------------------------------ Modul-Katalog
+   27 Bereiche sind zu viele für eine Reihe Kacheln und zu wenige für eine
+   eigene Seite. Also: Filterleiste oben, darunter ein Raster, das bei
+   schmalem Fenster einspaltig wird. Ohne JavaScript sind alle Bereiche
+   sichtbar — der Filter blendet aus, er lädt nicht nach. */
+.fuehrung {
+  max-width: 680px; margin: 14px auto 0; font-size: 17px; line-height: 1.7;
+  color: var(--gedaempft);
+}
+.kopfzeile .fuehrung { margin-left: auto; margin-right: auto; }
+
+.chips {
+  display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+  margin: 34px 0 30px;
+}
+.chip {
+  font: inherit; font-size: 14px; padding: 9px 17px; border-radius: 999px;
+  border: 1px solid var(--linie); background: var(--karte); color: var(--blau);
+  cursor: pointer; transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+.chip:hover { border-color: var(--gold); }
+.chip.an { background: var(--blau); border-color: var(--blau); color: #fff; }
+
+.module {
+  display: grid; gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+.modul {
+  background: var(--karte); border: 1px solid var(--linie);
+  border-radius: var(--rund); padding: 24px 22px 20px;
+  transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease, border-color .25s ease;
+}
+.modul:hover { transform: translateY(-3px); box-shadow: var(--schatten); border-color: var(--gold-hell); }
+.modul .zeichen { font-size: 26px; display: block; margin-bottom: 10px; }
+.modul h3 { font-size: 19px; margin: 0 0 6px; }
+.modul > p { color: var(--gedaempft); font-size: 15px; margin: 0 0 14px; }
+.modul ul { list-style: none; margin: 0; padding: 0; }
+.modul li {
+  position: relative; padding-left: 20px; font-size: 14.5px; line-height: 1.55;
+  margin-bottom: 7px; color: var(--blau);
+}
+.modul li::before {
+  content: ""; position: absolute; left: 4px; top: 9px;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--gold);
+}
+/* Ausgefiltert: weg aus dem Fluss und weg aus dem Vorlesefluss. */
+.modul[hidden] { display: none; }
+
+@media (max-width: 560px) {
+  .module { grid-template-columns: 1fr; }
+  .chips { gap: 8px; margin: 26px 0 22px; }
+  .chip { padding: 8px 13px; font-size: 13px; }
+}
