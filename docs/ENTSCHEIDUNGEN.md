@@ -5237,3 +5237,51 @@ jede Datei, die es benutzt. Eine Liste von Hand hatte sieben Dateien
 übersehen — darunter vier Beilagen in Unterordnern. Sie hätten den Aufruf
 enthalten, aber nicht die Funktion, und wären beim Laden gescheitert.
 Eine Liste von Hand läuft der nächsten Regel immer hinterher.
+
+---
+
+## 2026-10-06 · Bestandsmandanten vor dem Ausrollen der Credit-Pflicht
+
+**Frage:** fork_49 lässt einen Mandanten ohne vollen Abo-Zugriff nicht mehr
+an die KI. Im laufenden Projekt gab es zwei Mandanten aus der Zeit vor
+fork_47: ohne Zeile in `mandant_abo`, ohne `testphase_bis`, mit Saldo 0.
+`abo_zugriff` las daraus folgerichtig „gesperrt". Ein Ausrollen hätte zwei
+Nutzer eines Hauses von einem Tag auf den anderen ohne KI dastehen lassen —
+ohne dass jemand etwas gekündigt hätte.
+
+**Entscheidung:** `fork_50` tut für Bestandsmandanten genau das, was
+`registrierung_abschliessen` für neue tut: Testphase ab jetzt (oder die
+laufende, wenn eine steht), Abo-Zeile mit Status `test`, Testcredits
+einmalig. Alle Werte aus `plattform_werte`.
+
+**Grund:** Eine Abrechnung einzuführen heißt nicht, Bestandskunden
+auszusperren. Die Migration ist additiv — sie kann Zugriff nur erweitern,
+nie einschränken —, und sie ist über die Gutschrift-Referenz idempotent;
+ein zweiter Lauf verschenkt keine zweiten 300 Credits.
+
+**Was das kostet:** Die beiden Mandanten haben jetzt eine Testphase mit 300
+Credits, die im November endet. Das ist die reguläre Testphase, kein
+Dauerzustand — und genau der Punkt, an dem der Betreiber einen Tarif wählen
+muss.
+
+---
+
+## 2026-10-06 · Keine Credits für Hintergrundläufe
+
+**Frage:** Rund vierzig Edge Functions rufen KI. fork_49 rechnet vier davon
+ab. Warum nicht alle?
+
+**Entscheidung:** Abgerechnet wird nur, was ein angemeldeter Mensch auslöst.
+Die Hintergrundläufe — Postfachabruf, Anfrageverarbeitung, Akquise-Leads,
+Nachfassen, Nachrichtenlage — bleiben vorerst frei. Den Parsern und
+Auslesefunktionen fehlt ein Preis im Katalog; einen zu erfinden wäre eine
+Preisentscheidung.
+
+**Grund:** Ein Zeitplan-Lauf, der einem Mandanten nachts unbemerkt Credits
+abzieht, ist etwas anderes als ein Knopf, den jemand drückt. Er muss
+angekündigt und im Admin abschaltbar sein, bevor er Geld kostet. Und ein
+Preis gehört in `plattform_credit_preise`, nicht in einen Codekommentar.
+
+**Was das kostet:** Anbieterkosten, die niemandem zugeordnet werden. Sie
+stehen in `docs/BILLING.md`, Abschnitt 5, namentlich — damit sie nicht in
+Vergessenheit geraten.
