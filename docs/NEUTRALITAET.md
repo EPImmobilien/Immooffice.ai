@@ -91,6 +91,52 @@ Farben, gilt die Plattform-CI.
 
 **Musterfirma für Demo und Bildschirmfotos:** „Musterhaus Immobilien GmbH".
 
+### 4a. Farbwerte der Referenz
+
+CLAUDE.md nennt die Farbwerte unter dem, was neutralisiert wird. Acht Werte
+der Vorlage sind gesperrt; getauscht werden sie gegen die Plattform-CI:
+
+| Referenz | immoOffice.ai | Rolle |
+|---|---|---|
+| `#263159` | `#1B2A47` | Marineblau |
+| `#1a2342` | `#12203B` | Marineblau dunkel |
+| `#D4A567` | `#B5934F` | Gold |
+| `#e0bd80`, `#e6c894` | `#C9AE72` | Gold hell |
+| `#FAFAF7` | `#FAFAFA` | Hintergrund |
+| `#E8E4DA` | `#E6E8EB` | Linien |
+| `#8B8377` | `#7A828C` | gedämpfter Text |
+
+Gesperrt ist der **Wert**, nicht die Schreibweise. Fünf Formen kommen im
+Quelltext der Vorlage vor, und genau sie prüft das Gate:
+
+- `#D4A567` — Hexfarbe, Groß- und Kleinschreibung egal
+- `"D4A567"` — ohne Doppelkreuz, in Anführungszeichen (so steht sie im OOXML
+  der Word- und PowerPoint-Ausgabe)
+- `rgb(212,165,103)` und `rgba(212,165,103,.22)` — dezimal
+- `rgb(0.831, 0.647, 0.404)` — Fließkomma, so verlangt es `pdf-lib`
+
+Die Fließkomma-Form ist der Grund, warum 392 Stellen bis zum 06.10.2026
+unentdeckt blieben: darin steht nirgends `D4A567`.
+
+**Wo geprüft wird:** `tests/marke.py`, Punkt 5 — über `src/`, `supabase/`,
+`website/`, `packages/`, `scripts/`, `tests/`, `assets/`, `index.html` und
+`netlify.toml`, **einschließlich Kommentarzeilen**. Das allgemeine
+Neutralitäts-Gate überliest Kommentare; CLAUDE.md nennt den Kommentar
+ausdrücklich, deshalb hier nicht.
+
+**Wo getauscht wird:** `scripts/farben.py`, als Nachlauf nach allen Regeln in
+`scripts/oberflaeche-zerlegen.py`, `scripts/nebenseiten.py` und
+`scripts/neutralisieren-funktionen.py`. Eine Palette, drei Erzeuger.
+
+**Ausgenommen, mit Grund:** die Erzeuger selbst und `tests/marke.py` (sie
+müssen die alten Werte nennen, um sie zu finden), `assets/marke/quelle/` und
+`assets/marke/README.md` (der unveränderte Stand des Gestalters; ausgeliefert
+wird nur das Umgefärbte), sowie die angewendete Migration
+`20260915000100_vorlage_tabellen.sql` — eine angewendete Migration ist ein
+Protokoll, keine Arbeitsdatei. Dass ihre beiden Spaltenvorgaben seit `fork_58`
+überschrieben sind und bleiben, prüft `tests/vorlage-vollstaendig.sql` am
+laufenden Schema.
+
 ## 5. Rechtstexte
 
 Vertrags-, Widerrufs- und Datenschutztexte der Referenz werden **ersetzt**, nicht

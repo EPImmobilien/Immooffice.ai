@@ -18,6 +18,8 @@ Ausgabe:  src/seiten/                        (versioniert)
 """
 import hashlib, importlib.util, pathlib, re, sys
 
+import farben  # scripts/farben.py — derselbe Farb-Nachlauf wie bei index.html
+
 WURZEL = pathlib.Path(__file__).resolve().parent.parent
 QUELLE = WURZEL / 'reference'
 ZIEL = WURZEL / 'src' / 'seiten'
@@ -83,6 +85,11 @@ def main():
             pruefe_haeufigkeit(n, bemerkung, ziel)
             if n:
                 zaehler[bemerkung] = zaehler.get(bemerkung, 0) + n
+        # Der Farb-Nachlauf, wie bei index.html und aus demselben Modul.
+        inhalt, z_farbe = farben.tauschen(inhalt)
+        for bemerkung, n in z_farbe.items():
+            zaehler['[FARBE] ' + bemerkung] = \
+                zaehler.get('[FARBE] ' + bemerkung, 0) + n
         # Erst nach den Regeln: die FREMD-Regel hat die Projektkennung der
         # Vorlage gerade durch die eigene ersetzt. Aus der eigenen wird hier
         # ein Platzhalter — sonst baut derselbe Quellstand nur fuer ein Projekt.

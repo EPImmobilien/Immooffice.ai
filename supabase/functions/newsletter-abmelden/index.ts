@@ -9,8 +9,8 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 
 function seite(titel: string, text: string) {
   const html = `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${titel}</title>
-<style>body{font-family:Montserrat,Arial,sans-serif;background:#f6f6f9;color:#263159;margin:0;padding:40px 16px}main{max-width:520px;margin:0 auto;background:#fff;border-top:4px solid #D4A567;padding:28px 26px;box-shadow:0 2px 12px rgba(38,49,89,.08)}h1{font-size:20px;font-weight:600;margin:0 0 12px}p{font-size:14px;line-height:1.6;margin:0 0 10px}small{color:#7a7f95}</style></head>
-<body><main><div style="font-size:10px;letter-spacing:.2em;color:#D4A567;font-weight:700;margin-bottom:10px">MUSTERHAUS IMMOBILIEN</div><h1>${titel}</h1><p>${text}</p><p><small>Sie können sich jederzeit wieder anmelden, indem Sie bei einer Exposé-Anfrage den Newsletter ankreuzen oder uns kurz schreiben.</small></p></main></body></html>`;
+<style>body{font-family:Montserrat,Arial,sans-serif;background:#f6f6f9;color:#1B2A47;margin:0;padding:40px 16px}main{max-width:520px;margin:0 auto;background:#fff;border-top:4px solid #B5934F;padding:28px 26px;box-shadow:0 2px 12px rgba(27, 42, 71,.08)}h1{font-size:20px;font-weight:600;margin:0 0 12px}p{font-size:14px;line-height:1.6;margin:0 0 10px}small{color:#7a7f95}</style></head>
+<body><main><div style="font-size:10px;letter-spacing:.2em;color:#B5934F;font-weight:700;margin-bottom:10px">MUSTERHAUS IMMOBILIEN</div><h1>${titel}</h1><p>${text}</p><p><small>Sie können sich jederzeit wieder anmelden, indem Sie bei einer Exposé-Anfrage den Newsletter ankreuzen oder uns kurz schreiben.</small></p></main></body></html>`;
   return new Response(html, { status: 200, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
 }
 

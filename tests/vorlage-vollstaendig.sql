@@ -459,3 +459,27 @@ begin
   end if;
 end;
 $$;
+
+-- --- Keine Farbe der Referenz als Spaltenvorgabe --------------------------
+-- CLAUDE.md nennt den Standardwert ausdruecklich unter dem, worin kein
+-- Kennzeichen der Referenz stehen darf. Zwei Spalten trugen bis fork_58 das
+-- Gold der Referenz als Vorgabe (mail_eigene_ordner.farbe,
+-- mail_kategorien.farbe) — jeder neu angelegte Ordner haette ihre Farbe
+-- bekommen, ohne dass sie irgendwo im Quelltext stuende.
+--
+-- Geprueft wird das ganze Schema, nicht die beiden Spalten: die naechste
+-- uebernommene Tabelle bringt die naechste Vorgabe mit.
+do $$
+declare treffer text;
+begin
+  select string_agg(format('%s.%s = %s', table_name, column_name, column_default),
+                    '; ' order by table_name, column_name)
+    into treffer
+    from information_schema.columns
+   where table_schema = 'public'
+     and column_default ~* '(263159|D4A567|1a2342|e0bd80|e6c894|FAFAF7|E8E4DA|8B8377)';
+  if treffer is not null then
+    raise exception 'Farbwert der Referenz als Spaltenvorgabe: %', treffer;
+  end if;
+  raise notice 'Keine Farbe der Referenz als Spaltenvorgabe.';
+end $$;

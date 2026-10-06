@@ -78,12 +78,12 @@ async function mailSenden(leadId: string) {
   const flag = heiss ? "🔥🔥 HEISS" : warm ? "🔥 WARM" : l.verkaufszeitpunkt ? "🕒" : "❔";
   const quali = [l.verkaufszeitpunkt, l.eigentuemer ? (l.eigentuemer === "ja" ? "Eigentümer" : "KEIN Eigentümer") : "", l.anlass].filter(Boolean).join(" · ");
   const zeile = (k: string, v: string | null) => v ? `<tr><td style="padding:6px 12px 6px 0;color:#666;white-space:nowrap;vertical-align:top">${k}</td><td style="padding:6px 0;font-weight:600">${esc(v)}</td></tr>` : "";
-  const html = `<div style="font-family:Montserrat,Arial,sans-serif;font-size:15px;color:#1a2342;max-width:640px">
-    <div style="background:#263159;color:#fff;padding:14px 18px;border-left:4px solid #D4A567;font-size:17px;font-weight:700">${flag} Neuer Bewertungs-Lead von der Website</div>
-    ${quali ? `<div style="background:#fff5e0;border:1px solid #D4A567;padding:10px 14px;margin:14px 0;font-weight:700;font-size:16px">${esc(quali)}</div>` : `<div style="background:#f3f3f3;padding:10px 14px;margin:14px 0;color:#666">Schritt 2 (Zeitpunkt/Eigentümer/Anlass) wurde nicht ausgefüllt – im Telefonat klären.</div>`}
+  const html = `<div style="font-family:Montserrat,Arial,sans-serif;font-size:15px;color:#12203B;max-width:640px">
+    <div style="background:#1B2A47;color:#fff;padding:14px 18px;border-left:4px solid #B5934F;font-size:17px;font-weight:700">${flag} Neuer Bewertungs-Lead von der Website</div>
+    ${quali ? `<div style="background:#fff5e0;border:1px solid #B5934F;padding:10px 14px;margin:14px 0;font-weight:700;font-size:16px">${esc(quali)}</div>` : `<div style="background:#f3f3f3;padding:10px 14px;margin:14px 0;color:#666">Schritt 2 (Zeitpunkt/Eigentümer/Anlass) wurde nicht ausgefüllt – im Telefonat klären.</div>`}
     <p style="margin:6px 0"><b>Bitte innerhalb von 15 Minuten zurückrufen.</b></p>
     <table style="border-collapse:collapse">${zeile("Telefon", l.telefon)}${zeile("Name", l.name)}${zeile("E-Mail", l.email)}${zeile("Objektart", l.objektart)}${zeile("Adresse", l.adresse)}${zeile("Verkauf", l.verkaufszeitpunkt)}${zeile("Eigentümer", l.eigentuemer)}${zeile("Anlass", l.anlass)}${zeile("Nachricht", l.nachricht)}${zeile("Kontakt", l.kontakt_id ? "in ImmoOffice verknüpft" : "–")}${zeile("Quelle", l.seite)}${zeile("Google-Klick", l.gclid ? "ja (gclid vorhanden)" : null)}</table>
-    <p style="margin-top:18px"><a href="tel:${esc(String(l.telefon).replace(/\s/g, ""))}" style="background:#D4A567;color:#1a2342;padding:12px 22px;border-radius:6px;text-decoration:none;font-weight:700">📞 ${esc(l.telefon)} anrufen</a></p>
+    <p style="margin-top:18px"><a href="tel:${esc(String(l.telefon).replace(/\s/g, ""))}" style="background:#B5934F;color:#12203B;padding:12px 22px;border-radius:6px;text-decoration:none;font-weight:700">📞 ${esc(l.telefon)} anrufen</a></p>
     <p style="color:#888;font-size:12px;margin-top:22px">ImmoOffice · Lead-ID ${l.id}</p></div>`;
   try {
     const r = await fetch("https://api.resend.com/emails", {

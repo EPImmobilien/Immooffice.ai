@@ -40,8 +40,8 @@ async function immoFirma(db: any, mandant: string | null): Promise<ImmoFirma> {
 const LOGO = "https://usguiggfciavwzkdfjgt.supabase.co/storage/v1/object/public/web-assets/logo-weiss.png";
 const MAX_ANHANG_GESAMT = 14 * 1024 * 1024;
 
-const NAVY = "#263159";
-const GOLD = "#d4a567";
+const NAVY = "#1B2A47";
+const GOLD = "#B5934F";
 
 const txt = (v: unknown, max = 300) => String(v ?? "").trim().slice(0, max);
 const esc = (v: unknown) => String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");

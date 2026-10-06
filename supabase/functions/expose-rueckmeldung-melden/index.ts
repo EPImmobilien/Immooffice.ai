@@ -158,23 +158,23 @@ function buildMail(opts: {
   const htmlBody = `<!DOCTYPE html>
 <html lang="de">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#f5f3ee;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#263159;">
+<body style="margin:0;padding:0;background:#f5f3ee;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1B2A47;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f3ee;">
     <tr><td align="center" style="padding:40px 20px;">
       <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background:#ffffff;border:1px solid #e5e0d6;">
-        <tr><td style="background:#263159;padding:28px 36px;border-bottom:3px solid ${opts.istFreigabe ? "#2da14b" : "#c7a455"};">
+        <tr><td style="background:#1B2A47;padding:28px 36px;border-bottom:3px solid ${opts.istFreigabe ? "#2da14b" : "#c7a455"};">
           <div style="font-size:22px;font-weight:300;letter-spacing:0.25em;color:#ffffff;">MUSTERHAUS</div>
           <div style="font-size:10px;color:#c7a455;letter-spacing:0.2em;margin-top:4px;font-weight:600;">INTERN \u2013 ${opts.istFreigabe ? "FREIGABE ERTEILT" : "ANMERKUNGEN VOM EIGENT\u00dcMER"}</div>
         </td></tr>
         <tr><td style="padding:36px 36px 28px;">
-          <h1 style="margin:0 0 10px;font-size:20px;font-weight:300;color:#263159;line-height:1.3;">
+          <h1 style="margin:0 0 10px;font-size:20px;font-weight:300;color:#1B2A47;line-height:1.3;">
             ${opts.istFreigabe ? "\u2713 " : ""}${escapeHtml(opts.dokName)}
           </h1>
           <p style="margin:0 0 8px;font-size:14px;line-height:1.7;">${escapeHtml(statusZeile)}</p>
           ${anmerkHtml}
           ${anhangHtml}
           <p style="margin:26px 0 0;text-align:center;">
-            <a href="${opts.portalUrl}" style="display:inline-block;background:#263159;color:#ffffff;text-decoration:none;padding:13px 30px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">
+            <a href="${opts.portalUrl}" style="display:inline-block;background:#1B2A47;color:#ffffff;text-decoration:none;padding:13px 30px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">
               Im Portal \u00f6ffnen
             </a>
           </p>

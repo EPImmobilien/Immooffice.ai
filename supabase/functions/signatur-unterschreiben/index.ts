@@ -424,7 +424,7 @@ Deno.serve(async (req) => {
     if (positionen.length === 0 || inFelderGestempelt === 0) {
       const sigPage = pdf.addPage([595.28, 841.89]);
       let sy = 780;
-      sigPage.drawText("Unterschriften", { x: margin, y: sy, size: 18, font, color: rgb(0.149, 0.192, 0.349) });
+      sigPage.drawText("Unterschriften", { x: margin, y: sy, size: 18, font, color: rgb(0.106, 0.165, 0.278) });
       sy -= 40;
       for (const e of (empfaengerAktuell || [])) {
         sigPage.drawText(`${e.anzeigename} (${rollenLabel(vorgang.dokument_typ, e.rolle)})`, { x: margin, y: sy, size: 11, font, color: rgb(0.05, 0.05, 0.05) });

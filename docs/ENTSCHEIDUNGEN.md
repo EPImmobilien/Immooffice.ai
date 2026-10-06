@@ -5361,3 +5361,35 @@ Werkzeugs in der Historie, nicht mit der aus dem Dateinamen. Die Namen
 stimmen, die Versionen nicht. Das wird nicht nachträglich geradegezogen —
 eine Historie umzuschreiben, um sie hübscher zu machen, verliert mehr, als
 sie gewinnt.
+
+---
+
+## 2026-10-06 · Ein Farb-Nachlauf statt 392 Einzelregeln
+
+**Frage:** Die Farbwerte der Referenz standen noch an 392 Stellen im
+Quelltext — in Farbwählern, im Grundriss-Zeichner, in PDF-Erzeugern,
+Mailvorlagen und Nebenseiten. CLAUDE.md nennt Farbwerte ausdrücklich unter
+dem, was neutralisiert wird. Eine Regel je Stelle, oder etwas anderes?
+
+**Entscheidung:** Ein gemeinsamer Nachlauf, `scripts/farben.py`, den alle
+drei Erzeuger nach ihren Regeln laufen lassen. Acht Farbpaare, vier
+Suchmuster je Paar, fünf abgedeckte Schreibweisen.
+
+**Grund:** 392 Einzelregeln wären ein Regelsatz, den niemand pflegt, und
+jede neue Vorlagenfassung brächte neue Stellen mit. Der Nachlauf greift
+nach den Regeln — davor geschrieben hätten einige Regeln die alte Farbe
+wieder eingesetzt, weil sie selbst Farbwerte enthalten.
+
+Die fünfte Schreibweise war der eigentliche Fund: `rgb(0.831, 0.647, 0.404)`
+ist das Gold der Referenz, wie `pdf-lib` es verlangt. Darin steht nirgends
+`D4A567`. So sind die PDF-Erzeuger durch jede bisherige Prüfung gefallen.
+
+**Was das kostet:** Der Nachlauf tauscht blind. Eine Stelle, an der einer
+dieser acht Werte etwas anderes bedeutet als eine Farbe, würde er
+mitnehmen. Geprüft: es gibt keine — die Dezimalmuster greifen nur innerhalb
+von `rgb(`/`rgba(`, die Hexmuster nur mit Doppelkreuz oder in
+Anführungszeichen, und eine neunte Hexziffer schließt den Treffer aus.
+
+**Nachweis:** `tests/marke.py`, Punkt 5 — neun Bereiche des Quelltextes,
+Kommentarzeilen eingeschlossen. Gegenprobe gemacht: alle fünf Schreibweisen
+werden gefunden, auch die im Kommentar.

@@ -15,11 +15,21 @@ davon faellt erst dem Kunden auf:
 4. Irgendwo wird eine Marken-Datei angefordert, die es nicht gibt. Genau
    das war bis zum 06.10.2026 der Fall: die Huelle verwies auf sechs
    Icon-Dateien, von denen keine je existiert hat.
+5. Eine Farbe der Referenz steht wieder im ausgelieferten Quelltext. Punkt 2
+   sieht nur die SVGs; bis zum 06.10.2026 standen die Vorgabefarben noch an
+   392 weiteren Stellen — in der Anwendung, in den Nebenseiten, in
+   Mailvorlagen und in den PDF-Erzeugern. Gesucht wird in allen fuenf
+   Schreibweisen, die scripts/farben.py kennt, und anders als das
+   Neutralitaets-Gate ueberliest dieser Test auch Kommentarzeilen nicht:
+   CLAUDE.md nennt den Kommentar ausdruecklich.
 """
 import pathlib
 import re
 import subprocess
 import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "scripts"))
+import farben  # scripts/farben.py — dieselbe Palette, die die Erzeuger tauschen
 
 STAMM = pathlib.Path(__file__).resolve().parent.parent
 MARKE = STAMM / "assets" / "marke"
@@ -95,6 +105,58 @@ def main() -> int:
             print(f"[FEHLER] {quelle.relative_to(STAMM)} fordert \"{pfad}\" an, "
                   f"aber {wo} gibt es nicht.")
 
+    # 5. Keine Farbe der Referenz im ausgelieferten Quelltext.
+    #    Die unversionierten und die erzeugenden Dateien sind aus: die
+    #    Erzeuger MUESSEN die alten Werte nennen, um sie zu ersetzen.
+    AUS = {
+        "scripts/farben.py",
+        "scripts/marke-aufbereiten.py",
+        "scripts/neutralisieren-funktionen.py",
+        "scripts/oberflaeche-zerlegen.py",
+        "tests/marke.py",
+        # Eine angewendete Migration ist ein Protokoll, keine Arbeitsdatei.
+        # Die beiden Vorgaben darin sind seit fork_58 ueberschrieben, und
+        # dass sie es BLEIBEN, prueft tests/vorlage-vollstaendig.sql am
+        # laufenden Schema — dort, wo es zaehlt.
+        "supabase/migrations/20260915000100_vorlage_tabellen.sql",
+    }
+    # Die Lieferung selbst. assets/marke/quelle/ ist der unveraenderte Stand
+    # des Gestalters, und er traegt die Farben der Lieferung — genau deshalb
+    # faerbt scripts/marke-aufbereiten.py sie um. Ausgeliefert wird nichts
+    # davon: scripts/bauen.py nimmt assets/marke/*.svg und
+    # assets/marke/icons/*.png. Dass das Erzeugte sauber ist, prueft Punkt 2.
+    AUS_ORDNER = ("assets/marke/quelle/", "assets/marke/README.md")
+    ENDUNGEN = {".js", ".ts", ".tsx", ".html", ".css", ".json", ".mjs",
+                ".sql", ".py", ".md", ".toml", ".yml", ".svg"}
+    BEREICHE = ["src", "supabase", "website", "packages", "scripts", "tests",
+                "assets", "index.html", "netlify.toml"]
+    gefunden = []
+    for bereich in BEREICHE:
+        wurzel = STAMM / bereich
+        if not wurzel.exists():
+            continue
+        kandidaten = [wurzel] if wurzel.is_file() else sorted(wurzel.rglob("*"))
+        for p in kandidaten:
+            if not p.is_file() or p.suffix not in ENDUNGEN:
+                continue
+            rel = str(p.relative_to(STAMM))
+            if (rel in AUS or rel.startswith(AUS_ORDNER)
+                    or "node_modules" in rel or "__pycache__" in rel):
+                continue
+            try:
+                text = p.read_text(encoding="utf-8")
+            except UnicodeDecodeError:
+                continue
+            for muster, _, bemerkung in farben.REGELN:
+                for m in muster.finditer(text):
+                    zeile = text.count("\n", 0, m.start()) + 1
+                    gefunden.append((rel, zeile, bemerkung, m.group(0)))
+    for rel, zeile, bemerkung, text in gefunden[:20]:
+        print(f"[FEHLER] {rel}:{zeile} traegt {text!r} — {bemerkung}.")
+    if len(gefunden) > 20:
+        print(f"[FEHLER] ... und {len(gefunden) - 20} weitere.")
+    fehler += len(gefunden)
+
     if fehler:
         print(f"\n{fehler} Befund(e).")
         return 1
@@ -103,6 +165,8 @@ def main() -> int:
     print(f"     Lieferung ueberein, tragen die Plattform-CI "
           f"({', '.join(PLATTFORM)}),")
     print(f"     und alle {len(set(gefordert))} angeforderten Pfade haben eine Datei.")
+    print(f"     Keine Farbe der Referenz in {len(BEREICHE)} Bereichen des "
+          f"Quelltextes — {len(farben.REGELN)} Muster ueber alle fuenf Schreibweisen.")
     return 0
 
 

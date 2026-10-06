@@ -93,10 +93,10 @@ const LOGO_PFAD               = "logo.png";
 const MAKLER_SIGNATUR_PFADE   = ["unterschrift.png"];
 
 const CI = {
-  // Hier standen bis zum 28.09.2026 rgb(0.149, 0.192, 0.349) und
-  // rgb(0.831, 0.647, 0.404) — das sind #263159 und #D4A567, die Farben
-  // der Referenz. In Fliesskomma-Schreibweise hat das Neutralitaets-Gate
-  // sie nicht gefunden.
+  // Hier standen bis zum 28.09.2026 die beiden Markenfarben der
+  // Referenz, in Fliesskomma-Schreibweise. So hat das Neutralitaets-
+  // Gate sie lange nicht gefunden; seit dem 06.10.2026 sucht es auch
+  // diese Schreibweise (scripts/farben.py).
   blau: rgb(0.106, 0.165, 0.278),  // #1B2A47, Plattform-CI aus CLAUDE.md
   gold: rgb(0.710, 0.576, 0.310),  // #B5934F, dito
   text: rgb(0.08, 0.08, 0.08),

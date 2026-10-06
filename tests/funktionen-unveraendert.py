@@ -17,6 +17,9 @@ und ist zufrieden; sie ist eine Pruefung der Uebersetzung, nicht des Ergebnisses
 """
 import base64, difflib, pathlib, re, sys
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "scripts"))
+import farben  # scripts/farben.py — die Palette, die die Erzeuger tauschen
+
 WURZEL = pathlib.Path(__file__).resolve().parent.parent
 VORLAGE = WURZEL / 'reference' / 'functions'
 FORK = WURZEL / 'supabase' / 'functions'
@@ -32,6 +35,12 @@ EIGENE = WURZEL / 'supabase' / 'eigene'
 KENNZEICHEN = re.compile(
     base64.b64decode('ZW5nZmVyfGVwd29ybGR8ZXBbLV8gXT9pbW1vYmlsaWVufGVwLXdvcmxkfEVQIFdvcmxkfEUmUHxFJmFtcDtQfEVOR0ZFUnxWKMO2fG9lfFxcdTAwZjYpZ2VudGVpY2h8Vm9lZ2VudGVpY2h8Um9zdG9ja3xTY2h3ZXJpbnxCZXJsaW58SGFtYnVyZ3xXYXJuZW0ow7x8dWUpbmRlfE1hcmtncmFmZW5oZWlkZXwxODA1NXwxODA1N3wxOTA1NXxQdXNjaGtpbnwwMzgxWyAvLi1dPzM2WyAvLi1dPzc3WyAvLi1dPzk5WyAvLi1dPzg4fHNwcmVuZ25ldHRlcnxTUFJFTkdORVRURVJ8am90Zm9ybXxzaXBnYXRlfHlvZGVja3xzaG9wLT90dnx5YXp3a3p6amlxdXBydGpwdXJ1cnxTVEFORE9SVEVcW3xTVEFORE9SVEVcLnxEb2JiZXJ0aW58THVkd2lnc2x1c3Q=').decode(),
     re.IGNORECASE)
+
+def FARBE_IN_ZEILE(zeile):
+    """Traegt die Zeile einen Farbwert der Referenz, in irgendeiner der
+    fuenf Schreibweisen?"""
+    return any(muster.search(zeile) for muster, _, _ in farben.REGELN)
+
 
 # Zeilen, die nur verschwinden, weil sie zu einem Block gehoeren, dessen
 # uebrige Zeilen ein Kennzeichen tragen. Bisher genau einer: die
@@ -342,6 +351,14 @@ def main():
                 if zeile in dazu:
                     continue
                 if zeile in BLOCKZEILEN.get(ordner.name, ()):
+                    continue
+                # Farbwerte sind seit dem 06.10.2026 ebenfalls Kennzeichen
+                # (docs/NEUTRALITAET.md, Abschnitt 4a). Sie stehen NICHT in
+                # der Liste oben, sondern kommen aus scripts/farben.py: eine
+                # Palette, und sie steht an einer Stelle. Geprueft wird die
+                # ENTFERNTE Zeile, also die der Vorlage — dort steht der alte
+                # Wert, und genau den finden die Muster.
+                if FARBE_IN_ZEILE(zeile):
                     continue
                 if not KENNZEICHEN.search(zeile):
                     beanstandet.append(

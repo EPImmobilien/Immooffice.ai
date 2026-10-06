@@ -292,7 +292,7 @@ function buildMail(opts: {
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:18px 0;background:#faf8f3;border:1px solid #e5e0d6;">
       ${opts.dokumente.map(d => `
         <tr><td style="padding:10px 14px;border-bottom:1px solid #efeae0;">
-          <div style="font-size:13px;color:#263159;font-weight:600;">${escapeHtml(d.name)}</div>
+          <div style="font-size:13px;color:#1B2A47;font-weight:600;">${escapeHtml(d.name)}</div>
           <div style="font-size:11px;color:#8a8470;letter-spacing:0.05em;margin-top:2px;">${escapeHtml(kategorieLabels[d.kategorie] || d.kategorie)}</div>
           ${d.nachricht ? `<div style="font-size:13px;color:#4a4434;font-style:italic;margin-top:8px;padding:8px 12px;background:#f3edde;border-left:3px solid #c7a455;line-height:1.6;white-space:pre-wrap;">${escapeHtml(d.nachricht)}</div>` : ""}
         </td></tr>
@@ -311,16 +311,16 @@ function buildMail(opts: {
   const htmlBody = `<!DOCTYPE html>
 <html lang="de">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#f5f3ee;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#263159;">
+<body style="margin:0;padding:0;background:#f5f3ee;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1B2A47;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f3ee;">
     <tr><td align="center" style="padding:40px 20px;">
       <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background:#ffffff;border:1px solid #e5e0d6;">
-        <tr><td style="background:#263159;padding:32px 36px;border-bottom:3px solid #c7a455;">
+        <tr><td style="background:#1B2A47;padding:32px 36px;border-bottom:3px solid #c7a455;">
           <div style="font-size:22px;font-weight:300;letter-spacing:0.25em;color:#ffffff;">MUSTERHAUS</div>
           <div style="font-size:10px;color:#c7a455;letter-spacing:0.2em;margin-top:4px;font-weight:600;">EIGENT\u00dcMER-PORTAL</div>
         </td></tr>
         <tr><td style="padding:40px 36px 30px;">
-          <h1 style="margin:0 0 18px;font-size:22px;font-weight:300;color:#263159;line-height:1.3;">
+          <h1 style="margin:0 0 18px;font-size:22px;font-weight:300;color:#1B2A47;line-height:1.3;">
             ${istEines ? "Ein neues Dokument f\u00fcr Sie" : `${opts.anzahl} neue Dokumente f\u00fcr Sie`}
           </h1>
           <p style="margin:0 0 14px;font-size:14px;line-height:1.7;">
@@ -336,7 +336,7 @@ function buildMail(opts: {
             \u00dcber den folgenden Link gelangen Sie direkt zu Ihrem Portal:
           </p>
           <p style="margin:24px 0;text-align:center;">
-            <a href="${opts.portalUrl}" style="display:inline-block;background:#263159;color:#ffffff;text-decoration:none;padding:14px 32px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;border-radius:0;">
+            <a href="${opts.portalUrl}" style="display:inline-block;background:#1B2A47;color:#ffffff;text-decoration:none;padding:14px 32px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;border-radius:0;">
               Zum Eigent\u00fcmer-Portal
             </a>
           </p>

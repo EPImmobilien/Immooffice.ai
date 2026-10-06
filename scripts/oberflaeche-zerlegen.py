@@ -26,6 +26,7 @@ Aufruf:
     python3 scripts/oberflaeche-zerlegen.py --roh DIR nur zerlegen, nach DIR
 """
 import pathlib, re, shutil, subprocess, sys
+import farben  # scripts/farben.py — der Farb-Nachlauf
 
 WURZEL = pathlib.Path(__file__).resolve().parent.parent
 VORLAGE = WURZEL / 'reference' / 'epworld-src.html'
@@ -5356,7 +5357,7 @@ def main():
         for name, beiseite in gerettet.items():
             shutil.move(str(beiseite), str(ziel / name))
 
-    zaehler, formatiert = {}, {}
+    zaehler, formatiert, farbzaehler = {}, {}, {}
     for datei, (a, b) in STUECKE.items():
         inhalt = '\n'.join(z[a - 1:b]) + '\n'
         if not roh:
@@ -5393,6 +5394,15 @@ def main():
                 if n:
                     inhalt = inhalt.replace(suche, ersatz)
                     zaehler[(grund, suche)] = zaehler.get((grund, suche), 0) + n
+            # Der Farb-Nachlauf, ganz zum Schluss: er tauscht die
+            # Vorgabefarben der Referenz in allen fuenf Schreibweisen. Nach
+            # den Regeln, weil einige von ihnen selbst Farbwerte setzen —
+            # steht der Nachlauf davor, schreibt die Regel die alte Farbe
+            # wieder hinein.
+            inhalt, z_farbe = farben.tauschen(inhalt)
+            for bemerkung, n in z_farbe.items():
+                pruefe_haeufigkeit(n, bemerkung, datei)
+                farbzaehler[bemerkung] = farbzaehler.get(bemerkung, 0) + n
             if datei == 'huelle/01-kopf.html':
                 inhalt += KONFIGURATION
         p = ziel / datei
@@ -5413,6 +5423,9 @@ def main():
         print(f'\n  {len(nie)} Regel(n) ohne Treffer:')
         for b in nie:
             print(f'    - {b}')
+    if farbzaehler:
+        print(f'\n  Farb-Nachlauf ({sum(farbzaehler.values())} Stellen):')
+        farben.bericht(farbzaehler, '  ')
     for datei, n in formatiert.items():
         print(f'\n[FORMAT] {datei}: {n} vorkompilierte Zeile(n) umgebrochen '
               f'(nur Leerraum, nachgerechnet).')

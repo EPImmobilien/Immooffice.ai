@@ -23,6 +23,8 @@ entfernt, nicht die Architektur geaendert.
 """
 import pathlib, re, shutil, sys
 
+import farben  # scripts/farben.py — der Farb-Nachlauf, geteilt mit dem Zerleger
+
 WURZEL = pathlib.Path(__file__).resolve().parent.parent
 QUELLE = WURZEL / 'reference' / 'functions'
 ZIEL = WURZEL / 'supabase' / 'functions'
@@ -1387,10 +1389,10 @@ ERSETZUNGEN = [
 
     ('FORK',
      r'  blau: rgb\(0\.149, 0\.192, 0\.349\),\n  gold: rgb\(0\.831, 0\.647, 0\.404\),',
-     '  // Hier standen bis zum 28.09.2026 rgb(0.149, 0.192, 0.349) und\n'
-     '  // rgb(0.831, 0.647, 0.404) — das sind #263159 und #D4A567, die Farben\n'
-     '  // der Referenz. In Fliesskomma-Schreibweise hat das Neutralitaets-Gate\n'
-     '  // sie nicht gefunden.\n'
+     '  // Hier standen bis zum 28.09.2026 die beiden Markenfarben der\n'
+     '  // Referenz, in Fliesskomma-Schreibweise. So hat das Neutralitaets-\n'
+     '  // Gate sie lange nicht gefunden; seit dem 06.10.2026 sucht es auch\n'
+     '  // diese Schreibweise (scripts/farben.py).\n'
      '  blau: rgb(0.106, 0.165, 0.278),  // #1B2A47, Plattform-CI aus CLAUDE.md\n'
      '  gold: rgb(0.710, 0.576, 0.310),  // #B5934F, dito',
      'PDF: die Farben der Referenz in signatur-vorgang-starten ersetzt.',
@@ -4349,7 +4351,7 @@ def main():
         sys.exit(f'Nicht gefunden: {QUELLE}\n'
                  'Die Funktionen der Vorlage gehoeren unversioniert nach reference/functions.')
 
-    zaehler = {}
+    zaehler, farbzaehler = {}, {}
     if ZIEL.exists():
         shutil.rmtree(ZIEL)
     ZIEL.mkdir(parents=True)
@@ -4402,6 +4404,16 @@ def main():
                     # ERSETZUNGEN abbekam, fiel es nicht auf.
                     if grund == 'FORK':
                         erweitert = True
+            # Der Farb-Nachlauf, nach allen Regeln: er tauscht die
+            # Vorgabefarben der Referenz in allen fuenf Schreibweisen —
+            # auch in der Fliesskomma-Form, die pdf-lib verlangt und in der
+            # keine Hexziffer vorkommt. Er aendert keine Zeilenzahl, die
+            # Notbremse darunter bleibt also unberuehrt.
+            inhalt, z_farbe = farben.tauschen(inhalt)
+            for bemerkung, n in z_farbe.items():
+                pruefe_haeufigkeit(n, bemerkung, datei)
+                farbzaehler[bemerkung] = farbzaehler.get(bemerkung, 0) + n
+
             # Zweite Notbremse: eine NEUTRALISIERUNG fuegt keine Zeilen hinzu
             # und entfernt hoechstens die beiden Standortzeilen. Eine
             # FORK-Regel erweitert die Vorlage und darf das sehr wohl —
@@ -4443,6 +4455,8 @@ def main():
         uebernommen += 1
 
     print('Neutralisierung der Edge Functions:')
+    if farbzaehler:
+        farben.bericht(farbzaehler)
     # Regeln sind Vierer- oder Fuenfertupel; das fuenfte Element grenzt eine
     # Regel auf bestimmte Funktionen ein. Fuer den Bericht zaehlt nur, was in
     # den ersten vier steht.

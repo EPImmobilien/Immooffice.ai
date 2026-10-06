@@ -15,14 +15,14 @@
 </script>
 <style>
   :root {
-    --navy: #263159;
-    --navy-dark: #1a2342;
-    --gold: #D4A567;
-    --gold-hell: #e6c894;
-    --ink: #263159;
-    --muted: #8B8377;
-    --rand: #E8E4DA;
-    --bg: #FAFAF7;
+    --navy: #1B2A47;
+    --navy-dark: #12203B;
+    --gold: #B5934F;
+    --gold-hell: #C9AE72;
+    --ink: #1B2A47;
+    --muted: #7A828C;
+    --rand: #E6E8EB;
+    --bg: #FAFAFA;
     --karte: #FFFFFF;
     --gruen: #1e7e34;
     --rot: #c0392b;
@@ -102,7 +102,7 @@
   .sv-karte canvas { outline: none; }
   .sv-kartenhinweis {
     position: absolute; left: 12px; bottom: 12px; z-index: 5;
-    background: rgba(38,49,89,.9); color: #fff; padding: 8px 12px;
+    background: rgba(27, 42, 71,.9); color: #fff; padding: 8px 12px;
     font-size: 12px; max-width: 72%; border-left: 3px solid var(--gold);
   }
   .sv-kartenhinweis:empty { display: none; }
@@ -177,8 +177,8 @@ var Sonnenverlauf = (function () {
      0. Konstanten
      --------------------------------------------------------------- */
   var CI = {
-    navy: "#263159", navyDark: "#1a2342", gold: "#D4A567",
-    goldHell: "#e6c894", muted: "#8B8377", rand: "#E8E4DA"
+    navy: "#1B2A47", navyDark: "#12203B", gold: "#B5934F",
+    goldHell: "#C9AE72", muted: "#7A828C", rand: "#E6E8EB"
   };
   var RAD = Math.PI / 180;
   var DEG = 180 / Math.PI;
@@ -571,7 +571,7 @@ var Sonnenverlauf = (function () {
           '<div class="sv-kein-webgl">' +
             '<div>' +
               '<div style="font-family:Marcellus,serif;font-size:19px;margin-bottom:8px">3D-Karte nicht verfügbar</div>' +
-              '<div style="font-size:12.5px;max-width:420px;color:#8B8377">Dieses Gerät stellt keine 3D-Grafik (WebGL) bereit. ' +
+              '<div style="font-size:12.5px;max-width:420px;color:#7A828C">Dieses Gerät stellt keine 3D-Grafik (WebGL) bereit. ' +
               'Kompass, Sonnenzeiten und der Exposé-Text rechts werden trotzdem vollständig berechnet.</div>' +
             '</div>' +
           '</div>' +
@@ -603,9 +603,9 @@ var Sonnenverlauf = (function () {
           '<h2>Kompass &amp; Ausrichtung</h2>' +
           '<div id="sv-kompassBox"></div>' +
           '<div class="sv-ausrichtung">' +
-            '<span style="font-size:11.5px;color:#8B8377">Terrasse/Balkon/Garten</span>' +
+            '<span style="font-size:11.5px;color:#7A828C">Terrasse/Balkon/Garten</span>' +
             '<input id="sv-ausrichtung" class="sv-eingabe" type="number" min="0" max="359" step="1" value="180">' +
-            '<span style="font-size:11.5px;color:#8B8377">°</span>' +
+            '<span style="font-size:11.5px;color:#7A828C">°</span>' +
             richtungChips +
           '</div>' +
         '</div>' +
@@ -619,7 +619,7 @@ var Sonnenverlauf = (function () {
           '<div class="sv-status" id="sv-status"></div>' +
           '<div class="sv-status" id="sv-osmstatus"></div>' +
           '<div class="sv-legende">' +
-            '<span><i style="background:#D4A567"></i>Objektgebäude</span>' +
+            '<span><i style="background:#B5934F"></i>Objektgebäude</span>' +
             '<span><i style="background:#e3d9c6"></i>Wohnhaus</span>' +
             '<span><i style="background:#c08a5e"></i>Scheune/Stall</span>' +
             '<span><i style="background:#b9b3a6"></i>Garage/Schuppen</span>' +
@@ -1264,7 +1264,7 @@ var Sonnenverlauf = (function () {
     if (!E.kompassBox) return;
     var G = 240, cx = 120, cy = 120, R = 96;
     var teile = [];
-    teile.push('<circle cx="120" cy="120" r="96" fill="#FAFAF7" stroke="' + CI.rand + '" stroke-width="1"/>');
+    teile.push('<circle cx="120" cy="120" r="96" fill="#FAFAFA" stroke="' + CI.rand + '" stroke-width="1"/>');
     teile.push('<circle cx="120" cy="120" r="64" fill="none" stroke="' + CI.rand + '" stroke-width="1"/>');
     teile.push('<circle cx="120" cy="120" r="32" fill="none" stroke="' + CI.rand + '" stroke-width="1"/>');
 

@@ -1,33 +1,33 @@
   * { box-sizing: border-box; }
   html, body, #root { margin: 0; padding: 0; min-height: 100%; font-family: 'Montserrat', system-ui, sans-serif; }
-  body { background: #FAFAF7; }
+  body { background: #FAFAFA; }
   #loadingScreen { 
     position: fixed; inset: 0; 
-    background: linear-gradient(135deg, #263159 0%, #1a2342 100%);
+    background: linear-gradient(135deg, #1B2A47 0%, #12203B 100%);
     display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 24px;
     z-index: 9999; transition: opacity 0.5s;
   }
   #loadingScreen.hidden { opacity: 0; pointer-events: none; }
   #loadingScreen .dot { 
-    width: 12px; height: 12px; background: #D4A567; border-radius: 50%;
+    width: 12px; height: 12px; background: #B5934F; border-radius: 50%;
     animation: pulse 1.4s ease-in-out infinite;
   }
   #loadingScreen .dot:nth-child(2) { animation-delay: 0.2s; }
   #loadingScreen .dot:nth-child(3) { animation-delay: 0.4s; }
   @keyframes pulse { 0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); } 40% { opacity: 1; transform: scale(1); } }
   #loadingScreen .dots { display: flex; gap: 12px; }
-  #loadingScreen .text { color: #D4A567; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; font-weight: 600; }
+  #loadingScreen .text { color: #B5934F; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; font-weight: 600; }
   #errorOverlay {
-    position: fixed; inset: 0; background: #FAFAF7; padding: 24px;
+    position: fixed; inset: 0; background: #FAFAFA; padding: 24px;
     display: none; align-items: center; justify-content: center; z-index: 10000;
     font-family: 'Montserrat', sans-serif;
   }
   #errorOverlay .card {
     max-width: 600px; background: #fff; padding: 40px;
-    border: 1px solid #E8E4DA; border-left: 4px solid #c0392b;
+    border: 1px solid #E6E8EB; border-left: 4px solid #c0392b;
   }
   #errorOverlay h1 { color: #c0392b; font-size: 22px; margin-top: 0; }
-  #errorOverlay pre { background: #FAFAF7; padding: 16px; overflow: auto; font-size: 11px; max-height: 240px; white-space: pre-wrap; word-break: break-word; }
+  #errorOverlay pre { background: #FAFAFA; padding: 16px; overflow: auto; font-size: 11px; max-height: 240px; white-space: pre-wrap; word-break: break-word; }
 
   /* ===================== Mobile-Fixes (iPhone, schmale Bildschirme) =====================
      Die App ist mit Inline-Styles gebaut, deshalb greifen normale CSS-Regeln nicht.

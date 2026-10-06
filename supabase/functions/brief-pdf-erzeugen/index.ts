@@ -69,7 +69,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const NAVY = rgb(0.149, 0.192, 0.349);
+const NAVY = rgb(0.106, 0.165, 0.278);
 const GOLD = rgb(0.690, 0.553, 0.243);   // #B08D3E — gedecktes Gold
 const GRAU = rgb(0.431, 0.416, 0.369);   // #6E6A5E
 const TEXT = rgb(0.149, 0.149, 0.165);

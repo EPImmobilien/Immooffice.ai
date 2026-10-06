@@ -45,44 +45,29 @@ Farben der Lieferung gelten. Beides ist vertretbar. Stillschweigend
 auseinanderlaufen darf es nicht — gedruckt und am Bildschirm nebeneinander
 fällt der Unterschied im Gold sofort auf.
 
-## Neutralisierung der Farbwerte ist unvollständig
+## ~~Neutralisierung der Farbwerte ist unvollständig~~ — erledigt am 06.10.2026
 
-Am 28.09.2026 wurden die Farben des Referenzunternehmens gegen die
-Plattform-CI getauscht — aber nur im Farb-Block der Anwendung. Als
-Vorgabewerte stehen sie weiter im Haus, Stand 06.10.2026:
+269 Stellen in Hexschreibweise und 123 in Dezimal- und Fließkommaschreibweise
+sind getauscht: 297 in der Anwendung und ihren Hüllteilen, 54 in den
+Nebenseiten, 60 in den Edge Functions, dazu zwei Spaltenvorgaben im Schema
+(`fork_58`). Gemacht hat es nicht eine Regel je Stelle, sondern ein
+Nachlauf — `scripts/farben.py` —, den alle drei Erzeuger nach ihren Regeln
+laufen lassen.
 
-| Wert | `src/app/anwendung.js` | übrige Quellen |
-|---|---|---|
-| `#263159` (Blau) | 50 | 71 |
-| `#D4A567` (Gold) | 49 | 29 |
-| `#1a2342` (Blau dunkel) | 6 | 8 |
-| `#FAFAF7` (Hintergrund) | 34 | 5 |
-| `#E8E4DA` (Linien) | 2 | 3 |
-| `#8B8377` (gedämpfter Text) | 7 | 5 |
+Dass sie nicht zurückkommen, prüft `tests/marke.py` (Punkt 5) über neun
+Bereiche des Quelltextes, Kommentarzeilen eingeschlossen, in allen fünf
+Schreibweisen; die Spaltenvorgaben prüft `tests/vorlage-vollstaendig.sql` am
+laufenden Schema. Einzelheiten in `docs/NEUTRALITAET.md`, Abschnitt 4a.
 
-269 Stellen: Farbwähler, Grundriss-Zeichner, PDF-Erzeuger, Mailvorlagen,
-Nebenseiten. Der Austausch selbst ist mechanisch und gehört als Regel in
-`scripts/oberflaeche-zerlegen.py` und `scripts/neutralisieren-funktionen.py`.
-Was ihn zu einem eigenen Durchgang macht, ist die Prüfung: PDFs und
-Mailvorlagen lassen sich nicht nebenbei nachsehen, und genau dort sitzt die
-Hälfte der Treffer.
+Offen bleibt davon nur der Druck — siehe den Abschnitt zu den Druckdateien
+weiter oben. Am Bildschirm ist nichts mehr von der Vorlage übrig.
 
-## Edge Function `testbilder-holen` entfernen
+## ~~Edge Function `testbilder-holen` entfernen~~ — erledigt am 06.10.2026
 
-Einmalige Hilfsfunktion für die drei Testobjekte (`docs/ENTSCHEIDUNGEN.md`,
-06.10.2026). Sie ist abgeschaltet und antwortet nur noch mit 410. Sie liegt
-nicht im Repository, und solange sie auf dem Projekt liegt, endet
-`funktionen-ausrollen.yml` rot — der Schritt „Nachzählen" vergleicht
-Projekt und Repository.
-
-Der Weg dafür ist da: `funktionen-ausrollen.yml` von Hand starten und
-`loeschen = testbilder-holen` setzen. **Am 06.10.2026 ab 07:25 UTC
-beantwortet Supabase sowohl das Ausrollen als auch das Löschen zeitweise mit
-`500 FGA Authentication Error. Unauthorized`** — ein Fehler der Plattform,
-nicht des Tokens: dieselbe Datei, dasselbe Geheimnis, derselbe Lauf ging um
-08:02 durch (expose-pdf-erzeugen, Fassung 56) und das Löschen um 08:05 und
-08:08 nicht. Also später noch einmal starten; sonst im Dashboard unter Edge
-Functions entfernen.
+Die einmalige Hilfsfunktion für die drei Testobjekte liegt nicht mehr auf
+dem Projekt. Nachgezählt am 06.10.2026: 131 Funktionen im Repository, 131
+auf dem Projekt, keine auf einer Seite zu viel. Der Schritt „Nachzählen" in
+`funktionen-ausrollen.yml` hat damit nichts mehr zu beanstanden.
 
 ## Umgebung
 

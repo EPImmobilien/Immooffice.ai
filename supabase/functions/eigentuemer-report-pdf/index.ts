@@ -85,7 +85,7 @@ import { PDFDocument, rgb, StandardFonts } from "npm:pdf-lib@1.17.1";
 import fontkit from "npm:@pdf-lib/fontkit@1.1.1";
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
-const NAVY = rgb(0.149, 0.192, 0.349), GOLD = rgb(0.831, 0.647, 0.404), GRAU = rgb(0.42, 0.45, 0.5), HELL = rgb(0.953, 0.957, 0.973), SCHWARZ = rgb(0.1, 0.1, 0.1), WEISS = rgb(1, 1, 1);
+const NAVY = rgb(0.106, 0.165, 0.278), GOLD = rgb(0.710, 0.576, 0.310), GRAU = rgb(0.42, 0.45, 0.5), HELL = rgb(0.953, 0.957, 0.973), SCHWARZ = rgb(0.1, 0.1, 0.1), WEISS = rgb(1, 1, 1);
 const A4 = { w: 595.28, h: 841.89 }, RAND = 50;
 const dDE = (s: string | Date) => new Date(s).toLocaleDateString("de-DE", { timeZone: "Europe/Berlin" });
 const dtDE = (s: string | Date) => new Date(s).toLocaleString("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });

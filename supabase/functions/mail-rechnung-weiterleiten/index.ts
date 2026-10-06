@@ -222,7 +222,7 @@ async function verarbeiten(db: any, mail: any, erzwingen: boolean) {
     from: `${pf?.absender_name || "ImmoOffice"} <${pf?.email_adresse || immoFehlt("eine Absenderadresse (Postfach, Firmenstammdaten oder SMTP_FROM_EMAIL)")}>`, to: ziel.an, reply_to: absender || undefined,
     subject: `WG: ${mail.betreff || "(ohne Betreff)"}`,
     text: kopf + text,
-    html: mail.html ? `<pre style="font-family:Arial,sans-serif;font-size:13px;white-space:pre-wrap;background:#f3f4f8;padding:10px;border-left:3px solid #D4A567">${kopf.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>` + mail.html : undefined,
+    html: mail.html ? `<pre style="font-family:Arial,sans-serif;font-size:13px;white-space:pre-wrap;background:#f3f4f8;padding:10px;border-left:3px solid #B5934F">${kopf.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>` + mail.html : undefined,
     attachments: mitAnhang ? anhaenge.map((a) => ({ filename: a.filename, content: bytesZuBase64(a.content), content_type: a.contentType })) : [],
   };
   const r = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" }, body: JSON.stringify(body) });
