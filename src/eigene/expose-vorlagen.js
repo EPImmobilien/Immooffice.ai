@@ -329,6 +329,18 @@
       setSeite(0);
     }, [gewaehlt]);
 
+    // Auf dem Telefon steht die Flaeche UNTER der Liste. Wer "Bearbeiten"
+    // drueckt, sieht sonst nichts passieren und sucht den Editor dort, wo
+    // er nicht ist.
+    React.useEffect(function () {
+      if (!modus) return;
+      if (typeof document === "undefined" || !document.getElementById) return;
+      var k = document.getElementById("immo-expose-werkbank");
+      if (k && k.scrollIntoView) {
+        try { k.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (x) {}
+      }
+    }, [modus, gewaehlt]);
+
     // Die Vorschau entsteht neu, sobald eine andere Vorlage gewaehlt wird.
     React.useEffect(function () {
       if (!gewaehlt) return;
@@ -488,6 +500,11 @@
                      "haupt", arbeit === "kopie")]
             : art === "eigen"
               ? [
+                  knopf("Bearbeiten", function (ev) {
+                    ev.stopPropagation();
+                    setGewaehlt(reihe.id);
+                    setModus("felder");
+                  }, "haupt", !!arbeit),
                   knopf("Kopie", function (ev) { ev.stopPropagation(); kopieAnlegen(reihe); }, "zweit", !!arbeit),
                   knopf("Umbenennen", function (ev) { ev.stopPropagation(); umbenennen(reihe); }, "zweit", !!arbeit),
                   reihe.ist_standard ? null
@@ -662,7 +679,8 @@
            + "der Migration fork_38 in die Datenbank.") : null,
       ]),
       // --- rechts: die Vorschau ---
-      e("div", { key: "vorschau", style: { flex: "1 1 460px", minWidth: 380 } }, [
+      e("div", { key: "vorschau", id: "immo-expose-werkbank",
+                 style: { flex: "1 1 460px", minWidth: 320 } }, [
         e("div", { key: "kopf", style: {
           display: "flex", alignItems: "baseline", justifyContent: "space-between",
           marginBottom: 8, gap: 10,

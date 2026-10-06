@@ -476,6 +476,16 @@ if (fehler) { console.log(`\n  ${fehler} Pruefung(en) gescheitert.`); process.ex
   if (eigene6.length) eigene6[0].props.onClick();
   await warte(40);
   baum = hol();
+  // Der Weg zur Flaeche muss AUF der Karte stehen. Am 06.10.2026 kam die
+  // Meldung "Gibt es so nicht" mit einem Bild der Liste: die Knoepfe
+  // standen weiter unten und nur nach Auswahl — auf dem Telefon also
+  // unsichtbar.
+  const karteEigen = knotenMit(baum, 'div').filter((k) => k.props && k.props.onClick
+    && texte(k).join(' ').includes('Hausvorlage'))[0];
+  melde('Die Karte der eigenen Vorlage bietet "Bearbeiten"',
+        !!karteEigen && knotenMit(karteEigen, 'button')
+          .some((b) => texte(b).join(' ').includes('Bearbeiten')),
+        karteEigen ? texte(karteEigen).join(' | ') : 'keine Karte');
   melde('Es gibt den Knopf "Felder festlegen"', druecke(baum, 'Felder festlegen'),
         texte(baum).join(' | ').slice(-200));
   await warte(20);
