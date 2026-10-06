@@ -72,6 +72,47 @@ dem Projekt. Nachgezählt am 06.10.2026: 131 Funktionen im Repository, 131
 auf dem Projekt, keine auf einer Seite zu viel. Der Schritt „Nachzählen" in
 `funktionen-ausrollen.yml` hat damit nichts mehr zu beanstanden.
 
+## Der Sicherheitsberater von Supabase: was noch offen ist
+
+Am 06.10.2026 zum ersten Mal gelesen. Zwei seiner Funde waren offene
+Löcher und sind geschlossen (`fork_62`, `fork_63`, beide mit Nachweis in
+`docs/ENTSCHEIDUNGEN.md`). Drei bleiben stehen, jeder mit Grund:
+
+### `function_search_path_mutable` — 77 Funktionen, geringes Risiko
+
+77 Funktionen haben kein festes `search_path`. Ausnutzbar wäre das nur,
+wenn jemand Objekte in einem Schema anlegen könnte, das vor `public` auf
+dem Suchpfad liegt. **Nachgesehen:** weder `anon` noch `authenticated` noch
+`service_role` hat `CREATE` auf `public`, und keine der drei darf Rollen
+oder Datenbanken anlegen. Es fehlt also die Voraussetzung.
+
+Trotzdem gehört es gemacht — `set search_path to 'public'` an 77 Stellen,
+mechanisch, aber 77 Funktionsdefinitionen anzufassen ist eine eigene Runde
+mit eigener Gegenprobe. Die Funktionen des Forks setzen es schon; die 77
+kommen aus der Vorlage.
+
+### `anon_security_definer_function_executable` / `authenticated_…` — bleibt gemeldet
+
+Der Berater zählt weiter 94 und 95 Treffer. Das ist eine Auskunft über die
+**Form**, nicht über den Zustand: er zählt `SECURITY DEFINER`-Funktionen im
+Schema `public`, unabhängig davon, wer sie aufrufen darf. Seit `fork_63`
+darf `anon` keine einzige davon aufrufen (nachgezählt: 0 von 153), und
+`authenticated` acht weniger als vorher.
+
+Was wirklich offen bleibt: `authenticated` darf 145 der 153 Funktionen
+rufen, und die Anwendung ruft 28. Die Differenz ist kein Loch — jede dieser
+Funktionen prüft ihre Rechte selbst, und die restriktiven Richtlinien
+gelten auch für sie —, aber es ist mehr Fläche als nötig. Sie
+zusammenzustreichen heißt, 117 Funktionen einzeln zu lesen; das gehört in
+eine eigene Runde, nicht an das Ende dieser.
+
+### `auth_leaked_password_protection` — Sache des Betreibers
+
+Supabase kann Passwörter gegen HaveIBeenPwned prüfen. Der Schalter sitzt im
+Dashboard unter Authentication → Policies und lässt sich von hier nicht
+umlegen. **Empfehlung: einschalten.** Er kostet nichts und verhindert, dass
+ein Makler sein überall benutztes Passwort auch hier benutzt.
+
 ## Umgebung
 
 | Punkt | Wirkung |

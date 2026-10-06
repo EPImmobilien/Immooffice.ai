@@ -701,9 +701,36 @@ doppelte Anführungszeichen sind in SQL ein Bezeichner, keine Zeichenkette —
 der Eintrag scheiterte lautlos, weil `curl` ohne `-f` lief. Behoben,
 nachgetragen, und der Schritt liest jetzt nach, ob die Zeile wirklich steht.
 
+### 8. Zwei offene Löcher in der Mandantentrennung (fork_62, fork_63)
+
+Der Sicherheitsberater von Supabase, zum ersten Mal gelesen. Zwei Funde,
+beide ausnutzbar, beide mit dem öffentlichen anon-Schlüssel allein:
+
+**Fünf Sichten** in `public` liefen mit den Rechten ihres Eigners
+(`SECURITY DEFINER` ist die Vorgabe von `create view`), und ein
+Tabelleneigner ist von Row-Level-Security befreit. Zwei davon stuft
+PostgreSQL als schreibbar ein, und `anon` hatte darauf SELECT, INSERT,
+UPDATE und DELETE. Der Akquise-Bestand jedes Mandanten war damit lesbar —
+Anschrift, Preis, Courtage, Telefonnummern und E-Mail-Adressen privater
+Verkäufer — und schreibbar. `tests/sichten.sql` hat es vorgeführt: Mandant A
+änderte B's Bewertungstitel auf „Gekapert" und löschte B's Radar-Objekt.
+
+**147 von 153 Funktionen** in `public` durfte `anon` über
+`/rest/v1/rpc/<name>` aufrufen. Fünf davon verändern Geld und prüfen nichts.
+`tests/funktionsrechte.sql` hat sich als `anon` 99 999 Credits
+gutgeschrieben.
+
+Beides ist geschlossen und live. Was es zeigt: die eigenen Gates prüfen
+Tabellen und Richtlinien — Sichten und Funktionsrechte, zwei ganze
+Zugriffswege, hat keines angesehen. Beide haben jetzt ein Gate.
+
 ### Was der Betreiber noch tun muss
 
 Unverändert die vier Punkte oben. Dazu neu: entscheiden, ob es einen
 Sammelpreis für das ganze Exposé geben soll (zehn Credits) oder ob es bei
 zwei je Baustein bleibt — und ob die Parser und Auslesefunktionen einen Preis
 bekommen. Bis dahin sind sie kostenlos, aber nicht mehr frei zugänglich.
+
+Und einen Schalter umlegen, der von hier nicht erreichbar ist: Supabase →
+Authentication → Policies → **Leaked Password Protection einschalten**. Er
+kostet nichts und prüft Passwörter gegen HaveIBeenPwned.
