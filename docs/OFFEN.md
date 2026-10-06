@@ -3,6 +3,13 @@
 Was ohne Verhaltensänderung, ohne fehlende Zugangsdaten oder ohne Netzzugang
 nicht lösbar ist. Nach Auftrag Abschnitt 9.
 
+## Edge Function `testbilder-holen` entfernen
+
+Einmalige Hilfsfunktion für die drei Testobjekte (`docs/ENTSCHEIDUNGEN.md`,
+06.10.2026). Sie ist abgeschaltet und antwortet nur noch mit 410. Das
+Werkzeug dieser Umgebung kann Funktionen nicht löschen; bitte im Dashboard
+unter Edge Functions entfernen. Sie liegt nicht im Repository.
+
 ## Umgebung
 
 | Punkt | Wirkung |

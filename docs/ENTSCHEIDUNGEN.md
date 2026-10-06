@@ -4473,3 +4473,31 @@ auf.
 byte-genau an die Verwaltungs-API — denselben Weg, den der SQL-Editor im
 Dashboard nimmt, mit demselben Geheimnis wie das Ausrollen der Funktionen.
 Nur von Hand zu starten, nur mit einem Dateinamen ohne Pfad.
+
+## Drei Testobjekte aus echten Vermarktungen (06.10.2026)
+
+Auftrag des Betreibers: „2–3 Exposés beziehungsweise Immobilien von der
+Vorlage nach ImmoOffice übertragen, damit Testobjekte da sind." Das ist eine
+ausdrückliche Ausnahme von „keine Daten aus dem Quellprojekt" und bleibt eine
+einmalige Übernahme, kein Abgleich. Die Vorlage wurde dabei nur gelesen.
+
+Übernommen in den Mandanten `musterhaus` (Nr. 2–4):
+
+| Nr. | Bezeichnung | Bilder |
+|---|---|---|
+| 2 | Testobjekt: Wohn- und Geschäftshaus Ribnitz-Damgarten | 7 |
+| 3 | Testobjekt: Bungalow Barth | 24 |
+| 4 | Testobjekt: Eigentumswohnung Hamburg | 15 |
+
+- **Mit:** Stammdaten, Preise, Flächen, Energie, Exposé-Texte, Höhepunkte,
+  Entfernungen, Koordinaten, Fotos, Grundrisse und Lagepläne.
+- **Ohne:** Hausnummer, Eigentümer, Kontakte, Termine, Dokumente und
+  Exposé-PDFs; ohne Bilder, die die Vorlage selbst vom Exposé ausschließt
+  (Portal-Werbebilder, Kontaktbild), und ohne doppelte Bilder.
+  Website-Veröffentlichung aus, Zuständig der erste Chef des Mandanten.
+- **Neue Kennungen**, neue Dateinamen (`…_bild_NN.jpg`); Bildtitel mit
+  Personennamen umbenannt. Texte vorher auf die Blockliste geprüft.
+- Die Bilder hat die einmalige Funktion `testbilder-holen` aus der
+  öffentlichen Ablage geholt — nur in vorgemerkte Datensätze, jeden genau
+  einmal. Sie ist danach abgeschaltet worden (Antwort 410). Siehe
+  `docs/OFFEN.md`.
