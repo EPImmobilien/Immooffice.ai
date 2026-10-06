@@ -4,226 +4,514 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>immoOffice.ai — Maklersoftware für Vermarktung, Exposés und Post</title>
-<meta name="description" content="immoOffice.ai ist eine Software für Immobilienmakler und Immobiliensachverständige: Objekte und Vermarktung, Exposé-Baukasten, Posteingang mit eigenen Postfächern, Adressbuch, Termine, Eigentümerportal. Gehostet in Frankfurt am Main.">
-<meta name="robots" content="index, follow">
-<meta property="og:title" content="immoOffice.ai — Maklersoftware">
-<meta property="og:description" content="Objekte, Exposés, Post, Termine und Eigentümerportal in einer Oberfläche. Für Makler und Sachverständige.">
+<meta name="description" content="immoOffice.ai ist die Software für Immobilienmakler und Sachverständige: Objekte und Vermarktung, Exposé-Baukasten, Posteingang mit eigenen Postfächern, Adressbuch, Termine, Eigentümerportal. Betrieb in Frankfurt am Main.">
+<meta name="theme-color" content="#1B2A47">
+<meta property="og:title" content="immoOffice.ai — ein Haus für die ganze Vermarktung">
+<meta property="og:description" content="Objekte, Exposés, Post, Termine und Eigentümer in einer Oberfläche. Für Makler und Sachverständige.">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="stil.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231B2A47'/><text x='16' y='23' font-family='Georgia,serif' font-size='19' fill='%23B5934F' text-anchor='middle'>i</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%231B2A47'/><text x='16' y='23' font-family='Georgia,serif' font-size='19' fill='%23B5934F' text-anchor='middle'>i</text></svg>">
 <script src="konfig.js"></script>
 </head>
 <body>
 
 <header>
   <div class="bahn">
-    <a class="marke" href="/">immoOffice<span>.ai</span></a>
+    <a class="marke" href="/"><i>i</i>immoOffice<span>.ai</span></a>
+    <button class="menuknopf" type="button" aria-label="Menü" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
     <nav>
-      <a class="nur-breit" href="#funktionen">Funktionen</a>
-      <a class="nur-breit" href="#fuer-wen">Für wen</a>
-      <a class="nur-breit" href="#sicherheit">Sicherheit</a>
-      <a class="nur-breit" href="#kontakt">Kontakt</a>
+      <a class="punkt" href="#module">Module</a>
+      <a class="punkt" href="#ablauf">So arbeitet es</a>
+      <a class="punkt" href="#sicherheit">Sicherheit</a>
+      <a class="punkt" href="#fragen">Fragen</a>
       <a class="knopf klein" id="anmelden-oben" href="#">Anmelden</a>
     </nav>
   </div>
 </header>
 
+<!-- ------------------------------------------------------------------ Bühne -->
 <div class="buehne">
   <div class="bahn">
-    <div class="augenbraue">Software für Immobilienmakler und Sachverständige</div>
-    <h1>Ein Haus für die ganze<br>Vermarktung.</h1>
-    <p class="lead">
-      Objekte, Exposés, Post, Termine und Eigentümer — in einer Oberfläche,
-      in der ein Arbeitsschritt den nächsten kennt. Kein Zusammensuchen aus
-      vier Programmen, kein zweites Mal dieselbe Adresse eintippen.
-    </p>
-    <div class="knoepfe">
-      <a class="knopf" id="anmelden-buehne" href="#">Zur Anwendung anmelden</a>
-      <a class="knopf leer" href="#funktionen">Was drin ist</a>
-    </div>
-    <div class="fussnote">
-      Betrieb und Datenhaltung in Frankfurt am Main. Selbstregistrierung für
-      Ihr Büro — jeder Mandant sieht ausschließlich seine eigenen Daten.
+    <div class="zwei">
+      <div>
+        <div class="augenbraue auf">Für Immobilienmakler und Sachverständige</div>
+        <h1 class="auf v1">Ein Haus für die<br>ganze <span class="gold">Vermarktung</span>.</h1>
+        <p class="lead auf v2">
+          Objekte, Exposés, Post, Termine und Eigentümer — in einer Oberfläche,
+          in der ein Arbeitsschritt den nächsten kennt. Kein Zusammensuchen aus
+          vier Programmen, keine Adresse zweimal getippt.
+        </p>
+        <div class="knoepfe auf v3">
+          <a class="knopf" id="anmelden-buehne" href="#">Zur Anwendung</a>
+          <a class="knopf leer" href="#module">Ansehen, was drin ist</a>
+        </div>
+        <div class="merkmale auf v3">
+          <span>Betrieb in Frankfurt am Main</span>
+          <span>Mandantenfähig</span>
+          <span>Läuft im Browser, auch mobil</span>
+          <span>Deutschsprachig</span>
+        </div>
+      </div>
+
+      <!-- Der Stapel: eine nachgebaute Objektansicht, zwei schwebende
+           Karten daneben. Alles CSS, keine Bilddatei — damit die Seite
+           schnell bleibt und nichts behauptet, was es nicht gibt. -->
+      <div class="stapel auf v2" aria-hidden="true">
+        <div class="ansicht">
+          <div class="leiste"><i></i><i></i><i></i><b>immoOffice.ai — Objekt</b></div>
+          <div class="inhalt">
+            <div class="z-foto"></div>
+            <div class="z-reihe" style="justify-content:space-between">
+              <div class="z-titel">Stadtvilla am Hafen</div>
+              <span class="z-chip gruen">In Vermarktung</span>
+            </div>
+            <div class="z-gitter3">
+              <div class="z-block"><div class="z-klein">Wohnfläche</div><div class="z-wert">186 m²</div></div>
+              <div class="z-block"><div class="z-klein">Zimmer</div><div class="z-wert">5,5</div></div>
+              <div class="z-block"><div class="z-klein">Energie</div><div class="z-wert">B</div></div>
+            </div>
+            <div class="z-reihe">
+              <span class="z-chip">Exposé erstellt</span>
+              <span class="z-chip blau">Objektseite aktiv</span>
+            </div>
+          </div>
+          <span class="beispielmarke">Beispielansicht</span>
+        </div>
+
+        <div class="schwebt eins">
+          <div class="z-klein">Posteingang</div>
+          <div class="z-reihe" style="gap:8px">
+            <span class="kreis" style="width:24px;height:24px;border-radius:50%;background:#1B2A47;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center">AK</span>
+            <span style="font-size:12px;font-weight:600">Anfrage zum Objekt</span>
+          </div>
+          <div class="z-balken"></div>
+          <div class="z-balken kurz"></div>
+        </div>
+
+        <div class="schwebt zwei">
+          <div class="z-reihe" style="justify-content:space-between">
+            <span class="z-klein">Exposé</span>
+            <span class="z-chip gruen">fertig</span>
+          </div>
+          <div style="font-size:12.5px;font-weight:600">PDF erzeugt · 12 Seiten</div>
+          <div class="z-balken gold"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<section id="funktionen">
+<div class="laufband" aria-hidden="true">
+  <div class="reihe">
+    <span>Objekte</span><span>Exposé-Baukasten</span><span>Posteingang</span>
+    <span>Adressbuch</span><span>Termine &amp; Fahrzeiten</span><span>Aufgaben</span>
+    <span>Eigentümerportal</span><span>Neubauprojekte</span><span>Portalexport</span>
+    <span>Objektseite</span><span>Unterlagen-Versand</span><span>Newsletter</span>
+    <span>Objekte</span><span>Exposé-Baukasten</span><span>Posteingang</span>
+    <span>Adressbuch</span><span>Termine &amp; Fahrzeiten</span><span>Aufgaben</span>
+    <span>Eigentümerportal</span><span>Neubauprojekte</span><span>Portalexport</span>
+    <span>Objektseite</span><span>Unterlagen-Versand</span><span>Newsletter</span>
+  </div>
+</div>
+
+<!-- --------------------------------------------------------------- Slideshow -->
+<section id="module">
   <div class="bahn">
-    <div class="augenbraue">Funktionen</div>
-    <h2>Was Sie damit tun</h2>
-    <p style="max-width:680px;color:#4a5361">
-      Das Objekt ist das Drehkreuz: was dort gepflegt ist, steht im Exposé,
-      im Portalexport, auf der Objektseite und in der Mail an den
-      Interessenten — ohne zweite Eingabe.
-    </p>
-    <div class="gitter" style="margin-top:28px">
-      <div class="karte">
-        <span class="zeichen">🏠</span>
-        <h3>Objekte und Vermarktung</h3>
-        <p>Alle Daten eines Objekts an einer Stelle: Flächen, Preise, Energie,
-          Ausstattung, Bilder, Grundrisse, Lage. Status und Vermarktungsstand
-          sind jederzeit ablesbar.</p>
+    <div class="kopfzeile auf">
+      <div class="augenbraue">Einblick</div>
+      <h2>Vier Ansichten, ein Datenbestand</h2>
+      <p>
+        Das Objekt ist das Drehkreuz: was dort gepflegt ist, steht im Exposé,
+        auf der Objektseite, im Portalexport und in der Mail an den
+        Interessenten — ohne zweite Eingabe.
+      </p>
+    </div>
+
+    <div class="schau auf v1" data-schau aria-roledescription="Bildstrecke" aria-label="Ansichten aus der Software">
+      <div class="fenster">
+        <div class="band">
+
+          <!-- Folie 1: Exposé -->
+          <div class="bild-und-text">
+            <div>
+              <div class="augenbraue">Exposé-Baukasten</div>
+              <h3 style="font-size:28px">Ihr Exposé, Feld für Feld</h3>
+              <p>
+                Drei Hausvorlagen, beliebig viele eigene. Felder auf der
+                Fläche verschieben, Texte ändern — Vorschau und PDF sind
+                dasselbe Programm, sie können nicht auseinanderlaufen.
+              </p>
+              <ul class="haken">
+                <li>Eigenes Design als PDF hochladen und nachbauen lassen</li>
+                <li>Platzhalter statt abgetippter Werte</li>
+                <li>Logo, Farben und Schriften aus Ihrem Branding</li>
+              </ul>
+            </div>
+            <div class="ansicht">
+              <div class="leiste"><i></i><i></i><i></i><b>Exposé — Vorschau</b></div>
+              <div class="inhalt">
+                <div class="z-foto"></div>
+                <div class="z-reihe" style="justify-content:space-between">
+                  <div class="z-titel">Stadtvilla am Hafen</div>
+                  <span class="z-chip">Vorlage: Signature</span>
+                </div>
+                <div class="z-gitter3">
+                  <div class="z-block"><div class="z-klein">Wohnfläche</div><div class="z-wert">186 m²</div></div>
+                  <div class="z-block"><div class="z-klein">Zimmer</div><div class="z-wert">5,5</div></div>
+                  <div class="z-block"><div class="z-klein">Baujahr</div><div class="z-wert">1998</div></div>
+                </div>
+                <div class="z-balken gold"></div>
+                <div class="z-balken"></div>
+                <div class="z-balken kurz"></div>
+              </div>
+              <span class="beispielmarke">Beispielansicht</span>
+            </div>
+          </div>
+
+          <!-- Folie 2: Posteingang -->
+          <div class="bild-und-text">
+            <div>
+              <div class="augenbraue">Posteingang</div>
+              <h3 style="font-size:28px">Ihre Postfächer, Ihre Ordner</h3>
+              <p>
+                Mehrere Postfächer je Mitarbeiter: Microsoft 365 und Google
+                ohne Passwort verbinden, jeder andere Server über IMAP.
+                Ordner und Gelesen-Status bleiben mit Ihrem Postfach im
+                Gleichklang.
+              </p>
+              <ul class="haken">
+                <li>Anfragen landen am richtigen Objekt</li>
+                <li>Anhänge wandern in die Objektakte</li>
+                <li>Aus einer Mail wird eine Aufgabe oder ein Termin</li>
+              </ul>
+            </div>
+            <div class="ansicht">
+              <div class="leiste"><i></i><i></i><i></i><b>Posteingang</b></div>
+              <div class="inhalt">
+                <div class="z-reihe">
+                  <span class="z-chip blau">Microsoft 365 verbunden</span>
+                  <span class="z-chip gruen">15 Ordner</span>
+                </div>
+                <div class="z-liste">
+                  <div class="z-mail aktiv">
+                    <span class="kreis">AK</span>
+                    <span><span class="betreff">Anfrage: Stadtvilla am Hafen</span><br>
+                      <span class="vor">Guten Tag, ist das Objekt noch verfügbar …</span></span>
+                    <span class="z-klein">09:14</span>
+                  </div>
+                  <div class="z-mail">
+                    <span class="kreis">TB</span>
+                    <span><span class="betreff">Unterlagen Energieausweis</span><br>
+                      <span class="vor">anbei wie besprochen die Bedarfs…</span></span>
+                    <span class="z-klein">08:02</span>
+                  </div>
+                  <div class="z-mail">
+                    <span class="kreis">MR</span>
+                    <span><span class="betreff">Besichtigung Freitag?</span><br>
+                      <span class="vor">passt Ihnen 14 Uhr am Objekt …</span></span>
+                    <span class="z-klein">Gestern</span>
+                  </div>
+                </div>
+              </div>
+              <span class="beispielmarke">Beispielansicht</span>
+            </div>
+          </div>
+
+          <!-- Folie 3: Objekt -->
+          <div class="bild-und-text">
+            <div>
+              <div class="augenbraue">Objekte</div>
+              <h3 style="font-size:28px">Alles zum Objekt an einer Stelle</h3>
+              <p>
+                Flächen, Preise, Energie, Ausstattung, Bilder, Grundrisse,
+                Lage und Vermarktungsstand. Was hier steht, steht überall —
+                im Exposé, auf der Objektseite, im Portalexport.
+              </p>
+              <ul class="haken">
+                <li>Bild-Pipeline mit Web-Variante und Grundriss-Erkennung</li>
+                <li>Lageplan und Entfernungen werden ergänzt</li>
+                <li>Freigabelink für einzelne Interessenten</li>
+              </ul>
+            </div>
+            <div class="ansicht">
+              <div class="leiste"><i></i><i></i><i></i><b>Objekt — Übersicht</b></div>
+              <div class="inhalt">
+                <div class="z-reihe" style="justify-content:space-between">
+                  <div class="z-titel">3-Zimmer-Wohnung, Hafenviertel</div>
+                  <span class="z-chip gruen">In Vermarktung</span>
+                </div>
+                <div class="z-gitter2">
+                  <div class="z-foto klein"></div>
+                  <div class="z-foto klein" style="background:linear-gradient(135deg,#8a9bb3,#cdd5e0 60%,#b8a383)"></div>
+                </div>
+                <div class="z-gitter3">
+                  <div class="z-block"><div class="z-klein">Wohnfläche</div><div class="z-wert">78 m²</div></div>
+                  <div class="z-block"><div class="z-klein">Etage</div><div class="z-wert">3. OG</div></div>
+                  <div class="z-block"><div class="z-klein">Energie</div><div class="z-wert">B</div></div>
+                </div>
+                <div class="z-reihe">
+                  <span class="z-chip">Exposé erstellt</span>
+                  <span class="z-chip blau">Objektseite aktiv</span>
+                </div>
+              </div>
+              <span class="beispielmarke">Beispielansicht</span>
+            </div>
+          </div>
+
+          <!-- Folie 4: Eigentümerportal -->
+          <div class="bild-und-text">
+            <div>
+              <div class="augenbraue">Eigentümerportal</div>
+              <h3 style="font-size:28px">Der Eigentümer sieht selbst nach</h3>
+              <p>
+                Eigener Zugang für Ihre Eigentümer: Vermarktungsstand,
+                Besichtigungen, Unterlagen und Nachrichten. Das ersetzt den
+                wöchentlichen Anruf — und zeigt, dass gearbeitet wird.
+              </p>
+              <ul class="haken">
+                <li>Einladung per Mail, Zugang ohne Installation</li>
+                <li>Besichtigungen mit Rückmeldung</li>
+                <li>Dokumente freigeben statt verschicken</li>
+              </ul>
+            </div>
+            <div>
+              <div class="telefon">
+                <div class="kerbe"></div>
+                <div class="schirm">
+                  <div class="inhalt" style="padding:14px">
+                    <div class="z-klein">Ihre Immobilie</div>
+                    <div class="z-titel" style="font-size:17px">Hafenviertel 3-Zi.</div>
+                    <div class="z-foto klein"></div>
+                    <div class="z-block">
+                      <div class="z-klein">Diese Woche</div>
+                      <div class="z-wert">3 Besichtigungen</div>
+                    </div>
+                    <div class="z-block">
+                      <div class="z-klein">Exposé abgerufen</div>
+                      <div class="z-wert">24 ×</div>
+                    </div>
+                    <div class="z-reihe"><span class="z-chip gruen">2 neue Nachrichten</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
-      <div class="karte">
-        <span class="zeichen">📄</span>
-        <h3>Exposé-Baukasten</h3>
-        <p>Drei Hausvorlagen, beliebig viele eigene. Felder auf der Fläche
-          verschieben, Texte ändern, Vorschau und Ergebnis sind dasselbe
-          Programm. Ihr vorhandenes Exposé-Design lässt sich als PDF
-          hochladen und nachbauen.</p>
-      </div>
-      <div class="karte">
-        <span class="zeichen">✉️</span>
-        <h3>Posteingang</h3>
-        <p>Mehrere Postfächer je Mitarbeiter — Microsoft 365, Google oder
-          jeder eigene Server über IMAP. Ordner, Gelesen-Status und Anhänge
-          bleiben mit Ihrem Postfach im Gleichklang; Anfragen landen am
-          richtigen Objekt.</p>
-      </div>
-      <div class="karte">
-        <span class="zeichen">👥</span>
-        <h3>Adressbuch und Akquise</h3>
-        <p>Kontakte, Eigentümer, Interessenten mit Suchkriterien und
-          automatischem Abgleich gegen neue Objekte. Vorgänge und
-          Besichtigungen hängen am Kontakt, nicht in einem Notizzettel.</p>
-      </div>
-      <div class="karte">
-        <span class="zeichen">📅</span>
-        <h3>Termine und Aufgaben</h3>
-        <p>Kalender mit Einladungen, Fahrzeiten zwischen Terminen,
-          Erinnerungen und Aufgaben, die aus einer Mail entstehen können.</p>
-      </div>
-      <div class="karte">
-        <span class="zeichen">🔑</span>
-        <h3>Eigentümerportal</h3>
-        <p>Ihr Eigentümer sieht seinen eigenen Zugang: Vermarktungsstand,
-          Besichtigungen, Unterlagen, Nachrichten. Das spart den wöchentlichen
-          Anruf.</p>
-      </div>
-      <div class="karte">
-        <span class="zeichen">🏗️</span>
-        <h3>Neubauprojekte</h3>
-        <p>Projekte mit Einheitenliste, Reservierungen und eigener
-          Projektseite für Interessenten.</p>
-      </div>
-      <div class="karte">
-        <span class="zeichen">📤</span>
-        <h3>Portalexport und Objektseite</h3>
-        <p>Objektdaten als OpenImmo für die Übergabe an Portale, dazu eine
-          öffentliche Objektseite mit Freigabelink für einzelne
-          Interessenten.</p>
-      </div>
-      <div class="karte">
-        <span class="zeichen">🤖</span>
-        <h3>KI, die nichts erfindet</h3>
-        <p>Textvorschläge für Beschreibungen, Bildunterschriften und
-          Antworten; Bildbearbeitung mit sichtbarer Kennzeichnung. Jeder
-          Vorschlag ist editierbar und muss freigegeben werden — fehlende
-          Angaben werden gekennzeichnet, nicht ausgedacht.</p>
+
+      <div class="steuerung">
+        <div class="punkte" role="tablist" aria-label="Folien"></div>
+        <span class="zaehler">01 / 04</span>
+        <button class="pfeil" type="button" data-zurueck aria-label="Vorherige Folie">‹</button>
+        <button class="pfeil" type="button" data-vor aria-label="Nächste Folie">›</button>
       </div>
     </div>
   </div>
 </section>
 
-<section class="hell" id="fuer-wen">
+<!-- ------------------------------------------------------------------ Module -->
+<section class="hell">
+  <div class="bahn">
+    <div class="kopfzeile auf">
+      <div class="augenbraue">Module</div>
+      <h2>Was Sie damit tun</h2>
+    </div>
+    <div class="gitter">
+      <div class="karte auf"><span class="zeichen">🏠</span><h3>Objekte &amp; Vermarktung</h3>
+        <p>Alle Daten eines Objekts an einer Stelle, mit Status, Bildern, Grundrissen und Lage.</p></div>
+      <div class="karte auf v1"><span class="zeichen">📄</span><h3>Exposé-Baukasten</h3>
+        <p>Vorlagen wählen, Felder verschieben, eigenes Design hochladen. PDF und Web-Exposé.</p></div>
+      <div class="karte auf v2"><span class="zeichen">✉️</span><h3>Posteingang</h3>
+        <p>Mehrere Postfächer je Mitarbeiter — Microsoft 365, Google oder eigener Server.</p></div>
+      <div class="karte auf"><span class="zeichen">👥</span><h3>Adressbuch &amp; Akquise</h3>
+        <p>Kontakte, Eigentümer, Interessenten mit Suchkriterien und automatischem Abgleich.</p></div>
+      <div class="karte auf v1"><span class="zeichen">📅</span><h3>Termine &amp; Aufgaben</h3>
+        <p>Kalender mit Einladungen, Fahrzeiten zwischen Terminen, Erinnerungen, ToDos aus Mails.</p></div>
+      <div class="karte auf v2"><span class="zeichen">🔑</span><h3>Eigentümerportal</h3>
+        <p>Eigener Zugang für Eigentümer: Stand, Besichtigungen, Unterlagen, Nachrichten.</p></div>
+      <div class="karte auf"><span class="zeichen">🏗️</span><h3>Neubauprojekte</h3>
+        <p>Projekte mit Einheitenliste, Reservierungen und eigener Projektseite.</p></div>
+      <div class="karte auf v1"><span class="zeichen">📤</span><h3>Portalexport &amp; Objektseite</h3>
+        <p>Objektdaten als OpenImmo, öffentliche Objektseite und Freigabelinks.</p></div>
+      <div class="karte auf v2"><span class="zeichen">🤖</span><h3>KI, die nichts erfindet</h3>
+        <p>Textvorschläge und Bildbearbeitung — editierbar, freigabepflichtig, gekennzeichnet.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ------------------------------------------------------------------ Ablauf -->
+<section class="dunkel" id="ablauf">
+  <div class="bahn">
+    <div class="kopfzeile auf">
+      <div class="augenbraue">So arbeitet es zusammen</div>
+      <h2>Vier Schritte, keine Doppeleingabe</h2>
+      <p>Verkettete Arbeitsschritte statt Insellösungen — das ist der Kern.</p>
+    </div>
+    <div class="ablauf">
+      <div class="schritt auf"><div class="nr">01</div><h3>Objekt anlegen</h3>
+        <p>Daten, Bilder, Grundrisse. Lageplan und Entfernungen kommen automatisch dazu.</p></div>
+      <div class="schritt auf v1"><div class="nr">02</div><h3>Exposé erzeugen</h3>
+        <p>Vorlage wählen, Texte prüfen, PDF und Web-Exposé entstehen aus denselben Daten.</p></div>
+      <div class="schritt auf v2"><div class="nr">03</div><h3>Veröffentlichen</h3>
+        <p>Objektseite, Freigabelink, Portalexport — überall derselbe Stand.</p></div>
+      <div class="schritt auf v3"><div class="nr">04</div><h3>Anfragen bearbeiten</h3>
+        <p>Die Anfrage landet am Objekt, die Antwort geht aus Ihrem Postfach, der Termin steht im Kalender.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- --------------------------------------------------------------- Für wen -->
+<section>
   <div class="bahn">
     <div class="zweispalt">
-      <div>
+      <div class="auf">
         <div class="augenbraue">Für wen</div>
         <h2>Für Büros, die ihre Abläufe kennen</h2>
-        <p style="color:#4a5361">
-          immoOffice.ai ist für Immobilienmakler und Immobiliensachverständige
-          gemacht — vom Einzelbüro bis zum Haus mit mehreren Standorten. Die
-          Software ist mandantenfähig: jedes Büro arbeitet in seinem eigenen
-          Bestand, mit eigenem Logo, eigenen Farben und eigenen Vorlagen.
+        <p>
+          Vom Einzelbüro bis zum Haus mit mehreren Standorten. Jedes Büro
+          arbeitet in seinem eigenen Bestand — mit eigenem Logo, eigenen
+          Farben und eigenen Vorlagen.
         </p>
         <ul class="haken">
-          <li>Selbstregistrierung — Büro anlegen und loslegen</li>
-          <li>Rollen und Rechte je Mitarbeiter, auch für Sichtbarkeit</li>
+          <li>Selbstregistrierung: Büro anlegen und loslegen</li>
+          <li>Rollen, Rechte und Sichtbarkeit je Mitarbeiter</li>
           <li>Eigenes Branding in Oberfläche, Exposés und Mails</li>
           <li>Deutschsprachig, von der Oberfläche bis zum Exposé</li>
-          <li>Läuft im Browser, auch auf dem Telefon</li>
         </ul>
       </div>
-      <div>
-        <div class="karte">
-          <h3>Wertermittlung und Verträge</h3>
-          <p style="margin-bottom:12px">
-            Offene, editierbare Rechenblätter statt Blackbox: Sie
-            verantworten die Ansätze, die Software rechnet und setzt.
-          </p>
-          <div class="hinweis">
-            Eine Wertermittlung in immoOffice.ai ist eine
-            <strong>Marktpreiseinschätzung</strong> und ersetzt kein
-            Verkehrswertgutachten nach § 194 BauGB.
-          </div>
-          <div class="hinweis">
-            Vertragsmuster sind Vorlagen, keine Rechtsberatung — vor der
-            Verwendung anwaltlich prüfen lassen. Die eingebaute Unterschrift
-            ist eine <strong>einfache</strong> elektronische Signatur, keine
-            qualifizierte.
-          </div>
+      <div class="karte auf v1">
+        <h3>Wertermittlung und Verträge</h3>
+        <p>
+          Offene, editierbare Rechenblätter statt Blackbox: Sie verantworten
+          die Ansätze, die Software rechnet und setzt.
+        </p>
+        <div class="hinweis">
+          <p>Eine Wertermittlung in immoOffice.ai ist eine
+          <strong>Marktpreiseinschätzung</strong> und ersetzt kein
+          Verkehrswertgutachten nach § 194 BauGB.</p>
+        </div>
+        <div class="hinweis">
+          <p>Vertragsmuster sind Vorlagen, keine Rechtsberatung — vor der
+          Verwendung anwaltlich prüfen lassen. Die eingebaute Unterschrift ist
+          eine <strong>einfache</strong> elektronische Signatur, keine
+          qualifizierte.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="dunkel" id="sicherheit">
+<!-- ------------------------------------------------------------- Sicherheit -->
+<section class="hell" id="sicherheit">
   <div class="bahn">
-    <div class="augenbraue">Sicherheit und Datenschutz</div>
-    <h2>Fremde Daten sieht niemand</h2>
-    <div class="zweispalt" style="margin-top:24px">
-      <div>
+    <div class="zahlen auf" style="margin-bottom:56px">
+      <div class="zahl"><b>EU</b><span>Betrieb in Frankfurt am Main</span></div>
+      <div class="zahl"><b>RLS</b><span>Trennung in der Datenbank erzwungen</span></div>
+      <div class="zahl"><b>0</b><span>Passwörter bei Microsoft und Google</span></div>
+      <div class="zahl"><b>100 %</b><span>deutschsprachige Oberfläche</span></div>
+    </div>
+    <div class="zweispalt">
+      <div class="auf">
+        <div class="augenbraue">Sicherheit und Datenschutz</div>
+        <h2>Fremde Daten sieht niemand</h2>
         <ul class="haken">
-          <li>Betrieb und Datenhaltung in Frankfurt am Main (EU)</li>
-          <li>Die Trennung der Mandanten wird in der Datenbank erzwungen,
-            nicht nur durch ausgeblendete Knöpfe</li>
-          <li>Zugangsdaten zu Postfächern und Portalen liegen verschlüsselt;
-            Microsoft und Google werden ohne Passwort verbunden</li>
-          <li>Rechte serverseitig geprüft — auch für Export, Suche und
-            Dateien</li>
-          <li>Plattform-Administratoren haben keinen automatischen Zugriff
-            auf Ihre Daten</li>
+          <li>Die Trennung der Mandanten wird in der Datenbank erzwungen, nicht
+            nur durch ausgeblendete Knöpfe</li>
+          <li>Zugangsdaten zu Postfächern und Portalen liegen verschlüsselt</li>
+          <li>Rechte serverseitig geprüft — auch für Export, Suche und Dateien</li>
+          <li>Plattform-Administratoren haben keinen automatischen Zugriff auf
+            Ihre Daten</li>
         </ul>
       </div>
-      <div>
+      <div class="auf v1">
         <p>
           Wir behaupten keine „vollständige DSGVO-Konformität" — das kann
-          keine Software für Sie erklären, weil es von Ihren Abläufen
-          abhängt. Was wir sagen können: wo die Daten liegen, wer sie sehen
-          kann und wie die Grenze technisch gezogen ist. Den Rest prüfen Sie
-          mit Ihrem Datenschutzbeauftragten; Auftragsverarbeitungsvertrag auf
-          Anfrage.
+          keine Software für Sie erklären, weil es von Ihren Abläufen abhängt.
+          Was wir sagen können: wo die Daten liegen, wer sie sehen kann und
+          wie die Grenze technisch gezogen ist.
         </p>
-        <p style="margin-top:20px">
-          <a class="knopf gold" href="#kontakt">Fragen? Sprechen Sie uns an</a>
+        <p>
+          Den Rest prüfen Sie mit Ihrem Datenschutzbeauftragten;
+          Auftragsverarbeitungsvertrag auf Anfrage.
         </p>
+        <p style="margin-top:24px"><a class="knopf gold" href="#kontakt">Sprechen Sie uns an</a></p>
       </div>
     </div>
   </div>
 </section>
 
-<section id="kontakt">
-  <div class="bahn" style="max-width:720px;text-align:center">
-    <div class="augenbraue">Loslegen</div>
-    <h2>Anmelden oder Büro anlegen</h2>
-    <p style="color:#4a5361">
-      Sie haben schon einen Zugang? Dann geht es direkt in die Anwendung.
-      Neu hier? Auf der Anmeldeseite legen Sie mit „Firma registrieren" Ihr
-      eigenes Büro an.
-    </p>
-    <p style="margin-top:22px">
-      <a class="knopf" id="anmelden-unten" href="#">Zur Anwendung</a>
-    </p>
-    <p id="kontaktzeile" style="margin-top:26px;font-size:15px;color:#4a5361"></p>
-    <p style="font-size:14px;color:#7A828C">
-      Preise und Leistungsumfang auf Anfrage.
-    </p>
+<!-- ----------------------------------------------------------------- Fragen -->
+<section id="fragen">
+  <div class="bahn eng">
+    <div class="kopfzeile auf">
+      <div class="augenbraue">Häufig gefragt</div>
+      <h2>Kurz beantwortet</h2>
+    </div>
+    <div class="fragen">
+      <details class="frage auf">
+        <summary>Kann ich mein vorhandenes Exposé-Design weiter benutzen?</summary>
+        <p>Ja. Laden Sie es als PDF hoch: Flächen, Linien, Bildrahmen und jede
+          Textzeile werden mit ihren Maßen übernommen und als Ihre eigene
+          Vorlage angelegt. Schriften werden dem nächstliegenden eigenen
+          Schnitt zugeordnet — so gut es geht, und den Rest machen Sie auf der
+          Bearbeitungsfläche fertig.</p>
+      </details>
+      <details class="frage auf">
+        <summary>Welche Postfächer lassen sich anbinden?</summary>
+        <p>Microsoft 365 und Google verbinden Sie mit Ihrem Konto, ohne
+          Passwort. Jedes andere Postfach — eigener Server, Hoster, Exchange —
+          richten Sie mit IMAP und SMTP ein. Beliebig viele, auch gemischt,
+          mit eigener Signatur je Postfach.</p>
+      </details>
+      <details class="frage auf">
+        <summary>Wo liegen meine Daten?</summary>
+        <p>Datenbank, Dateien und Hintergrunddienste laufen in Frankfurt am
+          Main. Jeder Mandant arbeitet getrennt; die Grenze zieht die
+          Datenbank, nicht die Oberfläche.</p>
+      </details>
+      <details class="frage auf">
+        <summary>Muss ich etwas installieren?</summary>
+        <p>Nein. immoOffice.ai läuft im Browser, auch auf dem Telefon, und
+          lässt sich dort wie eine App ablegen.</p>
+      </details>
+      <details class="frage auf">
+        <summary>Was macht die KI — und was nicht?</summary>
+        <p>Sie schlägt Texte vor, beschriftet Bilder und hilft beim Antworten.
+          Sie erfindet keine Objektdaten: fehlende Angaben werden sichtbar
+          gekennzeichnet, jeder Vorschlag ist editierbar und muss freigegeben
+          werden. Bearbeitete Bilder bleiben als bearbeitet gekennzeichnet —
+          auch im Exposé.</p>
+      </details>
+      <details class="frage auf">
+        <summary>Was kostet es?</summary>
+        <p>Preise und Leistungsumfang auf Anfrage — sprechen Sie uns an.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ---------------------------------------------------------------- Schluss -->
+<section id="kontakt" style="padding-top:20px">
+  <div class="bahn">
+    <div class="schlussband auf">
+      <div class="augenbraue" style="justify-content:center">Loslegen</div>
+      <h2>Anmelden oder Büro anlegen</h2>
+      <p>
+        Sie haben schon einen Zugang? Dann geht es direkt in die Anwendung.
+        Neu hier? Auf der Anmeldeseite legen Sie mit „Firma registrieren" Ihr
+        eigenes Büro an.
+      </p>
+      <p style="margin-top:28px">
+        <a class="knopf hell" id="anmelden-unten" href="#">Zur Anwendung</a>
+      </p>
+      <p id="kontaktzeile" style="margin-top:22px;font-size:15px"></p>
+    </div>
   </div>
 </section>
 
@@ -231,22 +519,23 @@
   <div class="bahn">
     <div class="spalten">
       <div>
-        <div class="marke">immoOffice<span style="color:#C9AE72">.ai</span></div>
-        <p style="margin-top:10px;max-width:380px">
+        <div class="marke"><i>i</i>immoOffice<span>.ai</span></div>
+        <p style="margin-top:12px;max-width:380px;color:rgba(255,255,255,.72)">
           Software für die Vermarktung von Immobilien: Objekte, Exposés,
           Post, Termine und Eigentümer in einer Oberfläche.
         </p>
       </div>
       <div>
-        <strong style="color:#fff">Produkt</strong><br>
-        <a href="#funktionen">Funktionen</a><br>
-        <a href="#fuer-wen">Für wen</a><br>
-        <a href="#sicherheit">Sicherheit</a><br>
+        <strong>Produkt</strong>
+        <a href="#module">Module</a>
+        <a href="#ablauf">So arbeitet es</a>
+        <a href="#sicherheit">Sicherheit</a>
+        <a href="#fragen">Fragen</a>
         <a id="anmelden-fuss" href="#">Anmelden</a>
       </div>
       <div>
-        <strong style="color:#fff">Rechtliches</strong><br>
-        <a href="impressum.html">Impressum</a><br>
+        <strong>Rechtliches</strong>
+        <a href="impressum.html">Impressum</a>
         <a href="datenschutz.html">Datenschutz</a>
       </div>
     </div>
@@ -271,15 +560,16 @@
   var kz = document.getElementById("kontaktzeile");
   if (kz) {
     var teile = [];
-    if (k.email) teile.push('<a href="mailto:' + k.email + '">' + k.email + '</a>');
-    if (k.telefon) teile.push(k.telefon);
-    kz.innerHTML = teile.length ? teile.join(" · ")
-      : '<span style="color:#c0392b">Kontaktangaben sind noch nicht hinterlegt '
+    if (k.email) teile.push('<a style="color:#fff" href="mailto:' + k.email + '">' + k.email + '</a>');
+    if (k.telefon) teile.push('<span style="color:rgba(255,255,255,.8)">' + k.telefon + '</span>');
+    kz.innerHTML = teile.length ? teile.join(" &nbsp;·&nbsp; ")
+      : '<span style="color:#ffd9d9">Kontaktangaben sind noch nicht hinterlegt '
         + '(website/konfig.js).</span>';
   }
   var ff = document.getElementById("fuss-firma");
   if (ff) ff.textContent = k.firma || "";
 })();
 </script>
+<script src="seite.js" defer></script>
 </body>
 </html>

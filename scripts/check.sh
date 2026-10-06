@@ -463,6 +463,20 @@ else
   fehler=1
 fi
 
+abschnitt "Website: laeuft sie im Browser?"
+# Die Website hat Bewegung — Slideshow, Abschnitte, die beim Scrollen
+# erscheinen. Ob die wirklich laeuft, sieht keine Textpruefung: am
+# 06.10.2026 trugen zwei Funktionen im selben Gueltigkeitsbereich den
+# Namen "pruefen", die zweite wurde von der ersten ueberschrieben, und
+# KEIN Abschnitt erschien je. Im eigenen Browser faellt das nicht auf,
+# weil die Seite ohne die Klasse trotzdem Text zeigt — nur eben ohne
+# Animation. Ohne Chromium wird uebersprungen, nicht gemeldet.
+if node tests/website-browser.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Postfaecher je Anbieter: Microsoft, Google, IMAP"
 # Die beiden Funktionen, die ein Postfach verbinden, laufen hier wirklich —
 # gegen ein nachgebautes Supabase und einen nachgebauten Anbieter. Geprueft
