@@ -1,0 +1,6 @@
+ImmoOffice.Ai – Druckdateien
+
+Konturen aus der bestehenden Bildvorlage nachgezeichnet; leichte Konturabweichungen sind möglich. Alle Schriftzüge sind Pfade. PDF: Vektoren in DeviceCMYK, SVG: Vektoren in RGB.
+CI: Blau #263159, Gold #D4A567. CMYK-Werte sind rechnerisch umgerechnet, nicht für ein bestimmtes Papierprofil zertifiziert. Gold ist eine gedruckte Farbe, keine Metallic-Sonderfarbe.
+PDF-Breite 160 mm; verlustfrei skalierbar. Weiß/Gold und Weiß ohne Hintergrund sind für dunkle Untergründe vorgesehen. Auf weißem Papier bleiben weiße Elemente unsichtbar.
+Keine Beschnittzugabe: Logo-Dateien sind für die Platzierung in einem Drucklayout gedacht. Die Druckerei muss das endgültige Layout mit ihrem Zielprofil und Beschnitt ausgeben. Keine PDF/X-Zertifizierung.

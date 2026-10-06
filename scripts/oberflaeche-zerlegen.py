@@ -792,6 +792,17 @@ ERSETZUNGEN = [
      '    ink: "#1B2A47",\n'
      '    muted: "#7A828C",',
      'Farbwerte der Referenz gegen die Plattform-CI aus CLAUDE.md.'),
+    ('MARKE', r'<meta name="theme-color" content="#263159" />',
+     '<meta name="theme-color" content="#1B2A47" />',
+     'Themenfarbe der Huelle: Marineblau der Plattform statt der Referenz.'),
+    # Das SVG-Favicon war ein Marineblau-Quadrat mit dem Wort "ImmoOffice"
+    # in 14 px — auf 32 Pixeln ein grauer Streifen, auf 16 gar nichts. Seit
+    # der Lieferung vom 06.10.2026 gibt es eine Bildmarke; bei dieser
+    # Groesse traegt die Haus-Kontur allein, ohne das Netz-Motiv.
+    ('MARKE',
+     r'<link rel=.icon. type=.image/svg\+xml. href=.data:image/svg\+xml,<svg[^>]*>.*?</svg>. />',
+     '<link rel="icon" type="image/svg+xml" href="/marke/immooffice-haus.svg" />',
+     'Favicon: die eigene Bildmarke statt eines Schriftzugs im Quadrat.'),
     ('MARKE', r'rgba\(38,49,89,0\.06\)', 'rgba(27,42,71,0.06)',
      'Schattenfarbe, aus demselben Marineblau.'),
     ('MARKE', r'rgba\(38,49,89,0\.12\)', 'rgba(27,42,71,0.12)',
@@ -3852,6 +3863,28 @@ def B64(s):
 
 
 WOERTLICH = [
+    # --- Die Marke des Produkts ------------------------------------------
+    # In der Vorlage standen hier vier Logos der Referenz als Base64; die
+    # MARKE-Regel oben hat sie geleert, und seitdem gab Logo() eine
+    # Wortmarke aus und ExposeKachelLogo ein <img src=""> — also ein
+    # kaputtes Bild. Seit dem 06.10.2026 gibt es eigene Logos
+    # (assets/marke/, aus der Lieferung des Auftraggebers, auf die
+    # Plattform-CI umgefaerbt).
+    #
+    # Als Datei neben der Anwendung, nicht als Daten-URL im Skript: vier
+    # Logos als Base64 waeren rund 90 KB in JEDER index.html, und eine
+    # Datei kann der Browser zwischenspeichern. scripts/bauen.py legt sie
+    # nach dist/marke/.
+    ('FORK',
+     'const LOGO_BLAU = "",\n'
+     '  LOGO_DUNKEL = "",\n'
+     '  LOGO_ECHT = "",\n'
+     '  LOGO_HELL = "",',
+     'const LOGO_BLAU = "/marke/immooffice-logo.svg",\n'
+     '  LOGO_DUNKEL = "/marke/immooffice-logo-invers.svg",\n'
+     '  LOGO_ECHT = "/marke/immooffice-logo.svg",\n'
+     '  LOGO_HELL = "/marke/immooffice-logo-weiss.svg",',
+     'Die eigenen Logos statt der geleerten Konstanten.'),
     ('FORK',
      'if ("undefined" != typeof document && !document.querySelector(`link[href="${fontLink}"]`)) {\n  const e = document.createElement("link");\n  e.rel = "stylesheet", e.href = fontLink, document.head.appendChild(e)\n}',
      'if ("undefined" != typeof document && !document.querySelector(`link[href="${fontLink}"]`)) {\n  const e = document.createElement("link");\n  e.rel = "stylesheet", e.href = fontLink, document.head.appendChild(e)\n}\n\n// FORK: die eigenen Teile des Forks (src/eigene/) stehen in einem eigenen\n// <script> und sehen die Konstanten dieses Skripts nicht. Statt die Farben\n// dort ein zweites Mal zu schreiben — und beim naechsten Branding zu\n// vergessen — werden sie hier einmal nach aussen gegeben.\nwindow.IMMO_CI = CI;\nwindow.IMMO_FONT_SERIF = FONT_SERIF;',

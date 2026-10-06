@@ -4836,3 +4836,62 @@ Daraus die allgemeine Lehre, die über die Website hinausgeht: **wo Code
 im Browser etwas bewegt, prüft nur ein Browser, ob er es tut.** Beide
 Fehler waren syntaktisch einwandfrei, warfen keine Ausnahme und wären
 mit einer Textprüfung nie aufgefallen.
+
+## 2026-10-06 · Die gelieferten Logos — Form ja, Farben nein
+
+**Lieferung:** `ImmoOffice_Druckdateien.zip` — sechs Logo-Varianten als SVG
+(RGB) und als CMYK-PDF, dazu `Druckhinweise.txt`. Haus-Kontur mit Fenster,
+goldenes Netz-Motiv, Wortmarke „ImmoOffice.Ai" mit goldenem `.Ai`. Auftrag:
+„bitte verwende die neuen Logos".
+
+**Befund:** die Druckhinweise nennen als CI Blau `#263159` und Gold
+`#D4A567`. Das sind genau die beiden Farben, die am 28.09.2026 als
+Kennzeichen des Referenzunternehmens aus dem Quelltext entfernt und durch
+die Plattform-CI `#1B2A47` / `#B5934F` ersetzt worden sind;
+`docs/NEUTRALITAET.md` nennt Farbwerte ausdrücklich. Das Gold ist der
+sichtbare Unterschied — `#D4A567` ist deutlich heller und wärmer.
+
+**Entscheidung des Auftraggebers (06.10.2026), vorgelegt mit drei Wegen:**
+die **Form** der Lieferung gilt, die **Farben** bleiben die der Plattform.
+Getauscht werden zwei Füllwerte; an der Zeichnung ändert sich nichts.
+
+Der dritte Weg — Logo in der einen, Oberfläche in der anderen Goldfärbung —
+war der einzige, von dem ich abgeraten habe. Zwei Goldtöne nebeneinander
+liest niemand als Entscheidung, sondern als Fehler.
+
+**Umsetzung:** `assets/marke/quelle/` trägt die Lieferung unverändert,
+`scripts/marke-aufbereiten.py` erzeugt daraus `assets/marke/`. Drei
+Schritte: umfärben, die Bildmarke über den `viewBox` herausschneiden (Haus
+und Netz enden bei x=401, die Wortmarke beginnt bei x=438 — dazwischen
+liegt kein Punkt), und die Nachkommanullen kürzen (halbiert die Dateien;
+das zählt, weil die Anwendung eine einzige `index.html` ist).
+
+**Was dabei nebenbei herauskam — sechs Dateien, die es nie gab.** Die Hülle
+verweist seit jeher auf `/icons/favicon-32.png` und fünf
+`apple-touch-icon`-Dateien. Keine davon hat je existiert: jeder Aufruf lief
+ins Leere, auf dem Startbildschirm eines iPhones stand ein leeres Kästchen.
+Niemandem war das aufgefallen, weil ein fehlendes Bild keinen Fehler wirft.
+Jetzt gibt es die Dateien, und `tests/website-browser.js` meldet ab sofort
+jede Antwort ab 400 — das ist die Prüfung, die den Befund gefunden hätte.
+
+Ebenfalls behoben: `ExposeKachelLogo` gab seit dem Leeren der Konstanten ein
+`<img src="">` aus, also ein kaputtes Bild. Mit den eigenen Logos ist die
+Konstante wieder gefüllt.
+
+**Unter 48 px das Haus allein.** Netz-Motiv und Fensterkreuz ergeben auf 32
+Pixeln einen Fleck. `favicon-16` und `favicon-32` bekommen deshalb die
+Haus-Kontur ohne das Netz, die größeren Icons die ganze Bildmarke.
+
+**Die Druckdateien bleiben, wie geliefert.** `quelle/*.pdf` sind
+DeviceCMYK-Vektoren in den Farben der Lieferung; verlässlich umfärben lassen
+sie sich hier nicht. Vor dem ersten Druckauftrag ist zu entscheiden:
+entweder ein neuer Export in `#1B2A47` / `#B5934F`, oder bewusst andere
+Farben im Druck als am Bildschirm. Vermerkt in `docs/OFFEN.md`.
+
+**Offen geblieben, mit Absicht:** die Neutralisierung vom 28.09.2026 ist
+unvollständig. Die Referenzfarben stehen weiterhin an **269 Stellen** in
+`src/`, `supabase/functions/` und den Nebenseiten — als Vorgabewerte in
+Farbwählern, im Grundriss-Zeichner, in PDF-Erzeugern und in Mailvorlagen.
+Das ist derselbe Befund, nur in groß, und es ist ein eigener Durchgang mit
+eigener Prüfung (PDFs und Mails lassen sich nicht nebenbei nachsehen). In
+den Logo-Einbau gehört er nicht.

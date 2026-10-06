@@ -73,10 +73,21 @@ const MIME = {
     const seite = await browser.newPage({ viewport: { width: breite, height: hoehe } });
     const pannen = [];
     seite.on('pageerror', (f) => pannen.push(String(f.message)));
+    // Eine Datei, die es nicht gibt, wirft keinen Fehler — der Browser
+    // laesst das Bild einfach weg. Genau so hat die Huelle jahrelang sechs
+    // Icon-Dateien angefordert, die nie existiert haben, und auf dem
+    // Startbildschirm eines iPhones stand ein leeres Kaestchen. Darum wird
+    // hier jede Antwort ab 400 gemeldet.
+    const fehlend = [];
+    seite.on('response', (r) => {
+      if (r.status() >= 400) fehlend.push(`${r.status()} ${r.url()}`);
+    });
     await seite.goto(`http://127.0.0.1:${port}/`, { waitUntil: 'load' });
     await seite.waitForTimeout(700);
 
     melde(`${name}: kein Fehler im Browser`, pannen.length === 0, pannen[0]);
+    melde(`${name}: jede angeforderte Datei ist da`, fehlend.length === 0,
+          fehlend.join(', '));
 
     // Waagerechtes Scrollen ist auf einer Seite immer ein Fehler — und auf
     // dem Telefon der haeufigste.

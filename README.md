@@ -59,7 +59,7 @@ erst mit den jeweiligen Funktionen benötigt.
 | `npm run lint` | ESLint |
 | `npm run test` | Unit-Tests (Vitest) |
 | `npm run test:e2e` | Kernflüsse (Playwright) |
-| `npm run marken-scan` | Prüfung auf Altkennzeichen und Geheimnisse |
+| `npm run neutral` | Prüfung auf Altkennzeichen und Geheimnisse |
 | `npm run pruefen` | Alles zusammen — vor jedem Meilenstein |
 
 Weitere Werkzeuge:
@@ -67,7 +67,7 @@ Weitere Werkzeuge:
 ```bash
 psql "$DATENBANK_URL" -f supabase/tests/rls-mandantentrennung.sql  # Mandantentrennung
 python3 scripts/guv-modell.py            # Wirtschaftlichkeitsmodell neu rechnen
-python3 scripts/build-brand.py <ttf>     # Markenassets neu erzeugen
+python3 scripts/marke-aufbereiten.py     # Marken-Dateien aus der Lieferung erzeugen
 scripts/analyse-referenz.sh              # Referenzanalyse reproduzieren
 ```
 
@@ -81,7 +81,7 @@ src/
   middleware.ts  Sicherheits-Kopfzeilen und CSP mit Nonce
 supabase/        Migrationen
 scripts/         Analyse, Marken-Scan, Marke, GuV-Modell
-assets/brand/    Markenassets (erzeugt)
+assets/marke/    Logo und Icons (erzeugt aus assets/marke/quelle/)
 docs/            Auftrag und Analysen
 reference/       Referenzmaterial — bewusst nicht versioniert
 ```
@@ -90,7 +90,7 @@ reference/       Referenzmaterial — bewusst nicht versioniert
 
 - **Deutsch** als Oberflächensprache, Struktur für spätere Übersetzung vorbereitet.
 - **Keine Kennzeichen der Referenz-Anwendung**, an keiner Stelle. Prüfung über
-  `npm run marken-scan`.
+  `npm run neutral`.
 - **Mandantentrennung** wird in der Datenbank erzwungen (RLS), nicht in der Oberfläche.
 - **Keine Geheimnisse** im Repository oder im Client.
 - **KI erfindet keine Objektdaten.** Fehlende Angaben werden gekennzeichnet und sind

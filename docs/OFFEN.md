@@ -3,6 +3,42 @@
 Was ohne Verhaltensänderung, ohne fehlende Zugangsdaten oder ohne Netzzugang
 nicht lösbar ist. Nach Auftrag Abschnitt 9.
 
+## Druckdateien der Marke tragen die Farben der Lieferung
+
+`assets/marke/quelle/*.pdf` sind DeviceCMYK-Vektoren in Blau `#263159` und
+Gold `#D4A567`. Am Bildschirm gilt seit dem 06.10.2026 die Plattform-CI
+`#1B2A47` / `#B5934F` (`docs/ENTSCHEIDUNGEN.md`). Verlässlich umfärben
+lassen sich die PDFs hier nicht — in den SVGs ist es ein Füllwert, im PDF
+ein Farboperator in einem komprimierten Datenstrom.
+
+**Vor dem ersten Druckauftrag entscheiden:** entweder einen neuen Export in
+der Plattform-CI anfordern, oder bewusst festlegen, dass im Druck die
+Farben der Lieferung gelten. Beides ist vertretbar. Stillschweigend
+auseinanderlaufen darf es nicht — gedruckt und am Bildschirm nebeneinander
+fällt der Unterschied im Gold sofort auf.
+
+## Neutralisierung der Farbwerte ist unvollständig
+
+Am 28.09.2026 wurden die Farben des Referenzunternehmens gegen die
+Plattform-CI getauscht — aber nur im Farb-Block der Anwendung. Als
+Vorgabewerte stehen sie weiter im Haus, Stand 06.10.2026:
+
+| Wert | `src/app/anwendung.js` | übrige Quellen |
+|---|---|---|
+| `#263159` (Blau) | 50 | 71 |
+| `#D4A567` (Gold) | 49 | 29 |
+| `#1a2342` (Blau dunkel) | 6 | 8 |
+| `#FAFAF7` (Hintergrund) | 34 | 5 |
+| `#E8E4DA` (Linien) | 2 | 3 |
+| `#8B8377` (gedämpfter Text) | 7 | 5 |
+
+269 Stellen: Farbwähler, Grundriss-Zeichner, PDF-Erzeuger, Mailvorlagen,
+Nebenseiten. Der Austausch selbst ist mechanisch und gehört als Regel in
+`scripts/oberflaeche-zerlegen.py` und `scripts/neutralisieren-funktionen.py`.
+Was ihn zu einem eigenen Durchgang macht, ist die Prüfung: PDFs und
+Mailvorlagen lassen sich nicht nebenbei nachsehen, und genau dort sitzt die
+Hälfte der Treffer.
+
 ## Edge Function `testbilder-holen` entfernen
 
 Einmalige Hilfsfunktion für die drei Testobjekte (`docs/ENTSCHEIDUNGEN.md`,

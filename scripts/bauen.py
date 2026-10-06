@@ -133,6 +133,7 @@ def zugang_einsetzen(inhalt):
 # scripts/nebenseiten.py; hier werden nur noch die Platzhalter gefuellt.
 SEITEN = SRC / 'seiten'
 SCHRIFTEN = WURZEL / 'assets' / 'fonts' / 'expose'
+MARKE = WURZEL / 'assets' / 'marke'
 EIGENE = SRC / 'eigene'
 BUENDEL = WURZEL / 'packages' / 'expose-renderer' / 'buendel' / 'immo-expose.js'
 
@@ -177,6 +178,40 @@ def schriften_ausliefern():
         roh = p.read_bytes()
         (ziel / p.name).write_bytes(roh)
         geschrieben.append((p.name, len(roh)))
+    return geschrieben
+
+
+def marke_ausliefern():
+    """Legt die Marken-Dateien neben die Auslieferung.
+
+    Die Anwendung verweist auf /marke/immooffice-logo.svg und Geschwister,
+    die Huelle zusaetzlich auf /icons/favicon-32.png und vier
+    apple-touch-icon-Dateien. Beides sind Dateien, keine Daten-URLs:
+    vier Logos als Base64 waeren rund 90 KB in jeder index.html, und eine
+    Datei kann der Browser zwischenspeichern.
+
+    Die Icon-Pfade standen seit jeher in der Huelle, ohne dass es die
+    Dateien je gegeben haette — jeder Aufruf lief ins Leere und auf dem
+    Startbildschirm eines iPhones stand ein leeres Kaestchen. Mit der
+    Lieferung vom 06.10.2026 gibt es etwas zu zeigen.
+    """
+    if not MARKE.is_dir():
+        print('HINWEIS: assets/marke/ fehlt — erst '
+              '`python3 scripts/marke-aufbereiten.py`. Logo und Favicon '
+              'fehlten dann in der Auslieferung.')
+        return []
+    geschrieben = []
+    for quelle, unter in ((MARKE, 'marke'), (MARKE / 'icons', 'icons')):
+        if not quelle.is_dir():
+            continue
+        ziel = ZIEL.parent / unter
+        ziel.mkdir(parents=True, exist_ok=True)
+        for q in sorted(quelle.iterdir()):
+            if not q.is_file() or q.suffix not in ('.svg', '.png'):
+                continue
+            roh = q.read_bytes()
+            (ziel / q.name).write_bytes(roh)
+            geschrieben.append((f'{unter}/{q.name}', len(roh)))
     return geschrieben
 
 
@@ -243,6 +278,11 @@ def main():
         if schriften:
             summe = sum(g for _, g in schriften)
             print(f'dist/schriften/expose/: {len(schriften)} Dateien, '
+                  f'{summe:,} B')
+        marke = marke_ausliefern()
+        if marke:
+            summe = sum(g for _, g in marke)
+            print(f'dist/marke/ und dist/icons/: {len(marke)} Dateien, '
                   f'{summe:,} B')
 
     if '--pruefen' in sys.argv:

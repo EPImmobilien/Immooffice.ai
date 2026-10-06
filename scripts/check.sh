@@ -454,6 +454,19 @@ else
   fehler=1
 fi
 
+abschnitt "Marke: Logo, Bildmarke, Icons"
+# Erzeugt aus assets/marke/quelle/. Geprueft wird dreierlei: dass niemand
+# eine erzeugte Datei von Hand bearbeitet hat (die Aenderung waere beim
+# naechsten Lauf weg), dass keine der beiden Farben der Lieferung in einer
+# ausgelieferten Datei steht (es sind die des Referenzunternehmens), und
+# dass jeder angeforderte Marken-Pfad eine Datei hat. Letzteres war bis zum
+# 06.10.2026 sechsmal nicht der Fall.
+if python3 tests/marke.py; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Website: was sie behaupten darf"
 # Eine Werbeseite ist die Stelle, an der sich Saetze einschleichen, die das
 # Produkt nicht halten kann. CLAUDE.md verbietet genau diese Saetze.
