@@ -4358,3 +4358,118 @@ gebraucht. Für die Links in den Mails der anderen zwölf Funktionen bleibt es
 nötig — und dass es nicht gesetzt ist, heißt, dass jeder Einladungs- und
 Freigabelink bisher auf `immooffice.example` zeigte. Das steht in
 `docs/INBETRIEBNAHME.md`, Schritt 2.
+
+## Ein Text entfällt nicht mehr ganz, wenn ein Platzhalter leer ist (06.10.2026)
+
+Zwei echte Exposés aus dem Betrieb. Was darin fehlte, fehlte nicht wegen
+einer fehlenden Angabe, sondern wegen einer Regel: `ersetze()` gab
+`undefined` zurück, sobald **ein** Platzhalter im Text keinen Wert hatte —
+und das Element entfiel vollständig.
+
+In der Luxusvorlage steht in der Fußzeile
+`{{firma.marken_name}}  ·  {{firma.linie}}`. Der Mandant hat keine
+Markenlinie gepflegt. Also fehlte die Fußzeile auf **neun** Seiten. In der
+Studio-Vorlage steht im Seitenkopf
+`{{objekt.objektart}}  /  {{objekt.ort}}-{{objekt.ortsteil}}`. Das Objekt
+hat keinen Ortsteil. Also fehlte der Seitenkopf auf **sechs** Seiten.
+
+Die Regel war richtig gemeint — „Wohnfläche:" ohne Zahl ist schlimmer als
+keine Zeile — aber zu grob. Jetzt zerfällt ein Text in **Abschnitte**,
+getrennt an Zeichen, die Angaben voneinander trennen (Mittelpunkt,
+Schrägstrich, Komma, Gedankenstrich, zwei und mehr Leerzeichen). Ein
+Abschnitt, in dem ein Platzhalter steht und kein Wert ankommt, entfällt
+mitsamt seiner Beschriftung und seinem Trenner. Die übrigen bleiben.
+
+Ein **einzelnes** Leerzeichen trennt ausdrücklich nicht: es bindet die
+Beschriftung an ihren Wert. `{{objekt.grundstueck?}} Grundstück` ist ein
+Abschnitt, nicht zwei — sonst stünde bei einer Wohnung das Wort
+„Grundstück" ohne Zahl da.
+
+Das Fragezeichen am Platzhalter heißt damit nicht mehr „der Text übersteht
+das Fehlen", sondern „**dieser** Platzhalter darf fehlen, ohne den ganzen
+Text mitzunehmen". Eine Beschriftung allein ist weiterhin kein Text und
+entfällt.
+
+## Ein Einzeiler wird verkleinert, nicht übergelaufen (06.10.2026)
+
+Die drei Vorlagen sind gegen die Prototypen vermessen — und die Prototypen
+gegen **einen** Markennamen. Der Mandant heißt länger. Sein Name stand quer
+über dem Titelbild, abgeschnitten an der Bildkante.
+
+Die Vorlage kann das nicht wissen; der Renderer kann es messen. Ein
+einzeiliger Text, der breiter ist als sein Rahmen, wird jetzt verkleinert,
+bis er passt — bis zur Mindestgröße seines Stils, danach bleibt die
+Warnung. Die Marken-Stile dürfen dafür tiefer gehen als die üblichen 82 %:
+lieber klein und innen als groß und daneben.
+
+Mittige Einzeiler haben zusätzlich die volle Satzbreite bekommen statt der
+Breite, die zum Demotitel des Prototyps passte. Das ändert für kurze Texte
+nichts (sie stehen mittig) und gibt langen Luft.
+
+## Die Vorlagen behaupten nichts mehr über Objekte (06.10.2026)
+
+Unter einem Schlafzimmer stand „SEETERRASSE". Unter einer Küche
+„WOHNBEREICH". Auf der Ausstattungsseite „Durchdacht und sofort
+bezugsfertig.", in der Fußnote „Wohnung ist bezugsfrei" und ein konkretes
+Hausgeld von 95 €/Monat. Nichts davon kam aus den Daten des Objekts — es
+stand in der Vorlage, übernommen aus den Prototypen, deren Demodaten ein
+Haus am See beschreiben.
+
+Das verstößt gegen `CLAUDE.md`: keine erfundenen Objektdaten. Eine Vorlage
+gilt für **jedes** Objekt, das sie benutzt; was sie behauptet, behauptet
+sie über alle.
+
+Also:
+
+- **Bildunterschriften** kommen aus `immobilie_datei.titel` und entfallen
+  ohne Titel. Die Vorlage kennt das Foto nicht.
+- **Kapitelzeilen** sagen nur noch, was die Seite zeigt („Ein Blick / nach
+  innen." statt „Wo der Tag am / Wasser beginnt.").
+- **Das Zitat** steht in `immobilien.expose_zitat`.
+- **Zwei Textfelder** trugen eine Arbeitsanweisung als Vorgabetext
+  („Beschreiben Sie hier, was dieses Bild zeigt."). Sie bleiben als leerer
+  Platz: ein leerer Vorgabetext ist seitdem kein fehlender Wert, sondern
+  ein freier Platz, den der Editor füllt.
+
+Der Vergleich gegen die Prototypen bleibt scharf. Die vierzehn bewussten
+Textabweichungen stehen einzeln mit Grund in `tests/expose-vorlagen.js`;
+die objektbezogenen Texte kommen als Übernahmen herein — denselben Weg,
+den der Editor im Objektmodus nimmt.
+
+## Die zweite Mandantenfarbe wird abgedunkelt, wenn sie hell ist (06.10.2026)
+
+Studio führt `ci_akzent` als **Dunkelton**: daraus werden Markenfläche,
+Linien, Fließtext und gedämpfter Text. Der Mandant hat dort ein helles Grau
+eingetragen. Ergebnis: weiße Schrift auf hellgrauem Grund, der Firmenname
+praktisch unsichtbar.
+
+Ist die gewählte Farbe heller als die Hälfte, wird sie für diese Rolle
+abgedunkelt. Ein dunkler Akzent bleibt unverändert. Dieselbe Art von
+Automatik, die der Auftrag für `on_s` ausdrücklich vorsieht — Text auf der
+Signalfläche wird dunkel, sobald die Fläche hell ist.
+
+## Eine unbearbeitete Kopie bekommt die Korrekturen der Systemvorlage (06.10.2026)
+
+Wer „Kopie anlegen" drückt, bekommt das Dokument der Systemvorlage mit
+`version = 1`. Solange niemand etwas daran geändert hat, **ist** diese Kopie
+die Systemvorlage unter anderem Namen. Ihr die Korrekturen vorzuenthalten
+hieße, den Mandanten die alten Fehler weitertragen zu lassen, ohne dass er
+davon erfährt.
+
+Ab `version > 1` bleibt sie unangetastet: da hat jemand im Editor
+gearbeitet, und seine Arbeit zu überschreiben wäre ein Verlust, kein
+Dienst.
+
+## Migrationen gehen über einen Arbeitsablauf, nicht über eine Abschrift (06.10.2026)
+
+Der Netzfilter der Arbeitsumgebung beantwortet `api.supabase.com` mit 403.
+Was von dort aus geht, ist das Supabase-Werkzeug — aber dabei wandert der
+**Inhalt** der Migration durch die Werkzeugaufrufe. Bei 110 KiB JSON ist
+das eine Abschrift, keine Übertragung: jedes Zeichen wird einmal gelesen
+und einmal wieder getippt, und ein Tippfehler fällt erst in der Datenbank
+auf.
+
+`.github/workflows/migrationen-einspielen.yml` schickt die Datei
+byte-genau an die Verwaltungs-API — denselben Weg, den der SQL-Editor im
+Dashboard nimmt, mit demselben Geheimnis wie das Ausrollen der Funktionen.
+Nur von Hand zu starten, nur mit einem Dateinamen ohne Pfad.

@@ -8,7 +8,7 @@
 |---|---|
 | 1 — Renderer, Schema, drei Start-Vorlagen | **fertig** |
 | 2 — Edge Function und Datenbank auf den Renderer umstellen | **fertig** |
-| 3 — Editor Basis | Liste, Kopie und Vorschau fertig; Element-Editor offen |
+| 3 — Editor Basis | Liste, Kopie, Vorschau und **Texte bearbeiten** fertig; Elemente verschieben offen |
 | 4 — Editor Komfort | offen |
 | 5 — Objektmodus mit Abweichungen | Renderer-Seite fertig, Oberfläche offen |
 | 6 — E2E-Tests, Neutralitäts-Gate, dieser Bericht | Gates stehen, Playwright offen |
@@ -288,3 +288,34 @@ Offen und nicht vergessen:
   nicht im Exposé. Die Vorlagen führen die Beschriftung als Text am
   Bildelement; sie gehört ans Bild, und das heißt: als Abweichung am
   Objekt, die der Editor schreibt (Etappe 5).
+
+## Was zwei echte Exposés gezeigt haben (06.10.2026)
+
+Der erste Betrieb lieferte zwei PDFs, und mit ihnen drei Sätze: „Man kann
+manche Überschriften nicht bearbeiten, die Logos müssen richtig angezeigt
+werden, manche überschneiden sich auch." Dahinter standen fünf Fehler, jeder
+mit vielen Fundstellen. Alle fünf sind behoben; die Begründungen stehen in
+[`ENTSCHEIDUNGEN.md`](ENTSCHEIDUNGEN.md).
+
+| Befund | Wo es sichtbar war | Was jetzt gilt |
+|---|---|---|
+| Ein Text entfiel ganz, sobald ein Platzhalter leer war | Fußzeile auf 9 Seiten, Seitenkopf auf 6 | Nur der Abschnitt ohne Wert entfällt, mit seinem Trenner |
+| Ein Einzeiler lief über seinen Rahmen | Markenname quer über dem Titelbild | Verkleinern bis zur Mindestgröße, dann Warnung |
+| Das Logo wurde nirgends gezeigt | Studio und Signature hatten kein Logo-Element | Logo-Element in allen drei Vorlagen, sichtbar nur mit Logo |
+| Die weiße Logo-Fassung wurde unter festem Namen gesucht | dunkle Seiten ohne Logo | Pfad des Mandanten, Zwischenspeicher am Pfad |
+| Die zweite Mandantenfarbe war hell, die Rolle „dunkel" | weiße Schrift auf hellgrau | Wird abgedunkelt, wenn sie hell ist |
+| Vorlagen behaupteten Objektdaten | „SEETERRASSE" unter einem Schlafzimmer | Unterschriften aus `immobilie_datei.titel`, neutrale Kapitelzeilen |
+| Überschriften waren nicht änderbar | jede feste Zeile der Vorlage | Textliste je Seite, Vorschau mit Entwurf, Historie beim Speichern |
+
+Dazu, aus demselben Befund: die Initiale nur noch bei einem Absatz mit drei
+Zeilen; das Baujahr ohne Tausenderpunkt; Überschriften entfallen mit ihrem
+Block; die Grundriss-Seite entfällt ohne Grundriss; Kennwert und
+Effizienzklasse melden sich, wenn sie sich widersprechen.
+
+**Das Werkzeug dazu:** `scripts/expose-probe.mjs` rendert alle drei Vorlagen
+mit nachgebauten Daten eines **dünn gepflegten** Objekts — Eckdaten ja,
+Beschreibung ein Satz, keine Grundrisse, keine Highlights, langer
+Markenname. Genau das konnte `scripts/expose-vorschau.mjs` nicht zeigen,
+weil in den Demodaten der Prototypen jedes Feld steht. Beim ersten Lauf 55
+Warnungen, jetzt 38 — und die übrigen sind ehrliche Hinweise auf fehlende
+Angaben, keine Fehler.
