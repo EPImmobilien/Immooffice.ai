@@ -187,7 +187,39 @@ Nachlässigkeit:
 
 ---
 
-## 6. Die Preise auf der Website
+## 6. Der Kundenbereich „Abo & Abrechnung" (fork_51)
+
+Ein Reiter in den Einstellungen — und damit hinter deren Chef-Schranke;
+`abo-verwalten` prüft dieselbe Rolle noch einmal. Zwei Schranken, und die
+zweite ist die, die zählt.
+
+Die Tafel (`src/eigene/abrechnung.js`) zeigt: Credit-Saldo mit getrennten
+Töpfen und Gültigkeit, Tarif, Nutzer von Limit, laufende Periode,
+Mindestlaufzeit, Kündigungstermin — und je nach Lage ein Band mit dem einen
+Satz, der gerade gilt (Testphase läuft noch X Tage · Zahlung offen · nur
+Lesezugriff · gekündigt zum …).
+
+Was sie **nicht** kann, und zwar mit Absicht: den Abo-Stand ändern. Sie
+fasst `mandant_abo`, `credit_konten` und `credit_buchungen` nicht an —
+`tests/abrechnung-ui.js` prüft genau das am Quelltext. Geschrieben wird dort
+ausschliesslich vom Webhook.
+
+Vor einer Kündigung wird gefragt, und das **Datum rechnet der Server**. Eine
+zweite Rechnung in der Oberfläche könnte ein anderes Ergebnis zeigen als die,
+die gilt — bei sechs Monaten Mindestlaufzeit ist das kein Schönheitsfehler.
+
+Preise stehen nicht in der Datei. Sie kommen aus `tarife-oeffentlich`, also
+aus demselben Katalog, aus dem auch die Rechnung entsteht. Fällt er aus,
+bleibt die Tafel lesbar und zeigt **keinen** Preis — der Test besteht darauf.
+
+`tests/abrechnung-ui.js` zeichnet die Tafel mit einem nachgebauten React
+(sie benutzt nur `useState`, `useEffect` und `useCallback`) und sieht sich
+fünf Lagen einzeln an: Testphase, laufendes Abo, Kündigung, Sperre und den
+Fall ohne Katalog. 38 Prüfungen.
+
+---
+
+## 7. Die Preise auf der Website
 
 Ein Abschnitt `#preise` in der bestehenden Landingpage, keine eigene
 Preisseite. Die Zahlen im HTML sind **Rückfall**, nicht Quelle: `seite.js`
@@ -214,9 +246,9 @@ in den Fragen ist genau der, den später niemand mitpflegt.
 
 ---
 
-## 7. Abnahme
+## 8. Abnahme
 
-### 7.1 Hier geprüft — `tests/abrechnung.sql`, Teil von `npm run check`
+### 8.1 Hier geprüft — `tests/abrechnung.sql`, Teil von `npm run check`
 
 34 Prüfungen gegen eine echte Postgres-Instanz, alle grün:
 
@@ -245,7 +277,7 @@ sähe man nicht, ob die Seite den Katalog oder den Rückfall zeigt), der
 Umschalter rechnet, der Knopf nimmt Tarif und Takt mit, und bei 375 px Breite
 steht nichts über dem Rand.
 
-### 7.2 Nicht hier prüfbar — Abnahme beim Betreiber
+### 8.2 Nicht hier prüfbar — Abnahme beim Betreiber
 
 Dieser Container kommt **weder an Stripe noch an Supabase über HTTPS** heran,
 und einen Stripe-Schlüssel gibt es hier nicht. Die folgenden Punkte muss der
@@ -270,18 +302,18 @@ Betreiber einmal durchspielen. Die Reihenfolge ist die sinnvolle.
 8. **Gründerpreis** → der Coupon greift nur auf dem dafür bestimmten Tarif,
    und der Zähler auf der Website zählt herunter.
 9. **Zwei Mandanten nebeneinander** → Mandant A sieht in der Oberfläche
-   nichts von B. (Die Datenbankseite ist unter 7.1 geprüft; hier geht es um
+   nichts von B. (Die Datenbankseite ist unter 8.1 geprüft; hier geht es um
    den Weg durch die Anwendung.)
 
-Ergebnisse gehören in dieses Dokument, Abschnitt 7.3.
+Ergebnisse gehören in dieses Dokument, Abschnitt 8.3.
 
-### 7.3 Ergebnisse der Abnahme beim Betreiber
+### 8.3 Ergebnisse der Abnahme beim Betreiber
 
-Noch keine. Einzutragen, sobald die Punkte aus 7.2 durchgespielt sind.
+Noch keine. Einzutragen, sobald die Punkte aus 8.2 durchgespielt sind.
 
 ---
 
-## 8. Was der Betreiber setzen muss
+## 9. Was der Betreiber setzen muss
 
 Supabase → Edge Functions → Secrets (siehe `docs/SECRETS.md` und
 `.env.example`):
@@ -297,7 +329,7 @@ Danach `website/konfig.js` → `preise` auf die eigene Projektadresse prüfen.
 
 ---
 
-## 9. Gate 3 — bevor es live geht
+## 10. Gate 3 — bevor es live geht
 
 Dieses Gate ist ein **Stopp**, kein Haken. Vor der Umstellung auf Live-Keys:
 

@@ -550,6 +550,16 @@ else
   fehler=1
 fi
 
+abschnitt "Abo & Abrechnung: die Tafel im Kundenbereich"
+# Gezeichnet wird mit einem nachgebauten React. Die Frage ist nicht, wie es
+# aussieht, sondern ob vor einer Kuendigung das Datum steht und ob die Tafel
+# irgendeinen Weg anbietet, den Abo-Stand selbst zu setzen.
+if node tests/abrechnung-ui.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Umgebungsvariablen: jede gelesene ist dokumentiert"
 # CLAUDE.md: keine Geheimnisse im Repository, nur Umgebungsvariablen,
 # dokumentiert in .env.example. Am 06.10.2026 nannte die Datei drei

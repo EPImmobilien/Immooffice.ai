@@ -4598,6 +4598,27 @@ WOERTLICH = [
      '    return huelle;\n  };\n})();',
      '    return huelle;\n  };\n})();\n\n// --- Credits: „nicht genug“ wird lesbar ------------------------------\n//\n// supabase-js meldet jeden Nicht-2xx-Status als "Edge Function returned a\n// non-2xx status code" und wirft den Koerper weg. Genau darin steht aber,\n// WORAN es lag — zu wenig Credits, beendetes Abo, fehlende Anmeldung — und\n// das ist die einzige Fehlermeldung dieser Art, die der Makler selbst\n// beheben kann.\n//\n// Hier und nicht an den Aufrufstellen: es sind ueber achtzig, jede mit\n// eigener Fehlerbehandlung. Eine Huelle am Aufruf trifft alle, auch die,\n// die spaeter dazukommen.\n(function () {\n  const echt = window._sb.functions.invoke.bind(window._sb.functions);\n  window._sb.functions.invoke = async function (name, optionen) {\n    const antwort = await echt(name, optionen);\n    const f = antwort && antwort.error;\n    const r = f && f.context;\n    // `context` ist die Antwort selbst. Gelesen wird eine KOPIE: wer sie\n    // auswertet, soll sie danach noch lesen koennen.\n    if (!r || typeof r.clone !== "function") return antwort;\n    let koerper = null;\n    try { koerper = await r.clone().json(); } catch (e) { return antwort; }\n    if (!koerper || !koerper.credits_grund) return antwort;\n    let satz = String(koerper.error || "");\n    if (koerper.credits_grund === "credits") {\n      satz += " Credits lassen sich unter „Abo & Abrechnung“ nachkaufen.";\n    }\n    f.message = satz;\n    f.credits = koerper;\n    // Damit die Kopfzeile ihren Stand auffrischen kann, ohne dass jede\n    // Aufrufstelle davon wissen muss.\n    try {\n      window.dispatchEvent(new CustomEvent("immo-credits", { detail: koerper }));\n    } catch (e) { /* aeltere Browser: dann eben ohne */ }\n    return antwort;\n  };\n})();',
      'Credits: die Antwort "nicht genug" wird eine lesbare Meldung.'),
+
+    # =====================================================================
+    # fork_51 — „Abo & Abrechnung“ als Reiter in den Einstellungen
+    # ---------------------------------------------------------------------
+    # Der Ort ist nicht beliebig: die Seite Einstellungen ist bereits
+    # chef-only (die Ansichtssperre weist jeden anderen ab), und genau
+    # diese Rolle prueft `abo-verwalten` noch einmal. Zwei Schranken, und
+    # die zweite ist die, die zaehlt.
+    #
+    # Die Tafel selbst steht in src/eigene/abrechnung.js. Fehlt sie — etwa
+    # weil das Buendel ohne die eigenen Stuecke gebaut wurde —, sagt der
+    # Reiter das, statt leer zu bleiben.
+    # =====================================================================
+    ('FORK',
+     '  const reiterListe = [["firma", "Firma & Impressum"], ["gesellschaften", "Gesellschaften"], ["standorte", "Standorte"], ["belegnummern", "Belegnummern"], ["zahlung", "Zahlung & Freigabe"], ["signatur", "Signatur & Texte"], ["vorgaben", "Vorgaben"], ["vertragsvorlagen", "Vertragsvorlagen"]];',
+     '  // fork_51: Abo, Credits und Rechnungen. Steht in den Einstellungen und\n  // damit hinter der Chef-Schranke der Seite — Abrechnung ist Chefsache,\n  // und die Edge Function prueft dieselbe Rolle noch einmal.\n  const reiterListe = [["firma", "Firma & Impressum"], ["gesellschaften", "Gesellschaften"], ["standorte", "Standorte"], ["belegnummern", "Belegnummern"], ["zahlung", "Zahlung & Freigabe"], ["signatur", "Signatur & Texte"], ["vorgaben", "Vorgaben"], ["vertragsvorlagen", "Vertragsvorlagen"], ["abrechnung", "Abo & Abrechnung"]];',
+     'Einstellungen: Reiter „Abo & Abrechnung“.'),
+    ('FORK',
+     '      : reiter === "vertragsvorlagen" ? React.createElement(EinstVertragsvorlagen, { user })\n      : React.createElement(EinstVorgaben, null));',
+     '      : reiter === "vertragsvorlagen" ? React.createElement(EinstVertragsvorlagen, { user })\n      : reiter === "abrechnung" ? (window.ImmoAbrechnung\n          ? React.createElement(window.ImmoAbrechnung, null)\n          : React.createElement("div", { style: { padding: 20, color: CI.muted } },\n              "Die Abrechnung konnte nicht geladen werden."))\n      : React.createElement(EinstVorgaben, null));',
+     'Einstellungen: der Reiter zeigt die Abrechnungstafel.'),
 ]
 
 

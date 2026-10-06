@@ -133462,7 +133462,10 @@ function EinstellungenPage({ user }) {
   const knopf = (aktiv) => ({ background: "transparent", border: "none", padding: "10px 16px", fontSize: 14,
     fontWeight: aktiv ? 600 : 400, color: aktiv ? CI.blau : CI.muted,
     borderBottom: aktiv ? `2px solid ${CI.blau}` : "2px solid transparent", cursor: "pointer", fontFamily: FONT });
-  const reiterListe = [["firma", "Firma & Impressum"], ["gesellschaften", "Gesellschaften"], ["standorte", "Standorte"], ["belegnummern", "Belegnummern"], ["zahlung", "Zahlung & Freigabe"], ["signatur", "Signatur & Texte"], ["vorgaben", "Vorgaben"], ["vertragsvorlagen", "Vertragsvorlagen"]];
+  // fork_51: Abo, Credits und Rechnungen. Steht in den Einstellungen und
+  // damit hinter der Chef-Schranke der Seite — Abrechnung ist Chefsache,
+  // und die Edge Function prueft dieselbe Rolle noch einmal.
+  const reiterListe = [["firma", "Firma & Impressum"], ["gesellschaften", "Gesellschaften"], ["standorte", "Standorte"], ["belegnummern", "Belegnummern"], ["zahlung", "Zahlung & Freigabe"], ["signatur", "Signatur & Texte"], ["vorgaben", "Vorgaben"], ["vertragsvorlagen", "Vertragsvorlagen"], ["abrechnung", "Abo & Abrechnung"]];
   return React.createElement(React.Fragment, null,
     React.createElement("div", { style: { display: "flex", borderBottom: `1px solid ${CI.border}`, marginBottom: 24, flexWrap: "wrap" } },
       reiterListe.map(([id, label]) => React.createElement("button", { key: id, "data-einst-reiter": id,
@@ -133475,6 +133478,10 @@ function EinstellungenPage({ user }) {
       : reiter === "standorte" ? React.createElement(EinstStandorte, null)
       : reiter === "signatur" ? React.createElement(EinstSignatur, { user })
       : reiter === "vertragsvorlagen" ? React.createElement(EinstVertragsvorlagen, { user })
+      : reiter === "abrechnung" ? (window.ImmoAbrechnung
+          ? React.createElement(window.ImmoAbrechnung, null)
+          : React.createElement("div", { style: { padding: 20, color: CI.muted } },
+              "Die Abrechnung konnte nicht geladen werden."))
       : React.createElement(EinstVorgaben, null));
 }
 
