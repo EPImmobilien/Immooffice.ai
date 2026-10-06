@@ -4789,3 +4789,50 @@ Die Netlify-Site wird beim ersten Lauf über ihren Namen gesucht und, wenn
 es sie nicht gibt, angelegt — damit niemand von Hand eine Site anlegen und
 eine Kennung eintragen muss. Wer lieber selbst eine anlegt, setzt
 `NETLIFY_SITE_ID_WEBSITE`.
+
+### Nachtrag: Bewegung — und ein Browsertest dazu (06.10.2026)
+
+Rückmeldung: „die Seite soll wesentlich moderner wirken, mit Slideshows und
+sowas alles. Das ist ja jetzt total langweilig."
+
+Dazugekommen ist `website/seite.js`: eine Slideshow über vier Folien
+(automatisch alle 7 s, mit Pfeilen, Punkten, Zähler, Pfeiltasten und
+Wischen) und Abschnitte, die beim Scrollen versetzt erscheinen. Weiter
+ohne Bibliothek, weiter ohne Bauschritt — 180 Zeilen, handgeschrieben.
+
+**Zwei Regeln, die die Bewegung nicht brechen darf:**
+
+* `prefers-reduced-motion: reduce` schaltet Automatik und Einblenden ab.
+  Wer im Betriebssystem weniger Bewegung eingestellt hat, bekommt dieselbe
+  Seite, nur still.
+* Ohne JavaScript bleibt die Seite benutzbar: die erste Folie steht da,
+  alle Abschnitte sind sichtbar. Die Einblende-Klasse versteckt nur, was
+  JavaScript auch wieder zeigt.
+
+**Neu als Gate: `tests/website-browser.js`** — die Seite läuft wirklich in
+Chromium (Playwright, in zwei Fenstergrößen). Geprüft wird: kein
+Konsolenfehler, kein waagerechter Überlauf, die Slideshow blättert
+tatsächlich weiter, **jeder** Abschnitt erscheint, alle vier
+Anmelde-Knöpfe führen zur Adresse aus `konfig.js`, und Impressum und
+Datenschutz laden samt Unvollständigkeits-Hinweis. Ohne Chromium wird
+übersprungen, nicht gemeldet.
+
+Der Test hat sich sofort bezahlt. Er fand zwei Fehler, die keine
+Textprüfung und kein Blick in den eigenen Browser gefunden hätte:
+
+1. Zwei Funktionen hießen im selben Gültigkeitsbereich `pruefen` — die
+   eine schrumpft die Kopfzeile, die andere lässt die Abschnitte
+   erscheinen. `var` ist funktions-, nicht blockweit: die Zuweisung oben
+   überschrieb die Deklaration unten, und **kein Abschnitt erschien je**.
+   Im eigenen Browser fällt das nicht auf, weil die Seite auch ohne die
+   Klasse Text zeigt — nur eben ohne Animation.
+2. Das Erscheinen lief über `requestAnimationFrame` mit einem
+   „schon geplant"-Schalter. Fällt der erste Frame aus — und das tut er,
+   wenn die Seite in einem Hintergrund-Tab geöffnet wird —, bleibt der
+   Schalter stehen und es erscheint nie wieder etwas. Jetzt über die Uhr
+   gebremst, ohne Schalter.
+
+Daraus die allgemeine Lehre, die über die Website hinausgeht: **wo Code
+im Browser etwas bewegt, prüft nur ein Browser, ob er es tut.** Beide
+Fehler waren syntaktisch einwandfrei, warfen keine Ausnahme und wären
+mit einer Textprüfung nie aufgefallen.
