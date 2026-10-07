@@ -168,8 +168,10 @@ Deno.serve(async (req) => {
       "customer_update[name]": "auto",
       "customer_update[address]": "auto",
       billing_address_collection: "required",
-      "payment_method_types[0]": "card",
-      "payment_method_types[1]": "sepa_debit",
+      // KEINE feste Liste von Zahlarten: Stripe zeigt, was im Dashboard
+      // eingeschaltet ist (dynamische Zahlarten). Eine feste Liste mit
+      // sepa_debit liess am 07.10.2026 jede Kasse scheitern, weil SEPA im
+      // Live-Konto noch nicht aktiviert war.
     };
 
     // --- Credit-Paket: Einmalzahlung --------------------------------------

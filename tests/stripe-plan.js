@@ -44,8 +44,8 @@ pruefe("Kasse: Stripe Tax nirgends ausgeschaltet", !/"automatic_tax\[enabled\]":
 pruefe("Kasse: USt-IdNr. wird abgefragt", /"tax_id_collection\[enabled\]": "true"/.test(kasse));
 pruefe("Kasse: Anschrift darf an den Kunden geschrieben werden (sonst lehnt Stripe tax_id_collection ab)",
   /"customer_update\[address\]": "auto"/.test(kasse) && /"customer_update\[name\]": "auto"/.test(kasse));
-pruefe("Kasse: Karte und SEPA-Lastschrift",
-  /"card"/.test(kasse) && /"sepa_debit"/.test(kasse));
+pruefe("Kasse: keine feste Zahlartenliste (sonst scheitert jede Kasse an einer nicht aktivierten Zahlart, 07.10.)",
+  !/payment_method_types\[/.test(kasse));
 pruefe("Kasse: flexible Abrechnung", /billing_mode\]\[type\]": "flexible"/.test(kasse));
 pruefe("Kasse: Paketrechnung mit gültigem Parameter invoice_creation[enabled] (Fehler vom 07.10.)",
   /"invoice_creation\[enabled\]": "true"/.test(kasse) && !/invoice_creation: "true"/.test(kasse));
