@@ -40,14 +40,16 @@ select 'anon darf keine Funktion in public rufen',
        and has_function_privilege('anon', p.oid, 'EXECUTE')
   ) s;
 
--- --- 2) Die acht, die nur der Dienstschlüssel rufen darf -----------------
+-- --- 2) Die neun, die nur der Dienstschlüssel rufen darf -----------------
 -- Ausgeschrieben, nicht als Muster: wer eine hinzufügt, soll sie
 -- hinschreiben müssen.
 create temporary table nur_dienst (name text primary key);
 insert into nur_dienst values
   ('credits_gutschreiben'), ('credits_tarif_zuteilen'), ('credits_buchen'),
   ('credits_freigeben'), ('credits_reservieren'), ('gruender_platz_vergeben'),
-  ('diagnose_secret_pruefen'), ('intern_secret_pruefen');
+  ('diagnose_secret_pruefen'), ('intern_secret_pruefen'),
+  -- fork_76: nimmt bei einer Erstattung Credits zurueck — nur der Webhook.
+  ('credits_erstattung');
 
 insert into befund (pruefung, bestanden, bemerkung)
 select 'authenticated darf die Geld- und Geheimnisfunktionen nicht rufen',
@@ -62,13 +64,13 @@ select 'authenticated darf die Geld- und Geheimnisfunktionen nicht rufen',
   ) s;
 
 insert into befund (pruefung, bestanden, bemerkung)
-select 'jede der acht gibt es ueberhaupt', count(*) = 8, format('%s von 8 gefunden', count(*))
+select 'jede der neun gibt es ueberhaupt', count(*) = 9, format('%s von 9 gefunden', count(*))
   from pg_proc p join pg_namespace n on n.oid = p.pronamespace
  where n.nspname='public' and p.prokind='f' and p.proname in (select name from nur_dienst);
 
 insert into befund (pruefung, bestanden, bemerkung)
 select 'der Dienstschluessel darf sie weiterhin rufen', count(*) = 0,
-       coalesce(left(string_agg(p.proname, ', '), 120), 'alle acht')
+       coalesce(left(string_agg(p.proname, ', '), 120), 'alle neun')
   from pg_proc p join pg_namespace n on n.oid = p.pronamespace
  where n.nspname='public' and p.prokind='f' and p.proname in (select name from nur_dienst)
    and not has_function_privilege('service_role', p.oid, 'EXECUTE');

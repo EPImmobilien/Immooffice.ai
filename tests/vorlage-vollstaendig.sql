@@ -476,7 +476,10 @@ zuwachs(bereich, mehr, grund) as (values
   ('Indizes ohne Constraint', 2, 'fork_75: je nach Zeit'),
   ('Richtlinien', 3, 'fork_75: lesen und erledigen system_fehler, lesen dienst_aufrufe'),
   ('Funktionen', 4, 'fork_75: cron_laeufe, cron_job_jetzt, plattform_speicher, plattform_technik')
-),
+,
+
+  -- fork_76: Erstattung nimmt die Credits mit.
+  ('Funktionen', 1, 'fork_76: credits_erstattung')),
 soll(bereich, soll) as (
   select v.bereich,
          v.soll + coalesce((select sum(z.mehr) from zuwachs z

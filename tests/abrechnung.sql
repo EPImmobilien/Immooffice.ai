@@ -352,6 +352,50 @@ begin
 end
 $$;
 
+-- --- Erstattung nimmt die Credits mit (fork_76) ---------------------------
+-- Mandant B kauft ein Paket über 250 Credits (Rechnung in_abr1), verbraucht
+-- 100, dann wird die Hälfte erstattet, dann der Rest — und dieselbe
+-- Erstattung kommt noch einmal an.
+do $$
+declare
+  v_b uuid := (select wert from wer where was = 'b');
+  v_vorher int; v_r1 int; v_r2 int; v_r3 int; v_nachher int; v_frei int;
+begin
+  perform public.credits_gutschreiben(v_b, 'paket', 250, now() + interval '360 days',
+                                      'paket:in_abr1:il_abr1');
+  update public.credit_konten set verbraucht = verbraucht + 100
+   where mandant_id = v_b and referenz = 'paket:in_abr1:il_abr1';
+  select public.credits_saldo(v_b) into v_vorher;
+
+  select public.credits_erstattung(v_b, 'in_abr1', 0.5) into v_r1;   -- 125 fällig, 125 frei
+  select public.credits_erstattung(v_b, 'in_abr1', 0.5) into v_r2;   -- doppelt: nichts mehr
+  select public.credits_erstattung(v_b, 'in_abr1', 1.0) into v_r3;   -- Rest: 125 fällig, 25 frei
+  select public.credits_saldo(v_b) into v_nachher;
+  select credits - verbraucht into v_frei from public.credit_konten
+   where mandant_id = v_b and referenz = 'paket:in_abr1:il_abr1';
+
+  insert into befund (pruefung, bestanden, bemerkung) values
+    ('Erstattung 50 %: halbes Paket wird abgezogen', v_r1 = 125, v_r1::text),
+    ('Dieselbe Erstattung zweimal: kein zweiter Abzug', v_r2 = 0, v_r2::text),
+    ('Volle Erstattung: nur der freie Rest, kein negativer Saldo', v_r3 = 25 and v_frei = 0,
+     v_r3 || ' / frei ' || v_frei),
+    ('Saldo sinkt genau um das Abgezogene', v_vorher - v_nachher = 150,
+     v_vorher || ' -> ' || v_nachher),
+    ('Verbrauchte Credits stehen mit Grund im Ledger',
+     exists (select 1 from public.credit_buchungen
+              where mandant_id = v_b and aktion = 'erstattung' and notiz like '%bereits verbraucht%'),
+     'Notiz vorhanden'),
+    ('Fremde Rechnung trifft nichts', public.credits_erstattung(v_b, 'in_gibtsnicht', 1) = 0, 'null');
+end
+$$;
+
+-- Nur der Dienstschlüssel darf erstatten.
+insert into befund (pruefung, bestanden, bemerkung)
+select 'credits_erstattung ist für Angemeldete gesperrt',
+       not has_function_privilege('authenticated', 'public.credits_erstattung(uuid,text,numeric)', 'execute')
+       and not has_function_privilege('anon', 'public.credits_erstattung(uuid,text,numeric)', 'execute'),
+       'execute entzogen';
+
 -- --- Ergebnis ---------------------------------------------------------------
 select nr, case when bestanden then 'ok' else 'FEHLER' end as stand, pruefung, bemerkung
   from befund order by nr;
