@@ -512,3 +512,8 @@ verify_jwt = false
 
 [functions.kaufvertrag-lesen]
 verify_jwt = true
+
+# fork_88 — Send-Email-Hook von Supabase Auth. Kein JWT: Supabase ruft mit
+# Standard-Webhooks-Signatur (AUTH_HOOK_SECRET); die Function prueft sie.
+[functions.auth-mail]
+verify_jwt = false

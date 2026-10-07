@@ -75,11 +75,11 @@ export async function absender(db: Db, mandant: string): Promise<{ name: string;
 
 /** Mail ueber Resend. Gibt zurueck, ob sie raus ist — und warum nicht. */
 export async function mailen(db: Db, mandant: string, an: string, anName: string | null, betreff: string, text: string,
-  opts: { antwort_an?: string | null; anhaenge?: { filename: string; content: string }[] } = {}): Promise<{ ok: boolean; grund?: string }> {
+  opts: { antwort_an?: string | null; anhaenge?: { filename: string; content: string }[]; html?: string | null; absender?: { name: string; mail: string; antwort_an: string } | null } = {}): Promise<{ ok: boolean; grund?: string }> {
   if (!/@/.test(an)) return { ok: false, grund: "keine Empfaengeradresse" };
   const schluessel = Deno.env.get("RESEND_API_KEY") || "";
   if (!schluessel) return { ok: false, grund: "RESEND_API_KEY fehlt" };
-  const abs = await absender(db, mandant);
+  const abs = opts.absender || (mandant ? await absender(db, mandant) : null);
   if (!abs) return { ok: false, grund: "kein Absender (Postfach des Mandanten oder SMTP_FROM_EMAIL)" };
   const start = Date.now();
   let r: Response | null = null;
@@ -89,11 +89,12 @@ export async function mailen(db: Db, mandant: string, an: string, anName: string
       body: JSON.stringify({
         from: `${abs.name} <${abs.mail}>`, to: [anName ? `${anName} <${an}>` : an],
         reply_to: opts.antwort_an || abs.antwort_an, subject: betreff, text,
+        ...(opts.html ? { html: opts.html } : {}),
         ...(opts.anhaenge?.length ? { attachments: opts.anhaenge } : {}),
       }),
     });
   } catch { r = null; }
-  await db.from("dienst_aufrufe").insert({ dienst: "resend", funktion: "bautraeger", dauer_ms: Date.now() - start, ok: !!r?.ok, status: r?.status ?? null }).then(() => {}, () => {});
+  await db.from("dienst_aufrufe").insert({ dienst: "resend", funktion: (globalThis as any).__immoFunktion || "bautraeger", dauer_ms: Date.now() - start, ok: !!r?.ok, status: r?.status ?? null }).then(() => {}, () => {});
   if (!r) return { ok: false, grund: "Resend nicht erreichbar" };
   if (!r.ok) return { ok: false, grund: `Resend ${r.status}` };
   return { ok: true };

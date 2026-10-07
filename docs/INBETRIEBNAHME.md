@@ -191,6 +191,11 @@ Kurzform:
 Reihenfolge einhalten: Links, die vor der Umstellung verschickt wurden,
 zeigen weiter auf die Netlify-Adresse. Die bleibt erreichbar.
 
+5. **Anmelde-Mails auf Deutsch und im Namen der Firma:** Authentication →
+   Hooks → Send Email → `auth-mail` einschalten, Geheimnis als
+   `AUTH_HOOK_SECRET` eintragen. Anleitung und Rückfall-Vorlagen:
+   `docs/AUTH_MAILS.md`.
+
 ---
 
 ## Schritt 8 — Demo-Passwort ändern (1 Minute)

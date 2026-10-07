@@ -797,6 +797,13 @@ else
   schlecht
 fi
 
+abschnitt "Anmelde-Mails: Signatur, Mandant, deutsche Texte"
+if node tests/auth-mail.js; then
+  :
+else
+  schlecht
+fi
+
 abschnitt "CSV-Import: Lesen, Zuordnen, Pruefen"
 if node tests/csv-import.js; then
   :

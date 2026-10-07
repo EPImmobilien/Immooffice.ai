@@ -6616,3 +6616,21 @@ geändert (CLAUDE.md).
 gebündelt wird über das CRM-Objekt der Einheit und die Absenderadressen
 von Käufer und Handwerkern. Das trifft nicht jede Mail, aber erfindet
 keine Zuordnung.
+
+
+## 2026-10-07 · Anmelde-Mails über den Send-Email-Hook statt Dashboard-Vorlagen (fork_88)
+
+Supabase kennt nur eine Vorlage je Mailart für das ganze Projekt. Deutsche
+Texte dort einzutragen hätte die Sprache gelöst, nicht den Absender: jede
+Firma hätte Mails „von immoOffice" bekommen, ohne Logo, ohne eigenes
+Postfach. Darum übernimmt die Function `auth-mail` den Versand als Hook und
+baut die Mail je Mandant (Name, Logo, Farbe, Postfach). Die deutschen
+Dashboard-Vorlagen stehen trotzdem in `docs/AUTH_MAILS.md` — als Rückfall,
+solange der Hook nicht eingeschaltet ist, und für den Fall, dass er einmal
+ausfällt.
+
+Der Hook ist eine öffentliche Function ohne JWT; abgesichert ist sie durch
+die Signatur von Supabase (Standard Webhooks, Geheimnis `AUTH_HOOK_SECRET`),
+nicht durch Verstecken. Den Mandanten nimmt sie aus dem Profil des Nutzers;
+ein Aufruf kann ihn nicht vorgeben. Einschalten kann nur der Betreiber im
+Dashboard — das Management-API ist aus der Umgebung nicht erreichbar.

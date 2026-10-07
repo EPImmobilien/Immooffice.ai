@@ -30,6 +30,12 @@ ABGESICHERT = {
         'benennt genau eine Zeile; aus ihr kommen Mandant und Projekt, und '
         'jede Abfrage ist auf beide begrenzt. Es gehen nur Einheit, Raum, '
         'Mangel und Frist hinaus — keine Kaeuferdaten.'),
+    'auth-mail': ('webhook-signature',
+        'Send-Email-Hook von Supabase Auth (fork_88). Kein Nutzer ruft sie: '
+        'Supabase schickt Nutzer und Token mit Standard-Webhooks-Signatur, '
+        'die Function prueft sie gegen AUTH_HOOK_SECRET und tut ohne '
+        'gueltige Signatur nichts. Den Mandanten nimmt sie aus dem Profil '
+        'des Nutzers, nie aus dem Koerper.'),
     'einheit-qr': ('qr_token',
         'QR-Code an der Wohnungstuer (fork_86). Der Token benennt genau eine '
         'Einheit; ohne Anmeldung gehen nur Projektname, Ort, Einheitennummer '

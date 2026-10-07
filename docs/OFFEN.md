@@ -1467,3 +1467,14 @@ Betreiberarbeit.
   war vor diesem Paket da).
 - **E&P World**: dieselben Migrationen und Functions sind dort noch
   einzuspielen (Auftrag: „je Codebasis einmal").
+
+
+## Anmelde-Mails (fork_88)
+
+- **Hook einschalten** — Dashboard, Authentication → Hooks → Send Email →
+  `auth-mail`, Geheimnis als `AUTH_HOOK_SECRET` (`docs/AUTH_MAILS.md`).
+  Bis dahin englische Supabase-Vorlage; die deutschen Rückfall-Vorlagen
+  fürs Dashboard liegen bei.
+- **„Passwort vergessen" für Mitarbeiter** — die Oberfläche verweist an den
+  Ansprechpartner. Mit dem Hook wäre Selbstbedienung sauber; sie braucht eine
+  Seite „Neues Passwort setzen" nach dem Rücksprung (`type=recovery`).

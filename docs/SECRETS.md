@@ -94,6 +94,9 @@ werden.
 - `APNS_*` — nur für Push an eine iOS-Hülle. Kommt aus dem Apple Developer
   Account und ist ohne App gegenstandslos.
 - `PUSH_HOOK_SECRET` — selbst erzeugt wie oben, schützt den Push-Endpunkt.
+- `AUTH_HOOK_SECRET` — erzeugt Supabase beim Einrichten des Send-Email-Hooks
+  (Authentication → Hooks). Ohne ihn bleiben die Anmelde-Mails englisch
+  (`docs/AUTH_MAILS.md`).
 - `BUCHHALTUNG_EMAIL` — eine Adresse, keine Anmeldung.
 
 ### Eintragen
@@ -133,6 +136,7 @@ nicht stumm aus, aber sie arbeitet auch nicht.
 | `APNS_TEAM_ID` | 1 | wie oben |
 | `APNS_UMGEBUNG` | 1 | wie oben — "sandbox" oder "production" |
 | `BUCHHALTUNG_EMAIL` | 1 | Empfaenger weitergeleiteter Rechnungen |
+| `AUTH_HOOK_SECRET` | 1 | Signatur des Send-Email-Hooks (auth-mail) |
 | `PUSH_HOOK_SECRET` | 1 | schuetzt den Push-Endpunkt gegen fremde Aufrufe |
 
 Dazu 3 Werte, die Supabase selbst in jede Funktion setzt und die niemand eintragen muss: `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_URL`.

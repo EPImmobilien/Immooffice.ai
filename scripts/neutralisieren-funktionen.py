@@ -104,6 +104,7 @@ GEMEINSAME_BEILAGEN['_bautraeger/bautraeger.ts'] = {
     'abnahme-abschliessen',
     'handwerker-portal',
     'maengel-fristen',
+    'auth-mail',         # fork_88: Mailversand mit Absender des Mandanten
 }
 
 # --------------------------------------------------------------- Phase 1.4
