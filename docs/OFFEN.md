@@ -207,6 +207,40 @@ irren, eine Zeile, die niemandem gehört, nicht. Gegen das laufende Projekt
 gehört dasselbe Skript regelmäßig gestartet; im Durchlauf prüft es nur die
 frisch migrierte Instanz.
 
+## Ein Postfach gehört einem Nutzer — die Posteingangsliste aber dem Haus
+
+Aufgefallen am 07.10.2026 bei der Frage „Ich sehe die Mails nicht im
+Postfach". Nach `fork_65` sieht sie, wer soll — aber nicht überall gleich:
+
+| Abfrage der Oberfläche | Filter | Folge für einen Chef, der nicht Besitzer ist |
+|---|---|---|
+| Posteingangsliste | nur RLS, kein `postfach_id` | sieht alle Mails des Hauses |
+| Ordnerliste | nur RLS | sieht alle Ordner |
+| Postfach-Einstellungen | `benutzer_id = auth.uid()` | sieht **kein** Postfach |
+| Absenderauswahl beim Schreiben | `benutzer_id = auth.uid()` | kann **nicht** antworten |
+| Ungelesen-Zähler | `postfach_id in (eigene)` | zeigt **0**, während die Liste 133 zeigt |
+
+Die Richtlinie `mail_eingang_lesen` erlaubt dem Besitzer **oder** jeder
+Person mit der Rolle `chef`. Die Oberfläche der Vorlage filtert dagegen an
+fünf Stellen auf den Besitzer. Beides ist für sich vertretbar — ein
+persönliches Postfach gehört nicht dem ganzen Haus —, aber zusammen ergibt
+es einen Zustand, der sich widerspricht: eine Liste mit 133 Mails und ein
+Zähler, der 0 sagt.
+
+**Zu entscheiden ist die Richtung, und das ist eine Produktfrage:**
+
+1. **Postfach bleibt persönlich.** Dann muss die Richtlinie den
+   `chef`-Zweig verlieren und die Liste auf die eigenen Postfächer filtern.
+   Konsequent, aber ein Chef sieht die Objektkorrespondenz seiner
+   Mitarbeiter dann nicht mehr.
+2. **Postfach ist Sache des Hauses.** Dann müssen die fünf Stellen der
+   Oberfläche den Besitzerfilter verlieren — eine Verhaltensänderung an der
+   Vorlage, und sie betrifft Vertraulichkeit.
+
+Bis zur Entscheidung gilt: **wer das Postfach verbunden hat, arbeitet damit.**
+Das ist kein Fehler, nur eine Hälfte. `CLAUDE.md` verbietet
+Verhaltensänderungen an der Vorlage ohne Grund, und beide Wege sind einer.
+
 ## Umgebung
 
 | Punkt | Wirkung |
