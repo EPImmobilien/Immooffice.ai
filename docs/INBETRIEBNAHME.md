@@ -77,8 +77,14 @@ Workflow — die Seite kann sich nicht mehr gegenseitig überschreiben.
 GitHub → **Actions** → Workflow **„Oberflaeche ausliefern"** → *Run workflow*
 → bei `umgebung` **`produktion`** wählen → *Run workflow*.
 
-Bisher gibt es nur Entwürfe unter Vorschau-Adressen. Ohne diesen Schritt ist
-die Registrierung nirgends erreichbar, egal wie grün die Tests sind.
+**Am 07.10.2026 erledigt** (Lauf 29, Commit `95adc02`): `immoofficeeai.netlify.app`
+trägt jetzt denselben Stand wie der Entwurf. Bis dahin gingen alle 28
+Auslieferungen auf den Entwurf — deshalb war in der Produktion nichts von der
+Arbeit der letzten Tage zu sehen, und zwar ohne jede Fehlermeldung.
+
+Der Schritt bleibt für jede weitere Auslieferung derselbe. Ohne ihn ist eine
+Änderung nirgends erreichbar, egal wie grün die Tests sind — und eine eigene
+Domain zeigt **immer** auf die Produktion, nie auf den Entwurf.
 
 Die beiden Netlify-Geheimnisse (`NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`)
 liegen bereits im Repository — die Entwürfe sind damit gelaufen.

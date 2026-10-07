@@ -5824,3 +5824,86 @@ wäre nur dauerhaft komisch gewesen. Schritt 7 nannte vorher nur
 Die Adresse `immoofficeeai.netlify.app` wird **nicht** abgeschaltet und
 bleibt in den Redirect URLs stehen. Jeder Exposé-Freigabe-, Einladungs- und
 Bestätigungslink, der vor der Umstellung hinausging, zeigt dorthin.
+
+## 2026-10-07 · Die Produktion ist ausgeliefert — und der Wächter meldete rot, weil er die falsche Adresse rief
+
+Achtundzwanzig Auslieferungen, achtundzwanzigmal der Entwurf. Belegt an den
+Commit-Status, die der Workflow seit dem 06.10. anhängt: neun Läufe, neunmal
+`Anwendung (entwurf)`. Die drei Dinge, die in der Anwendung nicht zu finden
+waren — Plattform-Kachel (`d3b803b`), Social-Baukasten (`3b6c669`),
+Exposé-Sofortversand (`2c443ac`) — sind alle **nach** Lauf 19 entstanden. Der
+erste Lauf, der alle drei trug, war Lauf 24. Entwurf. Jeder danach: Entwurf.
+In der Produktion konnte also nichts davon stehen.
+
+**Das ist mein Fehler, nicht der des Betreibers.** Schritt 3 der
+Inbetriebnahme — „Oberfläche in Produktion ausliefern" — stand seit dem
+28.09. als Betreiber-Schritt im Dokument, und ich habe nie nachgehalten, dass
+er offen blieb. Stattdessen habe ich nach jeder Lieferung „ausgeliefert"
+gemeldet und gemeint: in den Entwurf. Lauf 29 hat das nachgeholt.
+
+**Der zweite Befund kam aus dem roten Lauf 29.** Die Auslieferung glückte
+(Schritt 6), gescheitert ist der Nachsehen-Schritt (Schritt 8). Grund:
+`netlify deploy --prod --json` gibt unter `url` die **primäre Domain** der
+Site zurück, nicht die netlify.app-Adresse — hier `https://immooffice.ai`,
+die noch nicht auf Netlify zeigt. Der Wächter rief eine Adresse, die es noch
+nicht gibt, und erklärte eine geglückte Auslieferung für gescheitert.
+
+Behoben, und zwar getrennt: **geprüft** wird jetzt die Adresse, die immer
+auflöst, **angezeigt** die, die gemeint ist.
+
+- Produktion: die netlify.app-Adresse der Site, aus dem Permalink gewonnen
+  (`https://<lauf>--<site>.netlify.app` → `https://<site>.netlify.app`).
+  Kein zweites Geheimnis mit dem Site-Namen — zwei Quellen laufen auseinander.
+- Entwurf: die Alias-Adresse selbst. Sie genauso zu kürzen hieße, die
+  Produktion zu prüfen und den Entwurf ungeprüft zu lassen. Beim ersten
+  Entwurf dieser Änderung stand genau das drin.
+- Die eigene Domain wird zusätzlich gerufen, aber **ohne Urteil**: antwortet
+  sie nicht, ist das ein `::notice::` mit Verweis auf
+  `DOMAIN_VERBINDEN.md`. Solange das DNS fehlt oder das Zertifikat noch nicht
+  steht, ist das Wartezeit — und ein Gate, das Wartezeit als Fehler meldet,
+  wird irgendwann ignoriert. Das ist das Schlimmste, was einem Gate passieren
+  kann.
+
+**Nebenbei die Antwort auf eine offene Frage:** die Domain `immooffice.ai`
+hängt bereits an der Site und ist dort als primär gesetzt. Sonst hätte
+`--json` sie nicht genannt. Es fehlt allein das DNS bei Strato.
+
+## 2026-10-07 · Das Betreiber-Konto heißt jetzt info@immooffice.ai
+
+`plattform_admins` führte genau einen Eintrag: `info@engferundpartner.de`,
+angelegt mit fork_52. Das ist die Adresse des Referenzunternehmens als
+Betreiber einer neutralen Plattform — in der Datenbank, nicht im Repository,
+also außerhalb der Reichweite des Neutralitäts-Gates, aber derselbe Fehler.
+
+Angelegt am 07.10.2026: `info@immooffice.ai`, bestätigt, als `chef` im
+Mandanten *Musterhaus Immobilien GmbH* und als Betreiber in
+`plattform_admins`.
+
+**Warum von Hand in der Datenbank und nicht über die Selbstregistrierung:**
+Die Registrierung schickt eine Bestätigungsmail. Für `immooffice.ai` gibt es
+heute kein Postfach — die Domain zeigt noch nicht einmal auf Netlify. Eine
+Registrierung wäre an der Bestätigung hängen geblieben.
+
+**Warum keine Migration:** Ein Konto hat ein Passwort. Eine Migration mit
+einem Passwort darin wäre ein Geheimnis im Repository (CLAUDE.md). Der
+Vorgang ist deshalb hier beschrieben, nicht als Datei abgelegt. Das Passwort
+ist einmalig und mit `must_change_password = true` versehen: die Anwendung
+hält den Angemeldeten auf *Mein Profil* fest, bis er es ersetzt hat
+(`src/app/anwendung.js`, Zeile 123347).
+
+**Zwei Dinge ausdrücklich beachtet:**
+
+- `profiles.mandant_id` ist mit `aktuelle_mandant_id()` vorbelegt. Ohne
+  angemeldeten Nutzer ergibt das `null`, und eine Zeile ohne Mandanten ist
+  unter der Mandantentrennung unsichtbar — genau der Fehler aus fork_65. Der
+  Mandant steht deshalb ausdrücklich im `insert`.
+- Zum Konto gehört eine Zeile in `auth.identities`. Ohne sie hält Supabase
+  eine erneute Registrierung derselben Adresse für ein bestehendes Konto
+  *ohne* Identität und meldet nichts — dieselbe Sackgasse, die am 29.09.2026
+  schon einmal auftrat.
+
+**Offen und absichtlich nicht entschieden:** `info@engferundpartner.de`
+bleibt vorerst ebenfalls Betreiber. Das Konto ist das, mit dem gerade
+gearbeitet wird; es stillzulegen, während jemand damit angemeldet ist, nimmt
+ihm mitten im Vorgang den Plattform-Bereich. Der Eintrag gehört entfernt,
+sobald das neue Konto erprobt ist — in `docs/OFFEN.md` vermerkt.

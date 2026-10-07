@@ -25,6 +25,11 @@ Das ist die einzige echte Weiche. Alles danach folgt daraus.
 | **Haken** | **Alle übrigen Einträge ziehen mit — vor allem `MX`. Wer Strato-Postfächer auf dieser Domain hat, muss sie bei Netlify neu eintragen, sonst kommt keine Mail mehr an.** | Eine feste IP statt eines Namens: ändert Netlify sie, muss sie nachgezogen werden |
 | Empfehlung | wenn die Domain **neu** ist und dort keine Postfächer hängen | wenn auf der Domain **Strato-Mail** liegt |
 
+**Gewählt am 07.10.2026: Weg A.** Die Domain ist neu, es liegen keine
+Strato-Postfächer darauf — damit entfällt der einzige Haken dieses Wegs.
+Weg B bleibt beschrieben, weil die Entscheidung umkehrbar sein muss und
+weil eine zweite Domain mit Mail darauf anders ausgehen würde.
+
 Weg A ist der bequemere, Weg B der eingriffsärmere. Beides ist tragfähig;
 kaputt geht nur die Mischung — Nameserver bei Netlify *und* Einträge bei
 Strato pflegen führt dazu, dass Strato-Einträge gar nicht mehr gelesen
@@ -33,6 +38,14 @@ werden und niemand sieht, warum.
 ---
 
 ## Gemeinsamer Anfang: die Domain bei Netlify anmelden
+
+**Vermutlich schon passiert.** Die Produktions-Auslieferung vom 07.10.2026
+(Lauf 29) hat als Adresse der Site `https://immooffice.ai` zurückgegeben —
+`netlify deploy --prod --json` nennt dort die **primäre Domain**. Diese Domain
+ist also bereits an die Site gehängt und als primär gesetzt; es fehlt allein
+das DNS. Wenn die Strato-Domain `immooffice.ai` ist, ist dieser Abschnitt
+erledigt und es geht direkt bei Weg A weiter. Ist es eine **andere** Domain,
+muss sie hier dazukommen und unter *Primary domain* an die erste Stelle.
 
 1. Netlify → die Site **`immoofficeeai`** → *Domain management* →
    *Domains* → **Add a domain**.

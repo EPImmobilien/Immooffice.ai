@@ -207,6 +207,31 @@ irren, eine Zeile, die niemandem gehört, nicht. Gegen das laufende Projekt
 gehört dasselbe Skript regelmäßig gestartet; im Durchlauf prüft es nur die
 frisch migrierte Instanz.
 
+## Das alte Betreiber-Konto trägt noch die Adresse der Referenz
+
+`plattform_admins` führt seit dem 07.10.2026 zwei Einträge:
+`info@immooffice.ai` (neu) und `info@engferundpartner.de` (aus fork_52). Der
+zweite gehört entfernt — die Adresse des Referenzunternehmens als Betreiber
+einer neutralen Plattform ist derselbe Fehler, den das Neutralitäts-Gate im
+Quelltext verhindert, nur eine Ebene tiefer.
+
+Nicht einfach gelöscht, weil mit diesem Konto gerade gearbeitet wird. Wer
+ihm den Plattform-Bereich mitten im Vorgang nimmt, nimmt sich selbst den
+Zugang. Reihenfolge:
+
+1. Mit `info@immooffice.ai` anmelden, Passwort ersetzen (die Anwendung
+   verlangt es), Plattform-Kachel prüfen.
+2. Dann:
+   `delete from public.plattform_admins where benutzer_id = '253fa3e4-360a-4564-a8e7-446585e42cdc';`
+
+Das Konto selbst bleibt davon unberührt — es verliert nur den
+Betreiber-Rang, nicht den Zugang zu seinem Mandanten.
+
+Offen bleibt daneben die Frage, ob das Konto `le@engferundpartner.de`
+(angelegt am 17.07.2026, ohne Profil, ohne Mandanten) noch gebraucht wird.
+Ein bestätigtes Konto ohne Profil kommt an keiner Oberfläche an, zählt aber
+als Nutzer.
+
 ## Ein Postfach gehört einem Nutzer — die Posteingangsliste aber dem Haus
 
 Aufgefallen am 07.10.2026 bei der Frage „Ich sehe die Mails nicht im

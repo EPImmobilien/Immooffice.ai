@@ -159,15 +159,50 @@ jobs:
             schluessel=deploy_url
           fi
           cd ..
-          ziel=$(python3 -c "import json,sys; print(json.load(open('ausgabe.json'))['$schluessel'])")
-          echo "ziel=$ziel" >> "$GITHUB_OUTPUT"
-          echo "Ausgeliefert nach $ziel"
+          # ZWEI Adressen, nicht eine. Bei --prod gibt die CLI unter "url" die
+          # PRIMAERE DOMAIN der Site zurueck — bei dieser Site immooffice.ai,
+          # die am 07.10.2026 noch gar nicht auf Netlify zeigte. Lauf 29 hat
+          # deshalb rot gemeldet, obwohl die Auslieferung geglueckt war: der
+          # Nachsehen-Schritt rief eine Adresse, die es noch nicht gibt.
+          #
+          # Geprueft wird daher die Adresse, die IMMER aufloest: die
+          # netlify.app-Adresse der Site. Sie steckt im Permalink
+          # (https://<lauf>--<site>.netlify.app) und wird daraus gewonnen —
+          # ein zweites Geheimnis mit dem Site-Namen waere eine zweite
+          # Quelle, die auseinanderlaufen kann.
+          eval "$(python3 - "$schluessel" <<'ENDE'
+          import json, shlex, sys
+          from urllib.parse import urlsplit
+          a = json.load(open('ausgabe.json'))
+          schluessel = sys.argv[1]
+          anzeige = a.get(schluessel) or a.get('deploy_url') or a.get('url')
+          if not anzeige:
+              sys.exit('::error::netlify deploy --json nennt keine Adresse.')
+          if schluessel == 'url':
+              # Produktion: aus dem Permalink die netlify.app-Adresse der Site
+              # gewinnen (https://<lauf>--<site>.netlify.app -> <site>).
+              host = urlsplit(a.get('deploy_url') or anzeige).netloc
+              pruefen = 'https://' + (host.split('--', 1)[1] if '--' in host else host)
+          else:
+              # Entwurf: die Alias-Adresse IST die zu pruefende. Sie hier
+              # genauso zu kuerzen, hiesse die Produktion zu pruefen und den
+              # Entwurf ungeprueft zu lassen.
+              pruefen = anzeige
+          print('export ANZEIGE=' + shlex.quote(anzeige))
+          print('export PRUEFEN=' + shlex.quote(pruefen))
+          ENDE
+          )"
+          echo "ziel=$ANZEIGE" >> "$GITHUB_OUTPUT"
+          echo "pruefen=$PRUEFEN" >> "$GITHUB_OUTPUT"
+          echo "Ausgeliefert nach $ANZEIGE (geprueft wird $PRUEFEN)"
           {
             echo "### Oberflaeche ausgeliefert"
             echo ""
             echo "Umgebung: **${{ github.event.inputs.umgebung }}**"
             echo ""
-            echo "$ziel"
+            echo "$ANZEIGE"
+            [ "$ANZEIGE" = "$PRUEFEN" ] || echo ""
+            [ "$ANZEIGE" = "$PRUEFEN" ] || echo "Immer erreichbar: $PRUEFEN"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Adresse an den Commit haengen
@@ -200,7 +235,8 @@ jobs:
       - name: Nachsehen, was angekommen ist
         run: |
           set -uo pipefail
-          ziel="${{ steps.stellen.outputs.ziel }}"
+          ziel="${{ steps.stellen.outputs.pruefen }}"
+          anzeige="${{ steps.stellen.outputs.ziel }}"
           schlecht=0
           for pfad in "/" "/schriften/expose/Jak-Regular.ttf" \
                       "/schriften/expose/Arch-CondXB.ttf" \
@@ -211,4 +247,15 @@ jobs:
             echo "$antwort  $pfad"
             [ "$code" = "200" ] || { echo "::error::$ziel$pfad antwortet mit $code"; schlecht=1; }
           done
+          # Die eigene Domain zusaetzlich, aber OHNE Urteil: solange sie nicht
+          # auf Netlify zeigt oder das Zertifikat noch nicht steht, ist das
+          # Wartezeit und kein Fehler der Auslieferung.
+          if [ "$anzeige" != "$ziel" ]; then
+            code=$(curl -s -o /dev/null --max-time 30 -w '%{http_code}' "$anzeige/" || echo "000")
+            if [ "$code" = "200" ]; then
+              echo "Eigene Domain $anzeige antwortet: 200"
+            else
+              echo "::notice::Eigene Domain $anzeige antwortet mit $code — zeigt noch nicht auf Netlify oder das Zertifikat steht noch nicht. Siehe docs/DOMAIN_VERBINDEN.md."
+            fi
+          fi
           exit $schlecht
