@@ -6220,3 +6220,35 @@ die beiden eigenen Betreiber-Funktionen. Die 130 übrigen sind generierter
 Code aus der Vorlage; sie anzuschließen heißt, den Generator um eine Regel
 je Funktion zu erweitern. Lieber zwei Funktionen ehrlich als 130 halb —
 die Ampel sagt dazu „nur angeschlossene Funktionen".
+
+
+## 2026-10-07 · Betreiberbereich, Schritt 8: der Chef gibt frei, die Uhr läuft ab der Freigabe (fork_77)
+
+fork_54 hatte die Sitzung mit vier Stunden gedeckelt, weil der
+Administrator sie sich selbst nahm. Jetzt gewährt sie der Chef des
+Hauses — und der Auftrag will 1–24 Stunden. Also 24 Stunden Obergrenze,
+und die Zeit beginnt bei der Freigabe, nicht bei der Anfrage: eine
+Anfrage, die drei Tage liegt, darf nicht am Tag der Freigabe schon
+abgelaufen sein. Nach sieben Tagen ohne Antwort gilt sie als verfallen.
+
+Die Freigabe ist in `support_sitzung()` erzwungen, nicht in der
+Oberfläche: diese eine Funktion speist jede Richtlinie. Ein Knopf, der
+fehlt, ist keine Sperre; eine Funktion, die ohne `freigegeben_am` nichts
+liefert, ist eine.
+
+Protokoll der Änderungen über einen Trigger an allen 200 Mandantentabellen
+statt über eine handverlesene Liste „wichtiger" Tabellen. Jede Zeile
+prüft zuerst `auth.uid()`, dann die Sitzung — für jeden normalen Nutzer
+ein Indexzugriff. Aufgezeichnet wird Tabelle, Kennung und Vorgang; der
+Inhalt nicht, denn das Protokoll liest der Mandant, und es soll ihm
+sagen, WAS angefasst wurde, nicht noch einmal seine Daten zeigen.
+
+Seitenaufrufe meldet die Oberfläche (das Band ruft bei jedem Hash-Wechsel
+`support_seite_protokollieren`). Das ist weniger als ein Server-Log, aber
+die Anwendung hat keinen Router und keinen Server zwischen Browser und
+Datenbank — die Datenbank sieht Abfragen, keine Seiten.
+
+Mail ist best effort. Fehlt `RESEND_API_KEY`, scheitert weder die
+Zugriffsanfrage noch die Antwort — die Datenbank ist die Wahrheit, das
+Band im Portal der zweite Weg. Die Antwort sagt dem Betreiber, ob eine
+Mail hinausging.

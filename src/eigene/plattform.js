@@ -566,7 +566,7 @@
     var gZ = React.useState(""), grund = gZ[0], setzeGrund = gZ[1];
     var bZ = React.useState(""), busy = bZ[0], setzeBusy = bZ[1];
     var lZ = React.useState(""), loeschwort = lZ[0], setzeLoeschwort = lZ[1];
-    var sZ = React.useState({ grund: "", schreiben: false }), sup = sZ[0], setzeSup = sZ[1];
+    var sZ = React.useState({ grund: "", schreiben: false, dauer: 60 }), sup = sZ[0], setzeSup = sZ[1];
     var d = p.daten;
     if (!d) return E("div", { style: { color: CI.muted } }, "Lade Mandant …");
     var m = d.mandant, a = d.abo || {};
@@ -607,12 +607,11 @@
       setzeBusy("support");
       try {
         var r = await ruf("support_start",
-          { mandant_id: m.id, grund: sup.grund, schreiben: sup.schreiben });
-        p.melden("Supportzugriff läuft bis "
-          + zeit(r.sitzung && r.sitzung.gueltig_bis)
-          + (sup.schreiben ? " — MIT Schreibrecht." : " — nur lesend.")
-          + " Der Mandant kann den Zugriff nachlesen.", "warnung");
-        setzeSup({ grund: "", schreiben: false });
+          { mandant_id: m.id, grund: sup.grund, schreiben: sup.schreiben, dauer_minuten: sup.dauer });
+        p.melden("Zugriff angefragt" + (sup.schreiben ? " — MIT Schreibrecht" : " — nur lesend")
+          + ". Der Chef des Hauses muss freigeben" + (r.mail ? " (per Mail benachrichtigt)" : "")
+          + "; die Zeit läuft ab der Freigabe.", "warnung");
+        setzeSup({ grund: "", schreiben: false, dauer: 60 });
         p.supportNeu();
         p.neuLaden();
       } catch (f) { p.melden(f.message || String(f), "fehler"); }
@@ -830,16 +829,24 @@
           E("input", { type: "checkbox", checked: sup.schreiben,
             onChange: function (e) { setzeSup(Object.assign({}, sup, { schreiben: e.target.checked })); } }),
           "Auch ändern dürfen (nur, wenn der Kunde darum gebeten hat)"),
+        E("label", { style: { display: "flex", alignItems: "center", gap: 8, margin: "10px 0", fontSize: 13.5 } },
+          "Gewünschte Dauer",
+          E("select", { style: Object.assign({}, feld, { width: "auto" }), value: sup.dauer,
+            onChange: function (e) { setzeSup(Object.assign({}, sup, { dauer: Number(e.target.value) })); } },
+            [[60, "1 Stunde"], [120, "2 Stunden"], [240, "4 Stunden"], [480, "8 Stunden"], [1440, "24 Stunden"]].map(function (o) {
+              return E("option", { key: o[0], value: o[0] }, o[1]); }))),
         E("button", { type: "button", style: knopf,
           disabled: !!busy || sup.grund.trim().length < 5, onClick: supportStarten },
-          busy === "support" ? "Beginnt …" : "Supportzugriff beginnen"),
+          busy === "support" ? "Fragt an …" : "Zugriff anfragen — der Chef gibt frei"),
         (d.sitzungen || []).length
           ? E("div", { style: { marginTop: 14 } },
               E("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 6 } },
-                "Bisherige Zugriffe"),
+                "Bisherige Anfragen und Zugriffe"),
               (d.sitzungen || []).map(function (sz) {
+                var stand = sz.abgelehnt_am ? "abgelehnt" : sz.beendet_am ? "beendet"
+                  : !sz.freigegeben_am ? "wartet auf Freigabe" : new Date(sz.gueltig_bis) > new Date() ? "läuft" : "abgelaufen";
                 return E("div", { key: sz.id, style: { fontSize: 12.5, color: CI.muted, padding: "3px 0" } },
-                  zeit(sz.begonnen_am) + " · " + (sz.schreiben ? "lesen und ändern" : "nur lesen")
+                  zeit(sz.begonnen_am) + " · " + stand + " · " + (sz.schreiben ? "lesen und ändern" : "nur lesen")
                   + " · " + sz.grund);
               }))
           : null),
@@ -1314,6 +1321,134 @@
           "Reihenfolge der Entscheidung: Ausnahme des Hauses (befristbar) → Tarif → Standard. Gesperrte Module zeigen im Portal einen Upgrade-Hinweis, sie verschwinden nicht.")));
   }
 
+  // --- Support (fork_77) ------------------------------------------------------
+  var S_STAND = { offen: "offen", in_arbeit: "in Arbeit", wartet_kunde: "wartet auf Kunde", geloest: "gelöst", geschlossen: "geschlossen" };
+  var S_KAT = { frage: "Frage", fehler: "Fehler", abrechnung: "Abrechnung", datenuebernahme: "Datenübernahme", sonstiges: "Sonstiges" };
+  function Support(p) {
+    var d = p.daten;
+    var fZ = React.useState("offen"), filter = fZ[0], setzeFilter = fZ[1];
+    var kZ = React.useState(""), katF = kZ[0], setzeKatF = kZ[1];
+    var oZ = React.useState(null), offen = oZ[0], setzeOffenA = oZ[1];
+    var dZ = React.useState(null), detail = dZ[0], setzeDetail = dZ[1];
+    var tZ = React.useState(""), text = tZ[0], setzeText = tZ[1];
+    React.useEffect(function () {
+      if (!offen) { setzeDetail(null); return; }
+      ruf("support_anfrage", { id: offen }).then(setzeDetail).catch(function (f) { p.melden(f.message || String(f), "fehler"); });
+    }, [offen]);
+    if (!d) return E("div", { style: { color: CI.muted } }, "Lade Support …");
+    var k = d.kennzahlen || {};
+    var liste = (d.anfragen || []).filter(function (a) {
+      var okStand = filter === "alle" ? true : filter === "offen" ? (a.status === "offen" || a.status === "in_arbeit")
+        : filter === "wartet" ? a.status === "wartet_kunde" : filter === "erledigt" ? (a.status === "geloest" || a.status === "geschlossen")
+        : filter === "uebernahme" ? a.kategorie === "datenuebernahme" : true;
+      return okStand && (!katF || a.kategorie === katF);
+    });
+    async function setzen(id, was) {
+      try { await ruf("support_anfrage_setzen", Object.assign({ id: id }, was)); p.neuLaden(); if (offen === id) setzeDetail(await ruf("support_anfrage", { id: id })); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    async function antworten() {
+      if (!text.trim()) return;
+      try { var x = await ruf("support_antworten", { id: offen, text: text }); setzeText("");
+        p.melden(x.mail ? "Antwort gespeichert und per Mail gesendet." : "Antwort gespeichert (keine Mail — Versanddienst nicht eingerichtet)."); 
+        setzeDetail(await ruf("support_anfrage", { id: offen })); p.neuLaden(); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    var stripeBasis = "https://dashboard.stripe.com/" + (d.stripe_modus === "live" ? "" : "test/") + "invoices/";
+    return E("div", null,
+      E("div", { style: { display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", marginBottom: 18 } },
+        [["Offen", zahl(k.offen), (k.offen_aelter_24h ? zahl(k.offen_aelter_24h) + " ohne Antwort seit > 24 h" : "alle beantwortet")],
+         ["Priorität hoch", zahl(k.hoch_offen), "offen"],
+         ["Erste Antwort", k.erste_antwort_median_h === null || k.erste_antwort_median_h === undefined ? "—" : k.erste_antwort_median_h + " h", "Median, 90 Tage"],
+         ["Lösung", k.loesung_median_h === null || k.loesung_median_h === undefined ? "—" : k.loesung_median_h + " h", "Median, 90 Tage"],
+         ["Zugriffsanfragen", zahl(k.zugriffe_offen), zahl(k.zugriffe_laufend) + " laufen gerade"]
+        ].map(function (x, i) {
+          return E("div", { key: i, style: kasten },
+            E("div", { style: { fontSize: 11, color: CI.muted, letterSpacing: "0.06em", textTransform: "uppercase" } }, x[0]),
+            E("div", { style: { fontSize: 26, fontWeight: 700, color: CI.blau, margin: "6px 0 4px" } }, x[1]),
+            E("div", { style: { fontSize: 11.5, color: CI.muted } }, x[2]));
+        })),
+      E("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 12 } },
+        "Je Kategorie (90 Tage): " + Object.keys(k.je_kategorie || {}).map(function (c) { return (S_KAT[c] || c) + " " + zahl(k.je_kategorie[c]); }).join(" · ")
+        + (Object.keys(k.uebernahmen || {}).length ? " — Datenübernahmen: " + Object.keys(k.uebernahmen).map(function (c) { return c + " " + zahl(k.uebernahmen[c]); }).join(", ") : "")),
+
+      detail ? E("div", { style: kasten },
+        E("button", { type: "button", style: knopfLeer, onClick: function () { setzeOffenA(null); } }, "← Alle Anfragen"),
+        E("h3", { style: { margin: "14px 0 4px", fontSize: 17, color: CI.blau } }, detail.anfrage.betreff),
+        E("div", { style: { fontSize: 12.5, color: CI.muted, marginBottom: 10 } },
+          E("a", { href: "#", onClick: function (e) { e.preventDefault(); p.oeffnen(detail.anfrage.mandant_id); }, style: { color: CI.blau } }, detail.anfrage.mandant_name || detail.anfrage.mandant_id),
+          " · " + (detail.anfrage.nutzer_name || "") + (detail.anfrage.nutzer_email ? " <" + detail.anfrage.nutzer_email + ">" : "") + " · " + zeit(detail.anfrage.erstellt_am)),
+        E("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 } },
+          E("select", { value: detail.anfrage.status, style: feld, onChange: function (e) { setzen(detail.anfrage.id, { status: e.target.value }); } },
+            Object.keys(S_STAND).map(function (x) { return E("option", { key: x, value: x }, S_STAND[x]); })),
+          E("select", { value: detail.anfrage.prioritaet, style: feld, onChange: function (e) { setzen(detail.anfrage.id, { prioritaet: e.target.value }); } },
+            ["niedrig", "normal", "hoch"].map(function (x) { return E("option", { key: x, value: x }, "Priorität " + x); })),
+          E("select", { value: detail.anfrage.zustaendig_id || "", style: feld, onChange: function (e) { setzen(detail.anfrage.id, { zustaendig_id: e.target.value || null }); } },
+            [E("option", { key: "", value: "" }, "— niemand zuständig —")].concat((d.admins || []).map(function (a) { return E("option", { key: a.id, value: a.id }, a.name); }))),
+          detail.anfrage.kategorie === "datenuebernahme" ? E("select", { value: detail.anfrage.uebernahme_status || "", style: feld,
+            onChange: function (e) { setzen(detail.anfrage.id, { uebernahme_status: e.target.value || null }); } },
+            [E("option", { key: "", value: "" }, "Übernahme: noch kein Stand")].concat(["beauftragt", "datei_erhalten", "importiert", "abgenommen"].map(function (x) {
+              return E("option", { key: x, value: x }, "Übernahme: " + x.replace("_", " ")); }))) : null),
+        detail.anfrage.kategorie === "datenuebernahme" ? E("div", { style: { display: "flex", gap: 8, alignItems: "center", marginBottom: 10, fontSize: 12.5 } },
+          "Einrichtungspaket (Stripe-Rechnung in_…):",
+          E("input", { style: Object.assign({}, feld, { width: 260 }), defaultValue: detail.anfrage.paket_rechnung_id || "", placeholder: "in_…",
+            onBlur: function (e) { if ((e.target.value || "") !== (detail.anfrage.paket_rechnung_id || "")) setzen(detail.anfrage.id, { paket_rechnung_id: e.target.value }); } }),
+          detail.anfrage.paket_rechnung_id ? E("a", { href: stripeBasis + detail.anfrage.paket_rechnung_id, target: "_blank", rel: "noopener", style: { color: CI.blau } }, "In Stripe öffnen") : null) : null,
+        E("div", { style: { fontSize: 14, whiteSpace: "pre-wrap", lineHeight: 1.6, padding: "10px 12px", background: "#f7f8fa", borderRadius: 8 } }, detail.anfrage.text),
+        (detail.antworten || []).map(function (a) {
+          return E("div", { key: a.id, style: { marginTop: 10, padding: "10px 12px", borderRadius: 8, background: a.von_betreiber ? "#eef2f8" : "#fff", border: "1px solid " + CI.border } },
+            E("div", { style: { fontSize: 11.5, color: CI.muted, marginBottom: 4 } }, (a.von_betreiber ? "Support" : "Kunde") + (a.autor_name ? " (" + a.autor_name + ")" : "") + " · " + zeit(a.erstellt_am)),
+            E("div", { style: { fontSize: 14, whiteSpace: "pre-wrap", lineHeight: 1.6 } }, a.text));
+        }),
+        E("textarea", { style: Object.assign({}, feld, { minHeight: 90, marginTop: 12 }), value: text, placeholder: "Antwort an den Kunden — geht per Mail und steht im Portal",
+          onChange: function (e) { setzeText(e.target.value); } }),
+        E("div", { style: { display: "flex", gap: 8, marginTop: 8 } },
+          E("button", { type: "button", style: knopf, disabled: !text.trim(), onClick: antworten }, "Antworten"),
+          E("button", { type: "button", style: knopfLeer, onClick: function () { setzen(detail.anfrage.id, { status: "geloest" }); } }, "Als gelöst markieren")))
+
+      : E("div", null,
+        E("div", { style: { display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 } },
+          [["offen", "Offen"], ["wartet", "Wartet auf Kunde"], ["erledigt", "Erledigt"], ["uebernahme", "Datenübernahmen"], ["alle", "Alle"]].map(function (f) {
+            return E("button", { key: f[0], type: "button", onClick: function () { setzeFilter(f[0]); },
+              style: Object.assign({}, knopfLeer, filter === f[0] ? { background: CI.blau, color: "#fff", borderColor: CI.blau } : {}) }, f[1]); }),
+          E("select", { value: katF, style: Object.assign({}, feld, { width: "auto" }), onChange: function (e) { setzeKatF(e.target.value); } },
+            [E("option", { key: "", value: "" }, "alle Kategorien")].concat(Object.keys(S_KAT).map(function (x) { return E("option", { key: x, value: x }, S_KAT[x]); }))),
+          E("button", { type: "button", style: Object.assign({}, knopfLeer, { marginLeft: "auto" }), onClick: function () {
+            csvExport("support-anfragen.csv", [["Erstellt", "erstellt_am"], ["Mandant", "mandant_name"], ["Betreff", "betreff"], ["Kategorie", "kategorie"],
+              ["Prioritaet", "prioritaet"], ["Stand", "status"], ["Zustaendig", "zustaendig_name"], ["Erste Antwort", "erste_antwort_am"], ["Geloest", "geloest_am"]], liste); } }, "CSV")),
+        E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+          !liste.length ? E("div", { style: { padding: 18, fontSize: 13, color: CI.muted } }, "Keine Anfrage in dieser Auswahl.")
+          : E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 820 } },
+            E("thead", null, E("tr", null, ["Gestellt", "Haus", "Betreff", "Art", "Prio", "Stand", "Zuständig"].map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
+            E("tbody", null, liste.map(function (a) {
+              return E("tr", { key: a.id, style: { cursor: "pointer" }, onClick: function () { setzeOffenA(a.id); } },
+                E("td", { style: Object.assign({}, zelle, { whiteSpace: "nowrap" }) }, zeit(a.erstellt_am)),
+                E("td", { style: zelle }, a.mandant_name || "—"),
+                E("td", { style: Object.assign({}, zelle, { fontWeight: 600, color: CI.blau }) }, a.betreff),
+                E("td", { style: zelle }, S_KAT[a.kategorie] || a.kategorie),
+                E("td", { style: Object.assign({}, zelle, { color: a.prioritaet === "hoch" ? CI.danger : CI.muted }) }, a.prioritaet),
+                E("td", { style: zelle }, S_STAND[a.status] || a.status),
+                E("td", { style: zelle }, a.zustaendig_name || "—"));
+            })))),
+
+        E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+          E("div", { style: { padding: "16px 18px 0" } }, Ueberschrift("Zugriffsanfragen und Sitzungen (letzte 100)")),
+          !(d.zugriffe || []).length ? E("div", { style: { padding: "0 18px 16px", fontSize: 13, color: CI.muted } }, "Noch keine.")
+          : E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 760 } },
+            E("thead", null, E("tr", null, ["Angefragt", "Haus", "Betreiber", "Umfang", "Dauer", "Stand", "Grund"].map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
+            E("tbody", null, d.zugriffe.map(function (z) {
+              var stand = z.abgelehnt_am ? "abgelehnt" : z.beendet_am ? "beendet" : !z.freigegeben_am ? "wartet" : new Date(z.gueltig_bis) > new Date() ? "läuft" : "abgelaufen";
+              return E("tr", { key: z.id },
+                E("td", { style: Object.assign({}, zelle, { whiteSpace: "nowrap" }) }, zeit(z.begonnen_am)),
+                E("td", { style: zelle }, z.mandant_name || "—"), E("td", { style: zelle }, z.admin_name || "—"),
+                E("td", { style: zelle }, z.schreiben ? "lesen + ändern" : "nur lesen"), E("td", { style: zelle }, zahl(z.dauer_minuten) + " min"),
+                E("td", { style: Object.assign({}, zelle, { color: stand === "läuft" ? CI.danger : stand === "wartet" ? CI.gold : CI.muted, fontWeight: 600 }) }, stand),
+                E("td", { style: Object.assign({}, zelle, { fontSize: 11.5, color: CI.muted }) }, z.grund));
+            })))),
+        E("p", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.7 } },
+          "Zugriffsanfragen stellt man in der Mandantenansicht. Freigeben kann nur der Chef des Hauses; was der Betreiber in der Sitzung tut, liest der Kunde in seinen Einstellungen.")));
+  }
+
   // --- Technik & Jobs (fork_75) ----------------------------------------------
   function Lampe(p) {
     var f = p.stand === "gruen" ? CI.success : p.stand === "gelb" ? CI.gold
@@ -1686,6 +1821,8 @@
     // betreiber_sitzung_minuten, Start 30) faellt die Tafel in den
     // Anfangszustand zurueck und fragt den zweiten Faktor erneut ab.
     var gesperrtZ = React.useState(false), gesperrt = gesperrtZ[0], setzeGesperrt = gesperrtZ[1];
+    // fork_77: eine Zugriffsanfrage, die noch auf den Chef wartet.
+    var anfZ = React.useState(null), anfrage = anfZ[0], setzeAnfrage = anfZ[1];
     React.useEffect(function () {
       var minuten = Number(window.IMMO_BETREIBER_SITZUNG_MINUTEN || 30);
       var zuletzt = Date.now();
@@ -1715,6 +1852,7 @@
         : welcher === "katalog" ? "katalog"
         : welcher === "konten" ? "nutzer"
         : welcher === "system" ? "technik"
+        : welcher === "support" ? "support"
         : welcher === "admins" ? "admin_liste"
         : welcher === "mandant" ? "mandant" : "protokoll";
       ruf(aktion, welcher === "mandant" ? { mandant_id: id } : (welcher === "zahlen" || welcher === "kosten" || welcher === "zahlungen") ? { tage: tage } : null).then(function (d) {
@@ -1728,7 +1866,7 @@
     }, [tage]);
 
     var supportLaden = React.useCallback(function () {
-      ruf("support_stand").then(function (d) { setzeSupport(d.sitzung || null); })
+      ruf("support_stand").then(function (d) { setzeSupport(d.sitzung || null); setzeAnfrage(d.anfrage || null); })
         .catch(function () { /* ohne Anzeige laeuft der Rest weiter */ });
     }, []);
 
@@ -1748,7 +1886,7 @@
     function melden(text, art) { setzeMeldung({ text: text, art: art || "ok" }); }
 
     async function supportBeenden() {
-      try { await ruf("support_ende"); setzeSupport(null);
+      try { await ruf("support_ende"); setzeSupport(null); setzeAnfrage(null);
         melden("Supportzugriff beendet."); }
       catch (f) { melden(f.message || String(f), "fehler"); }
     }
@@ -1776,6 +1914,7 @@
       ["mandanten", "Mandanten", ["owner", "admin", "support", "finanzen"]],
       ["konten", "Konten", ["owner", "admin", "support"]],
       ["katalog", "Katalog", ["owner", "admin", "support", "finanzen"]],
+      ["support", "Support", ["owner", "admin", "support"]],
       ["system", "Technik", ["owner", "admin"]],
       ["admins", "Admins", ["owner", "admin", "support", "finanzen"]],
       ["protokoll", "Audit-Log", ["owner", "admin", "support", "finanzen"]]];
@@ -1806,6 +1945,15 @@
           + " · bis " + zeit(support.gueltig_bis)),
         E("button", { type: "button", style: knopfLeer, onClick: supportBeenden },
           "Jetzt beenden")) : null,
+      !support && anfrage ? E("div", { "data-support-anfrage": "1", style: {
+        background: "#f3f5f9", border: "1px solid " + CI.border, color: CI.blau,
+        padding: "10px 14px", marginBottom: 16, fontSize: 13.5, borderRadius: 8,
+        display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap",
+      } },
+        E("strong", null, "Zugriffsanfrage wartet"),
+        E("span", null, (anfrage.mandant_name || anfrage.mandant_id) + " · der Chef des Hauses muss freigeben · "
+          + (anfrage.schreiben ? "lesen und ändern" : "nur lesen") + " · " + zahl(anfrage.dauer_minuten) + " min"),
+        E("button", { type: "button", style: knopfLeer, onClick: supportBeenden }, "Zurückziehen")) : null,
       E("div", { style: { display: "flex", borderBottom: "1px solid " + CI.border, marginBottom: 20, flexWrap: "wrap" } },
         reiterListe.map(function (r) {
           var an = reiter === r[0] && !offen;
@@ -1847,6 +1995,8 @@
         : reiter === "zahlungen" ? E(Zahlungen, { daten: daten.zahlungen, rolle: rolle, melden: melden, neuLaden: function () { laden("zahlungen"); },
             oeffnen: function (id) { setzeOffen(id); } })
         : reiter === "funktionen" ? E(Funktionen, { daten: daten.funktionen, rolle: rolle, melden: melden, neuLaden: function () { laden("funktionen"); } })
+        : reiter === "support" ? E(Support, { daten: daten.support, rolle: rolle, melden: melden, neuLaden: function () { laden("support"); },
+            oeffnen: function (id) { setzeOffen(id); } })
         : reiter === "system" ? E(System, { daten: daten.system, rolle: rolle, melden: melden, neuLaden: function () { laden("system"); } })
         : reiter === "admins" ? E(Admins, { daten: daten.admins, konten: daten.konten, rolle: rolle,
             melden: melden, neuLaden: function () { laden("admins"); if (rolle === "owner") laden("konten"); } })

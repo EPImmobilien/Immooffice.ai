@@ -755,6 +755,13 @@ else
   schlecht
 fi
 
+abschnitt "Betreiber-Support: Anfragen, Freigabe, Protokoll"
+if scripts/lokale-db.sh psql -q -f tests/betreiber-support.sql; then
+  :
+else
+  schlecht
+fi
+
 abschnitt "IMAP: liest der Abruf die Ordnerliste jedes Servers?"
 node tests/imap-ordnerliste.js || schlecht
 

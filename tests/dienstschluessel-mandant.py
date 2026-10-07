@@ -174,6 +174,8 @@ BUCH = {
     # Ein Cron hat keinen Mandanten. Er liest die Warteschlange ueber alle
     # Mandanten und arbeitet danach je Zeile im Mandanten DIESER Zeile
     # weiter — die Bauform aus Phase 2 ("ein Lauf je Mandant").
+    ('plattform-admin', 'support_anfragen'):
+        (1, 'BEABSICHTIGT', 'Betreiber: Support-Anfragen aller Mandanten — sie sind an ihn gerichtet (fork_77)'),
     ('plattform-admin', 'stripe_rechnungen'):
         (3, 'BEABSICHTIGT', 'Betreiber: Rechnungen aller Mandanten fuer Zahlungen, Export, Erstattung (fork_74)'),
     ('plattform-stripe-abgleich', 'stripe_rechnungen'):

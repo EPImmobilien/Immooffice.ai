@@ -37,15 +37,18 @@ declare
   v_chef_a uuid := gen_random_uuid();
   v_chef_b uuid := gen_random_uuid();
   v_admin  uuid := gen_random_uuid();
+  v_mit_a  uuid := gen_random_uuid();
 begin
   insert into public.mandanten (name, slug) values ('Alpha', 'sup-a') returning id into v_a;
   insert into public.mandanten (name, slug) values ('Beta',  'sup-b') returning id into v_b;
   insert into public.mandanten (name, slug) values ('Platt', 'sup-platt') returning id into v_p;
 
   insert into auth.users (id, email) values
-    (v_chef_a, 'a@sup.example'), (v_chef_b, 'b@sup.example'), (v_admin, 'admin@sup.example');
+    (v_chef_a, 'a@sup.example'), (v_chef_b, 'b@sup.example'), (v_admin, 'admin@sup.example'),
+    (v_mit_a, 'mit@sup.example');
   insert into public.profiles (id, name, email, role, mandant_id) values
     (v_chef_a, 'Chef A', 'a@sup.example', 'chef', v_a),
+    (v_mit_a, 'Mitarbeiter A', 'mit@sup.example', 'mitarbeiter', v_a),
     (v_chef_b, 'Chef B', 'b@sup.example', 'chef', v_b),
     (v_admin,  'Admin',  'admin@sup.example', 'chef', v_p);
 
@@ -55,7 +58,8 @@ begin
   insert into public.plattform_admins (benutzer_id, notiz) values (v_admin, 'Pruefung');
 
   insert into wer values ('a', v_a), ('b', v_b), ('p', v_p),
-                         ('chef_a', v_chef_a), ('chef_b', v_chef_b), ('admin', v_admin);
+                         ('chef_a', v_chef_a), ('chef_b', v_chef_b), ('admin', v_admin),
+                         ('mit_a', v_mit_a);
 end $$;
 
 -- --- 1. Ohne Sitzung: nichts Fremdes --------------------------------------
@@ -80,8 +84,8 @@ declare v_admin uuid := (select wert from wer where was='admin');
         v_a uuid := (select wert from wer where was='a');
         v_sicht uuid; v_n_a int; v_n_b int; v_schreiben uuid;
 begin
-  insert into public.support_sitzungen (admin_id, mandant_id, grund, gueltig_bis)
-    values (v_admin, v_a, 'Kunde meldet fehlende Bilder', now() + interval '30 minutes');
+  insert into public.support_sitzungen (freigegeben_am, admin_id, mandant_id, grund, gueltig_bis)
+    values (now(), v_admin, v_a, 'Kunde meldet fehlende Bilder', now() + interval '30 minutes');
 
   perform set_config('request.jwt.claims', json_build_object('sub', v_admin)::text, true);
   set local role authenticated;
@@ -152,8 +156,8 @@ declare v_admin uuid := (select wert from wer where was='admin');
         v_ok boolean := false; v_fremd boolean := false; v_n int;
 begin
   update public.support_sitzungen set beendet_am = now() where admin_id = v_admin;
-  insert into public.support_sitzungen (admin_id, mandant_id, grund, schreiben, gueltig_bis)
-    values (v_admin, v_a, 'Datensatz auf Wunsch des Kunden berichtigen', true,
+  insert into public.support_sitzungen (freigegeben_am, admin_id, mandant_id, grund, schreiben, gueltig_bis)
+    values (now(), v_admin, v_a, 'Datensatz auf Wunsch des Kunden berichtigen', true,
             now() + interval '30 minutes');
 
   perform set_config('request.jwt.claims', json_build_object('sub', v_admin)::text, true);
@@ -182,8 +186,8 @@ declare v_admin uuid := (select wert from wer where was='admin');
         v_sicht uuid; v_n int;
 begin
   update public.support_sitzungen set beendet_am = now() where admin_id = v_admin;
-  insert into public.support_sitzungen (admin_id, mandant_id, grund, begonnen_am, gueltig_bis)
-    values (v_admin, (select wert from wer where was='a'), 'Laengst vorbei',
+  insert into public.support_sitzungen (freigegeben_am, admin_id, mandant_id, grund, begonnen_am, gueltig_bis)
+    values (now(), v_admin, (select wert from wer where was='a'), 'Laengst vorbei',
             now() - interval '3 hours', now() - interval '1 hour');
 
   perform set_config('request.jwt.claims', json_build_object('sub', v_admin)::text, true);
@@ -203,8 +207,8 @@ do $$
 declare v_admin uuid := (select wert from wer where was='admin'); v_sicht uuid;
 begin
   delete from public.support_sitzungen where admin_id = v_admin;
-  insert into public.support_sitzungen (admin_id, mandant_id, grund, gueltig_bis, beendet_am)
-    values (v_admin, (select wert from wer where was='a'), 'Von Hand beendet',
+  insert into public.support_sitzungen (freigegeben_am, admin_id, mandant_id, grund, gueltig_bis, beendet_am)
+    values (now(), v_admin, (select wert from wer where was='a'), 'Von Hand beendet',
             now() + interval '1 hour', now());
   perform set_config('request.jwt.claims', json_build_object('sub', v_admin)::text, true);
   set local role authenticated;
@@ -224,8 +228,8 @@ declare v_chef_b uuid := (select wert from wer where was='chef_b');
         v_sicht uuid; v_n int; v_nach uuid;
 begin
   delete from public.support_sitzungen;
-  insert into public.support_sitzungen (admin_id, mandant_id, grund, gueltig_bis)
-    values (v_chef_b, (select wert from wer where was='a'), 'Unbefugter Versuch',
+  insert into public.support_sitzungen (freigegeben_am, admin_id, mandant_id, grund, gueltig_bis)
+    values (now(), v_chef_b, (select wert from wer where was='a'), 'Unbefugter Versuch',
             now() + interval '1 hour');
   perform set_config('request.jwt.claims', json_build_object('sub', v_chef_b)::text, true);
   set local role authenticated;
@@ -240,8 +244,8 @@ begin
   -- Und die Gegenprobe: dem echten Admin das Recht entziehen, waehrend eine
   -- Sitzung laeuft.
   delete from public.support_sitzungen;
-  insert into public.support_sitzungen (admin_id, mandant_id, grund, gueltig_bis)
-    values (v_admin, (select wert from wer where was='a'), 'Laeuft noch',
+  insert into public.support_sitzungen (freigegeben_am, admin_id, mandant_id, grund, gueltig_bis)
+    values (now(), v_admin, (select wert from wer where was='a'), 'Laeuft noch',
             now() + interval '1 hour');
   delete from public.plattform_admins where benutzer_id = v_admin;
   perform set_config('request.jwt.claims', json_build_object('sub', v_admin)::text, true);
@@ -274,23 +278,69 @@ begin
     ('Ein unbeteiligter sieht ihn nicht', v_b = 0, v_b::text);
 end $$;
 
+-- --- 8a. Ohne Freigabe keine Sitzung (fork_77) ------------------------------
+-- Die Zeile steht, der Grund steht, die Zeit laeuft — aber der Chef hat
+-- nicht Ja gesagt. Dann sieht der Administrator: nichts Fremdes.
+do $$
+declare v_admin uuid := (select wert from wer where was='admin');
+        v_a uuid := (select wert from wer where was='a');
+        v_platt uuid := (select wert from wer where was='p');
+        v_chef_a uuid := (select wert from wer where was='chef_a');
+        v_mit_a uuid := (select wert from wer where was='mit_a');
+        v_id uuid; v_sicht uuid; v_nach uuid; v_fremd boolean := false; v_mit boolean := false;
+begin
+  update public.support_sitzungen set beendet_am = now() where beendet_am is null;
+  insert into public.support_sitzungen (admin_id, mandant_id, grund, dauer_minuten, gueltig_bis)
+    values (v_admin, v_a, 'Anfrage ohne Freigabe', 90, now() + interval '90 minutes') returning id into v_id;
+  perform set_config('request.jwt.claims', json_build_object('sub', v_admin)::text, true);
+  set local role authenticated;
+  select public.aktuelle_mandant_id() into v_sicht;
+  reset role;
+  -- Ein Mitarbeiter darf nicht freigeben, ein Chef eines anderen Hauses auch nicht.
+  perform set_config('request.jwt.claims', json_build_object('sub', v_mit_a)::text, true);
+  set local role authenticated;
+  begin perform public.support_zugriff_entscheiden(v_id, true); exception when others then v_mit := sqlstate = '42501'; end;
+  reset role;
+  perform set_config('request.jwt.claims', json_build_object('sub', (select wert from wer where was='chef_b'))::text, true);
+  set local role authenticated;
+  begin perform public.support_zugriff_entscheiden(v_id, true); exception when others then v_fremd := sqlstate = '42501'; end;
+  reset role;
+  -- Der Chef des Hauses gibt frei — ab jetzt sieht der Administrator A.
+  perform set_config('request.jwt.claims', json_build_object('sub', v_chef_a)::text, true);
+  set local role authenticated;
+  perform public.support_zugriff_entscheiden(v_id, true);
+  reset role;
+  perform set_config('request.jwt.claims', json_build_object('sub', v_admin)::text, true);
+  set local role authenticated;
+  select public.aktuelle_mandant_id() into v_nach;
+  reset role;
+  insert into befund (pruefung, bestanden, bemerkung) values
+    ('Ohne Freigabe sieht der Administrator nur sein eigenes Haus', v_sicht = v_platt, coalesce(v_sicht::text, 'null')),
+    ('Ein Mitarbeiter kann nicht freigeben', v_mit, ''),
+    ('Der Chef eines anderen Hauses kann nicht freigeben', v_fremd, ''),
+    ('Nach Freigabe durch den Chef sieht er A', v_nach = v_a, coalesce(v_nach::text, 'null')),
+    ('Die Uhr laeuft ab der Freigabe (90 Minuten)',
+     (select gueltig_bis - freigegeben_am = interval '90 minutes' from public.support_sitzungen where id = v_id), '');
+  update public.support_sitzungen set beendet_am = now() where id = v_id;
+end $$;
+
 -- --- 9. Die Grenzen der Sitzung selbst ------------------------------------
 do $$
 declare v_admin uuid := (select wert from wer where was='admin');
         v_ohne_grund boolean := true; v_zu_lang boolean := true;
 begin
   begin
-    insert into public.support_sitzungen (admin_id, mandant_id, grund, gueltig_bis)
-      values (v_admin, (select wert from wer where was='a'), 'x', now() + interval '10 minutes');
+    insert into public.support_sitzungen (freigegeben_am, admin_id, mandant_id, grund, gueltig_bis)
+    values (now(), v_admin, (select wert from wer where was='a'), 'x', now() + interval '10 minutes');
   exception when others then v_ohne_grund := false; end;
   begin
-    insert into public.support_sitzungen (admin_id, mandant_id, grund, gueltig_bis)
-      values (v_admin, (select wert from wer where was='a'), 'Ein ordentlicher Grund',
+    insert into public.support_sitzungen (freigegeben_am, admin_id, mandant_id, grund, gueltig_bis)
+    values (now(), v_admin, (select wert from wer where was='a'), 'Ein ordentlicher Grund',
               now() + interval '2 days');
   exception when others then v_zu_lang := false; end;
   insert into befund (pruefung, bestanden, bemerkung) values
     ('Ohne ordentlichen Grund keine Sitzung', not v_ohne_grund, ''),
-    ('Laenger als vier Stunden geht nicht', not v_zu_lang, '');
+    ('Laenger als 24 Stunden geht nicht', not v_zu_lang, '');
 end $$;
 
 -- --- Aufraeumen und Urteil -------------------------------------------------

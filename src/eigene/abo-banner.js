@@ -101,6 +101,18 @@
       var uhr = setInterval(fragen, 60000);
       return function () { weg = true; clearInterval(uhr); };
     }, []);
+    // fork_77: jeder Seitenwechsel waehrend der Sitzung steht im Protokoll
+    // des Mandanten. Gemeldet wird die Adresse, nicht der Inhalt.
+    React.useEffect(function () {
+      if (!sitzung || !window._sb) return;
+      function melden() {
+        try { window._sb.rpc("support_seite_protokollieren", { p_was: String(window.location.hash || "#/") }); }
+        catch (e) { /* das Protokoll ist Pflicht, aber kein Grund, die Seite anzuhalten */ }
+      }
+      melden();
+      window.addEventListener("hashchange", melden);
+      return function () { window.removeEventListener("hashchange", melden); };
+    }, [sitzung && sitzung.id]);
     if (!sitzung) return null;
     return E("div", { "data-support-band": "1", style: {
       background: "#6b2f2f", color: "#fff", fontSize: 13.5,

@@ -38,6 +38,27 @@ function stripeModus(): "test" | "live" | null {
   const s = Deno.env.get("STRIPE_SECRET_KEY") || "";
   return s.startsWith("sk_test_") ? "test" : s.startsWith("sk_live_") ? "live" : null;
 }
+
+/** Eine kurze Nachricht an den Mandanten — best effort. Ohne RESEND_API_KEY
+ *  oder Absender geht nichts hinaus, und die Aktion scheitert daran NICHT:
+ *  die Datenbank ist die Wahrheit, die Mail nur der Hinweis darauf. */
+async function mailen(an: string[], betreff: string, zeilen: string[]): Promise<boolean> {
+  const schluessel = Deno.env.get("RESEND_API_KEY") || "";
+  const absender = Deno.env.get("SMTP_FROM_EMAIL") || "";
+  const empfaenger = an.filter((a) => /@/.test(a));
+  if (!schluessel || !absender || !empfaenger.length) return false;
+  const sicher = (t: string) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const html = "<div style=\"font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.65;color:#1B2A47\">"
+    + zeilen.map((z) => z ? `<p style="margin:0 0 12px">${sicher(z)}</p>` : "").join("") + "</div>";
+  try {
+    const r = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + schluessel, "Content-Type": "application/json" },
+      body: JSON.stringify({ from: `immoOffice.ai <${absender}>`, to: empfaenger, subject: betreff, text: zeilen.join("\n"), html }),
+    });
+    return r.ok;
+  } catch { return false; }
+}
 async function stripe(pfad: string, felder: Record<string, string>, methode = "POST") {
   const schluessel = Deno.env.get("STRIPE_SECRET_KEY") || "";
   if (!stripeModus()) throw new Error("STRIPE_SECRET_KEY fehlt oder ist kein sk_test_/sk_live_-Schluessel.");
@@ -91,6 +112,10 @@ const ROLLEN: Record<string, string[]> = {
   vorgang_freigeben:      ["owner", "admin"],
   fehler_erledigt:        ["owner", "admin"],
   speicher:               ["owner", "admin"],
+  support:                ["owner", "admin", "support"],
+  support_anfrage:        ["owner", "admin", "support"],
+  support_antworten:      ["owner", "admin", "support"],
+  support_anfrage_setzen: ["owner", "admin", "support"],
   fixkosten_speichern:    ["owner", "admin"],
   fixkosten_loeschen:     ["owner", "admin"],
   uebersicht:             ["owner", "admin", "support", "finanzen"],
@@ -298,6 +323,106 @@ Deno.serve(async (req) => {
       }
       await protokoll("tarif_umgestellt", schluessel, { grund, ergebnis }, { typ: "plattform_tarife" });
       return antwort({ ok: true, ergebnis });
+    }
+
+    // --- Support-Anfragen (fork_77) ----------------------------------------
+    if (aktion === "support") {
+      const [{ data: kennzahlen, error }, { data: anfragen }, { data: namen }, { data: zugriffe }] = await Promise.all([
+        db.rpc("plattform_support_kennzahlen"),
+        db.from("support_anfragen").select("*").order("erstellt_am", { ascending: false }).limit(300),
+        db.from("mandanten").select("id, name"),
+        db.from("support_sitzungen").select("id, mandant_id, admin_id, grund, schreiben, dauer_minuten, begonnen_am, freigegeben_am, abgelehnt_am, gueltig_bis, beendet_am")
+          .order("begonnen_am", { ascending: false }).limit(100),
+      ]);
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      const name = new Map((namen || []).map((m) => [String(m.id), m.name]));
+      const { data: admins } = await db.from("plattform_admins").select("benutzer_id, rolle");
+      const adminIds = (admins || []).map((a) => String(a.benutzer_id));
+      const { data: adminProfile } = adminIds.length
+        ? await db.from("profiles").select("id, name, email").in("id", adminIds) : { data: [] };
+      const adminName = new Map((adminProfile || []).map((a) => [String(a.id), a.name || a.email]));
+      const nutzerIds = Array.from(new Set((anfragen || []).map((a) => String(a.nutzer_id || "")).filter(Boolean)));
+      const { data: nutzer } = nutzerIds.length
+        ? await db.from("profiles").select("id, name, email").in("id", nutzerIds) : { data: [] };
+      const nutzerName = new Map((nutzer || []).map((n) => [String(n.id), n.name || n.email]));
+      return antwort({ ok: true, kennzahlen: kennzahlen || {},
+        anfragen: (anfragen || []).map((a) => ({ ...a, mandant_name: name.get(String(a.mandant_id)) || null,
+          nutzer_name: nutzerName.get(String(a.nutzer_id)) || null, zustaendig_name: adminName.get(String(a.zustaendig_id)) || null })),
+        zugriffe: (zugriffe || []).map((z) => ({ ...z, mandant_name: name.get(String(z.mandant_id)) || null,
+          admin_name: adminName.get(String(z.admin_id)) || null })),
+        admins: (adminProfile || []).map((a) => ({ id: a.id, name: a.name || a.email })),
+        stripe_modus: stripeModus() });
+    }
+    if (aktion === "support_anfrage") {
+      const id = String(body.id || "");
+      if (!id) return antwort({ ok: false, fehler: "Keine Anfrage." }, 400);
+      const [{ data: a }, { data: antworten }] = await Promise.all([
+        db.from("support_anfragen").select("*").eq("id", id).maybeSingle(),
+        db.from("support_antworten").select("*").eq("anfrage_id", id).order("erstellt_am"),
+      ]);
+      if (!a) return antwort({ ok: false, fehler: "Anfrage nicht gefunden." }, 404);
+      const { data: haus } = await db.from("mandanten").select("name, abo_status").eq("id", String(a.mandant_id)).maybeSingle();
+      const { data: n } = a.nutzer_id ? await db.from("profiles").select("name, email").eq("id", String(a.nutzer_id)).maybeSingle() : { data: null };
+      return antwort({ ok: true, anfrage: { ...a, mandant_name: haus?.name || null, nutzer_name: n?.name || null, nutzer_email: n?.email || null },
+        antworten: antworten || [] });
+    }
+    if (aktion === "support_antworten") {
+      const id = String(body.id || "");
+      const text = String(body.text || "").trim();
+      if (!id || text.length < 1) return antwort({ ok: false, fehler: "Keine Antwort." }, 400);
+      const { data: a } = await db.from("support_anfragen").select("id, mandant_id, nutzer_id, betreff, status").eq("id", id).maybeSingle();
+      if (!a) return antwort({ ok: false, fehler: "Anfrage nicht gefunden." }, 404);
+      const { data: ich } = await db.from("profiles").select("name, email").eq("id", u.user.id).maybeSingle();
+      const { error } = await db.from("support_antworten").insert({
+        anfrage_id: id, mandant_id: a.mandant_id, von_betreiber: true, autor_id: u.user.id,
+        autor_name: ich?.name || "Support", text: text.slice(0, 8000) });
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      if (!a.status || a.status === "offen") {
+        await db.from("support_anfragen").update({ zustaendig_id: u.user.id }).eq("id", id).is("zustaendig_id", null);
+      }
+      await protokoll("support_geantwortet", id, { mandant_id: a.mandant_id, zeichen: text.length }, { typ: "support_anfrage" });
+      const { data: n } = a.nutzer_id ? await db.from("profiles").select("email").eq("id", String(a.nutzer_id)).maybeSingle() : { data: null };
+      const portal = (Deno.env.get("PORTAL_URL") || "").replace(/\/$/, "");
+      const mailOk = await mailen([String(n?.email || "")], `Antwort zu Ihrer Anfrage: ${String(a.betreff).slice(0, 80)}`,
+        ["Guten Tag,", "", "zu Ihrer Anfrage gibt es eine Antwort vom Support:", "", text, "",
+         "Sie koennen im Portal unter \u201eHilfe\u201c antworten." + (portal ? ` ${portal}` : ""), "",
+         "Mit freundlichen Gruessen", "Ihr Team von immoOffice.ai"]);
+      return antwort({ ok: true, mail: mailOk });
+    }
+    if (aktion === "support_anfrage_setzen") {
+      const id = String(body.id || "");
+      if (!id) return antwort({ ok: false, fehler: "Keine Anfrage." }, 400);
+      const { data: vorher } = await db.from("support_anfragen").select("status, prioritaet, zustaendig_id, uebernahme_status, paket_rechnung_id, kategorie").eq("id", id).maybeSingle();
+      if (!vorher) return antwort({ ok: false, fehler: "Anfrage nicht gefunden." }, 404);
+      const neu: Record<string, unknown> = { aktualisiert_am: new Date().toISOString() };
+      if (body.status !== undefined) {
+        const st = String(body.status);
+        if (!["offen", "in_arbeit", "wartet_kunde", "geloest", "geschlossen"].includes(st)) return antwort({ ok: false, fehler: "Unbekannter Stand." }, 400);
+        neu.status = st;
+        if ((st === "geloest" || st === "geschlossen") && !vorher.status.match(/geloest|geschlossen/)) neu.geloest_am = new Date().toISOString();
+        if (st === "offen" || st === "in_arbeit") neu.geloest_am = null;
+      }
+      if (body.prioritaet !== undefined) {
+        const pr = String(body.prioritaet);
+        if (!["niedrig", "normal", "hoch"].includes(pr)) return antwort({ ok: false, fehler: "Unbekannte Prioritaet." }, 400);
+        neu.prioritaet = pr;
+      }
+      if (body.zustaendig_id !== undefined) neu.zustaendig_id = body.zustaendig_id ? String(body.zustaendig_id) : null;
+      if (body.uebernahme_status !== undefined) {
+        const us = body.uebernahme_status ? String(body.uebernahme_status) : null;
+        if (us && !["beauftragt", "datei_erhalten", "importiert", "abgenommen"].includes(us)) return antwort({ ok: false, fehler: "Unbekannter Uebernahme-Stand." }, 400);
+        if (us && vorher.kategorie !== "datenuebernahme") return antwort({ ok: false, fehler: "Nur bei Datenuebernahmen." }, 400);
+        neu.uebernahme_status = us;
+      }
+      if (body.paket_rechnung_id !== undefined) {
+        const pr = String(body.paket_rechnung_id || "").trim();
+        if (pr && !/^in_[A-Za-z0-9]+$/.test(pr)) return antwort({ ok: false, fehler: "Das ist keine Stripe-Rechnungskennung (in_…)." }, 400);
+        neu.paket_rechnung_id = pr || null;
+      }
+      const { error } = await db.from("support_anfragen").update(neu).eq("id", id);
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll("support_anfrage_geaendert", id, { nachher: neu }, { typ: "support_anfrage", vorher, nachher: neu });
+      return antwort({ ok: true });
     }
 
     // --- Technik & Jobs (fork_75) ------------------------------------------
@@ -753,7 +878,13 @@ Deno.serve(async (req) => {
           text: `${name.get(String(a.mandant_id))?.name || a.mandant_id}: Zahlung offen seit ${String(a.zahlung_fehler_seit).slice(0, 10)}` });
       }
       const { data: sitzungen } = await db.from("support_sitzungen").select("mandant_id, gueltig_bis")
-        .is("beendet_am", null).gt("gueltig_bis", new Date().toISOString());
+        .is("beendet_am", null).not("freigegeben_am", "is", null).gt("gueltig_bis", new Date().toISOString());
+      const { count: supportOffen } = await db.from("support_anfragen")
+        .select("id", { count: "exact", head: true }).in("status", ["offen", "in_arbeit"]);
+      const { data: alteAnfragen } = await db.from("support_anfragen").select("mandant_id, betreff, erstellt_am")
+        .in("status", ["offen", "in_arbeit"]).is("erste_antwort_am", null).lt("erstellt_am", tagVor(1)).limit(20);
+      for (const a of alteAnfragen || []) zuTun.push({ art: "support_anfrage", mandant_id: String(a.mandant_id),
+        text: `${name.get(String(a.mandant_id))?.name || a.mandant_id}: Anfrage ohne Antwort seit ${String(a.erstellt_am).slice(0, 10)} — ${String(a.betreff).slice(0, 60)}` });
       for (const s of sitzungen || []) zuTun.push({ art: "support", mandant_id: String(s.mandant_id),
         text: `${name.get(String(s.mandant_id))?.name || s.mandant_id}: Supportzugriff laeuft bis ${String(s.gueltig_bis).slice(11, 16)}` });
       for (const k of (kennzahlen || []) as Record<string, unknown>[]) {
@@ -788,7 +919,7 @@ Deno.serve(async (req) => {
         buchungen_ohne_kosten: ohneKosten,
         erloes_eur: Math.round(erloes * 100) / 100, deckungsbeitrag_eur: Math.round(deckung * 100) / 100,
         marge: erloes > 0 ? deckung / erloes : null,
-        zahlung_offen: zahlungOffen, support_offen: null, technikfehler_24h: Number(technikfehler || 0),
+        zahlung_offen: zahlungOffen, support_offen: Number(supportOffen || 0), technikfehler_24h: Number(technikfehler || 0),
         vorher, zu_tun: zuTun,
         verlauf: Array.from(monate.entries()).map(([monat, t]) => ({ monat, ...t })),
         je_aktion: Array.from(jeAktion.entries())
@@ -1269,23 +1400,37 @@ Deno.serve(async (req) => {
       }
       const { data: w } = await db.from("plattform_werte")
         .select("wert").eq("schluessel", "support_dauer_minuten").maybeSingle();
-      const minuten = Math.max(5, Math.min(240,
-        Number(String(w?.wert ?? "60").replace(/"/g, "")) || 60));
-      // Nur eine Sitzung auf einmal. Zwei gleichzeitige waeren in der
-      // Datenbank nicht entscheidbar — sie nimmt die juengste, und das waere
-      // eine Regel, die niemand sieht.
+      const vorgabe = Number(String(w?.wert ?? "60").replace(/"/g, "")) || 60;
+      // fork_77: 1–24 Stunden, der Chef gewaehrt sie. Die Uhr stellt erst
+      // die Freigabe; bis dahin ist die Zeile eine ANFRAGE.
+      const minuten = Math.max(5, Math.min(1440, Math.floor(Number(body.dauer_minuten || vorgabe))));
+      // Nur eine Sitzung oder Anfrage auf einmal. Zwei gleichzeitige waeren
+      // in der Datenbank nicht entscheidbar — sie nimmt die juengste, und
+      // das waere eine Regel, die niemand sieht.
       await db.from("support_sitzungen")
         .update({ beendet_am: new Date().toISOString() })
         .eq("admin_id", u.user.id).is("beendet_am", null);
       const { data: neu, error } = await db.from("support_sitzungen").insert({
         admin_id: u.user.id, mandant_id: id, grund: grund.slice(0, 500),
-        schreiben,
+        schreiben, dauer_minuten: minuten,
         gueltig_bis: new Date(Date.now() + minuten * 60000).toISOString(),
-      }).select("id, gueltig_bis, schreiben").single();
+      }).select("id, gueltig_bis, schreiben, dauer_minuten").single();
       if (error) return antwort({ ok: false, fehler: error.message }, 400);
-      await protokoll("support_begonnen", id,
+      await protokoll("support_angefragt", id,
         { grund, schreiben, minuten, sitzung: neu?.id });
-      return antwort({ ok: true, sitzung: neu });
+      // Der Chef des Hauses erfaehrt es im Portal (Band) und per Mail.
+      const { data: chefs } = await db.from("profiles").select("email").eq("mandant_id", id).eq("role", "chef");
+      const { data: haus } = await db.from("mandanten").select("name").eq("id", id).maybeSingle();
+      const portal = (Deno.env.get("PORTAL_URL") || "").replace(/\/$/, "");
+      const mailOk = await mailen((chefs || []).map((c) => String(c.email || "")),
+        "Support-Zugriff angefragt — bitte freigeben oder ablehnen",
+        ["Guten Tag,", "",
+         `der Support von immoOffice.ai bittet um ${schreiben ? "Lese- und Schreibzugriff" : "Lesezugriff"} auf ${haus?.name || "Ihr Haus"} fuer ${minuten >= 60 ? Math.round(minuten / 60) + " Stunde(n)" : minuten + " Minuten"}.`,
+         `Grund: ${grund}`, "",
+         "Ohne Ihre Freigabe sieht der Support nichts. Sie entscheiden im Portal unter Einstellungen → Support-Zugriffe; dort koennen Sie den Zugriff auch jederzeit beenden und nachlesen, was waehrenddessen geschah.",
+         portal ? `Portal: ${portal}` : "", "",
+         "Mit freundlichen Gruessen", "Ihr Team von immoOffice.ai"]);
+      return antwort({ ok: true, sitzung: neu, mail: mailOk });
     }
 
     if (aktion === "support_ende") {
@@ -1301,15 +1446,19 @@ Deno.serve(async (req) => {
     }
 
     if (aktion === "support_stand") {
-      const { data } = await db.from("support_sitzungen")
-        .select("id, mandant_id, grund, schreiben, begonnen_am, gueltig_bis")
-        .eq("admin_id", u.user.id).is("beendet_am", null)
-        .gt("gueltig_bis", new Date().toISOString())
-        .order("begonnen_am", { ascending: false }).limit(1).maybeSingle();
-      if (!data) return antwort({ ok: true, sitzung: null });
-      const { data: m } = await db.from("mandanten")
-        .select("name").eq("id", data.mandant_id).maybeSingle();
-      return antwort({ ok: true, sitzung: { ...data, mandant_name: m?.name || null } });
+      // fork_77: eine Sitzung ist erst mit Freigabe eine; davor ist sie eine
+      // Anfrage, die das Band im Betreiberbereich als „wartet" zeigt.
+      const { data: zeilen } = await db.from("support_sitzungen")
+        .select("id, mandant_id, grund, schreiben, begonnen_am, gueltig_bis, freigegeben_am, dauer_minuten")
+        .eq("admin_id", u.user.id).is("beendet_am", null).is("abgelehnt_am", null)
+        .order("begonnen_am", { ascending: false }).limit(3);
+      const jetzt = Date.now();
+      const sitzung = (zeilen || []).find((z) => z.freigegeben_am && new Date(String(z.gueltig_bis)).getTime() > jetzt) || null;
+      const anfrage = (zeilen || []).find((z) => !z.freigegeben_am && new Date(String(z.begonnen_am)).getTime() > jetzt - 7 * 86400000) || null;
+      const namen = async (id: unknown) => (await db.from("mandanten").select("name").eq("id", String(id)).maybeSingle()).data?.name || null;
+      return antwort({ ok: true,
+        sitzung: sitzung ? { ...sitzung, mandant_name: await namen(sitzung.mandant_id) } : null,
+        anfrage: anfrage ? { ...anfrage, mandant_name: await namen(anfrage.mandant_id) } : null });
     }
 
     // --- Systemzustand ------------------------------------------------------

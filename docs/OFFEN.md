@@ -1388,3 +1388,11 @@ ergänzt (Funktion, Meldung, Mandant — kein Payload). `dienst_aufrufe`
 Die Ampel „E-Mail-Zustellung" bleibt grau, bis der Versanddienst
 (Resend) seinen Ereignis-Webhook an eine eigene Funktion liefert — dann
 gibt es Zustellung, Bounce und Beschwerde je Nachricht.
+
+
+## Support-Mails brauchen die Resend-Secrets an `plattform-admin`
+
+Zugriffsanfrage an den Chef und Betreiber-Antworten gehen per Mail
+hinaus, wenn `RESEND_API_KEY` und `SMTP_FROM_EMAIL` als Function-Secrets
+gesetzt sind (docs/SECRETS.md). Ohne sie bleibt es beim Band im Portal.
+Push-Benachrichtigung gibt es nicht; die Vorlage hat keinen Push-Weg.

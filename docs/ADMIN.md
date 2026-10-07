@@ -451,7 +451,76 @@ wirft 22023, Läufe-Funktion weist support ab (42501).
 - [ ] E-Mail-Zustellung — erst mit Versanddienst-Webhook
 - [ ] Fehler aus allen Funktionen — heute nur zwei Funktionen angeschlossen
 
-## Noch offen aus dem Auftrag (Schritte 8–10)
+## Schritt 8 — Support-Anfragen, Supportzugriff mit Freigabe (fork_77) · erledigt 07.10.2026
+
+**Migration** `20261007230000_fork_77_betreiber_support.sql`.
+
+**Supportzugriff — der einzige Weg zu Fachdaten — hat jetzt vier Schritte:**
+
+1. Der Betreiber (owner/admin/support) fragt in der Mandantenansicht an:
+   Grund (≥ 5 Zeichen), Umfang (nur lesen / lesen + ändern), Dauer
+   1–24 h. Das ist eine Zeile in `support_sitzungen` **ohne**
+   `freigegeben_am`. Audit: `support_angefragt`. Der Chef des Hauses
+   bekommt eine E-Mail (Resend, best effort) und ein Band im Portal.
+2. Der `chef` entscheidet — im Band oder unter *Einstellungen →
+   Support-Zugriffe* — über `support_zugriff_entscheiden(id, ja)`.
+   Nur der Chef **dieses** Hauses; Mitarbeiter und fremde Chefs bekommen
+   42501. Bei Freigabe wird die Uhr **jetzt** gestellt
+   (`gueltig_bis = now() + dauer`).
+3. `support_sitzung()` liefert nur Sitzungen mit `freigegeben_am`. Ohne
+   Freigabe zeigt `aktuelle_mandant_id()` auf das eigene Haus des
+   Administrators — jede RLS-Richtlinie bleibt zu. Nachgewiesen in
+   `tests/supportzugriff.sql`, Block 8a.
+4. Protokoll (`support_protokoll`): jeder Seitenwechsel (das rote Band
+   meldet `location.hash` über `support_seite_protokollieren`) und jede
+   geänderte Zeile (Trigger `support_protokoll_tr` an allen 200
+   Mandantentabellen: Tabelle, Kennung, insert/update/delete — **kein
+   Inhalt**). Der Mandant liest es in den Einstellungen; der Admin liest es
+   nicht als „eigenes". Der Chef beendet jederzeit vorzeitig
+   (`support_zugriff_beenden`); automatisches Ende nach Ablauf.
+
+**Support-Anfragen** (Portal-Kachel „Hilfe & Support", für jeden im Haus):
+
+| Tabelle | Wer schreibt | Wer liest |
+|---|---|---|
+| `support_anfragen` | Mandant (insert, nur `status = offen`), Betreiber (service role: Stand, Priorität, Zuständiger, Übernahme-Stand, Paket-Rechnung) | das Haus; Betreiber |
+| `support_antworten` | Mandant (`von_betreiber = false` erzwungen), Betreiber | das Haus; Betreiber |
+
+Trigger `support_antwort_nach`: erste Betreiber-Antwort stempelt
+`erste_antwort_am`; Betreiber-Antwort → `wartet_kunde`, Kunden-Antwort →
+`offen`; gelöst/geschlossen bleiben. Der Kunde schließt selbst
+(`support_anfrage_schliessen`). Antwort des Betreibers geht per E-Mail an
+den Fragesteller (best effort) und steht im Portal.
+
+**Datenübernahme:** Kategorie `datenuebernahme` mit `uebernahme_status`
+(beauftragt → datei_erhalten → importiert → abgenommen) und
+`paket_rechnung_id` (Stripe-Rechnung `in_…` des Einrichtungspakets, Link
+ins Dashboard).
+
+**Kennzahlen** (`plattform_support_kennzahlen()`, owner/admin/support):
+offen, davon > 24 h ohne erste Antwort, Priorität hoch, erste Antwortzeit
+und Lösungszeit als **Median in Stunden über 90 Tage**, Anfragen je
+Kategorie, Übernahmen je Stand, Zugriffsanfragen offen/laufend. Die
+Übersicht zählt offene Anfragen; „Heute zu tun" nennt Anfragen ohne
+Antwort seit > 24 h.
+
+**Neue Mandantentabellen brauchen den Trigger:** Block 6 der Migration
+(Schleife über `mandanten_einstufung`, Gruppe MANDANT) in der nächsten
+Migration wiederholen — er ist idempotent.
+
+`tests/betreiber-support.sql`: 19 Prüfungen (Hausgrenze, kein falscher
+Betreiber, Statuswechsel, Protokoll von Seite und Änderung, Kennzahlen
+nur Betreiber).
+
+### Abnahme Schritt 8
+
+- [x] Anfrage → Freigabe durch `chef` → Banner (rot, nicht wegklickbar) → Zugriff endet automatisch → Mandant sieht Protokoll
+- [x] Ohne Freigabe kein Zugriff (RLS-Test mit echten Abfragen)
+- [x] Tickets: Mandant stellt, Betreiber antwortet (Dashboard + E-Mail + Portal), Kennzahlen
+- [x] Datenübernahme als eigener Anfragetyp mit Stand und Paketverknüpfung
+- [ ] E-Mail-Versand live nachweisen — braucht `RESEND_API_KEY`/`SMTP_FROM_EMAIL` als Function-Secrets
+
+## Noch offen aus dem Auftrag (Schritte 9–10)
 
 Werden hier je Schritt nachgetragen. Reihenfolge wie im Auftrag.
 

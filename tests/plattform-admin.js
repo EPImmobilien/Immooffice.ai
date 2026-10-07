@@ -50,6 +50,8 @@ const ERLAUBT = new Set([
   'plattform_features', 'tarif_features', 'mandant_features',
   // Abbild der Stripe-Rechnungen (Kopfdaten) und der Abgleich: Vertragsdaten.
   'stripe_rechnungen', 'stripe_abgleich', 'system_fehler', 'dienst_aufrufe', 'stripe_ereignisse',
+  // fork_77: Support-Anfragen sind an den Betreiber gerichtet — er liest und beantwortet sie.
+  'support_anfragen', 'support_antworten',
   // Nur GEZAEHLT (head: true) fuer "Technikfehler 24 h"; keine Meldung geht hinaus.
   'fehler_protokoll',
   // Die Vertragsbeziehung. `credit_konten` und `credit_buchungen` sind das
@@ -183,7 +185,8 @@ melde('ein entzogenes Recht beendet laufende Sitzungen',
 melde('eine neue Sitzung beendet die vorherige',
       /aktion === "support_start"[\s\S]{0,1600}?is\("beendet_am", null\)[\s\S]{0,400}?\.insert\(\{/.test(q),
       'zwei gleichzeitige Sitzungen waeren eine Regel, die niemand sieht');
-melde('die Dauer ist nach oben begrenzt', /Math\.min\(240/.test(q));
+// fork_77: 24 Stunden, weil der Chef sie gewaehrt — nicht mehr der Admin sich selbst.
+melde('die Dauer ist nach oben begrenzt', /Math\.min\(1440/.test(q));
 melde('ein Supportzugriff verlangt einen Grund, den der Mandant lesen kann',
       /der Mandant kann ihn nachlesen/.test(q));
 // Die Zurueckseten-Mail geht an die HINTERLEGTE Adresse. Eine Adresse aus
@@ -269,6 +272,15 @@ if (fs.existsSync(TAFEL)) {
         aktion: 'ki_text', credits: 3, zeitpunkt: '2026-10-05T08:00:00Z' }],
       dienste: [], stunden: 24, stripe_modus: 'test',
     },
+    support: {
+      kennzahlen: { offen: 2, offen_aelter_24h: 1, hoch_offen: 1, erste_antwort_median_h: 3.5, loesung_median_h: 20,
+        je_kategorie: { fehler: 2 }, uebernahmen: {}, zugriffe_offen: 1, zugriffe_laufend: 0 },
+      anfragen: [{ id: 'anf1', mandant_id: 'a', mandant_name: 'Alpha GmbH', betreff: 'Bilder fehlen im Expose', kategorie: 'fehler',
+        prioritaet: 'hoch', status: 'offen', zustaendig_name: null, erstellt_am: '2026-10-06T08:00:00Z', aktualisiert_am: '2026-10-06T08:00:00Z' }],
+      zugriffe: [{ id: 'z1', mandant_id: 'a', mandant_name: 'Alpha GmbH', admin_name: 'Owner', schreiben: false, dauer_minuten: 60,
+        begonnen_am: '2026-10-06T09:00:00Z', freigegeben_am: null, abgelehnt_am: null, gueltig_bis: '2026-10-06T10:00:00Z', beendet_am: null, grund: 'Ticket anf1' }],
+      admins: [{ id: 'o', name: 'Owner' }], stripe_modus: 'test',
+    },
     mandant: {
       mandant: { id: 'a', name: 'Alpha GmbH', slug: 'alpha', erstellt_am: '2026-01-02',
         testphase_bis: null, gesperrt_am: null },
@@ -285,7 +297,7 @@ if (fs.existsSync(TAFEL)) {
     },
   };
 
-  for (const reiter of ['zahlen', 'mandanten', 'konten', 'katalog', 'system',
+  for (const reiter of ['zahlen', 'mandanten', 'konten', 'katalog', 'system', 'support',
                         'protokoll', 'DETAIL']) {
     let i = 0;
     const detail = reiter === 'DETAIL';
@@ -383,6 +395,12 @@ if (fs.existsSync(TAFEL)) {
       melde('Technik: die haengende Reservierung ist freigebbar', /c0ffee00/.test(text) && /Freigeben/.test(text));
       melde('System: und es wird gesagt, warum der Wortlaut fehlt',
             /Supportzugriff/.test(text), text.slice(-200));
+    }
+    if (reiter === 'support') {
+      melde('Support: die Anfrage steht da', /Bilder fehlen im Expose/.test(text) && /Alpha GmbH/.test(text));
+      melde('Support: die Zugriffsanfrage wartet auf den Chef', /wartet/.test(text) && /Ticket anf1/.test(text));
+      melde('Support: die Tafel sagt, dass nur der Chef freigibt',
+            /Freigeben kann nur der Chef des Hauses/.test(text));
     }
     if (detail) {
       melde('Detail: das Haus steht da', /Alpha GmbH/.test(text));

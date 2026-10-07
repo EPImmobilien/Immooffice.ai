@@ -475,11 +475,21 @@ zuwachs(bereich, mehr, grund) as (values
   ('Primaer- und Eindeutigkeitsschluessel', 2, 'fork_75: je ein Primaerschluessel'),
   ('Indizes ohne Constraint', 2, 'fork_75: je nach Zeit'),
   ('Richtlinien', 3, 'fork_75: lesen und erledigen system_fehler, lesen dienst_aufrufe'),
-  ('Funktionen', 4, 'fork_75: cron_laeufe, cron_job_jetzt, plattform_speicher, plattform_technik')
-,
-
+  ('Funktionen', 4, 'fork_75: cron_laeufe, cron_job_jetzt, plattform_speicher, plattform_technik'),
   -- fork_76: Erstattung nimmt die Credits mit.
-  ('Funktionen', 1, 'fork_76: credits_erstattung')),
+  ('Funktionen', 1, 'fork_76: credits_erstattung'),
+  -- fork_77: Betreiber, Schritt 8 — Support-Anfragen, Supportzugriff mit Freigabe.
+  ('Tabellen', 3, 'fork_77: support_protokoll, support_anfragen, support_antworten'),
+  ('Tabellen mit RLS', 3, 'fork_77: alle drei'),
+  ('Spalten', 37, 'fork_77: 5 support_sitzungen, 9 support_protokoll, 15 support_anfragen, 8 support_antworten'),
+  ('Primaer- und Eindeutigkeitsschluessel', 3, 'fork_77: je ein Primaerschluessel'),
+  ('Indizes ohne Constraint', 7, 'fork_77: 2 + 3 + 2'),
+  ('Richtlinien', 11, 'fork_77: 3 + 4 + 4'),
+  ('Funktionen', 8, 'fork_77: Protokoll (2), Zugriffe (3), Anfragen (3)'),
+  ('Trigger', 201, 'fork_77: Aenderungsprotokoll an 200 Mandantentabellen, support_antwort_nach'),
+  ('Fremdschluessel', 9, 'fork_77: 2 support_sitzungen (freigegeben_von, beendet_von), 2 protokoll, 3 anfragen, 2 antworten'),
+  ('Pruefbedingungen', 8, 'fork_77: art; betreff, text, kategorie, prioritaet, status, uebernahme_status; text')
+),
 soll(bereich, soll) as (
   select v.bereich,
          v.soll + coalesce((select sum(z.mehr) from zuwachs z
