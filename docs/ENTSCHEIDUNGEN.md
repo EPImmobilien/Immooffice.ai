@@ -5708,3 +5708,74 @@ Das Ziel des Skripts ist jetzt
 anfasst. Gegenprobe gemacht: Ziel zurück auf fork_38 gestellt, der Test
 nennt beide Überschreiber. Lokal und live tragen jetzt dieselben drei
 Prüfsummen.
+
+---
+
+## 2026-10-07 · Der Posteingang war leer, obwohl 156 Mails darin lagen (fork_65)
+
+**Gemeldet am 06.10.2026:** „im postfach wird meine testmail bisher nicht
+angezeigt". Als offen vermerkt war das nicht — ich hatte es für eine Frage
+der fehlenden Zugangsdaten gehalten. Es war ein Fehler.
+
+**Befund:** Der Abruf lief, und er lief richtig. 156 Mails und 15 Ordner
+standen in der Datenbank, der Cron-Lauf ging alle fünf Minuten durch, die
+letzte UID stand bei 7856. Sichtbar war **keine einzige Zeile**.
+
+Alle 171 hatten `mandant_id = null`. `mail_eingang` und `mail_ordner` sind
+MANDANT-Tabellen; ihre Spalte hat den Vorgabewert `aktuelle_mandant_id()`,
+und der greift nur bei einem **angemeldeten** Nutzer.
+`mail-postfach-pull` läuft aus dem Zeitplan mit dem Dienstschlüssel — dort
+ist `auth.uid()` null. Eingefügt wurde mit null, und die restriktive
+Richtlinie vergleicht `mandant_id = aktuelle_mandant_id()`: **`null =
+irgendwas` ist null, nicht wahr.** Der Dienstschlüssel umgeht RLS und schrieb
+ohne Murren; der Nutzer sah nichts.
+
+Diese Lücke stand seit dem 28.09.2026 in diesem Dokument unter „Was offen
+bleibt": „`NOT NULL` auf `mandant_id`. Der Vorgabewert greift nur bei
+angemeldetem Nutzer; Edge Functions arbeiten mit `service_role`." Sie ist
+nicht theoretisch geblieben.
+
+**Entscheidung:** Das Postfach kennt seinen Mandanten, also wird er
+mitgeschrieben — an allen drei Einfügungen der Funktion (`mail_eingang`,
+`mail_ordner`, `mietanfragen`), als Regel im Erzeuger. Die vorhandenen
+Zeilen sind nachgetragen, und zwar nur dort, wo die Herkunft eindeutig ist:
+über das Postfach, über das Objekt. Geraten wird nichts.
+
+**Warum vier Gates das nicht gefunden haben** — das ist der eigentliche
+Befund:
+
+- Der Dienstschlüssel umgeht RLS. Die Einfügung gelang.
+- `tests/mandant-rundumschlag.sql` prüft die **Richtlinien**. Die waren in
+  Ordnung. Dass sie auf Zeilen angewendet werden, die niemandem gehören,
+  sieht es nicht.
+- „Edge Functions: schreiben sie mit Mandanten?" liest Quelltext — aber nur
+  die **öffentlichen** Endpunkte. `mail-postfach-pull` läuft aus dem
+  Zeitplan und fiel nicht darunter.
+- `tests/dienstschluessel-mandant.py` prüft **Leseabfragen** über die
+  Mandantengrenze, nicht Einfügungen ohne sie.
+
+Keines stellte die einfachste Frage: *steht in der Tabelle etwas, das
+niemandem gehört?* `tests/mandant-ohne.sql` stellt sie jetzt, bei jedem
+Commit, über jede MANDANT-Tabelle. Eine Bestandsprüfung statt einer
+Strukturprüfung — sie findet den Fehler nicht im Code, sondern an seinem
+Ergebnis, und zwar bei der ersten Zeile.
+
+**Beim ersten Lauf hat es gleich einen zweiten Fall gefunden:**
+`projekt_nachricht_glocke()` ist ein Trigger, der die Glocken-Meldung für den
+Makler anlegt, wenn ein Neubaukunde im Kundenportal schreibt. Der Kunde ist
+kein angemeldeter Nutzer der Anwendung — kein Profil, also kein Mandant, also
+eine Meldung, **die der Makler nie sieht**. Eine Glocke, die nicht klingelt.
+Behoben: der Mandant kommt vom Projekt, und wenn das Projekt keinen hat,
+bleibt die Zeile leer statt geraten zu werden.
+
+**Ein Nebenbefund an mir selbst:** `tests/mandant-aus-eltern.sql` legt
+absichtlich eine „herrenlose" Zeile an, um zu zeigen, dass der Wächter nicht
+rät — und ließ sie liegen. Sie hängt an keinem Mandanten und fällt deshalb
+nicht mit den Testmandanten weg. Ein Test, der Unsichtbares hinterlässt,
+macht das nächste Gate blind für den echten Fall. Jetzt räumt er auf.
+
+**Was offen bleibt:** achtzehn Datenbankfunktionen schreiben in
+MANDANT-Tabellen, ohne `mandant_id` zu nennen. Die meisten laufen in der
+Sitzung eines angemeldeten Nutzers, wo der Vorgabewert greift — sechs
+nicht. Einzeln aufgeführt in `docs/OFFEN.md`, mit der Abfrage, die sie
+findet. Das neue Gate fängt jede davon an ihrem Ergebnis.

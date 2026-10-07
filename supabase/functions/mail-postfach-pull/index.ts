@@ -633,6 +633,7 @@ Deno.serve(async (req) => {
           if (!existing) {
             const { data: neuerOrdner } = await admin.from("mail_ordner").insert({
               postfach_id: pf.id, name: imapF.name, anzeige_name: imapUtf7Decode(anzeige), typ,
+              mandant_id: pf.mandant_id,
               pull_aktiv: typ === "inbox" || typ === "sent" || typ === "custom" || typ === "archive",
             }).select().single();
             if (neuerOrdner) dbFoldersByName.set(imapF.name, neuerOrdner);
@@ -817,6 +818,7 @@ Deno.serve(async (req) => {
 
             const { data: eingangNeu, error: eingangErr } = await admin.from("mail_eingang").insert({
               postfach_id: pf.id, ordner_id: ordnerId, ordner: zielOrdner,
+              mandant_id: pf.mandant_id,
               message_id: messageId, imap_uid: uid, imap_folder: folderName,
               absender_email: von.erster || (istSent ? pf.email_adresse : ""), absender_name: von.ersterName,
               empfaenger_email: istSent ? (an.liste || an.erster || "") : pf.email_adresse,
@@ -855,6 +857,7 @@ Deno.serve(async (req) => {
               catch (e) { console.error(`    Claude-Fehler:`, e); }
               const { data: anfrageNeu } = await admin.from("mietanfragen").insert({
                 quelle, status: "neu", eingegangen_am: datum,
+                mandant_id: pf.mandant_id,
                 email_message_id: messageId, email_eingang_postfach: pf.email_adresse,
                 email_eingang_absender: von.erster, email_eingang_betreff: betreff,
                 email_eingang_text: textSpeicher, email_eingang_html: htmlSpeicher,

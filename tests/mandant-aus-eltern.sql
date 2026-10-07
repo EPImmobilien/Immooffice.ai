@@ -186,6 +186,17 @@ end $$;
 select nr, case when bestanden is true then 'ok  ' else 'FEHL' end as ergebnis, pruefung, bemerkung
   from befund order by nr;
 
+-- Aufraeumen. Die herrenlose Zeile aus Abschnitt 4 ist gewollt — aber sie
+-- haengt an keinem Mandanten und faellt deshalb NICHT mit den Mandanten
+-- weg, die oben geloescht werden. Sie blieb liegen, und
+-- tests/mandant-ohne.sql meldete sie zu Recht: eine Zeile ohne Mandanten
+-- ist fuer jeden Nutzer unsichtbar. Ein Test, der Unsichtbares
+-- hinterlaesst, macht das naechste Gate blind fuer den echten Fall.
+delete from public.vermerke where titel in ('herrenlos', 'am Kontakt');
+delete from public.kontakte where vorname = 'Probe' and nachname = 'Kontakt';
+delete from public.aktivitaeten where titel in ('ueber den Eigentuemer',
+                                                'ueber den Empfaenger');
+
 do $$
 declare n int; liste text;
 begin

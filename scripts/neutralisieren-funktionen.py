@@ -4459,6 +4459,50 @@ NACHBESSERN = [
      '    if (credits) await credits.freigeben("Abbruch: " + meldung);',
      'Credits: ein Abbruch gibt die Credits zurueck.',
      {'signatur-vorgang-starten'}),
+
+    # =====================================================================
+    # fork_65 — der Posteingang war leer, obwohl 156 Mails darin lagen
+    #
+    # Gemeldet am 06.10.2026: „im postfach wird meine testmail bisher nicht
+    # angezeigt". Der Abruf lief, und er lief richtig: 156 Mails und 15
+    # Ordner standen in der Datenbank. Sichtbar war keine einzige.
+    #
+    # Grund: mail_eingang, mail_ordner und mietanfragen sind
+    # MANDANT-Tabellen, und ihre Spalte mandant_id hat den Vorgabewert
+    # aktuelle_mandant_id(). Der greift nur bei einem ANGEMELDETEN Nutzer.
+    # mail-postfach-pull laeuft aus dem Zeitplan mit dem Dienstschluessel —
+    # dort ist auth.uid() null, also auch der Vorgabewert. Eingefuegt wurde
+    # mit mandant_id = null, und die restriktive Richtlinie vergleicht
+    # `mandant_id = aktuelle_mandant_id()`: null = irgendwas ist null, nicht
+    # wahr. Der Dienstschluessel umgeht RLS und schrieb ohne Murren; der
+    # Nutzer sah nichts.
+    #
+    # Das ist genau die Luecke, die docs/ENTSCHEIDUNGEN.md am 28.09.2026
+    # unter „Was offen bleibt" notiert hat: „NOT NULL auf mandant_id. Der
+    # Vorgabewert greift nur bei angemeldetem Nutzer; Edge Functions
+    # arbeiten mit service_role."
+    #
+    # Das Postfach kennt seinen Mandanten (mail_postfaecher.mandant_id, aus
+    # Phase 2). Er wird jetzt mitgeschrieben — an allen drei Einfuegungen.
+    # =====================================================================
+    ('FORK',
+     'postfach_id: pf.id, ordner_id: ordnerId, ordner: zielOrdner,',
+     'postfach_id: pf.id, ordner_id: ordnerId, ordner: zielOrdner,\n'
+     '              mandant_id: pf.mandant_id,',
+     'Posteingang: die Mail traegt den Mandanten des Postfachs.',
+     {'mail-postfach-pull'}),
+    ('FORK',
+     'postfach_id: pf.id, name: imapF.name, anzeige_name: imapUtf7Decode(anzeige), typ,',
+     'postfach_id: pf.id, name: imapF.name, anzeige_name: imapUtf7Decode(anzeige), typ,\n'
+     '              mandant_id: pf.mandant_id,',
+     'Posteingang: der Ordner traegt den Mandanten des Postfachs.',
+     {'mail-postfach-pull'}),
+    ('FORK',
+     'quelle, status: "neu", eingegangen_am: datum,',
+     'quelle, status: "neu", eingegangen_am: datum,\n'
+     '                mandant_id: pf.mandant_id,',
+     'Posteingang: die Mietanfrage traegt den Mandanten des Postfachs.',
+     {'mail-postfach-pull'}),
 ]
 
 

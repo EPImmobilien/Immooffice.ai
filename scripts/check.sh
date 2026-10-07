@@ -156,6 +156,18 @@ else
   fehler=1
 fi
 
+abschnitt "Mandantentrennung: Zeilen ohne Mandanten"
+# Die naheliegendste Frage, und vier Gates haben sie nicht gestellt: steht
+# in einer MANDANT-Tabelle etwas, das niemandem gehoert? Am 06.10.2026
+# waren es 156 Mails und 15 Ordner — fuer jeden Nutzer unsichtbar, weil
+# die restriktive Richtlinie mandant_id = aktuelle_mandant_id() vergleicht
+# und null nicht gleich irgendwas ist (fork_65).
+if scripts/lokale-db.sh psql -q -f tests/mandant-ohne.sql; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Mandantentrennung: Rundumschlag ueber alle Tabellen"
 if scripts/lokale-db.sh psql -q -f tests/mandant-rundumschlag.sql; then
   :

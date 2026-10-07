@@ -159,6 +159,54 @@ Bis zur Entscheidung steht die Grenze benannt in `tests/expose-probe.js`
 Signature haben das Problem nicht: Raster setzt 10 pt in 150 pt, Signature
 15 pt in 523 pt.
 
+## Achtzehn Datenbankfunktionen schreiben in MANDANT-Tabellen, ohne den Mandanten zu nennen
+
+Gefunden am 07.10.2026 bei der Suche nach der Ursache des leeren
+Posteingangs. Zwei davon waren echte Fehler und sind behoben (`fork_65`:
+`mail-postfach-pull` und `projekt_nachricht_glocke`). Die Abfrage, die sie
+findet, steht hier — sie ist in zwanzig Sekunden wiederholbar:
+
+```sql
+with mandant_tab as (
+  select e.tabelle from public.mandanten_einstufung e
+   where e.gruppe = 'MANDANT'
+     and exists (select 1 from information_schema.columns c
+                  where c.table_schema='public' and c.table_name=e.tabelle
+                    and c.column_name='mandant_id'))
+select p.proname, p.prosecdef, string_agg(distinct t.tabelle, ', ')
+  from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+  join mandant_tab t
+    on p.prosrc ~* ('insert\s+into\s+(public\.)?' || t.tabelle || '\s*\(')
+ where n.nspname='public' and p.prokind='f' and p.prosrc !~* 'mandant_id'
+ group by 1,2 order by 1;
+```
+
+**Die meisten sind vermutlich harmlos**, und zwar aus einem Grund, der
+nachgesehen und nicht geraten gehört: läuft die Funktion in der Sitzung
+eines **angemeldeten** Nutzers, greift der Vorgabewert
+`aktuelle_mandant_id()` der Spalte, und alles ist richtig. Gefährlich sind
+nur die, die **ohne** angemeldeten Nutzer laufen:
+
+- aus dem **Zeitplan** (Cron) — `suchkriterien_pflege` schreibt `todos`,
+- vom **Dienstschlüssel** einer Edge Function — `mail_anfrage_vermerk`,
+  `radar_upsert`,
+- durch einen **Portalkunden ohne Profil** — `expose_freigabe_vermerk`,
+  `expose_freigabe_vermerk_neu`, `upload_benachrichtigung_planen`.
+
+Diese sechs gehören einzeln nachgesehen; die übrigen zwölf
+(`checkliste_aus_vorlage_kopieren`, `notiz_wiederholung_anlegen`,
+`objekt_kosten_berechnen`, `todo_nach_erledigung`, `naechste_rechnungsnummer`
+und die `rechnung_*`-Gruppe) werden von der Oberfläche eines angemeldeten
+Nutzers aufgerufen.
+
+**Warum das trotzdem nicht als dringend hier steht:**
+`tests/mandant-ohne.sql` läuft bei jedem Commit und findet jede dieser
+Funktionen an ihrem **Ergebnis** — sobald sie eine Zeile ohne Mandanten
+hinterlässt. Das ist die verlässlichere Richtung: eine Quelltextsuche kann
+irren, eine Zeile, die niemandem gehört, nicht. Gegen das laufende Projekt
+gehört dasselbe Skript regelmäßig gestartet; im Durchlauf prüft es nur die
+frisch migrierte Instanz.
+
 ## Umgebung
 
 | Punkt | Wirkung |
