@@ -5907,3 +5907,50 @@ bleibt vorerst ebenfalls Betreiber. Das Konto ist das, mit dem gerade
 gearbeitet wird; es stillzulegen, während jemand damit angemeldet ist, nimmt
 ihm mitten im Vorgang den Plattform-Bereich. Der Eintrag gehört entfernt,
 sobald das neue Konto erprobt ist — in `docs/OFFEN.md` vermerkt.
+
+## 2026-10-07 · „Database error finding user" — vier Spalten, die leer sein dürfen, aber nicht NULL
+
+Der Magic Link für `info@immooffice.ai` scheiterte mit *Database error
+finding user*. Das war kein Mailproblem und kein Rechteproblem, sondern die
+Folge davon, dass ich die Zeile in `auth.users` von Hand eingefügt habe.
+
+**Der Befund, nicht die Vermutung.** Ein Vergleich aller fünf Konten über
+dieselben Spalten:
+
+| Spalte | gewachsene Konten | das von Hand angelegte |
+|---|---|---|
+| `confirmation_token` | `''` | **NULL** |
+| `recovery_token` | `''` | **NULL** |
+| `email_change` | `''` | **NULL** |
+| `email_change_token_new` | `''` | **NULL** |
+| `email_change_token_current`, `phone_change`, `phone_change_token`, `reauthentication_token` | `''` | `''` |
+
+Die unteren vier haben in der Tabelle einen Vorgabewert `''`, die oberen vier
+nicht. GoTrue — der Auth-Dienst von Supabase — liest sie in Felder, die kein
+NULL annehmen können. Jede Suche nach dem Nutzer bricht deshalb ab, egal über
+welchen Weg. Behoben mit `coalesce(..., '')` über alle Konten; die anderen
+vier waren ohnehin in Ordnung.
+
+**Gegenprobe statt Hoffnung.** Danach eine Abfrage, die *jede* Spalte nennt,
+in der die neue Zeile leer ist, während sie bei allen gewachsenen Konten
+gefüllt ist. Übrig blieb `last_sign_in_at` — richtig so bei einem Konto, das
+sich noch nie angemeldet hat. Die Zeile in `auth.identities` stimmt in Form
+und Inhalt mit den gewachsenen überein.
+
+**Die Lehre, und sie geht gegen mich:** Konten legt man nicht mit `insert`
+an. Der vorgesehene Weg ist die Admin-Schnittstelle oder
+*Authentication → Users → Add user* in der Supabase-Konsole. Beides war mir
+hier verschlossen — der Netzfilter dieser Arbeitsumgebung lässt
+`*.supabase.co` nicht durch, und der Dienstschlüssel liegt zu Recht nicht im
+Repository. Ich habe den Umweg genommen, ohne die Zeile danach mit einer
+gewachsenen zu vergleichen. Dieser Vergleich hätte zwei Minuten gedauert und
+den Fehler vor der Meldung gefunden.
+
+Ein Gate dafür gibt es nicht und kann es hier nicht geben: die SQL-Prüfungen
+laufen gegen eine lokale Datenbank aus den Migrationen, in der es keine
+Konten gibt (`scripts/lokale-db.sh`). Was bleibt, ist die Regel — und die
+Abfrage oben, wenn doch einmal von Hand angelegt wird.
+
+**Noch offen, unabhängig davon:** Ein Magic Link an `info@immooffice.ai`
+kommt vorerst nirgends an. Zu der Domain gibt es kein Postfach, und sie zeigt
+noch nicht auf Netlify. Die Anmeldung geht über das Passwort.
