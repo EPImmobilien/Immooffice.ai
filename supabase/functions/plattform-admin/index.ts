@@ -32,6 +32,26 @@ const cors = {
 const antwort = (o: unknown, status = 200) =>
   new Response(JSON.stringify(o), { status, headers: { ...cors, "Content-Type": "application/json" } });
 
+/** Stripe über das Formular-API, dieselbe Bauform wie in abo-checkout (fork_73). */
+const STRIPE_VERSION = "2026-08-26.dahlia";
+function stripeModus(): "test" | "live" | null {
+  const s = Deno.env.get("STRIPE_SECRET_KEY") || "";
+  return s.startsWith("sk_test_") ? "test" : s.startsWith("sk_live_") ? "live" : null;
+}
+async function stripe(pfad: string, felder: Record<string, string>, methode = "POST") {
+  const schluessel = Deno.env.get("STRIPE_SECRET_KEY") || "";
+  if (!stripeModus()) throw new Error("STRIPE_SECRET_KEY fehlt oder ist kein sk_test_/sk_live_-Schluessel.");
+  const r = await fetch("https://api.stripe.com/v1/" + pfad, {
+    method: methode,
+    headers: { Authorization: "Bearer " + schluessel, "Stripe-Version": STRIPE_VERSION,
+               "Content-Type": "application/x-www-form-urlencoded" },
+    body: methode === "GET" ? undefined : new URLSearchParams(felder).toString(),
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d?.error?.message || ("Stripe: " + r.status));
+  return d;
+}
+
 /** Monatsäquivalent eines Preises — ein Jahrespreis zählt mit einem Zwölftel. */
 function jeMonat(cent: number, intervall: string) {
   return intervall === "jahr" ? Math.round(Number(cent || 0) / 12) : Number(cent || 0);
@@ -55,6 +75,12 @@ const ROLLEN: Record<string, string[]> = {
   wer:                    ["owner", "admin", "support", "finanzen"],
   umsatz:                 ["owner", "admin", "finanzen"],
   kosten:                 ["owner", "admin", "finanzen"],
+  gutscheine:             ["owner", "admin", "finanzen", "support"],
+  gutschein_speichern:    ["owner", "admin", "finanzen"],
+  gutschein_zuweisen:     ["owner", "admin", "finanzen"],
+  features:               ["owner", "admin", "support", "finanzen"],
+  feature_speichern:      ["owner", "admin"],
+  tarif_umstellen:        ["owner"],
   fixkosten_speichern:    ["owner", "admin"],
   fixkosten_loeschen:     ["owner", "admin"],
   uebersicht:             ["owner", "admin", "support", "finanzen"],
@@ -189,18 +215,196 @@ Deno.serve(async (req) => {
 
       const spalte = SCHLUESSELSPALTE[tabelle];
       const { data: vorher } = await db.from(tabelle).select("*").eq(spalte, schluessel).maybeSingle();
+
+      // Preisaenderung bei Stripe (fork_73): ein NEUER Price, der alte bleibt
+      // — laufende Abos behalten ihn, das ist bei Stripe so gewollt und
+      // rechtlich das Richtige (keine stille Preiserhoehung). Nur wenn ein
+      // Schluessel und ein Stripe-Produkt da sind; sonst sagt die Antwort,
+      // dass Stripe noch fehlt.
+      const stripeMeldung: string[] = [];
+      let stripeNoetig = false;
+      if (tabelle === "plattform_tarife" && vorher?.stripe_product_id && stripeModus()
+          && (("preis_monat_cent" in neu && neu.preis_monat_cent !== vorher.preis_monat_cent)
+              || ("preis_jahr_cent" in neu && neu.preis_jahr_cent !== vorher.preis_jahr_cent))) {
+        try {
+          if ("preis_monat_cent" in neu && neu.preis_monat_cent !== vorher.preis_monat_cent) {
+            const p = await stripe("prices", { product: String(vorher.stripe_product_id), currency: "eur",
+              unit_amount: String(neu.preis_monat_cent), "recurring[interval]": "month",
+              nickname: `${schluessel} monatlich ${new Date().toISOString().slice(0, 10)}` });
+            neu.stripe_price_monat_id = p.id; stripeMeldung.push("Monatspreis: neuer Stripe-Price " + p.id);
+          }
+          if ("preis_jahr_cent" in neu && neu.preis_jahr_cent !== vorher.preis_jahr_cent) {
+            const p = await stripe("prices", { product: String(vorher.stripe_product_id), currency: "eur",
+              unit_amount: String(neu.preis_jahr_cent), "recurring[interval]": "year",
+              nickname: `${schluessel} jaehrlich ${new Date().toISOString().slice(0, 10)}` });
+            neu.stripe_price_jahr_id = p.id; stripeMeldung.push("Jahrespreis: neuer Stripe-Price " + p.id);
+          }
+        } catch (e) {
+          return antwort({ ok: false, fehler: "Stripe: " + (e instanceof Error ? e.message : String(e)) }, 400);
+        }
+      } else if (tabelle === "plattform_tarife" && ("preis_monat_cent" in neu || "preis_jahr_cent" in neu)) {
+        stripeNoetig = true;
+      } else if (tabelle === "plattform_credit_pakete" && "preis_cent" in neu) {
+        stripeNoetig = true;
+      }
+
       const { error } = await db.from(tabelle).update(neu).eq(spalte, schluessel);
       if (error) return antwort({ ok: false, fehler: error.message }, 400);
 
-      await protokoll("katalog_geaendert", `${tabelle}:${schluessel}`, { vorher, nachher: neu });
-      // Ein geänderter Preis gilt erst bei Stripe, wenn dort ein neuer Preis
-      // angelegt wurde. Das sagt die Antwort, statt es den Betreiber
-      // herausfinden zu lassen.
-      const stripeNoetig = tabelle === "plattform_tarife"
-        ? ("preis_monat_cent" in neu || "preis_jahr_cent" in neu)
-        : tabelle === "plattform_credit_pakete" ? ("preis_cent" in neu) : false;
-      return antwort({ ok: true, stripe_noetig: stripeNoetig });
+      await protokoll("katalog_geaendert", `${tabelle}:${schluessel}`, { stripe: stripeMeldung },
+                      { typ: tabelle, vorher, nachher: neu });
+      return antwort({ ok: true, stripe_noetig: stripeNoetig, stripe: stripeMeldung });
     }
+
+    // --- Bestandskunden auf den aktuellen Preis umstellen (fork_73) --------
+    // Nur owner, nur ausdruecklich, nie still: die Antwort nennt jeden
+    // betroffenen Mandanten, und die Oberflaeche verlangt die Bestaetigung
+    // mit dem Hinweis auf die Informationspflicht.
+    if (aktion === "tarif_umstellen") {
+      const schluessel = String(body.tarif || "");
+      const grund = String(body.grund || "").trim();
+      if (!schluessel) return antwort({ ok: false, fehler: "Kein Tarif." }, 400);
+      if (grund.length < 10) return antwort({ ok: false, fehler: "Bitte einen Grund mit Datum der Kundeninformation angeben." }, 400);
+      if (!stripeModus()) return antwort({ ok: false, fehler: "Stripe ist nicht verbunden." }, 400);
+      const { data: tarif } = await db.from("plattform_tarife").select("*").eq("schluessel", schluessel).maybeSingle();
+      if (!tarif) return antwort({ ok: false, fehler: "Unbekannter Tarif." }, 404);
+      const { data: abos } = await db.from("mandant_abo").select("mandant_id, intervall, stripe_subscription_id")
+        .eq("tarif", schluessel).not("stripe_subscription_id", "is", null);
+      const ergebnis: { mandant_id: string; ok: boolean; meldung: string }[] = [];
+      for (const a of abos || []) {
+        const preis = a.intervall === "jahr" ? tarif.stripe_price_jahr_id : tarif.stripe_price_monat_id;
+        if (!preis) { ergebnis.push({ mandant_id: String(a.mandant_id), ok: false, meldung: "kein Stripe-Price" }); continue; }
+        try {
+          const sub = await stripe("subscriptions/" + a.stripe_subscription_id, {}, "GET");
+          const item = (sub.items?.data || []).find((i: Record<string, unknown>) => (i.price as Record<string, unknown>)?.product === tarif.stripe_product_id);
+          if (!item) { ergebnis.push({ mandant_id: String(a.mandant_id), ok: false, meldung: "Tarifposition nicht gefunden" }); continue; }
+          if (item.price.id === preis) { ergebnis.push({ mandant_id: String(a.mandant_id), ok: true, meldung: "schon aktuell" }); continue; }
+          await stripe("subscriptions/" + a.stripe_subscription_id, {
+            "items[0][id]": item.id, "items[0][price]": preis, proration_behavior: "none" });
+          ergebnis.push({ mandant_id: String(a.mandant_id), ok: true, meldung: "umgestellt auf " + preis });
+        } catch (e) {
+          ergebnis.push({ mandant_id: String(a.mandant_id), ok: false, meldung: e instanceof Error ? e.message : String(e) });
+        }
+      }
+      await protokoll("tarif_umgestellt", schluessel, { grund, ergebnis }, { typ: "plattform_tarife" });
+      return antwort({ ok: true, ergebnis });
+    }
+
+    // --- Gutscheine (fork_73) ---------------------------------------------
+    if (aktion === "gutscheine") {
+      const [{ data: liste }, { data: einl }] = await Promise.all([
+        db.from("gutscheine").select("*").order("erstellt_am", { ascending: false }),
+        db.from("gutschein_einloesungen").select("gutschein_code, mandant_id, eingeloest_am"),
+      ]);
+      const zaehl = new Map<string, number>();
+      for (const e of einl || []) zaehl.set(String(e.gutschein_code), (zaehl.get(String(e.gutschein_code)) || 0) + 1);
+      return antwort({ ok: true, gutscheine: (liste || []).map((g) => ({ ...g, einloesungen: zaehl.get(String(g.code)) || 0 })),
+                       stripe_modus: stripeModus() });
+    }
+    if (aktion === "gutschein_speichern") {
+      const code = String(body.code || "").trim().toUpperCase();
+      const g: Record<string, unknown> = {
+        code, art: body.art === "betrag" ? "betrag" : "prozent", wert: Math.floor(Number(body.wert || 0)),
+        dauer: ["einmalig", "monate", "dauerhaft"].includes(String(body.dauer)) ? String(body.dauer) : "einmalig",
+        monate: body.monate ? Math.floor(Number(body.monate)) : null,
+        gueltig_bis: body.gueltig_bis ? new Date(String(body.gueltig_bis)).toISOString() : null,
+        max_einloesungen: body.max_einloesungen ? Math.floor(Number(body.max_einloesungen)) : null,
+        tarife: Array.isArray(body.tarife) && body.tarife.length ? body.tarife.map(String) : null,
+        aktiv: body.aktiv !== false, notiz: body.notiz ? String(body.notiz).slice(0, 500) : null,
+        geaendert_am: new Date().toISOString(),
+      };
+      if (!/^[A-Z0-9][A-Z0-9_-]{2,39}$/.test(code)) return antwort({ ok: false, fehler: "Code: 3-40 Zeichen, A-Z, 0-9, - und _." }, 400);
+      const { data: vorher } = await db.from("gutscheine").select("*").eq("code", code).maybeSingle();
+      // Der Stripe-Coupon entsteht beim ersten Speichern, wenn Stripe da ist.
+      if (!vorher?.stripe_coupon_id && stripeModus()) {
+        try {
+          const felder: Record<string, string> = { name: code, duration: g.dauer === "monate" ? "repeating" : g.dauer === "dauerhaft" ? "forever" : "once" };
+          if (g.art === "prozent") felder.percent_off = String(g.wert); else { felder.amount_off = String(g.wert); felder.currency = "eur"; }
+          if (g.dauer === "monate") felder.duration_in_months = String(g.monate || 1);
+          if (g.max_einloesungen) felder.max_redemptions = String(g.max_einloesungen);
+          if (g.gueltig_bis) felder.redeem_by = String(Math.floor(new Date(String(g.gueltig_bis)).getTime() / 1000));
+          const c = await stripe("coupons", felder);
+          g.stripe_coupon_id = c.id;
+        } catch (e) {
+          return antwort({ ok: false, fehler: "Stripe-Coupon: " + (e instanceof Error ? e.message : String(e)) }, 400);
+        }
+      }
+      const { error } = await db.from("gutscheine").upsert(g, { onConflict: "code" });
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll(vorher ? "gutschein_geaendert" : "gutschein_angelegt", code, {}, { typ: "gutschein", vorher, nachher: g });
+      return antwort({ ok: true, stripe_coupon_id: g.stripe_coupon_id || null });
+    }
+    if (aktion === "gutschein_zuweisen") {
+      const code = String(body.code || "").trim().toUpperCase();
+      const mandant = String(body.mandant_id || "");
+      const grund = String(body.grund || "").trim();
+      if (!code || !mandant) return antwort({ ok: false, fehler: "Code und Mandant noetig." }, 400);
+      if (grund.length < 5) return antwort({ ok: false, fehler: "Bitte einen Grund angeben." }, 400);
+      const { data: g } = await db.from("gutscheine").select("*").eq("code", code).maybeSingle();
+      if (!g || !g.aktiv) return antwort({ ok: false, fehler: "Gutschein unbekannt oder inaktiv." }, 404);
+      if (g.gueltig_bis && new Date(String(g.gueltig_bis)) < new Date()) return antwort({ ok: false, fehler: "Gutschein abgelaufen." }, 400);
+      const { data: abo } = await db.from("mandant_abo").select("tarif, stripe_subscription_id").eq("mandant_id", mandant).maybeSingle();
+      if (Array.isArray(g.tarife) && g.tarife.length && !g.tarife.includes(String(abo?.tarif || ""))) {
+        return antwort({ ok: false, fehler: "Gutschein gilt nicht fuer den Tarif dieses Hauses." }, 400);
+      }
+      const { count } = await db.from("gutschein_einloesungen").select("id", { count: "exact", head: true }).eq("gutschein_code", code);
+      if (g.max_einloesungen && (count || 0) >= g.max_einloesungen) return antwort({ ok: false, fehler: "Gutschein ist ausgeschoepft." }, 400);
+      let stripeRef: string | null = null;
+      if (abo?.stripe_subscription_id && g.stripe_coupon_id && stripeModus()) {
+        try {
+          await stripe("subscriptions/" + abo.stripe_subscription_id, { "discounts[0][coupon]": String(g.stripe_coupon_id) });
+          stripeRef = String(abo.stripe_subscription_id);
+        } catch (e) {
+          return antwort({ ok: false, fehler: "Stripe: " + (e instanceof Error ? e.message : String(e)) }, 400);
+        }
+      }
+      const { error } = await db.from("gutschein_einloesungen")
+        .insert({ gutschein_code: code, mandant_id: mandant, stripe_ref: stripeRef, notiz: grund.slice(0, 300) });
+      if (error) return antwort({ ok: false, fehler: error.message.includes("duplicate") ? "Dieses Haus hat den Gutschein schon." : error.message }, 400);
+      await protokoll("gutschein_zugewiesen", mandant, { code, grund, stripe: !!stripeRef }, { typ: "mandant" });
+      return antwort({ ok: true, stripe: !!stripeRef,
+        hinweis: stripeRef ? "Beim laufenden Stripe-Abo hinterlegt." : "Vermerkt; ohne laufendes Stripe-Abo greift er beim naechsten Checkout nicht automatisch — Code dem Kunden nennen." });
+    }
+
+    // --- Funktionsschalter (fork_73) --------------------------------------
+    if (aktion === "features") {
+      const [{ data: features }, { data: tarifF }, { data: mandantF }, { data: tarife }, { data: namen }] = await Promise.all([
+        db.from("plattform_features").select("*").order("sortierung"),
+        db.from("tarif_features").select("*"),
+        db.from("mandant_features").select("*"),
+        db.from("plattform_tarife").select("schluessel, name, ist_zusatznutzer, sortierung").eq("ist_zusatznutzer", false).order("sortierung"),
+        db.from("mandanten").select("id, name"),
+      ]);
+      const name = new Map((namen || []).map((m) => [String(m.id), m.name]));
+      return antwort({ ok: true, features: features || [], tarif_features: tarifF || [], tarife: tarife || [],
+        mandant_features: (mandantF || []).map((x) => ({ ...x, mandant_name: name.get(String(x.mandant_id)) || x.mandant_id })) });
+    }
+    if (aktion === "feature_speichern") {
+      const feature = String(body.feature || "");
+      if (!feature) return antwort({ ok: false, fehler: "Kein Feature." }, 400);
+      if (body.standard_an !== undefined) {
+        const { data: vorher } = await db.from("plattform_features").select("*").eq("schluessel", feature).maybeSingle();
+        const { error } = await db.from("plattform_features").update({ standard_an: !!body.standard_an }).eq("schluessel", feature);
+        if (error) return antwort({ ok: false, fehler: error.message }, 400);
+        await protokoll("feature_standard", feature, { standard_an: !!body.standard_an }, { typ: "feature", vorher, nachher: { standard_an: !!body.standard_an } });
+      }
+      if (body.tarif) {
+        const an = !!body.an;
+        if (an) { const { error } = await db.from("tarif_features").upsert({ tarif: String(body.tarif), feature }); if (error) return antwort({ ok: false, fehler: error.message }, 400); }
+        else { await db.from("tarif_features").delete().eq("tarif", String(body.tarif)).eq("feature", feature); }
+        await protokoll("feature_tarif", feature, { tarif: body.tarif, an }, { typ: "feature" });
+      }
+      if (body.mandant_id) {
+        const zeile = { mandant_id: String(body.mandant_id), feature, an: !!body.an,
+          bis: body.bis ? new Date(String(body.bis)).toISOString() : null, notiz: body.notiz ? String(body.notiz).slice(0, 300) : null };
+        if (body.entfernen) { await db.from("mandant_features").delete().eq("mandant_id", String(body.mandant_id)).eq("feature", feature); }
+        else { const { error } = await db.from("mandant_features").upsert(zeile); if (error) return antwort({ ok: false, fehler: error.message }, 400); }
+        await protokoll("feature_mandant", String(body.mandant_id), { feature, an: !!body.an, bis: zeile.bis, entfernt: !!body.entfernen }, { typ: "mandant" });
+      }
+      return antwort({ ok: true });
+    }
+
+    // --- Die Mandanten ------------------------------------------------------
 
     // --- Die Mandanten ------------------------------------------------------
     // NUR Vertragsdaten. Die Auswahl der Spalten ist die Grenze; sie steht
@@ -279,7 +483,7 @@ Deno.serve(async (req) => {
 
     // --- Die Zahlen ---------------------------------------------------------
     if (aktion === "wer") {
-      return antwort({ ok: true, rolle, mfa_pflicht: mfaPflicht });
+      return antwort({ ok: true, rolle, mfa_pflicht: mfaPflicht, stripe_modus: stripeModus() });
     }
 
     if (aktion === "uebersicht") {
@@ -424,7 +628,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // --- Kosten & Marge (fork_71) -----------------------------------------
+    // --- Kosten & Marge (fork_72) -----------------------------------------
     // Alles aus einer Datenbankfunktion; die Edge Function reicht nur den
     // Zeitraum durch und haengt die Namen der Haeuser an.
     if (aktion === "kosten") {
@@ -463,12 +667,13 @@ Deno.serve(async (req) => {
       return antwort({ ok: true });
     }
     if (aktion === "fixkosten_loeschen") {
-      const id = String(body.id || "");
-      if (!id) return antwort({ ok: false, fehler: "Keine Kennung." }, 400);
-      const { data: vorher } = await db.from("plattform_fixkosten").select("*").eq("id", id).maybeSingle();
-      const { error } = await db.from("plattform_fixkosten").delete().eq("id", id);
+      const fid = String(body.id || "");
+      if (!fid) return antwort({ ok: false, fehler: "Keine Kennung." }, 400);
+      const { data: vorher } = await db.from("plattform_fixkosten").select("*").eq("id", fid).maybeSingle();
+      // Erst das Protokoll, dann das Loeschen — wie beim Mandanten.
+      await protokoll("fixkosten_geloescht", fid, {}, { typ: "fixkosten", vorher, nachher: null });
+      const { error } = await db.from("plattform_fixkosten").delete().eq("id", fid);
       if (error) return antwort({ ok: false, fehler: error.message }, 400);
-      await protokoll("fixkosten_geloescht", id, {}, { typ: "fixkosten", vorher, nachher: null });
       return antwort({ ok: true });
     }
 

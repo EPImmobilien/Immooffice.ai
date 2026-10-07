@@ -942,6 +942,7 @@
   }
 
   // --- Katalog ---------------------------------------------------------------
+  // p.zusatz(zeile): ein kurzer Text unter der Schluesselspalte (fork_73: Ist-Kosten je Credit).
   function Katalogtabelle(p) {
     var eZ = React.useState({}), entwurf = eZ[0], setzeEntwurf = eZ[1];
     var bZ = React.useState(""), busy = bZ[0], setzeBusy = bZ[1];
@@ -1002,7 +1003,8 @@
         E("tbody", null, (p.zeilen || []).map(function (z) {
           return E("tr", { key: z[p.schluessel] },
             E("td", { style: Object.assign({}, zelle, { fontFamily: "ui-monospace, monospace", fontSize: 12 }) },
-              z[p.schluessel]),
+              z[p.schluessel],
+              p.zusatz ? E("div", { style: { fontFamily: "inherit", fontSize: 11, color: CI.muted, marginTop: 2 } }, p.zusatz(z)) : null),
             p.spalten.map(function (s) {
               var w = wert(z, s[0]);
               return E("td", { key: s[0], style: zelle },
@@ -1025,10 +1027,88 @@
         }))));
   }
 
+  // Die Preissektion, wie die Landingpage sie zeichnet (src/eigene/abrechnung.js
+  // liest dieselben Felder). Vorschau VOR dem Speichern: die Tabelle oben
+  // aendert den Entwurf, hier steht, was der Kunde saehe.
+  function Preisvorschau(p) {
+    var tarife = (p.tarife || []).filter(function (t) { return !t.ist_zusatznutzer && t.aktiv; })
+      .sort(function (a, b) { return (a.sortierung || 0) - (b.sortierung || 0); });
+    var addon = (p.tarife || []).find(function (t) { return t.ist_zusatznutzer; });
+    return E("div", { style: { display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" } },
+      tarife.map(function (t) {
+        return E("div", { key: t.schluessel, style: { border: "1px solid " + (t.empfohlen ? CI.gold : CI.border), borderRadius: 10, padding: 14, background: "#fff", position: "relative" } },
+          t.empfohlen ? E("div", { style: { position: "absolute", top: -9, right: 10, background: CI.gold, color: "#fff", fontSize: 10, padding: "1px 8px", borderRadius: 8, fontWeight: 700 } }, "EMPFOHLEN") : null,
+          E("div", { style: { fontWeight: 700, color: CI.blau, fontSize: 15 } }, t.name),
+          E("div", { style: { fontSize: 22, fontWeight: 700, color: CI.blau, margin: "6px 0 2px" } }, geld(t.preis_monat_cent), E("span", { style: { fontSize: 11, fontWeight: 400, color: CI.muted } }, " / Monat netto")),
+          E("div", { style: { fontSize: 11, color: CI.muted } }, "oder " + geld(t.preis_jahr_cent) + " / Jahr"),
+          E("div", { style: { fontSize: 12, marginTop: 8 } }, zahl(t.inkl_nutzer) + " Nutzer inkl. · " + zahl(t.credits_monat) + " Credits/Monat"),
+          t.hinweis ? E("div", { style: { fontSize: 11.5, color: CI.muted, marginTop: 4 } }, t.hinweis) : null,
+          addon ? E("div", { style: { fontSize: 11, color: CI.muted, marginTop: 6 } }, "Zusatznutzer " + geld(addon.preis_monat_cent) + " / Monat") : null);
+      }));
+  }
+
+  function Gutscheine(p) {
+    var gZ = React.useState(null), liste = gZ[0], setzeListe = gZ[1];
+    var fZ = React.useState({ code: "", art: "prozent", wert: 10, dauer: "einmalig", monate: 3, gueltig_bis: "", max_einloesungen: "", tarife: "" }), form = fZ[0], setzeForm = fZ[1];
+    var darf = ["owner", "admin", "finanzen"].indexOf(p.rolle) >= 0;
+    function laden() { ruf("gutscheine").then(function (d) { setzeListe(d); }).catch(function (f) { p.melden(f.message, "fehler"); }); }
+    React.useEffect(function () { laden(); }, []);
+    async function speichern() {
+      try {
+        var r = await ruf("gutschein_speichern", Object.assign({}, form, { wert: Number(form.wert), monate: Number(form.monate) || null,
+          max_einloesungen: form.max_einloesungen ? Number(form.max_einloesungen) : null,
+          tarife: form.tarife ? form.tarife.split(",").map(function (s) { return s.trim(); }).filter(Boolean) : null }));
+        p.melden(r.stripe_coupon_id ? "Gespeichert, Stripe-Coupon " + r.stripe_coupon_id : "Gespeichert (ohne Stripe-Coupon — kein Schlüssel).");
+        setzeForm(Object.assign({}, form, { code: "" })); laden();
+      } catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    if (!liste) return E("div", { style: { fontSize: 13, color: CI.muted } }, "Lade Gutscheine …");
+    return E("div", null,
+      liste.gutscheine.length ? E("div", { style: { overflowX: "auto" } }, E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 700 } },
+        E("thead", null, E("tr", null, ["Code", "Rabatt", "Dauer", "gültig bis", "Einlösungen", "Tarife", "Stripe", ""].map(function (h, i) { return E("th", { key: i, style: kopfzelle }, h); }))),
+        E("tbody", null, liste.gutscheine.map(function (g) {
+          return E("tr", { key: g.code, style: g.aktiv ? null : { opacity: 0.5 } },
+            E("td", { style: Object.assign({}, zelle, { fontFamily: "monospace", fontWeight: 600 }) }, g.code),
+            E("td", { style: zelle }, g.art === "prozent" ? g.wert + " %" : geld(g.wert)),
+            E("td", { style: zelle }, g.dauer === "monate" ? g.monate + " Monate" : g.dauer),
+            E("td", { style: zelle }, g.gueltig_bis ? datum(g.gueltig_bis) : "—"),
+            E("td", { style: zelle }, zahl(g.einloesungen) + (g.max_einloesungen ? " / " + zahl(g.max_einloesungen) : "")),
+            E("td", { style: Object.assign({}, zelle, { fontSize: 12 }) }, (g.tarife || []).join(", ") || "alle"),
+            E("td", { style: Object.assign({}, zelle, { fontSize: 11 }) }, g.stripe_coupon_id
+              ? E("a", { href: "https://dashboard.stripe.com/" + (liste.stripe_modus === "test" ? "test/" : "") + "coupons/" + g.stripe_coupon_id, target: "_blank", rel: "noopener" }, "In Stripe öffnen")
+              : E("span", { style: { color: CI.muted } }, "kein Coupon")),
+            E("td", { style: zelle }, darf ? E("button", { type: "button", style: knopfLeer, onClick: function () {
+              ruf("gutschein_speichern", Object.assign({}, g, { aktiv: !g.aktiv })).then(laden).catch(function (e) { p.melden(e.message, "fehler"); }); } }, g.aktiv ? "Deaktivieren" : "Aktivieren") : null));
+        })))) : E("div", { style: { fontSize: 13, color: CI.muted } }, "Noch kein Gutschein."),
+      darf ? E("div", { style: { display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", alignItems: "end", marginTop: 12 } },
+        E("div", null, E("label", { style: { fontSize: 11, color: CI.muted } }, "Code"), E("input", { style: feld, value: form.code, placeholder: "WILLKOMMEN10", onChange: function (e) { setzeForm(Object.assign({}, form, { code: e.target.value.toUpperCase() })); } })),
+        E("div", null, E("label", { style: { fontSize: 11, color: CI.muted } }, "Art"), E("select", { style: feld, value: form.art, onChange: function (e) { setzeForm(Object.assign({}, form, { art: e.target.value })); } }, E("option", { value: "prozent" }, "Prozent"), E("option", { value: "betrag" }, "Betrag (Cent)"))),
+        E("div", null, E("label", { style: { fontSize: 11, color: CI.muted } }, "Wert"), E("input", { type: "number", style: feld, value: form.wert, onChange: function (e) { setzeForm(Object.assign({}, form, { wert: e.target.value })); } })),
+        E("div", null, E("label", { style: { fontSize: 11, color: CI.muted } }, "Dauer"), E("select", { style: feld, value: form.dauer, onChange: function (e) { setzeForm(Object.assign({}, form, { dauer: e.target.value })); } }, E("option", { value: "einmalig" }, "einmalig"), E("option", { value: "monate" }, "X Monate"), E("option", { value: "dauerhaft" }, "dauerhaft"))),
+        form.dauer === "monate" ? E("div", null, E("label", { style: { fontSize: 11, color: CI.muted } }, "Monate"), E("input", { type: "number", style: feld, value: form.monate, onChange: function (e) { setzeForm(Object.assign({}, form, { monate: e.target.value })); } })) : null,
+        E("div", null, E("label", { style: { fontSize: 11, color: CI.muted } }, "gültig bis"), E("input", { type: "date", style: feld, value: form.gueltig_bis, onChange: function (e) { setzeForm(Object.assign({}, form, { gueltig_bis: e.target.value })); } })),
+        E("div", null, E("label", { style: { fontSize: 11, color: CI.muted } }, "max. Einlösungen"), E("input", { type: "number", style: feld, value: form.max_einloesungen, onChange: function (e) { setzeForm(Object.assign({}, form, { max_einloesungen: e.target.value })); } })),
+        E("div", null, E("label", { style: { fontSize: 11, color: CI.muted } }, "nur Tarife (Komma)"), E("input", { style: feld, value: form.tarife, placeholder: "leer = alle", onChange: function (e) { setzeForm(Object.assign({}, form, { tarife: e.target.value })); } })),
+        E("button", { type: "button", style: knopf, disabled: form.code.length < 3 || !(Number(form.wert) > 0), onClick: speichern }, "Anlegen")) : null);
+  }
+
   function Katalog(p) {
     if (!p.daten) return E("div", { style: { color: CI.muted } }, "Lade Katalog …");
     var gemeinsam = { melden: p.melden, neuLaden: p.neuLaden };
+    var istJeCredit = {};
+    ((p.kosten && p.kosten.je_aktion) || []).forEach(function (a) { istJeCredit[a.aktion] = a.ist_je_credit; });
+    var uZ = React.useState({ tarif: "", grund: "" }), um = uZ[0], setzeUm = uZ[1];
+    async function umstellen() {
+      if (!window.confirm("Bestandskunden werden auf den aktuellen Preis umgestellt. Informationspflicht: Preisänderungen sind den Kunden vorher mitzuteilen (Vertrag/AGB, in der Regel mit Frist). Fortfahren?")) return;
+      try { var r = await ruf("tarif_umstellen", { tarif: um.tarif, grund: um.grund });
+        p.melden(r.ergebnis.length + " Abo(s) bearbeitet: " + r.ergebnis.filter(function (x) { return x.ok; }).length + " ok", "warnung"); setzeUm({ tarif: "", grund: "" }); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
     return E("div", null,
+      E("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 8 } },
+        "Stripe: " + (p.stripeModus === "test" ? "TESTMODUS" : p.stripeModus === "live" ? "LIVE" : "nicht verbunden")
+        + " · Preisänderungen legen bei Stripe einen NEUEN Price an; laufende Abos behalten den alten."),
+      E("div", { style: kasten }, Ueberschrift("So sieht die Preissektion der Landingpage aus"), E(Preisvorschau, { tarife: p.daten.tarife })),
       E(Katalogtabelle, Object.assign({}, gemeinsam, {
         titel: "Tarife", tabelle: "plattform_tarife", schluessel: "schluessel",
         zeilen: p.daten.tarife,
@@ -1042,6 +1122,8 @@
         schluessel: "aktion", schluesselName: "Aktion", zeilen: p.daten.credit_preise,
         spalten: [["name", "text", "Name"], ["credits", "zahl", "Credits"],
           ["beschreibung", "text", "Beschreibung"], ["aktiv", "schalter", "Aktiv"]],
+        zusatz: function (zeile) { return istJeCredit[zeile.aktion] !== undefined && istJeCredit[zeile.aktion] !== null
+          ? "Ist je Credit " + euro(istJeCredit[zeile.aktion]) + " (" + zahl(p.tage || 30) + " Tage)" : "Ist je Credit: keine Kostenangabe"; },
       })),
       E(Katalogtabelle, Object.assign({}, gemeinsam, {
         titel: "Credit-Pakete", tabelle: "plattform_credit_pakete", schluessel: "schluessel",
@@ -1055,12 +1137,56 @@
         zeilen: p.daten.werte,
         spalten: [["wert", "json", "Wert"], ["beschreibung", "text", "Beschreibung"]],
       })),
+      E("div", { style: kasten }, Ueberschrift("Gutscheine"), E(Gutscheine, { rolle: p.rolle, melden: p.melden })),
+      p.rolle === "owner" ? E("div", { style: kasten },
+        Ueberschrift("Bestandskunden auf den aktuellen Preis umstellen"),
+        E("p", { style: { fontSize: 12.5, color: CI.muted, marginTop: 0 } },
+          "Nur ausdrücklich und nie still. Kunden sind vorher zu informieren; der Grund mit dem Datum der Information steht im Audit-Log."),
+        E("div", { style: { display: "grid", gap: 8, gridTemplateColumns: "1fr 2fr auto", alignItems: "end" } },
+          E("select", { style: feld, value: um.tarif, onChange: function (e) { setzeUm(Object.assign({}, um, { tarif: e.target.value })); } },
+            [E("option", { key: "", value: "" }, "— Tarif —")].concat((p.daten.tarife || []).filter(function (t) { return !t.ist_zusatznutzer; }).map(function (t) { return E("option", { key: t.schluessel, value: t.schluessel }, t.name); }))),
+          E("input", { style: feld, value: um.grund, placeholder: "Grund, z. B. „Kunden am 01.10. informiert, Umstellung zum 01.11.“", onChange: function (e) { setzeUm(Object.assign({}, um, { grund: e.target.value })); } }),
+          E("button", { type: "button", style: Object.assign({}, knopf, { background: CI.danger, borderColor: CI.danger }), disabled: !um.tarif || um.grund.length < 10, onClick: umstellen }, "Umstellen"))) : null,
       E("p", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.7 } },
-        "Preise sind Nettobeträge in Cent. Eine Preisänderung wirkt sofort auf "
-        + "der Website und im Kundenbereich; bei Stripe entsteht sie erst mit "
-        + "dem nächsten Lauf von scripts/stripe-einrichten.mjs, und laufende "
-        + "Abos bleiben auf ihrem alten Preis — so ist es bei Stripe gewollt "
-        + "und rechtlich das Richtige."));
+        "Preise sind Nettobeträge in Cent. Eine Preisänderung wirkt sofort auf der Website und im Kundenbereich. "
+        + "Ist Stripe verbunden, entsteht dort beim Speichern ein neuer Price; laufende Abos bleiben auf ihrem alten — "
+        + "so ist es bei Stripe gewollt und rechtlich das Richtige. Produkte, die bei Stripe noch fehlen, legt "
+        + "scripts/stripe-einrichten.mjs an (Workflow \u201eStripe einrichten\u201c)."));
+  }
+
+  // --- Funktionen & Tarife (fork_73) ---------------------------------------
+  function Funktionen(p) {
+    var d = p.daten;
+    if (!d) return E("div", { style: { color: CI.muted } }, "Lade Funktionsschalter …");
+    var darf = p.rolle === "owner" || p.rolle === "admin";
+    var an = {};
+    (d.tarif_features || []).forEach(function (x) { an[x.tarif + ":" + x.feature] = true; });
+    function schalte(felder) { ruf("feature_speichern", felder).then(p.neuLaden).catch(function (e) { p.melden(e.message, "fehler"); }); }
+    return E("div", null,
+      E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+        E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 640 } },
+          E("thead", null, E("tr", null, [E("th", { key: "f", style: kopfzelle }, "Funktion"), E("th", { key: "s", style: kopfzelle }, "Standard")]
+            .concat((d.tarife || []).map(function (t) { return E("th", { key: t.schluessel, style: Object.assign({}, kopfzelle, { textAlign: "center" }) }, t.name); })))),
+          E("tbody", null, (d.features || []).map(function (f) {
+            return E("tr", { key: f.schluessel },
+              E("td", { style: zelle }, E("div", { style: { fontWeight: 600, color: CI.blau } }, f.name), E("div", { style: { fontSize: 11, color: CI.muted } }, f.schluessel + (f.beschreibung ? " · " + f.beschreibung : ""))),
+              E("td", { style: zelle }, E("input", { type: "checkbox", checked: !!f.standard_an, disabled: !darf, onChange: function (e) { schalte({ feature: f.schluessel, standard_an: e.target.checked }); } }), " an"),
+              (d.tarife || []).map(function (t) {
+                var ein = f.standard_an || !!an[t.schluessel + ":" + f.schluessel];
+                return E("td", { key: t.schluessel, style: Object.assign({}, zelle, { textAlign: "center" }) },
+                  f.standard_an ? E("span", { title: "Standard an — gilt für alle Tarife", style: { color: CI.success } }, "✓")
+                    : E("input", { type: "checkbox", checked: ein, disabled: !darf, onChange: function (e) { schalte({ feature: f.schluessel, tarif: t.schluessel, an: e.target.checked }); } }));
+              }));
+          })))),
+      E("div", { style: kasten },
+        Ueberschrift("Ausnahmen je Mandant"),
+        (d.mandant_features || []).length ? (d.mandant_features || []).map(function (x) {
+          return E("div", { key: x.mandant_id + x.feature, style: { display: "flex", gap: 8, alignItems: "center", fontSize: 13, padding: "4px 0", borderBottom: "1px solid " + CI.border } },
+            E("span", { style: { flex: 1 } }, x.mandant_name + " · " + x.feature + ": " + (x.an ? "AN" : "AUS") + (x.bis ? " bis " + datum(x.bis) : "") + (x.notiz ? " — " + x.notiz : "")),
+            darf ? E("button", { type: "button", style: knopfLeer, onClick: function () { schalte({ feature: x.feature, mandant_id: x.mandant_id, entfernen: true }); } }, "Entfernen") : null);
+        }) : E("div", { style: { fontSize: 13, color: CI.muted } }, "Keine Ausnahmen. Ausnahmen setzt man in der Mandantenansicht (Beta-Module für einzelne Häuser)."),
+        E("p", { style: { fontSize: 11.5, color: CI.muted, marginTop: 10 } },
+          "Reihenfolge der Entscheidung: Ausnahme des Hauses (befristbar) → Tarif → Standard. Gesperrte Module zeigen im Portal einen Upgrade-Hinweis, sie verschwinden nicht.")));
   }
 
   // --- Systemzustand ----------------------------------------------------------
@@ -1310,7 +1436,7 @@
     // Wer bin ich hier — und muss erst der zweite Faktor her?
     var wZ = React.useState({ lade: true }), wer = wZ[0], setzeWer = wZ[1];
     var werLaden = React.useCallback(function () {
-      ruf("wer").then(function (d) { setzeWer({ lade: false, rolle: d.rolle, mfa_pflicht: d.mfa_pflicht }); })
+      ruf("wer").then(function (d) { setzeWer({ lade: false, rolle: d.rolle, mfa_pflicht: d.mfa_pflicht, stripe_modus: d.stripe_modus || null }); })
         .catch(function (f) {
           var mfa = /Zweiter Faktor/.test(f.message || "");
           setzeWer({ lade: false, mfa: mfa, fehler: mfa ? "" : (f.message || String(f)) });
@@ -1345,6 +1471,7 @@
       var aktion = welcher === "zahlen" ? "uebersicht"
         : welcher === "umsatz" ? "umsatz"
         : welcher === "kosten" ? "kosten"
+        : welcher === "funktionen" ? "features"
         : welcher === "mandanten" ? "mandanten"
         : welcher === "katalog" ? "katalog"
         : welcher === "konten" ? "nutzer"
@@ -1375,7 +1502,9 @@
     // Der Katalog wird fuer die Tarifauswahl in der Mandantentafel gebraucht.
     React.useEffect(function () {
       if (offen && !daten.katalog) laden("katalog");
-    }, [offen, daten.katalog, laden]);
+      // Der Katalog zeigt die Ist-Kosten je Credit neben dem Preis.
+      if (reiter === "katalog" && !daten.kosten) laden("kosten");
+    }, [offen, reiter, daten.katalog, daten.kosten, laden]);
 
     function melden(text, art) { setzeMeldung({ text: text, art: art || "ok" }); }
 
@@ -1403,6 +1532,7 @@
     var alleReiter = [["zahlen", "Übersicht", ["owner", "admin", "support", "finanzen"]],
       ["umsatz", "Umsatz & Abos", ["owner", "admin", "finanzen"]],
       ["kosten", "Kosten & Marge", ["owner", "admin", "finanzen"]],
+      ["funktionen", "Funktionen", ["owner", "admin", "support", "finanzen"]],
       ["mandanten", "Mandanten", ["owner", "admin", "support", "finanzen"]],
       ["konten", "Konten", ["owner", "admin", "support"]],
       ["katalog", "Katalog", ["owner", "admin", "support", "finanzen"]],
@@ -1472,8 +1602,9 @@
             neuLaden: function () { laden("mandanten"); } })
         : reiter === "konten" ? E(Konten, { daten: daten.konten, melden: melden,
             neuLaden: function () { laden("konten"); } })
-        : reiter === "katalog" ? E(Katalog, { daten: daten.katalog, melden: melden,
-            neuLaden: function () { laden("katalog"); } })
+        : reiter === "katalog" ? E(Katalog, { daten: daten.katalog, kosten: daten.kosten, tage: tage, rolle: rolle,
+            stripeModus: wer.stripe_modus, melden: melden, neuLaden: function () { laden("katalog"); } })
+        : reiter === "funktionen" ? E(Funktionen, { daten: daten.funktionen, rolle: rolle, melden: melden, neuLaden: function () { laden("funktionen"); } })
         : reiter === "system" ? E(System, { daten: daten.system })
         : reiter === "admins" ? E(Admins, { daten: daten.admins, konten: daten.konten, rolle: rolle,
             melden: melden, neuLaden: function () { laden("admins"); if (rolle === "owner") laden("konten"); } })

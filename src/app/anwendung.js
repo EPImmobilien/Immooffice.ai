@@ -23436,8 +23436,11 @@ function HomePage({
       }
     }, React.createElement("button", {
       onClick: () => {
-        p || t(e.id)
+        if (p) return;
+        if (window.ImmoFeature && !window.ImmoFeature.darf(e.id)) { window.ImmoFeature.hinweis(e.id); return; }
+        t(e.id);
       },
+      "data-immo-gesperrt": (window.ImmoFeature && !window.ImmoFeature.darf(e.id)) ? "1" : undefined,
       "data-tutorial": `kachel-${e.id}`,
       className: "ep-kachel",
       title: (S[e.id] && S[e.id].wert ? S[e.id].titel + " — " : "") + e.subtitle,

@@ -6160,3 +6160,25 @@ nicht rechnen. Als zwei nullable Spalten und eine zweite Fassung von
 `credits_buchen`; die alte bleibt. Ein Ledger-Aufruf, der an einer neuen
 Signatur scheitert, verliert eine Buchung, und das ist der eine Fehler,
 den ein Ledger nicht haben darf.
+
+
+## 2026-10-07 · Betreiberbereich, Schritt 5: der Gutschein ist das Original, der Stripe-Coupon das Abbild (fork_73)
+
+Stripe kennt den Coupon, aber nicht, für welche Tarife er gelten soll, wie
+oft er eingelöst wurde und von wem — und das Dashboard fragt Stripe nicht
+live (Auftrag). Also eine eigene Tabelle als Original, der Coupon als
+Abbild mit Kennung. Dieselbe Bauform wie bei den Rechnungen der parallelen
+Sitzung (`stripe_rechnungen`): die Datenbank ist das, was die Oberfläche
+liest; Stripe ist der Dienst, der ausführt.
+
+Funktionsschalter: drei Tabellen statt einer, weil die drei Fragen
+verschieden sind — gibt es das, kann der Tarif das, darf dieses Haus das.
+Eine Tabelle mit drei Spalten hätte dieselbe Information, aber jede Zeile
+müsste raten, welche Frage sie beantwortet. Unbekannte Schlüssel sind aus:
+ein Tippfehler im Code sperrt ein Modul, er öffnet keins.
+
+Beim Rebase auf die Stripe-Commits der parallelen Sitzung: gleicher
+Zeitstempel, gleiche Nummer (`fork_71`). Meine Migration wurde `fork_72`,
+die fremde blieb. Zwei Sitzungen auf einem Branch brauchen eine
+Nummernabsprache — die gibt es nicht, und das ist ein Risiko, das der
+Auftraggeber kennen sollte.

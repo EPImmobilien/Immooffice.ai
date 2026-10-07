@@ -445,7 +445,18 @@ zuwachs(bereich, mehr, grund) as (values
   ('Primaer- und Eindeutigkeitsschluessel', 1, 'fork_72: der Primaerschluessel'),
   ('Pruefbedingungen', 2, 'fork_72: Bezeichnung nicht leer, Betrag nicht negativ'),
   ('Richtlinien', 2, 'fork_72: lesen alle Betreiber, pflegen owner/admin'),
-  ('Funktionen', 1, 'fork_72: plattform_kosten — credits_buchen bekam nur zwei weitere Parameter')
+  ('Funktionen', 1, 'fork_72: plattform_kosten — credits_buchen bekam nur zwei weitere Parameter'),
+
+  -- fork_73: Betreiber, Schritt 5 — Gutscheine und Funktionsschalter.
+  ('Tabellen', 5, 'fork_73: gutscheine, gutschein_einloesungen, plattform_features, tarif_features, mandant_features'),
+  ('Tabellen mit RLS', 5, 'fork_73: alle fuenf'),
+  ('Spalten', 31, 'fork_73: 13 gutscheine, 6 einloesungen, 5 features, 2 tarif_features, 5 mandant_features'),
+  ('Primaer- und Eindeutigkeitsschluessel', 6, 'fork_73: fuenf Primaerschluessel und (gutschein_code, mandant_id) eindeutig'),
+  ('Pruefbedingungen', 4, 'fork_73: Code, Art, Wert, Dauer der Gutscheine'),
+  ('Fremdschluessel', 6, 'fork_73: einloesungen auf gutscheine und mandanten; tarif_features auf tarife und features; mandant_features auf mandanten und features'),
+  ('Indizes ohne Constraint', 2, 'fork_73: einloesungen und mandant_features je Mandant'),
+  ('Richtlinien', 12, 'fork_73: lesen/pflegen gutscheine; lesen + Trennung + Loeschsperre einloesungen; lesen/pflegen features; lesen/pflegen tarif_features; lesen + Trennung + Loeschsperre mandant_features'),
+  ('Funktionen', 2, 'fork_73: hat_feature, meine_features')
 ),
 soll(bereich, soll) as (
   select v.bereich,

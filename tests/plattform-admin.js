@@ -46,7 +46,8 @@ const ERLAUBT = new Set([
   'plattform_admins', 'plattform_tarife', 'plattform_credit_preise',
   'plattform_credit_pakete', 'plattform_werte', 'plattform_protokoll',
   'plattform_notizen', 'plattform_kennzahlen_tag', 'plattform_mandanten_tag',
-  'plattform_fixkosten',
+  'plattform_fixkosten', 'gutscheine', 'gutschein_einloesungen',
+  'plattform_features', 'tarif_features', 'mandant_features',
   // Nur GEZAEHLT (head: true) fuer "Technikfehler 24 h"; keine Meldung geht hinaus.
   'fehler_protokoll',
   // Die Vertragsbeziehung. `credit_konten` und `credit_buchungen` sind das

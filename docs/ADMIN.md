@@ -274,7 +274,79 @@ legt keine Fixkosten an, admin schon.
 - [x] Fixkostenliste, „Ergebnis vor Personal & Miete"
 - [ ] Stripe-Gebühren aus Balance Transactions statt Schätzung — Schritt 6
 
-## Noch offen aus dem Auftrag (Schritte 5–10)
+## Schritt 5 — Preise & Credits, Funktionsschalter (fork_73) · erledigt 07.10.2026
+
+### Preise
+
+- Tarife, Zusatznutzer-Preis, Credit-Kosten je Aktion, Credit-Pakete,
+  Testphase, Mindestlaufzeit, Sperrfrist, Gründerpreis: im Reiter „Katalog"
+  (gab es seit fork_52; jetzt mit Ist-Kosten je Credit neben jeder Aktion,
+  aus Schritt 4).
+- **Preisänderung bei Stripe**: ist `STRIPE_SECRET_KEY` gesetzt und trägt der
+  Tarif ein `stripe_product_id`, legt `katalog_speichern` beim Speichern
+  einen **neuen** Price an und trägt dessen Kennung ein; der alte Price
+  bleibt bei Stripe, laufende Abos behalten ihn. Ohne Stripe sagt die Antwort
+  `stripe_noetig`.
+- **Bestandskunden umstellen** (`tarif_umstellen`, nur owner): ausdrücklich,
+  mit Grund inkl. Datum der Kundeninformation, Bestätigungsdialog mit dem
+  Hinweis auf die Informationspflicht; je Abo die Tarifposition auf den
+  aktuellen Price, ohne Proration; jedes Ergebnis im Audit-Log.
+- **Vorschau** „So sieht die Preissektion der Landingpage aus" zeichnet aus
+  denselben Feldern wie `src/eigene/abrechnung.js`.
+- **Stripe-Modus** steht im Katalog (TESTMODUS / LIVE / nicht verbunden), aus
+  dem Präfix des Schlüssels. Hinweis: eine parallele Sitzung hat am
+  07.10.2026 Gate 3 („Stripe live erlaubt") freigegeben — siehe
+  `ENTSCHEIDUNGEN.md`, Eintrag „Gate 3 freigegeben". Dieser Bereich schreibt
+  nie einen Live-Schlüssel; er liest nur, welcher gesetzt ist.
+
+### Gutscheine
+
+Tabelle `gutscheine` (Original) mit Stripe-Coupon als Abbild
+(`stripe_coupon_id`, beim ersten Speichern angelegt, wenn Stripe da ist):
+Prozent oder Betrag, einmalig / X Monate / dauerhaft, gültig bis, maximale
+Einlösungen, Tarifbeschränkung. `gutschein_einloesungen` (MANDANT) zählt
+die Einlösungen; **Zuweisen** an einen Mandanten hinterlegt den Coupon am
+laufenden Stripe-Abo — ohne laufendes Abo wird nur vermerkt, und die Antwort
+sagt das. Pflegen dürfen owner/admin/**finanzen**, Einlösungen sieht das
+Haus (nur die eigenen).
+
+### Funktionsschalter
+
+Drei Tabellen, eine Entscheidung:
+
+| Tabelle | Bedeutung |
+|---|---|
+| `plattform_features` | was es gibt, `standard_an` |
+| `tarif_features` | schaltet je Tarif **an**, was standardmäßig aus ist |
+| `mandant_features` | Ausnahme je Haus, an oder aus, befristbar (`bis`) |
+
+`hat_feature(schluessel)` entscheidet: Ausnahme des Hauses (solange sie
+gilt) → Tarif → Standard. Unbekannte Schlüssel sind **aus**.
+`meine_features()` liefert alle Schalter mit dem Stand des eigenen Hauses —
+die Anwendung lädt sie einmal beim Start (`src/eigene/features.js`,
+`window.ImmoFeature`) und zeigt gesperrte Module als Kachel mit
+Upgrade-Hinweis statt sie zu verstecken.
+
+Angelegt: `ki_text`, `ki_bild`, `social`, `portalexport`, `signatur`,
+`kundenportal`, `akquise` (alle an — Phase 9: keine Verhaltensänderung) und
+`mcp_connector` (aus; an für `professional`/`business`/`enterprise`, soweit
+diese Tarife existieren). Ein Modul, das noch gar nicht gebaut ist, hat
+damit schon seinen Schalter.
+
+`tests/betreiber-features.sql`: abgelaufene Ausnahme zählt nicht, Ausnahme
+schlägt Tarif, Tarif schlägt Standard, unbekannt = aus, ein Haus sieht
+fremde Ausnahmen nicht, support legt keine Gutscheine an.
+
+### Abnahme Schritt 5
+
+- [x] Tarife/Zusatznutzer/Credit-Preise/Pakete/Werte bearbeitbar, Ist-Kosten daneben
+- [x] Neuer Stripe-Price statt stiller Preisänderung; Umstellung nur ausdrücklich mit Hinweis
+- [x] Gutscheine mit Einlöse-Statistik, Tarifbeschränkung, Stripe-Coupon, Zuweisung
+- [x] Vorschau der Preissektion vor dem Speichern
+- [x] Feature-Matrix Module × Tarife, Ausnahmen je Mandant, `hat_feature()`, Upgrade-Hinweis
+- [ ] Abnahmepunkt „Preisänderung erzeugt neuen Stripe-Price" live — braucht `STRIPE_SECRET_KEY` und ein Produkt mit `stripe_product_id`; lokal nicht prüfbar
+
+## Noch offen aus dem Auftrag (Schritte 6–10)
 
 Werden hier je Schritt nachgetragen. Reihenfolge wie im Auftrag.
 

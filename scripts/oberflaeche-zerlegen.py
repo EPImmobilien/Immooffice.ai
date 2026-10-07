@@ -946,6 +946,25 @@ ERSETZUNGEN = [
      'Mandanten-CI anwenden und das Logo mit Wortmarken-Ersatz; das Bild '
      'bleibt in seinem Platz.'),
 
+    # =====================================================================
+    # FORK — Funktionsschalter an den Kacheln (fork_73)
+    #
+    # Eine gesperrte Kachel verschwindet nicht, sie traegt "Upgrade" und
+    # oeffnet beim Klick einen Hinweis. Die Entscheidung trifft
+    # src/eigene/features.js (geladen aus meine_features()); hier haengen
+    # nur das Attribut und die Weiche am Klick.
+    # =====================================================================
+    ('FORK',
+     r'      onClick: \(\) => \{\n        p \|\| t\(e\.id\)\n      \},\n      "data-tutorial": `kachel-\$\{e\.id\}`,',
+     '      onClick: () => {\n'
+     '        if (p) return;\n'
+     '        if (window.ImmoFeature && !window.ImmoFeature.darf(e.id)) { window.ImmoFeature.hinweis(e.id); return; }\n'
+     '        t(e.id);\n'
+     '      },\n'
+     '      "data-immo-gesperrt": (window.ImmoFeature && !window.ImmoFeature.darf(e.id)) ? "1" : undefined,\n'
+     '      "data-tutorial": `kachel-${e.id}`,',
+     'Funktionsschalter: gesperrte Kacheln bleiben stehen, mit Upgrade-Hinweis.'),
+
     # getProfile holt die CI gleich mit — es ist die einzige Stelle, an der das
     # Profil des Angemeldeten geladen wird.
     ('FORK',
