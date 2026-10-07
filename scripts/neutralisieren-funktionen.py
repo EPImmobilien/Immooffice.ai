@@ -4201,6 +4201,15 @@ NACHBESSERN = [
      'Postfach-Anbieter: Zugangsdaten je Anbieter, Token wird erneuert.',
      {'mail-postfach-pull'}),
     # =====================================================================
+    # FORK — die Ordnerliste jedes Servers lesen, nicht nur die von Microsoft
+    # Begruendung im Ersatztext; Probe in tests/imap-ordnerliste.js.
+    # =====================================================================
+    ('FORK',
+     '      const m = line.match(/^\\* LIST \\(([^)]*)\\) "?([^"]*)"? "?([^"]*)"?$/i);\n      if (!m) continue;\n      const flags = (m[1] || "").split(/\\s+/).filter(Boolean);\n      const delimiter = m[2] || "/";\n      const name = (m[3] || "").trim().replace(/^"|"$/g, "");',
+     '      // Der Ausdruck der Vorlage kannte nur Namen OHNE Anfuehrungszeichen —\n      // so schickt sie Microsoft. Dovecot (Strato, IONOS, die meisten\n      // Hoster) setzt den Namen in Anfuehrungszeichen, und dann stand das\n      // "\\r" der Zeile hinter dem schliessenden Zeichen, wo der Ausdruck\n      // das Zeilenende verlangte. Ergebnis: null Ordner, null Mails, und\n      // der Abruf galt als gelungen. Am 07.10.2026 an einem Strato-Postfach\n      // gefunden. Jetzt: Trenner in Anfuehrungszeichen oder NIL, Name in\n      // Anfuehrungszeichen (auch mit Leerzeichen) oder als nacktes Wort,\n      // Leerraum am Ende erlaubt. tests/imap-ordnerliste.js haelt es fest.\n      const m = line.match(/^\\* LIST \\(([^)]*)\\)\\s+(?:"([^"]*)"|NIL)\\s+(?:"(.*)"|(\\S+))\\s*$/i);\n      if (!m) continue;\n      const flags = (m[1] || "").split(/\\s+/).filter(Boolean);\n      const delimiter = m[2] || "/";\n      const name = (m[3] !== undefined ? m[3] : (m[4] || "")).trim();',
+     'IMAP: Ordnernamen in Anfuehrungszeichen werden gelesen (Dovecot).',
+     {'mail-postfach-pull'}),
+    # =====================================================================
     # FORK — ein Abruf ohne Ordner ist kein Erfolg
     #
     # BEFUND vom 07.10.2026: Ein neu angebundenes Strato-Postfach wurde

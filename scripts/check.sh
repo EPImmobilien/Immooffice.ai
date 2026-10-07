@@ -697,6 +697,9 @@ else
   schlecht
 fi
 
+abschnitt "IMAP: liest der Abruf die Ordnerliste jedes Servers?"
+node tests/imap-ordnerliste.js || schlecht
+
 abschnitt "Umgebungsvariablen: jede gelesene ist dokumentiert"
 # CLAUDE.md: keine Geheimnisse im Repository, nur Umgebungsvariablen,
 # dokumentiert in .env.example. Am 06.10.2026 nannte die Datei drei

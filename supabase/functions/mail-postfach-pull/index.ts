@@ -326,11 +326,20 @@ class SimpleImap {
     this.letzteListe = resp;
     const result: Array<{ name: string; flags: string[]; delimiter: string }> = [];
     for (const line of resp.split("\n")) {
-      const m = line.match(/^\* LIST \(([^)]*)\) "?([^"]*)"? "?([^"]*)"?$/i);
+      // Der Ausdruck der Vorlage kannte nur Namen OHNE Anfuehrungszeichen —
+      // so schickt sie Microsoft. Dovecot (Strato, IONOS, die meisten
+      // Hoster) setzt den Namen in Anfuehrungszeichen, und dann stand das
+      // "\r" der Zeile hinter dem schliessenden Zeichen, wo der Ausdruck
+      // das Zeilenende verlangte. Ergebnis: null Ordner, null Mails, und
+      // der Abruf galt als gelungen. Am 07.10.2026 an einem Strato-Postfach
+      // gefunden. Jetzt: Trenner in Anfuehrungszeichen oder NIL, Name in
+      // Anfuehrungszeichen (auch mit Leerzeichen) oder als nacktes Wort,
+      // Leerraum am Ende erlaubt. tests/imap-ordnerliste.js haelt es fest.
+      const m = line.match(/^\* LIST \(([^)]*)\)\s+(?:"([^"]*)"|NIL)\s+(?:"(.*)"|(\S+))\s*$/i);
       if (!m) continue;
       const flags = (m[1] || "").split(/\s+/).filter(Boolean);
       const delimiter = m[2] || "/";
-      const name = (m[3] || "").trim().replace(/^"|"$/g, "");
+      const name = (m[3] !== undefined ? m[3] : (m[4] || "")).trim();
       if (!name) continue;
       result.push({ name, flags, delimiter });
     }

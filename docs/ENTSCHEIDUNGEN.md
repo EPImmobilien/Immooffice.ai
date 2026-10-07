@@ -6009,3 +6009,54 @@ läuft gegen die lokale Datenbank aus den Migrationen. Dort gibt es keine
 Daten, also findet es dort nie etwas. Die Bestandsfrage muss gegen das echte
 Projekt gestellt werden — das habe ich bei fork_65 von Hand getan und danach
 nicht wieder. In `docs/OFFEN.md` steht jetzt die Abfrage dafür.
+
+## 2026-10-07 · Der Abruf las nur Microsofts Ordnerliste — und meldete Erfolg
+
+„Ich sehe die Mails aber immer noch nicht." Das neue Strato-Postfach war
+sichtbar, abgerufen (`imap_letzter_pull` gesetzt), hatte null Ordner und
+null Mails. Die Anmeldung war geglückt — sonst hätte `cmd()` geworfen und
+der Zeitstempel wäre nicht gesetzt worden. Also kam die Antwort auf `LIST`
+an und ergab keinen einzigen Ordner.
+
+**Die Ursache, nachgerechnet statt vermutet.** Der Ausdruck der Vorlage,
+der eine LIST-Zeile liest:
+
+    /^\* LIST \(([^)]*)\) "?([^"]*)"? "?([^"]*)"?$/i
+
+verlangt das Zeilenende unmittelbar hinter dem Ordnernamen. Die Zeilen
+enden aber mit `\r\n`, und `split("\n")` lässt das `\r` stehen. Steht der
+Name **ohne** Anführungszeichen — `"/" INBOX\r` —, frisst `[^"]*` das `\r`
+mit, und es passt. Steht er **in** Anführungszeichen — `"." "INBOX"\r` —,
+endet die Gruppe am schließenden Zeichen, dahinter kommt `\r`, und `$`
+scheitert. Microsoft schickt die Namen nackt; Dovecot — Strato, IONOS, die
+meisten Hoster — setzt sie in Anführungszeichen. Deshalb liefen die beiden
+Microsoft-Postfächer seit Tagen, und das erste Dovecot-Postfach lief ins
+Leere.
+
+Vier Zeilen genügen für den Beleg: `tests/imap-ordnerliste.js` holt den
+Ausdruck aus der **erzeugten** Funktion und füttert ihn mit Zeilen, wie die
+Server sie schicken. Gegen den alten Ausdruck fallen vier von sieben; gegen
+den neuen bestehen alle. Die Probe habe ich zuerst gegen den alten laufen
+lassen — eine Probe, die den Fehlerfall nicht vorführt, beweist nichts.
+
+**Der zweite Fehler wog schwerer als der erste.** Der Zweig „keine Ordner
+zum Abrufen" setzte den Zeitstempel und schwieg. Ein Abruf, der nichts
+findet, galt als gelungen; die Oberfläche hatte nichts zu zeigen und nichts
+zu melden. Jetzt steht in diesem Fall der Grund am Postfach — in
+`letzter_test_fehler`, wo auch der Verbindungstest schreibt — mitsamt der
+**rohen** Antwort des Servers, auf 400 Zeichen gekürzt. Ohne sie wäre beim
+nächsten Server derselben Art wieder nur zu raten.
+
+Drei Regeln im Erzeuger (`scripts/neutralisieren-funktionen.py`), nichts von
+Hand in der erzeugten Datei. Die Probe hängt in `npm run check`.
+
+**Was offen bleibt, und ich sage es, bevor es jemand merkt:** ob Strato
+tatsächlich so antwortet, wie die Probe annimmt, zeigt erst der nächste
+Abruf nach dem Ausrollen. Wenn nicht, steht die Rohantwort danach am
+Postfach, und dann wird nicht geraten, sondern gelesen.
+
+Dazu, kleiner: Logos lassen sich jetzt **entfernen**, nicht nur ersetzen.
+Zurück bleibt die Wortmarke aus dem Markennamen. Anders als das Hochladen
+wirkt es sofort und wartet nicht auf „Speichern" — erst das Feld in der
+Datenbank, dann die Datei; ein halber Löschvorgang wäre schlimmer als
+beides.
