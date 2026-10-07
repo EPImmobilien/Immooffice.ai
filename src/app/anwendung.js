@@ -2736,6 +2736,8 @@ function PageShell({
   window.ImmoSupportAnfrageBand && React.createElement(window.ImmoSupportAnfrageBand, null),
   // fork_78: Hinweise des Betreibers und die Zustimmung zu neuen Rechtstexten.
   window.ImmoAnkuendigungBand && React.createElement(window.ImmoAnkuendigungBand, null),
+  // fork_82: was einem neuen Haus noch fehlt — mit dem Pfad dorthin.
+  window.ImmoEinrichtungBand && React.createElement(window.ImmoEinrichtungBand, null),
   window.ImmoRechtstextSperre && React.createElement(window.ImmoRechtstextSperre, null),
   window.ImmoAboBanner && React.createElement(window.ImmoAboBanner, {
     onNavigate: i
@@ -41721,7 +41723,10 @@ function AdminGmbHStammdaten({
     type: "checkbox",
     checked: !1 !== e.aktiv,
     onChange: t => c(e.id, "aktiv", t.target.checked)
-  }), " aktiv")), React.createElement("div", {
+  }), " aktiv")), window.ImmoFirmaErmitteln && React.createElement(window.ImmoFirmaErmitteln, {
+    firma: e,
+    uebernehmen: w => Object.keys(w).forEach(k => c(e.id, k, w[k]))
+  }), React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fit, minmax(min(220px, 100%), 1fr))",
@@ -133613,7 +133618,8 @@ function ProfilSignaturFeld({ user, profil, wert, onWert }) {
 }
 
 function EinstellungenPage({ user }) {
-  const [reiter, setReiter] = useState("firma");
+  // fork_82: ein Pfad-Verweis (ImmoPfad.zu("einstellungen/…")) nennt den Reiter.
+  const [reiter, setReiter] = useState(() => { const r = window._immoEinstellungenReiter || "firma"; window._immoEinstellungenReiter = null; return r; });
   const [geladen, setGeladen] = useState(false);
   useEffect(() => { epStammLaden(true).then(() => setGeladen(true)); }, []);
   const knopf = (aktiv) => ({ background: "transparent", border: "none", padding: "10px 16px", fontSize: 14,

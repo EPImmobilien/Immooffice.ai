@@ -487,3 +487,6 @@ verify_jwt = true
 
 [functions.web-asset-kopieren]
 verify_jwt = true
+
+[functions.firma-ermitteln]
+verify_jwt = true

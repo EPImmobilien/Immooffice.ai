@@ -6405,3 +6405,36 @@ Dateien ohne diese Spalte.
 Rückgängig gibt es nicht gesammelt: die Vorlage kennt keine Import-
 Stapel, und ein nachträglich angebauter würde eine Löschung über die
 Mandantengrenze hinweg ermöglichen müssen. Die Vorschau ist der Schutz.
+
+
+## 2026-10-07 · Firmendaten aus der Website und Pfad-Verweise (fork_82)
+
+Ein neuer Kunde nennt seine Website, die Function `firma-ermitteln` liest
+Startseite und Impressum und schlägt Firmenname, Anschrift, Kontakt,
+Registergericht, HRB, USt-IdNr., Geschäftsführung vor — **jeder Wert mit
+dem Satz, aus dem er stammt; ohne Beleg kein Wert.** Der Vorschlag landet
+im Formular Einstellungen › Firma & Impressum, Feld für Feld mit Häkchen;
+gespeichert wird mit dem normalen „Speichern". Vorhandene Werte sind nicht
+vorangehakt. Das ist das Prinzip „KI-Auslese immer über ein editierbares
+Formular", und es ist der einzige Schreibweg.
+
+Was absichtlich fehlt: eine Firma **ohne** Website im Netz suchen. Dahinter
+stünde eine Suchmaschine, und ein geratener Treffer wäre genau die
+erfundene Angabe, die CLAUDE.md verbietet. Logos werden gezeigt, nicht
+übernommen — Freistellung und Web-Variante laufen über Marketing › Logos.
+
+Kosten: 0 Credits (Einrichtung ist kostenlos), aber die Aktion steht im
+Ledger und läuft über die Beilage `_credits`, damit Notschalter,
+Tageslimit und Modellwahl des Betreibers greifen. Die Function schreibt
+in keine Tabelle und erlaubt keine internen Ziele (localhost, IP-Adressen,
+`.local`) — eine Website-Abfrage darf kein Weg in die eigene Infrastruktur
+sein.
+
+Pfad-Verweise (`src/eigene/pfad.js`): Wo die Anwendung sagt, dass etwas
+eingestellt werden muss, steht ein Link „→ Einstellungen › Firma &
+Impressum", der hinführt und den Reiter öffnet — statt eines Satzes zum
+Abtippen. Das Einrichtungsband zeigt dem Chef eines neuen Hauses, was
+fehlt (Anschrift, Kontakt, Logo, Postfach), jeweils mit diesem Link.
+Die Prosa-Hinweise der Vorlage („unter Einstellungen → Vorgaben") bleiben
+vorerst Prosa; umgestellt sind die eigenen Stellen (Funktionsschalter,
+Hilfe, Einrichtungsband). Weitere Stellen kommen, wo sie auffallen.

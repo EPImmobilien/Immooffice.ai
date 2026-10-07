@@ -47,7 +47,7 @@
     karte.style.cssText = "background:#fff;border-radius:10px;max-width:420px;width:100%;padding:22px;font-family:inherit;color:#1B2A47;box-shadow:0 20px 60px rgba(0,0,0,.3)";
     karte.innerHTML = '<div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#B5934F;font-weight:700;margin-bottom:8px">Nicht im Tarif enthalten</div>'
       + '<div style="font-size:15px;font-weight:600;margin-bottom:8px">Dieses Modul ist in Ihrem Tarif nicht freigeschaltet.</div>'
-      + '<div style="font-size:13px;color:#7A828C;line-height:1.6">Ein Upgrade schaltet es sofort frei. Sie finden die Tarife unter <strong>Abo &amp; Abrechnung</strong>. Ist das ein Irrtum, hilft der Support.</div>'
+      + '<div style="font-size:13px;color:#7A828C;line-height:1.6">Ein Upgrade schaltet es sofort frei. Sie finden die Tarife unter ' + (window.ImmoPfad ? window.ImmoPfad.html("einstellungen/abrechnung") : '<strong>Abo &amp; Abrechnung</strong>') + '. Ist das ein Irrtum, hilft der Support.</div>'
       + '<div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end"><button type="button" data-schliessen style="background:#1B2A47;color:#fff;border:1px solid #1B2A47;padding:8px 14px;border-radius:7px;font-weight:600;cursor:pointer;font-family:inherit">Verstanden</button></div>';
     karte.querySelector("[data-schliessen]").onclick = function () { box.remove(); };
     box.onclick = function (e) { if (e.target === box) box.remove(); };

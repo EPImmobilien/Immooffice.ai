@@ -4707,6 +4707,18 @@ WOERTLICH = [
      'Objekte: CSV-Import neben "Neues Objekt".'),
 
     # =====================================================================
+    # fork_82 — Firmendaten aus der Website, Pfad-Verweise, Einrichtungsband
+    # =====================================================================
+    ('FORK',
+     '  }), " aktiv")), React.createElement("div", {\n    style: {\n      display: "grid",\n      gridTemplateColumns: "repeat(auto-fit, minmax(min(220px, 100%), 1fr))",\n      gap: 10\n    }\n  }, React.createElement("div", null, React.createElement("label", {\n    style: u\n  }, "Firmenname")',
+     '  }), " aktiv")), window.ImmoFirmaErmitteln && React.createElement(window.ImmoFirmaErmitteln, {\n    firma: e,\n    uebernehmen: w => Object.keys(w).forEach(k => c(e.id, k, w[k]))\n  }), React.createElement("div", {\n    style: {\n      display: "grid",\n      gridTemplateColumns: "repeat(auto-fit, minmax(min(220px, 100%), 1fr))",\n      gap: 10\n    }\n  }, React.createElement("div", null, React.createElement("label", {\n    style: u\n  }, "Firmenname")',
+     'Firma & Impressum: „Aus Website übernehmen“ über jedem Firmensatz.'),
+    ('FORK',
+     'function EinstellungenPage({ user }) {\n  const [reiter, setReiter] = useState("firma");',
+     'function EinstellungenPage({ user }) {\n  // fork_82: ein Pfad-Verweis (ImmoPfad.zu("einstellungen/…")) nennt den Reiter.\n  const [reiter, setReiter] = useState(() => { const r = window._immoEinstellungenReiter || "firma"; window._immoEinstellungenReiter = null; return r; });',
+     'Einstellungen: der Reiter kommt aus dem Pfad-Verweis.'),
+
+    # =====================================================================
     # fork_52 — der Plattform-Bereich des Betreibers
     # ---------------------------------------------------------------------
     # Eine Kachel, eine Ansicht, eine Sperre und die Frage beim Anmelden.
@@ -4743,6 +4755,10 @@ WOERTLICH = [
      '  }, [u, n?.id]), React.createElement("div", {\n    style: {\n      minHeight: "100vh",\n      background: CI.bg,\n      fontFamily: FONT\n    }\n  }, c && i && React.createElement(MobileBurgerMenu, {',
      '  }, [u, n?.id]), React.createElement("div", {\n    style: {\n      minHeight: "100vh",\n      background: CI.bg,\n      fontFamily: FONT\n    }\n  },\n  // fork_53: das Band ueber der Anwendung. Es erscheint nur in den vier\n  // Lagen, in denen jemand etwas erfahren MUSS, bevor er es daran merkt,\n  // dass etwas nicht mehr geht — Testphase laeuft aus, Zahlung offen,\n  // Lesezugriff oder Sperre, Credits knapp. Sonst ist es nicht da; ein\n  // Band, das immer steht, liest niemand mehr.\n  window.ImmoSupportBand && React.createElement(window.ImmoSupportBand, null),\n  // fork_77: der Chef sieht eine wartende Zugriffsanfrage des Supports.\n  window.ImmoSupportAnfrageBand && React.createElement(window.ImmoSupportAnfrageBand, null),\n  // fork_78: Hinweise des Betreibers und die Zustimmung zu neuen Rechtstexten.\n  window.ImmoAnkuendigungBand && React.createElement(window.ImmoAnkuendigungBand, null),\n  window.ImmoRechtstextSperre && React.createElement(window.ImmoRechtstextSperre, null),\n  window.ImmoAboBanner && React.createElement(window.ImmoAboBanner, {\n    onNavigate: i\n  }), c && i && React.createElement(MobileBurgerMenu, {',
      'Abo-Band: erscheint ueber jeder Seite, wenn es etwas zu sagen gibt.'),
+    ('FORK',
+     '  window.ImmoAnkuendigungBand && React.createElement(window.ImmoAnkuendigungBand, null),',
+     '  window.ImmoAnkuendigungBand && React.createElement(window.ImmoAnkuendigungBand, null),\n  // fork_82: was einem neuen Haus noch fehlt — mit dem Pfad dorthin.\n  window.ImmoEinrichtungBand && React.createElement(window.ImmoEinrichtungBand, null),',
+     'Einrichtungsband ueber der Anwendung.'),
 
     # =====================================================================
     # fork_56 — Social-Media-Beitraege aus dem Objekt

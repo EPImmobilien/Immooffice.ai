@@ -153,7 +153,7 @@
                 E("td", { style: { padding: "9px 12px", borderBottom: "1px solid " + CI.border, fontSize: 12.5, whiteSpace: "nowrap" } }, zeit(a.aktualisiert_am)));
             })))),
         p.user && p.user.role === "chef" ? E("p", { style: { fontSize: 12, color: CI.muted } },
-          "Zugriffsanfragen des Supports auf Ihre Daten stehen unter Einstellungen → Support-Zugriffe. Ohne Ihre Freigabe sieht der Support nichts.") : null));
+          "Zugriffsanfragen des Supports auf Ihre Daten stehen unter ", window.ImmoPfadLink ? E(window.ImmoPfadLink, { ziel: "einstellungen/supportzugriffe" }) : "Einstellungen → Support-Zugriffe", ". Ohne Ihre Freigabe sieht der Support nichts.") : null));
   }
 
   // --- Support-Zugriffe (Einstellungen, Chef) ----------------------------------

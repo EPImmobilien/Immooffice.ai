@@ -776,6 +776,13 @@ else
   schlecht
 fi
 
+abschnitt "Firmendaten aus der Website: nur mit Beleg, nur ins Formular"
+if node tests/firma-ermitteln.js; then
+  :
+else
+  schlecht
+fi
+
 abschnitt "CSV-Import: Lesen, Zuordnen, Pruefen"
 if node tests/csv-import.js; then
   :
