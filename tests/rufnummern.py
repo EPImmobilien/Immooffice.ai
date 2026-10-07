@@ -77,10 +77,14 @@ def ist_platzhalter(ziffern):
     return False
 
 
-# Nummern, die bleiben duerfen, mit Grund. Leer — und das ist die Aussage:
-# im Quelltext steht keine einzige erreichbare Rufnummer. Wer eine
-# eintraegt, traegt sie hier mit Grund ein oder nimmt sie wieder heraus.
-ERLAUBT = {}
+# Nummern, die bleiben duerfen, mit Grund. Wer eine eintraegt, traegt sie
+# hier mit Grund ein oder nimmt sie wieder heraus.
+ERLAUBT = {
+    # Impressum der Website (website/konfig.js): die Kontaktnummer des
+    # Betreibers. § 5 DDG verlangt sie, und die Website hat keine Datenbank,
+    # aus der sie sie lesen koennte. Vom Betreiber selbst angegeben, 07.10.2026.
+    '01632188125': 'Impressum, Betreiber',
+}
 
 
 def dateien():

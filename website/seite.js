@@ -141,7 +141,7 @@
   }
 
   // --- 4. Filter des Modul-Katalogs ---------------------------------------
-  // 27 Bereiche auf einmal sind eine Wand. Der Filter blendet aus, was
+  // 29 Bereiche auf einmal sind eine Wand. Der Filter blendet aus, was
   // gerade nicht gefragt ist — er laedt nichts nach. Ohne JavaScript steht
   // alles da, und das ist die richtige Rueckfallebene: lieber alles sehen
   // als nichts.
@@ -153,7 +153,7 @@
   // Im Markup steht `open`, und zwar mit Absicht: ohne JavaScript ist alles
   // sichtbar, und das ist die richtige Rueckfallebene — lieber alles sehen
   // als nichts aufklappen koennen. Erst hier wird auf dem Telefon
-  // zugeklappt, wo 27 ausgeklappte Bereiche 8691 px ergaeben.
+  // zugeklappt, wo 29 ausgeklappte Bereiche 8691 px ergaeben.
   //
   // Umgeschaltet wird NUR beim Wechsel der Breite, nicht bei jedem
   // resize-Ereignis: sonst fiele jedes Aufgeklappte wieder zu, sobald die
