@@ -645,6 +645,19 @@ abgeschaltete Regel, Support hoch, Tageskosten, Zusammenfassung, Demo:
 30, MRR = Handsumme, Warnregeln ohne Demo, 12 Monate, Rechnungen,
 doppeltes Anlegen abgewiesen, vollständiges Entfernen).
 
+## Supabase-Advisors (Stand 07.10.2026, nach fork_79)
+
+| Befund | Anzahl | Betreiber-Objekte | Umgang |
+|---|---|---|---|
+| `function_search_path_mutable` | 77 | 2 (`credit_buchung_unveraenderlich`, `plattform_protokoll_unveraenderlich`) | **behoben** (fork_80); die 75 übrigen sind Vorlage/Altbestand → OFFEN |
+| `auth_rls_initplan` | 249 | 8 Richtlinien | **behoben** (fork_80: `(select auth.uid())`) |
+| `unindexed_foreign_keys` | 378 | 17 | **behoben** (fork_80) |
+| `authenticated_security_definer_function_executable` | 124 | alle Betreiberfunktionen | gewollt: das Gate `tests/funktionsrechte.sql` verlangt EXECUTE für `authenticated`; jede Funktion prüft `plattform_rolle()` im Körper |
+| `rls_enabled_no_policy` | 21 | 5 (`ankuendigungen`, `mandant_ki_limits`, `plattform_warnregeln`, `plattform_warnungen`, `system_mail_vorlagen`) | gewollt: nur Dienstschlüssel; Angemeldete lesen über Funktionen |
+| `multiple_permissive_policies` | 574 | 8 (`plattform_*`) | gewollt: lesen (alle) + pflegen (owner/admin) getrennt |
+| `unused_index` | 364 | 19 | erwartbar auf einer jungen Datenbank; nach drei Monaten Betrieb erneut prüfen |
+| `auth_leaked_password_protection` | 1 | — | Konsole: *Authentication → Password* einschalten (To-do Betreiber) |
+
 ## Abnahme (Auftrag, Abschnitt 22)
 
 | # | Punkt | Stand | Nachweis |
@@ -711,6 +724,8 @@ Werden hier je Schritt nachgetragen. Reihenfolge wie im Auftrag.
    „Zustimmung erforderlich" setzen, wenn die Chefs zustimmen sollen.
 5. KI-Grenzen prüfen: Reiter „KI" → Tageslimit (Start 0 = aus) und
    Alarm-Schwellen (Start 50 €/Tag, 1.000 €/Monat, je Mandant 10/100 €).
-6. Demo-Daten nach der Abnahme wieder entfernen (Reiter „Warnungen", unten,
+6. Leaked-Password-Schutz unter *Authentication → Password* einschalten
+   (Supabase-Advisor).
+7. Demo-Daten nach der Abnahme wieder entfernen (Reiter „Warnungen", unten,
    Bestätigung DEMO) — sie zählen in allen Listen mit, nur Warnungen,
    Zusammenfassung und Stripe-Abgleich lassen sie aus.

@@ -1425,3 +1425,14 @@ DSGVO-Löschprozess (Schritt 2, offen).
   auf einem Gerät gemessen.
 - **Dashboard < 2 s** lokal mit 30 Demo-Häusern nachgewiesen (20 ms je
   Funktion); auf dem Projekt mit Demo-Daten messen, sobald sie dort liegen.
+
+
+## Advisors: 75 Funktionen der Vorlage ohne festen search_path
+
+`function_search_path_mutable` nennt 77 Funktionen; zwei davon (Ledger,
+Audit-Log) sind in fork_80 behoben. Die übrigen 75 sind Trigger- und
+Hilfsfunktionen der Vorlage (`set_*_updated_at`, `rechnung_*`,
+`intern.*_verweise_pruefen` …). Ein pauschales `set search_path = public`
+könnte die `intern.*`-Funktionen brechen, die unqualifiziert in ihr Schema
+greifen. Je Funktion prüfen, dann setzen — Phase-9-Arbeit, keine
+Betreiberarbeit.

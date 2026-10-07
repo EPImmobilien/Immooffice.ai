@@ -508,7 +508,9 @@ zuwachs(bereich, mehr, grund) as (values
   ('Indizes ohne Constraint', 1, 'fork_79: warnungen nach Zeit'),
   ('Funktionen', 4, 'fork_79: plattform_warnungen_pruefen, plattform_tageszusammenfassung, plattform_demo_anlegen, plattform_demo_entfernen'),
   ('Fremdschluessel', 2, 'fork_79: warnungen auf regeln und mandanten'),
-  ('Cron-Jobs', 3, 'fork_79: plattform-warnungen-stuendlich, plattform-zusammenfassung-sommer/-winter')
+  ('Cron-Jobs', 3, 'fork_79: plattform-warnungen-stuendlich, plattform-zusammenfassung-sommer/-winter'),
+  -- fork_80: Advisor-Nachlese — Indizes auf 17 Fremdschluessel der Betreiber-Tabellen.
+  ('Indizes ohne Constraint', 17, 'fork_80: Fremdschluessel der Betreiber-Tabellen')
 ),
 soll(bereich, soll) as (
   select v.bereich,
