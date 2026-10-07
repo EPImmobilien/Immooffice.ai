@@ -54,6 +54,49 @@
     return a.data || {};
   }
 
+  // --- CSV fuer Excel (fork_69) ---------------------------------------------
+  // UTF-8 mit BOM, Semikolon, deutsche Zahlen — sonst oeffnet Excel die
+  // Datei in einer Spalte und macht aus 12,5 den 12. Mai. Jede Tabelle
+  // des Betreiberbereichs exportiert ueber diese eine Funktion.
+  function csvExport(dateiname, spalten, zeilen) {
+    function z(w) {
+      if (w === null || w === undefined) return "";
+      if (typeof w === "number") return String(w).replace(".", ",");
+      if (typeof w === "boolean") return w ? "ja" : "nein";
+      var s = String(w);
+      if (/^\d{4}-\d{2}-\d{2}T/.test(s)) { try { s = new Date(s).toLocaleString("de-DE"); } catch (e) { /* roh */ } }
+      return /[;"\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    }
+    var kopf = spalten.map(function (s) { return z(s[0]); }).join(";");
+    var koerper = zeilen.map(function (r) {
+      return spalten.map(function (s) { return z(typeof s[1] === "function" ? s[1](r) : r[s[1]]); }).join(";");
+    });
+    var blob = new Blob(["\ufeff" + [kopf].concat(koerper).join("\r\n")], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = dateiname; a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+  function sortiere(zeilen, feld, richtung) {
+    if (!feld) return zeilen;
+    var k = richtung === "ab" ? -1 : 1;
+    return zeilen.slice().sort(function (a, b) {
+      var x = a[feld], y = b[feld];
+      if (x === null || x === undefined) return 1;
+      if (y === null || y === undefined) return -1;
+      if (typeof x === "number" && typeof y === "number") return (x - y) * k;
+      return String(x).localeCompare(String(y), "de") * k;
+    });
+  }
+  function Ampel(p) {
+    var w = p.wert;
+    if (w === null || w === undefined) return E("span", { style: { color: CI.muted } }, "—");
+    var farbe = w >= 70 ? CI.success : w >= 40 ? CI.gold : CI.danger;
+    return E("span", { title: "Gesundheitswert " + w + " von 100", style: {
+      display: "inline-block", minWidth: 34, textAlign: "center", padding: "2px 6px",
+      borderRadius: 10, background: farbe, color: "#fff", fontSize: 12, fontWeight: 600 } }, w);
+  }
+  function mb(bytes) { return (Number(bytes || 0) / 1048576).toLocaleString("de-DE", { maximumFractionDigits: 1 }) + " MB"; }
+
   var kasten = {
     background: CI.card, border: "1px solid " + CI.border, borderRadius: 10,
     padding: 18, marginBottom: 16,
@@ -131,8 +174,26 @@
     var gZ = React.useState(null), geschenk = gZ[0], setzeGeschenk = gZ[1];
     var aZ = React.useState({ credits: 100, grund: "" }), form = aZ[0], setzeForm = aZ[1];
     var bZ = React.useState(false), busy = bZ[0], setzeBusy = bZ[1];
+    var sZ = React.useState(""), suche = sZ[0], setzeSuche = sZ[1];
+    var fZ = React.useState(""), filter = fZ[0], setzeFilter = fZ[1];
+    var oZ = React.useState({ feld: "name", richtung: "auf" }), sort = oZ[0], setzeSort = oZ[1];
     if (!p.daten) return E("div", { style: { color: CI.muted } }, "Lade Mandanten …");
-    var zeilen = p.daten;
+    var bald = Date.now() + 3 * 86400000;
+    var zeilen = sortiere(p.daten.filter(function (m) {
+      var s = suche.trim().toLowerCase();
+      if (s && !((m.name || "").toLowerCase().indexOf(s) >= 0 || (m.slug || "").toLowerCase().indexOf(s) >= 0
+                 || String(m.id).toLowerCase().indexOf(s) >= 0)) return false;
+      if (filter === "risiko") return (m.gesundheit !== null && m.gesundheit < 40) || !!m.zahlung_fehler_seit;
+      if (filter === "test_bald") return m.status === "test" && m.testphase_bis && new Date(m.testphase_bis).getTime() < bald;
+      if (filter === "zahlung") return !!m.zahlung_fehler_seit;
+      return true;
+    }), sort.feld, sort.richtung);
+    function kopf(titel, feld) {
+      var an = sort.feld === feld;
+      return E("th", { key: feld || titel, style: Object.assign({}, kopfzelle, { cursor: feld ? "pointer" : "default", whiteSpace: "nowrap" }),
+        onClick: feld ? function () { setzeSort({ feld: feld, richtung: an && sort.richtung === "auf" ? "ab" : "auf" }); } : null },
+        titel + (an ? (sort.richtung === "auf" ? " ▲" : " ▼") : ""));
+    }
 
     async function schenken() {
       setzeBusy(true);
@@ -147,12 +208,29 @@
       setzeBusy(false);
     }
 
+    var schnell = [["", "Alle"], ["risiko", "Risiko"], ["test_bald", "Test endet bald"], ["zahlung", "Zahlung offen"]];
     return E("div", null,
+      E("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 12 } },
+        E("input", { style: Object.assign({}, feld, { width: 260 }), value: suche, placeholder: "Firmenname, Kürzel oder Mandanten-ID",
+          onChange: function (e) { setzeSuche(e.target.value); } }),
+        schnell.map(function (f) {
+          var an = filter === f[0];
+          return E("button", { key: f[0], type: "button", onClick: function () { setzeFilter(f[0]); },
+            style: Object.assign({}, knopfLeer, an ? { background: CI.blau, color: "#fff", borderColor: CI.blau } : {}) }, f[1]);
+        }),
+        E("span", { style: { fontSize: 12, color: CI.muted, marginLeft: "auto" } }, zeilen.length + " von " + p.daten.length),
+        E("button", { type: "button", style: knopfLeer, onClick: function () {
+          csvExport("mandanten.csv", [["Firma", "name"], ["Mandanten-ID", "id"], ["Tarif", "tarif_name"],
+            ["Status", "status"], ["Zugriff", "zugriff"], ["Nutzer", "nutzer"], ["Credits", "saldo"],
+            ["MRR netto EUR", function (r) { return Number(r.mrr_cent || 0) / 100; }],
+            ["Letzter Login", "letzter_login"], ["Aktive Nutzer 14 Tage", "aktive_14"],
+            ["Onboarding von 8", "onboarding"], ["Gesundheit", "gesundheit"], ["Erstellt am", "erstellt_am"]], zeilen); } }, "CSV")),
       E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
-        E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 900 } },
+        E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 1100 } },
           E("thead", null, E("tr", null,
-            ["Haus", "Tarif", "Status", "Zugriff", "Nutzer", "Credits", "Monatserlös", "Fristen", ""]
-              .map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
+            kopf("Haus", "name"), kopf("Tarif", "tarif_name"), kopf("Status", "status"), kopf("Zugriff", "zugriff"),
+            kopf("Nutzer", "nutzer"), kopf("Credits", "saldo"), kopf("Monatserlös", "mrr_cent"),
+            kopf("Letzter Login", "letzter_login"), kopf("Gesundheit", "gesundheit"), kopf("Fristen", null), kopf("", null))),
           E("tbody", null, zeilen.map(function (m) {
             return E("tr", { key: m.id },
               E("td", { style: zelle },
@@ -173,6 +251,10 @@
                 + (m.zusatznutzer ? " (+" + zahl(m.zusatznutzer) + ")" : "")),
               E("td", { style: zelle }, zahl(m.saldo)),
               E("td", { style: zelle }, m.mrr_cent ? geld(m.mrr_cent) : "—"),
+              E("td", { style: Object.assign({}, zelle, { fontSize: 12 }) },
+                m.letzter_login ? datum(m.letzter_login) : E("span", { style: { color: CI.muted } }, "nie"),
+                E("div", { style: { fontSize: 11, color: CI.muted } }, zahl(m.aktive_14 || 0) + " aktiv · " + zahl(m.onboarding || 0) + "/8")),
+              E("td", { style: zelle }, E(Ampel, { wert: m.gesundheit })),
               E("td", { style: Object.assign({}, zelle, { fontSize: 11.5, color: CI.muted }) },
                 m.testphase_bis && m.status === "test" ? "Test bis " + datum(m.testphase_bis) : null,
                 m.cancel_at ? E("div", null, "endet " + datum(m.cancel_at)) : null,
@@ -279,6 +361,36 @@
 
     var geaendert = Object.keys(entwurf).length > 0;
     var tarife = (p.katalog && p.katalog.tarife) || [];
+    var md = d.metadaten || null, onb = (md && md.onboarding) || {};
+    var nZ = React.useState(""), notiz = nZ[0], setzeNotiz = nZ[1];
+    var abZ = React.useState(null), abzug = abZ[0], setzeAbzug = abZ[1];
+    var rolle = p.rolle || "admin";
+
+    function testPlus(tage) {
+      var basis = m.testphase_bis && new Date(m.testphase_bis).getTime() > Date.now()
+        ? new Date(m.testphase_bis) : new Date();
+      basis.setDate(basis.getDate() + tage);
+      setzen("testphase_bis", basis.toISOString().slice(0, 10));
+    }
+    async function notizSpeichern() {
+      if (!notiz.trim()) return;
+      setzeBusy("notiz");
+      try { await ruf("notiz_anlegen", { mandant_id: m.id, text: notiz }); setzeNotiz(""); p.neuLaden(); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+      setzeBusy("");
+    }
+    async function abziehen() {
+      setzeBusy("abzug");
+      try {
+        await ruf("credits_abziehen", { mandant_id: m.id, credits: Number(abzug.credits), grund: abzug.grund });
+        setzeAbzug(null); p.melden("Abgezogen."); p.neuLaden();
+      } catch (f) { p.melden(f.message || String(f), "fehler"); }
+      setzeBusy("");
+    }
+    var onbListe = [["Logo hochgeladen", onb.logo ? true : false, null], ["Farben gesetzt", !!onb.farben, null],
+      ["Schrift gewählt", !!onb.schrift, null], ["Erstes Objekt angelegt", !!onb.objekt_am, onb.objekt_am],
+      ["Erstes Exposé erzeugt", !!onb.expose_am, onb.expose_am], ["Erste E-Signatur", !!onb.signatur_am, onb.signatur_am],
+      ["Postfach verbunden", !!onb.postfach_am, onb.postfach_am], ["Mitarbeiter eingeladen", !!onb.mitarbeiter_am, onb.mitarbeiter_am]];
 
     return E("div", null,
       E("button", { type: "button", style: knopfLeer, onClick: p.zurueck },
@@ -331,6 +443,11 @@
         m.gesperrt_am ? E("div", { style: { fontSize: 12, color: CI.danger, marginTop: 4 } },
           "Gesperrt seit " + datum(m.gesperrt_am)
           + (m.gesperrt_grund ? ": " + m.gesperrt_grund : "")) : null,
+        E("div", { style: { display: "flex", gap: 6, marginTop: 12, alignItems: "center", flexWrap: "wrap" } },
+          E("span", { style: { fontSize: 12, color: CI.muted } }, "Testphase verlängern:"),
+          [7, 14, 30].map(function (tg) {
+            return E("button", { key: tg, type: "button", style: knopfLeer, onClick: function () { testPlus(tg); } }, "+" + tg + " Tage");
+          })),
         geaendert ? E("div", { style: { marginTop: 14 } },
           E("label", { style: { fontSize: 12, color: CI.muted, display: "block", marginBottom: 4 } },
             "Grund — steht im Protokoll"),
@@ -347,10 +464,46 @@
               + "Änderungen gehören deshalb nach Stripe.")
           : null),
 
+      md ? E("div", { style: kasten },
+        Ueberschrift("Onboarding und Nutzung — nur Zählwerte"),
+        E("div", { style: { display: "grid", gap: 6, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" } },
+          onbListe.map(function (o) {
+            return E("div", { key: o[0], style: { fontSize: 13 } },
+              E("span", { style: { color: o[1] ? CI.success : CI.muted, marginRight: 6 } }, o[1] ? "✓" : "○"),
+              o[0], o[2] ? E("span", { style: { fontSize: 11, color: CI.muted } }, " · " + datum(o[2])) : null);
+          })),
+        E("div", { style: { display: "flex", gap: 18, flexWrap: "wrap", marginTop: 12, fontSize: 12.5, color: CI.muted } },
+          Object.keys(md.zaehlwerte || {}).map(function (k) {
+            return E("span", { key: k }, E("strong", { style: { color: CI.blau } }, zahl(md.zaehlwerte[k])), " " + k);
+          })),
+        Object.keys(md.module || {}).length ? E("div", { style: { marginTop: 12 } },
+          E("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 4 } }, "Aktionen je Modul, letzte 30 Tage"),
+          E("div", { style: { display: "flex", gap: 10, flexWrap: "wrap", fontSize: 12.5 } },
+            Object.keys(md.module).sort(function (a, b) { return md.module[b] - md.module[a]; }).map(function (k) {
+              return E("span", { key: k, style: { background: CI.bg, border: "1px solid " + CI.border, borderRadius: 6, padding: "2px 8px" } },
+                k + " " + zahl(md.module[k]));
+            }))) : null,
+        E("div", { style: { marginTop: 12 } },
+          E("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 4 } }, "Speicher je Bucket"),
+          Object.keys(md.speicher || {}).length
+            ? E("div", { style: { display: "flex", gap: 10, flexWrap: "wrap", fontSize: 12.5 } },
+                Object.keys(md.speicher).map(function (k) { return E("span", { key: k }, k + ": " + mb(md.speicher[k])); }))
+            : E("span", { style: { fontSize: 12.5, color: CI.muted } }, "nichts abgelegt"))) : null,
+
       E("div", { style: kasten },
         Ueberschrift("Credits"),
         E("div", { style: { fontSize: 24, fontWeight: 700, color: CI.blau } },
-          zahl(d.saldo), E("span", { style: { fontSize: 13, fontWeight: 400, color: CI.muted } }, " verfügbar")),
+          zahl(d.saldo), E("span", { style: { fontSize: 13, fontWeight: 400, color: CI.muted } }, " verfügbar"),
+          (rolle === "owner" || rolle === "admin") ? E("button", { type: "button", style: Object.assign({}, knopfLeer, { marginLeft: 12 }),
+            onClick: function () { setzeAbzug({ credits: 10, grund: "" }); } }, "Abziehen") : null),
+        abzug ? E("div", { style: { marginTop: 10, display: "grid", gap: 8, gridTemplateColumns: "120px 1fr auto auto", alignItems: "end" } },
+          E("input", { type: "number", min: 1, style: feld, value: abzug.credits,
+            onChange: function (e) { setzeAbzug(Object.assign({}, abzug, { credits: e.target.value })); } }),
+          E("input", { style: feld, value: abzug.grund, placeholder: "Grund — steht im Ledger und im Audit-Log",
+            onChange: function (e) { setzeAbzug(Object.assign({}, abzug, { grund: e.target.value })); } }),
+          E("button", { type: "button", style: knopf, disabled: !!busy || abzug.grund.trim().length < 5, onClick: abziehen },
+            busy === "abzug" ? "Zieht ab …" : "Abziehen"),
+          E("button", { type: "button", style: knopfLeer, onClick: function () { setzeAbzug(null); } }, "Abbrechen")) : null,
         (d.konten || []).length
           ? E("table", { style: { width: "100%", borderCollapse: "collapse", marginTop: 10 } },
               E("thead", null, E("tr", null, ["Topf", "Gutgeschrieben", "Verbraucht", "Gültig bis", "Herkunft"]
@@ -370,15 +523,37 @@
         Ueberschrift("Konten im Haus (" + zahl((d.nutzer || []).length)
           + " von " + zahl(d.nutzer_limit) + ")"),
         E("table", { style: { width: "100%", borderCollapse: "collapse" } },
-          E("thead", null, E("tr", null, ["Name", "Adresse", "Rolle", "Funktion"]
+          E("thead", null, E("tr", null, ["Name", "Adresse", "Rolle", "Funktion", "Letzter Login"]
             .map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
           E("tbody", null, (d.nutzer || []).map(function (n) {
             return E("tr", { key: n.id },
               E("td", { style: zelle }, n.name || "—"),
               E("td", { style: zelle }, n.email),
               E("td", { style: zelle }, n.role),
-              E("td", { style: zelle }, n.funktion || "—"));
+              E("td", { style: zelle }, n.funktion || "—"),
+              E("td", { style: Object.assign({}, zelle, { fontSize: 12 }) }, n.letzter_login ? zeit(n.letzter_login) : "nie"));
           })))),
+
+      E("div", { style: kasten },
+        Ueberschrift("Notizen des Betreibers"),
+        E("div", { style: { display: "flex", gap: 8 } },
+          E("input", { style: feld, value: notiz, placeholder: "Interne Notiz — der Mandant sieht sie nie",
+            onChange: function (e) { setzeNotiz(e.target.value); },
+            onKeyDown: function (e) { if (e.key === "Enter") notizSpeichern(); } }),
+          E("button", { type: "button", style: knopf, disabled: !!busy || !notiz.trim(), onClick: notizSpeichern }, "Notieren")),
+        (d.notizen || []).map(function (n) {
+          return E("div", { key: n.id, style: { fontSize: 13, padding: "8px 0", borderBottom: "1px solid " + CI.border } },
+            E("div", { style: { fontSize: 11, color: CI.muted } }, zeit(n.erstellt_am)), n.text);
+        })),
+
+      E("div", { style: kasten },
+        Ueberschrift("Verlauf — was Betreiber an diesem Haus getan haben"),
+        (d.verlauf || []).length ? (d.verlauf || []).map(function (v) {
+          return E("div", { key: v.id, style: { fontSize: 12.5, padding: "5px 0", borderBottom: "1px solid " + CI.border } },
+            E("span", { style: { color: CI.muted } }, zeit(v.erstellt_am) + " · " + (v.rolle || "") + " · "),
+            E("strong", null, v.aktion),
+            v.begruendung ? E("span", { style: { color: CI.muted } }, " — " + v.begruendung) : null);
+        }) : E("div", { style: { fontSize: 13, color: CI.muted } }, "Noch nichts.")),
 
       E("div", { style: kasten },
         Ueberschrift("In dieses Haus hineinsehen"),
@@ -1010,7 +1185,7 @@
         padding: "10px 14px", marginBottom: 16, fontSize: 13, borderRadius: 8,
       } }, meldung.text) : null,
 
-      offen ? E(MandantTafel, { daten: daten.mandant, katalog: daten.katalog,
+      offen ? E(MandantTafel, { daten: daten.mandant, katalog: daten.katalog, rolle: rolle,
             melden: melden, supportNeu: supportLaden,
             neuLaden: function () { laden("mandant", offen); },
             zurueck: function () { setzeOffen(null); laden("mandanten"); } })

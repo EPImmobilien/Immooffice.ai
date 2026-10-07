@@ -62,6 +62,8 @@ const ROLLEN: Record<string, string[]> = {
   nutzer:                 ["owner", "admin", "support"],
   katalog_speichern:      ["owner", "admin"],
   credits_schenken:       ["owner", "admin", "support"],
+  credits_abziehen:       ["owner", "admin"],
+  notiz_anlegen:          ["owner", "admin", "support"],
   mandant_speichern:      ["owner", "admin", "support"],
   mandant_loeschen:       ["owner"],
   admin_setzen:           ["owner"],
@@ -208,6 +210,12 @@ Deno.serve(async (req) => {
           + "periode_bis, mindestlaufzeit_bis, cancel_at, zahlung_fehler_seit, stripe_customer_id");
       const { data: tarife } = await db.from("plattform_tarife").select("*");
       const { data: profile } = await db.from("profiles").select("mandant_id");
+      // Letzter Login, aktive Nutzer, Onboarding, Gesundheit — aus einer
+      // Datenbankfunktion, die nur ZAEHLT (fork_69). Die Fachtabellen
+      // bleiben dieser Function verschlossen, auch zum Zaehlen.
+      const { data: kennzahlen } = await db.rpc("plattform_mandanten_kennzahlen");
+      const kzNach = new Map<string, Record<string, unknown>>();
+      for (const k of (kennzahlen || []) as Record<string, unknown>[]) kzNach.set(String(k.mandant_id), k);
 
       const nachMandant = new Map<string, Record<string, unknown>>();
       for (const a of abos || []) nachMandant.set(String(a.mandant_id), a);
@@ -255,6 +263,11 @@ Deno.serve(async (req) => {
           zahlung_fehler_seit: a?.zahlung_fehler_seit || null,
           zahlt: !!a?.stripe_customer_id,
           mrr_cent: mrr,
+          letzter_login: kzNach.get(String(m.id))?.letzter_login || null,
+          aktive_14: Number(kzNach.get(String(m.id))?.aktive_14 || 0),
+          onboarding: Number(kzNach.get(String(m.id))?.onboarding || 0),
+          aktionen_30: Number(kzNach.get(String(m.id))?.aktionen_30 || 0),
+          gesundheit: kzNach.has(String(m.id)) ? Number(kzNach.get(String(m.id))?.gesundheit || 0) : null,
         });
       }
       return antwort({ ok: true, mandanten: zeilen });
@@ -362,6 +375,47 @@ Deno.serve(async (req) => {
       return antwort({ ok: true, referenz });
     }
 
+    // --- Credits abziehen (fork_69) ----------------------------------------
+    // Das Gegenstueck zur Gutschrift: aelteste Toepfe zuerst, nie unter null,
+    // jede Buchung mit Quelle `betreiber` und Grund im Ledger. Nur owner und
+    // admin — das steht in ROLLEN und noch einmal in der Datenbankfunktion.
+    if (aktion === "credits_abziehen") {
+      const mandant = String(body.mandant_id || "");
+      const anzahl = Math.floor(Number(body.credits || 0));
+      const grund = String(body.grund || "").trim();
+      if (!mandant) return antwort({ ok: false, fehler: "Kein Mandant." }, 400);
+      if (!(anzahl > 0) || anzahl > 100000) {
+        return antwort({ ok: false, fehler: "Anzahl zwischen 1 und 100000." }, 400);
+      }
+      if (grund.length < 5) {
+        return antwort({ ok: false, fehler:
+          "Bitte einen Grund angeben — er steht im Ledger und im Protokoll." }, 400);
+      }
+      const referenz = "abzug:" + mandant + ":" + (body.vorgang || crypto.randomUUID());
+      const { data: saldoVorher } = await db.rpc("credits_saldo", { p_mandant: mandant });
+      const { error } = await db.rpc("credits_abziehen", {
+        p_mandant: mandant, p_credits: anzahl, p_grund: grund, p_referenz: referenz,
+      });
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll("credits_abgezogen", mandant, { credits: anzahl, grund, referenz },
+                      { typ: "mandant", vorher: { saldo: saldoVorher },
+                        nachher: { saldo: Number(saldoVorher || 0) - anzahl } });
+      return antwort({ ok: true, referenz });
+    }
+
+    // --- Notiz des Betreibers (fork_69) -----------------------------------
+    if (aktion === "notiz_anlegen") {
+      const mandant = String(body.mandant_id || "");
+      const text = String(body.text || "").trim();
+      if (!mandant) return antwort({ ok: false, fehler: "Kein Mandant." }, 400);
+      if (!text) return antwort({ ok: false, fehler: "Leere Notiz." }, 400);
+      const { error } = await db.from("plattform_notizen")
+        .insert({ betrifft_mandant_id: mandant, admin_id: u.user.id, text: text.slice(0, 4000) });
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll("notiz_angelegt", mandant, { laenge: text.length }, { typ: "mandant" });
+      return antwort({ ok: true });
+    }
+
     // --- Ein Mandant im Einzelnen ------------------------------------------
     // Wieder NUR die Vertragsbeziehung. Dazu die Konten des Hauses (Name,
     // Adresse, Rolle) — ohne sie liesse sich ein Kunde nicht betreuen, und
@@ -387,16 +441,33 @@ Deno.serve(async (req) => {
             .order("begonnen_am", { ascending: false }).limit(20),
         ]);
       if (!m) return antwort({ ok: false, fehler: "Unbekannter Mandant." }, 404);
-      const [{ data: saldo }, { data: zugriff }, { data: limit }] = await Promise.all([
+      const [{ data: saldo }, { data: zugriff }, { data: limit }, { data: metadaten },
+             { data: notizen }, { data: verlauf }] = await Promise.all([
         db.rpc("credits_saldo", { p_mandant: id }),
         db.rpc("abo_zugriff", { p_mandant: id }),
         db.rpc("nutzer_limit", { p_mandant: id }),
+        // Onboarding, Zaehlwerte, Logins, Module, Speicher — nur Metadaten (fork_69).
+        db.rpc("plattform_mandant_metadaten", { p_mandant: id }),
+        db.from("plattform_notizen").select("id, admin_id, text, erstellt_am")
+          .eq("betrifft_mandant_id", id).order("erstellt_am", { ascending: false }).limit(100),
+        // Der Verlauf: alles, was Betreiber an diesem Haus getan haben.
+        db.from("plattform_protokoll").select("id, erstellt_am, benutzer_id, rolle, aktion, einzelheiten, begruendung")
+          .eq("gegenstand", id).order("erstellt_am", { ascending: false }).limit(100),
       ]);
+      // Die Logins je Konto an die Konten haengen (Name/E-Mail kommen aus
+      // profiles, der Zeitpunkt aus der Funktion).
+      const loginNach = new Map<string, unknown>();
+      for (const l of ((metadaten as Record<string, unknown>)?.logins as Record<string, unknown>[] || [])) {
+        loginNach.set(String(l.id), l.letzter_login);
+      }
       return antwort({
-        ok: true, mandant: m, abo, nutzer: nutzer || [], konten: konten || [],
+        ok: true, mandant: m, abo,
+        nutzer: (nutzer || []).map((n) => ({ ...n, letzter_login: loginNach.get(String(n.id)) || null })),
+        konten: konten || [],
         buchungen: buchungen || [], erinnerungen: erinnerungen || [],
         sitzungen: sitzungen || [],
         saldo: Number(saldo ?? 0), zugriff, nutzer_limit: Number(limit ?? 0),
+        metadaten: metadaten || null, notizen: notizen || [], verlauf: verlauf || [],
       });
     }
 

@@ -401,7 +401,18 @@ zuwachs(bereich, mehr, grund) as (values
   ('Pruefbedingungen', 1, 'fork_68: rolle ist owner, admin, support oder finanzen'),
   ('Funktionen', 2, 'fork_68: plattform_rolle, plattform_admins_letzter_owner'),
   ('Trigger', 1, 'fork_68: der letzte aktive Owner bleibt'),
-  ('Sichten', 1, 'fork_68: plattform_audit_log — der Name aus dem Auftrag, auf plattform_protokoll')
+  ('Sichten', 1, 'fork_68: plattform_audit_log — der Name aus dem Auftrag, auf plattform_protokoll'),
+
+  -- fork_69: Betreiber, Schritt 2 — Notizen, Credits abziehen, Metadaten.
+  ('Tabellen', 1, 'fork_69: plattform_notizen'),
+  ('Tabellen mit RLS', 1, 'fork_69: auch diese'),
+  ('Spalten', 5, 'fork_69: id, betrifft_mandant_id, admin_id, text, erstellt_am'),
+  ('Primaer- und Eindeutigkeitsschluessel', 1, 'fork_69: der Primaerschluessel'),
+  ('Pruefbedingungen', 1, 'fork_69: eine Notiz ist nicht leer'),
+  ('Fremdschluessel', 2, 'fork_69: auf mandanten und profiles'),
+  ('Indizes ohne Constraint', 1, 'fork_69: je Mandant nach Zeit'),
+  ('Richtlinien', 2, 'fork_69: lesen alle Betreiber, schreiben owner/admin/support'),
+  ('Funktionen', 3, 'fork_69: credits_abziehen, plattform_mandanten_kennzahlen, plattform_mandant_metadaten')
 ),
 soll(bereich, soll) as (
   select v.bereich,

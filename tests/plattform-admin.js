@@ -45,6 +45,7 @@ const ERLAUBT = new Set([
   // Der Katalog der Plattform — ihr eigenes Regal.
   'plattform_admins', 'plattform_tarife', 'plattform_credit_preise',
   'plattform_credit_pakete', 'plattform_werte', 'plattform_protokoll',
+  'plattform_notizen',
   // Die Vertragsbeziehung. `credit_konten` und `credit_buchungen` sind das
   // Guthaben und seine Bewegungen — sie gehoeren zur Abrechnung, nicht zur
   // Arbeit des Hauses. `abo_erinnerungen` haelt fest, welche Fristmeldung

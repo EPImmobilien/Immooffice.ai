@@ -6086,3 +6086,23 @@ Deaktiviert statt gelöscht, weil das Audit-Log sonst auf einen Eintrag
 zeigte, den es nicht mehr gibt. Der letzte aktive Owner bleibt, und zwar per
 Trigger: eine Prüfung allein in der Funktion hätte der Dienstschlüssel
 umgangen — derselbe Grund, aus dem fork_52 das Protokoll per Trigger schützt.
+
+
+## 2026-10-07 · Betreiberbereich, Schritt 2: Zählen darf nur die Datenbank (fork_69)
+
+Der Auftrag will in der Mandantenansicht Onboarding, Modulnutzung und
+Speicher — alles aus Fachtabellen abgeleitet. Die Edge Function darf diese
+Tabellen aber nicht anfassen: `tests/plattform-admin.js` führt eine Liste
+*erlaubter* Tabellen, und `immobilien` steht nicht darauf. Die Liste zu
+erweitern wäre der bequeme Weg gewesen — und der falsche: wer `immobilien`
+zum Zählen lesen darf, liest beim nächsten Mal auch eine Zeile.
+
+Also zählt die Datenbank. Zwei Funktionen mit Security Definer geben
+Zahlen und Zeitpunkte zurück, keine Zeile. Die Probe dafür ist bewusst
+plump: sie legt ein Objekt namens „Geheimes Objekt" an und sucht die
+Zeichenkette in der Antwort. Findet sie sie je, ist die Grenze gefallen.
+
+Für `credits_abziehen` gilt dieselbe Reihenfolge wie beim Verbrauch —
+älteste Töpfe zuerst. Andersherum nähme ein Abzug dem Haus die Credits mit
+der längsten Gültigkeit und ließe die verfallenden stehen; das wäre ein
+versteckter zweiter Abzug.

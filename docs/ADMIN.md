@@ -80,6 +80,21 @@ Auf dem Projekt `usguiggfciavwzkdfjgt` ist das bereits geschehen:
 `info@engferundpartner.de` hat dieselbe Rolle, bis es stillgelegt wird
 (siehe `docs/OFFEN.md`).
 
+### Wie fork_68 live kam — und was dabei auffiel
+
+Die Migration ist auf `usguiggfciavwzkdfjgt` angewendet (07.10.2026), aber
+nicht in einem Stück: `apply_migration` über das Supabase-MCP lief dreimal
+in den 60-Sekunden-Zeitbegrenzer, ohne dass eine Sperre zu sehen war
+(`pg_locks` leer, `lock_timeout` schlug nicht an). Eingekreist auf die
+Anweisung: **jede Anweisung mit `DROP … IF EXISTS` hängt** über dieses
+Werkzeug — `drop trigger`, `drop view`, `drop policy`; dieselben Stücke ohne
+`drop` (`create trigger`, `create view`, `alter policy`) liefen in Sekunden.
+Deshalb wurde die Datei stückweise und ohne `drop` eingespielt; der Stand
+entspricht der Datei im Repository, geprüft über `pg_trigger`, `pg_policy`
+und `to_regclass`. Für künftige Migrationen: entweder den Workflow
+`migrationen-einspielen.yml` (Runner, `psql`) nehmen oder im MCP auf
+`DROP … IF EXISTS` verzichten.
+
 ### Abnahme Schritt 1
 
 - [x] Normaler Nutzer / `chef` kommt nicht hinein — Function 403, Richtlinien
@@ -90,7 +105,78 @@ Auf dem Projekt `usguiggfciavwzkdfjgt` ist das bereits geschehen:
 - [x] Mindestens ein aktiver Owner (Trigger, Test)
 - [ ] TOTP in der Supabase-Konsole eingeschaltet — **Betreiber**
 
-## Noch offen aus dem Auftrag (Schritte 2–10)
+## Schritt 2 — Mandantenliste und Detail (fork_69) · erledigt 07.10.2026
+
+**Die Grenze, technisch.** `tests/plattform-admin.js` lässt die Edge
+Function nur Plattform- und Vertragstabellen anfassen — eine Liste erlaubter
+Tabellen. Zählen in `immobilien` dürfte sie also gar nicht. Deshalb zählen
+zwei Datenbankfunktionen mit Security Definer und geben **nur Zahlen und
+Zeitpunkte** zurück:
+
+- `plattform_mandanten_kennzahlen()` — eine Zeile je Mandant: letzter Login,
+  Nutzer, aktive Nutzer (14 Tage), Onboarding-Schritte (0–8), Aktionen in
+  30 Tagen, Gesundheitswert.
+- `plattform_mandant_metadaten(mandant)` — Onboarding mit Datum, Zählwerte,
+  letzte Logins je Konto, Modulnutzung 30 Tage (aus `aktivitaets_log`,
+  nur `objekt_typ` gezählt), Speicher je Bucket (`storage.objects`, Summe
+  `metadata.size` unter dem Mandantenpräfix).
+
+`tests/betreiber-metadaten.sql` legt ein Objekt „Geheimes Objekt" an und
+prüft, dass diese Zeichenkette in der Antwort **nicht** vorkommt — und dass
+ein `chef` mit 42501 abgewiesen wird.
+
+**Gesundheitswert (0–100).** Gewichte in `plattform_werte.gesundheit_gewichte`
+(Start: login14 30, aktive_nutzer 20, onboarding 25, module 15, zahlung 10):
+
+| Anteil | Rechnung |
+|---|---|
+| login14 | 1, wenn ein Login in den letzten 14 Tagen, sonst 0 |
+| aktive_nutzer | aktive Nutzer (Login ≤ 14 Tage) ÷ Nutzer |
+| onboarding | erledigte Schritte ÷ 8 |
+| module | min(1, Aktionen in 30 Tagen ÷ 20) |
+| zahlung | aktiv/test 1 · gekündigt 0,5 · sonst 0 |
+
+Ampel: ≥ 70 grün, ≥ 40 gelb, sonst rot. Schnellfilter „Risiko" = Wert < 40
+oder Zahlung offen; „Test endet bald" = ≤ 3 Tage.
+
+**Credits abziehen** (`credits_abziehen`): älteste Töpfe zuerst — dieselbe
+Reihenfolge wie beim Verbrauch —, nie unter null, jede Buchung mit Quelle
+`betreiber` und Grund im Ledger, idempotent über die Referenz. Nur
+owner/admin, geprüft in der Rollenkarte **und** in der Funktion. Der
+Quelle-Check auf `credit_konten` kennt jetzt `betreiber`.
+
+**Notizen** (`plattform_notizen`): lesen alle Betreiber, schreiben
+owner/admin/support; Einstufung GLOBAL, und die Spalte heißt
+`betrifft_mandant_id`, nicht `mandant_id`: `tests/mandant-einstufung.sql`
+stuft jede Tabelle mit `mandant_id` als MANDANT ein, und MANDANT hieße, der
+Mandant liest mit. Die Notiz handelt vom Mandanten, gehört ihm aber nicht.
+
+**CSV-Export** (`csvExport` in `plattform.js`): UTF-8 mit BOM, Semikolon,
+Zahlen mit Komma, Zeitpunkte im deutschen Format — eine Funktion für alle
+Tabellen des Bereichs.
+
+**Testphase verlängern**: Knöpfe +7/+14/+30 Tage setzen `testphase_bis`
+relativ zum späteren von heute und bisherigem Ende; gespeichert wird wie
+bisher mit Grund. Für `support` lässt die Function nur dieses Feld und
+höchstens 30 Tage ab heute zu.
+
+**Noch nicht in diesem Schritt** (kommen mit den genannten Schritten):
+Deckungsbeitrag je Mandant (Schritt 4), Rechnungen mit Stripe-Link
+(Schritt 6), Gutschein zuweisen (Schritt 5), Tarif per Stripe-API setzen
+(Schritt 5), DSGVO-Löschprozess mit 30-Tage-Frist (Schritt 9/10 — heute
+gibt es nur die sofortige Löschung durch owner, mit Namensbestätigung).
+
+### Abnahme Schritt 2
+
+- [x] Liste: Firma, ID, Tarif, Status, Nutzer, Credits, MRR, letzter Login,
+      Erstellt, Gesundheit; Suche, Schnellfilter, Sortierung, CSV
+- [x] Detail nur Metadaten; Onboarding-Checkliste ja/nein + Datum;
+      Modulnutzung; Speicher je Bucket; Notizen; Verlauf aus dem Audit-Log
+- [x] Aktionen mit Pflicht-Begründung und Audit: Test verlängern, Credits
+      gutschreiben/abziehen, sperren/entsperren
+- [x] Kein Inhalt einer Fachtabelle in der Antwort (Test)
+
+## Noch offen aus dem Auftrag (Schritte 3–10)
 
 Werden hier je Schritt nachgetragen. Reihenfolge wie im Auftrag.
 
