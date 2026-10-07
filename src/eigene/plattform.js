@@ -49,7 +49,22 @@
   async function ruf(aktion, mehr) {
     var a = await window._sb.functions.invoke("plattform-admin",
       { body: Object.assign({ aktion: aktion }, mehr || {}) });
-    if (a.error) throw a.error;
+    if (a.error) {
+      // supabase-js verpackt jede Nicht-2xx-Antwort in „Edge Function
+      // returned a non-2xx status code"; die Meldung der Funktion (403
+      // „Zweiter Faktor erforderlich", „Kein Plattform-Administrator",
+      // Rollenverbot) steht im Antwortkoerper unter error.context. Ohne
+      // das Auslesen sah der Betreiber den Rahmen statt des Grundes — und
+      // die TOTP-Einrichtung, die an „Zweiter Faktor" haengt, kam nie.
+      var text = a.error.message || String(a.error);
+      try {
+        if (a.error.context && typeof a.error.context.json === "function") {
+          var k = await a.error.context.json();
+          if (k && k.fehler) text = k.fehler;
+        }
+      } catch (e) { /* kein JSON im Koerper — dann der Rahmen */ }
+      throw new Error(text);
+    }
     if (a.data && a.data.ok === false) throw new Error(a.data.fehler || "Unbekannter Fehler");
     return a.data || {};
   }
