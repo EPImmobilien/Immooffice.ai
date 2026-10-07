@@ -55,6 +55,20 @@ QUELLEN = {
         "0e094a7d3c7c4c25cf1310c4b30014f1dae9332220b1c2c88f4fa996f0b05053",
         "archivo",
     ),
+    # Vorlage „Buehne" (07.10.2026): Headlines in Bricolage Grotesque, Text
+    # in DM Sans. Die Achsen stehen im Kopf des Prototyps
+    # (immoOffice_buehne_generator.py): opsz 48 / wdth 90 fuer die
+    # Headlines; DM Sans in der optischen Groesse fuer Lesetext.
+    "bricolage": (
+        f"{ROH}/bricolagegrotesque/BricolageGrotesque%5Bopsz,wdth,wght%5D.ttf",
+        "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682",
+        "bricolagegrotesque",
+    ),
+    "dmsans": (
+        f"{ROH}/dmsans/DMSans%5Bopsz,wght%5D.ttf",
+        "8cd08d97e89c24d0aa92edd2f0f4c8ee6195eee9b7c9f154865a58b02f0c1c0d",
+        "dmsans",
+    ),
 }
 
 # Datei, Quelle, Achsen, PostScript-Name (nameID 6), Anzeigename (1 und 4).
@@ -82,6 +96,12 @@ SCHNITTE = [
     ("Arch-Bold.ttf",        "archivo",   {"wght": 700, "wdth": 100}, "Arch-Bold",             "Arch Bold"),
     ("Arch-CondXB.ttf",      "archivo",   {"wght": 800, "wdth": 62},  "Arch-CondXB",           "Arch Condensed ExtraBold"),
     ("Arch-CondBlack.ttf",   "archivo",   {"wght": 900, "wdth": 62},  "Arch-CondBlack",        "Arch Condensed Black"),
+    ("Bric-Medium.ttf",      "bricolage", {"wght": 500, "wdth": 90, "opsz": 48}, "BricolageGrotesque-Medium", "Bricolage Grotesque Medium"),
+    ("Bric-Bold.ttf",        "bricolage", {"wght": 700, "wdth": 90, "opsz": 48}, "BricolageGrotesque-Bold", "Bricolage Grotesque Bold"),
+    ("Bric-ExtraBold.ttf",   "bricolage", {"wght": 800, "wdth": 90, "opsz": 48}, "BricolageGrotesque-ExtraBold", "Bricolage Grotesque ExtraBold"),
+    ("DMS-Regular.ttf",      "dmsans",    {"wght": 400, "opsz": 14}, "DMSans-Regular", "DM Sans Regular"),
+    ("DMS-Medium.ttf",       "dmsans",    {"wght": 500, "opsz": 14}, "DMSans-Medium", "DM Sans Medium"),
+    ("DMS-Bold.ttf",         "dmsans",    {"wght": 700, "opsz": 14}, "DMSans-Bold", "DM Sans Bold"),
 ]
 
 # Welche Zeichen bleiben. Alles, was ein deutscher Makler tippt, und

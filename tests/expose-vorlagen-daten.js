@@ -330,7 +330,80 @@ function signature(D) {
   };
 }
 
+// Buehne (07.10.2026) geht einen anderen Weg: nicht in die Platzhalter
+// uebersetzt, sondern in ZEILEN, wie sie aus der Datenbank kaemen — und
+// dann durch aufbereiten(), denselben Weg wie die Edge Function. Der
+// Prototyp ist nachgebaut, nicht Schritt fuer Schritt uebersetzt
+// (tests/expose-vorlagen.js), und was die Vorschau zeigen soll, ist das
+// Expose, das ein Mandant mit diesen Daten bekaeme: samt Rechnung,
+// Bildlisten, Energiewertung — alles, was aufbereiten() ableitet.
+function buehneZeilen(D) {
+  const ap = D.ap || {};
+  const [strasse, hausnummer] = String(D.adresse || '').split(/\s+(?=\d)/);
+  const [plz, ...ortTeile] = String(D.plz_ort || '').split(' ');
+  const ort = ortTeile.join(' ');
+  const en = D.energie || {};
+  const fin = D.fin || {};
+  const raeume = [];
+  for (const [geschoss, liste] of D.raeume || []) {
+    for (const [raum, flaeche] of liste) raeume.push({ raum, flaeche, geschoss });
+  }
+  const bilder = {};
+  const titel = ['Titelbild', 'Straßenansicht', 'Garten & Terrasse', 'Detail', 'Küche',
+                 'Bad', 'Wohnen', 'Essen', 'Arbeiten', 'Schlafen'];
+  titel.forEach((t, i) => { bilder[`bild.foto.${i + 1}`] = `foto-${i + 1}`; });
+  bilder['bild.titelbild'] = 'foto-1';
+  bilder['bild.grundriss.1'] = 'grundriss-1';
+  bilder['bild.grundriss.2'] = 'grundriss-2';
+  bilder['bild.lageplan'] = 'lageplan';
+  bilder['firma.logo.hell'] = 'logo-hell';
+  bilder['firma.logo.dunkel'] = 'logo-dunkel';
+  bilder['ansprechpartner.foto'] = 'foto-ap';
+  return {
+    immobilie: {
+      immo_nr: D.objnr, objektart: D.objektart, vertragsart: 'verkauf',
+      objekttitel: D.titel, expose_slogan: D.slogan, expose_zitat: D.zitat,
+      strasse, hausnummer, plz, ort: ort.split('-')[0], ortsteil: ort.split('-')[1],
+      adresse_freigeben: D.adresse_freigeben,
+      angebotspreis: D.preis, expose_preis_auf_anfrage: D.preis_auf_anfrage,
+      provisionsfrei: D.provisionsfrei, provision_aussen: D.provision,
+      wohnflaeche: D.wohnflaeche, nutzflaeche: D.nutzflaeche, grundstueck: D.grundstueck,
+      zimmer: D.zimmer, schlafzimmer: D.schlafzimmer, badezimmer: D.baeder,
+      baujahr: D.baujahr, modernisierung_jahr: D.modernisierung, etagen_gesamt: D.etagen,
+      unterkellert: D.keller, stellplatz: D.stellplatz, zustand: D.zustand,
+      verfuegbar_ab: D.verfuegbar, hausgeld: D.hausgeld, heizungsart: D.heizung,
+      beschreibung_objekt: String(D.beschreibung || '').replace(/\n/g, '\n\n'),
+      beschreibung_lage: D.lage,
+      expose_highlights: (D.highlights || []).map((h) => ({ zeile1: h })),
+      expose_ausstattung_gruppen: (D.ausstattung || []).map(([titel, punkte]) => ({ titel, punkte })),
+      raumaufteilung: raeume,
+      lage_distanzen: (D.distanzen || []).map(([label, km]) => ({ label, wert: String(km).replace('.', ',') })),
+      energieausweis_typ: en.art, energie_kennwert: en.wert, energie_klasse: en.klasse,
+      energie_traeger: en.traeger, energie_baujahr_anlage: en.baujahr_anlage,
+      energie_gueltig_bis: String(en.gueltig || '').split('.').reverse().join('-'),
+      expose_qr_url: D.qr_url,
+    },
+    // Die Bildtitel, aus denen die Beschriftungen kommen (label_vom_slot).
+    bildtitel: Object.fromEntries(titel.map((t, i) => [`bild.foto.${i + 1}`, `Bild ${String(i + 1).padStart(2, '0')} · ${t}`])),
+    firma: {
+      firma_name: D.firma, marken_name: D.marke, marken_linie: D.marke2,
+      strasse: String(D.firma_adr || '').split(' · ')[0],
+      plz: String(D.firma_adr || '').split(' · ')[1]?.split(' ')[0],
+      ort: String(D.firma_adr || '').split(' · ')[1]?.split(' ').slice(1).join(' '),
+      telefon: D.firma_tel, email: D.firma_mail, web: D.firma_web,
+      hrb: String(D.hrb || '').split(' · ')[0],
+      registergericht: String(D.hrb || '').split(' · ')[1],
+      ust_id: String(D.hrb || '').split(' · ')[2]?.replace(/^USt-IdNr\.\s*/, ''),
+    },
+    ansprechpartner: { name: ap.name, funktion: ap.titel, telefon: ap.tel, mobil: ap.mobil, email: ap.mail },
+    annahmen: { notar_prozent: fin.notar, zinssatz: fin.zins, tilgung: fin.tilgung,
+                eigenkapital_prozent: fin.ek },
+    bilder,
+  };
+}
+
 const UEBERSETZER = { raster, studio, signature };
+const ZEILEN = { buehne: buehneZeilen };
 
 // Texte, die der Prototyp je Objekt schreibt. Im Produkt stehen sie in
 // immobilien.expose_overrides; die Vorlage haelt nur einen neutralen
@@ -370,5 +443,7 @@ const UEBERNAHMEN = {
 
 module.exports = {
   daten: (vorlage, D) => UEBERSETZER[vorlage](D),
+  // Zeilen fuer aufbereiten() statt fertiger Platzhalter — nur Buehne.
+  zeilen: (vorlage, D) => (ZEILEN[vorlage] ? ZEILEN[vorlage](D) : null),
   uebernahmen: (vorlage) => UEBERNAHMEN[vorlage],
 };

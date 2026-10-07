@@ -62,6 +62,10 @@ export const OBJEKT: Feld[] = [
     hinweis: "Für Vorlagen, die den Titel in festen Zeilen setzen (Studio)." },
   { schluessel: "objekt.expose_titel_text", name: "Titel als Textblock", typ: "mehrzeilig",
     quelle: GERECHNET, hinweis: "Die Titelzeilen mit Umbruch dazwischen." },
+  { schluessel: "objekt.energie_klasse_urteil", name: "Energieklasse, Wertung", typ: "text",
+    quelle: GERECHNET, hinweis: "Aus der Effizienzklasse: „Sehr effizient“ bis „Hoher Verbrauch“." },
+  { schluessel: "objekt.energie_klasse_hinweis", name: "Energieklasse, Folge", typ: "text",
+    quelle: GERECHNET, hinweis: "Aus der Effizienzklasse: „niedrige Nebenkosten“ usw." },
   { schluessel: "objekt.untertitel", name: "Untertitel", typ: "text", quelle: GERECHNET,
     hinweis: "Kurzzeile unter dem Titel, aus Zimmern, Fläche und Besonderheit." },
   { schluessel: "objekt.expose_slogan", name: "Slogan", typ: "text", quelle: O("expose_slogan") },
@@ -86,6 +90,9 @@ export const OBJEKT: Feld[] = [
   { schluessel: "objekt.vertragsart", name: "Vermarktungsart", typ: "text", quelle: O("vertragsart"),
     hinweis: "Als Text fuer das Exposé: \"Verkauf\", \"Vermietung\", "
            + "\"Verkauf & Vermietung\"." },
+  { schluessel: "objekt.vermarktung_pille", name: "Vermarktungsart, kurz", typ: "text",
+    quelle: GERECHNET,
+    hinweis: "\"Zum Kauf\", \"Zur Miete\" oder \"Kauf oder Miete\" — fuer eine Pille auf dem Titel (Buehne)." },
   { schluessel: "objekt.vermarktung", name: "Vermarktungsart (Schluessel)", typ: "text",
     quelle: GERECHNET,
     hinweis: "kauf, miete oder beides. DAS ist der Wert fuer Bedingungen — "

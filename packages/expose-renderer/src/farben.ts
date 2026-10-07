@@ -158,11 +158,51 @@ export function themaStudio(signal: string, dunkel: string) {
   };
 }
 
+/**
+ * Luminanz nach sRGB (WCAG), wie lum() im Buehne-Prototyp. Buehne
+ * entscheidet damit, ob der Akzent hell ist — dann steht Text darauf
+ * dunkel und der Akzent selbst wird fuer Text abgedunkelt.
+ */
+function luminanz(c: Farbe): number {
+  const f = (v: number) => v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
+}
+
+/** Buehne: Primaer (dunkel) und Akzent. Aus immoOffice_buehne_generator.py. */
+export function themaBuehne(primaer: string, akzent: string) {
+  const d = hx(primaer), a = hx(akzent);
+  const hell = luminanz(a) > 0.45;
+  const paper = mix(mix(WEISS, a, 0.07), d, 0.01);
+  return {
+    d, a, paper,
+    card: WEISS,
+    ink: mix(d, SCHWARZ, 0.2),
+    text: mix(d, paper, 0.14),
+    muted: mix(d, paper, 0.48),
+    line: mix(d, paper, 0.86),
+    soft: mix(paper, a, 0.20),
+    softD: mix(paper, d, 0.07),
+    ph: mix(mix(paper, d, 0.14), a, 0.10),
+    onD: mix(WEISS, d, 0.05),
+    onDm: mix(WEISS, d, 0.40),
+    dline: mix(d, WEISS, 0.20),
+    dsoft: mix(d, WEISS, 0.08),
+    dsoft2: mix(d, WEISS, 0.10),
+    onA: hell ? mix(d, SCHWARZ, 0.3) : WEISS,
+    aT: hell ? mix(a, d, 0.4) : a,
+    // Der grosse Betrag auf dem Dunkelton: Akzent, wenn er dort lesbar ist.
+    aAufD: luminanz(a) > 0.08 ? a : mix(WEISS, d, 0.05),
+    aSoft: mix(a, paper, 0.5),
+    dSoft: mix(d, paper, 0.55),
+  };
+}
+
 /** Die Vorgabefarben der Prototypen, als Rueckfall und fuer die Pruefung. */
 export const VORGABE = {
   raster: { f1: "#0F4C5C", f2: "#E8915A" },
   signature: { f1: "#2B221D", f2: "#B08A5E" },
   studio: { f1: "#2F4BFF", f2: "#111318" },
+  buehne: { f1: "#2D2A4A", f2: "#F08A5D" },
 } as const;
 
 export type Ableitung = keyof typeof VORGABE;
@@ -179,5 +219,6 @@ export type Ableitung = keyof typeof VORGABE;
 export function palette(ableitung: Ableitung, f1: string, f2: string) {
   if (ableitung === "raster") return { art: "raster" as const, ...themaRaster(f1, f2) };
   if (ableitung === "signature") return { art: "signature" as const, ...themaSignature(f1, f2) };
+  if (ableitung === "buehne") return { art: "buehne" as const, ...themaBuehne(f1, f2) };
   return { art: "studio" as const, ...themaStudio(f1, f2) };
 }

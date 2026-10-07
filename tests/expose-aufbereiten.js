@@ -51,6 +51,8 @@ for (const f of R.KATALOG) {
 }
 // Zwei Werte, die zum Rechnen passen muessen.
 zeilen.immobilien.vertragsart = 'kauf';
+// Die Wertung der Energieklasse (Buehne) gibt es nur fuer eine echte Klasse.
+zeilen.immobilien.energie_klasse = 'B';
 zeilen.immobilien.plz = '20095';
 zeilen.immobilien.provision_aussen = '3,57 %';
 zeilen.immobilien.provisionsfrei = false;

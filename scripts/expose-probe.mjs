@@ -5,6 +5,7 @@
 //   node scripts/expose-probe.mjs studio          nur eine
 //   node scripts/expose-probe.mjs studio --voll   mit allem, was es gibt
 //   node scripts/expose-probe.mjs studio --ohne-logo
+//   node scripts/expose-probe.mjs buehne --farben=#2D2A4A,#F08A5D
 //
 // Unterschied zu scripts/expose-vorschau.mjs: die Vorschau nimmt die
 // Demodaten der Prototypen und vergleicht mit den Referenz-PDFs. Die liefern
@@ -55,6 +56,14 @@ const zahlAus = (vorsatz, vorgabe) => {
   return Number.isFinite(n) && n >= 0 ? Math.floor(n) : vorgabe;
 };
 const anzahlFotos = zahlAus('--fotos', 13);
+// Die beiden Markenfarben des Mandanten (--farben=#2D2A4A,#F08A5D). Ohne
+// Angabe ein dunkles Rot und ein Grau — mit Absicht nicht die Farben eines
+// Prototyps, damit die Ableitung geprueft wird und nicht der Zufall. Fuer
+// den Vergleich mit einem Referenz-PDF braucht man aber dessen Farben.
+const farbenArg = argumente.find((x) => x.startsWith('--farben='));
+const [ciPrimaer, ciAkzent] = farbenArg
+  ? farbenArg.slice('--farben='.length).split(',').map((f) => f.trim())
+  : ['#980101', '#C2C2BD'];
 const anzahlGrundrisse = zahlAus('--grundrisse', voll ? 2 : 0);
 const zielOrdner = process.env.PROBE_ZIEL || path.join(os.tmpdir(), 'expose-probe');
 
@@ -111,7 +120,7 @@ const firma = {
   strasse: 'Musterweg 1', plz: '20095', ort: 'Hamburg',
   telefon: '040 1234560', email: 'info@musterhaus.example', web: 'musterhaus.example',
   registergericht: 'AG Hamburg', hrb: 'HRB 12345', ust_id: 'DE123456789',
-  geschaeftsfuehrer: 'Alex Muster', ci_primaer: '#980101', ci_akzent: '#C2C2BD',
+  geschaeftsfuehrer: 'Alex Muster', ci_primaer: ciPrimaer, ci_akzent: ciAkzent,
   logo_pfad: 'logos/muster.png',
 };
 const ansprechpartner = {
@@ -171,10 +180,14 @@ const immobilie = {
        { zeile1: 'Garten nach Sueden', zeile2: '654 m2 mit altem Baumbestand' }] : null,
   lage_distanzen: voll ? [{ label: 'Bahnhof', wert: '2,4' }] : null,
   expose_wege: voll ? [{ ziel: 'Schule', minuten: 6 }] : null,
-  raumaufteilung: voll ? [{ name: 'Wohnen', flaeche: 38 }] : null,
+  raumaufteilung: voll ? [{ name: 'Wohnen', flaeche: 38, geschoss: 'Erdgeschoss' },
+                          { name: 'Kueche', flaeche: 12.5, geschoss: 'Erdgeschoss' },
+                          { name: 'Schlafen', flaeche: 16, geschoss: '1. OG' },
+                          { name: 'Flur', flaeche: 6 }] : null,
   laufende_kosten: voll ? [{ bezeichnung: 'Hausgeld', betrag: 95 }] : null,
   expose_ausstattung_gruppen: voll
-    ? [{ gruppe: 'Innen', punkte: ['Parkett', 'Fussbodenheizung'] }] : null,
+    ? [{ titel: 'Innen', punkte: ['Parkett', 'Fussbodenheizung'] },
+       { titel: 'Aussen', punkte: ['Terrasse', 'Garten nach Sueden', 'Carport'] }] : null,
 };
 
 // Ein einfarbiges PNG beliebiger Groesse, zur Laufzeit gebaut. So kann die

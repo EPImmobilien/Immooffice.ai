@@ -35,11 +35,12 @@ KENNUNG = {
     "raster":    "9f3b1c40-6d2e-4a51-8c77-1e5b0a4d2f10",
     "signature": "9f3b1c40-6d2e-4a51-8c77-1e5b0a4d2f11",
     "studio":    "9f3b1c40-6d2e-4a51-8c77-1e5b0a4d2f12",
+    "buehne":    "9f3b1c40-6d2e-4a51-8c77-1e5b0a4d2f13",
 }
 
 KOPF = """\
 -- ===========================================================================
--- fork_38 — die drei Systemvorlagen des Exposé-Baukastens
+-- fork_38 — die Systemvorlagen des Exposé-Baukastens
 --
 -- ERZEUGT von scripts/expose-systemvorlagen.py aus
 -- packages/expose-renderer/vorlagen/*.json. Nicht von Hand aendern: wer
@@ -53,7 +54,35 @@ KOPF = """\
 -- Die Kennungen sind fest. Eine Systemvorlage, die bei jedem Einspielen
 -- eine neue Kennung bekaeme, verlore die Verbindung zu jedem Objekt, das
 -- sie benutzt.
+--
+-- Die Pruefbedingungen aus fork_34 und fork_37 kannten „raster, signature,
+-- studio" als abgeschlossene Liste. Seit „buehne" (07.10.2026) werden sie
+-- hier mitgefuehrt — VOR den Einfuegungen, sonst scheitert die vierte an
+-- der Bedingung, die sie noch nicht kennt. Drop und Add sind
+-- wiederholbar; ein Mandant kann so jede Systemvorlage als Standard
+-- waehlen, ein Objekt sie als Uebersteuerung, eine Mandantenvorlage auf
+-- ihr aufbauen.
 -- ===========================================================================
+
+alter table public.firma_stammdaten
+  drop constraint if exists firma_stammdaten_expose_vorlage_check;
+alter table public.firma_stammdaten
+  add constraint firma_stammdaten_expose_vorlage_check
+  check (expose_vorlage in ({basen}));
+comment on column public.firma_stammdaten.expose_vorlage is
+  'Welche Systemvorlage der Mandant standardmaessig benutzt: {basen_text}.';
+
+alter table public.immobilien
+  drop constraint if exists immobilien_expose_vorlage_check;
+alter table public.immobilien
+  add constraint immobilien_expose_vorlage_check
+  check (expose_vorlage is null or expose_vorlage in ({basen}));
+
+alter table public.expose_vorlagen
+  drop constraint if exists expose_vorlagen_basis_check;
+alter table public.expose_vorlagen
+  add constraint expose_vorlagen_basis_check
+  check (basis in ({basen}, 'leer'));
 
 """
 
@@ -80,7 +109,9 @@ def zeichenkette(s):
 
 
 def erzeugen():
-    teile = [KOPF]
+    basen = sorted(KENNUNG, key=list(KENNUNG).index)
+    teile = [KOPF.format(basen=", ".join(f"'{b}'" for b in basen),
+                         basen_text=", ".join(basen))]
     for basis in sorted(KENNUNG):
         pfad = os.path.join(VORLAGEN, f"{basis}.json")
         with open(pfad, encoding="utf-8") as f:

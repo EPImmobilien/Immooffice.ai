@@ -672,7 +672,7 @@ if (!firma) return jsonErr(500, "Firma-Stammdaten fehlen");
 // Aufruf aus der Oberflaeche kommt — Portalexport, Newsletter und die
 // Nachbestellung eines Exposes nennen keine Vorlage und muessen trotzdem
 // eine bekommen.
-const BASEN = ["raster", "signature", "studio"];
+const BASEN = ["raster", "signature", "studio", "buehne"];
 const basisName = BASEN.includes(String(firma.expose_vorlage || ""))
   ? String(firma.expose_vorlage) : "raster";
 let vz: any = null;

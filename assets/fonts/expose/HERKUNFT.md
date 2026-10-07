@@ -11,6 +11,8 @@ wenn die Dateien weitergegeben werden.
 | Plus Jakarta Sans | `ofl/plusjakartasans/PlusJakartaSans[wght].ttf` | OFL 1.1 | Tokotype |
 | Cormorant Garamond | `ofl/cormorantgaramond/CormorantGaramond[wght].ttf` und `-Italic` | OFL 1.1 | Catharsis Fonts |
 | Archivo | `ofl/archivo/Archivo[wdth,wght].ttf` | OFL 1.1 | Omnibus-Type |
+| Bricolage Grotesque | `ofl/bricolagegrotesque/BricolageGrotesque[opsz,wdth,wght].ttf` | OFL 1.1 | Mathieu Triay |
+| DM Sans | `ofl/dmsans/DMSans[opsz,wght].ttf` | OFL 1.1 | Colophon Foundry |
 
 ## Warum genau diese Schnitte
 
@@ -45,6 +47,16 @@ Exposé eine Zeile zu breit setzt.
 | `Arch-Bold.ttf` | wght 700, wdth 100 | `Arch-Bold` |
 | `Arch-CondXB.ttf` | wght 800, wdth 62 | `Arch-CondXB` |
 | `Arch-CondBlack.ttf` | wght 900, wdth 62 | `Arch-CondBlack` |
+| `Bric-Medium.ttf` | wght 500, wdth 90, opsz 48 | `BricolageGrotesque-Medium` (Referenz: `Bx-Medium`) |
+| `Bric-Bold.ttf` | wght 700, wdth 90, opsz 48 | `BricolageGrotesque-Bold` (Referenz: `Bx-Bold`) |
+| `Bric-ExtraBold.ttf` | wght 800, wdth 90, opsz 48 | `BricolageGrotesque-ExtraBold` (Referenz: `Bx-ExtraBold`) |
+| `DMS-Regular.ttf` | wght 400, opsz 14 | `DMSans-Regular` (Referenz: `Sx-Regular`) |
+| `DMS-Medium.ttf` | wght 500, opsz 14 | `DMSans-Medium` (Referenz: `Sx-Medium`) |
+| `DMS-Bold.ttf` | wght 700, opsz 14 | `DMSans-Bold` (Referenz: `Sx-Bold`) |
+
+Die Achsen von Bühne sind nicht geraten: `tests/expose-schriften.py` legt
+jeden Schnitt Glyph für Glyph auf das Referenz-PDF. DM Sans passt dort nur
+bei opsz 14 — bei 10 und 16 weicht fast jede Glyphe ab.
 
 ## Was absichtlich fehlt
 

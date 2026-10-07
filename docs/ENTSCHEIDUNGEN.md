@@ -6489,3 +6489,30 @@ genau das sind — Texte, die der Fork mit Grund nicht setzt. Die
 Alternative, die Vorlage zurückzubauen, hätte eine Entscheidung des
 Auftraggebers rückgängig gemacht; die Alternative, das Gate zu lockern,
 hätte den Zweck des Gates aufgegeben.
+
+## 2026-10-07 · Vierte Systemvorlage „Bühne"
+
+Auftrag des Betreibers: den mitgelieferten Prototyp (`immoOffice_buehne_generator.py`,
+A4 quer) als vierte Systemvorlage neben Raster, Signature und Studio.
+
+- **Nachgebaut, nicht Schritt für Schritt übersetzt.** Die drei älteren
+  Vorlagen hält `tests/expose-vorlagen.js` auf 2 pt am Prototyp. Bühne zeichnet
+  Tacho, Donut, Chips, Minuten-Karten und Pillen mit Renderer-Elementen
+  (`darstellung`), nicht in der Reihenfolge der ReportLab-Aufrufe — ein
+  Schrittvergleich fände nur Reihenfolgen. Abgenommen Seite für Seite gegen
+  das Referenz-PDF; gerendert mit den Demodaten des Prototyps über
+  `aufbereiten()` (`scripts/expose-vorschau.mjs buehne`), also auf dem Weg der
+  Edge Function. Die Vorlage entsteht aus `scripts/expose-vorlage-buehne.py`.
+- **Schriften**: Bricolage Grotesque und DM Sans (OFL), sechs Schnitte; Achsen
+  per Glyph-Vergleich mit dem Referenz-PDF bestimmt (DM Sans opsz 14).
+- **Palette** `ableitung: "buehne"` aus zwei Markenfarben, 64 Farben gegen den
+  Prototyp geprüft (`tests/expose-farben.js`).
+- **Renderer**: Drehung jetzt beliebig (Preis-Sticker 8°), `ueberstand` für
+  gewollten Anschnitt; Raumliste ordnet freie Geschossangaben („Erdgeschoss",
+  „1. OG") den Kürzeln eg/og/dg/ug zu — vorher blieb die Raumliste von
+  Signature bei echten Objekten leer; `chips` liest die Ausstattungsgruppen;
+  neue Felder `objekt.vermarktung_pille` („Zum Kauf"),
+  `objekt.energie_klasse_urteil`/`_hinweis`.
+- **Datenbank**: fork_64 führt die Prüfbedingungen für `expose_vorlage` und
+  `basis` jetzt aus der Liste der Systemvorlagen mit (vor den Einfügungen),
+  statt eine eigene Migration nachzuschieben.

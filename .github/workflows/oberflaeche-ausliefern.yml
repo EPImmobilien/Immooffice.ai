@@ -120,13 +120,13 @@ jobs:
           # Schrift von hier nach. Fehlen sie, bleibt beides ohne Schrift —
           # und zwar still, denn index.html ist davon vollstaendig.
           schnitte=$(ls dist/schriften/expose/*.ttf 2>/dev/null | wc -l)
-          if [ "$schnitte" -lt 20 ]; then
-            echo "::error::dist/schriften/expose/ fuehrt nur $schnitte Schnitte (20 erwartet). Erst 'python3 scripts/expose-schriften.py' laufen lassen."
+          if [ "$schnitte" -lt 26 ]; then
+            echo "::error::dist/schriften/expose/ fuehrt nur $schnitte Schnitte (26 erwartet). Erst 'python3 scripts/expose-schriften.py' laufen lassen."
             schlecht=1
           fi
           # Und die Lizenztexte: die SIL Open Font License verlangt sie bei
           # jeder Weitergabe, und eine ausgelieferte Schrift ist eine.
-          for ofl in archivo cormorantgaramond plusjakartasans; do
+          for ofl in archivo cormorantgaramond plusjakartasans bricolagegrotesque dmsans; do
             [ -s "dist/schriften/expose/OFL-$ofl.txt" ] \
               || { echo "::error::dist/schriften/expose/OFL-$ofl.txt fehlt"; schlecht=1; }
           done

@@ -32,7 +32,7 @@ if (!fs.existsSync(vorlagePfad)) {
 // hier wird aus der Quelle uebersetzt, damit das Werkzeug ohne Bauschritt
 // funktioniert.
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'immo-vorschau-'));
-for (const datei of ['rendern.ts', 'pdf.ts']) {
+for (const datei of ['rendern.ts', 'pdf.ts', 'aufbereiten.ts']) {
   execFileSync('tsc', [path.join(WURZEL, 'packages', 'expose-renderer', 'src', datei),
                        '--outDir', tmp, '--module', 'commonjs', '--target', 'es2020',
                        '--skipLibCheck', '--esModuleInterop'],
@@ -40,6 +40,7 @@ for (const datei of ['rendern.ts', 'pdf.ts']) {
 }
 const { rendern } = require(path.join(tmp, 'rendern.js'));
 const { zuPdf } = require(path.join(tmp, 'pdf.js'));
+const { aufbereiten } = require(path.join(tmp, 'aufbereiten.js'));
 const { metrikLesen } = require(path.join(tmp, 'schrift.js'));
 const { hex } = require(path.join(tmp, 'farben.js'));
 
@@ -64,18 +65,28 @@ const grundlage = name.startsWith('social-') ? name.split('-')[1] : name;
 const aufzeichnung = JSON.parse(execFileSync(
   'python3', [path.join(WURZEL, 'tests', 'expose-aufzeichnung.py'), grundlage],
   { encoding: 'utf-8', maxBuffer: 256 << 20 }))[grundlage];
-const { daten } = require(path.join(WURZEL, 'tests', 'expose-vorlagen-daten.js'));
+if (aufzeichnung.uebersprungen) {
+  // Kein Fehler des Renderers, aber auch nichts zu zeigen: ohne den
+  // Prototyp fehlen die Demodaten. tests/expose-pdf.js liest diese Zeile.
+  console.log(`[uebersprungen] ${aufzeichnung.uebersprungen}`);
+  process.exit(0);
+}
+const { daten, zeilen } = require(path.join(WURZEL, 'tests', 'expose-vorlagen-daten.js'));
 
 const vorlage = JSON.parse(fs.readFileSync(vorlagePfad, 'utf-8'));
 const farbe = (c) => (c ? hex({ r: c[0], g: c[1], b: c[2] }) : undefined);
+// Buehne liefert Datenbankzeilen und geht durch aufbereiten() — wie die
+// Edge Function (tests/expose-vorlagen-daten.js sagt, warum).
+const reihen = zeilen(grundlage, aufzeichnung.daten);
 const ergebnis = rendern({
   vorlage,
-  daten: daten(grundlage, aufzeichnung.daten),
+  daten: reihen ? aufbereiten({ ...reihen, ki_bilder: [], logo_form: 'breit' })
+                : daten(grundlage, aufzeichnung.daten),
   schriften,
   // Raster fuehrt die beiden Vorlagenfarben als p/a, Signature als d/a,
   // Studio als s/d.
   marke: (() => {
-    const paare = { raster: ['p', 'a'], signature: ['d', 'a'], studio: ['s', 'd'] };
+    const paare = { raster: ['p', 'a'], signature: ['d', 'a'], studio: ['s', 'd'], buehne: ['d', 'a'] };
     const [x, y] = paare[grundlage] ?? ['p', 'a'];
     return { primaer: farbe(aufzeichnung.farben[x]), akzent: farbe(aufzeichnung.farben[y]) };
   })(),

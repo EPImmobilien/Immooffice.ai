@@ -42,6 +42,27 @@ DATEI = {
     "Arch-Bold": "Arch-Bold.ttf",
     "Arch-CondXB": "Arch-CondXB.ttf",
     "Arch-CondBlack": "Arch-CondBlack.ttf",
+    # Buehne: der Prototyp registriert Kurznamen (Bx = Bricolage Grotesque,
+    # Sx = DM Sans), und ReportLab bettet sie unter diesem Namen ein. Die
+    # Dateien hier tragen den vollen Namen — ein PDF, das jemand oeffnet,
+    # soll die Schrift nennen, nicht ihr Kuerzel.
+    "Bx-Medium": "Bric-Medium.ttf",
+    "Bx-Bold": "Bric-Bold.ttf",
+    "Bx-ExtraBold": "Bric-ExtraBold.ttf",
+    "Sx-Regular": "DMS-Regular.ttf",
+    "Sx-Medium": "DMS-Medium.ttf",
+    "Sx-Bold": "DMS-Bold.ttf",
+}
+
+# PostScript-Name, den die Datei tragen soll, wo er vom Namen im
+# Referenz-PDF abweicht (siehe oben).
+PS_NAME = {
+    "Bx-Medium": "BricolageGrotesque-Medium",
+    "Bx-Bold": "BricolageGrotesque-Bold",
+    "Bx-ExtraBold": "BricolageGrotesque-ExtraBold",
+    "Sx-Regular": "DMSans-Regular",
+    "Sx-Medium": "DMSans-Medium",
+    "Sx-Bold": "DMSans-Bold",
 }
 
 
@@ -153,9 +174,9 @@ def main():
                 f"Achse falsch oder Zeichensatz zu eng geschnitten.")
             continue
         namen = TTFont(pfad)["name"].getDebugName(6)
-        if namen != ps:
+        if namen != PS_NAME.get(ps, ps):
             fehler.append(f"{datei}: PostScript-Name ist {namen!r}, "
-                          f"die Referenz einbettet {ps!r}.")
+                          f"erwartet {PS_NAME.get(ps, ps)!r} (Referenz: {ps!r}).")
             continue
         geprueft += 1
 

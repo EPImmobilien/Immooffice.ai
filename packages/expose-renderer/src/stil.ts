@@ -101,6 +101,8 @@ const FAMILIE: Record<string, string> = {
   jakarta: "Jak",
   cormorant: "Corm",
   archivo: "Arch",
+  bricolage: "Bric",
+  dmsans: "DMS",
 };
 
 /**
@@ -171,6 +173,6 @@ export function stilAus(vorlage: Vorlage, name: string, p: Palette): FesterStil 
 
 /** Satzregeln aus der Ableitung — die drei Prototypen setzen verschieden. */
 export function satzRegeln(ableitung: string, blocksatz: boolean): SatzRegeln {
-  const faktor = ableitung === "signature" ? 0.6 : ableitung === "studio" ? 0.5 : 0.55;
+  const faktor = ableitung === "signature" ? 0.6 : ableitung === "studio" ? 0.5 : ableitung === "buehne" ? 0.5 : 0.55;
   return { blocksatz, absatzFaktor: faktor, einzug: 0, einzugZeilen: 0 };
 }

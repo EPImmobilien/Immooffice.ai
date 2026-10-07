@@ -116,7 +116,7 @@ function tabellen(immo) {
       zinssatz: 3.9, tilgung: 2.0, eigenkapital_prozent: 20 }],
     // Alle drei Systemvorlagen, wie fork_38 sie einspielt. Welche genommen
     // wird, entscheidet firma_stammdaten.expose_vorlage.
-    expose_vorlagen: ['raster', 'signature', 'studio'].map((b) => ({
+    expose_vorlagen: ['raster', 'signature', 'studio', 'buehne'].map((b) => ({
       id: 'v-' + b, mandant_id: null, name: b[0].toUpperCase() + b.slice(1), basis: b,
       archiviert: false, ist_standard: false,
       dokument: JSON.parse(fs.readFileSync(path.join(VORLAGEN, b + '.json'), 'utf-8')),
@@ -341,7 +341,7 @@ const VOLL = {
   // Der Vergleich mit den Prototypen prueft die Vorlagen mit Demodaten.
   // Hier laufen sie durch den ganzen Weg: aus der Datenbank geladen, mit
   // echten Objektdaten gefuellt, als PDF geschrieben.
-  for (const [basis, name, seiten] of [['signature', 'Signature', 12], ['studio', 'Studio', 9]]) {
+  for (const [basis, name, seiten] of [['signature', 'Signature', 12], ['studio', 'Studio', 9], ['buehne', 'Buehne', 9]]) {
     const e = await lauf(VOLL, { nur_pruefen: true }, basis);
     if (!e) continue;
     melde(`Vorlage ${name} laeuft durch`, e.ergebnis.ok === true,

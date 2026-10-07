@@ -50,6 +50,10 @@ for (const name of namen) {
     console.log('    ' + String(grund.stderr || grund.message).split('\n').slice(-6).join('\n    '));
     continue;
   }
+  if (/^\[uebersprungen\]/m.test(ausgabe)) {
+    console.log(`  ${name}: ${ausgabe.match(/^\[uebersprungen\] (.*)$/m)[1]} — uebersprungen.`);
+    continue;
+  }
   if (/\[FEHLER\]/.test(ausgabe)) {
     fehler++;
     console.log(`  [FEHLER] ${name}: der Renderer meldet Fehler.`);

@@ -119,6 +119,12 @@ function vermarktungVon(immo: Record<string, unknown>): "kauf" | "miete" | "beid
 const VERMARKTUNG_TEXT: Record<string, string> = {
   kauf: "Verkauf", miete: "Vermietung", beides: "Verkauf & Vermietung",
 };
+// Dasselbe als kurze Marke fuer eine Pille auf dem Titel ("Zum Kauf"), wie
+// die Vorlage Buehne sie traegt. "Zum Verkauf" sagt der Verkaeufer; der
+// Leser des Exposés ist der Kaeufer.
+const VERMARKTUNG_PILLE: Record<string, string> = {
+  kauf: "Zum Kauf", miete: "Zur Miete", beides: "Kauf oder Miete",
+};
 
 export function aufbereiten(q: Quellen): Daten {
   const immo = q.immobilie ?? {};
@@ -189,6 +195,27 @@ export function aufbereiten(q: Quellen): Daten {
     if (m) d["objekt.titel_zweite_zeile"] = m[2];
   }
 
+  // Die Wertung zur Effizienzklasse (Buehne): zwei Worte zur Klasse, nicht
+  // zum Objekt — sie folgen allein dem Buchstaben aus dem Ausweis.
+  {
+    const kl = text(immo["energie_klasse"])?.toLocaleUpperCase("de-DE");
+    const urteil: Record<string, [string, string]> = {
+      "A+": ["Sehr effizient", "sehr niedrige Nebenkosten"],
+      "A": ["Sehr effizient", "niedrige Nebenkosten"],
+      "B": ["Effizient", "niedrige Nebenkosten"],
+      "C": ["Gut", "moderate Nebenkosten"],
+      "D": ["Durchschnittlich", "durchschnittliche Nebenkosten"],
+      "E": ["Unterdurchschnittlich", "erhöhte Nebenkosten"],
+      "F": ["Hoher Verbrauch", "hohe Nebenkosten"],
+      "G": ["Hoher Verbrauch", "hohe Nebenkosten"],
+      "H": ["Sehr hoher Verbrauch", "sehr hohe Nebenkosten"],
+    };
+    if (kl && urteil[kl]) {
+      d["objekt.energie_klasse_urteil"] = urteil[kl][0];
+      d["objekt.energie_klasse_hinweis"] = urteil[kl][1];
+    }
+  }
+
   // Der Untertitel: Zimmer, Flaeche, Lage — was davon da ist.
   const zimmer = z(immo["zimmer"]);
   const wohnflaeche = z(immo["wohnflaeche"]);
@@ -247,6 +274,7 @@ export function aufbereiten(q: Quellen): Daten {
   const vermarktung = vermarktungVon(immo);
   d["objekt.vermarktung"] = vermarktung;
   d["objekt.vertragsart"] = VERMARKTUNG_TEXT[vermarktung];
+  d["objekt.vermarktung_pille"] = VERMARKTUNG_PILLE[vermarktung];
   const kauf = vermarktung !== "miete";
   const preisZahl = kauf ? z(immo["angebotspreis"]) : z(immo["kaltmiete"]);
   if (immo["expose_preis_auf_anfrage"] === true) {

@@ -42,4 +42,6 @@ export const SCHNITTE = [
   "Corm-LightItalic", "Corm-RegularItalic", "Corm-MediumItalic",
   "Arch-Light", "Arch-Regular", "Arch-Medium", "Arch-SemiBold", "Arch-Bold",
   "Arch-CondXB", "Arch-CondBlack",
+  "Bric-Medium", "Bric-Bold", "Bric-ExtraBold",
+  "DMS-Regular", "DMS-Medium", "DMS-Bold",
 ] as const;
