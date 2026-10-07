@@ -114,20 +114,131 @@ function impressumLink(html: string, basis: URL): URL | null {
   }
   return null;
 }
-function logoKandidaten(html: string, basis: URL): string[] {
-  const aus: string[] = [];
-  const add = (s: string | undefined) => { if (!s) return; try { const u = new URL(s, basis); if (/^https?:$/.test(u.protocol)) aus.push(u.toString()); } catch { /* egal */ } };
-  for (const m of html.matchAll(/<meta\b[^>]*property\s*=\s*["']og:image["'][^>]*content\s*=\s*["']([^"']+)["']/gi)) add(m[1]);
-  for (const m of html.matchAll(/<link\b[^>]*rel\s*=\s*["'][^"']*icon[^"']*["'][^>]*href\s*=\s*["']([^"']+)["']/gi)) add(m[1]);
-  for (const m of html.matchAll(/<img\b[^>]*src\s*=\s*["']([^"']+)["'][^>]*>/gi)) { if (/logo/i.test(m[0])) add(m[1]); }
-  return Array.from(new Set(aus)).slice(0, 5);
-}
 function hinweiseAusHtml(html: string) {
   const mails = Array.from(new Set(Array.from(html.matchAll(/mailto:([^"'?\s>]+)/gi)).map((m) => entity(m[1]).toLowerCase()))).slice(0, 5);
   const tels = Array.from(new Set(Array.from(html.matchAll(/tel:([+\d][^"'\s>]*)/gi)).map((m) => m[1]))).slice(0, 5);
   const titel = (html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || "").trim();
   const site = html.match(/<meta\b[^>]*property\s*=\s*["']og:site_name["'][^>]*content\s*=\s*["']([^"']+)["']/i)?.[1] || "";
   return { mails, tels, titel: entity(titel).slice(0, 120), site: entity(site).slice(0, 120) };
+}
+
+// --- Marke: Farben, Schriften, Logos — ohne KI, aus HTML und CSS ---------------------
+// Eine Farbe ist ein Messwert, kein Urteil: gezaehlt wird, wie oft sie im
+// Stylesheet steht, gewichtet mit Saettigung und mit der Naehe zu Woertern
+// wie primary/brand/accent/button. Weiss, Schwarz und Grau sind Papier und
+// Tinte, keine Marke, und fallen heraus. Vorgeschlagen wird — entschieden
+// wird im Formular.
+function hexNorm(s: string): string | null {
+  let m = s.match(/^#([0-9a-f]{3})$/i);
+  if (m) return ("#" + m[1].split("").map((c) => c + c).join("")).toUpperCase();
+  m = s.match(/^#([0-9a-f]{6})$/i);
+  if (m) return ("#" + m[1]).toUpperCase();
+  m = s.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+  if (m) { const [r, g, b] = [m[1], m[2], m[3]].map((x) => Math.max(0, Math.min(255, Number(x)))); return "#" + [r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("").toUpperCase(); }
+  return null;
+}
+function hsl(hex: string) {
+  const r = parseInt(hex.slice(1, 3), 16) / 255, g = parseInt(hex.slice(3, 5), 16) / 255, b = parseInt(hex.slice(5, 7), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2;
+  const d = max - min; const sat = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+  let h = 0;
+  if (d !== 0) { h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4; h = (h * 60 + 360) % 360; }
+  return { h, s: sat, l };
+}
+async function stylesheets(html: string, basis: URL): Promise<{ css: string; googleFonts: string[] }> {
+  const teile: string[] = [];
+  for (const m of html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)) teile.push(m[1]);
+  for (const m of html.matchAll(/\bstyle\s*=\s*["']([^"']{0,400})["']/gi)) teile.push(m[1] + ";");
+  const googleFonts: string[] = [];
+  const links = Array.from(html.matchAll(/<link\b[^>]*rel\s*=\s*["'][^"']*stylesheet[^"']*["'][^>]*href\s*=\s*["']([^"']+)["']/gi))
+    .concat(Array.from(html.matchAll(/<link\b[^>]*href\s*=\s*["']([^"']+)["'][^>]*rel\s*=\s*["'][^"']*stylesheet[^"']*["']/gi)));
+  let geladen = 0;
+  for (const m of links) {
+    let u: URL;
+    if (!URL.canParse(m[1], basis)) continue;
+    u = new URL(m[1], basis);
+    if (/fonts\.googleapis\.com/i.test(u.hostname)) {
+      for (const f of (u.searchParams.getAll("family"))) googleFonts.push(decodeURIComponent(f.split(":")[0]).replace(/\+/g, " "));
+      continue;
+    }
+    if (geladen >= 4 || u.hostname !== basis.hostname || !erlaubteAdresse(u.toString())) continue;
+    const steuer = new AbortController(); const uhr = setTimeout(() => steuer.abort(), 8000);
+    const r = await fetch(u.toString(), { signal: steuer.signal, headers: { "Accept": "text/css,*/*;q=0.5" } }).catch(() => null);
+    clearTimeout(uhr);
+    if (!r || !r.ok) continue;
+    const t = await r.text().catch(() => "");
+    teile.push(t.slice(0, 300000)); geladen++;
+  }
+  return { css: teile.join("\n"), googleFonts: Array.from(new Set(googleFonts)) };
+}
+function farben(css: string, html: string) {
+  const punkte = new Map<string, number>();
+  const bonus = (hex: string, p: number) => punkte.set(hex, (punkte.get(hex) || 0) + p);
+  for (const m of css.matchAll(/(#[0-9a-f]{3,6}\b|rgba?\([^)]*\))/gi)) { const h = hexNorm(m[0]); if (h) bonus(h, 1); }
+  // Markenwoerter in der Naehe: Variablen und Klassen
+  for (const m of css.matchAll(/(--[\w-]*(?:primary|primär|primaer|brand|marke|accent|akzent|main|haupt|cta)[\w-]*\s*:\s*)(#[0-9a-f]{3,6}\b|rgba?\([^)]*\))/gi)) { const h = hexNorm(m[2]); if (h) bonus(h, 40); }
+  for (const m of css.matchAll(/(?:\.btn|\.button|\.primary|\.cta|\.accent|\.brand|header|nav|a\s*\{)[^}]{0,300}?(?:background(?:-color)?|color|border-color)\s*:\s*(#[0-9a-f]{3,6}\b|rgba?\([^)]*\))/gi)) { const h = hexNorm(m[1]); if (h) bonus(h, 8); }
+  const theme = html.match(/<meta\b[^>]*name\s*=\s*["']theme-color["'][^>]*content\s*=\s*["']([^"']+)["']/i)?.[1];
+  if (theme) { const h = hexNorm(theme.trim()); if (h) bonus(h, 60); }
+  const liste = Array.from(punkte.entries()).map(([hex, n]) => {
+    const { s, l } = hsl(hex);
+    // Papier und Tinte raus: fast weiss, fast schwarz, grau.
+    const marke = s >= 0.12 && l > 0.08 && l < 0.92;
+    return { hex, n, s, l, wert: marke ? n * (0.5 + s) * (l < 0.6 ? 1.2 : 1) : 0 };
+  }).filter((x) => x.wert > 0).sort((a, b) => b.wert - a.wert);
+  const primaer = liste[0] || null;
+  let akzent: typeof primaer = null;
+  if (primaer) {
+    const hp = hsl(primaer.hex).h;
+    akzent = liste.slice(1).find((x) => { const d = Math.abs(hsl(x.hex).h - hp); return Math.min(d, 360 - d) > 30; }) || liste[1] || null;
+  }
+  return { liste: liste.slice(0, 8).map((x) => ({ hex: x.hex, treffer: x.n })), primaer: primaer?.hex || null, akzent: akzent?.hex || null };
+}
+const SYSTEM_SCHRIFTEN = new Set(["inherit", "initial", "unset", "sans-serif", "serif", "monospace", "system-ui", "ui-sans-serif", "ui-serif", "cursive", "fantasy",
+  "-apple-system", "blinkmacsystemfont", "segoe ui", "roboto", "helvetica neue", "helvetica", "arial", "noto sans", "liberation sans", "apple color emoji", "segoe ui emoji", "segoe ui symbol", "font awesome 5 free", "font awesome 6 free", "fontawesome", "icomoon", "material icons", "dashicons", "eicons", "elementor-icons", "genericons", "swiper-icons", "woocommerce", "star"]);
+function schriften(css: string, googleFonts: string[]) {
+  const z = new Map<string, number>();
+  for (const m of css.matchAll(/font-family\s*:\s*([^;}!]+)/gi)) {
+    const erste = m[1].split(",")[0].replace(/["']/g, "").trim();
+    if (!erste || erste.startsWith("var(") || SYSTEM_SCHRIFTEN.has(erste.toLowerCase()) || /icon|awesome|glyph|symbol/i.test(erste)) continue;
+    z.set(erste, (z.get(erste) || 0) + 1);
+  }
+  for (const g of googleFonts) z.set(g, (z.get(g) || 0) + 25);
+  for (const m of css.matchAll(/@font-face\s*\{[^}]*font-family\s*:\s*["']?([^;"'}]+)/gi)) { const f = m[1].trim(); if (f && !/icon|awesome/i.test(f)) z.set(f, (z.get(f) || 0) + 10); }
+  const liste = Array.from(z.entries()).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([name, treffer]) => ({ name, treffer }));
+  return { liste, vorschlag: liste[0]?.name || null, google: googleFonts };
+}
+function logoKandidatenMehr(html: string, basis: URL): { url: string; grund: string }[] {
+  const aus: { url: string; grund: string }[] = [];
+  const add = (s: string | undefined, grund: string) => { if (!s || !URL.canParse(s, basis)) return; const u = new URL(s, basis); if (/^https?:$/.test(u.protocol) && !aus.some((x) => x.url === u.toString())) aus.push({ url: u.toString(), grund }); };
+  for (const m of html.matchAll(/<img\b[^>]*>/gi)) {
+    const tag = m[0];
+    if (!/logo|marke|brand/i.test(tag)) continue;
+    const src = tag.match(/\bsrc\s*=\s*["']([^"']+)["']/i)?.[1] || tag.match(/\bdata-src\s*=\s*["']([^"']+)["']/i)?.[1];
+    add(src, "Bild mit „logo“ in Name/Klasse/Alt");
+  }
+  const kopf = html.match(/<header\b[\s\S]{0,6000}?<\/header>/i)?.[0] || "";
+  for (const m of kopf.matchAll(/<img\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/gi)) add(m[1], "erstes Bild im Seitenkopf");
+  for (const m of html.matchAll(/<link\b[^>]*rel\s*=\s*["']apple-touch-icon[^"']*["'][^>]*href\s*=\s*["']([^"']+)["']/gi)) add(m[1], "Apple-Touch-Icon");
+  for (const m of html.matchAll(/<meta\b[^>]*property\s*=\s*["']og:image["'][^>]*content\s*=\s*["']([^"']+)["']/gi)) add(m[1], "og:image (oft ein Teaserbild, kein Logo)");
+  for (const m of html.matchAll(/<link\b[^>]*rel\s*=\s*["'][^"']*\bicon\b[^"']*["'][^>]*href\s*=\s*["']([^"']+)["']/gi)) add(m[1], "Favicon (klein)");
+  return aus.slice(0, 8);
+}
+// Ein Bild der Website holen und als Base64 zurueckgeben — die Oberflaeche
+// kann fremde Bilder nicht selbst laden (CORS). Nur Bilder, hoechstens 3 MB.
+async function bildHolen(roh: string): Promise<{ mime: string; base64: string; bytes: number } | null> {
+  const u = erlaubteAdresse(roh);
+  if (!u) return null;
+  const steuer = new AbortController(); const uhr = setTimeout(() => steuer.abort(), 12000);
+  const r = await fetch(u.toString(), { signal: steuer.signal, redirect: "follow", headers: { "Accept": "image/*" } }).catch(() => null);
+  clearTimeout(uhr);
+  if (!r || !r.ok) return null;
+  const mime = (r.headers.get("content-type") || "").split(";")[0].trim().toLowerCase();
+  if (!/^image\/(png|jpeg|jpg|svg\+xml|webp|gif|x-icon|vnd\.microsoft\.icon)$/.test(mime)) return null;
+  const puffer = new Uint8Array(await r.arrayBuffer());
+  if (puffer.length > 3 * 1024 * 1024 || puffer.length === 0) return null;
+  let bin = ""; for (let i = 0; i < puffer.length; i += 0x8000) bin += String.fromCharCode(...puffer.subarray(i, i + 0x8000));
+  return { mime, base64: btoa(bin), bytes: puffer.length };
 }
 
 // --- KI ----------------------------------------------------------------------------
@@ -143,6 +254,13 @@ Deno.serve(async (req) => {
   let credits: Abrechnung | null = null;
   try {
     const body = await req.json().catch(() => ({})) as Record<string, unknown>;
+    // Modus "logo": ein gewaehltes Bild der Website holen (fuer den Upload
+    // ins Haus). Keine KI, keine Reservierung — nur das Bild.
+    if (String(body.modus || "") === "logo") {
+      const bild = await bildHolen(String(body.url || ""));
+      if (!bild) return antwort({ ok: false, fehler: "Das Bild liess sich nicht laden (kein Bild, zu gross oder gesperrt)." }, 400);
+      return antwort({ ok: true, ...bild });
+    }
     const ziel = erlaubteAdresse(String(body.website || ""));
     if (!ziel) return antwort({ ok: false, fehler: "Bitte die Adresse der Website angeben (z. B. www.ihre-firma.de)." }, 400);
 
@@ -176,7 +294,9 @@ Deno.serve(async (req) => {
     }
     const startText = text(start.html, 8000);
     const html = hinweiseAusHtml(start.html);
-    const logos = logoKandidaten(start.html, basis);
+    const logos = logoKandidatenMehr(start.html, basis);
+    const styles = await stylesheets(start.html, basis);
+    const marke = { farben: farben(styles.css, start.html), schriften: schriften(styles.css, styles.googleFonts), logos };
 
     const nutzer = `WEBSITE: ${basis.hostname}\nTITEL: ${html.titel}\nSITE-NAME: ${html.site}\nMAILTO-LINKS: ${html.mails.join(", ") || "-"}\nTEL-LINKS: ${html.tels.join(", ") || "-"}\n\n=== IMPRESSUM ===\n${impressumText || "(kein Impressum gefunden)"}\n\n=== STARTSEITE ===\n${startText}`;
 
@@ -209,7 +329,7 @@ Deno.serve(async (req) => {
     await abr.buchen(kosten, "firma-ermitteln " + basis.hostname, "anthropic", abr.modell(MODELL));
 
     const gefunden = FELDER.filter((f) => felder[f].wert).length;
-    return antwort({ ok: true, felder, logos, quellen, impressum_gefunden: !!impressumText, gefunden,
+    return antwort({ ok: true, felder, logos: logos.map((l) => l.url), marke, quellen, impressum_gefunden: !!impressumText, gefunden,
       hinweise: Array.isArray(roh.hinweise) ? (roh.hinweise as unknown[]).map(String).slice(0, 5) : [] });
   } catch (e) {
     const grund = e instanceof Error ? e.message : String(e);

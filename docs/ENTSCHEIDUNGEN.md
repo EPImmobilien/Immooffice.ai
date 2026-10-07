@@ -6438,3 +6438,54 @@ fehlt (Anschrift, Kontakt, Logo, Postfach), jeweils mit diesem Link.
 Die Prosa-Hinweise der Vorlage („unter Einstellungen → Vorgaben") bleiben
 vorerst Prosa; umgestellt sind die eigenen Stellen (Funktionsschalter,
 Hilfe, Einrichtungsband). Weitere Stellen kommen, wo sie auffallen.
+
+
+## 2026-10-07 · Marke von der Website: Farben, Schriften, Logo (fork_82, Nachtrag)
+
+Farben und Schriften brauchen kein Sprachmodell: sie stehen im
+Stylesheet. Die Function zählt Farbwerte (hex, rgb), gewichtet nach
+Sättigung und Nähe zu Wörtern wie `primary`, `brand`, `accent`, `button`,
+`theme-color`, und lässt Weiß, Schwarz und Grau heraus — Papier und
+Tinte sind keine Marke. Schriften kommen aus `font-family`, Google-Fonts-
+Links und `@font-face`; Icon-Fonts und Systemschriften fallen weg. Das
+Ergebnis ist ein Vorschlag mit Treffern, keine Entscheidung: die Farben
+werden angeklickt, die Schrift gewählt, und erst „Speichern" schreibt.
+
+Das Logo kann die Oberfläche nicht selbst von der fremden Website laden
+(CORS). Die Function holt das gewählte Bild (nur Bilder, ≤ 3 MB, keine
+internen Ziele) und gibt es zurück; dann geht es denselben Weg wie ein
+hochgeladenes Logo — Freistellen anbieten, `branding-assets/logos/…`,
+`logo_pfad` ins Formular. Kein zweiter Speicherpfad, kein zweites Format.
+
+**Übernahme ins Formular (gemeldet 07.10.2026: „er erkennt das aus der
+Website richtig, aber übernimmt es nicht").** Die erste Fassung schrieb
+jedes vorgeschlagene Feld einzeln über die Feldänderung der Stammdaten-
+Tafel. Die liest den Zustand der Firmenliste aus ihrem Abschluss — und
+der war bei jedem Aufruf derselbe alte. Von acht Feldern überlebte so nur
+das letzte. Jetzt kommt die ganze Auswahl als **ein** Objekt zurück und
+wird in einem Schritt in die Firma gemischt; „Speichern" schreibt wie
+zuvor.
+
+## 2026-10-07 · Exposé-Treue-Gate: drittes Buch „bewusst anders"
+
+PR #13 (`2467c48`, „Exposé Raster — Anmerkungen aus dem Testexposé") hat
+die Raster-Vorlage nach Anschauen eines echten Exposés umgebaut:
+Titelseite ohne weißes Markenfeld und ohne Bildunterschrift, Galerie mit
+den echten Bildtiteln, Grundrissseite bei nur einem Grundriss ohne
+Seitenspalte und ohne Obergeschoss-Kasten. Das ist eine Vorgabe des
+Auftraggebers und geht dem Prototyp vor (CLAUDE.md, Rangfolge). Das Gate
+`tests/expose-vorlagen.js` kannte dafür bisher nur zwei Bücher: anderer
+Text an derselben Stelle und weggelassener Text. Ein geänderter Aufbau
+passte in keines — und in der Umgebung, die den PR geschrieben hat, lag
+`reference/` nicht vor, das Gate wurde dort übersprungen.
+
+Entschieden: ein drittes Buch `BEWUSST_ANDERS` je Vorlage und Seite, mit
+Grund, Bereichen in Seitenkoordinaten oder datengetriebenen Texten. Es
+deckt beide Richtungen (Prototyp zeichnet, Renderer nicht — und umgekehrt),
+greift erst **nach** allen Platzhalter-Regeln, und ein Eintrag, der keinen
+Schritt mehr trifft, ist ein Fehler: ein Buch, das Altes mitführt, taugt
+nicht. Die drei Galerie-Beschriftungen stehen in `WEGGELASSEN`, weil sie
+genau das sind — Texte, die der Fork mit Grund nicht setzt. Die
+Alternative, die Vorlage zurückzubauen, hätte eine Entscheidung des
+Auftraggebers rückgängig gemacht; die Alternative, das Gate zu lockern,
+hätte den Zweck des Gates aufgegeben.

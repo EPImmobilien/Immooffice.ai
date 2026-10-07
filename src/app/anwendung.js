@@ -41725,7 +41725,7 @@ function AdminGmbHStammdaten({
     onChange: t => c(e.id, "aktiv", t.target.checked)
   }), " aktiv")), window.ImmoFirmaErmitteln && React.createElement(window.ImmoFirmaErmitteln, {
     firma: e,
-    uebernehmen: w => Object.keys(w).forEach(k => c(e.id, k, w[k]))
+    uebernehmen: w => n(t.map(x => x.id === e.id ? { ...x, ...w } : x))
   }), React.createElement("div", {
     style: {
       display: "grid",

@@ -4711,7 +4711,7 @@ WOERTLICH = [
     # =====================================================================
     ('FORK',
      '  }), " aktiv")), React.createElement("div", {\n    style: {\n      display: "grid",\n      gridTemplateColumns: "repeat(auto-fit, minmax(min(220px, 100%), 1fr))",\n      gap: 10\n    }\n  }, React.createElement("div", null, React.createElement("label", {\n    style: u\n  }, "Firmenname")',
-     '  }), " aktiv")), window.ImmoFirmaErmitteln && React.createElement(window.ImmoFirmaErmitteln, {\n    firma: e,\n    uebernehmen: w => Object.keys(w).forEach(k => c(e.id, k, w[k]))\n  }), React.createElement("div", {\n    style: {\n      display: "grid",\n      gridTemplateColumns: "repeat(auto-fit, minmax(min(220px, 100%), 1fr))",\n      gap: 10\n    }\n  }, React.createElement("div", null, React.createElement("label", {\n    style: u\n  }, "Firmenname")',
+     '  }), " aktiv")), window.ImmoFirmaErmitteln && React.createElement(window.ImmoFirmaErmitteln, {\n    firma: e,\n    uebernehmen: w => n(t.map(x => x.id === e.id ? { ...x, ...w } : x))\n  }), React.createElement("div", {\n    style: {\n      display: "grid",\n      gridTemplateColumns: "repeat(auto-fit, minmax(min(220px, 100%), 1fr))",\n      gap: 10\n    }\n  }, React.createElement("div", null, React.createElement("label", {\n    style: u\n  }, "Firmenname")',
      'Firma & Impressum: „Aus Website übernehmen“ über jedem Firmensatz.'),
     ('FORK',
      'function EinstellungenPage({ user }) {\n  const [reiter, setReiter] = useState("firma");',

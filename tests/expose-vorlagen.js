@@ -62,6 +62,20 @@ const schnittName = (n) => {
 // Dieselbe Buchfuehrung wie bei den abweichenden Texten: eine Luecke gegen
 // den Prototyp muss begruendet im Test stehen, sonst ist sie ein Fehler.
 const WEGGELASSEN = [
+  // Raster, Galerie: der Prototyp beschriftet seine drei Platzhalterfotos
+  // fest mit "Terrasse & Garten", "Elternschlafzimmer", "Tageslichtbad".
+  // Seit PR #13 (2467c48, „Anmerkungen aus dem Testexposé", 07.10.2026)
+  // steht dort der Titel des jeweiligen Objektfotos — und wo das Foto
+  // keinen hat, nichts. Die Testdaten tragen Titel nur fuer Foto 1–3.
+  ...['TERRASSE & GARTEN', 'ELTERNSCHLAFZIMMER', 'TAGESLICHTBAD'].map((text) => ({
+    vorlage: 'raster',
+    text,
+    grund: 'Beschriftung eines Platzhalterfotos im Prototyp. Seit PR #13 '
+         + 'zeigt die Galerie den Titel des echten Objektfotos; eine feste '
+         + 'Beschriftung waere bei jedem Objekt ausser dem Demo-Objekt eine '
+         + 'erfundene Angabe. Entscheidung des Auftraggebers nach dem '
+         + 'Testexposé vom 07.10.2026.',
+  })),
   {
     vorlage: 'studio',
     text: 'PORTRÄTFOTO',
@@ -260,6 +274,72 @@ const ABWEICHENDE_TEXTE = [
 
 const textErsatz = new Map();
 for (const e of ABWEICHENDE_TEXTE) textErsatz.set(`${e.vorlage}|${e.soll}`, e.ist);
+
+// Stellen, an denen der Fork den Prototyp BEWUSST anders zeichnet — nicht
+// ein anderer Text an derselben Stelle (das ist ABWEICHENDE_TEXTE) und nicht
+// ein weggelassener Text (WEGGELASSEN), sondern ein geaenderter Aufbau:
+// Elemente fehlen, stehen woanders oder in anderer Farbe.
+//
+// Quelle ist in allen Faellen PR #13 (2467c48, „Exposé Raster — Anmerkungen
+// aus dem Testexposé", 07.10.2026): der Auftraggeber hat ein echtes Expose
+// in der Raster-Vorlage angesehen und Aenderungen am Aufbau verlangt. Eine
+// Vorgabe des Auftraggebers geht dem Prototyp vor (CLAUDE.md, Rangfolge).
+//
+// Jeder Eintrag nennt Vorlage, Seite und eine Regel, die sagt, welche
+// Schritte er deckt — auf beiden Seiten des Vergleichs: was der Prototyp
+// zeichnet und der Renderer nicht, und was der Renderer zeichnet und der
+// Prototyp nicht. Ein Eintrag, der KEINEN Schritt mehr trifft, ist
+// ueberholt und schlaegt als Fehler an: ein Buch, das Altes mitfuehrt,
+// taugt nicht.
+//
+// `bereiche` sind Kaesten in Seitenkoordinaten [x1, y1, x2, y2]; gedeckt ist
+// ein Schritt des Prototyps, der ganz darin liegt. `texte(daten)` liefert
+// Texte, die gedeckt sind, wo immer sie stehen.
+const BEWUSST_ANDERS = [
+  {
+    vorlage: 'raster',
+    seite: 1,
+    grund: 'Titelseite ohne weisses Markenfeld und ohne Bildunterschrift. '
+         + 'Der Prototyp legt unten links ein weisses Feld ueber das '
+         + 'Titelbild und setzt Markenname und -linie dunkel hinein; '
+         + 'daneben beschriftet er das Titelbild mit dessen Titel. Seit '
+         + 'PR #13 stehen Markenname und -linie hell direkt auf dem Bild, '
+         + 'das Feld und die Beschriftung entfallen.',
+    texte: (d) => [d['firma.marken_name'], d['firma.linie'], d['objekt.hauptbild_url.titel']]
+      .filter(Boolean).map((s) => String(s).toUpperCase()),
+  },
+  {
+    vorlage: 'raster',
+    seite: 6,
+    grund: 'Grundrissseite bei nur EINEM Grundriss: ohne die Seitenspalte '
+         + 'mit den Raumlisten (Erdgeschoss/Obergeschoss, Raum, m², Summe) '
+         + 'und ohne den Obergeschoss-Kasten. Der eine Grundriss bekommt '
+         + 'statt dessen die ganze Seite. Die Testdaten haben, wie der '
+         + 'Prototyp, keinen zweiten Grundriss. Die Platzhalter-Striche '
+         + 'des Prototyps am oberen Rand seines Grundrissrahmens '
+         + '(76..349 × 410..660) liegen ausserhalb des neuen, hohen '
+         + 'Rahmens und sind darum hier mit gedeckt.',
+    bereiche: [
+      [395, 400, 560, 700],        // Seitenspalte mit den Raumlisten
+      [42, 80, 383.28, 364],       // Obergeschoss-Kasten des Prototyps
+      [76, 409.89, 349.28, 659.89], // alter Rahmen des EG-Grundrisses
+    ],
+  },
+];
+const bewusstGetroffen = new Map(BEWUSST_ANDERS.map((e) => [e, 0]));
+function bewusstAnders(name, seite, s, daten) {
+  const [ax1, ay1, ax2, ay2] = kasten(s);
+  for (const e of BEWUSST_ANDERS) {
+    if (e.vorlage !== name || e.seite !== seite) continue;
+    const text = s.art === 'text' ? String(s.text || '').trim() : null;
+    const trifft =
+      (text !== null && e.texte && e.texte(daten).includes(text)) ||
+      (e.bereiche || []).some(([x1, y1, x2, y2]) =>
+        ax1 >= x1 - 0.5 && ax2 <= x2 + 0.5 && ay1 >= y1 - 0.5 && ay2 <= y2 + 0.5);
+    if (trifft) { bewusstGetroffen.set(e, bewusstGetroffen.get(e) + 1); return true; }
+  }
+  return false;
+}
 
 if (!fs.existsSync(REF)) {
   console.log('  reference/expose-vorlagen fehlt — uebersprungen. Die Prototypen');
@@ -530,9 +610,10 @@ for (const name of WELCHE) {
 
   vorlageName = name;
   const vorlage = JSON.parse(fs.readFileSync(path.join(VORLAGEN, `${name}.json`), 'utf-8'));
+  const daten = datenFuer(name, soll.daten);
   const ergebnis = rendern({
     vorlage,
-    daten: datenFuer(name, soll.daten),
+    daten,
     schriften,
     // Welche zwei Farben der Prototyp als "die beiden der Vorlage" fuehrt,
     // heisst bei jedem anders: Raster p/a, Signature d/a, Studio s/d.
@@ -618,6 +699,7 @@ for (const name of WELCHE) {
             (platzhalterArten.get('eigener ' + s.art) || 0) + 1);
           continue;
         }
+        if (bewusstAnders(name, i + 1, s, daten)) { geprueft--; continue; }
         fehler++;
         if (meldungen.length < 30) {
           meldungen.push(`${name} S.${i + 1}: der Renderer zeichnet ` +
@@ -664,6 +746,8 @@ for (const name of WELCHE) {
             (platzhalterArten.get('Beschriftung einer Zeichnung') || 0) + 1);
           continue;
         }
+        // Zuletzt, damit die Buchung nur deckt, was sonst ein Fehler waere.
+        if (bewusstAnders(name, i + 1, s, daten)) continue;
         fehler++;
         if (meldungen.length < 30) {
           const [x, y] = ort(s);
@@ -699,6 +783,14 @@ function beschreibe(s) {
 
 fs.rmSync(tmp, { recursive: true, force: true });
 
+for (const [e, n] of bewusstGetroffen) {
+  if (!n && WELCHE.includes(e.vorlage)) {
+    fehler++;
+    meldungen.push(`${e.vorlage} S.${e.seite}: die Buchung „bewusst anders" trifft keinen ` +
+      `Schritt mehr — ueberholt, bitte aus dem Test nehmen.`);
+  }
+}
+
 for (const m of meldungen) console.log('  ' + (m.includes('noch nicht gebaut') ? '' : '[FEHLER] ') + m);
 if (fehler) {
   console.log(`\n  ${fehler} Abweichungen bei ${geprueft} verglichenen Schritten.`);
@@ -721,4 +813,8 @@ for (const e of WEGGELASSEN) {
 for (const e of ABWEICHENDE_TEXTE) {
   console.log(`       Mit Grund abweichend: ${e.vorlage} — "${e.soll}"`);
   console.log(`         statt dessen "${e.ist}". ${e.grund}`);
+}
+for (const [e, n] of bewusstGetroffen) {
+  console.log(`       Bewusst anders: ${e.vorlage} S.${e.seite} — ${n} Schritte.`);
+  console.log(`         ${e.grund}`);
 }
