@@ -114435,7 +114435,7 @@ function ClaudeChatWidget({
         {
           data: a,
           error: r
-        } = await window._sb.functions.invoke("claude-chat", {
+        } = await window._sb.functions.invoke("ki-assistent", {
           body: {
             messages: n,
             user_info: {
@@ -114586,13 +114586,13 @@ function ClaudeChatWidget({
     style: {
       marginBottom: 16
     }
-  }, "Frag mich was — z.B.:"), React.createElement("div", {
+  }, "Ich kann Ihre Objekte und Kontakte lesen und Entwürfe anlegen — z. B.:"), React.createElement("div", {
     style: {
       textAlign: "left",
       display: "inline-block",
       lineHeight: 1.8
     }
-  }, React.createElement("div", null, '• "Schreib mir einen Exposé-Text für ..."'), React.createElement("div", null, '• "Wie hoch ist die Grunderwerbsteuer in MV?"'), React.createElement("div", null, '• "Verfass eine E-Mail an einen Kunden"'), React.createElement("div", null, '• "Berechne 3,57% Provision auf 449.000 €"'))), r.map((e, t) => {
+  }, React.createElement("div", null, '• "Lege eine E-Mail-Vorlage für die Absage nach einer Besichtigung an"'), React.createElement("div", null, '• "Schreib einen Brief an den Eigentümer der Hafenstraße 12"'), React.createElement("div", null, '• "Erstelle eine ToDo-Kette für die Vermietung einer Wohnung"'), React.createElement("div", null, '• "Entwirf eine Reservierungsvereinbarung für Objekt 1042"'))), r.map((e, t) => {
     return React.createElement("div", {
       key: t,
       style: {

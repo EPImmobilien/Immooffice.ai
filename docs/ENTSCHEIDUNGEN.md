@@ -6349,3 +6349,33 @@ der Referenz nicht kannte.
   Das Gate prüft jetzt den Namen (PERSONEN) und beide Microsoft-Kennungen (FREMD).
 - **Branchen-News** (fork_82): der Cron-Job war seit der Übernahme inaktiv,
   der Schlüssel aber schon auf den Vault umgestellt. Eingeschaltet.
+
+## 2026-10-07 · KI-Assistent mit Werkzeugen (fork_83)
+
+Auftrag des Betreibers: Kunden sollen Claude direkt in immoOffice.ai Vorlagen,
+Briefe und Verträge anlegen lassen können.
+
+- **Eigene Funktion `ki-assistent`** statt Umbau von `claude-chat`: claude-chat
+  ist eine übernommene Funktion, deren Änderungen als Regel in den Erzeuger
+  müssten; ein Werkzeug-Kreislauf ist keine Neutralisierung. Das Chat-Fenster
+  ruft jetzt `ki-assistent` (Regel in `scripts/oberflaeche-zerlegen.py`).
+  Ein- und Ausgabeform bleiben die von claude-chat.
+- **Rechte**: Jeder Datenzugriff läuft mit dem JWT des Nutzers, also unter RLS.
+  Der Assistent kann nichts, was der Nutzer in der Oberfläche nicht auch kann
+  (ToDo-Ketten z. B. nur die Geschäftsleitung). Kein Dienstschlüssel in der
+  Funktion; nur die Credit-Beilage bucht mit ihm.
+- **Werkzeuge**: lesen — Objekte, Objekt, Kontakte, Mail-Vorlagen, Firma;
+  anlegen — Mail-Vorlage, Brief-Entwurf (auch Vertragsentwürfe, Status
+  `entwurf`), ToDo-Kette. Kein Versand, kein Löschen, kein Ändern.
+- **Verträge** landen als Brief-Entwurf, nicht als `vertragsvorlagen`-Datei:
+  diese Tabelle hält hochgeladene Muster je Vertragsart mit festen
+  `vorgaben` und hängt an Signatur und PDF-Erzeugung. Ein KI-Text dort wäre
+  ein ungeprüftes Muster an der Stelle, an der der Kunde geprüfte erwartet.
+  Jeder Vertragsentwurf trägt den Pflichthinweis auf anwaltliche Prüfung.
+- **Credits**: Aktion `ki_assistent`, 2 Credits je Nachricht, gleich wie viele
+  Werkzeugrunden (höchstens 8). Notschalter und Modell über
+  `plattform_ki_einstellungen`. `tests/credits.js` liest den Katalog jetzt aus
+  allen Migrationen, nicht nur aus fork_47.
+- **Nächster Schritt**: dieselben Werkzeuge als MCP-Server (Claude-Connector,
+  Schalter `mcp_connector`, ab Professional). ChatGPT nimmt denselben
+  MCP-Server als Connector — ein Server, zwei Assistenten.
