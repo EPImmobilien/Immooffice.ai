@@ -466,7 +466,16 @@ zuwachs(bereich, mehr, grund) as (values
   ('Primaer- und Eindeutigkeitsschluessel', 2, 'fork_74: Primaerschluessel und (datum, bereich, zeitraum)'),
   ('Richtlinien', 1, 'fork_74: lesen owner/admin/finanzen'),
   ('Funktionen', 1, 'fork_74: plattform_zahlungen'),
-  ('Cron-Jobs', 1, 'fork_74: plattform-stripe-abgleich-taeglich')
+  ('Cron-Jobs', 1, 'fork_74: plattform-stripe-abgleich-taeglich'),
+
+  -- fork_75: Betreiber, Schritt 7 — Technik & Jobs.
+  ('Tabellen', 2, 'fork_75: system_fehler, dienst_aufrufe'),
+  ('Tabellen mit RLS', 2, 'fork_75: beide'),
+  ('Spalten', 14, 'fork_75: 7 system_fehler, 7 dienst_aufrufe'),
+  ('Primaer- und Eindeutigkeitsschluessel', 2, 'fork_75: je ein Primaerschluessel'),
+  ('Indizes ohne Constraint', 2, 'fork_75: je nach Zeit'),
+  ('Richtlinien', 3, 'fork_75: lesen und erledigen system_fehler, lesen dienst_aufrufe'),
+  ('Funktionen', 4, 'fork_75: cron_laeufe, cron_job_jetzt, plattform_speicher, plattform_technik')
 ),
 soll(bereich, soll) as (
   select v.bereich,

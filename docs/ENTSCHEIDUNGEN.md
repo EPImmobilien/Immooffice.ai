@@ -6198,3 +6198,25 @@ Konten, BU-Schlüssel und Debitorennummern — die gehören der Buchhaltung,
 nicht der Plattform. Eine Datei, die so aussieht wie DATEV, aber mit
 geratenen Konten, wäre schlimmer als eine ehrliche CSV mit beschriebenen
 Spalten.
+
+
+## 2026-10-07 · Betreiberbereich, Schritt 7: kein „Erneut verarbeiten" für Stripe-Webhooks (fork_75)
+
+Der Auftrag nennt für das Webhook-Log ein „Erneut verarbeiten". Das gibt
+es hier nicht, mit Absicht: Der Webhook gehört der Stripe-Integration, er
+ist idempotent, und Stripe selbst kann jedes Ereignis aus dem Dashboard
+erneut senden — genau an denselben Endpunkt, mit derselben Signatur. Ein
+eigener Knopf müsste die Signaturprüfung umgehen oder die Verarbeitung aus
+dem Webhook herauslösen. Beides schwächt den Pfad, den der Auftrag
+idempotent und geprüft haben will. Die Zeile im Log trägt stattdessen den
+Link ins Stripe-Dashboard.
+
+„Jetzt ausführen" führt das Kommando eines pg_cron-Jobs aus — nicht
+mehr. Keine eigene Fassung, kein anderer Parameter. Was der Zeitplan tut,
+tut der Knopf; was beim Knopf schiefgeht, ginge nachts auch schief.
+
+Das Fehlerprotokoll der Funktionen (`system_fehler`) füllen zunächst nur
+die beiden eigenen Betreiber-Funktionen. Die 130 übrigen sind generierter
+Code aus der Vorlage; sie anzuschließen heißt, den Generator um eine Regel
+je Funktion zu erweitern. Lieber zwei Funktionen ehrlich als 130 halb —
+die Ampel sagt dazu „nur angeschlossene Funktionen".

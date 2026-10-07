@@ -1314,86 +1314,199 @@
           "Reihenfolge der Entscheidung: Ausnahme des Hauses (befristbar) → Tarif → Standard. Gesperrte Module zeigen im Portal einen Upgrade-Hinweis, sie verschwinden nicht.")));
   }
 
-  // --- Systemzustand ----------------------------------------------------------
+  // --- Technik & Jobs (fork_75) ----------------------------------------------
+  function Lampe(p) {
+    var f = p.stand === "gruen" ? CI.success : p.stand === "gelb" ? CI.gold
+      : p.stand === "rot" ? CI.danger : CI.muted;
+    return E("span", { title: p.stand, style: { display: "inline-block", width: 12, height: 12,
+      borderRadius: 6, background: f, marginRight: 8, verticalAlign: "middle" } });
+  }
+  function Tabelle(koepfe, zeilen, breite) {
+    return E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: breite || 700 } },
+      E("thead", null, E("tr", null, koepfe.map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
+      E("tbody", null, zeilen));
+  }
   function System(p) {
     var d = p.daten;
-    if (!d) return E("div", { style: { color: CI.muted } }, "Lade Systemzustand …");
+    var sZ = React.useState(null), speicher = sZ[0], setzeSpeicher = sZ[1];
+    var fZ = React.useState(null), frei = fZ[0], setzeFrei = fZ[1];
+    var gZ = React.useState(""), grund = gZ[0], setzeGrund = gZ[1];
+    if (!d) return E("div", { style: { color: CI.muted } }, "Lade Technik …");
+    var darf = p.rolle === "owner" || p.rolle === "admin";
     var cron = d.cron || [];
-    var kaputt = cron.filter(function (j) { return Number(j.fehler_24h) > 0; });
-    var still = cron.filter(function (j) {
-      return j.aktiv && Number(j.laeufe_24h) === 0;
-    });
+    var stripeBasis = "https://dashboard.stripe.com/" + (d.stripe_modus === "live" ? "" : "test/") + "events/";
+    async function jobJetzt(j) {
+      if (!window.confirm("Job „" + j.jobname + "“ jetzt ausführen? Das ist dasselbe Kommando wie im Zeitplan.")) return;
+      try { await ruf("job_jetzt", { jobname: j.jobname }); p.melden("Job gestartet."); p.neuLaden(); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    async function erledigt(f) {
+      try { await ruf("fehler_erledigt", { id: f.id }); p.melden("Als erledigt markiert."); p.neuLaden(); }
+      catch (x) { p.melden(x.message || String(x), "fehler"); }
+    }
+    async function freigeben() {
+      try { var x = await ruf("vorgang_freigeben", { vorgang_id: frei.vorgang_id, grund: grund });
+        p.melden(zahl(x.credits) + " Credits freigegeben."); setzeFrei(null); setzeGrund(""); p.neuLaden(); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    async function speicherLaden() {
+      try { setzeSpeicher({ laedt: true }); setzeSpeicher(await ruf("speicher")); }
+      catch (f) { setzeSpeicher(null); p.melden(f.message || String(f), "fehler"); }
+    }
+    var offeneFehler = (d.fehler || []).filter(function (f) { return !f.erledigt_am; });
     return E("div", null,
-      E("div", { style: { display: "grid", gap: 14,
-        gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", marginBottom: 18 } },
-        [
-          ["Zeitplan-Jobs", zahl(cron.length), "angelegt"],
-          ["Mit Fehlern (24 h)", zahl(kaputt.length),
-            kaputt.length ? "nachsehen" : "nichts zu tun"],
-          ["Still (24 h)", zahl(still.length),
-            "aktiv, aber kein Lauf — kann richtig sein, wenn der Takt länger ist"],
-          ["Oberflächenfehler", zahl((d.fehler || []).reduce(function (a, f) {
-            return a + Number(f.anzahl || 0); }, 0)), "in " + zahl(d.tage) + " Tagen"],
-        ].map(function (k, i) {
-          return E("div", { key: i, style: kasten },
-            E("div", { style: { fontSize: 11, color: CI.muted, letterSpacing: "0.06em", textTransform: "uppercase" } }, k[0]),
-            E("div", { style: { fontSize: 26, fontWeight: 700, color: CI.blau, margin: "6px 0 4px" } }, k[1]),
-            E("div", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.5 } }, k[2]));
-        })),
+      // Status-Ampel
+      E("div", { style: kasten }, Ueberschrift("Status"),
+        E("div", { style: { display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" } },
+          (d.status || []).map(function (s, i) {
+            return E("div", { key: i, style: { display: "flex", alignItems: "flex-start", gap: 4, fontSize: 13 } },
+              E(Lampe, { stand: s.stand }),
+              E("div", null, E("div", { style: { fontWeight: 600 } }, s.dienst),
+                E("div", { style: { fontSize: 11.5, color: CI.muted } }, s.text)));
+          })),
+        E("p", { style: { fontSize: 11.5, color: CI.muted, marginTop: 12, marginBottom: 0 } },
+          "Grün: nichts zu tun. Gelb: ansehen. Rot: eingreifen. Grau: noch kein Messwert. Der Stripe-Modus ist „" + (d.stripe_modus || "unbekannt") + "“.")),
 
+      // Zeitplan-Jobs
       E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
         E("div", { style: { padding: "16px 18px 0" } }, Ueberschrift("Zeitplan-Jobs")),
-        d.cron_fehler
-          ? E("div", { style: { padding: "0 18px 16px", fontSize: 13, color: CI.danger } },
-              d.cron_fehler)
-          : E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 700 } },
-              E("thead", null, E("tr", null, ["Job", "Takt", "Aktiv", "Letzter Lauf", "Ausgang", "Läufe 24 h", "Fehler 24 h"]
-                .map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
-              E("tbody", null, cron.map(function (j) {
-                var schlimm = Number(j.fehler_24h) > 0;
-                return E("tr", { key: j.jobname },
-                  E("td", { style: zelle }, j.jobname),
-                  E("td", { style: Object.assign({}, zelle, { fontFamily: "ui-monospace, monospace", fontSize: 11.5 }) }, j.zeitplan),
-                  E("td", { style: zelle }, j.aktiv ? "ja" : "nein"),
-                  E("td", { style: zelle }, j.letzter_lauf ? zeit(j.letzter_lauf) : "—"),
-                  E("td", { style: Object.assign({}, zelle, {
-                    color: j.letzter_stand === "succeeded" ? CI.success
-                      : j.letzter_stand ? CI.danger : CI.muted,
-                  }) }, j.letzter_stand || "—"),
-                  E("td", { style: zelle }, zahl(j.laeufe_24h)),
-                  E("td", { style: Object.assign({}, zelle, {
-                    color: schlimm ? CI.danger : CI.muted,
-                    fontWeight: schlimm ? 700 : 400,
-                  }) }, zahl(j.fehler_24h)));
-              })))),
+        Tabelle(["Job", "Takt", "Aktiv", "Letzter Lauf", "Ausgang", "Läufe 24 h", "Fehler 24 h", ""],
+          cron.map(function (j) {
+            var schlimm = Number(j.fehler_24h) > 0;
+            return E("tr", { key: j.jobname },
+              E("td", { style: zelle }, j.jobname),
+              E("td", { style: Object.assign({}, zelle, { fontFamily: "ui-monospace, monospace", fontSize: 11.5 }) }, j.zeitplan),
+              E("td", { style: zelle }, j.aktiv ? "ja" : "nein"),
+              E("td", { style: zelle }, j.letzter_lauf ? zeit(j.letzter_lauf) : "—"),
+              E("td", { style: Object.assign({}, zelle, { color: j.letzter_stand === "succeeded" ? CI.success : j.letzter_stand ? CI.danger : CI.muted }) }, j.letzter_stand || "—"),
+              E("td", { style: zelle }, zahl(j.laeufe_24h)),
+              E("td", { style: Object.assign({}, zelle, { color: schlimm ? CI.danger : CI.muted, fontWeight: schlimm ? 700 : 400 }) }, zahl(j.fehler_24h)),
+              E("td", { style: zelle }, darf ? E("button", { type: "button", style: knopfLeer, onClick: function () { jobJetzt(j); } }, "Jetzt ausführen") : null));
+          }), 820)),
 
+      // Letzte Laeufe
       E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
-        E("div", { style: { padding: "16px 18px 0" } },
-          Ueberschrift("Oberflächenfehler der letzten " + zahl(d.tage) + " Tage")),
-        d.fehler_fehler
-          ? E("div", { style: { padding: "0 18px 16px", fontSize: 13, color: CI.danger } },
-              d.fehler_fehler)
-          : !(d.fehler || []).length
-            ? E("div", { style: { padding: "0 18px 16px", fontSize: 13, color: CI.muted } },
-                "Nichts gemeldet.")
-            : E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 700 } },
-                E("thead", null, E("tr", null, ["Haus", "Schlüssel", "Quelle", "Anzahl", "Offen", "Zuletzt"]
-                  .map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
-                E("tbody", null, d.fehler.map(function (f, i) {
-                  return E("tr", { key: i },
-                    E("td", { style: zelle }, f.mandant_name || "—"),
-                    E("td", { style: Object.assign({}, zelle, { fontFamily: "ui-monospace, monospace", fontSize: 11.5 }) },
-                      f.schluessel),
-                    E("td", { style: Object.assign({}, zelle, { fontSize: 11.5, color: CI.muted }) }, f.quelle),
-                    E("td", { style: zelle }, zahl(f.anzahl)),
-                    E("td", { style: zelle }, zahl(f.offen)),
-                    E("td", { style: zelle }, zeit(f.zuletzt)));
-                })))),
+        E("div", { style: { padding: "16px 18px 0" } }, Ueberschrift("Letzte Läufe (" + zahl(d.stunden) + " h)")),
+        !(d.laeufe || []).length
+          ? E("div", { style: { padding: "0 18px 16px", fontSize: 13, color: CI.muted } }, "Keine Läufe im Zeitraum.")
+          : Tabelle(["Job", "Start", "Dauer", "Stand", "Meldung"], d.laeufe.slice(0, 60).map(function (l, i) {
+              var dauer = l.start && l.ende ? Math.round((new Date(l.ende) - new Date(l.start)) / 100) / 10 + " s" : "—";
+              return E("tr", { key: i },
+                E("td", { style: zelle }, l.jobname),
+                E("td", { style: Object.assign({}, zelle, { whiteSpace: "nowrap" }) }, zeit(l.start)),
+                E("td", { style: zelle }, dauer),
+                E("td", { style: Object.assign({}, zelle, { color: l.status === "succeeded" ? CI.success : CI.danger }) }, l.status),
+                E("td", { style: Object.assign({}, zelle, { fontSize: 11.5, color: CI.muted }) }, l.meldung || ""));
+            }))),
+
+      // Stripe-Webhooks
+      E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+        E("div", { style: { padding: "16px 18px 0" } }, Ueberschrift("Stripe-Webhooks (letzte 50)")),
+        !(d.webhooks || []).length
+          ? E("div", { style: { padding: "0 18px 16px", fontSize: 13, color: CI.muted } }, "Noch kein Ereignis empfangen.")
+          : Tabelle(["Empfangen", "Typ", "Verarbeitet", "Fehler", "Stripe"], d.webhooks.map(function (w) {
+              return E("tr", { key: w.id },
+                E("td", { style: Object.assign({}, zelle, { whiteSpace: "nowrap" }) }, zeit(w.empfangen_am)),
+                E("td", { style: Object.assign({}, zelle, { fontFamily: "ui-monospace, monospace", fontSize: 11.5 }) }, w.typ),
+                E("td", { style: zelle }, w.verarbeitet_am ? zeit(w.verarbeitet_am) : E("span", { style: { color: CI.gold } }, "offen")),
+                E("td", { style: Object.assign({}, zelle, { fontSize: 11.5, color: CI.danger }) }, w.fehler || ""),
+                E("td", { style: zelle }, E("a", { href: stripeBasis + w.id, target: "_blank", rel: "noopener", style: { color: CI.blau } }, "Öffnen")));
+            })),
+        E("p", { style: { padding: "8px 18px 14px", margin: 0, fontSize: 11.5, color: CI.muted, lineHeight: 1.6 } },
+          "Ein „Erneut verarbeiten“ gibt es hier nicht: Stripe selbst kann jedes Ereignis erneut senden, und der Webhook ist idempotent. Wer eines nachholen will, nutzt den Stripe-Link.")),
+
+      // Funktionsfehler
+      E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+        E("div", { style: { padding: "16px 18px 0" } }, Ueberschrift("Funktionsfehler (7 Tage, " + zahl(offeneFehler.length) + " offen)")),
+        !(d.fehler || []).length
+          ? E("div", { style: { padding: "0 18px 16px", fontSize: 13, color: CI.muted } }, "Nichts gemeldet — bisher melden nur die angeschlossenen Funktionen (plattform-admin, plattform-stripe-abgleich).")
+          : Tabelle(["Zeit", "Funktion", "Meldung", "Haus", ""], d.fehler.map(function (f) {
+              return E("tr", { key: f.id, style: { opacity: f.erledigt_am ? 0.5 : 1 } },
+                E("td", { style: Object.assign({}, zelle, { whiteSpace: "nowrap" }) }, zeit(f.zeit)),
+                E("td", { style: Object.assign({}, zelle, { fontFamily: "ui-monospace, monospace", fontSize: 11.5 }) }, f.funktion),
+                E("td", { style: Object.assign({}, zelle, { fontSize: 11.5 }) }, f.meldung),
+                E("td", { style: zelle }, f.name || "—"),
+                E("td", { style: zelle }, f.erledigt_am ? "erledigt" : darf ? E("button", { type: "button", style: knopfLeer, onClick: function () { erledigt(f); } }, "Erledigt") : null));
+            }))),
+
+      // Haengende Reservierungen
+      E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+        E("div", { style: { padding: "16px 18px 0" } }, Ueberschrift("Hängende Credit-Reservierungen (älter als 1 h)")),
+        !(d.haengend || []).length
+          ? E("div", { style: { padding: "0 18px 16px", fontSize: 13, color: CI.muted } }, "Keine. Fehlgeschlagene KI-Aufträge geben ihre Reservierung selbst frei.")
+          : Tabelle(["Seit", "Haus", "Aktion", "Credits", "Vorgang", ""], d.haengend.map(function (h) {
+              return E("tr", { key: h.vorgang_id },
+                E("td", { style: Object.assign({}, zelle, { whiteSpace: "nowrap" }) }, zeit(h.zeitpunkt)),
+                E("td", { style: zelle }, h.name || "—"),
+                E("td", { style: zelle }, h.aktion),
+                E("td", { style: zelle }, zahl(h.credits)),
+                E("td", { style: Object.assign({}, zelle, { fontFamily: "ui-monospace, monospace", fontSize: 11 }) }, String(h.vorgang_id).slice(0, 8)),
+                E("td", { style: zelle }, darf ? E("button", { type: "button", style: knopfLeer, onClick: function () { setzeFrei(h); setzeGrund(""); } }, "Freigeben") : null));
+            })),
+        frei ? E("div", { style: { padding: "0 18px 16px" } },
+          E("div", { style: { fontSize: 13, marginBottom: 6 } }, "Reservierung " + String(frei.vorgang_id).slice(0, 8) + " freigeben — der Grund landet im Audit-Log."),
+          E("input", { value: grund, placeholder: "Grund (mindestens 5 Zeichen)", onChange: function (e) { setzeGrund(e.target.value); },
+            style: { width: "100%", maxWidth: 420, padding: "7px 9px", border: "1px solid " + CI.border, borderRadius: 6, fontSize: 13, marginRight: 8 } }),
+          E("button", { type: "button", style: knopf, disabled: grund.trim().length < 5, onClick: freigeben }, "Freigeben"),
+          E("button", { type: "button", style: Object.assign({}, knopfLeer, { marginLeft: 6 }), onClick: function () { setzeFrei(null); } }, "Abbrechen")) : null),
+
+      // Dienste (Latenz)
+      (d.dienste || []).length ? E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+        E("div", { style: { padding: "16px 18px 0" } }, Ueberschrift("Dienste (24 h)")),
+        Tabelle(["Dienst", "Aufrufe", "Fehlerquote", "Median", "p95"], d.dienste.map(function (x) {
+          return E("tr", { key: x.dienst },
+            E("td", { style: zelle }, x.dienst), E("td", { style: zelle }, zahl(x.aufrufe)),
+            E("td", { style: Object.assign({}, zelle, { color: Number(x.fehlerquote) > 5 ? CI.danger : CI.muted }) }, x.fehlerquote + " %"),
+            E("td", { style: zelle }, Math.round(x.median_ms) + " ms"), E("td", { style: zelle }, Math.round(x.p95_ms) + " ms"));
+        }), 560)) : null,
+
+      // Speicher
+      E("div", { style: kasten }, Ueberschrift("Speicher"),
+        !speicher ? E("button", { type: "button", style: knopfLeer, onClick: speicherLaden }, "Speicher auswerten")
+        : speicher.laedt ? E("div", { style: { color: CI.muted, fontSize: 13 } }, "Zähle Objekte …")
+        : E("div", null,
+            E("div", { style: { display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", marginBottom: 14 } },
+              [["Dateien gesamt", mb(speicher.gesamt_bytes), zahl(speicher.objekte) + " Objekte"],
+               ["Datenbank", mb(speicher.datenbank_bytes), "pg_database_size"],
+               ["Buckets", zahl(Object.keys(speicher.je_bucket || {}).length), Object.keys(speicher.je_bucket || {}).map(function (b) { return b + " " + mb(speicher.je_bucket[b]); }).join(" · ")]
+              ].map(function (k, i) {
+                return E("div", { key: i, style: { border: "1px solid " + CI.border, borderRadius: 8, padding: 12 } },
+                  E("div", { style: { fontSize: 11, color: CI.muted, letterSpacing: "0.06em", textTransform: "uppercase" } }, k[0]),
+                  E("div", { style: { fontSize: 22, fontWeight: 700, color: CI.blau, margin: "4px 0" } }, k[1]),
+                  E("div", { style: { fontSize: 11.5, color: CI.muted } }, k[2]));
+              })),
+            E("div", { style: { overflowX: "auto" } }, Tabelle(["Haus", "Objekte", "Größe"], (speicher.je_mandant || []).slice(0, 30).map(function (m) {
+              return E("tr", { key: m.mandant_id }, E("td", { style: zelle }, m.name), E("td", { style: zelle }, zahl(m.objekte)), E("td", { style: zelle }, mb(m.bytes)));
+            }), 420)),
+            (speicher.je_monat || []).length ? E("div", { style: { marginTop: 14 } },
+              E("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 6 } }, "Zuwachs je Monat"),
+              E("div", { style: { overflowX: "auto" } }, Tabelle(["Monat", "Objekte", "Größe"], speicher.je_monat.map(function (m) {
+                return E("tr", { key: m.monat }, E("td", { style: zelle }, m.monat), E("td", { style: zelle }, zahl(m.objekte)), E("td", { style: zelle }, mb(m.bytes)));
+              }), 420))) : null)),
+
+      // Oberflaechenfehler (fork_55)
+      E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+        E("div", { style: { padding: "16px 18px 0" } }, Ueberschrift("Oberflächenfehler der letzten 7 Tage")),
+        d.oberflaeche_fehler
+          ? E("div", { style: { padding: "0 18px 16px", fontSize: 13, color: CI.danger } }, d.oberflaeche_fehler)
+          : !(d.oberflaeche || []).length
+            ? E("div", { style: { padding: "0 18px 16px", fontSize: 13, color: CI.muted } }, "Nichts gemeldet.")
+            : Tabelle(["Haus", "Schlüssel", "Quelle", "Anzahl", "Offen", "Zuletzt"], d.oberflaeche.map(function (f, i) {
+                return E("tr", { key: i },
+                  E("td", { style: zelle }, f.mandant_name || "—"),
+                  E("td", { style: Object.assign({}, zelle, { fontFamily: "ui-monospace, monospace", fontSize: 11.5 }) }, f.schluessel),
+                  E("td", { style: Object.assign({}, zelle, { fontSize: 11.5, color: CI.muted }) }, f.quelle),
+                  E("td", { style: zelle }, zahl(f.anzahl)), E("td", { style: zelle }, zahl(f.offen)), E("td", { style: zelle }, zeit(f.zuletzt)));
+              }))),
+
+      // E-Mail-Zustellung
+      E("div", { style: kasten }, Ueberschrift("E-Mail-Zustellung"),
+        E("div", { style: { fontSize: 13, color: CI.muted } },
+          "Noch kein Zustellprotokoll: Der Versanddienst meldet Zustellung und Bounces erst, wenn sein Webhook angebunden ist (docs/OFFEN.md). Bis dahin gilt: versendet heißt übergeben, nicht zugestellt.")),
+
       E("p", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.7 } },
-        "Der Wortlaut einer Fehlermeldung und ihre Stapelspur stehen hier "
-        + "NICHT: dort steht, woran ein Kunde gerade gearbeitet hat. Wer ihn "
-        + "braucht, beginnt beim betroffenen Haus einen Supportzugriff — "
-        + "befristet, begründet und für den Kunden nachlesbar."));
+        "Der Wortlaut eines Oberflächenfehlers und seine Stapelspur stehen hier NICHT: dort steht, woran ein Kunde gerade gearbeitet hat. "
+        + "Wer ihn braucht, beginnt beim betroffenen Haus einen Supportzugriff — befristet, begründet und für den Kunden nachlesbar."));
   }
 
   // --- Protokoll -------------------------------------------------------------
@@ -1601,7 +1714,7 @@
         : welcher === "mandanten" ? "mandanten"
         : welcher === "katalog" ? "katalog"
         : welcher === "konten" ? "nutzer"
-        : welcher === "system" ? "system"
+        : welcher === "system" ? "technik"
         : welcher === "admins" ? "admin_liste"
         : welcher === "mandant" ? "mandant" : "protokoll";
       ruf(aktion, welcher === "mandant" ? { mandant_id: id } : (welcher === "zahlen" || welcher === "kosten" || welcher === "zahlungen") ? { tage: tage } : null).then(function (d) {
@@ -1663,7 +1776,7 @@
       ["mandanten", "Mandanten", ["owner", "admin", "support", "finanzen"]],
       ["konten", "Konten", ["owner", "admin", "support"]],
       ["katalog", "Katalog", ["owner", "admin", "support", "finanzen"]],
-      ["system", "System", ["owner", "admin"]],
+      ["system", "Technik", ["owner", "admin"]],
       ["admins", "Admins", ["owner", "admin", "support", "finanzen"]],
       ["protokoll", "Audit-Log", ["owner", "admin", "support", "finanzen"]]];
     var reiterListe = alleReiter.filter(function (r) { return r[2].indexOf(rolle) >= 0; });
@@ -1734,7 +1847,7 @@
         : reiter === "zahlungen" ? E(Zahlungen, { daten: daten.zahlungen, rolle: rolle, melden: melden, neuLaden: function () { laden("zahlungen"); },
             oeffnen: function (id) { setzeOffen(id); } })
         : reiter === "funktionen" ? E(Funktionen, { daten: daten.funktionen, rolle: rolle, melden: melden, neuLaden: function () { laden("funktionen"); } })
-        : reiter === "system" ? E(System, { daten: daten.system })
+        : reiter === "system" ? E(System, { daten: daten.system, rolle: rolle, melden: melden, neuLaden: function () { laden("system"); } })
         : reiter === "admins" ? E(Admins, { daten: daten.admins, konten: daten.konten, rolle: rolle,
             melden: melden, neuLaden: function () { laden("admins"); if (rolle === "owner") laden("konten"); } })
         : E(Protokoll, { daten: daten.protokoll }));

@@ -1373,3 +1373,18 @@ namentlich aufgeführt, damit es nicht in Vergessenheit gerät.
 (`fork_50`). Bis dahin muss ein Tarif gewählt sein, sonst greift zuerst der
 Lesezugriff und danach die Sperre — für die eigenen Häuser des Betreibers
 genauso wie für jeden Kunden.
+
+
+## Betreiberbereich: Technik-Reiter sieht nur zwei Funktionen
+
+`system_fehler` (fork_75) wird heute nur von `plattform-admin` und
+`plattform-stripe-abgleich` beschrieben. Die 130 generierten Funktionen
+melden ihre Fehler nicht dorthin. Anschluss: eine Regel im Generator, die
+den `catch`-Block jeder Funktion um einen Insert nach `system_fehler`
+ergänzt (Funktion, Meldung, Mandant — kein Payload). `dienst_aufrufe`
+(Latenz je Fremddienst) ist angelegt, aber noch leer; die KI-Beilage
+`_credits` wäre die erste Messstelle.
+
+Die Ampel „E-Mail-Zustellung" bleibt grau, bis der Versanddienst
+(Resend) seinen Ereignis-Webhook an eine eigene Funktion liefert — dann
+gibt es Zustellung, Bounce und Beschwerde je Nachricht.

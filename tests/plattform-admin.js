@@ -49,7 +49,7 @@ const ERLAUBT = new Set([
   'plattform_fixkosten', 'gutscheine', 'gutschein_einloesungen',
   'plattform_features', 'tarif_features', 'mandant_features',
   // Abbild der Stripe-Rechnungen (Kopfdaten) und der Abgleich: Vertragsdaten.
-  'stripe_rechnungen', 'stripe_abgleich',
+  'stripe_rechnungen', 'stripe_abgleich', 'system_fehler', 'dienst_aufrufe', 'stripe_ereignisse',
   // Nur GEZAEHLT (head: true) fuer "Technikfehler 24 h"; keine Meldung geht hinaus.
   'fehler_protokoll',
   // Die Vertragsbeziehung. `credit_konten` und `credit_buchungen` sind das
@@ -255,8 +255,19 @@ if (fs.existsSync(TAFEL)) {
         { jobname: 'akq-mail-leads-20min', zeitplan: '8,28,48 * * * *', aktiv: true,
           letzter_lauf: '2026-10-06T11:48:00Z', letzter_stand: 'failed',
           laeufe_24h: 72, fehler_24h: 9 }],
-      fehler: [{ mandant_id: 'a', mandant_name: 'Alpha GmbH', schluessel: 'PGRST116',
+      oberflaeche: [{ mandant_id: 'a', mandant_name: 'Alpha GmbH', schluessel: 'PGRST116',
         quelle: 'kalender', anzahl: 47, offen: 47, zuletzt: '2026-10-06T10:00:00Z' }],
+      status: [{ dienst: 'Zeitplan (pg_cron)', stand: 'rot', text: '1 Job(s) mit Fehlern, 0 still' },
+        { dienst: 'E-Mail-Zustellung', stand: 'grau', text: 'kein Zustellprotokoll' }],
+      laeufe: [{ jobname: 'akq-mail-leads-20min', start: '2026-10-06T11:48:00Z', ende: '2026-10-06T11:48:02Z',
+        status: 'failed', meldung: 'ERROR: connection refused' }],
+      webhooks: [{ id: 'evt_pruef1', typ: 'invoice.paid', empfangen_am: '2026-10-06T09:00:00Z',
+        verarbeitet_am: '2026-10-06T09:00:01Z', fehler: null }],
+      fehler: [{ id: 'f1', zeit: '2026-10-06T08:00:00Z', funktion: 'plattform-stripe-abgleich',
+        meldung: 'Stripe 429', betrifft_mandant_id: null, erledigt_am: null, name: null }],
+      haengend: [{ vorgang_id: 'c0ffee00-0000-0000-0000-000000000001', mandant_id: 'a', name: 'Alpha GmbH',
+        aktion: 'ki_text', credits: 3, zeitpunkt: '2026-10-05T08:00:00Z' }],
+      dienste: [], stunden: 24, stripe_modus: 'test',
     },
     mandant: {
       mandant: { id: 'a', name: 'Alpha GmbH', slug: 'alpha', erstellt_am: '2026-01-02',
@@ -321,6 +332,7 @@ if (fs.existsSync(TAFEL)) {
       if (typeof k === 'string' || typeof k === 'number') { text += k + ' '; return; }
       if (Array.isArray(k)) { k.forEach((x) => sammeln(x, tiefe + 1)); return; }
       if (!k.typ) return;
+      if (k.props && typeof k.props.href === 'string') text += k.props.href + ' ';
       if (typeof k.typ === 'function') {
         try { sammeln(k.typ(k.props || {}), tiefe + 1); }
         catch (e) { text += `[[FEHLER: ${e.message}]] `; }
@@ -362,6 +374,13 @@ if (fs.existsSync(TAFEL)) {
             /akq-mail-leads-20min/.test(text) && /failed/.test(text));
       melde('System: die Fehler eines Hauses stehen da',
             /PGRST116/.test(text) && /47/.test(text));
+      melde('Technik: die Ampel steht da', /Zeitplan \(pg_cron\)/.test(text) && /1 Job\(s\) mit Fehlern/.test(text));
+      melde('Technik: der Webhook verweist in den Stripe-Testmodus',
+            /dashboard\.stripe\.com\/test\/events\/evt_pruef1/.test(text));
+      melde('Technik: kein „Erneut verarbeiten" fuer Webhooks, Stripe sendet selbst',
+            /gibt es hier nicht: Stripe selbst/.test(text));
+      melde('Technik: der Funktionsfehler steht da', /plattform-stripe-abgleich/.test(text) && /Stripe 429/.test(text));
+      melde('Technik: die haengende Reservierung ist freigebbar', /c0ffee00/.test(text) && /Freigeben/.test(text));
       melde('System: und es wird gesagt, warum der Wortlaut fehlt',
             /Supportzugriff/.test(text), text.slice(-200));
     }

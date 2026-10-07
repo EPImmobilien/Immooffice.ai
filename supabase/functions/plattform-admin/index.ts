@@ -86,6 +86,11 @@ const ROLLEN: Record<string, string[]> = {
   erstatten:              ["owner", "finanzen"],
   buchhaltung:            ["owner", "admin", "finanzen"],
   abgleich_jetzt:         ["owner", "admin", "finanzen"],
+  technik:                ["owner", "admin"],
+  job_jetzt:              ["owner", "admin"],
+  vorgang_freigeben:      ["owner", "admin"],
+  fehler_erledigt:        ["owner", "admin"],
+  speicher:               ["owner", "admin"],
   fixkosten_speichern:    ["owner", "admin"],
   fixkosten_loeschen:     ["owner", "admin"],
   uebersicht:             ["owner", "admin", "support", "finanzen"],
@@ -293,6 +298,61 @@ Deno.serve(async (req) => {
       }
       await protokoll("tarif_umgestellt", schluessel, { grund, ergebnis }, { typ: "plattform_tarife" });
       return antwort({ ok: true, ergebnis });
+    }
+
+    // --- Technik & Jobs (fork_75) ------------------------------------------
+    if (aktion === "technik") {
+      const stunden = Math.max(1, Math.min(24 * 14, Math.floor(Number(body.stunden || 24))));
+      const [{ data: technik, error }, { data: laeufe }, { data: cron }, { data: oberflaeche, error: oFehler }, { data: namen }] = await Promise.all([
+        db.rpc("plattform_technik"), db.rpc("cron_laeufe", { p_stunden: stunden }), db.rpc("cron_zustand"),
+        db.rpc("fehler_uebersicht", { p_tage: 7 }),
+        db.from("mandanten").select("id, name"),
+      ]);
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      const name = new Map((namen || []).map((m) => [String(m.id), m.name]));
+      const tk = (technik || {}) as Record<string, unknown>;
+      for (const k of ["fehler", "haengend"]) {
+        tk[k] = ((tk[k] as Record<string, unknown>[]) || []).map((x) => ({ ...x,
+          name: name.get(String(x.betrifft_mandant_id || x.mandant_id)) || null }));
+      }
+      // Oberflaechenfehler (fork_55) bleiben Teil der Seite: Haus, Schluessel,
+      // Quelle, Anzahl — kein Wortlaut, keine Stapelspur.
+      return antwort({ ok: true, ...tk, laeufe: laeufe || [], cron: cron || [],
+        oberflaeche: oberflaeche || [], oberflaeche_fehler: oFehler?.message || null,
+        stunden, stripe_modus: stripeModus() });
+    }
+    if (aktion === "speicher") {
+      const [{ data: s, error }, { data: namen }] = await Promise.all([db.rpc("plattform_speicher"), db.from("mandanten").select("id, name")]);
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      const name = new Map((namen || []).map((m) => [String(m.id), m.name]));
+      const ss = (s || {}) as Record<string, unknown>;
+      ss.je_mandant = ((ss.je_mandant as Record<string, unknown>[]) || []).map((x) => ({ ...x, name: name.get(String(x.mandant_id)) || x.mandant_id }));
+      return antwort({ ok: true, ...ss });
+    }
+    if (aktion === "job_jetzt") {
+      const job = String(body.jobname || "");
+      if (!job) return antwort({ ok: false, fehler: "Kein Job." }, 400);
+      const { data, error } = await db.rpc("cron_job_jetzt", { p_jobname: job });
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll("job_sofort", job, { kommando: String(data || "").slice(0, 300) }, { typ: "cron" });
+      return antwort({ ok: true });
+    }
+    if (aktion === "vorgang_freigeben") {
+      const vorgang = String(body.vorgang_id || "");
+      const grund = String(body.grund || "").trim();
+      if (!vorgang) return antwort({ ok: false, fehler: "Kein Vorgang." }, 400);
+      if (grund.length < 5) return antwort({ ok: false, fehler: "Bitte einen Grund angeben." }, 400);
+      const { data, error } = await db.rpc("credits_freigeben", { p_vorgang: vorgang, p_grund: "betreiber: " + grund.slice(0, 200) });
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll("reservierung_freigegeben", vorgang, { credits: data, grund }, { typ: "credit_vorgang" });
+      return antwort({ ok: true, credits: data });
+    }
+    if (aktion === "fehler_erledigt") {
+      const id = String(body.id || "");
+      if (!id) return antwort({ ok: false, fehler: "Keine Kennung." }, 400);
+      const { error } = await db.from("system_fehler").update({ erledigt_am: new Date().toISOString() }).eq("id", id);
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      return antwort({ ok: true });
     }
 
     // --- Zahlungen (fork_74) ----------------------------------------------

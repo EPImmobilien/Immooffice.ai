@@ -748,6 +748,13 @@ else
   schlecht
 fi
 
+abschnitt "Betreiber-Technik: Statusseite, Speicher, Job sofort"
+if scripts/lokale-db.sh psql -q -f tests/betreiber-technik.sql; then
+  :
+else
+  schlecht
+fi
+
 abschnitt "IMAP: liest der Abruf die Ordnerliste jedes Servers?"
 node tests/imap-ordnerliste.js || schlecht
 

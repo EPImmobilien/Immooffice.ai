@@ -407,7 +407,51 @@ support abgewiesen, chef sieht nur die eigene Rechnung.
 - [x] Stripe-Abgleich täglich mit Abweichungsliste
 - [ ] Live-Nachweis braucht Stripe-Verkehr; im Projekt gibt es heute noch keine Rechnung
 
-## Noch offen aus dem Auftrag (Schritte 7–10)
+## Schritt 7 — Technik & Jobs, Fehlerprotokoll (fork_75) · erledigt 07.10.2026
+
+**Migration** `20261007210000_fork_75_betreiber_technik.sql`: Tabellen
+`system_fehler` (Funktion, Meldung, betroffener Mandant, erledigt_am — nur
+Betreiber, nie Mandant) und `dienst_aufrufe` (Dienst, Dauer, ok — Latenz je
+Fremddienst); Funktionen `cron_laeufe(stunden)`, `cron_job_jetzt(jobname)`,
+`plattform_speicher()`, `plattform_technik()`.
+
+**Reiter „Technik"** (owner/admin):
+
+| Block | Woher | Was man tun kann |
+|---|---|---|
+| Status-Ampel | `plattform_technik()` — pg_cron, Stripe-Webhooks, Stripe-Abgleich, Edge Functions, Credit-Ledger, E-Mail | grün/gelb/rot/grau je Dienst, mit einem Satz Begründung |
+| Zeitplan-Jobs | `cron_zustand()` (fork_55) | **Jetzt ausführen** → `cron_job_jetzt`: führt exakt das Kommando des Jobs aus, protokolliert `job_sofort` |
+| Letzte Läufe | `cron_laeufe(24)` | Start, Dauer, Stand, Meldung (gekürzt auf 300 Zeichen) |
+| Stripe-Webhooks | `stripe_ereignisse`, letzte 50 | Link ins Stripe-Dashboard (Test-/Live-Pfad nach Modus). **Kein „Erneut verarbeiten"** — siehe Entscheidungen |
+| Funktionsfehler | `system_fehler`, 7 Tage | **Erledigt** setzt `erledigt_am`; Zeile bleibt, wird ausgegraut |
+| Hängende Reservierungen | `credit_buchungen`, Status `reserviert`, älter als 1 h | **Freigeben** mit Grund (≥ 5 Zeichen) → `credits_freigeben`, protokolliert `reservierung_freigegeben` |
+| Dienste | `dienst_aufrufe`, 24 h | Aufrufe, Fehlerquote, Median, p95 — erscheint erst, wenn eine Funktion misst |
+| Speicher | `plattform_speicher()` auf Knopfdruck | Gesamt, Datenbankgröße, je Bucket, je Haus (Top 30), Zuwachs je Monat |
+| Oberflächenfehler | `fehler_uebersicht(7)` (fork_55) | Haus, Schlüssel, Quelle, Anzahl — kein Wortlaut, keine Stapelspur |
+| E-Mail-Zustellung | — | Platzhalter: kein Zustellprotokoll, bis der Versanddienst-Webhook angebunden ist |
+
+**Grenzen:** Von 130 Edge Functions schreiben heute nur `plattform-admin`
+und `plattform-stripe-abgleich` nach `system_fehler`; die Ampel „Edge
+Functions" sieht nur diese. Das Anschließen der übrigen ist eine
+Fleißarbeit über den Generator (`scripts/neutralisieren-funktionen.py`) und
+steht in `docs/OFFEN.md`. `dienst_aufrufe` ist angelegt, aber noch leer.
+
+`tests/betreiber-technik.sql`: support darf `plattform_technik` nicht,
+Mandant sieht `system_fehler` nicht, `cron_job_jetzt` mit unbekanntem Job
+wirft 22023, Läufe-Funktion weist support ab (42501).
+
+### Abnahme Schritt 7
+
+- [x] Zeitplan-Jobs mit letztem Lauf, Ausgang, Fehlern; „Jetzt ausführen"
+- [x] Stripe-Webhook-Log mit Link ins Dashboard
+- [x] Funktionsfehler mit Erledigt-Vermerk
+- [x] Hängende Credit-Reservierungen mit begründeter Freigabe im Audit-Log
+- [x] Speicher je Haus und je Monat
+- [x] Status-Ampel
+- [ ] E-Mail-Zustellung — erst mit Versanddienst-Webhook
+- [ ] Fehler aus allen Funktionen — heute nur zwei Funktionen angeschlossen
+
+## Noch offen aus dem Auftrag (Schritte 8–10)
 
 Werden hier je Schritt nachgetragen. Reihenfolge wie im Auftrag.
 
