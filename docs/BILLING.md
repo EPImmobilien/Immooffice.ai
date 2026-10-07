@@ -136,7 +136,7 @@ Sandbox-Konto. Was er verlangt und wo es steht:
 | Test ohne Zahlungsmittel, Abo erst beim Abschluss | unverändert |
 | Flexible Abrechnung | `subscription_data[billing_mode][type]=flexible` |
 | Stripe Tax mit Erhebung | `automatic_tax`, `tax_id_collection`, `customer_update` in jeder Kasse; Produkte mit Steuerkategorie `txcd_10103001` (SaaS, geschäftlich) |
-| Karte und SEPA-Lastschrift | `payment_method_types` in jeder Kasse |
+| Karte und SEPA-Lastschrift | dynamische Zahlarten: was im Stripe-Dashboard aktiviert ist (seit 07.10.2026, vorher feste Liste) |
 | Eigene Abo-Verwaltung statt Kundenportal (Mindestlaufzeit) | `abo-verwalten`: Kündigung, Widerruf, Zusatznutzer, **neu: `tarif_wechseln`** |
 | Kundenportal nur für Zahlungsmittel und Rechnungen | eigene Portal-Konfiguration ohne Kündigung und ohne Tarifwechsel; Kennung in `plattform_werte.stripe_portal_konfiguration` |
 | Smart Retries, Mahn-Mails | Einstellung im Stripe-Dashboard (Betreiber) |
