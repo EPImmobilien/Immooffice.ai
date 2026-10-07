@@ -668,7 +668,7 @@ doppeltes Anlegen abgewiesen, vollständiges Entfernen).
 | 4 | Anfrage → Freigabe `chef` → Banner → automatisches Ende → Protokoll | ✓ | fork_77, `tests/supportzugriff.sql`, `tests/betreiber-support.sql` |
 | 5 | `support` ändert keine Preise, `finanzen` sperrt keine Mandanten | ✓ | ROLLEN-Karte: `katalog_speichern` owner/admin, `mandant_speichern` owner/admin/support; `tests/betreiber-rollen.sql` |
 | 6 | Audit-Log weder änderbar noch löschbar | ✓ | fork_52 Trigger; `tests/betreiber-rollen.sql` (auch mit Dienstrecht) |
-| 7 | MRR = manuelle Summe der Demo-Abos | ✓ | `tests/betreiber-warnungen.sql`: 350.471 vs 350.469 Cent — Differenz = Rundung Jahrespreis ÷ 12 je Jahresabo |
+| 7 | MRR = manuelle Summe der Demo-Abos | ✓ | `tests/betreiber-warnungen.sql`: 350.471 vs 350.469 Cent — Differenz = Rundung Jahrespreis ÷ 12 je Jahresabo; live mit denselben 30 Demo-Häusern: 350.471 Cent |
 | 8 | Ist-Kosten je Credit aus `credit_buchungen` | ✓ | Schritt 4, `tests/betreiber-kosten.sql` |
 | 9 | Preisänderung → neuer Stripe-Price, Bestand behält alten, Landingpage neu | ✓ (Testmodus) | Schritt 5 (`katalog_speichern`, `tarife-oeffentlich`) |
 | 10 | Feature-Flag „ab Professional" sperrt Modul im Starter mit Upgrade-Hinweis | ✓ | Schritt 5, `hat_feature`, `features.js` |
@@ -676,7 +676,7 @@ doppeltes Anlegen abgewiesen, vollständiges Entfernen).
 | 12 | Neue AGB-Version mit Zustimmungspflicht blockiert `chef` | ✓ | `rechtstexte_offen()`, `ImmoRechtstextSperre`, Test |
 | 13 | Warnung bei fehlgeschlagener Zahlung per E-Mail; Tageszusammenfassung versendet | ✓ Logik / ☐ live | Versand braucht `betreiber_email` + `RESEND_API_KEY`/`SMTP_FROM_EMAIL` als Function-Secrets |
 | 14 | CSV öffnet sauber in Excel (UTF-8 BOM, Semikolon, deutsche Zahlen) | ✓ | `csvExport` in `plattform.js`: `\ufeff`, `;`, Komma-Dezimal, de-DE-Datum |
-| 15 | Übersicht < 2 s mit Demo-Daten | ✓ | Datenbankfunktionen mit 30 Demo-Häusern lokal: `plattform_mandanten_kennzahlen()` 20 ms, `plattform_kosten()` 20 ms; Live-Messung siehe Kurzbericht |
+| 15 | Übersicht < 2 s mit Demo-Daten | ✓ | Live mit 30 Demo-Häusern (07.10.2026): `plattform_mandanten_kennzahlen()` + `plattform_kosten()` zusammen 13 ms; `plattform_technik()` (Technik-Reiter, liest `cron.job_run_details`) 1,7 s — nicht Teil der Übersicht |
 | 16 | 375 px nutzbar | ✓ (gebaut) | Kacheln `auto-fit`, Tabellen scrollen nur innerhalb des Kastens (`overflowX: auto`); nicht auf Gerät gemessen |
 | 17 | Neutralitäts-Gate grün | ✓ | Teil von `npm run check` |
 
@@ -702,6 +702,8 @@ System-Mails `willkommen`, `zahlung_problem`, `kuendigung_bestaetigt`,
 owner; Kohorten/Modulnutzung rechnen aus Metadaten, nicht aus Logins je
 Modul; zwei Sitzungen auf einem Branch brauchen eine Nummernabsprache
 (fork_71/fork_76 kollidierten je einmal).
+
+**Stand auf dem Projekt:** Demo-Daten sind angelegt (30 Häuser, 1.774 Ledger-Zeilen, 174 Rechnungen, Kennzahlen-Verlauf 12 Monate) — nach der Abnahme über „Warnungen → Demo-Daten entfernen“ wieder weg.
 
 **Der Betreiber selbst:** siehe nächster Abschnitt.
 

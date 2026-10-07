@@ -1423,8 +1423,9 @@ DSGVO-Löschprozess (Schritt 2, offen).
   Heute: sofortiges Löschen durch den owner mit Namensbestätigung.
 - **375 px** ist gebaut (auto-fit, Tabellen scrollen im Kasten), aber nicht
   auf einem Gerät gemessen.
-- **Dashboard < 2 s** lokal mit 30 Demo-Häusern nachgewiesen (20 ms je
-  Funktion); auf dem Projekt mit Demo-Daten messen, sobald sie dort liegen.
+- **Technik-Statusseite** braucht live 1,7 s (`plattform_technik()` liest
+  `cron.job_run_details`, ~30.000 Zeilen je Woche). Die Übersicht liegt mit
+  13 ms weit unter der Grenze.
 
 
 ## Advisors: 75 Funktionen der Vorlage ohne festen search_path
