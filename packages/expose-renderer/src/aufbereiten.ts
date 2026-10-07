@@ -347,6 +347,31 @@ export function aufbereiten(q: Quellen): Daten {
     d["objekt.hauptbild_url"] = q.bilder["objekt.hauptbild_url"];
   }
 
+  // --- Listen der vorhandenen Bilder (fork_64) -----------------------------
+  // Eine Seite, die sich "je Foto" wiederholt, braucht eine Liste, deren
+  // Laenge sagt, wie viele es gibt. Sie wird hier aus der Zuordnung
+  // ABGELEITET und nicht vom Aufrufer verlangt: eine zweite Angabe koennte
+  // mit der ersten auseinanderlaufen, und dann zeigte eine Seite auf ein
+  // Bild, das es nicht gibt.
+  //
+  // Gezaehlt wird nur zusammenhaengend ab 1. Eine Luecke — Slot 3 fehlt,
+  // Slot 4 ist da — beendet die Zaehlung, sonst entstuende eine Seite, die
+  // auf ein Loch zeigt.
+  for (const [art, feld] of [
+    ["foto", "objekt.fotoliste"],
+    ["grundriss", "objekt.grundrissliste"],
+  ] as const) {
+    const muster = new RegExp(`^bild\\.${art}\\.(\\d+)$`);
+    const da = new Set<number>();
+    for (const [k, v] of Object.entries(d)) {
+      const m = muster.exec(k);
+      if (m && !LEER(v)) da.add(Number(m[1]));
+    }
+    let n = 0;
+    while (da.has(n + 1)) n++;
+    if (n > 0) d[feld] = Array.from({ length: n }, (_, i) => ({ nr: i + 1 }));
+  }
+
   // Der QR-Code zeigt auf das Web-Expose, wenn eines hinterlegt ist, sonst
   // auf die Seite des Maklers. Ohne beides entfaellt er — ein QR-Code, der
   // ins Leere fuehrt, ist schlimmer als keiner.

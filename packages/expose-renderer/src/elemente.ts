@@ -38,6 +38,20 @@ function zahl(el: Element, name: string, vorgabe: number): number {
   return typeof v === "number" ? v : vorgabe;
 }
 
+/**
+ * Was die Bildslots dieser Seite zu ihrer Nummer dazuzaehlen (fork_64).
+ *
+ * Auf einer Seite, die sich wiederholt, zeigt der zweite Durchgang die
+ * naechsten Bilder und nicht noch einmal dieselben. rendern.ts legt den
+ * Versatz in die Daten; hier wird er gelesen. Null auf jeder nicht
+ * wiederholten Seite — und damit aendert sich fuer alle bisherigen Seiten
+ * nichts.
+ */
+function laufVersatz(u: Umgebung): number {
+  const v = u.daten["lauf.versatz"];
+  return typeof v === "number" && Number.isFinite(v) ? v : 0;
+}
+
 function zeichenkette(el: Element, name: string): string | undefined {
   const v = el[name];
   return typeof v === "string" ? v : undefined;
@@ -1220,7 +1234,20 @@ function bildAnker(el: Element): [number, number] | undefined {
  * ruhiger Rahmen mit Beschriftung.
  */
 const bild: Zeichner = (el, u) => {
-  const slot = el["slot"] as { art?: string; nr?: number } | undefined;
+  const roh = el["slot"] as { art?: string; nr?: number } | undefined;
+  // Nur die durchnummerierten Arten wandern mit dem Lauf. Logo,
+  // Titelbild, Lageplan und Ansprechpartner haben keine Nummer und
+  // bleiben, wo sie sind — auch auf einer wiederholten Seite.
+  // "slot_fertig" setzt die Galerie an ihren Kindern: sie hat den Versatz
+  // schon eingerechnet, weil sie ihn zum Zaehlen braucht. Ohne diese
+  // Klammer kaeme er zweimal drauf — am 07.10.2026 zeigte der vierte
+  // Durchgang dadurch Foto 31 statt 19, und das Expose hatte vier graue
+  // Kaesten statt vier Bildern.
+  const versatz = wahr(el, "slot_fertig", false) ? 0 : laufVersatz(u);
+  const slot = (versatz && roh && typeof roh.nr === "number"
+                && NUMMERIERT.has(roh.art ?? ""))
+    ? { ...roh, nr: roh.nr + versatz }
+    : roh;
   const schluessel = bildSchluessel(slot);
   const quelle = schluessel ? wert(u.daten, schluessel) : undefined;
   const radius = zahl(el, "eckradius", 0);
@@ -1258,7 +1285,14 @@ const bild: Zeichner = (el, u) => {
   // auch nicht abschalten koennen.
   if (quelle !== undefined) kiKennzeichnen(el, u, String(quelle));
 
-  const label = inhalt(el, u, false, "label");
+  // Die Beschriftung darf vom Slot selbst kommen (fork_64). Auf einer
+  // wiederholten Seite waere eine fest geschriebene Beschriftung immer die
+  // des ersten Durchgangs; sie muss der Nummer folgen, die gerade gilt.
+  const mitLabel = (el["label"] === undefined
+                    && wahr(el, "label_vom_slot", false) && schluessel)
+    ? { ...el, label: `{{${schluessel}.titel?}}` } as Element
+    : el;
+  const label = inhalt(mitLabel, u, false, "label");
   if (label !== undefined && zeichenkette(el, "stil_label")) {
     const s = u.stil(zeichenkette(el, "stil_label")!);
     const t = s.grossbuchstaben ? label.toLocaleUpperCase("de-DE") : label;
@@ -1297,6 +1331,9 @@ function kiKennzeichnen(el: Element, u: Umgebung, quelle: string): void {
   u.blatt.rect(x, y, b + 14, h, [0, 0, 0, 0.72], null, 0);
   u.blatt.T(x + 7, y + 4, s, schnitt, groesse, [1, 1, 1, 1], sperrung);
 }
+
+/** Bildarten, deren Slotnummer dem Lauf einer wiederholten Seite folgt. */
+const NUMMERIERT = new Set(["foto", "grundriss", "foto_kategorie"]);
 
 function bildSchluessel(slot: { art?: string; nr?: number; ton?: string;
                                 kategorie?: string } | undefined): string | undefined {
@@ -1870,11 +1907,52 @@ const karte: Zeichner = (el, u) => {
 const galerie: Zeichner = (el, u) => {
   const layout = zeichenkette(el, "layout") ?? "gross_oben";
   const g = zahl(el, "abstand", 10);
-  const abNr = zahl(el, "ab_nr", 1);
+  // Auf einer wiederholten Seite zeigt die Galerie die naechsten Fotos.
+  const abNr = zahl(el, "ab_nr", 1) + laufVersatz(u);
   const beschriftungen = (el["beschriftungen"] as string[] | undefined) ?? [];
 
   const rahmen: { x: number; y: number; b: number; h: number }[] = [];
-  if (layout === "gross_oben") {
+
+  // --- Galerie, die sich nach der Zahl der Bilder richtet (fork_64) -------
+  //
+  // Eine Seite fuer die ueberzaehligen Fotos weiss nicht, wie viele auf
+  // IHREM Durchgang noch kommen: bei fuenfzehn Fotos zeigt die letzte Seite
+  // drei und nicht vier. Ein festes 2x2-Raster setzte dort einen grauen
+  // Kasten — drei graue Kaesten bei siebzehn Fotos. Deshalb zaehlt diese
+  // Galerie erst, was wirklich da ist, und waehlt die Aufteilung danach.
+  if (wahr(el, "anpassen", false)) {
+    const hoechstens = Math.max(1, zahl(el, "max_bilder", 4));
+    let n = 0;
+    while (n < hoechstens
+           && wert(u.daten, `bild.foto.${abNr + n}`) !== undefined) n++;
+    if (n === 0) return;   // Die Seite sollte gar nicht entstanden sein.
+    const kb = (el.b - g) / 2;
+    const kh = (el.h - g) / 2;
+    if (n >= 4) {
+      for (const [sx, sy] of [[0, 1], [1, 1], [0, 0], [1, 0]]) {
+        rahmen.push({ x: el.x + sx * (kb + g), y: el.y + sy * (kh + g),
+                      b: kb, h: kh });
+      }
+    } else if (n === 3) {
+      const gross = el.h * zahl(el, "gross_anteil", 0.46);
+      const klein = el.h - gross - g;
+      rahmen.push({ x: el.x, y: el.y + el.h - gross, b: el.b, h: gross });
+      rahmen.push({ x: el.x, y: el.y, b: kb, h: klein });
+      rahmen.push({ x: el.x + kb + g, y: el.y, b: kb, h: klein });
+    } else if (n === 2) {
+      // Quer nebeneinander, hoch uebereinander: zwei Fotos in einem hohen
+      // Rahmen nebeneinander werden zu zwei Streifen.
+      if (el.b >= el.h) {
+        rahmen.push({ x: el.x, y: el.y, b: kb, h: el.h });
+        rahmen.push({ x: el.x + kb + g, y: el.y, b: kb, h: el.h });
+      } else {
+        rahmen.push({ x: el.x, y: el.y + kh + g, b: el.b, h: kh });
+        rahmen.push({ x: el.x, y: el.y, b: el.b, h: kh });
+      }
+    } else {
+      rahmen.push({ x: el.x, y: el.y, b: el.b, h: el.h });
+    }
+  } else if (layout === "gross_oben") {
     const anteil = zahl(el, "gross_anteil", 0.46);
     const gross = el.h * anteil;
     const klein = el.h - gross - g;
@@ -1911,6 +1989,7 @@ const galerie: Zeichner = (el, u) => {
       typ: "bild",
       x: r.x, y: r.y, b: r.b, h: r.h,
       slot: { art: "foto", nr: abNr + i },
+      slot_fertig: true,
       label: beschriftungen[i] ?? `{{bild.foto.${abNr + i}.titel?}}`,
     } as Element;
     bild(kind, u);

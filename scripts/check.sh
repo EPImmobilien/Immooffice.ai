@@ -460,6 +460,16 @@ else
   fehler=1
 fi
 
+abschnitt "Exposés: kommen ALLE Bilder hinein?"
+# Bis fork_64 nicht: feste Bildrahmen in den Vorlagen (fuenf bis sieben
+# Fotos) und eine fest verdrahtete Grenze von zehn in der Edge Function.
+# Wer dreissig Fotos pflegte, bekam sieben — lautlos.
+if node tests/expose-bildzahl.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Exposés: sieht das Gezeichnete fertig aus?"
 # scripts/expose-probe.mjs zeichnet jede Vorlage mit nachgebauten Daten und
 # meldet, was nicht gepasst hat: gekuerzter Text, verkleinerte Zeilen, ein

@@ -1624,6 +1624,78 @@
       ]
     },
     {
+      "id": "strecke-mehr",
+      "typ": "bildseite",
+      "name": "Impressionen",
+      "wiederholen": {
+        "feld": "objekt.fotoliste",
+        "pro_seite": 4,
+        "ab": 8
+      },
+      "elemente": [
+        {
+          "id": "strecke-grund",
+          "typ": "form",
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 841.89,
+          "form": "rechteck",
+          "fuell": "paper"
+        },
+        {
+          "id": "galerie",
+          "typ": "galerie",
+          "x": 54,
+          "y": 236,
+          "b": 487.28,
+          "h": 553.89,
+          "anpassen": true,
+          "max_bilder": 4,
+          "abstand": 12,
+          "gross_anteil": 0.46,
+          "ab_nr": 8,
+          "fuellmodus": "cover",
+          "platzhalter_farbe": "paper2",
+          "stil_label": "bild_label",
+          "label_hintergrund": "paper"
+        },
+        {
+          "id": "strecke-label",
+          "typ": "text",
+          "x": 54,
+          "y": 192.367,
+          "b": 300,
+          "h": 6.2,
+          "stil": "kapitel_label",
+          "inhalt": "IV  ·  Impressionen",
+          "einzeilig": true
+        },
+        {
+          "id": "strecke-titel-1",
+          "typ": "text",
+          "x": 54,
+          "y": 134.567,
+          "b": 250,
+          "h": 28,
+          "stil": "kapitel_titel_mittel",
+          "inhalt": "Weitere",
+          "einzeilig": true
+        },
+        {
+          "id": "strecke-titel-2",
+          "typ": "text",
+          "x": 54,
+          "y": 104.567,
+          "b": 250,
+          "h": 28,
+          "stil": "kapitel_titel_mittel_kursiv",
+          "inhalt": "Ansichten.",
+          "einzeilig": true
+        }
+      ]
+    },
+    {
       "id": "diptychon",
       "typ": "bildseite",
       "name": "Diptychon",
@@ -2031,6 +2103,89 @@
           }
         ]
       }
+    },
+    {
+      "id": "grundriss-mehr",
+      "typ": "grundriss",
+      "name": "Grundrisse",
+      "wiederholen": {
+        "feld": "objekt.grundrissliste",
+        "pro_seite": 1,
+        "ab": 2
+      },
+      "elemente": [
+        {
+          "id": "gr-grund",
+          "typ": "form",
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 841.89,
+          "form": "rechteck",
+          "fuell": "paper"
+        },
+        {
+          "id": "kapitel-label",
+          "typ": "text",
+          "x": 54,
+          "y": 743.6899999999999,
+          "b": 300,
+          "h": 6.2,
+          "stil": "kapitel_label",
+          "inhalt": "VI  ·  Grundrisse",
+          "einzeilig": true
+        },
+        {
+          "id": "kapitel-titel",
+          "typ": "text",
+          "x": 54,
+          "y": 675.89,
+          "b": 400,
+          "h": 34,
+          "stil": "kapitel_titel",
+          "inhalt": "Weitere",
+          "einzeilig": true
+        },
+        {
+          "id": "kapitel-titel-2",
+          "typ": "text",
+          "x": 54,
+          "y": 639.89,
+          "b": 400,
+          "h": 34,
+          "stil": "kapitel_titel_kursiv",
+          "inhalt": "Ebenen.",
+          "einzeilig": true
+        },
+        {
+          "id": "gr-plan-mehr",
+          "typ": "bild",
+          "x": 74,
+          "y": 236,
+          "b": 447.28,
+          "h": 400,
+          "slot": {
+            "art": "grundriss",
+            "nr": 2
+          },
+          "fuellmodus": "contain",
+          "platzhalter_farbe": "paper2",
+          "label_vom_slot": true,
+          "stil_label": "bild_label",
+          "label_hintergrund": "paper"
+        },
+        {
+          "id": "gr-hinweis",
+          "typ": "text",
+          "x": 54,
+          "y": 43,
+          "b": 487.28,
+          "h": 9,
+          "stil": "hinweis_kursiv",
+          "inhalt": "Grundrisse nicht maßstabsgetreu. Flächen ca.-Angaben, berechnet nach WoFlV.",
+          "einzeilig": true
+        }
+      ]
     },
     {
       "id": "lage",

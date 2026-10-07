@@ -126,7 +126,17 @@ export type Seite = {
    * haeufigste Fall bei einem Objekt ohne Grundrisse, und er soll keine
    * leere Seite erzeugen.
    */
-  wiederholen?: { feld: string; pro_seite?: number };
+  wiederholen?: {
+    feld: string;
+    pro_seite?: number;
+    /**
+     * Ab welchem Eintrag der Liste die Seite zaehlt. Eine Seite, die die
+     * UEBERZAEHLIGEN Fotos zeigt, laesst die stehen, die schon auf den
+     * festen Seiten der Vorlage liegen: `ab: 7` heisst "ab dem siebten".
+     * Reicht die Liste nicht bis dahin, entfaellt die Seite.
+     */
+    ab?: number;
+  };
   elemente: Element[];
 };
 

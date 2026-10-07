@@ -810,6 +810,34 @@ return null;
 }
 return u;
 }
+// --- Wie viele Bilder ins Expose gehen (fork_64) -------------------------
+// Hier standen 10 Fotos und 6 Grundrisse, fest verdrahtet. Ein Makler laedt
+// dreissig Fotos hoch — einundzwanzig verschwanden lautlos, weil sie nie
+// geladen wurden. Seit fork_64 tragen die Vorlagen beliebig viele (eine
+// Seite, die sich wiederholt), und diese Zahlen sind keine Grenze der
+// Gestaltung mehr, sondern eine des Speichers.
+//
+// Eine Edge Function hat endlichen Speicher, also bleibt eine Grenze. Aber
+// sie steht im Plattform-Admin und nicht im Code (CLAUDE.md: Limits
+// konfigurierbar), und sie SAGT, wenn sie greift. Lautlos verschwinden
+// darf kein Bild mehr.
+const grenzen = { fotos: 60, grundrisse: 20, budget: 48 * 1024 * 1024 };
+try {
+const { data: pwerte } = await admin.from("plattform_werte")
+.select("schluessel, wert")
+.in("schluessel", ["expose_max_fotos", "expose_max_grundrisse",
+"expose_bild_budget_mb"]);
+for (const z of pwerte || []) {
+const n = Number(String((z as any).wert).replace(/"/g, ""));
+if (!Number.isFinite(n) || n <= 0) continue;
+if ((z as any).schluessel === "expose_max_fotos") grenzen.fotos = Math.floor(n);
+if ((z as any).schluessel === "expose_max_grundrisse") grenzen.grundrisse = Math.floor(n);
+if ((z as any).schluessel === "expose_bild_budget_mb") grenzen.budget = Math.floor(n) * 1024 * 1024;
+}
+} catch (_e) { /* ohne Katalog gelten die Vorgaben oben */ }
+let bildBytes = 0;
+let budgetGemeldet = false;
+
 async function nimmBild(schluessel: string, d: any): Promise<void> {
 if (!d || !d.storage_path) return;
 // Die Bildunterschrift steht am BILD, nicht in der Vorlage. Eine Vorlage,
@@ -818,11 +846,25 @@ if (!d || !d.storage_path) return;
 // unter einem Schlafzimmer.
 if (typeof d.titel === "string" && d.titel.trim()) bildTitel[schluessel] = d.titel.trim();
 if (!bilder.has(d.storage_path)) {
+// Das Speicherbudget gilt fuer die NEU geladenen Bytes. Ein Bild, das
+// schon im Speicher liegt, kostet nichts mehr — darum erst hier und
+// nicht am Anfang der Funktion.
+if (bildBytes >= grenzen.budget) {
+if (!budgetGemeldet) {
+budgetGemeldet = true;
+warnungen.push("Speichergrenze fuer Bilder erreicht ("
++ Math.round(grenzen.budget / (1024 * 1024)) + " MB). Weitere Bilder "
++ "fehlen im PDF. Der Wert steht im Plattform-Bereich unter "
++ "expose_bild_budget_mb.");
+}
+return;
+}
 let bytes: Uint8Array | null = null;
 try { bytes = await bytesVon(d); }
 catch (e) { warnungen.push("Bild nicht ladbar: " + (d.name || "") + " (" + (e as Error).message + ")"); }
 if (!bytes) return;
 bilder.set(d.storage_path, bytes);
+bildBytes += bytes.length;
 if (d.ki_bearbeitet) kiBilder.push(d.storage_path);
 }
 bildWerte[schluessel] = d.storage_path;
@@ -833,14 +875,26 @@ const titelDatei = (immo.expose_titelbild_id
 && alleDateien.find((d: any) => d.id === immo.expose_titelbild_id)) || fotos[0] || null;
 const weitereFotos = fotos.filter((d: any) => !titelDatei || d.id !== titelDatei.id);
 await nimmBild("objekt.hauptbild_url", titelDatei);
-for (let i = 0; i < Math.min(weitereFotos.length, 10); i++) {
+const fotoGrenze = Math.min(weitereFotos.length, grenzen.fotos);
+for (let i = 0; i < fotoGrenze; i++) {
 await nimmBild("bild.foto." + (i + 1), weitereFotos[i]);
 // Fotos tragen im Expose die Bildunterschrift, die am Objekt gepflegt
 // ist. Sie gehoert zum Bild, nicht zur Vorlage — darum als Abweichung
 // am Bildslot und nicht als Text in der Vorlage.
 }
-for (let i = 0; i < Math.min(grundrisse.length, 6); i++) {
+if (weitereFotos.length > fotoGrenze) {
+warnungen.push("Das Objekt hat " + weitereFotos.length + " Fotos; " + fotoGrenze
++ " sind im PDF. Die Obergrenze steht im Plattform-Bereich unter "
++ "expose_max_fotos.");
+}
+const planGrenze = Math.min(grundrisse.length, grenzen.grundrisse);
+for (let i = 0; i < planGrenze; i++) {
 await nimmBild("bild.grundriss." + (i + 1), grundrisse[i]);
+}
+if (grundrisse.length > planGrenze) {
+warnungen.push("Das Objekt hat " + grundrisse.length + " Grundrisse; " + planGrenze
++ " sind im PDF. Die Obergrenze steht im Plattform-Bereich unter "
++ "expose_max_grundrisse.");
 }
 await nimmBild("bild.lageplan", lageplaene[0]);
 // Nach Kategorie: eine Vorlage kann "das erste Badfoto" anfordern.

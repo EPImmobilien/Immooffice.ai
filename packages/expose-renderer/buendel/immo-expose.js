@@ -1470,6 +1470,10 @@ var ImmoExpose = (() => {
     const v = el[name];
     return typeof v === "number" ? v : vorgabe;
   }
+  function laufVersatz(u) {
+    const v = u.daten["lauf.versatz"];
+    return typeof v === "number" && Number.isFinite(v) ? v : 0;
+  }
   function zeichenkette(el, name) {
     const v = el[name];
     return typeof v === "string" ? v : void 0;
@@ -2815,7 +2819,9 @@ var ImmoExpose = (() => {
     return x === 0.5 && y === 0.5 ? void 0 : [x, y];
   }
   var bild = (el, u) => {
-    const slot = el["slot"];
+    const roh = el["slot"];
+    const versatz = wahr(el, "slot_fertig", false) ? 0 : laufVersatz(u);
+    const slot = versatz && roh && typeof roh.nr === "number" && NUMMERIERT.has(roh.art ?? "") ? { ...roh, nr: roh.nr + versatz } : roh;
     const schluessel = bildSchluessel(slot);
     const quelle = schluessel ? wert(u.daten, schluessel) : void 0;
     const radius = zahl(el, "eckradius", 0);
@@ -2846,7 +2852,8 @@ var ImmoExpose = (() => {
       }, zweck);
     }
     if (quelle !== void 0) kiKennzeichnen(el, u, String(quelle));
-    const label = inhalt(el, u, false, "label");
+    const mitLabel = el["label"] === void 0 && wahr(el, "label_vom_slot", false) && schluessel ? { ...el, label: `{{${schluessel}.titel?}}` } : el;
+    const label = inhalt(mitLabel, u, false, "label");
     if (label !== void 0 && zeichenkette(el, "stil_label")) {
       const s = u.stil(zeichenkette(el, "stil_label"));
       const t = s.grossbuchstaben ? label.toLocaleUpperCase("de-DE") : label;
@@ -2889,6 +2896,7 @@ var ImmoExpose = (() => {
     u.blatt.rect(x, y, b + 14, h, [0, 0, 0, 0.72], null, 0);
     u.blatt.T(x + 7, y + 4, s, schnitt, groesse, [1, 1, 1, 1], sperrung);
   }
+  var NUMMERIERT = /* @__PURE__ */ new Set(["foto", "grundriss", "foto_kategorie"]);
   function bildSchluessel(slot) {
     if (!slot?.art) return void 0;
     switch (slot.art) {
@@ -3569,10 +3577,43 @@ var ImmoExpose = (() => {
   var galerie = (el, u) => {
     const layout = zeichenkette(el, "layout") ?? "gross_oben";
     const g = zahl(el, "abstand", 10);
-    const abNr = zahl(el, "ab_nr", 1);
+    const abNr = zahl(el, "ab_nr", 1) + laufVersatz(u);
     const beschriftungen = el["beschriftungen"] ?? [];
     const rahmen = [];
-    if (layout === "gross_oben") {
+    if (wahr(el, "anpassen", false)) {
+      const hoechstens = Math.max(1, zahl(el, "max_bilder", 4));
+      let n = 0;
+      while (n < hoechstens && wert(u.daten, `bild.foto.${abNr + n}`) !== void 0) n++;
+      if (n === 0) return;
+      const kb = (el.b - g) / 2;
+      const kh = (el.h - g) / 2;
+      if (n >= 4) {
+        for (const [sx, sy] of [[0, 1], [1, 1], [0, 0], [1, 0]]) {
+          rahmen.push({
+            x: el.x + sx * (kb + g),
+            y: el.y + sy * (kh + g),
+            b: kb,
+            h: kh
+          });
+        }
+      } else if (n === 3) {
+        const gross2 = el.h * zahl(el, "gross_anteil", 0.46);
+        const klein = el.h - gross2 - g;
+        rahmen.push({ x: el.x, y: el.y + el.h - gross2, b: el.b, h: gross2 });
+        rahmen.push({ x: el.x, y: el.y, b: kb, h: klein });
+        rahmen.push({ x: el.x + kb + g, y: el.y, b: kb, h: klein });
+      } else if (n === 2) {
+        if (el.b >= el.h) {
+          rahmen.push({ x: el.x, y: el.y, b: kb, h: el.h });
+          rahmen.push({ x: el.x + kb + g, y: el.y, b: kb, h: el.h });
+        } else {
+          rahmen.push({ x: el.x, y: el.y + kh + g, b: el.b, h: kh });
+          rahmen.push({ x: el.x, y: el.y, b: el.b, h: kh });
+        }
+      } else {
+        rahmen.push({ x: el.x, y: el.y, b: el.b, h: el.h });
+      }
+    } else if (layout === "gross_oben") {
       const anteil = zahl(el, "gross_anteil", 0.46);
       const gross2 = el.h * anteil;
       const klein = el.h - gross2 - g;
@@ -3611,6 +3652,7 @@ var ImmoExpose = (() => {
         b: r.b,
         h: r.h,
         slot: { art: "foto", nr: abNr + i },
+        slot_fertig: true,
         label: beschriftungen[i] ?? `{{bild.foto.${abNr + i}.titel?}}`
       };
       bild(kind, u);
@@ -3815,19 +3857,26 @@ var ImmoExpose = (() => {
         continue;
       }
       const quelle = daten[wdh.feld];
-      const anzahl = Array.isArray(quelle) ? quelle.length : 0;
+      const vorhanden = Array.isArray(quelle) ? quelle.length : 0;
+      const ab = Math.max(1, wdh.ab ?? 1);
+      const anzahl = Math.max(0, vorhanden - (ab - 1));
       if (anzahl === 0) {
-        warnungen.push({
-          art: "fehlender_wert",
-          seite: seite.id,
-          text: `"${seite.name}" wiederholt sich je Eintrag in ${wdh.feld}, und dort steht nichts — die Seite entfaellt.`
-        });
+        if (ab === 1) {
+          warnungen.push({
+            art: "fehlender_wert",
+            seite: seite.id,
+            text: `"${seite.name}" wiederholt sich je Eintrag in ${wdh.feld}, und dort steht nichts — die Seite entfaellt.`
+          });
+        }
         continue;
       }
       const proSeite = Math.max(1, wdh.pro_seite ?? 1);
       const seiten2 = Math.ceil(anzahl / proSeite);
       for (let i = 0; i < seiten2; i++) {
-        sichtbar.push({ seite, lauf: { nummer: i + 1, gesamt: seiten2 } });
+        sichtbar.push({
+          seite,
+          lauf: { nummer: i + 1, gesamt: seiten2, versatz: i * proSeite }
+        });
       }
     }
     const gesamt = sichtbar.length;
@@ -3854,6 +3903,7 @@ var ImmoExpose = (() => {
       daten["seite.gesamt_zweistellig"] = String(gesamt).padStart(2, "0");
       daten["lauf.nummer"] = lauf ? lauf.nummer : 1;
       daten["lauf.gesamt"] = lauf ? lauf.gesamt : 1;
+      daten["lauf.versatz"] = lauf ? lauf.versatz : 0;
       if (seite.hintergrund) hintergrundZeichnen(u, seite);
       for (const roh of seite.elemente) {
         const el = mitOverride(roh, texte, bilder);
@@ -4554,6 +4604,20 @@ var ImmoExpose = (() => {
     }
     if (q.bilder && !LEER(q.bilder["objekt.hauptbild_url"])) {
       d["objekt.hauptbild_url"] = q.bilder["objekt.hauptbild_url"];
+    }
+    for (const [art, feld2] of [
+      ["foto", "objekt.fotoliste"],
+      ["grundriss", "objekt.grundrissliste"]
+    ]) {
+      const muster = new RegExp(`^bild\\.${art}\\.(\\d+)$`);
+      const da = /* @__PURE__ */ new Set();
+      for (const [k, v] of Object.entries(d)) {
+        const m = muster.exec(k);
+        if (m && !LEER(v)) da.add(Number(m[1]));
+      }
+      let n = 0;
+      while (da.has(n + 1)) n++;
+      if (n > 0) d[feld2] = Array.from({ length: n }, (_, i) => ({ nr: i + 1 }));
     }
     if (!d["objekt.expose_qr_url"]) {
       const web = text2(firma["web"]);

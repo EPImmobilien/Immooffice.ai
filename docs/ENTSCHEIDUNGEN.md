@@ -5617,3 +5617,78 @@ hat `tests/expose-vorlagen.js` abgefangen — es hält die drei Vorlagen auf
 17,25 Punkt daneben und ist zurückgenommen. Der Test hat genau getan, wozu
 er da ist: er hat eine Gestaltungsentscheidung verhindert, die mir nicht
 zusteht.
+
+---
+
+## 2026-10-07 · Beliebig viele Bilder und Grundrisse ins Exposé (fork_64)
+
+**Befund:** Es gingen fünf bis sieben. Nachgezählt, nicht geschätzt:
+
+| | Fotos in der Vorlage | Grundrisse |
+|---|---|---|
+| Raster | 6 (Slots 1–3 + Galerie 4–6) | 2 |
+| Signature | 7 | 1 |
+| Studio | 5 | 1 |
+
+Und `expose-pdf-erzeugen` lud ohnehin höchstens zehn Fotos und sechs
+Grundrisse — `Math.min(weitereFotos.length, 10)`, fest verdrahtet. Wer
+dreißig Fotos pflegte, bekam sieben. Die übrigen wurden nicht einmal
+geladen, und niemand erfuhr davon: ein **fehlendes** Bild warnt, ein
+**überzähliges** warnte nicht.
+
+**Die Mechanik war schon beschrieben, aber nie angeschlossen.** `schema.ts`
+führte `wiederholen?: { feld, pro_seite }` mit dem Kommentar „je Grundriss
+eine Seite", `rendern.ts` vervielfachte die Seite, und `rendern.ts` legte
+sogar `lauf.nummer` in die Daten mit der Notiz „Elemente binden ihre
+Bildslots daran". Drei Dinge fehlten:
+
+1. **`schema.json` erlaubte `wiederholen` gar nicht** (`additionalProperties:
+   false`). Keine Vorlage konnte es benutzen — deshalb benutzte es keine.
+2. Die Bildslots folgten dem Durchgang nicht. Der zweite Durchgang hätte
+   dieselben Fotos gezeigt wie der erste.
+3. Es gab keine Liste, über die sich wiederholen ließe.
+
+**Entscheidung:** Die festen Seiten der Vorlagen bleiben **unverändert**, und
+je Vorlage kommen zwei Seiten dazu, die nur die **überzähligen** Bilder
+tragen: „Weitere Bilder" (vier Fotos je Seite) und „Weitere Grundrisse".
+
+**Grund für „zusätzlich" statt „die bestehenden wiederholen":** Die drei
+Vorlagen sind über `tests/expose-vorlagen.js` auf 2 Punkt an die Prototypen
+gebunden, und das kommt aus dem Auftrag. Eine zusätzliche Seite, die bei
+wenigen Fotos **nicht entsteht**, ändert an diesem Vergleich nichts —
+nachgewiesen: 2018 Zeichenschritte stimmen weiter überein, und Raster
+zeichnet mit den Prototypdaten weiterhin 10 Seiten. Hätte ich stattdessen
+`strecke` oder `bildseite` wiederholt, hätte der zweite Durchgang Fotos
+gezeigt, die auf anderen festen Seiten schon stehen.
+
+**Vier Teile:**
+- `wiederholen` bekommt **`ab`**: ab welchem Eintrag diese Seite zählt. Was
+  davor liegt, steht schon auf den festen Seiten. Reicht die Liste nicht bis
+  dahin, entfällt die Seite — ohne Warnung, denn „keine überzähligen Fotos"
+  ist der Normalfall und kein Mangel.
+- Die Bildslots einer wiederholten Seite zählen je Durchgang `pro_seite`
+  dazu. Kein neues Vorlagen-Vokabular: `pro_seite` **ist** der Versatz.
+- `aufbereiten` **leitet** `objekt.fotoliste` und `objekt.grundrissliste` aus
+  der Bildzuordnung ab, statt sie vom Aufrufer zu verlangen. Eine zweite
+  Angabe könnte mit der ersten auseinanderlaufen, und dann zeigte eine Seite
+  auf ein Bild, das es nicht gibt. Gezählt wird nur zusammenhängend ab 1.
+- Die Galerie wählt ihre Aufteilung nach der Zahl der Bilder, die auf
+  **ihrem** Durchgang noch kommen (`anpassen`): vier → 2×2, drei → eins
+  groß oben, zwei → nebeneinander oder übereinander, eins → ganzseitig. Ohne
+  das hätte die letzte Seite bei fünfzehn Fotos einen grauen Kasten gesetzt.
+
+**Die Grenze bleibt, aber sie ist jetzt eine des Speichers und nicht der
+Gestaltung** — und sie steht im Plattform-Admin (`expose_max_fotos` 60,
+`expose_max_grundrisse` 20, `expose_bild_budget_mb` 48). Greift sie, sagt die
+Funktion es in den Warnungen. Das Budget ist die eigentliche Sicherung: es
+greift auch bei wenigen, aber sehr großen Bildern.
+
+**Was dabei schiefging, und wie es auffiel:** Galerie und Bildslot zählten
+den Versatz **beide** dazu. Der vierte Durchgang zeigte Foto 31 statt 19 —
+vier graue Kästen statt vier Bildern. Gefunden hat es nicht Hinsehen,
+sondern Nachzählen: `tests/expose-bildzahl.js` prüft für drei Vorlagen und
+zehn Bestückungen von 0 bis 100 Fotos, dass **jedes** Foto und **jeder**
+Grundriss genau **einmal** gezeichnet wird. „Genau einmal" ist beides — kein
+Bild fehlt, keines steht zweimal. Gegenproben in beide Richtungen gemacht.
+
+100 Fotos und 20 Grundrisse ergeben 51 Seiten.

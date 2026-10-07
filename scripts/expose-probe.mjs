@@ -45,6 +45,17 @@ const lang = schalter.has('--lang');
 // Schalter traegt die Probe ein breites Logo und sagt den Vorlagen auch,
 // dass es breit ist.
 const wortmarke = schalter.has('--wortmarke');
+// Wie viele Fotos und Grundrisse das Objekt hat (fork_64). Ein Makler
+// laedt dreissig Bilder hoch, nicht sieben; die festen Seiten der Vorlagen
+// halten fuenf bis sieben, den Rest tragen die wiederholten Seiten. Ohne
+// Angabe bleibt es bei dem, was die Probe vorher lieferte.
+const zahlAus = (vorsatz, vorgabe) => {
+  const a = argumente.find((x) => x.startsWith(vorsatz + '='));
+  const n = a ? Number(a.slice(vorsatz.length + 1)) : NaN;
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : vorgabe;
+};
+const anzahlFotos = zahlAus('--fotos', 13);
+const anzahlGrundrisse = zahlAus('--grundrisse', voll ? 2 : 0);
 const zielOrdner = process.env.PROBE_ZIEL || path.join(os.tmpdir(), 'expose-probe');
 
 const namen = (gewuenscht.length ? gewuenscht : fs.readdirSync(VORLAGEN)
@@ -215,10 +226,22 @@ const bildWerte = {};
 const bilder = new Map();
 bilder.set('foto', new Uint8Array(JPEG));
 bilder.set('wortmarke', new Uint8Array(pngFlaeche(360, 60, 110, 20, 20)));
-for (let i = 1; i <= 13; i++) bildWerte['bild.foto.' + i] = 'foto';
+// JEDES Foto bekommt eine eigene Quelle (fork_64) — dieselben Bytes, aber
+// ein eigener Name. Nur so laesst sich hinterher nachzaehlen, WELCHES Foto
+// auf welcher Seite steht. Mit einer gemeinsamen Quelle sah ein Expose,
+// das dreimal Foto 7 zeigt, genauso aus wie eines mit 7, 8 und 9.
+for (let i = 1; i <= anzahlFotos; i++) {
+  const q = 'foto-' + i;
+  bilder.set(q, new Uint8Array(JPEG));
+  bildWerte['bild.foto.' + i] = q;
+}
 bildWerte['objekt.hauptbild_url'] = 'foto';
 bildWerte['bild.lageplan'] = 'foto';
-if (voll) { bildWerte['bild.grundriss.1'] = 'foto'; bildWerte['bild.grundriss.2'] = 'foto'; }
+for (let i = 1; i <= anzahlGrundrisse; i++) {
+  const q = 'grundriss-' + i;
+  bilder.set(q, new Uint8Array(JPEG));
+  bildWerte['bild.grundriss.' + i] = q;
+}
 if (voll) bildWerte['ansprechpartner.foto'] = 'foto';
 if (!ohneLogo) {
   const logo = wortmarke ? 'wortmarke' : 'foto';

@@ -1687,6 +1687,79 @@
       ]
     },
     {
+      "id": "bildseite-mehr",
+      "typ": "bildseite",
+      "name": "Impressionen",
+      "wiederholen": {
+        "feld": "objekt.fotoliste",
+        "pro_seite": 4,
+        "ab": 7
+      },
+      "elemente": [
+        {
+          "id": "kopf-nr",
+          "typ": "text",
+          "x": 42,
+          "y": 780.89,
+          "b": 18,
+          "h": 9,
+          "stil": "kapitel_nr",
+          "inhalt": "04",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-label",
+          "typ": "text",
+          "x": 62,
+          "y": 782.89,
+          "b": 260,
+          "h": 7,
+          "stil": "kapitel_label",
+          "inhalt": "Impressionen",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-linie",
+          "typ": "form",
+          "x": 146.79,
+          "y": 792.39,
+          "b": 406.49,
+          "h": 0,
+          "form": "linie",
+          "strich": "line",
+          "linienbreite": 0.6
+        },
+        {
+          "id": "kopf-titel",
+          "typ": "text",
+          "x": 42,
+          "y": 725.89,
+          "b": 471.28,
+          "h": 24,
+          "stil": "kapitel_titel",
+          "inhalt": "Weitere Bilder.",
+          "einzeilig": true
+        },
+        {
+          "id": "galerie",
+          "typ": "galerie",
+          "x": 42,
+          "y": 62,
+          "b": 511.28,
+          "h": 657.89,
+          "abstand": 10,
+          "eckradius": 10,
+          "ab_nr": 7,
+          "platzhalter_farbe": "surf2",
+          "stil_label": "bild_label",
+          "label_hintergrund": "weiss",
+          "anpassen": true,
+          "max_bilder": 4,
+          "gross_anteil": 0.46
+        }
+      ]
+    },
+    {
       "id": "grundriss",
       "typ": "grundriss",
       "name": "Grundrisse",
@@ -1890,6 +1963,101 @@
           }
         ]
       }
+    },
+    {
+      "id": "grundriss-mehr",
+      "typ": "grundriss",
+      "name": "Grundrisse",
+      "wiederholen": {
+        "feld": "objekt.grundrissliste",
+        "pro_seite": 1,
+        "ab": 3
+      },
+      "elemente": [
+        {
+          "id": "kopf-nr",
+          "typ": "text",
+          "x": 42,
+          "y": 780.89,
+          "b": 18,
+          "h": 9,
+          "stil": "kapitel_nr",
+          "inhalt": "05",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-label",
+          "typ": "text",
+          "x": 62,
+          "y": 782.89,
+          "b": 260,
+          "h": 7,
+          "stil": "kapitel_label",
+          "inhalt": "Grundrisse",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-linie",
+          "typ": "form",
+          "x": 135.56,
+          "y": 792.39,
+          "b": 417.71999999999997,
+          "h": 0,
+          "form": "linie",
+          "strich": "line",
+          "linienbreite": 0.6
+        },
+        {
+          "id": "kopf-titel",
+          "typ": "text",
+          "x": 42,
+          "y": 725.89,
+          "b": 471.28,
+          "h": 24,
+          "stil": "kapitel_titel",
+          "inhalt": "Weitere Grundrisse.",
+          "einzeilig": true
+        },
+        {
+          "id": "mehr-kasten-1",
+          "typ": "form",
+          "x": 42,
+          "y": 299.89,
+          "b": 511.28,
+          "h": 410,
+          "form": "rechteck",
+          "fuell": "surf",
+          "eckradius": 10
+        },
+        {
+          "id": "mehr-plan-1",
+          "typ": "bild",
+          "x": 72,
+          "y": 329.89,
+          "b": 451.28,
+          "h": 350,
+          "slot": {
+            "art": "grundriss",
+            "nr": 3
+          },
+          "fuellmodus": "contain",
+          "platzhalter_farbe": "surf",
+          "label_vom_slot": true,
+          "stil_label": "bild_label",
+          "label_hintergrund": "weiss"
+        },
+        {
+          "id": "grundriss-hinweis",
+          "typ": "text",
+          "x": 42,
+          "y": 51.2,
+          "b": 511.28,
+          "h": 6.8,
+          "stil": "kleingedruckt",
+          "inhalt": "Grundrisse nicht maßstabsgetreu. Flächen ca.-Angaben.",
+          "einzeilig": true
+        }
+      ]
     },
     {
       "id": "lage",

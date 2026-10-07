@@ -66,26 +66,44 @@ export function rendern(a: Auftrag): Ergebnis {
   // Vervielfachung passiert HIER und nicht beim Zeichnen, weil die
   // Seitenzahlen und das Inhaltsverzeichnis sonst die Wiederholungen
   // nicht kennen wuerden.
-  const sichtbar: { seite: Seite; lauf?: { nummer: number; gesamt: number } }[] = [];
+  const sichtbar: {
+    seite: Seite;
+    lauf?: { nummer: number; gesamt: number; versatz: number };
+  }[] = [];
   for (const seite of vorlage.seiten) {
     if (aus.has(seite.id)) continue;
     if (!trifftZu(daten, seite.sichtbar_wenn)) continue;
     const wdh = seite.wiederholen;
     if (!wdh) { sichtbar.push({ seite }); continue; }
     const quelle = daten[wdh.feld];
-    const anzahl = Array.isArray(quelle) ? quelle.length : 0;
+    const vorhanden = Array.isArray(quelle) ? quelle.length : 0;
+    // `ab` laesst die Eintraege stehen, die schon auf den festen Seiten der
+    // Vorlage liegen. Eine Seite fuer die ueberzaehligen Fotos beginnt bei
+    // `ab`, und wenn es so viele nicht gibt, entfaellt sie — ohne Warnung,
+    // denn "keine ueberzaehligen Fotos" ist der Normalfall und kein Mangel.
+    const ab = Math.max(1, wdh.ab ?? 1);
+    const anzahl = Math.max(0, vorhanden - (ab - 1));
     if (anzahl === 0) {
-      warnungen.push({
-        art: "fehlender_wert", seite: seite.id,
-        text: `"${seite.name}" wiederholt sich je Eintrag in ${wdh.feld}, und ` +
-              `dort steht nichts — die Seite entfaellt.`,
-      });
+      if (ab === 1) {
+        warnungen.push({
+          art: "fehlender_wert", seite: seite.id,
+          text: `"${seite.name}" wiederholt sich je Eintrag in ${wdh.feld}, und ` +
+                `dort steht nichts — die Seite entfaellt.`,
+        });
+      }
       continue;
     }
     const proSeite = Math.max(1, wdh.pro_seite ?? 1);
     const seiten = Math.ceil(anzahl / proSeite);
     for (let i = 0; i < seiten; i++) {
-      sichtbar.push({ seite, lauf: { nummer: i + 1, gesamt: seiten } });
+      // Der Versatz ist, was die Bildslots dieser Seite zu ihrer eigenen
+      // Nummer dazuzaehlen. Im ersten Durchgang null — deshalb sieht eine
+      // Seite mit genau einem Durchgang aus wie vor fork_64, und der
+      // Vergleich gegen die Prototypen bleibt gueltig.
+      sichtbar.push({
+        seite,
+        lauf: { nummer: i + 1, gesamt: seiten, versatz: i * proSeite },
+      });
     }
   }
   const gesamt = sichtbar.length;
@@ -116,6 +134,10 @@ export function rendern(a: Auftrag): Ergebnis {
     // es ist. Elemente binden ihre Bildslots daran: {{lauf.nummer}}.
     daten["lauf.nummer"] = lauf ? lauf.nummer : 1;
     daten["lauf.gesamt"] = lauf ? lauf.gesamt : 1;
+    // Die Bildslots dieser Seite lesen den Versatz (elemente.ts, bild und
+    // galerie). Er steht in den Daten und nicht am Element, damit kein
+    // Element eine Sonderbehandlung braucht — wie bei seite.nummer.
+    daten["lauf.versatz"] = lauf ? lauf.versatz : 0;
 
     if (seite.hintergrund) hintergrundZeichnen(u, seite);
 

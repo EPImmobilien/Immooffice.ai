@@ -457,9 +457,16 @@ if (fehler) { console.log(`\n  ${fehler} Pruefung(en) gescheitert.`); process.ex
       const alt = JSON.stringify(dok).includes('Die wichtigsten Fakten.');
       melde('Der neue Text steht im Dokument', drin && !alt,
             JSON.stringify([drin, alt]));
+      // Gezaehlt wird gegen die Vorlage und nicht gegen eine feste Zahl:
+      // die Seitenzahl von Raster ist mit fork_64 von 10 auf 12 gestiegen
+      // (zwei Seiten fuer die ueberzaehligen Bilder), und eine Zahl im
+      // Test haette dann nur gesagt, dass sie sich geaendert hat — nicht,
+      // ob der Editor etwas verloren hat. Genau das ist die Frage.
+      const sollSeiten = JSON.parse(fs.readFileSync(
+        path.join(VORLAGEN, 'raster.json'), 'utf-8')).seiten.length;
       melde('Das Dokument bleibt vollstaendig',
-            Array.isArray(dok.seiten) && dok.seiten.length === 10,
-            String(dok.seiten && dok.seiten.length));
+            Array.isArray(dok.seiten) && dok.seiten.length === sollSeiten,
+            `${dok.seiten && dok.seiten.length} von ${sollSeiten}`);
     }
     // Die Historie bekommt das Dokument VOR der Aenderung.
     if (fassung.length) {

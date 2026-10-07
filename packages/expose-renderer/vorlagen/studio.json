@@ -1497,6 +1497,90 @@
       ]
     },
     {
+      "id": "bildseite-mehr",
+      "typ": "bildseite",
+      "name": "Einblicke",
+      "ohne_fuss": true,
+      "wiederholen": {
+        "feld": "objekt.fotoliste",
+        "pro_seite": 4,
+        "ab": 6
+      },
+      "elemente": [
+        {
+          "id": "bild-grund",
+          "typ": "form",
+          "x": 0,
+          "y": 0,
+          "b": 595.28,
+          "h": 841.89,
+          "form": "rechteck",
+          "fuell": "rule"
+        },
+        {
+          "id": "galerie",
+          "typ": "galerie",
+          "x": 36,
+          "y": 62,
+          "b": 523.28,
+          "h": 743.89,
+          "anpassen": true,
+          "max_bilder": 4,
+          "abstand": 12,
+          "gross_anteil": 0.5,
+          "ab_nr": 6,
+          "fuellmodus": "cover",
+          "platzhalter_farbe": "tint2",
+          "stil_label": "bild_label",
+          "label_hintergrund": "paper"
+        },
+        {
+          "id": "fuss-linie-hell",
+          "typ": "form",
+          "x": 36,
+          "y": 44,
+          "b": 523.28,
+          "h": 0,
+          "form": "linie",
+          "strich": "weiss",
+          "linienbreite": 0.8
+        },
+        {
+          "id": "fuss-marke-hell",
+          "typ": "text",
+          "x": 36,
+          "y": 21,
+          "b": 200,
+          "h": 9,
+          "stil": "fuss_hell",
+          "inhalt": "{{firma.marken_name}}.",
+          "einzeilig": true
+        },
+        {
+          "id": "fuss-objekt-hell",
+          "typ": "text",
+          "x": 36.0,
+          "y": 25,
+          "b": 523.28,
+          "h": 6,
+          "stil": "fuss_mitte_hell",
+          "inhalt": "Objekt {{objekt.immo_nr}}",
+          "einzeilig": true
+        },
+        {
+          "id": "fuss-seite-hell",
+          "typ": "text",
+          "x": 409.28,
+          "y": 21,
+          "b": 150,
+          "h": 9,
+          "stil": "fuss_seite_hell",
+          "inhalt": "{{seite.nummer_zweistellig}}",
+          "einzeilig": true
+        }
+      ]
+    },
+    {
       "id": "ausstattung",
       "typ": "ausstattung",
       "name": "Ausstattung",
@@ -1771,6 +1855,110 @@
           }
         ]
       }
+    },
+    {
+      "id": "grundriss-mehr",
+      "typ": "grundriss",
+      "name": "Grundriss",
+      "wiederholen": {
+        "feld": "objekt.grundrissliste",
+        "pro_seite": 1,
+        "ab": 2
+      },
+      "elemente": [
+        {
+          "id": "kopf-marke",
+          "typ": "form",
+          "x": 36,
+          "y": 771.89,
+          "b": 28,
+          "h": 28,
+          "form": "rechteck",
+          "fuell": "s"
+        },
+        {
+          "id": "kopf-nr",
+          "typ": "text",
+          "x": 36,
+          "y": 770.89,
+          "b": 28,
+          "h": 10,
+          "stil": "kopf_nr",
+          "inhalt": "04",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-label",
+          "typ": "text",
+          "x": 74,
+          "y": 775.29,
+          "b": 400,
+          "h": 6.6,
+          "stil": "kopf_label",
+          "inhalt": "{{objekt.objektart}}  /  {{objekt.ort}}-{{objekt.ortsteil?}}",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-titel",
+          "typ": "text",
+          "x": 36,
+          "y": 663.89,
+          "b": 523.28,
+          "h": 50,
+          "stil": "kopf_titel",
+          "inhalt": "Weitere Grundrisse.",
+          "einzeilig": true
+        },
+        {
+          "id": "kopf-linie",
+          "typ": "form",
+          "x": 36,
+          "y": 697.89,
+          "b": 523.28,
+          "h": 0,
+          "form": "linie",
+          "strich": "rule",
+          "linienbreite": 2.4
+        },
+        {
+          "id": "plan-flaeche-mehr",
+          "typ": "form",
+          "x": 36,
+          "y": 180,
+          "b": 523.28,
+          "h": 500,
+          "form": "rechteck",
+          "fuell": "tint"
+        },
+        {
+          "id": "plan-mehr",
+          "typ": "bild",
+          "x": 66,
+          "y": 210,
+          "b": 463.28,
+          "h": 440,
+          "slot": {
+            "art": "grundriss",
+            "nr": 2
+          },
+          "fuellmodus": "contain",
+          "platzhalter_farbe": "tint",
+          "label_vom_slot": true,
+          "stil_label": "bild_label",
+          "label_hintergrund": "paper"
+        },
+        {
+          "id": "plan-hinweis",
+          "typ": "text",
+          "x": 36,
+          "y": 47.2,
+          "b": 523.28,
+          "h": 6.8,
+          "stil": "kleingedruckt",
+          "inhalt": "Grundriss nicht maßstabsgetreu. Terrasse zu ¼ angerechnet, Berechnung nach WoFlV.",
+          "einzeilig": true
+        }
+      ]
     },
     {
       "id": "lage",
