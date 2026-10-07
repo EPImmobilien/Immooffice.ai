@@ -27,14 +27,13 @@
 // dreißig Zeilen HMAC.
 //
 // ---------------------------------------------------------------------------
-// AUSSCHLIESSLICH TESTMODUS
+// TEST- ODER LIVEMODUS — ABER NIE GEMISCHT
 // ---------------------------------------------------------------------------
-// Der Auftrag ist eindeutig: „Ausschließlich Stripe-Testmodus. Keine
-// Live-Keys, kein Live-Schalter." Die Funktion weist deshalb jeden Schlüssel
-// ab, der nicht mit `sk_test_` beginnt, und jedes Ereignis, das `livemode`
-// trägt. Die Umstellung macht der Betreiber selbst — und muss dafür diese
-// Prüfung bewusst entfernen. Das ist der Sinn: ein Live-Gang soll nicht aus
-// Versehen passieren.
+// Seit dem Live-Gang (Weisung des Betreibers, 07.10.2026) laufen beide
+// Modi. Die Sperre ist jetzt eine andere: ein Ereignis muss zum Modus des
+// hinterlegten Schlüssels passen. Ein Testereignis an einem Live-System
+// (oder umgekehrt) wird abgewiesen — sonst schriebe eine Testkarte echte
+// Credits gut.
 // ============================================================================
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
@@ -246,9 +245,9 @@ Deno.serve(async (req) => {
   const geheim = Deno.env.get("STRIPE_WEBHOOK_SECRET") || "";
   const schluessel = Deno.env.get("STRIPE_SECRET_KEY") || "";
   if (!geheim) return antwort({ ok: false, fehler: "STRIPE_WEBHOOK_SECRET fehlt." }, 500);
-  // Testmodus, ohne Hintertür.
-  if (schluessel && !schluessel.startsWith("sk_test_")) {
-    return antwort({ ok: false, fehler: "Nur Stripe-Testmodus (sk_test_)." }, 500);
+  const liveSystem = schluessel.startsWith("sk_live_");
+  if (schluessel && !liveSystem && !schluessel.startsWith("sk_test_")) {
+    return antwort({ ok: false, fehler: "STRIPE_SECRET_KEY muss mit sk_test_ oder sk_live_ beginnen." }, 500);
   }
 
   const roh = await req.text();
@@ -266,8 +265,10 @@ Deno.serve(async (req) => {
     // der Endpunkt sollte auf dieselbe Fassung gestellt sein.
     console.warn(`stripe-webhook: Ereignis in Fassung ${ereignis.api_version}, erwartet ${STRIPE_VERSION}`);
   }
-  if (ereignis?.livemode === true) {
-    return antwort({ ok: false, fehler: "Live-Ereignis im Testbetrieb abgewiesen." }, 400);
+  if (schluessel && Boolean(ereignis?.livemode) !== liveSystem) {
+    return antwort({ ok: false, fehler: liveSystem
+      ? "Testereignis an einem Live-System abgewiesen."
+      : "Live-Ereignis an einem Testsystem abgewiesen." }, 400);
   }
 
   const db = createClient(

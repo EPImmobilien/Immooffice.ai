@@ -8,10 +8,9 @@
 //     SUPABASE_SERVICE_ROLE_KEY=… \
 //     node scripts/stripe-einrichten.mjs [--trocken]
 //
-// AUSSCHLIESSLICH TESTMODUS. Ein Schlüssel, der nicht mit `sk_test_`
-// beginnt, bricht den Lauf ab. Der Live-Gang ist Sache des Betreibers
-// (Gate 3 in CLAUDE.md) und verlangt, diese Prüfung bewusst zu entfernen —
-// genau so soll es sein: er darf nicht aus Versehen passieren.
+// TEST ODER LIVE. Mit `sk_live_…` legt das Skript den echten Katalog an —
+// dafür muss zusätzlich `--live` angegeben sein, damit es nicht aus
+// Versehen passiert.
 //
 // IDEMPOTENT. Das Skript darf beliebig oft laufen:
 //   * Produkte werden über `metadata.immo_schluessel` wiedergefunden, nicht
@@ -41,9 +40,10 @@ function abbruch(text) {
 }
 
 if (!SCHLUESSEL) abbruch("STRIPE_SECRET_KEY fehlt.");
-if (!SCHLUESSEL.startsWith("sk_test_")) {
-  abbruch("Nur der Testmodus ist erlaubt (sk_test_…). Der Live-Gang ist\n"
-    + "         Sache des Betreibers — siehe docs/BILLING.md.");
+const LIVE = SCHLUESSEL.startsWith("sk_live_");
+if (!LIVE && !SCHLUESSEL.startsWith("sk_test_")) abbruch("STRIPE_SECRET_KEY muss mit sk_test_ oder sk_live_ beginnen.");
+if (LIVE && !process.argv.includes("--live")) {
+  abbruch("Live-Schlüssel erkannt. Zur Bestätigung mit --live aufrufen.");
 }
 if (!SUPABASE_URL || !DIENST) abbruch("SUPABASE_URL und SUPABASE_SERVICE_ROLE_KEY fehlen.");
 
@@ -160,7 +160,7 @@ async function preis(produktId, cent, intervall, schluessel) {
 }
 
 async function main() {
-  console.log("Stripe-Einrichtung (Testmodus)\n" + "=".repeat(40));
+  console.log(`Stripe-Einrichtung (${LIVE ? "LIVE" : "Testmodus"})\n` + "=".repeat(40));
   if (TROCKEN) console.log("TROCKENLAUF — es wird nichts angelegt.\n");
 
   // --- Tarife ----------------------------------------------------------------
@@ -265,7 +265,7 @@ async function main() {
 
   console.log("\n" + "=".repeat(40));
   console.log("Fertig. Noch zu setzen (Supabase → Edge Functions → Secrets):");
-  console.log("  STRIPE_SECRET_KEY        sk_test_…");
+  console.log("  STRIPE_SECRET_KEY        " + (LIVE ? "sk_live_…" : "sk_test_…"));
   console.log("  STRIPE_WEBHOOK_SECRET    whsec_… (aus dem Webhook-Endpunkt)");
   console.log("  STRIPE_COUPON_GRUENDER   " + name);
   console.log("\nWebhook-Endpunkt bei Stripe anlegen auf:");

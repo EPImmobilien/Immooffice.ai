@@ -7,12 +7,13 @@ Dieses Dokument hält fest, **was gebaut wurde, welche Annahmen dabei getroffen
 wurden und was davon geprüft ist** — getrennt nach dem, was hier prüfbar war,
 und dem, was nur beim Betreiber mit einem echten Stripe-Konto prüfbar ist.
 
-> **Ausschließlich Stripe-Testmodus.** Jeder Schlüssel, der nicht mit
-> `sk_test_` beginnt, bricht den Lauf ab — im Skript, im Checkout, in der
-> Verwaltung. Ein Live-Schalter existiert nicht. Die Umstellung macht der
-> Betreiber selbst, und sie verlangt, diese Prüfungen bewusst zu entfernen
-> (Gate 3 in `CLAUDE.md`). Genau so soll es sein: sie darf nicht aus Versehen
-> passieren.
+> **Test- und Livemodus (seit 07.10.2026).** Gate 3 hat der Betreiber am
+> 07.10.2026 ausdrücklich freigegeben („ich will direkt live alles machen").
+> Erlaubt sind `sk_test_…` und `sk_live_…`; der Modus ergibt sich aus dem
+> hinterlegten Schlüssel. Der Webhook weist jedes Ereignis ab, dessen
+> `livemode` nicht zum Schlüssel passt — eine Testkarte schreibt an einem
+> Live-System nichts gut, und umgekehrt. Das Seed-Skript legt einen
+> Live-Katalog nur mit ausdrücklichem `--live` an.
 
 ---
 
@@ -587,13 +588,14 @@ Danach `website/konfig.js` → `preise` auf die eigene Projektadresse prüfen.
 
 ---
 
-## 12. Gate 3 — bevor es live geht
+## 12. Gate 3 — freigegeben am 07.10.2026
 
-Dieses Gate ist ein **Stopp**, kein Haken. Vor der Umstellung auf Live-Keys:
+Der Betreiber hat den Live-Gang am 07.10.2026 freigegeben. Die
+Testmodus-Sperren sind ersetzt durch die Modus-Sperre (siehe oben). Was
+dieses Gate prüfen sollte, bleibt als Liste stehen — es ist jetzt Aufgabe
+des Betreibers, nicht mehr eine Sperre im Code:
 
-1. Die Testmodus-Sperren in `abo-checkout`, `abo-verwalten` und
-   `scripts/stripe-einrichten.mjs` bewusst entfernen — jede einzeln, mit
-   Blick auf das, was sie verhindert hat.
+1. ~~Testmodus-Sperren entfernen~~ — erledigt, ersetzt durch die Modus-Sperre.
 2. Preise, Limits und Credit-Werte im Plattform-Admin auf den Stand bringen,
    der verkauft werden soll. Sie stehen an **einer** Stelle, nicht im Code.
 3. AGB, Widerrufsbelehrung und Preisangabenverordnung prüfen lassen. Dieses

@@ -88,6 +88,16 @@ pruefe("Verwaltung: Kündigung löst einen vorgemerkten Wechsel",
 pruefe("Verwaltung: Kundenportal mit eigener Konfiguration",
   /stripe_portal_konfiguration/.test(verwalten) && /configuration: konfId/.test(verwalten));
 
+// --- Modus: Test oder Live, nie gemischt (Live-Gang 07.10.2026) -------------------
+for (const [name, q] of [["Kasse", kasse], ["Verwaltung", verwalten], ["Webhook", webhook], ["Seed", seed]]) {
+  pruefe(`${name}: nimmt sk_test_ und sk_live_, sonst nichts`,
+    /startsWith\("sk_test_"\)/.test(q) && /startsWith\("sk_live_"\)/.test(q));
+}
+pruefe("Webhook: Ereignis muss zum Modus des Schlüssels passen",
+  /Boolean\(ereignis\?\.livemode\) !== liveSystem/.test(webhook));
+pruefe("Seed: Live-Katalog nur mit ausdrücklichem --live",
+  /LIVE && !process\.argv\.includes\("--live"\)/.test(seed));
+
 // --- Seed -------------------------------------------------------------------------
 pruefe("Seed: Portal ohne Kündigung und ohne Tarifwechsel",
   /subscription_cancel\]\[enabled\]": "false"/.test(seed)

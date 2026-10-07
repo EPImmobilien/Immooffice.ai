@@ -39,8 +39,8 @@ const STRIPE_VERSION = "2025-12-15.clover";
 
 async function stripe(pfad: string, felder?: Record<string, string>, methode = "POST") {
   const schluessel = Deno.env.get("STRIPE_SECRET_KEY") || immoFehlt("STRIPE_SECRET_KEY");
-  if (!schluessel.startsWith("sk_test_")) {
-    throw new Error("Nur Stripe-Testmodus (sk_test_).");
+  if (!schluessel.startsWith("sk_test_") && !schluessel.startsWith("sk_live_")) {
+    throw new Error("STRIPE_SECRET_KEY muss mit sk_test_ oder sk_live_ beginnen.");
   }
   const r = await fetch("https://api.stripe.com/v1/" + pfad, {
     method: methode,

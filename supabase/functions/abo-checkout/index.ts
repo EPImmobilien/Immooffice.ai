@@ -11,7 +11,9 @@
 // Status von hier, stünde er schon dann in der Datenbank, wenn jemand nur
 // die Kasse geöffnet und dann abgebrochen hat.
 //
-// AUSSCHLIESSLICH TESTMODUS: der Schlüssel muss mit `sk_test_` beginnen.
+// TEST- UND LIVEMODUS (Live-Gang auf Weisung des Betreibers, 07.10.2026):
+// erlaubt sind `sk_test_…` und `sk_live_…`. Eingeschränkte Schlüssel
+// (`rk_…`) und alles andere werden abgewiesen.
 // ============================================================================
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
@@ -38,9 +40,8 @@ const STRIPE_VERSION = "2025-12-15.clover";
 /** Stripe über das Formular-API — kein SDK, dieselbe Begründung wie im Webhook. */
 async function stripe(pfad: string, felder: Record<string, string>, methode = "POST") {
   const schluessel = Deno.env.get("STRIPE_SECRET_KEY") || immoFehlt("STRIPE_SECRET_KEY");
-  if (!schluessel.startsWith("sk_test_")) {
-    throw new Error("Nur Stripe-Testmodus (sk_test_). Der Live-Gang ist "
-      + "Sache des Betreibers — siehe docs/BILLING.md.");
+  if (!schluessel.startsWith("sk_test_") && !schluessel.startsWith("sk_live_")) {
+    throw new Error("STRIPE_SECRET_KEY muss mit sk_test_ oder sk_live_ beginnen.");
   }
   const koerper = new URLSearchParams(felder).toString();
   const r = await fetch("https://api.stripe.com/v1/" + pfad, {
