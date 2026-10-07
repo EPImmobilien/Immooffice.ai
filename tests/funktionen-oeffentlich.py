@@ -170,6 +170,12 @@ UNBEDENKLICH = {
         'und die ist eine Anzahl ohne Bezug: sie sagt "noch 37 frei" und '
         'nicht, wer die anderen dreizehn sind. Stripe-Kennungen gehen '
         'bewusst NICHT hinaus.',
+    'plattform-stripe-abgleich':
+        'Ziel eines Cron-Jobs (03:10 Uhr) und des Knopfes "Jetzt abgleichen" '
+        'im Betreiberbereich. Nimmt NICHTS aus dem Koerper: liest Stripe mit '
+        'dem Dienstschluessel und das Abbild, schreibt stripe_abgleich '
+        '(Summen, keine Kundendaten) und traegt Gebuehr/Versuche an '
+        'gespiegelten Rechnungen nach. Antwort: ok, Zahlen, Fehlertext.',
     'testphase-erinnerung':
         'Ziel eines Cron-Jobs, wie die uebrigen Sammelversender der Vorlage: '
         'der Zeitplan bringt kein Konto mit. Aus dem Koerper nimmt sie '

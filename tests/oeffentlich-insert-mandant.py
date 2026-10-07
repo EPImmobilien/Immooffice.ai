@@ -46,6 +46,8 @@ OHNE_MANDANT = {
     # Grenze und waere keine. Die Tabelle ist als DIENST eingestuft und hat
     # fuer Angemeldete keine einzige Richtlinie.
     'stripe_ereignisse',
+    # fork_74: Summen des Stripe-Abgleichs ueber ALLE Mandanten; GLOBAL, nur Betreiber lesen.
+    'stripe_abgleich',
 }
 
 # Tabellen, deren Mandant seit fork_22 aus dem Elternsatz kommt: ein

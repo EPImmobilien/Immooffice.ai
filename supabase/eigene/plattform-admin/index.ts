@@ -81,6 +81,11 @@ const ROLLEN: Record<string, string[]> = {
   features:               ["owner", "admin", "support", "finanzen"],
   feature_speichern:      ["owner", "admin"],
   tarif_umstellen:        ["owner"],
+  zahlungen:              ["owner", "admin", "finanzen"],
+  zahlung_erinnern:       ["owner", "admin", "finanzen"],
+  erstatten:              ["owner", "finanzen"],
+  buchhaltung:            ["owner", "admin", "finanzen"],
+  abgleich_jetzt:         ["owner", "admin", "finanzen"],
   fixkosten_speichern:    ["owner", "admin"],
   fixkosten_loeschen:     ["owner", "admin"],
   uebersicht:             ["owner", "admin", "support", "finanzen"],
@@ -288,6 +293,110 @@ Deno.serve(async (req) => {
       }
       await protokoll("tarif_umgestellt", schluessel, { grund, ergebnis }, { typ: "plattform_tarife" });
       return antwort({ ok: true, ergebnis });
+    }
+
+    // --- Zahlungen (fork_74) ----------------------------------------------
+    if (aktion === "zahlungen") {
+      const tage = Math.max(1, Math.min(365, Math.floor(Number(body.tage || 90))));
+      const bis = new Date().toISOString().slice(0, 10);
+      const von = new Date(Date.now() - (tage - 1) * 86400000).toISOString().slice(0, 10);
+      const [{ data: z, error }, { data: namen }] = await Promise.all([
+        db.rpc("plattform_zahlungen", { p_von: von, p_bis: bis }),
+        db.from("mandanten").select("id, name"),
+      ]);
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      const name = new Map((namen || []).map((m) => [String(m.id), m.name]));
+      const zz = (z || {}) as Record<string, unknown>;
+      for (const k of ["fehlgeschlagen", "rechnungen"]) {
+        zz[k] = ((zz[k] as Record<string, unknown>[]) || []).map((x) => ({ ...x, name: name.get(String(x.mandant_id)) || x.mandant_id }));
+      }
+      return antwort({ ok: true, ...zz, stripe_modus: stripeModus() });
+    }
+    // Zahlungserinnerung: Stripe schickt die gehostete Rechnung erneut. Bei
+    // automatisch eingezogenen Abo-Rechnungen laesst Stripe das nicht zu —
+    // dann versuchen wir die Zahlung erneut (pay), was den Kunden ueber
+    // Stripes eigene Mail informiert.
+    if (aktion === "zahlung_erinnern") {
+      const id = String(body.rechnung_id || "");
+      const mandant = String(body.mandant_id || "");
+      if (!id) return antwort({ ok: false, fehler: "Keine Rechnung." }, 400);
+      if (!stripeModus()) return antwort({ ok: false, fehler: "Stripe ist nicht verbunden." }, 400);
+      let meldung = "";
+      try {
+        await stripe(`invoices/${id}/send_invoice`, {});
+        meldung = "Rechnung erneut per Stripe versandt.";
+      } catch (e1) {
+        try { await stripe(`invoices/${id}/pay`, {}); meldung = "Einzug erneut angestossen."; }
+        catch (e2) { return antwort({ ok: false, fehler: "Stripe: " + (e2 instanceof Error ? e2.message : String(e2)) }, 400); }
+      }
+      await protokoll("zahlung_erinnert", mandant || id, { rechnung_id: id, meldung }, { typ: "rechnung" });
+      return antwort({ ok: true, meldung });
+    }
+    if (aktion === "erstatten") {
+      const id = String(body.rechnung_id || "");
+      const mandant = String(body.mandant_id || "");
+      const grund = String(body.grund || "").trim();
+      const betrag = body.betrag_cent ? Math.floor(Number(body.betrag_cent)) : null;
+      if (!id) return antwort({ ok: false, fehler: "Keine Rechnung." }, 400);
+      if (grund.length < 5) return antwort({ ok: false, fehler: "Bitte einen Grund angeben — er steht im Audit-Log." }, 400);
+      if (!stripeModus()) return antwort({ ok: false, fehler: "Stripe ist nicht verbunden." }, 400);
+      const { data: r } = await db.from("stripe_rechnungen").select("*").eq("id", id).maybeSingle();
+      if (!r || r.status !== "paid") return antwort({ ok: false, fehler: "Nur bezahlte Rechnungen lassen sich erstatten." }, 400);
+      try {
+        // Zahlung der Rechnung ermitteln (neue API: invoices/{id}/payments).
+        let pi = r.zahlung_id && String(r.zahlung_id).startsWith("pi_") ? String(r.zahlung_id) : "";
+        if (!pi) {
+          const zahlungen = await stripe(`invoices/${id}/payments`, {}, "GET");
+          pi = String(zahlungen?.data?.[0]?.payment?.payment_intent || "");
+        }
+        if (!pi) return antwort({ ok: false, fehler: "Keine Zahlung zu dieser Rechnung gefunden." }, 400);
+        const felder: Record<string, string> = { payment_intent: pi, reason: "requested_by_customer",
+          "metadata[grund]": grund.slice(0, 200), "metadata[mandant]": mandant };
+        if (betrag && betrag > 0) felder.amount = String(betrag);
+        const rf = await stripe("refunds", felder);
+        await protokoll("erstattet", mandant || id, { rechnung_id: id, betrag_cent: betrag || r.brutto_cent, grund, refund: rf.id },
+                        { typ: "rechnung", vorher: { status: r.status }, nachher: { erstattung: rf.id } });
+        return antwort({ ok: true, refund: rf.id });
+      } catch (e) {
+        return antwort({ ok: false, fehler: "Stripe: " + (e instanceof Error ? e.message : String(e)) }, 400);
+      }
+    }
+    // Buchhaltung: Monatszeilen. Die CSV baut die Oberflaeche (UTF-8 BOM,
+    // Semikolon, deutsche Zahlen) — hier nur die Zeilen, damit dieselben
+    // Daten auch anders exportiert werden koennten.
+    if (aktion === "buchhaltung") {
+      const monat = String(body.monat || new Date().toISOString().slice(0, 7));
+      if (!/^\d{4}-\d{2}$/.test(monat)) return antwort({ ok: false, fehler: "Monat als JJJJ-MM." }, 400);
+      const von = monat + "-01";
+      const bisD = new Date(Number(monat.slice(0, 4)), Number(monat.slice(5, 7)), 1);
+      const [{ data: rechnungen }, { data: namen }, { data: ust }] = await Promise.all([
+        db.from("stripe_rechnungen").select("*").gte("erstellt_am", von).lt("erstellt_am", bisD.toISOString()).order("erstellt_am"),
+        db.from("mandanten").select("id, name"),
+        db.from("plattform_werte").select("wert").eq("schluessel", "ust_satz").maybeSingle(),
+      ]);
+      const name = new Map((namen || []).map((m) => [String(m.id), m.name]));
+      const zeilen = (rechnungen || []).map((r) => ({
+        belegart: r.art === "gutschrift" ? "Gutschrift" : "Rechnung",
+        belegnummer: r.nummer || r.id, belegdatum: String(r.erstellt_am).slice(0, 10),
+        mandant: name.get(String(r.mandant_id)) || r.mandant_id, mandant_id: r.mandant_id,
+        netto_eur: Number(r.netto_cent) / 100, ust_eur: Number(r.steuer_cent) / 100, brutto_eur: Number(r.brutto_cent) / 100,
+        ust_satz: r.reverse_charge ? 0 : Number(ust?.wert ?? 19), reverse_charge: !!r.reverse_charge,
+        status: r.status, bezahlt_am: r.bezahlt_am ? String(r.bezahlt_am).slice(0, 10) : "",
+        gebuehr_eur: r.gebuehr_cent !== null && r.gebuehr_cent !== undefined ? Number(r.gebuehr_cent) / 100 : null,
+        stripe_id: r.id, waehrung: String(r.waehrung || "eur").toUpperCase(),
+      }));
+      await protokoll("buchhaltung_export", monat, { zeilen: zeilen.length }, { typ: "export" });
+      return antwort({ ok: true, monat, zeilen });
+    }
+    if (aktion === "abgleich_jetzt") {
+      // Dieselbe Funktion, die der Zeitplan ruft — damit es nur EINE Rechnung gibt.
+      const basis = (Deno.env.get("SUPABASE_URL") || "").replace(/\/+$/, "");
+      const r = await fetch(basis + "/functions/v1/plattform-stripe-abgleich", {
+        method: "POST", headers: { "Content-Type": "application/json",
+          Authorization: "Bearer " + (Deno.env.get("SUPABASE_ANON_KEY") || "") }, body: "{}" });
+      const d = await r.json().catch(() => ({}));
+      await protokoll("abgleich_gestartet", "stripe", { ok: !!d.ok, nachgetragen: d.nachgetragen }, { typ: "abgleich" });
+      return antwort({ ok: !!d.ok, ergebnis: d });
     }
 
     // --- Gutscheine (fork_73) ---------------------------------------------

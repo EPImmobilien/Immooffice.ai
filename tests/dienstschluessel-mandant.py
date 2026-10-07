@@ -174,6 +174,12 @@ BUCH = {
     # Ein Cron hat keinen Mandanten. Er liest die Warteschlange ueber alle
     # Mandanten und arbeitet danach je Zeile im Mandanten DIESER Zeile
     # weiter — die Bauform aus Phase 2 ("ein Lauf je Mandant").
+    ('plattform-admin', 'stripe_rechnungen'):
+        (3, 'BEABSICHTIGT', 'Betreiber: Rechnungen aller Mandanten fuer Zahlungen, Export, Erstattung (fork_74)'),
+    ('plattform-stripe-abgleich', 'stripe_rechnungen'):
+        (2, 'BEABSICHTIGT', 'taeglicher Abgleich Stripe gegen Abbild ueber alle Mandanten (fork_74)'),
+    ('plattform-stripe-abgleich', 'mandant_abo'):
+        (2, 'BEABSICHTIGT', 'Zahl der aktiven Abos im Abbild gegen Stripe (fork_74)'),
     ('plattform-admin', 'fehler_protokoll'):
         (1, 'BEABSICHTIGT', 'nur GEZAEHLT (head: true) fuer "Technikfehler 24 h" auf der '
                             'Betreiber-Uebersicht; keine Meldung verlaesst die Funktion (fork_70)'),

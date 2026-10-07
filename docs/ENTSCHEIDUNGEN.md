@@ -6182,3 +6182,19 @@ Zeitstempel, gleiche Nummer (`fork_71`). Meine Migration wurde `fork_72`,
 die fremde blieb. Zwei Sitzungen auf einem Branch brauchen eine
 Nummernabsprache — die gibt es nicht, und das ist ein Risiko, das der
 Auftraggeber kennen sollte.
+
+
+## 2026-10-07 · Betreiberbereich, Schritt 6: die Gebühr holt der Abgleich, nicht der Webhook (fork_74)
+
+Der Auftrag will Stripe-Gebühren aus Balance Transactions. Der Webhook
+liefert sie nicht mit, und der Webhook gehört der Stripe-Integration der
+parallelen Sitzung. Zwei Sitzungen in einer Datei sind der sichere Weg zu
+einem kaputten Webhook. Also holt sie der tägliche Abgleich — der ohnehin
+Stripe liest — und trägt sie am Abbild nach, je Rechnung einmal. Dasselbe
+für Versuche und nächsten Versuch. Der Webhook bleibt, wie er ist.
+
+Der Buchhaltungs-Export ist keine DATEV-Datei. Eine EXTF-Datei verlangt
+Konten, BU-Schlüssel und Debitorennummern — die gehören der Buchhaltung,
+nicht der Plattform. Eine Datei, die so aussieht wie DATEV, aber mit
+geratenen Konten, wäre schlimmer als eine ehrliche CSV mit beschriebenen
+Spalten.

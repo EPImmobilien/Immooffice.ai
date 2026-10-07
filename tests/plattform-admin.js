@@ -48,6 +48,8 @@ const ERLAUBT = new Set([
   'plattform_notizen', 'plattform_kennzahlen_tag', 'plattform_mandanten_tag',
   'plattform_fixkosten', 'gutscheine', 'gutschein_einloesungen',
   'plattform_features', 'tarif_features', 'mandant_features',
+  // Abbild der Stripe-Rechnungen (Kopfdaten) und der Abgleich: Vertragsdaten.
+  'stripe_rechnungen', 'stripe_abgleich',
   // Nur GEZAEHLT (head: true) fuer "Technikfehler 24 h"; keine Meldung geht hinaus.
   'fehler_protokoll',
   // Die Vertragsbeziehung. `credit_konten` und `credit_buchungen` sind das

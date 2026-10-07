@@ -456,7 +456,17 @@ zuwachs(bereich, mehr, grund) as (values
   ('Fremdschluessel', 6, 'fork_73: einloesungen auf gutscheine und mandanten; tarif_features auf tarife und features; mandant_features auf mandanten und features'),
   ('Indizes ohne Constraint', 2, 'fork_73: einloesungen und mandant_features je Mandant'),
   ('Richtlinien', 12, 'fork_73: lesen/pflegen gutscheine; lesen + Trennung + Loeschsperre einloesungen; lesen/pflegen features; lesen/pflegen tarif_features; lesen + Trennung + Loeschsperre mandant_features'),
-  ('Funktionen', 2, 'fork_73: hat_feature, meine_features')
+  ('Funktionen', 2, 'fork_73: hat_feature, meine_features'),
+
+  -- fork_74: Betreiber, Schritt 6 — Zahlungen, Abgleich, echte Gebuehr.
+  ('Spalten', 5, 'fork_74: gebuehr_cent, versuche, naechster_versuch, zahlung_id, abgeglichen_am an stripe_rechnungen'),
+  ('Tabellen', 1, 'fork_74: stripe_abgleich'),
+  ('Tabellen mit RLS', 1, 'fork_74: auch diese'),
+  ('Spalten', 12, 'fork_74: id, datum, bereich, zeitraum, stripe_anzahl, stripe_cent, spiegel_anzahl, spiegel_cent, abweichung, kennungen, fehler, erstellt_am'),
+  ('Primaer- und Eindeutigkeitsschluessel', 2, 'fork_74: Primaerschluessel und (datum, bereich, zeitraum)'),
+  ('Richtlinien', 1, 'fork_74: lesen owner/admin/finanzen'),
+  ('Funktionen', 1, 'fork_74: plattform_zahlungen'),
+  ('Cron-Jobs', 1, 'fork_74: plattform-stripe-abgleich-taeglich')
 ),
 soll(bereich, soll) as (
   select v.bereich,

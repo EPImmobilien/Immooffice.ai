@@ -400,6 +400,11 @@ verify_jwt = true
 [functions.testphase-erinnerung]
 verify_jwt = false
 
+# Oeffentlich wie jedes Cron-Ziel; nimmt nichts aus dem Koerper, liest Stripe
+# und das Abbild, schreibt stripe_abgleich (fork_74).
+[functions.plattform-stripe-abgleich]
+verify_jwt = false
+
 # Oeffentlich, zwangslaeufig: Stripe bringt kein Supabase-Token mit. Die
 # Echtheit haengt an der Signatur, und die prueft die Funktion selbst.
 [functions.stripe-webhook]

@@ -346,7 +346,68 @@ fremde Ausnahmen nicht, support legt keine Gutscheine an.
 - [x] Feature-Matrix Module × Tarife, Ausnahmen je Mandant, `hat_feature()`, Upgrade-Hinweis
 - [ ] Abnahmepunkt „Preisänderung erzeugt neuen Stripe-Price" live — braucht `STRIPE_SECRET_KEY` und ein Produkt mit `stripe_product_id`; lokal nicht prüfbar
 
-## Noch offen aus dem Auftrag (Schritte 6–10)
+## Schritt 6 — Zahlungen, Buchhaltungs-Export, Stripe-Abgleich (fork_74) · erledigt 07.10.2026
+
+Baut auf `stripe_rechnungen` auf (fork_71 der parallelen Sitzung — das
+Abbild der Rechnungen, geschrieben vom Webhook). Dazu:
+
+- **Drei Spalten am Abbild**, die der Webhook nicht kennt: `gebuehr_cent`
+  (Balance Transaction), `versuche` (= Mahnstufe), `naechster_versuch`. Gefüllt
+  vom **täglichen Abgleich** (`plattform-stripe-abgleich`, 03:10 Uhr, auch
+  per Knopf), nicht vom Webhook — der gehört der Stripe-Integration, und ein
+  Webhook mit zwei Nachfragen je Ereignis wird langsam.
+- **Fehlgeschlagene Zahlungen**: seit wann (`mandant_abo.zahlung_fehler_seit`),
+  Mahnstufe, Betrag, nächster Versuch, **Tage bis Sperre** =
+  `zahlung_frist_tage` − Tage seit Ausfall. „Erinnerung senden" lässt Stripe
+  die Rechnung erneut versenden (`send_invoice`); bei automatischem Einzug
+  stößt es stattdessen den Einzug erneut an (`pay`).
+- **Rechnungen** offen / bezahlt / Gutschriften, je mit „In Stripe öffnen"
+  (Testmodus-Pfad automatisch). **Erstattung** nur owner/finanzen, mit Grund,
+  voll oder Teilbetrag, über `refunds` auf den Payment Intent der Rechnung.
+- **Stripe-Abgleich** (`stripe_abgleich`): bezahlte und offene Rechnungen im
+  laufenden und im Vormonat, aktive Abos — Anzahl und Summe bei Stripe neben
+  dem Abbild, Abweichung mit den Kennungen, die nur auf einer Seite stehen.
+  Ein verlorener Webhook fällt so am nächsten Morgen auf.
+- **Kosten & Marge** rechnet ab jetzt mit der **echten** Gebühr, sobald der
+  Abgleich sie geliefert hat; sonst weiter mit der Schätzung, so beschriftet.
+
+### Export für die Buchhaltung (DATEV-kompatible Struktur)
+
+Monats-CSV, UTF-8 mit BOM, Semikolon, Komma als Dezimaltrenner, eine Zeile
+je Beleg (Rechnung oder Gutschrift):
+
+| Spalte | Inhalt | DATEV-Entsprechung (Buchungsstapel) |
+|---|---|---|
+| Belegart | Rechnung / Gutschrift | Soll/Haben-Kennzeichen (S = Rechnung, H = Gutschrift) |
+| Belegnummer | Stripe-Rechnungsnummer | Belegfeld 1 |
+| Belegdatum | JJJJ-MM-TT | Belegdatum (TTMM) |
+| Mandant, Mandanten-ID | Kunde | Konto (Debitor) — Zuordnung Debitorennummer ↔ Mandanten-ID führt die Buchhaltung |
+| Netto EUR, USt EUR, Brutto EUR | Beträge | Umsatz (Brutto) mit BU-Schlüssel |
+| USt-Satz % | 19 oder 0 (Reverse Charge) | BU-Schlüssel (z. B. 3 = 19 %, Reverse Charge gesondert) |
+| Reverse Charge | ja/nein | Steuerschlüssel §13b |
+| Zahlungsstatus, Bezahlt am | paid/open/void | für den Zahlungseingang (Bank) |
+| Gebühr EUR | Stripe-Gebühr | separater Aufwandsbeleg (Nebenkosten des Geldverkehrs) |
+| Stripe-ID, Währung | Referenz | Buchungstext |
+
+Das ist bewusst **keine** fertige DATEV-Datei (EXTF-Format mit 116 Spalten
+und Kopfzeile): die Kontenzuordnung (Erlöskonto, Debitorenkonten, BU-
+Schlüssel) gehört der Buchhaltung. Die CSV liefert die Belege so, dass ein
+Steuerberater sie mit einer Zuordnungstabelle in einen Buchungsstapel
+überführen kann; `docs/ADMIN.md` hält die Spaltenbedeutung fest.
+
+`tests/betreiber-zahlungen.sql`: Mahnstufe 2, Tage bis Sperre 10 (14 − 4),
+offener Betrag, Gebühr im Abbild, Kosten rechnen echt statt geschätzt,
+support abgewiesen, chef sieht nur die eigene Rechnung.
+
+### Abnahme Schritt 6
+
+- [x] Fehlgeschlagene Zahlungen mit Mahnstufe, Datum, Betrag, Tage bis Sperre, Erinnerung
+- [x] Offene/bezahlte/erstattete Rechnungen, Erstattung (owner/finanzen, Begründung)
+- [x] Monats-CSV mit Rechnungsnummer, Datum, Mandant, Netto, USt, Brutto, Status; DATEV-Struktur beschrieben
+- [x] Stripe-Abgleich täglich mit Abweichungsliste
+- [ ] Live-Nachweis braucht Stripe-Verkehr; im Projekt gibt es heute noch keine Rechnung
+
+## Noch offen aus dem Auftrag (Schritte 7–10)
 
 Werden hier je Schritt nachgetragen. Reihenfolge wie im Auftrag.
 

@@ -1154,6 +1154,131 @@
         + "scripts/stripe-einrichten.mjs an (Workflow \u201eStripe einrichten\u201c)."));
   }
 
+  // --- Zahlungen (fork_74) ----------------------------------------------------
+  function stripeLink(modus, art, id) {
+    if (!id) return null;
+    return E("a", { href: "https://dashboard.stripe.com/" + (modus === "test" ? "test/" : "") + art + "/" + id, target: "_blank", rel: "noopener",
+      style: { fontSize: 11, color: CI.blau, whiteSpace: "nowrap" } }, "In Stripe öffnen");
+  }
+  function Zahlungen(p) {
+    var d = p.daten;
+    var mZ = React.useState(new Date().toISOString().slice(0, 7)), monat = mZ[0], setzeMonat = mZ[1];
+    var fZ = React.useState("offen"), filter = fZ[0], setzeFilter = fZ[1];
+    var eZ = React.useState(null), erst = eZ[0], setzeErst = eZ[1];
+    if (!d) return E("div", { style: { color: CI.muted } }, "Lade Zahlungen …");
+    var darfErstatten = p.rolle === "owner" || p.rolle === "finanzen";
+    var darfStripe = ["owner", "admin", "finanzen"].indexOf(p.rolle) >= 0;
+    var rechnungen = (d.rechnungen || []).filter(function (r) {
+      return filter === "alle" ? true : filter === "offen" ? r.status === "open" || r.status === "uncollectible"
+        : filter === "bezahlt" ? r.status === "paid" : r.art === "gutschrift" || r.status === "void";
+    });
+    async function erinnern(r) {
+      try { var x = await ruf("zahlung_erinnern", { rechnung_id: r.rechnung_id, mandant_id: r.mandant_id }); p.melden(x.meldung); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    async function erstatten() {
+      try { var x = await ruf("erstatten", { rechnung_id: erst.id, mandant_id: erst.mandant_id, grund: erst.grund,
+          betrag_cent: erst.betrag ? Math.round(Number(String(erst.betrag).replace(",", ".")) * 100) : null });
+        p.melden("Erstattung " + x.refund + " ausgelöst."); setzeErst(null); p.neuLaden(); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    async function exportieren() {
+      try { var x = await ruf("buchhaltung", { monat: monat });
+        csvExport("buchhaltung-" + monat + ".csv", [["Belegart", "belegart"], ["Belegnummer", "belegnummer"], ["Belegdatum", "belegdatum"],
+          ["Mandant", "mandant"], ["Mandanten-ID", "mandant_id"], ["Netto EUR", "netto_eur"], ["USt EUR", "ust_eur"], ["Brutto EUR", "brutto_eur"],
+          ["USt-Satz %", "ust_satz"], ["Reverse Charge", "reverse_charge"], ["Zahlungsstatus", "status"], ["Bezahlt am", "bezahlt_am"],
+          ["Gebuehr EUR", "gebuehr_eur"], ["Stripe-ID", "stripe_id"], ["Waehrung", "waehrung"]], x.zeilen);
+        p.melden(x.zeilen.length + " Belege exportiert."); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    async function abgleich() {
+      p.melden("Abgleich läuft …", "warnung");
+      try { var x = await ruf("abgleich_jetzt"); p.melden(x.ok ? "Abgleich fertig." : "Abgleich mit Fehler: " + (x.ergebnis && x.ergebnis.fehler), x.ok ? "ok" : "fehler"); p.neuLaden(); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    var s = d.summen || {};
+    return E("div", null,
+      E("div", { style: { display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", marginBottom: 18 } },
+        [["Fehlgeschlagen offen", zahl((d.fehlgeschlagen || []).length), "Sperre nach " + zahl(d.frist_tage) + " Tagen"],
+         ["Offen", geld(s.offen_cent || 0), "Rechnungen im Zeitraum"],
+         ["Bezahlt", geld(s.bezahlt_cent || 0), zahl(s.anzahl || 0) + " Belege"],
+         ["Gutschriften", geld(s.gutschriften_cent || 0), "negativ im Netto"],
+         ["Stripe-Gebühren", geld(s.gebuehren_cent || 0), "aus Balance Transactions (Abgleich)"]].map(function (k, i) {
+          return E("div", { key: i, style: kasten },
+            E("div", { style: { fontSize: 11, color: CI.muted, letterSpacing: "0.06em", textTransform: "uppercase" } }, k[0]),
+            E("div", { style: { fontSize: 22, fontWeight: 700, color: CI.blau, margin: "6px 0 4px" } }, k[1]),
+            E("div", { style: { fontSize: 11.5, color: CI.muted } }, k[2]));
+        })),
+      E("div", { style: kasten },
+        Ueberschrift("Fehlgeschlagene Zahlungen"),
+        (d.fehlgeschlagen || []).length ? E("div", { style: { overflowX: "auto" } }, E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 760 } },
+          E("thead", null, E("tr", null, ["Mandant", "Mahnstufe", "Seit", "Betrag", "Tage bis Sperre", "Nächster Versuch", "", ""].map(function (h, i) { return E("th", { key: i, style: kopfzelle }, h); }))),
+          E("tbody", null, d.fehlgeschlagen.map(function (f) {
+            return E("tr", { key: f.mandant_id, style: f.tage_bis_sperre <= 3 ? { background: "#fdf2f2" } : null },
+              E("td", { style: zelle }, E("button", { type: "button", style: Object.assign({}, knopfLeer, { padding: "3px 8px" }), onClick: function () { p.oeffnen(f.mandant_id); } }, f.name)),
+              E("td", { style: zelle }, zahl(f.mahnstufe)),
+              E("td", { style: zelle }, datum(f.seit)),
+              E("td", { style: zelle }, f.offen_cent ? geld(f.offen_cent) : "—"),
+              E("td", { style: Object.assign({}, zelle, { fontWeight: 600, color: f.tage_bis_sperre <= 3 ? CI.danger : CI.blau }) }, zahl(f.tage_bis_sperre)),
+              E("td", { style: zelle }, f.naechster_versuch ? zeit(f.naechster_versuch) : "—"),
+              E("td", { style: zelle }, darfStripe ? stripeLink(d.stripe_modus, "customers", f.stripe_kunde_id) : null),
+              E("td", { style: zelle }, f.rechnung_id ? E("button", { type: "button", style: knopfLeer, onClick: function () { erinnern(f); } }, "Erinnerung senden") : null));
+          })))) : E("div", { style: { fontSize: 13, color: CI.muted } }, "Keine.")),
+      E("div", { style: kasten },
+        E("div", { style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 10 } },
+          Ueberschrift("Rechnungen"),
+          [["offen", "Offen"], ["bezahlt", "Bezahlt"], ["erstattet", "Gutschriften / storniert"], ["alle", "Alle"]].map(function (f) {
+            return E("button", { key: f[0], type: "button", onClick: function () { setzeFilter(f[0]); },
+              style: Object.assign({}, knopfLeer, { marginBottom: 12 }, filter === f[0] ? { background: CI.blau, color: "#fff", borderColor: CI.blau } : {}) }, f[1]);
+          })),
+        rechnungen.length ? E("div", { style: { overflowX: "auto" } }, E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 820 } },
+          E("thead", null, E("tr", null, ["Nummer", "Mandant", "Datum", "Art", "Netto", "USt", "Brutto", "Status", "Gebühr", "", ""].map(function (h, i) { return E("th", { key: i, style: kopfzelle }, h); }))),
+          E("tbody", null, rechnungen.map(function (r) {
+            return E("tr", { key: r.id },
+              E("td", { style: Object.assign({}, zelle, { fontFamily: "monospace", fontSize: 12 }) }, r.nummer || r.id),
+              E("td", { style: zelle }, r.name),
+              E("td", { style: zelle }, datum(r.erstellt_am)),
+              E("td", { style: zelle }, r.art),
+              E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, geld(r.netto_cent)),
+              E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, geld(r.steuer_cent)),
+              E("td", { style: Object.assign({}, zelle, { textAlign: "right", fontWeight: 600 }) }, geld(r.brutto_cent)),
+              E("td", { style: zelle }, r.status),
+              E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, r.gebuehr_cent !== null && r.gebuehr_cent !== undefined ? geld(r.gebuehr_cent) : "—"),
+              E("td", { style: zelle }, darfStripe ? stripeLink(d.stripe_modus, "invoices", r.id) : null),
+              E("td", { style: zelle }, darfErstatten && r.status === "paid" && r.art !== "gutschrift"
+                ? E("button", { type: "button", style: knopfLeer, onClick: function () { setzeErst({ id: r.id, mandant_id: r.mandant_id, grund: "", betrag: "" }); } }, "Erstatten") : null));
+          })))) : E("div", { style: { fontSize: 13, color: CI.muted } }, "Keine Rechnungen in dieser Auswahl."),
+        erst ? E("div", { style: { marginTop: 12, display: "grid", gap: 8, gridTemplateColumns: "2fr 1fr auto auto", alignItems: "end" } },
+          E("input", { style: feld, value: erst.grund, placeholder: "Grund — steht im Audit-Log", onChange: function (e) { setzeErst(Object.assign({}, erst, { grund: e.target.value })); } }),
+          E("input", { style: feld, value: erst.betrag, placeholder: "Teilbetrag EUR (leer = voll)", onChange: function (e) { setzeErst(Object.assign({}, erst, { betrag: e.target.value })); } }),
+          E("button", { type: "button", style: Object.assign({}, knopf, { background: CI.danger, borderColor: CI.danger }), disabled: erst.grund.trim().length < 5, onClick: erstatten }, "Erstattung auslösen"),
+          E("button", { type: "button", style: knopfLeer, onClick: function () { setzeErst(null); } }, "Abbrechen")) : null),
+      E("div", { style: kasten },
+        Ueberschrift("Export für die Buchhaltung"),
+        E("div", { style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" } },
+          E("input", { type: "month", style: Object.assign({}, feld, { width: 170 }), value: monat, onChange: function (e) { setzeMonat(e.target.value); } }),
+          E("button", { type: "button", style: knopf, onClick: exportieren }, "Monats-CSV"),
+          E("span", { style: { fontSize: 12, color: CI.muted } }, "UTF-8 mit BOM, Semikolon, deutsche Zahlen — Struktur siehe docs/ADMIN.md (DATEV-kompatibel)."))),
+      E("div", { style: kasten },
+        E("div", { style: { display: "flex", gap: 8, alignItems: "center" } },
+          Ueberschrift("Stripe-Abgleich"),
+          E("button", { type: "button", style: Object.assign({}, knopfLeer, { marginLeft: "auto", marginBottom: 12 }), onClick: abgleich }, "Jetzt abgleichen")),
+        (d.abgleich || []).length ? E("table", { style: { width: "100%", borderCollapse: "collapse" } },
+          E("thead", null, E("tr", null, ["Datum", "Bereich", "Zeitraum", "Stripe", "Abbild", "Abweichung"].map(function (h, i) { return E("th", { key: i, style: kopfzelle }, h); }))),
+          E("tbody", null, d.abgleich.map(function (g) {
+            var k = g.kennungen || {};
+            return E("tr", { key: g.id, style: g.abweichung ? { background: "#fff7e6" } : null },
+              E("td", { style: zelle }, g.datum),
+              E("td", { style: zelle }, g.bereich),
+              E("td", { style: zelle }, g.zeitraum),
+              E("td", { style: zelle }, zahl(g.stripe_anzahl) + (g.stripe_cent ? " · " + geld(g.stripe_cent) : "")),
+              E("td", { style: zelle }, zahl(g.spiegel_anzahl) + (g.spiegel_cent ? " · " + geld(g.spiegel_cent) : "")),
+              E("td", { style: Object.assign({}, zelle, { fontSize: 12 }) }, g.fehler ? E("span", { style: { color: CI.danger } }, g.fehler)
+                : g.abweichung ? ("nur bei Stripe: " + ((k.nur_stripe || []).join(", ") || "—") + " · nur im Abbild: " + ((k.nur_spiegel || []).join(", ") || "—"))
+                : E("span", { style: { color: CI.success } }, "stimmt")));
+          }))) : E("div", { style: { fontSize: 13, color: CI.muted } }, "Noch kein Abgleich — läuft täglich um 03:10 Uhr, oder jetzt.")));
+  }
+
   // --- Funktionen & Tarife (fork_73) ---------------------------------------
   function Funktionen(p) {
     var d = p.daten;
@@ -1472,13 +1597,14 @@
         : welcher === "umsatz" ? "umsatz"
         : welcher === "kosten" ? "kosten"
         : welcher === "funktionen" ? "features"
+        : welcher === "zahlungen" ? "zahlungen"
         : welcher === "mandanten" ? "mandanten"
         : welcher === "katalog" ? "katalog"
         : welcher === "konten" ? "nutzer"
         : welcher === "system" ? "system"
         : welcher === "admins" ? "admin_liste"
         : welcher === "mandant" ? "mandant" : "protokoll";
-      ruf(aktion, welcher === "mandant" ? { mandant_id: id } : (welcher === "zahlen" || welcher === "kosten") ? { tage: tage } : null).then(function (d) {
+      ruf(aktion, welcher === "mandant" ? { mandant_id: id } : (welcher === "zahlen" || welcher === "kosten" || welcher === "zahlungen") ? { tage: tage } : null).then(function (d) {
         var n = {};
         n[welcher] = welcher === "mandanten" ? d.mandanten
           : welcher === "admins" ? d.admins
@@ -1532,6 +1658,7 @@
     var alleReiter = [["zahlen", "Übersicht", ["owner", "admin", "support", "finanzen"]],
       ["umsatz", "Umsatz & Abos", ["owner", "admin", "finanzen"]],
       ["kosten", "Kosten & Marge", ["owner", "admin", "finanzen"]],
+      ["zahlungen", "Zahlungen", ["owner", "admin", "finanzen"]],
       ["funktionen", "Funktionen", ["owner", "admin", "support", "finanzen"]],
       ["mandanten", "Mandanten", ["owner", "admin", "support", "finanzen"]],
       ["konten", "Konten", ["owner", "admin", "support"]],
@@ -1604,6 +1731,8 @@
             neuLaden: function () { laden("konten"); } })
         : reiter === "katalog" ? E(Katalog, { daten: daten.katalog, kosten: daten.kosten, tage: tage, rolle: rolle,
             stripeModus: wer.stripe_modus, melden: melden, neuLaden: function () { laden("katalog"); } })
+        : reiter === "zahlungen" ? E(Zahlungen, { daten: daten.zahlungen, rolle: rolle, melden: melden, neuLaden: function () { laden("zahlungen"); },
+            oeffnen: function (id) { setzeOffen(id); } })
         : reiter === "funktionen" ? E(Funktionen, { daten: daten.funktionen, rolle: rolle, melden: melden, neuLaden: function () { laden("funktionen"); } })
         : reiter === "system" ? E(System, { daten: daten.system })
         : reiter === "admins" ? E(Admins, { daten: daten.admins, konten: daten.konten, rolle: rolle,
