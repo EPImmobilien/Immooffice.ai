@@ -177,6 +177,24 @@ for (const [name, muster] of [
 ]) {
   melde(name, muster.test(q));
 }
+// Hooks nach einem fruehen `return` — React-Fehler #310 ("Rendered more
+// hooks than during the previous render"), sobald die Daten nachkommen und
+// der Zweig hinter dem return erstmals laeuft. Am 07.10.2026 live in
+// MandantTafel und Katalog passiert; der Tafeltest sah es nicht, weil sein
+// useState-Ersatz die Reihenfolge nicht prueft. Deshalb statisch.
+{
+  const zeilen = fs.readFileSync(TAFEL, 'utf8').split('\n');
+  const befunde = [];
+  let fn = null, erstesReturn = null;
+  zeilen.forEach((z, idx) => {
+    const m = z.match(/^  function ([A-Z]\w*)\(/);
+    if (m) { fn = m[1]; erstesReturn = null; return; }
+    if (!fn) return;
+    if (erstesReturn === null && /^    (if \(.*\) )?return /.test(z)) erstesReturn = idx + 1;
+    if (erstesReturn && /^    .*React\.use(State|Effect|Callback|Memo|Ref)\(/.test(z)) befunde.push(`${fn}:${idx + 1}`);
+  });
+  melde('kein Hook steht hinter einem fruehen return (React #310)', befunde.length === 0, befunde.join(', '));
+}
 melde('das Loeschen verlangt den ausgeschriebenen Namen',
       /bestaetigung !== m\.name/.test(q),
       'ein Knopf allein ist keine Sperre fuer etwas Unwiderrufliches');

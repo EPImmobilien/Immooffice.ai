@@ -584,6 +584,9 @@
     var lZ = React.useState(""), loeschwort = lZ[0], setzeLoeschwort = lZ[1];
     var sZ = React.useState({ grund: "", schreiben: false, dauer: 60 }), sup = sZ[0], setzeSup = sZ[1];
     var d = p.daten;
+    // Hooks stehen VOR dem fruehen return — sonst React-Fehler #310, sobald die Daten nachkommen.
+    var nZ = React.useState(""), notiz = nZ[0], setzeNotiz = nZ[1];
+    var abZ = React.useState(null), abzug = abZ[0], setzeAbzug = abZ[1];
     if (!d) return E("div", { style: { color: CI.muted } }, "Lade Mandant …");
     var m = d.mandant, a = d.abo || {};
 
@@ -637,8 +640,6 @@
     var geaendert = Object.keys(entwurf).length > 0;
     var tarife = (p.katalog && p.katalog.tarife) || [];
     var md = d.metadaten || null, onb = (md && md.onboarding) || {};
-    var nZ = React.useState(""), notiz = nZ[0], setzeNotiz = nZ[1];
-    var abZ = React.useState(null), abzug = abZ[0], setzeAbzug = abZ[1];
     var rolle = p.rolle || "admin";
 
     function testPlus(tage) {
@@ -1116,11 +1117,12 @@
   }
 
   function Katalog(p) {
+    // Hooks stehen VOR dem fruehen return — sonst React-Fehler #310, sobald die Daten nachkommen.
+    var uZ = React.useState({ tarif: "", grund: "" }), um = uZ[0], setzeUm = uZ[1];
     if (!p.daten) return E("div", { style: { color: CI.muted } }, "Lade Katalog …");
     var gemeinsam = { melden: p.melden, neuLaden: p.neuLaden };
     var istJeCredit = {};
     ((p.kosten && p.kosten.je_aktion) || []).forEach(function (a) { istJeCredit[a.aktion] = a.ist_je_credit; });
-    var uZ = React.useState({ tarif: "", grund: "" }), um = uZ[0], setzeUm = uZ[1];
     async function umstellen() {
       if (!window.confirm("Bestandskunden werden auf den aktuellen Preis umgestellt. Informationspflicht: Preisänderungen sind den Kunden vorher mitzuteilen (Vertrag/AGB, in der Regel mit Frist). Fortfahren?")) return;
       try { var r = await ruf("tarif_umstellen", { tarif: um.tarif, grund: um.grund });

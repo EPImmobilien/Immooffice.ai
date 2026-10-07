@@ -83,7 +83,6 @@ ERLAUBT = {
     # Impressum der Website (website/konfig.js): die Kontaktnummer des
     # Betreibers. § 5 DDG verlangt sie, und die Website hat keine Datenbank,
     # aus der sie sie lesen koennte. Vom Betreiber selbst angegeben, 07.10.2026.
-    '01632188125': 'Impressum, Betreiber',
 }
 
 # Dateien, die keine Rufnummer der Vorlage tragen KOENNEN, weil sie die
