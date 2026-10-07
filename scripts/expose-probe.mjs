@@ -118,6 +118,11 @@ const immobilie = {
   ortsteil: voll ? 'Seeviertel' : null,
   wohnflaeche: 123, nutzflaeche: 45, grundstueck: 654, zimmer: 5, schlafzimmer: 4,
   badezimmer: 3, baujahr: 2016, angebotspreis: 1325000, provision_aussen: '3,57',
+  // Kennwert 46 und Klasse C passen ABSICHTLICH nicht zusammen: 46 kWh/(m2*a)
+  // ist Klasse A. Ein vertippter Energieausweis ist der Alltag, und der
+  // Renderer soll es melden statt stillschweigend das eine oder das andere
+  // zu zeichnen. tests/expose-probe.js kennt diese beiden Warnungen und
+  // laesst sie durch; jede WEITERE Kuerzung ist ein Befund.
   energieausweis_typ: 'Verbrauchsausweis', energie_kennwert: '46', energie_klasse: 'C',
   energie_warmwasser: false, heizungsart: voll ? 'Waermepumpe' : null,
   energie_traeger: voll ? 'Strom' : null,

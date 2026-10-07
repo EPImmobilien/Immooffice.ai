@@ -725,6 +725,14 @@ def quadrat(h, post):
             # Was darueber liegt, wandert mit; das Foto schrumpft.
             if e["id"] == "grund":
                 e["h"] = QUAD_H
+            elif e["id"] == "rahmen":
+                # Der Zierrahmen der Handschrift Signature ist auf allen
+                # Seiten gleich weit eingerueckt: b = Seitenbreite - 2*x.
+                # Beim Stauchen blieb seine HOEHE die des Beitrags (639 pt
+                # auf einer 540 pt hohen Seite) und er lief unten heraus.
+                # Gemeldet hat es der Renderer von Anfang an — gelesen hat
+                # die Warnung niemand, weil nichts sie gepruefte.
+                e["h"] = QUAD_H - 2 * e["y"]
             elif e["id"] in ("foto", "foto-scrim", "abdunkler"):
                 # Zwoelf Punkt mehr als noetig: sonst sitzt die Augenbraue
                 # direkt auf der Unterkante des Fotos.
@@ -734,6 +742,19 @@ def quadrat(h, post):
             elif e["y"] >= 300:
                 e["y"] = e["y"] - weniger
             neue.append(e)
+        # Notbremse: nach dem Stauchen darf kein Element mehr ueber die
+        # Seite ragen. Eine Anordnung, die von einer anderen abgeleitet
+        # wird, verliert genau hier den Bezug — und das faellt auf einem
+        # Bildschirm nicht auf, sondern erst im fertigen Beitrag.
+        for e in neue:
+            rechts = (e.get("x") or 0) + (e.get("b") or 0)
+            oben = (e.get("y") or 0) + (e.get("h") or 0)
+            if rechts > QUAD_B + 0.5 or oben > QUAD_H + 0.5:
+                raise SystemExit(
+                    f'ABBRUCH: {h["name"]} Quadrat — Element "{e.get("id")}" '
+                    f'reicht bis ({rechts:.0f}, {oben:.0f}) und damit ueber die '
+                    f'Seite ({QUAD_B:.0f}, {QUAD_H:.0f}). quadrat() muss es '
+                    'mitstauchen.')
         s["elemente"] = neue
         seiten.append(s)
     return seiten

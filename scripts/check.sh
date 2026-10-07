@@ -460,6 +460,18 @@ else
   fehler=1
 fi
 
+abschnitt "Exposés: sieht das Gezeichnete fertig aus?"
+# scripts/expose-probe.mjs zeichnet jede Vorlage mit nachgebauten Daten und
+# meldet, was nicht gepasst hat: gekuerzter Text, verkleinerte Zeilen, ein
+# Rahmen ueber der Seite. Das Werkzeug gab es seit dem 06.10.2026 — gelesen
+# hat seine Meldungen niemand. Darin stand ein Zierrahmen, der im
+# Quadratformat 639 pt hoch auf einer 540 pt hohen Seite lag.
+if node tests/expose-probe.js; then
+  :
+else
+  fehler=1
+fi
+
 abschnitt "Oberflaeche: Rauchtest"
 if python3 tests/oberflaeche-rauchtest.py; then
   :

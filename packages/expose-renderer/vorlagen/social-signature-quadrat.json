@@ -326,7 +326,7 @@
           "x": 18,
           "y": 18,
           "b": 504.0,
-          "h": 639.0,
+          "h": 504.0,
           "form": "rechteck",
           "strich": "a",
           "linienbreite": 0.7
@@ -508,7 +508,7 @@
           "x": 18,
           "y": 18,
           "b": 504.0,
-          "h": 639.0,
+          "h": 504.0,
           "form": "rechteck",
           "strich": "a",
           "linienbreite": 0.7

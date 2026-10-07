@@ -113,6 +113,52 @@ Dashboard unter Authentication → Policies und lässt sich von hier nicht
 umlegen. **Empfehlung: einschalten.** Er kostet nichts und verhindert, dass
 ein Makler sein überall benutztes Passwort auch hier benutzt.
 
+## Studios Wortmarke hält elf Zeichen — Entscheidung des Auftraggebers
+
+Die Handschrift **Studio** setzt auf Titel- und Kontaktseite eine Wortmarke
+in ein dunkles Feld, das der Prototyp bei 126 pt Breite festlegt
+(`rect(c, 0, H-M-54, M+90, 54)`); für den Text bleiben 90 pt bei 15 Punkt
+Archivo Bold. Nachgemessen mit den Schriftmetriken des Renderers:
+
+| Wortmarke | Breite bei 15 pt | ergibt |
+|---|---|---|
+| `Haus & Hof.` | 85 pt | passt |
+| `Stadtmakler.` | 92 pt | 14,7 pt |
+| `Immowelt Nord.` | 113 pt | 11,9 pt |
+| `Immobilien Schmidt.` | 146 pt | 9,2 pt |
+| `MUSTERHAUS PROJEKTE.` | 200 pt | **6,8 pt** |
+| `Hansen & Partner Immobilien.` | 213 pt | **6,3 pt** |
+
+Der Prototyp selbst setzt dort `musterhaus.` — eine kurze, kleingeschriebene
+Wortmarke, und genau dafür ist das Feld gemacht. `marken_name` ist auch nicht
+der Firmenname; der steht in `firma_name`. Zwei Ausweichwege gibt es schon:
+eine kurze Wortmarke, oder ein **breites Logo** — dann entfällt der Text ganz
+(`sichtbar_wenn`).
+
+Trotzdem wird ein Mandant „Hansen & Partner Immobilien" eintragen und eine
+Titelseite mit 6,3 Punkt Marke bekommen. Lesbar ist das, schön ist es nicht.
+
+**Zu entscheiden hat das der Auftraggeber, nicht der Code.**
+`tests/expose-vorlagen.js` hält die drei Vorlagen auf 2 Punkt am Prototyp,
+und diese Grenze kommt aus dem Auftrag. Vier Wege:
+
+1. **So lassen.** Lange Namen werden klein. Kostet nichts.
+2. **Feld breiter.** Das dunkle Feld von 126 auf etwa 190 pt, der Text auf
+   154 pt. Dann passen rund 19 Zeichen bei 15 pt. Das Feld verdeckt mehr vom
+   Titelbild — eine Abweichung vom Prototyp, die als solche in
+   `tests/expose-vorlagen.js` eingetragen würde (dort gibt es dafür „Mit
+   Grund abweichend").
+3. **Zwei Zeilen** im höheren Feld. Hält auch die langen Namen bei 12 pt,
+   verschiebt aber die Zusatzzeile um 17 pt — dieselbe Art Abweichung.
+4. **In der Oberfläche warnen,** wenn `marken_name` für Studio zu lang ist,
+   und bei der Eingabe auf das breite Logo verweisen. Keine Abweichung vom
+   Prototyp, aber auch keine Lösung für den, der es ignoriert.
+
+Bis zur Entscheidung steht die Grenze benannt in `tests/expose-probe.js`
+(`BEKANNTE_GRENZEN`), damit sie nicht wieder unsichtbar wird. Raster und
+Signature haben das Problem nicht: Raster setzt 10 pt in 150 pt, Signature
+15 pt in 523 pt.
+
 ## Umgebung
 
 | Punkt | Wirkung |

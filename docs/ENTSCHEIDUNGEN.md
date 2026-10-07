@@ -5567,3 +5567,53 @@ bleiben grün.
 Richtlinien. Sichten und Funktionsrechte — zwei ganze Zugriffswege — hat
 keines angesehen. Gefunden hat beides der Sicherheitsberater von Supabase.
 Er gehört von jetzt an in die Runde.
+
+---
+
+## 2026-10-07 · Der Renderer hat gewarnt, und niemand hat zugehört
+
+**Frage:** Sind die Exposés wirklich fertig? `npm run check` war grün, und
+alle vierzehn Exposé-Tests liefen durch.
+
+**Befund:** Grün heißt nicht fertig. `scripts/expose-probe.mjs` zeichnet seit
+dem 06.10.2026 jede Vorlage mit nachgebauten Objektdaten und **meldet**, was
+nicht gepasst hat — gekürzter Text, verkleinerte Zeilen, ein Rahmen über der
+Seite. Das Werkzeug lief, es schrieb seine Meldungen hin, und es endete immer
+mit `exit 0`. Keine Prüfung las sie.
+
+Darin stand:
+
+- **Der Zierrahmen der Handschrift Signature war im Quadratformat 639 pt hoch
+  auf einer 540 pt hohen Seite.** `quadrat()` in `scripts/social-vorlagen.py`
+  leitet das Quadrat aus dem Beitrag ab und staucht dabei Hintergrund und
+  Foto. Den Rahmen kannte es nicht — er lief auf jedem Quadrat-Beitrag unten
+  heraus, seit es das Format gibt. Behoben: `h = QUAD_H - 2*y`, und eine
+  Notbremse bricht ab, wenn nach dem Stauchen irgendein Element über die
+  Seite ragt.
+
+- **Die Wortmarke der Handschrift Studio schrumpft auf 6,8 Punkt.** Das ist
+  keine Panne, sondern eine Grenze des Prototyps — siehe `docs/OFFEN.md`.
+
+**Entscheidung:** `tests/expose-probe.js` liest die Meldungen der Probe und
+macht `npm run check` rot bei: gekürztem Text, einer Zeile unter 9 Punkt,
+einem Element über der Seite. Geprüft wird gegen zwei Datenlagen, dünn und
+voll gepflegt, weil sie verschiedene Fehler zeigen.
+
+Zwei Dinge sind ausgenommen, und beide stehen benannt statt hinter einem
+Schwellwert:
+- der Widerspruch im Energieausweis der Probedaten (Kennwert 46, Klasse C) —
+  er prüft die Querprobe des Renderers, und ein eigener Punkt im Test
+  verlangt, dass er **noch auftritt**;
+- die zwei Studio-Wortmarken in `BEKANNTE_GRENZEN`, ebenfalls mit einem
+  Punkt, der verlangt, dass sie noch auftreten. Ein Eintrag, der nichts mehr
+  abdeckt, deckt irgendwann etwas Neues.
+
+**Was das kostet:** Der Test zeichnet 26 PDFs und braucht gut eine Minute.
+
+**Was dabei auffiel, und zwar an mir:** Mein erster Griff war, die Studio-
+Wortmarke zweizeilig zu machen und den Zusatz nach unten zu schieben. Das
+hat `tests/expose-vorlagen.js` abgefangen — es hält die drei Vorlagen auf
+2 Punkt am Prototyp, und das kommt aus dem Auftrag. Die Änderung war um
+17,25 Punkt daneben und ist zurückgenommen. Der Test hat genau getan, wozu
+er da ist: er hat eine Gestaltungsentscheidung verhindert, die mir nicht
+zusteht.
