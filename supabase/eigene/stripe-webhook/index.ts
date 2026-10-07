@@ -87,6 +87,40 @@ async function signaturGueltig(roh: string, kopf: string, geheim: string): Promi
   return v1.some((k) => gleich(k, erwartet));
 }
 
+// ---------------------------------------------------------------------------
+// API-FASSUNG
+// ---------------------------------------------------------------------------
+// Der Webhook-Endpunkt bei Stripe ist auf 2025-12-15.clover festgelegt
+// (dieselbe Fassung senden abo-checkout und abo-verwalten). Seit der
+// Basil-Fassung liegen drei Dinge woanders als vorher:
+//   * die Periode eines Abos an den Positionen (items.data[].current_period_*)
+//   * der Preis einer Rechnungszeile unter pricing.price_details.price
+//   * das Abo einer Rechnung unter parent.subscription_details
+// Die Helfer unten lesen beide Formen. Ein Endpunkt, den jemand auf eine
+// ältere Fassung zurückstellt, bricht damit nicht still.
+const STRIPE_VERSION = "2025-12-15.clover";
+
+function periode(abo: any): { von: unknown; bis: unknown } {
+  const pos = abo?.items?.data?.[0] || {};
+  return {
+    von: abo?.current_period_start ?? pos.current_period_start,
+    bis: abo?.current_period_end ?? pos.current_period_end,
+  };
+}
+function zeilenPreis(z: any): string | null {
+  const p = z?.pricing?.price_details?.price ?? z?.price?.id ?? z?.price;
+  return typeof p === "string" ? p : (p?.id ?? null);
+}
+function rechnungsAbo(r: any): string | null {
+  const s = r?.parent?.subscription_details?.subscription ?? r?.subscription;
+  return typeof s === "string" ? s : (s?.id ?? null);
+}
+// Woher eine Rechnung kommt. Nur Abo-Rechnungen tragen Tarif-Credits;
+// eine Paket-Rechnung (billing_reason "manual") schreibt nur das Paket gut.
+function ausAbo(r: any): boolean {
+  return String(r?.billing_reason || "").startsWith("subscription") || !!rechnungsAbo(r);
+}
+
 function jetzt() { return new Date().toISOString(); }
 function ausStripeZeit(sek: unknown): string | null {
   const n = Number(sek);
@@ -102,7 +136,9 @@ async function wert(db: any, schluessel: string, vorgabe: number): Promise<numbe
 
 /** Welcher Mandant? Aus den Metadaten, sonst über die Stripe-Kundenkennung. */
 async function mandantFinden(db: any, obj: any): Promise<string | null> {
-  const ausMeta = obj?.metadata?.mandant_id || obj?.subscription_details?.metadata?.mandant_id;
+  const ausMeta = obj?.metadata?.mandant_id
+    || obj?.parent?.subscription_details?.metadata?.mandant_id
+    || obj?.subscription_details?.metadata?.mandant_id;
   if (typeof ausMeta === "string" && ausMeta) return ausMeta;
   const kunde = obj?.customer;
   if (typeof kunde === "string" && kunde) {
@@ -110,7 +146,7 @@ async function mandantFinden(db: any, obj: any): Promise<string | null> {
       .eq("stripe_customer_id", kunde).maybeSingle();
     if (data?.mandant_id) return data.mandant_id;
   }
-  const abo = obj?.subscription ?? obj?.id;
+  const abo = rechnungsAbo(obj) ?? obj?.id;
   if (typeof abo === "string" && abo.startsWith("sub_")) {
     const { data } = await db.from("mandant_abo").select("mandant_id")
       .eq("stripe_subscription_id", abo).maybeSingle();
@@ -137,6 +173,73 @@ function ausPositionen(abo: any, tarife: any[]): { tarif: string | null; interva
   return { tarif, intervall, zusatz };
 }
 
+/** Steuer einer Rechnung — neue Form (total_taxes) und alte (tax). */
+function steuer(r: any): number {
+  if (Array.isArray(r?.total_taxes)) {
+    return r.total_taxes.reduce((s: number, x: any) => s + Number(x?.amount ?? 0), 0);
+  }
+  return Number(r?.tax ?? 0);
+}
+
+/**
+ * Eine Rechnung in `stripe_rechnungen` schreiben. Abgelegt werden Beträge,
+ * Nummer, Status und die Stripe-Links — keine Positionen, keine Zahlungsdaten.
+ * Upsert über die Rechnungskennung: jedes spätere Ereignis derselben
+ * Rechnung überschreibt den Stand, nichts entsteht doppelt.
+ */
+async function rechnungSpiegeln(db: any, mandant: string, r: any) {
+  if (!r?.id || String(r.object) !== "invoice") return;
+  const brutto = Number(r.total ?? 0);
+  const st = steuer(r);
+  await db.from("stripe_rechnungen").upsert({
+    id: String(r.id),
+    mandant_id: mandant,
+    art: ausAbo(r) ? "abo" : "einmal",
+    nummer: r.number || null,
+    status: String(r.status || ""),
+    waehrung: String(r.currency || "eur"),
+    netto_cent: brutto - st,
+    steuer_cent: st,
+    brutto_cent: brutto,
+    bezahlt_cent: Number(r.amount_paid ?? 0),
+    offen_cent: Number(r.amount_remaining ?? 0),
+    reverse_charge: JSON.stringify(r?.total_taxes ?? []).includes("reverse_charge"),
+    stripe_abo_id: rechnungsAbo(r),
+    stripe_kunde_id: typeof r.customer === "string" ? r.customer : null,
+    rechnung_url: r.hosted_invoice_url || null,
+    pdf_url: r.invoice_pdf || null,
+    erstellt_am: ausStripeZeit(r.created),
+    bezahlt_am: ausStripeZeit(r?.status_transitions?.paid_at),
+    geaendert_am: jetzt(),
+  }, { onConflict: "mandant_id,id" });
+}
+
+/** Gutschrift (Erstattung über Stripe) — als negative Zeile neben der Rechnung. */
+async function gutschriftSpiegeln(db: any, mandant: string, g: any) {
+  if (!g?.id) return;
+  const brutto = Number(g.total ?? 0);
+  const st = steuer(g);
+  await db.from("stripe_rechnungen").upsert({
+    id: String(g.id),
+    mandant_id: mandant,
+    art: "gutschrift",
+    nummer: g.number || null,
+    status: String(g.status || ""),
+    waehrung: String(g.currency || "eur"),
+    netto_cent: -(brutto - st),
+    steuer_cent: -st,
+    brutto_cent: -brutto,
+    bezahlt_cent: 0,
+    offen_cent: 0,
+    reverse_charge: false,
+    bezug_rechnung_id: typeof g.invoice === "string" ? g.invoice : null,
+    stripe_kunde_id: typeof g.customer === "string" ? g.customer : null,
+    pdf_url: g.pdf || null,
+    erstellt_am: ausStripeZeit(g.created),
+    geaendert_am: jetzt(),
+  }, { onConflict: "mandant_id,id" });
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
@@ -158,6 +261,11 @@ Deno.serve(async (req) => {
 
   let ereignis: any;
   try { ereignis = JSON.parse(roh); } catch { return antwort({ ok: false }, 400); }
+  if (ereignis?.api_version && ereignis.api_version !== STRIPE_VERSION) {
+    // Kein Abbruch — die Helfer lesen beide Formen. Aber sichtbar machen:
+    // der Endpunkt sollte auf dieselbe Fassung gestellt sein.
+    console.warn(`stripe-webhook: Ereignis in Fassung ${ereignis.api_version}, erwartet ${STRIPE_VERSION}`);
+  }
   if (ereignis?.livemode === true) {
     return antwort({ ok: false, fehler: "Live-Ereignis im Testbetrieb abgewiesen." }, 400);
   }
@@ -211,10 +319,15 @@ Deno.serve(async (req) => {
     switch (typ) {
       // --- Der Abschluss --------------------------------------------------
       case "checkout.session.completed": {
-        await setze({
-          stripe_customer_id: typeof obj.customer === "string" ? obj.customer : null,
-          stripe_subscription_id: typeof obj.subscription === "string" ? obj.subscription : null,
-        });
+        // Nur die Kennungen — der Status kommt mit dem Abo-Ereignis. Bei
+        // einem Paketkauf (mode "payment") gibt es kein Abo; dann darf die
+        // Kennung eines laufenden Abos NICHT mit null überschrieben werden.
+        const felder: Record<string, unknown> = {};
+        if (typeof obj.customer === "string") felder.stripe_customer_id = obj.customer;
+        if (obj.mode === "subscription" && typeof obj.subscription === "string") {
+          felder.stripe_subscription_id = obj.subscription;
+        }
+        if (Object.keys(felder).length) await setze(felder);
         break;
       }
 
@@ -222,8 +335,9 @@ Deno.serve(async (req) => {
       case "customer.subscription.created":
       case "customer.subscription.updated": {
         const { tarif, intervall, zusatz } = ausPositionen(obj, tarife || []);
-        const von = ausStripeZeit(obj.current_period_start);
-        const bis = ausStripeZeit(obj.current_period_end);
+        const p = periode(obj);
+        const von = ausStripeZeit(p.von);
+        const bis = ausStripeZeit(p.bis);
 
         const { data: vorher } = await db.from("mandant_abo")
           .select("mindestlaufzeit_bis, status, gruenderpreis").eq("mandant_id", mandant).maybeSingle();
@@ -284,34 +398,12 @@ Deno.serve(async (req) => {
 
       // --- Bezahlt: Credits zuteilen ---------------------------------------
       case "invoice.paid": {
-        await setze({ status: "aktiv", zahlung_fehler_seit: null });
-        await db.from("mandanten").update({ abo_status: "aktiv" }).eq("id", mandant);
+        await rechnungSpiegeln(db, mandant, obj);
 
-        // Die Tarif-Credits der neuen Periode. Die Referenz enthält die
-        // Rechnungskennung — dieselbe Rechnung schreibt nie zweimal gut,
-        // auch wenn das Ereignis doppelt kommt.
-        const von = ausStripeZeit(obj.period_start) || jetzt();
-        const bis = ausStripeZeit(obj.period_end);
-        const { data: abo } = await db.from("mandant_abo")
-          .select("tarif, intervall").eq("mandant_id", mandant).maybeSingle();
-        const t = (tarife || []).find((x: any) => x.schluessel === abo?.tarif);
-        if (t?.credits_monat > 0) {
-          // Beim Jahresabo gilt die Zuteilung einen Monat, nicht ein Jahr:
-          // „Bei Jahresabo monatliche Zuteilung". Den Rest holt der
-          // monatliche Lauf.
-          const gueltigBis = abo?.intervall === "jahr"
-            ? new Date(new Date(von).getTime() + 31 * 86400000).toISOString()
-            : bis;
-          await db.rpc("credits_gutschreiben", {
-            p_mandant: mandant, p_quelle: "tarif", p_credits: t.credits_monat,
-            p_gueltig_bis: gueltigBis,
-            p_referenz: "rechnung:" + String(obj.id),
-          });
-        }
-
-        // Gekaufte Credit-Pakete: je Position einmal.
+        // Gekaufte Credit-Pakete: je Position einmal. Die Referenz trägt
+        // Rechnung und Zeile — dieselbe Zeile schreibt nie zweimal gut.
         for (const z of obj?.lines?.data || []) {
-          const preisId = z?.price?.id;
+          const preisId = zeilenPreis(z);
           if (!preisId) continue;
           const { data: paket } = await db.from("plattform_credit_pakete")
             .select("*").eq("stripe_price_id", preisId).maybeSingle();
@@ -327,8 +419,45 @@ Deno.serve(async (req) => {
           });
         }
 
-        // Der Gründerplatz wird bei der ERSTEN bezahlten Rechnung vergeben.
-        if (abo?.tarif === String((await db.from("plattform_werte").select("wert")
+        // Alles Weitere gilt nur für Abo-Rechnungen. Eine Paket-Rechnung
+        // darf weder den Abo-Status anfassen noch Tarif-Credits auslösen —
+        // sonst brächte jeder Paketkauf ein Monatskontingent obendrauf.
+        if (!ausAbo(obj)) break;
+
+        await setze({ status: "aktiv", zahlung_fehler_seit: null });
+        await db.from("mandanten").update({ abo_status: "aktiv" }).eq("id", mandant);
+
+        // Tarif-Credits gibt es für den Beginn einer Periode: Abschluss und
+        // Verlängerung. Eine Nachberechnung beim Wechsel nach oben
+        // (subscription_update) bringt KEIN zweites Monatskontingent; das
+        // grössere kommt mit der nächsten Periode.
+        const grund = String(obj.billing_reason || "");
+        const periodeBeginnt = grund === "subscription_create" || grund === "subscription_cycle";
+
+        const von = ausStripeZeit(obj.period_start) || jetzt();
+        const bis = ausStripeZeit(obj.period_end);
+        const { data: abo } = await db.from("mandant_abo")
+          .select("tarif, intervall").eq("mandant_id", mandant).maybeSingle();
+        const t = (tarife || []).find((x: any) => x.schluessel === abo?.tarif);
+        if (periodeBeginnt && t?.credits_monat > 0) {
+          // Beim Jahresabo gilt die Zuteilung einen Monat, nicht ein Jahr:
+          // „Bei Jahresabo monatliche Zuteilung". Den Rest holt der
+          // monatliche Lauf.
+          const gueltigBis = abo?.intervall === "jahr"
+            ? new Date(new Date(von).getTime() + 31 * 86400000).toISOString()
+            : bis;
+          await db.rpc("credits_gutschreiben", {
+            p_mandant: mandant, p_quelle: "tarif", p_credits: t.credits_monat,
+            p_gueltig_bis: gueltigBis,
+            p_referenz: "rechnung:" + String(obj.id),
+          });
+        }
+
+        // Der Gründerplatz wird bei der ERSTEN bezahlten Abo-Rechnung
+        // vergeben. (Den Rabatt selbst hat die Kasse nur angehängt, solange
+        // Plätze frei waren; die Funktion vergibt höchstens einen je Mandant.)
+        const mitGruender = grund === "subscription_create";
+        if (mitGruender && abo?.tarif === String((await db.from("plattform_werte").select("wert")
               .eq("schluessel", "gruender_tarif").maybeSingle()).data?.wert ?? "starter")
               .replace(/"/g, "")) {
           await db.rpc("gruender_platz_vergeben", { p_mandant: mandant });
@@ -336,8 +465,24 @@ Deno.serve(async (req) => {
         break;
       }
 
+      // --- Rechnungen spiegeln (Grundlage für Betreiber-Ansicht, Export) ----
+      case "invoice.finalized":
+      case "invoice.voided":
+      case "invoice.marked_uncollectible": {
+        await rechnungSpiegeln(db, mandant, obj);
+        break;
+      }
+
+      case "credit_note.created": {
+        await gutschriftSpiegeln(db, mandant, obj);
+        break;
+      }
+
       // --- Zahlung gescheitert ---------------------------------------------
       case "invoice.payment_failed": {
+        await rechnungSpiegeln(db, mandant, obj);
+        // Ein gescheiterter Paketkauf ist kein Zahlungsverzug im Abo.
+        if (!ausAbo(obj)) break;
         const { data: abo } = await db.from("mandant_abo")
           .select("zahlung_fehler_seit").eq("mandant_id", mandant).maybeSingle();
         const frist = await wert(db, "zahlung_frist_tage", 14);

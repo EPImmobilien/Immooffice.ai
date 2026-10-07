@@ -48,11 +48,25 @@ if (!SCHLUESSEL.startsWith("sk_test_")) {
 if (!SUPABASE_URL || !DIENST) abbruch("SUPABASE_URL und SUPABASE_SERVICE_ROLE_KEY fehlen.");
 
 // --- Stripe ------------------------------------------------------------------
+// Dieselbe feste API-Fassung wie in den Edge Functions und am Webhook-Endpunkt.
+const STRIPE_VERSION = "2025-12-15.clover";
+// Steuerkategorie für Stripe Tax: „Software as a service (SaaS) – business use".
+const STEUERKATEGORIE = "txcd_10103001";
+// Diese Ereignisse braucht der Webhook (docs/BILLING.md, Abschnitt 4).
+const EREIGNISSE = [
+  "checkout.session.completed",
+  "customer.subscription.created", "customer.subscription.updated", "customer.subscription.deleted",
+  "invoice.finalized", "invoice.paid", "invoice.payment_failed",
+  "invoice.voided", "invoice.marked_uncollectible",
+  "credit_note.created",
+];
+
 async function stripe(pfad, felder, methode = "POST") {
   const r = await fetch("https://api.stripe.com/v1/" + pfad, {
     method: methode,
     headers: {
       Authorization: "Bearer " + SCHLUESSEL,
+      "Stripe-Version": STRIPE_VERSION,
       ...(felder ? { "Content-Type": "application/x-www-form-urlencoded" } : {}),
     },
     body: felder ? new URLSearchParams(felder).toString() : undefined,
@@ -84,15 +98,15 @@ async function produkt(schluessel, name) {
     undefined, "GET");
   if (suche.data?.length) {
     const p = suche.data[0];
-    if (p.name !== name && !TROCKEN) {
-      await stripe("products/" + p.id, { name });
-      console.log(`  Produkt umbenannt: ${schluessel} → "${name}"`);
+    if ((p.name !== name || p.tax_code !== STEUERKATEGORIE) && !TROCKEN) {
+      await stripe("products/" + p.id, { name, tax_code: STEUERKATEGORIE });
+      console.log(`  Produkt nachgezogen: ${schluessel} → "${name}"`);
     }
     return p;
   }
   if (TROCKEN) { console.log(`  [trocken] Produkt anlegen: ${schluessel}`); return { id: "prod_trocken" }; }
   const neu = await stripe("products", {
-    name, "metadata[immo_schluessel]": schluessel,
+    name, "metadata[immo_schluessel]": schluessel, tax_code: STEUERKATEGORIE,
   });
   console.log(`  Produkt angelegt: ${schluessel}`);
   return neu;
@@ -136,6 +150,9 @@ async function preis(produktId, cent, intervall, schluessel) {
     tax_behavior: "exclusive",
     ...(intervall ? { "recurring[interval]": intervall } : {}),
     "metadata[immo_schluessel]": schluessel,
+    // Der lookup_key wandert mit: der neue Preis übernimmt ihn vom alten.
+    lookup_key: "immo:" + schluessel,
+    transfer_lookup_key: "true",
   });
   console.log(`  Preis angelegt: ${schluessel} ${(cent / 100).toFixed(2)} €`
     + (intervall ? ` / ${intervall}` : " einmalig"));
@@ -195,7 +212,10 @@ async function main() {
       console.log(`  [trocken] Coupon anlegen: ${(rabatt / 100).toFixed(2)} € dauerhaft, `
         + `${plaetze}×, nur ${gruenderTarif}`);
     } else {
-      const tarif = tarife.find((t) => t.schluessel === gruenderTarif);
+      // Frisch lesen: beim ersten Lauf stand die Produktkennung oben noch
+      // nicht in der Datenbank — ohne sie gälte der Coupon für ALLES.
+      const [tarif] = await db("plattform_tarife", `?schluessel=eq.${gruenderTarif}`);
+      if (!tarif?.stripe_product_id) abbruch("Gründertarif ohne Stripe-Produkt — Coupon nicht angelegt.");
       coupon = await stripe("coupons", {
         id: name,
         amount_off: String(rabatt),
@@ -212,6 +232,37 @@ async function main() {
     }
   }
 
+  // --- Kundenportal ----------------------------------------------------------
+  // Nur Zahlungsmittel, Rechnungsdaten und Rechnungen. Kündigung und
+  // Tarifwechsel sind AUS — beides läuft über abo-verwalten, weil Stripe die
+  // Mindestlaufzeit nicht kennt.
+  console.log(`\nKundenportal`);
+  const portalFelder = {
+    "business_profile[headline]": "immoOffice.ai — Zahlungsmittel und Rechnungen",
+    "features[payment_method_update][enabled]": "true",
+    "features[invoice_history][enabled]": "true",
+    "features[customer_update][enabled]": "true",
+    "features[customer_update][allowed_updates][0]": "name",
+    "features[customer_update][allowed_updates][1]": "email",
+    "features[customer_update][allowed_updates][2]": "address",
+    "features[customer_update][allowed_updates][3]": "tax_id",
+    "features[subscription_cancel][enabled]": "false",
+    "features[subscription_update][enabled]": "false",
+    "metadata[immo_schluessel]": "portal",
+  };
+  const vorhandenePortale = await stripe("billing_portal/configurations?active=true&limit=100", undefined, "GET");
+  let portal = (vorhandenePortale.data || []).find((k) => k.metadata?.immo_schluessel === "portal");
+  if (TROCKEN) {
+    console.log(`  [trocken] Portal-Konfiguration ${portal ? "nachziehen" : "anlegen"}`);
+  } else {
+    portal = portal
+      ? await stripe("billing_portal/configurations/" + portal.id, portalFelder)
+      : await stripe("billing_portal/configurations", portalFelder);
+    await db("plattform_werte", "?schluessel=eq.stripe_portal_konfiguration", "PATCH",
+      { wert: portal.id, geaendert_am: new Date().toISOString() });
+    console.log(`  Portal-Konfiguration: ${portal.id} (ohne Kündigung, ohne Tarifwechsel)`);
+  }
+
   console.log("\n" + "=".repeat(40));
   console.log("Fertig. Noch zu setzen (Supabase → Edge Functions → Secrets):");
   console.log("  STRIPE_SECRET_KEY        sk_test_…");
@@ -219,9 +270,8 @@ async function main() {
   console.log("  STRIPE_COUPON_GRUENDER   " + name);
   console.log("\nWebhook-Endpunkt bei Stripe anlegen auf:");
   console.log("  " + SUPABASE_URL + "/functions/v1/stripe-webhook");
-  console.log("  Ereignisse: checkout.session.completed,");
-  console.log("              customer.subscription.created/updated/deleted,");
-  console.log("              invoice.paid, invoice.payment_failed");
+  console.log("  API-Fassung: " + STRIPE_VERSION);
+  console.log("  Ereignisse:  " + EREIGNISSE.join(",\n               "));
 }
 
 main().catch((f) => abbruch(f.message));
