@@ -56,6 +56,26 @@ async function stripe(pfad: string, felder?: Record<string, string>, methode = "
   return d;
 }
 
+/**
+ * Die Rücksprungadresse für Stripe. Ein Secret ist schnell falsch getippt —
+ * ohne https://, mit Leerzeichen, in Anführungszeichen, mit Schrägstrich am
+ * Ende. Stripe antwortet darauf nur „Not a valid URL", und der Kunde sieht
+ * „Edge Function returned a non-2xx status code". Hier wird geglättet, was
+ * eindeutig ist, und mit Klartext abgebrochen, was es nicht ist.
+ */
+function portalAdresse(): string {
+  let a = String(Deno.env.get("PORTAL_URL") || "").trim().replace(/^["']+|["']+$/g, "").trim();
+  if (!a) immoFehlt("PORTAL_URL");
+  if (!/^https?:\/\//i.test(a)) a = "https://" + a;
+  try {
+    const u = new URL(a);
+    if (!u.hostname.includes(".") && u.hostname !== "localhost") throw new Error("ohne Domain");
+    return (u.origin + u.pathname).replace(/\/+$/, "");
+  } catch {
+    throw new Error(`PORTAL_URL ist keine gültige Adresse („${a}"). Erwartet z. B. https://app.example.de`);
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   try {
@@ -139,7 +159,7 @@ Deno.serve(async (req) => {
     if (!istChef) return antwort({ ok: false, fehler: "Nur die Chef-Rolle." }, 403);
     if (!abo) return antwort({ ok: false, fehler: "Kein Abo." }, 404);
 
-    const zurueck = (Deno.env.get("PORTAL_URL") || immoFehlt("PORTAL_URL")).replace(/\/$/, "");
+    const zurueck = portalAdresse();
 
     // --- Kundenportal ------------------------------------------------------
     if (aktion === "portal") {
