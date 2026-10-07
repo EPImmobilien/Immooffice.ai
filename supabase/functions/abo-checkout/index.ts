@@ -237,8 +237,11 @@ Deno.serve(async (req) => {
       // API-Fassung ohnehin Vorgabe — hier ausdrücklich, damit ein späterer
       // Fassungswechsel daran nichts ändert.
       "subscription_data[billing_mode][type]": "flexible",
-      __idem: "abo:v2:" + mandant + ":" + tarifSchluessel + ":" + intervall + ":" + zusatz
-        + ":" + new Date().toISOString().slice(0, 10),
+      // KEIN Idempotenzschlüssel an der Kasse. Eine zweite Sitzung kostet
+      // nichts — abgerechnet wird erst, wenn der Kunde zahlt. Ein Schlüssel
+      // je Tag sperrte dagegen am 07.10.2026 den Starter-Tarif: der erste
+      // (gescheiterte) Versuch hatte andere Parameter, und Stripe weist
+      // denselben Schlüssel mit neuen Parametern 24 Stunden lang ab.
     };
 
     if (zusatz > 0) {
