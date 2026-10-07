@@ -4200,6 +4200,55 @@ NACHBESSERN = [
      '        // Drei Anbieter, ein Abruf. "imap" meldet sich mit Passwort an,\n        // "microsoft" und "google" mit einem Token, das hier bei Bedarf\n        // erneuert wird. Scheitert das, bleibt der Grund am Postfach\n        // stehen (oauth_fehler) — die Oberflaeche bietet dann "Verbindung\n        // erneuern" an, statt den Nutzer raten zu lassen.\n        const perOauth = pf.anbieter && pf.anbieter !== "imap";\n        if (!pf.imap_server || (!perOauth && !pf.imap_passwort_verschluesselt)) {\n          log.fehler_text = "imap_server oder Passwort fehlt";\n          ergebnisse.push(log);\n          continue;\n        }\n\n        let passwort = "";\n        let xoauthZeile: string | null = null;\n        if (perOauth) {\n          try {\n            const t = await zugriffstoken(pf);\n            if (t.neu) await admin.from("mail_postfaecher").update(t.neu).eq("id", pf.id);\n            xoauthZeile = xoauth2(t.adresse, t.token);\n          } catch (e) {\n            const grund = e instanceof Error ? e.message : String(e);\n            await admin.from("mail_postfaecher")\n              .update({ oauth_fehler: grund.slice(0, 500) }).eq("id", pf.id);\n            log.fehler_text = grund;\n            ergebnisse.push(log);\n            continue;\n          }\n        } else {\n          passwort = await entschluessele(pf.imap_passwort_verschluesselt);\n        }',
      'Postfach-Anbieter: Zugangsdaten je Anbieter, Token wird erneuert.',
      {'mail-postfach-pull'}),
+    # =====================================================================
+    # FORK — ein Abruf ohne Ordner ist kein Erfolg
+    #
+    # BEFUND vom 07.10.2026: Ein neu angebundenes Strato-Postfach wurde
+    # abgerufen, bekam den Zeitstempel imap_letzter_pull — und hatte danach
+    # null Ordner und null Mails. Die Anmeldung war geglueckt (sonst haette
+    # cmd() geworfen), aber die Antwort auf LIST ergab keinen einzigen
+    # verwertbaren Ordner. Der Zweig, der das behandelt, setzte nur den
+    # Zeitstempel und schwieg.
+    #
+    # Das ist dieselbe Sorte Fehler wie die unsichtbaren Zeilen ohne
+    # Mandanten: etwas meldet Erfolg und tut nichts. Jetzt steht der Grund
+    # am Postfach — mitsamt der ROHEN Antwort des Servers, denn ohne die
+    # bleibt es beim Raten.
+    # =====================================================================
+    ('FORK',
+     '              private pass: string, private xoauth: string | null = null) {}',
+     '              private pass: string, private xoauth: string | null = null) {}\n'
+     '  /** Die letzte Antwort auf LIST, unveraendert. Nur fuer die Diagnose. */\n'
+     '  letzteListe = "";',
+     'Postfach-Diagnose: die rohe LIST-Antwort wird aufgehoben.',
+     {'mail-postfach-pull'}),
+    ('FORK',
+     '    const resp = await this.cmd(`LIST "" "*"`, 15000);',
+     '    const resp = await this.cmd(`LIST "" "*"`, 15000);\n'
+     '    this.letzteListe = resp;',
+     'Postfach-Diagnose: die rohe LIST-Antwort wird gemerkt.',
+     {'mail-postfach-pull'}),
+    ('FORK',
+     '        if (ordnerZumPullen.length === 0) {\n'
+     '          await admin.from("mail_postfaecher").update({ imap_letzter_pull: new Date().toISOString() }).eq("id", pf.id);',
+     '        if (ordnerZumPullen.length === 0) {\n'
+     '          // Ein Abruf ohne einen einzigen Ordner ist KEIN Erfolg. Bis zum\n'
+     '          // 07.10.2026 wurde hier nur der Zeitstempel gesetzt: das\n'
+     '          // Postfach blieb leer, die Oberflaeche zeigte nichts, und\n'
+     '          // niemand erfuhr, woran es lag. Jetzt steht der Grund dort, wo\n'
+     '          // auch das Ergebnis des Verbindungstests steht.\n'
+     '          if (imapFolders.length === 0) {\n'
+     '            await admin.from("mail_postfaecher").update({\n'
+     '              letzter_test_ok: false,\n'
+     '              letzter_test_am: new Date().toISOString(),\n'
+     '              letzter_test_fehler:\n'
+     '                "Der Server hat auf LIST keinen Ordner genannt. Rohantwort: "\n'
+     '                + String(imap!.letzteListe || "").slice(0, 400),\n'
+     '            }).eq("id", pf.id);\n'
+     '          }\n'
+     '          await admin.from("mail_postfaecher").update({ imap_letzter_pull: new Date().toISOString() }).eq("id", pf.id);',
+     'Postfach-Diagnose: kein Ordner gefunden heisst kein Erfolg.',
+     {'mail-postfach-pull'}),
     ('FORK',
      '          imap = new SimpleImap(pf.imap_server, Number(pf.imap_port || 993), pf.imap_user || pf.email_adresse, passwort);',
      '          imap = new SimpleImap(pf.imap_server, Number(pf.imap_port || 993),\n                                pf.imap_user || pf.email_adresse, passwort, xoauthZeile);',

@@ -237,6 +237,8 @@ class SimpleImap {
   // nur noch mit App-Passwort — der Abruf selbst bleibt derselbe.
   constructor(private host: string, private port: number, private user: string,
               private pass: string, private xoauth: string | null = null) {}
+  /** Die letzte Antwort auf LIST, unveraendert. Nur fuer die Diagnose. */
+  letzteListe = "";
 
   private nextTag(): string {
     this.tagCounter++;
@@ -321,6 +323,7 @@ class SimpleImap {
 
   async listFolders(): Promise<Array<{ name: string; flags: string[]; delimiter: string }>> {
     const resp = await this.cmd(`LIST "" "*"`, 15000);
+    this.letzteListe = resp;
     const result: Array<{ name: string; flags: string[]; delimiter: string }> = [];
     for (const line of resp.split("\n")) {
       const m = line.match(/^\* LIST \(([^)]*)\) "?([^"]*)"? "?([^"]*)"?$/i);
@@ -652,6 +655,20 @@ Deno.serve(async (req) => {
         log.eigene_ordner_geprueft = eigeneOrdner.length;
 
         if (ordnerZumPullen.length === 0) {
+          // Ein Abruf ohne einen einzigen Ordner ist KEIN Erfolg. Bis zum
+          // 07.10.2026 wurde hier nur der Zeitstempel gesetzt: das
+          // Postfach blieb leer, die Oberflaeche zeigte nichts, und
+          // niemand erfuhr, woran es lag. Jetzt steht der Grund dort, wo
+          // auch das Ergebnis des Verbindungstests steht.
+          if (imapFolders.length === 0) {
+            await admin.from("mail_postfaecher").update({
+              letzter_test_ok: false,
+              letzter_test_am: new Date().toISOString(),
+              letzter_test_fehler:
+                "Der Server hat auf LIST keinen Ordner genannt. Rohantwort: "
+                + String(imap!.letzteListe || "").slice(0, 400),
+            }).eq("id", pf.id);
+          }
           await admin.from("mail_postfaecher").update({ imap_letzter_pull: new Date().toISOString() }).eq("id", pf.id);
           await imap?.logout();
           imap = null;

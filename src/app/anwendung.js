@@ -41860,7 +41860,38 @@ function AdminGmbHStammdaten({
         alert("Logo konnte nicht hochgeladen werden: " + (f.message || f));
       }
     }
-  })))), React.createElement("div", null, React.createElement("label", {
+  })),
+  // Entfernen, nicht nur Ersetzen. Bis zum 07.10.2026 gab es nur
+  // "Hochladen"/"Ersetzen" — wer ein Logo wieder loswerden wollte,
+  // konnte es nicht. Zurueck bleibt dann die Wortmarke aus dem
+  // Markennamen, so wie bei einem Mandanten, der nie eines hatte.
+  //
+  // Anders als das Hochladen wirkt das SOFORT und wartet nicht auf
+  // "Speichern": erst das Feld in der Datenbank, dann die Datei. Ein
+  // halber Loeschvorgang — Feld leer, Datei noch da, oder umgekehrt —
+  // waere schlimmer als beides. Und andersherum (erst Datei, dann
+  // Feld) bliebe bei einem Fehler ein Verweis auf eine Datei, die es
+  // nicht mehr gibt.
+  e.logo_pfad ? React.createElement("button", {
+    type: "button",
+    title: "Logo entfernen",
+    onClick: async () => {
+      if (!window.confirm("Logo entfernen? Danach steht wieder der Markenname — im Kopf, in Exposés und in den Dokumenten. Die Datei wird dabei geloescht.")) return;
+      const alt = e.logo_pfad;
+      try {
+        const { error: dErr } = await window._sb.from("firma_stammdaten")
+          .update({ logo_pfad: null }).eq("id", e.id);
+        if (dErr) throw dErr;
+        c(e.id, "logo_pfad", null);
+        await window._sb.storage.from("branding-assets").remove([alt]);
+        await logAction("delete", "logo", e.id, e.firma_name || "", { pfad: alt });
+      } catch (f) {
+        alert("Logo konnte nicht entfernt werden: " + (f.message || f));
+      }
+    },
+    style: { ...secondaryBtn, padding: "7px 12px", fontSize: 12, cursor: "pointer",
+             whiteSpace: "nowrap", color: CI.danger, borderColor: CI.border }
+  }, "Entfernen") : null)), React.createElement("div", null, React.createElement("label", {
     style: u
   }, "Web"), React.createElement("input", {
     style: d,
