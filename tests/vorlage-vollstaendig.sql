@@ -388,7 +388,20 @@ zuwachs(bereich, mehr, grund) as (values
   -- Grund, warum ein frisch angelegtes Postfach am 07.10.2026 unsichtbar
   -- blieb. Keine neue Funktion: es ist derselbe mandant_aus_eltern() aus
   -- fork_22, nur an dreissig weiteren Tabellen.
-  ('Trigger', 30, 'fork_67: mandant_aus_eltern an dreissig Tabellen mit Besitzerfeld')
+  ('Trigger', 30, 'fork_67: mandant_aus_eltern an dreissig Tabellen mit Besitzerfeld'),
+
+  -- fork_68: Betreiberrollen, Audit-Log, Zwei-Faktor-Pflicht (Schritt 1 des
+  -- Betreiber-Auftrags). Keine neue Tabelle: plattform_admins und
+  -- plattform_protokoll werden erweitert, plattform_audit_log ist eine Sicht.
+  ('Spalten', 24, 'fork_68: rolle, aktiv, erstellt_von an plattform_admins; rolle, ziel_typ, '
+     'ziel_id, vorher, nachher, begruendung, ip, user_agent an plattform_protokoll; '
+     'dazu die 13 Spalten der Sicht plattform_audit_log — information_schema.columns '
+     'zaehlt Sichten mit'),
+  ('Fremdschluessel', 1, 'fork_68: plattform_admins.erstellt_von auf profiles'),
+  ('Pruefbedingungen', 1, 'fork_68: rolle ist owner, admin, support oder finanzen'),
+  ('Funktionen', 2, 'fork_68: plattform_rolle, plattform_admins_letzter_owner'),
+  ('Trigger', 1, 'fork_68: der letzte aktive Owner bleibt'),
+  ('Sichten', 1, 'fork_68: plattform_audit_log — der Name aus dem Auftrag, auf plattform_protokoll')
 ),
 soll(bereich, soll) as (
   select v.bereich,

@@ -732,6 +732,137 @@
   }
 
   // --- Das Ganze -------------------------------------------------------------
+  // --- Admins & Rollen (fork_68) --------------------------------------------
+  // Nur owner aendert etwas; alle anderen sehen die Liste. Deaktiviert statt
+  // geloescht, damit das Audit-Log weiter sagt, wer es war.
+  var ROLLEN_TEXT = {
+    owner: "alles, auch Admins, Preise, endgültige Löschungen",
+    admin: "alles außer Admins verwalten und endgültig löschen",
+    support: "Mandanten ansehen, Test verlängern, Credits bis 500, Supportzugriff",
+    finanzen: "Umsatz, Rechnungen, Zahlungen; keine Eingriffe",
+  };
+  function Admins(p) {
+    var liste = p.daten || [];
+    var fZ = React.useState({ benutzer_id: "", rolle: "support", grund: "" }), form = fZ[0], setzeForm = fZ[1];
+    var darf = p.rolle === "owner";
+    React.useEffect(function () { if (darf && !p.konten) p.neuLaden(); }, []);
+
+    async function setzen(id, an, rolle, grund) {
+      try { await ruf("admin_setzen", { benutzer_id: id, an: an, rolle: rolle, grund: grund });
+        p.melden(an ? "Gespeichert." : "Deaktiviert."); p.neuLaden(); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+
+    return E("div", null,
+      E(Ueberschrift, { text: "Plattform-Administratoren" }),
+      E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+        E("table", { style: { width: "100%", borderCollapse: "collapse" } },
+          E("thead", null, E("tr", null, ["Konto", "Rolle", "Status", "Seit", "Notiz", ""].map(function (k) {
+            return E("th", { key: k, style: kopfzelle }, k); }))),
+          E("tbody", null, liste.map(function (a) {
+            return E("tr", { key: a.benutzer_id },
+              E("td", { style: zelle }, E("div", null, a.name || "—"),
+                E("div", { style: { fontSize: 11, color: CI.muted } }, a.email || a.benutzer_id)),
+              E("td", { style: zelle }, darf && a.aktiv
+                ? E("select", { style: feld, value: a.rolle, onChange: function (ev) {
+                    var g = window.prompt("Grund für die Rollenänderung:"); if (!g) return;
+                    setzen(a.benutzer_id, true, ev.target.value, g); } },
+                    ["owner", "admin", "support", "finanzen"].map(function (r) {
+                      return E("option", { key: r, value: r }, r); }))
+                : E("span", null, a.rolle),
+                E("div", { style: { fontSize: 11, color: CI.muted } }, ROLLEN_TEXT[a.rolle] || "")),
+              E("td", { style: zelle }, a.aktiv ? "aktiv" : E("span", { style: { color: CI.muted } }, "deaktiviert")),
+              E("td", { style: zelle }, datum(a.erstellt_am)),
+              E("td", { style: Object.assign({}, zelle, { fontSize: 12, color: CI.muted }) }, a.notiz || ""),
+              E("td", { style: zelle }, darf && a.aktiv
+                ? E("button", { type: "button", style: knopfLeer, onClick: function () {
+                    var g = window.prompt("Grund für die Deaktivierung:"); if (!g) return;
+                    setzen(a.benutzer_id, false, a.rolle, g); } }, "Deaktivieren")
+                : (darf && !a.aktiv ? E("button", { type: "button", style: knopfLeer, onClick: function () {
+                    var g = window.prompt("Grund für die Reaktivierung:"); if (!g) return;
+                    setzen(a.benutzer_id, true, a.rolle, g); } }, "Reaktivieren") : null)));
+          })))),
+      darf ? E("div", { style: kasten },
+        E("div", { style: { fontWeight: 600, fontSize: 14, marginBottom: 10, color: CI.blau } }, "Betreiber ernennen"),
+        E("div", { style: { display: "grid", gridTemplateColumns: "2fr 1fr 2fr auto", gap: 8, alignItems: "end" } },
+          E("div", null, E("label", { style: { fontSize: 11, color: CI.muted } }, "Konto"),
+            E("select", { style: feld, value: form.benutzer_id, onChange: function (ev) {
+              setzeForm(Object.assign({}, form, { benutzer_id: ev.target.value })); } },
+              [E("option", { key: "", value: "" }, "— wählen —")].concat((p.konten || []).map(function (k) {
+                return E("option", { key: k.id, value: k.id }, (k.name || "") + " <" + (k.email || "") + ">"); })))),
+          E("div", null, E("label", { style: { fontSize: 11, color: CI.muted } }, "Rolle"),
+            E("select", { style: feld, value: form.rolle, onChange: function (ev) {
+              setzeForm(Object.assign({}, form, { rolle: ev.target.value })); } },
+              ["owner", "admin", "support", "finanzen"].map(function (r) { return E("option", { key: r, value: r }, r); }))),
+          E("div", null, E("label", { style: { fontSize: 11, color: CI.muted } }, "Grund"),
+            E("input", { style: feld, value: form.grund, onChange: function (ev) {
+              setzeForm(Object.assign({}, form, { grund: ev.target.value })); } })),
+          E("button", { type: "button", style: knopf, disabled: !form.benutzer_id || form.grund.length < 5,
+            onClick: function () { setzen(form.benutzer_id, true, form.rolle, form.grund);
+              setzeForm({ benutzer_id: "", rolle: "support", grund: "" }); } }, "Ernennen"))) : null,
+      E("div", { style: { fontSize: 12, color: CI.muted } },
+        "Mindestens ein aktiver Owner bleibt immer bestehen — die Datenbank lässt das Gegenteil nicht zu. "
+        + "Jede Änderung steht im Audit-Log."));
+  }
+
+  // --- Zweiter Faktor (fork_68) ---------------------------------------------
+  // Supabase fuehrt die Stufe der Anmeldung: aal1 = Passwort, aal2 = Passwort
+  // und bestaetigter zweiter Faktor. Der Betreiberbereich verlangt aal2 —
+  // die Edge Function weist alles andere ab, diese Tafel fuehrt nur hin.
+  function ZweiterFaktor(p) {
+    var sZ = React.useState({ lade: true }), stand = sZ[0], setzeStand = sZ[1];
+    var cZ = React.useState(""), code = cZ[0], setzeCode = cZ[1];
+    var fZ = React.useState(""), fehler = fZ[0], setzeFehler = fZ[1];
+
+    React.useEffect(function () {
+      var mfa = window._sb.auth.mfa;
+      mfa.listFactors().then(function (r) {
+        var totp = ((r.data && r.data.totp) || []).filter(function (f) { return f.status === "verified"; });
+        if (totp.length) { setzeStand({ lade: false, faktor: totp[0], bestaetigen: true }); return; }
+        // Noch kein Faktor: einen anlegen — Supabase liefert QR-Code und Geheimnis.
+        return mfa.enroll({ factorType: "totp", friendlyName: "immoOffice Betreiber" })
+          .then(function (e) {
+            if (e.error) throw e.error;
+            setzeStand({ lade: false, neu: e.data, bestaetigen: false });
+          });
+      }).catch(function (f) { setzeStand({ lade: false }); setzeFehler(f.message || String(f)); });
+    }, []);
+
+    async function bestaetigen() {
+      setzeFehler("");
+      var mfa = window._sb.auth.mfa;
+      var faktorId = stand.neu ? stand.neu.id : stand.faktor.id;
+      try {
+        var ch = await mfa.challenge({ factorId: faktorId });
+        if (ch.error) throw ch.error;
+        var v = await mfa.verify({ factorId: faktorId, challengeId: ch.data.id, code: code.trim() });
+        if (v.error) throw v.error;
+        p.fertig();
+      } catch (f) { setzeFehler(f.message || String(f)); }
+    }
+
+    if (stand.lade) return E("div", { style: kasten }, "Zweiter Faktor wird geprüft …");
+    return E("div", { style: Object.assign({}, kasten, { maxWidth: 520 }) },
+      E("h3", { style: { margin: "0 0 8px", fontSize: 16, color: CI.blau } },
+        stand.neu ? "Zweiten Faktor einrichten" : "Zweiten Faktor bestätigen"),
+      E("p", { style: { fontSize: 13, color: CI.muted, margin: "0 0 14px" } },
+        "Der Betreiberbereich ist nur mit einem zweiten Faktor erreichbar. "
+        + (stand.neu
+          ? "Scannen Sie den Code mit einer Authenticator-App (z. B. Microsoft Authenticator, Google Authenticator, 1Password) und geben Sie die sechs Ziffern ein."
+          : "Geben Sie die sechs Ziffern aus Ihrer Authenticator-App ein.")),
+      stand.neu ? E("div", { style: { textAlign: "center", marginBottom: 12 } },
+        E("img", { src: stand.neu.totp.qr_code, alt: "QR-Code", style: { width: 180, height: 180 } }),
+        E("div", { style: { fontSize: 11, color: CI.muted, wordBreak: "break-all", marginTop: 6 } },
+          "Geheimnis von Hand: ", stand.neu.totp.secret)) : null,
+      E("div", { style: { display: "flex", gap: 8 } },
+        E("input", { style: Object.assign({}, feld, { letterSpacing: "0.3em", fontSize: 18, textAlign: "center" }),
+          value: code, inputMode: "numeric", autoComplete: "one-time-code", maxLength: 6,
+          placeholder: "000000", onChange: function (ev) { setzeCode(ev.target.value.replace(/\D/g, "")); },
+          onKeyDown: function (ev) { if (ev.key === "Enter") bestaetigen(); } }),
+        E("button", { type: "button", style: knopf, onClick: bestaetigen, disabled: code.length !== 6 }, "Bestätigen")),
+      fehler ? E("div", { style: { color: CI.danger, fontSize: 13, marginTop: 10 } }, fehler) : null);
+  }
+
   function ImmoPlattform() {
     var rZ = React.useState("zahlen"), reiter = rZ[0], setzeReiter = rZ[1];
     var dZ = React.useState({}), daten = dZ[0], setzeDaten = dZ[1];
@@ -739,6 +870,40 @@
     var mZ = React.useState(null), meldung = mZ[0], setzeMeldung = mZ[1];
     var oZ = React.useState(null), offen = oZ[0], setzeOffen = oZ[1];
     var supZ = React.useState(null), support = supZ[0], setzeSupport = supZ[1];
+    // Die sechs Zustaende oben sind die der Vorlage und bleiben die ERSTEN
+    // sechs Hooks — tests/plattform-admin.js setzt sie der Reihe nach.
+    // Wer bin ich hier — und muss erst der zweite Faktor her?
+    var wZ = React.useState({ lade: true }), wer = wZ[0], setzeWer = wZ[1];
+    var werLaden = React.useCallback(function () {
+      ruf("wer").then(function (d) { setzeWer({ lade: false, rolle: d.rolle, mfa_pflicht: d.mfa_pflicht }); })
+        .catch(function (f) {
+          var mfa = /Zweiter Faktor/.test(f.message || "");
+          setzeWer({ lade: false, mfa: mfa, fehler: mfa ? "" : (f.message || String(f)) });
+        });
+    }, []);
+    React.useEffect(function () { werLaden(); }, [werLaden]);
+
+    // Sitzungssperre: nach N Minuten ohne Eingabe (Plattformwert
+    // betreiber_sitzung_minuten, Start 30) faellt die Tafel in den
+    // Anfangszustand zurueck und fragt den zweiten Faktor erneut ab.
+    var gesperrtZ = React.useState(false), gesperrt = gesperrtZ[0], setzeGesperrt = gesperrtZ[1];
+    React.useEffect(function () {
+      var minuten = Number(window.IMMO_BETREIBER_SITZUNG_MINUTEN || 30);
+      var zuletzt = Date.now();
+      var merk = function () { zuletzt = Date.now(); };
+      ["mousemove", "keydown", "click", "touchstart", "scroll"].forEach(function (ev) {
+        window.addEventListener(ev, merk, { passive: true });
+      });
+      var uhr = setInterval(function () {
+        if (Date.now() - zuletzt > minuten * 60000) setzeGesperrt(true);
+      }, 15000);
+      return function () {
+        clearInterval(uhr);
+        ["mousemove", "keydown", "click", "touchstart", "scroll"].forEach(function (ev) {
+          window.removeEventListener(ev, merk);
+        });
+      };
+    }, []);
 
     var laden = React.useCallback(function (welcher, id) {
       var aktion = welcher === "zahlen" ? "uebersicht"
@@ -746,10 +911,12 @@
         : welcher === "katalog" ? "katalog"
         : welcher === "konten" ? "nutzer"
         : welcher === "system" ? "system"
+        : welcher === "admins" ? "admin_liste"
         : welcher === "mandant" ? "mandant" : "protokoll";
       ruf(aktion, welcher === "mandant" ? { mandant_id: id } : null).then(function (d) {
         var n = {};
         n[welcher] = welcher === "mandanten" ? d.mandanten
+          : welcher === "admins" ? d.admins
           : welcher === "konten" ? d.nutzer
           : welcher === "protokoll" ? d.eintraege : d;
         setzeDaten(function (alt) { return Object.assign({}, alt, n); });
@@ -780,11 +947,33 @@
       catch (f) { melden(f.message || String(f), "fehler"); }
     }
 
-    var reiterListe = [["zahlen", "Zahlen"], ["mandanten", "Mandanten"],
-      ["konten", "Konten"], ["katalog", "Katalog"], ["system", "System"],
-      ["protokoll", "Protokoll"]];
+    if (wer.lade) return E("div", { style: kasten }, "Betreiberbereich wird geöffnet …");
+    if (gesperrt) return E("div", { style: Object.assign({}, kasten, { maxWidth: 520 }) },
+      E("h3", { style: { margin: "0 0 8px", fontSize: 16, color: CI.blau } }, "Sitzung gesperrt"),
+      E("p", { style: { fontSize: 13, color: CI.muted } },
+        "Im Betreiberbereich war eine Weile keine Eingabe. Bitte erneut öffnen."),
+      E("button", { type: "button", style: knopf, onClick: function () {
+        setzeGesperrt(false); setzeWer({ lade: true }); werLaden(); } }, "Erneut öffnen"));
+    if (wer.mfa) return E(ZweiterFaktor, { fertig: function () {
+      // Das Token traegt jetzt aal2 — die Funktion laesst herein.
+      setzeWer({ lade: true }); werLaden(); } });
+    if (wer.fehler) return E("div", { style: Object.assign({}, kasten, { color: CI.danger }) }, wer.fehler);
+
+    // Welche Reiter eine Rolle sieht. Ausgeblendet ist Bequemlichkeit; die
+    // Schranke steht in der Funktion.
+    var rolle = wer.rolle || "admin";
+    var alleReiter = [["zahlen", "Zahlen", ["owner", "admin", "support", "finanzen"]],
+      ["mandanten", "Mandanten", ["owner", "admin", "support", "finanzen"]],
+      ["konten", "Konten", ["owner", "admin", "support"]],
+      ["katalog", "Katalog", ["owner", "admin", "support", "finanzen"]],
+      ["system", "System", ["owner", "admin"]],
+      ["admins", "Admins", ["owner", "admin", "support", "finanzen"]],
+      ["protokoll", "Audit-Log", ["owner", "admin", "support", "finanzen"]]];
+    var reiterListe = alleReiter.filter(function (r) { return r[2].indexOf(rolle) >= 0; });
 
     return E("div", null,
+      E("div", { style: { fontSize: 11, color: CI.muted, textAlign: "right", marginBottom: -6 } },
+        "Rolle: " + rolle),
       // Ein laufender Supportzugriff muss sichtbar sein, immer. Wer vergisst,
       // dass er in fremden Daten steht, haelt sie fuer seine eigenen.
       support ? E("div", { "data-support-band": "1", style: {
@@ -834,6 +1023,8 @@
         : reiter === "katalog" ? E(Katalog, { daten: daten.katalog, melden: melden,
             neuLaden: function () { laden("katalog"); } })
         : reiter === "system" ? E(System, { daten: daten.system })
+        : reiter === "admins" ? E(Admins, { daten: daten.admins, konten: daten.konten, rolle: rolle,
+            melden: melden, neuLaden: function () { laden("admins"); if (rolle === "owner") laden("konten"); } })
         : E(Protokoll, { daten: daten.protokoll }));
   }
 

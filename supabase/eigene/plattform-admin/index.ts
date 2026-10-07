@@ -48,6 +48,40 @@ const AENDERBAR: Record<string, string[]> = {
     "sortierung", "aktiv"],
   plattform_werte: ["wert", "beschreibung"],
 };
+// Welche Rolle welche Aktion rufen darf (fork_68). Nicht aufgefuehrte
+// Aktionen: nur owner und admin. Die vier Rollen und ihr Zuschnitt stehen
+// in docs/ADMIN.md.
+const ROLLEN: Record<string, string[]> = {
+  wer:                    ["owner", "admin", "support", "finanzen"],
+  uebersicht:             ["owner", "admin", "support", "finanzen"],
+  mandanten:              ["owner", "admin", "support", "finanzen"],
+  mandant:                ["owner", "admin", "support", "finanzen"],
+  katalog:                ["owner", "admin", "support", "finanzen"],
+  protokoll:              ["owner", "admin", "support", "finanzen"],
+  system:                 ["owner", "admin"],
+  nutzer:                 ["owner", "admin", "support"],
+  katalog_speichern:      ["owner", "admin"],
+  credits_schenken:       ["owner", "admin", "support"],
+  mandant_speichern:      ["owner", "admin", "support"],
+  mandant_loeschen:       ["owner"],
+  admin_setzen:           ["owner"],
+  admin_liste:            ["owner", "admin", "support", "finanzen"],
+  passwort_zuruecksetzen: ["owner", "admin", "support"],
+  support_start:          ["owner", "admin", "support"],
+  support_ende:           ["owner", "admin", "support"],
+  support_stand:          ["owner", "admin", "support", "finanzen"],
+};
+
+/** Die Anmeldestufe aus dem Token: "aal1" oder "aal2". Ohne Pruefung der
+ *  Signatur — die hat getUser() gerade gemacht; hier wird nur gelesen. */
+function tokenStufe(jwt: string): string {
+  try {
+    const teil = jwt.split(".")[1] || "";
+    const json = atob(teil.replace(/-/g, "+").replace(/_/g, "/"));
+    return String(JSON.parse(json).aal || "aal1");
+  } catch { return "aal1"; }
+}
+
 const SCHLUESSELSPALTE: Record<string, string> = {
   plattform_tarife: "schluessel",
   plattform_credit_preise: "aktion",
@@ -68,16 +102,49 @@ Deno.serve(async (req) => {
     if (!u?.user) return antwort({ ok: false, fehler: "Nicht angemeldet." }, 401);
 
     const { data: admin } = await db.from("plattform_admins")
-      .select("benutzer_id").eq("benutzer_id", u.user.id).maybeSingle();
-    if (!admin) return antwort({ ok: false, fehler: "Kein Plattform-Administrator." }, 403);
+      .select("benutzer_id, rolle, aktiv").eq("benutzer_id", u.user.id).maybeSingle();
+    if (!admin || !admin.aktiv) return antwort({ ok: false, fehler: "Kein Plattform-Administrator." }, 403);
+    const rolle = String(admin.rolle || "admin");
+
+    // Zweiter Faktor (fork_68). Supabase schreibt die Stufe der Anmeldung in
+    // das Token: "aal1" ist Passwort, "aal2" ist Passwort UND bestaetigter
+    // zweiter Faktor. Die Pflicht ist ein Plattformwert, damit der Betreiber
+    // sich nicht aussperrt, bevor TOTP eingerichtet ist — und damit sie sich
+    // ohne Ausrollen abschalten laesst, wenn jemand den Zugang verliert.
+    const { data: mfaWert } = await db.from("plattform_werte")
+      .select("wert").eq("schluessel", "betreiber_mfa_pflicht").maybeSingle();
+    const mfaPflicht = mfaWert ? mfaWert.wert === true : true;
+    if (mfaPflicht && tokenStufe(kopf) !== "aal2") {
+      return antwort({ ok: false, mfa: true, fehler:
+        "Zweiter Faktor erforderlich. Bitte TOTP einrichten oder bestaetigen." }, 403);
+    }
 
     const body = await req.json().catch(() => ({}));
     const aktion = String(body.aktion || "uebersicht");
 
-    const protokoll = async (was: string, gegenstand: string, einzelheiten: unknown) => {
+    // Die Rollenschranke steht VOR der Aktion, nicht in ihr. Was nicht in
+    // der Liste steht, duerfen nur owner und admin — ein Versehen sperrt
+    // also zu viel, nie zu wenig.
+    const erlaubt = ROLLEN[aktion] || ["owner", "admin"];
+    if (!erlaubt.includes(rolle)) {
+      return antwort({ ok: false, fehler:
+        `Die Rolle "${rolle}" darf das nicht (${aktion}).` }, 403);
+    }
+
+    // Jede schreibende Aktion ins Audit-Log: wer (mit Rolle), was, woran,
+    // warum, von wo. `vorher`/`nachher` dort, wo es einen Zustand gibt.
+    const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || null;
+    const userAgent = (req.headers.get("user-agent") || "").slice(0, 300) || null;
+    const protokoll = async (was: string, gegenstand: string, einzelheiten: unknown,
+                             stand?: { typ?: string; vorher?: unknown; nachher?: unknown }) => {
+      const e = (einzelheiten || {}) as Record<string, unknown>;
       await db.from("plattform_protokoll").insert({
         benutzer_id: u.user.id, aktion: was, gegenstand,
-        einzelheiten: einzelheiten as Record<string, unknown>,
+        einzelheiten: e,
+        rolle, ziel_typ: stand?.typ || null, ziel_id: gegenstand || null,
+        vorher: stand?.vorher ?? null, nachher: stand?.nachher ?? null,
+        begruendung: typeof e.grund === "string" ? e.grund : null,
+        ip, user_agent: userAgent,
       });
     };
 
@@ -194,6 +261,10 @@ Deno.serve(async (req) => {
     }
 
     // --- Die Zahlen ---------------------------------------------------------
+    if (aktion === "wer") {
+      return antwort({ ok: true, rolle, mfa_pflicht: mfaPflicht });
+    }
+
     if (aktion === "uebersicht") {
       const seit = new Date(Date.now() - 30 * 86400000).toISOString();
       const [{ data: verbrauch }, { data: frei }, { data: abos }, { data: tarife }] =
@@ -265,6 +336,12 @@ Deno.serve(async (req) => {
       if (!mandant) return antwort({ ok: false, fehler: "Kein Mandant." }, 400);
       if (!(anzahl > 0) || anzahl > 100000) {
         return antwort({ ok: false, fehler: "Anzahl zwischen 1 und 100000." }, 400);
+      }
+      // Die Rolle support darf bis 500 gutschreiben — mehr ist eine
+      // Entscheidung, keine Kulanz.
+      if (rolle === "support" && anzahl > 500) {
+        return antwort({ ok: false, fehler:
+          "Die Rolle support darf hoechstens 500 Credits gutschreiben." }, 403);
       }
       // Ohne Grund nicht. Wer in einem halben Jahr fragt, warum ein Haus
       // 2000 Credits bekam, soll eine Antwort finden.
@@ -339,6 +416,21 @@ Deno.serve(async (req) => {
       }
       const { data: vorher } = await db.from("mandanten").select("*").eq("id", id).maybeSingle();
       if (!vorher) return antwort({ ok: false, fehler: "Unbekannter Mandant." }, 404);
+      // support: Testphase verlaengern ja — Name, Sperre, Tarif, Abo nein.
+      if (rolle === "support") {
+        const fremd = Object.keys(body).filter((k) =>
+          !["aktion", "mandant_id", "grund", "testphase_bis"].includes(k));
+        if (fremd.length) {
+          return antwort({ ok: false, fehler:
+            "Die Rolle support darf nur die Testphase verlaengern." }, 403);
+        }
+        // Hoechstens 30 Tage ueber heute hinaus.
+        const bis = body.testphase_bis ? new Date(body.testphase_bis).getTime() : 0;
+        if (!bis || bis > Date.now() + 30 * 86400000) {
+          return antwort({ ok: false, fehler:
+            "Verlaengerung um hoechstens 30 Tage ab heute." }, 400);
+        }
+      }
 
       const m: Record<string, unknown> = {};
       if (typeof body.name === "string" && body.name.trim().length >= 2) {
@@ -389,7 +481,8 @@ Deno.serve(async (req) => {
         if (error) return antwort({ ok: false, fehler: error.message }, 400);
       }
 
-      await protokoll("mandant_geaendert", id, { vorher, mandant: m, abo: a, grund });
+      await protokoll("mandant_geaendert", id, { mandant: m, abo: a, grund },
+                      { typ: "mandant", vorher, nachher: { ...vorher, ...m, abo: a } });
       return antwort({ ok: true, stripe_laeuft: stripeLaeuft });
     }
 
@@ -427,7 +520,7 @@ Deno.serve(async (req) => {
       const { data } = await db.from("profiles")
         .select("id, name, email, role, mandant_id");
       const { data: mandanten } = await db.from("mandanten").select("id, name");
-      const { data: admins } = await db.from("plattform_admins").select("benutzer_id");
+      const { data: admins } = await db.from("plattform_admins").select("benutzer_id").eq("aktiv", true);
       const nameVon = new Map((mandanten || []).map((m) => [String(m.id), m.name]));
       const istAdmin = new Set((admins || []).map((a) => String(a.benutzer_id)));
       return antwort({ ok: true, nutzer: (data || []).map((p) => ({
@@ -437,37 +530,61 @@ Deno.serve(async (req) => {
     }
 
     // --- Plattform-Recht vergeben und entziehen ----------------------------
+    if (aktion === "admin_liste") {
+      const { data: admins } = await db.from("plattform_admins")
+        .select("benutzer_id, rolle, aktiv, notiz, erstellt_am, erstellt_von");
+      const ids = (admins || []).map((a) => String(a.benutzer_id));
+      const { data: profile } = ids.length
+        ? await db.from("profiles").select("id, name, email").in("id", ids)
+        : { data: [] };
+      const pv = new Map((profile || []).map((p) => [String(p.id), p]));
+      return antwort({ ok: true, admins: (admins || []).map((a) => ({
+        ...a, name: pv.get(String(a.benutzer_id))?.name || null,
+        email: pv.get(String(a.benutzer_id))?.email || null,
+      })) });
+    }
+
+    // Admins ernennen, Rolle aendern, deaktivieren — nur owner (fork_68).
+    // Deaktiviert statt geloescht: das Audit-Log soll weiter zeigen, wer
+    // damals gehandelt hat. Den letzten aktiven Owner schuetzt die
+    // Datenbank selbst (Trigger plattform_admins_letzter_owner).
     if (aktion === "admin_setzen") {
       const nutzerId = String(body.benutzer_id || "");
       const an = !!body.an;
       const grund = String(body.grund || "").trim();
+      const neueRolle = String(body.rolle || "admin");
       if (!nutzerId) return antwort({ ok: false, fehler: "Kein Konto." }, 400);
       if (grund.length < 5) return antwort({ ok: false, fehler: "Bitte einen Grund angeben." }, 400);
-      // Sich selbst das Recht zu entziehen ist erlaubt — aber nicht, wenn
-      // danach niemand mehr eines hat. Dann kaeme niemand mehr hinein.
-      if (!an) {
-        const { count } = await db.from("plattform_admins")
-          .select("benutzer_id", { count: "exact", head: true });
-        if ((count || 0) <= 1) {
-          return antwort({ ok: false, fehler:
-            "Das ist der letzte Plattform-Administrator. Erst einen zweiten "
-            + "ernennen, sonst kommt niemand mehr in diesen Bereich." }, 409);
-        }
+      if (!["owner", "admin", "support", "finanzen"].includes(neueRolle)) {
+        return antwort({ ok: false, fehler: "Unbekannte Rolle." }, 400);
       }
+      const { data: vorher } = await db.from("plattform_admins")
+        .select("benutzer_id, rolle, aktiv").eq("benutzer_id", nutzerId).maybeSingle();
       if (an) {
         const { error } = await db.from("plattform_admins")
-          .upsert({ benutzer_id: nutzerId, notiz: grund.slice(0, 300) },
+          .upsert({ benutzer_id: nutzerId, rolle: neueRolle, aktiv: true,
+                    notiz: grund.slice(0, 300), erstellt_von: vorher ? undefined : u.user.id },
                   { onConflict: "benutzer_id" });
-        if (error) return antwort({ ok: false, fehler: error.message }, 400);
+        if (error) return antwort({ ok: false, fehler: error.message.includes("letzte aktive Owner")
+          ? "Das ist der letzte aktive Owner. Erst einen zweiten ernennen." : error.message }, 409);
       } else {
-        await db.from("plattform_admins").delete().eq("benutzer_id", nutzerId);
+        if (!vorher) return antwort({ ok: false, fehler: "Kein Betreiber." }, 404);
+        const { error } = await db.from("plattform_admins")
+          .update({ aktiv: false, notiz: grund.slice(0, 300) }).eq("benutzer_id", nutzerId);
+        if (error) return antwort({ ok: false, fehler: error.message.includes("letzte aktive Owner")
+          ? "Das ist der letzte Plattform-Administrator mit Owner-Rolle. Erst einen "
+            + "zweiten ernennen, sonst kommt niemand mehr in diesen Bereich." : error.message }, 409);
         // Laufende Sitzungen enden mit dem Recht. Die Datenbankfunktion
         // prueft das ohnehin bei jedem Zugriff; hier wird es auch sichtbar.
         await db.from("support_sitzungen")
           .update({ beendet_am: new Date().toISOString() })
           .eq("admin_id", nutzerId).is("beendet_am", null);
       }
-      await protokoll(an ? "admin_ernannt" : "admin_entzogen", nutzerId, { grund });
+      await protokoll(an ? (vorher ? "admin_rolle_geaendert" : "admin_ernannt") : "admin_deaktiviert",
+                      nutzerId, { grund, rolle: an ? neueRolle : null },
+                      { typ: "plattform_admin", vorher,
+                        nachher: an ? { benutzer_id: nutzerId, rolle: neueRolle, aktiv: true }
+                                    : { ...(vorher || {}), aktiv: false } });
       return antwort({ ok: true });
     }
 

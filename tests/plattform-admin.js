@@ -272,11 +272,13 @@ if (fs.existsSync(TAFEL)) {
     let i = 0;
     const detail = reiter === 'DETAIL';
     // Reihenfolge der useState-Aufrufe: reiter, daten, fehler, meldung,
-    // offen, support.
+    // offen, support — und seit fork_68: wer (Rolle, zweiter Faktor
+    // bestanden) und gesperrt (Sitzungssperre).
     const zustaende = [detail ? 'mandanten' : reiter, DATEN, '', null,
                        detail ? 'a' : null,
                        detail ? { mandant_name: 'Alpha GmbH', schreiben: false,
-                                  gueltig_bis: '2026-10-06T12:00:00Z' } : null];
+                                  gueltig_bis: '2026-10-06T12:00:00Z' } : null,
+                       { lade: false, rolle: 'owner', mfa_pflicht: true }, false];
     const React = {
       createElement: (typ, props, ...kinder) => ({ typ,
         props: Object.assign({}, props || {},

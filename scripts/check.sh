@@ -697,6 +697,13 @@ else
   schlecht
 fi
 
+abschnitt "Betreiberrollen: halten sie in der Datenbank?"
+if scripts/lokale-db.sh psql -q -f tests/betreiber-rollen.sql; then
+  :
+else
+  schlecht
+fi
+
 abschnitt "IMAP: liest der Abruf die Ordnerliste jedes Servers?"
 node tests/imap-ordnerliste.js || schlecht
 

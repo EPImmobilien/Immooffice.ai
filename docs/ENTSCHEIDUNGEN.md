@@ -6060,3 +6060,29 @@ Zurück bleibt die Wortmarke aus dem Markennamen. Anders als das Hochladen
 wirkt es sofort und wartet nicht auf „Speichern" — erst das Feld in der
 Datenbank, dann die Datei; ein halber Löschvorgang wäre schlimmer als
 beides.
+
+## 2026-10-07 · Betreiberbereich, Schritt 1: Rollen in der Datenbank, nicht nur in der Funktion (fork_68)
+
+Der Auftrag „Betreiber-Dashboard" vom 07.10.2026 ist der jüngste des
+Auftraggebers und gilt — auch wo er CLAUDE.md widerspricht (MFA-Pflicht).
+Vier Abweichungen vom Wortlaut stehen mit Grund in `docs/ADMIN.md`:
+`mandant_id` statt `firma_id`, Erweiterung statt Neubau bei Protokoll und
+Supportzugriff, Kachel statt Route, MFA als Plattformwert.
+
+**Die eine Entscheidung dieses Schritts:** Die Rolle wird **zweimal** geprüft
+— in den Richtlinien der Plattformtabellen und in der Edge Function. Bis
+heute durfte jeder Betreiber über `plattform_tarife_pflegen` die Preise
+direkt schreiben, an der Funktion vorbei. Eine Rolle `support`, die in der
+Funktion keine Preise ändern darf, hätte es über den Supabase-Client
+trotzdem gekonnt. Jetzt verlangt die Richtlinie `plattform_rolle() in
+('owner','admin')`, und `tests/betreiber-rollen.sql` versucht es als support
+und zählt: null Zeilen.
+
+In der Funktion steht die Rollenkarte **vor** der Aktion. Was nicht in der
+Karte steht, dürfen nur owner und admin — ein vergessener Eintrag sperrt zu
+viel, nie zu wenig. Das ist die Richtung, in die ein Fehler fallen soll.
+
+Deaktiviert statt gelöscht, weil das Audit-Log sonst auf einen Eintrag
+zeigte, den es nicht mehr gibt. Der letzte aktive Owner bleibt, und zwar per
+Trigger: eine Prüfung allein in der Funktion hätte der Dienstschlüssel
+umgangen — derselbe Grund, aus dem fork_52 das Protokoll per Trigger schützt.
