@@ -52099,7 +52099,7 @@ function ObjektWerbemittel({
       marginBottom: 14,
       lineHeight: 1.5
     }
-  }, "Öffnet die Vorlage mit den Eckdaten und Fotos dieses Objekts. ", n ? `Als Bild wird das Hauptbild gesetzt${t>1?`, Shop TV nimmt die ersten drei von ${t} Fotos`:""}.` : t ? `Kein Hauptbild gesetzt — es wird das erste von ${t} Fotos verwendet.` : "Am Objekt liegt noch kein Foto — das Bild musst du in der Vorlage selbst wählen."), React.createElement("div", {
+  }, "Öffnet die Vorlage mit den Eckdaten und Fotos dieses Objekts. ", n ? `Als Bild wird das Hauptbild gesetzt${t>1?`, die Vorlage nimmt die ersten drei von ${t} Fotos`:""}.` : t ? `Kein Hauptbild gesetzt — es wird das erste von ${t} Fotos verwendet.` : "Am Objekt liegt noch kein Foto — das Bild musst du in der Vorlage selbst wählen."), React.createElement("div", {
     className: "mob-stack",
     style: {
       display: "grid",
@@ -95978,10 +95978,13 @@ function MietvertraegeTab({
     }), " Löschen"))))
   })))
 }
+// OneDrive: App-Registrierung des Betreibers (Entra ID, mehrinstanzenfaehig,
+// SPA). Leer = noch nicht eingerichtet.
+const ONEDRIVE_CLIENT_ID = "";
 const MSAL_CONFIG = {
     auth: {
-      clientId: "dac8c657-d6c1-4913-abb5-fc669ea1c73d",
-      authority: "https://login.microsoftonline.com/80ec2e93-0a3c-4fe5-bcdc-aa3f2dd0d82d",
+      clientId: ONEDRIVE_CLIENT_ID || "00000000-0000-0000-0000-000000000000",
+      authority: "https://login.microsoftonline.com/organizations",
       redirectUri: window.location.origin
     },
     cache: {
@@ -95993,6 +95996,7 @@ const MSAL_CONFIG = {
 let msalInstance = null;
 
 function getMsal() {
+  if (!ONEDRIVE_CLIENT_ID) throw new Error("OneDrive ist für diese Installation noch nicht eingerichtet. Bitte wenden Sie sich an den Support.");
   if (!window.msal) throw new Error("Microsoft-Login-Modul wird noch geladen. Bitte gleich nochmal probieren oder Seite neu laden (Strg+F5).");
   return msalInstance || (msalInstance = new window.msal.PublicClientApplication(MSAL_CONFIG)), msalInstance
 }
@@ -97764,17 +97768,17 @@ function provisionsAbrechnungPDF(e) {
       align: "right"
     }), s += 9, n.setTextColor(0, 0, 0)
   }
-  n.setFont("helvetica", "bold"), n.setFontSize(18), n.setTextColor(38, 49, 89), n.text("PROVISIONSABRECHNUNG", l, s), s += 7, n.setFont("helvetica", "normal"), n.setFontSize(10.5), n.setTextColor(70, 70, 70), n.text("Olaf Kraus · Gebietsleiter Berlin & Brandenburg", l, s), s += 4.6, n.text("1. Nachtrag zum Arbeitsvertrag", l, s), s += 4.6;
+  n.setFont("helvetica", "bold"), n.setFontSize(18), n.setTextColor(38, 49, 89), n.text("PROVISIONSABRECHNUNG", l, s), s += 7, n.setFont("helvetica", "normal"), n.setFontSize(10.5), n.setTextColor(70, 70, 70), n.text("Provisionsvereinbarung laut Arbeitsvertrag", l, s), s += 4.6, n.text("Objekte im vereinbarten Gebiet", l, s), s += 4.6;
   const b = (new Date).toLocaleDateString("de-DE");
   n.text((e.monat ? "Abrechnungsmonat: " + e.monat + "    ·    " : "") + "Erstellt am " + b, l, s), s += 6, n.setDrawColor(199, 164, 85), n.setLineWidth(.8), n.line(l, s, o, s), s += 8, n.setTextColor(0, 0, 0), g("§ 2 · Vermittlungsprovision Verkauf"), A("Bemessungsgrundlage Verkauf", e.bgV), f(["Stufe", "Satz", "Umsatz i. Stufe", "Provision"]), e.staffel.forEach(e => p([e.label, d(e.satz), c(e.betrag), c(e.prov)])), h("Vermittlungsprovision Verkauf  (eff. " + d(e.effSatz) + ")", e.provV), s += 4, g("§ 2 Abs. 9 · Vermittlungsprovision Vermietung"), A("Bemessungsgrundlage Vermietung", e.bgM), h("Vermittlungsprovision Vermietung  (25 %)", e.provM), s += 4, g("§ 3 · Zuführungsprovision"), f(["Art der Zuführung", "Satz", "Bemessung", "Provision"]), e.zuf.forEach(e => p([e.label, d(e.satz), c(e.bg), c(e.prov)])), h("Zuführungsprovision gesamt", e.provZ), s += 5, m(18), n.setFillColor(38, 49, 89), n.rect(l, s, i, 13, "F"), n.setFont("helvetica", "bold"), n.setFontSize(11), n.setTextColor(255, 255, 255), n.text("VARIABLE VERGÜTUNG GESAMT", 21.5, s + 8), n.setFontSize(15), n.text(c(e.gesamt), o - 3.5, s + 8.5, {
     align: "right"
   }), s += 20, n.setTextColor(0, 0, 0), n.setFont("helvetica", "normal"), n.setFontSize(8), n.setTextColor(120, 120, 120);
-  ["Vermittlungsprovision Verkauf (§ 2) gestaffelt, anteilig je Stufe; über 25.000 € = 35 %. Grundlage: 1. Nachtrag zum Arbeitsvertrag vom 10.10.2025.", "Voraussetzung je Position: erheblicher Anteil am Vermittlungs-/Zuführungserfolg, Objekt in Berlin/Brandenburg, Zahlungseingang im Abrechnungsmonat.", "Zuführungsprovision (§ 3) entsteht erst nach Zahlungseingang des Arbeitgebers vom Kooperationspartner. Vorschüsse und Zahlungen Dritter zählen nicht.", "Auszahlung mit Grundgehalt zum Monatsende des Folgemonats (§ 4). Berechnung ohne Gewähr."].forEach(e => {
+  ["Vermittlungsprovision Verkauf (§ 2) gestaffelt, anteilig je Stufe; über 25.000 € = 35 %. Grundlage: Provisionsvereinbarung im Arbeitsvertrag.", "Voraussetzung je Position: erheblicher Anteil am Vermittlungs-/Zuführungserfolg, Objekt im vereinbarten Gebiet, Zahlungseingang im Abrechnungsmonat.", "Zuführungsprovision (§ 3) entsteht erst nach Zahlungseingang des Arbeitgebers vom Kooperationspartner. Vorschüsse und Zahlungen Dritter zählen nicht.", "Auszahlung mit Grundgehalt zum Monatsende des Folgemonats (§ 4). Berechnung ohne Gewähr."].forEach(e => {
     const t = n.splitTextToSize(e, i);
     m(3.4 * t.length + 2), n.text(t, l, s), s += 3.4 * t.length + 1.6
   }), n.setFontSize(7.5), n.setTextColor(120, 120, 120), n.text(immoMarkeMit("", " · immooffice.example"), l, r - 9);
   const y = (e.monat || b).replace(/[^0-9A-Za-zäöüÄÖÜ]+/g, "_").replace(/^_+|_+$/g, "");
-  n.save("Provisionsabrechnung_Olaf_Kraus_" + y + ".pdf")
+  n.save("Provisionsabrechnung_" + y + ".pdf")
 }
 
 function ProvFeld({
@@ -98063,7 +98067,7 @@ function ProvisionenPage({
       ...j,
       marginBottom: 0
     }
-  }, "1. Nachtrag zum Arbeitsvertrag vom 10.10.2025 · Olaf Kraus · Gebietsleiter Berlin & Brandenburg")), React.createElement("div", {
+  }, "Provisionsvereinbarung laut Arbeitsvertrag · Objekte im vereinbarten Gebiet")), React.createElement("div", {
     style: {
       display: "flex",
       gap: 8,
@@ -98181,7 +98185,7 @@ function ProvisionenPage({
     }
   }, React.createElement("h3", {
     style: W
-  }, "Tracker · Olaf Kraus"), React.createElement("span", {
+  }, "Provisionstracker"), React.createElement("span", {
     style: {
       fontSize: 11.5,
       color: CI.muted
@@ -98201,9 +98205,9 @@ function ProvisionenPage({
   }, [{
     label: "Provisionsumsatz gesamt",
     value: y.umsatz,
-    sub: "Provision auf Olafs Abschlüsse"
+    sub: "Provision auf die eigenen Abschlüsse"
   }, {
-    label: "Auszahlung an Olaf",
+    label: "Auszahlung an den Mitarbeiter",
     value: y.aus,
     sub: "Variable Vergütung kumuliert",
     gold: !0
@@ -98248,7 +98252,7 @@ function ProvisionenPage({
     style: W
   }, "§ 2 · Vermittlungsprovision Verkauf"), React.createElement("p", {
     style: j
-  }, "Gestaffelt, anteilig je Stufe – nur Berlin & Brandenburg, Zahlungseingang im Monat"), React.createElement("div", {
+  }, "Gestaffelt, anteilig je Stufe – nur im vereinbarten Gebiet, Zahlungseingang im Monat"), React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
@@ -98266,7 +98270,7 @@ function ProvisionenPage({
     value: o.abzugV,
     onChange: e => c("abzugV", e.target.value),
     accentColor: "#4a6bd4",
-    hint: "An ImmoOffice GmbH / Kooperationspartner"
+    hint: "An das Unternehmen / Kooperationspartner"
   })), React.createElement("div", {
     style: {
       display: "flex",
@@ -98360,7 +98364,7 @@ function ProvisionenPage({
     style: W
   }, "§ 2 Abs. 9 · Vermittlungsprovision Vermietung"), React.createElement("p", {
     style: j
-  }, "Pauschal 25 % – nur Berlin & Brandenburg, Zahlungseingang im Monat"), React.createElement("div", {
+  }, "Pauschal 25 % – nur im vereinbarten Gebiet, Zahlungseingang im Monat"), React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
@@ -98759,7 +98763,7 @@ function ProvisionenPage({
       marginTop: 14,
       lineHeight: 1.5
     }
-  }, "Voraussetzung je Position: erheblicher Anteil am Vermittlungs-/Zuführungserfolg, Objekt in Berlin/Brandenburg, Zahlungseingang im Abrechnungsmonat. Vorschüsse und Zahlungen Dritter zählen nicht. Berechnung ohne Gewähr – maßgeblich ist der Vertragstext."))
+  }, "Voraussetzung je Position: erheblicher Anteil am Vermittlungs-/Zuführungserfolg, Objekt im vereinbarten Gebiet, Zahlungseingang im Abrechnungsmonat. Vorschüsse und Zahlungen Dritter zählen nicht. Berechnung ohne Gewähr – maßgeblich ist der Vertragstext."))
 }
 
 function FinanzenPage({
@@ -98780,7 +98784,7 @@ function FinanzenPage({
   }, {
     id: "provisionen",
     title: "Provisionen",
-    subtitle: "Provisionsrechner Olaf Kraus",
+    subtitle: "Provisionsrechner",
     icon: Percent,
     num: "03"
   }];
@@ -102443,7 +102447,7 @@ const TUTORIAL_SCHRITTE = [{
   target: '[data-tutorial="kachel-marketing"]',
   position: "bottom",
   title: "Marketing",
-  text: "Sechs Werkzeuge: Social-Media-Vorlagen mit Branding, die Ablage für Marketing-Dateien, KI-Bildbearbeitung (Retusche, Himmel tauschen, Home Staging), Print-Materialien wie Visitenkarten und Flyer, der Bild-Editor mit RAW-Entwickler und Shop TV für den Bildschirm im Schaufenster."
+  text: "Fünf Werkzeuge: Social-Media-Vorlagen mit Branding, die Ablage für Marketing-Dateien, KI-Bildbearbeitung (Retusche, Himmel tauschen, Home Staging), Print-Materialien wie Visitenkarten und Flyer und der Bild-Editor mit RAW-Entwickler."
 }, {
   id: "ki_agenten",
   view: "home",

@@ -76,9 +76,10 @@ ORTE="$(printf %s 'XGJyb3N0b2NrfFxic2Nod2VyaW58d2FybmVtKMO8fFxcdTAwZmN8dWUpbmRlf
 # deutsches Verb und faerbte jede zweite Datei rot. Gesucht wird er dort, wo
 # er ein Kennzeichen ist — in Bezeichnern, Dateinamen und neben dem
 # Nachnamen. Kodiert wie STAMM und ORTE.
-PERSONEN="$(printf %s 'dW50ZXJzY2hyaWZ0Wy1fXT9sYXNzZXxTVElMX1BST0ZJTF9MQVNTRXxsYXNzZVsgXy1dP2VuZ2Zlcnxha2FudFstIF0/aGF1c3wwMTYzWyAvLi1dKjIxODgxMjU=' | base64 -d)"
-# Fremdes Supabase-Projekt.
-FREMD='yazwkzzjiquprtjpurur'
+PERSONEN="$(printf %s 'dW50ZXJzY2hyaWZ0Wy1fXT9sYXNzZXxTVElMX1BST0ZJTF9MQVNTRXxsYXNzZVsgXy1dP2VuZ2Zlcnxha2FudFstIF0/aGF1c3wwMTYzWyAvLi1dKjIxODgxMjV8b2xhZlsgXy1dP2tyYXVz' | base64 -d)"
+# Fremdes Supabase-Projekt, und die Microsoft-Anmeldung der Referenz
+# (Tenant und App-Registrierung, bis 07.10.2026 im OneDrive-Login).
+FREMD='yazwkzzjiquprtjpurur|80ec2e93-0a3c-4fe5-bcdc-aa3f2dd0d82d|dac8c657-d6c1-4913-abb5-fc669ea1c73d'
 # NICHT GEPRUEFT: Rufnummern allgemein. Ein Muster, das jede deutsche
 # Nummer findet, trifft im Quelltext auch Koordinaten, Zeitstempel,
 # Farbwerte und Beispielnummern — am 06.10.2026 ausprobiert: ueber
@@ -137,7 +138,7 @@ echo "=== Neutralitaets-Gate ==="
 pruefe "Keine Kennzeichen des Referenzunternehmens" "$MARKEN"
 pruefe "Keine personenbezogenen Kennzeichen der Referenz" "$PERSONEN"
 pruefe "Keine Stammdaten des Referenzunternehmens"  "$STAMM"
-pruefe "Kein Verweis auf das fremde Supabase-Projekt" "$FREMD"
+pruefe "Kein Verweis auf fremde Projekte der Referenz (Supabase, Microsoft)" "$FREMD"
 pruefe_genau "Kein Vorsatz EP_ in Bezeichnern" '\bEP_[A-Z]'
 # 30.09.2026: dieselbe Abkuerzung mit Bindestrich, als Zeichenkette. Sie stand
 # an sieben Stellen im Portalexport und bildete dort die OpenImmo-Objektnummer

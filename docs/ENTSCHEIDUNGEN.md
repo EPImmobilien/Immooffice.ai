@@ -6324,3 +6324,28 @@ Stripe-Abgleich (Rechnungen, die Stripe nie gesehen hat). Namen wie
 „Küstenmakler Demo GmbH" tragen „Demo" im Namen; „Musterhaus" aus dem
 Auftrag fehlt mit Absicht — das Firmennamen-Gate (tests/firmenname-verdrahtet.py)
 kennt es als Beispielnamen der Vorlage.
+
+## 2026-10-07 · Reste der Referenz in der Oberfläche: Provisionstracker, OneDrive, Shop TV; Branchen-News an (fork_82)
+
+Beim Abgleich der Website mit der Anwendung gefunden. Das Neutralitäts-Gate
+hatte nichts davon gemeldet, weil es Personennamen und Microsoft-Kennungen
+der Referenz nicht kannte.
+
+- **Provisionstracker** (Finanzen → Provisionen): Name, Funktion, Gebiet und
+  Vertragsdatum eines Mitarbeiters der Referenz standen in Überschriften,
+  Hinweisen, PDF und PDF-Dateinamen. Ersetzt durch neutrale Angaben
+  („Provisionsvereinbarung laut Arbeitsvertrag", „vereinbartes Gebiet").
+  Die Rechenlogik (Staffel, Sätze) bleibt — Phase 9: keine Verhaltensänderung.
+  Dass die Staffel fest verdrahtet ist statt je Mitarbeiter einstellbar, ist
+  ein fachlicher Mangel, kein Kennzeichen; vermerkt, nicht hier gelöst.
+- **OneDrive**: Client-ID und Tenant der Referenz waren fest eingetragen —
+  jeder Kunde wäre auf die Microsoft-Anmeldung der Referenz geleitet worden.
+  Jetzt `ONEDRIVE_CLIENT_ID` (leer) und Authority `organizations`. Leer heißt:
+  die Kachel meldet „noch nicht eingerichtet". Der Betreiber trägt die
+  Client-ID seiner eigenen, mehrinstanzenfähigen App-Registrierung ein.
+- **Shop TV**: zwei Texte nannten das entfallene Modul noch.
+- Alle Ersetzungen stehen auch in `scripts/oberflaeche-zerlegen.py`
+  (WOERTLICH, kodiert), damit ein erneutes Zerlegen sie nicht zurückholt.
+  Das Gate prüft jetzt den Namen (PERSONEN) und beide Microsoft-Kennungen (FREMD).
+- **Branchen-News** (fork_82): der Cron-Job war seit der Übernahme inaktiv,
+  der Schlüssel aber schon auf den Vault umgestellt. Eingeschaltet.
