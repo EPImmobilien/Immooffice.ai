@@ -25238,7 +25238,7 @@ function NeubauProjekteBereich({
       color: ie === e ? CI.blau : CI.muted,
       borderBottom: ie === e ? `2px solid ${CI.gold}` : "2px solid transparent"
     }
-  }, t))), "cockpit" === ie && window.ImmoNeubauCockpit && React.createElement(window.ImmoNeubauCockpit, {
+  }, t))), "cockpit" === ie && (window.ImmoNeubauCockpit ? React.createElement(window.ImmoNeubauCockpit, {
     projekt: l,
     einheiten: o,
     zugaenge: u,
@@ -25246,7 +25246,12 @@ function NeubauProjekteBereich({
     dateien: c,
     user: e,
     neuLaden: () => Be(l)
-  }), "einheiten" === ie && React.createElement("div", {
+  }) : React.createElement("div", {
+    style: {
+      padding: 20,
+      color: "#b3261e"
+    }
+  }, "Das Cockpit-Modul ist nicht geladen (src/eigene/bautraeger-cockpit.js). Bitte Seite mit Strg+F5 neu laden; bleibt es dabei, die Browserkonsole (F12) pruefen.")), "einheiten" === ie && React.createElement("div", {
     style: {
       overflowX: "auto"
     }

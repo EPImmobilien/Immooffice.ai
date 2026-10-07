@@ -4797,7 +4797,7 @@ WOERTLICH = [
      'Neubau: Reiter Cockpit.'),
     ('FORK',
      '  }, t))), "einheiten" === ie && React.createElement("div", {\n    style: {\n      overflowX: "auto"\n    }',
-     '  }, t))), "cockpit" === ie && window.ImmoNeubauCockpit && React.createElement(window.ImmoNeubauCockpit, {\n    projekt: l,\n    einheiten: o,\n    zugaenge: u,\n    kontakte: K,\n    dateien: c,\n    user: e,\n    neuLaden: () => Be(l)\n  }), "einheiten" === ie && React.createElement("div", {\n    style: {\n      overflowX: "auto"\n    }',
+     '  }, t))), "cockpit" === ie && (window.ImmoNeubauCockpit ? React.createElement(window.ImmoNeubauCockpit, {\n    projekt: l,\n    einheiten: o,\n    zugaenge: u,\n    kontakte: K,\n    dateien: c,\n    user: e,\n    neuLaden: () => Be(l)\n  }) : React.createElement("div", {\n    style: {\n      padding: 20,\n      color: "#b3261e"\n    }\n  }, "Das Cockpit-Modul ist nicht geladen (src/eigene/bautraeger-cockpit.js). Bitte Seite mit Strg+F5 neu laden; bleibt es dabei, die Browserkonsole (F12) pruefen.")), "einheiten" === ie && React.createElement("div", {\n    style: {\n      overflowX: "auto"\n    }',
      'Neubau: das Cockpit mit Wohnungsakte.'),
     ('FORK',
      '  }, "Bearbeiten"), React.createElement("button", {\n    onClick: () => (async e => {\n      if (!confirm(`Einheit ${e.we_nr} wirklich löschen?',

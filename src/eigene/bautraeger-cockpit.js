@@ -190,7 +190,15 @@
       if (r.error) B.hinweis(r.error.message, true); else { B.hinweis("Einstellungen gespeichert."); setzeEinstellungen(false); p.neuLaden && p.neuLaden(); }
     }
     var kachel = function (zahl, text, farbe) { return E("div", { style: Object.assign({}, B.karte, { textAlign: "center", padding: 12 }) }, E("div", { style: { fontSize: 24, fontWeight: 700, color: farbe || CI.blau } }, zahl), E("div", { style: B.klein }, text)); };
+    var leerStart = !daten.laedt && !daten.maengel.length && !daten.protokolle.length && !daten.bautenstand.length;
     return E("div", { style: { display: "flex", flexDirection: "column", gap: 16 } },
+      leerStart ? E("div", { style: Object.assign({}, B.karte, { borderColor: CI.gold, background: "#fffdf8" }) },
+        E("div", { style: { fontSize: 14, fontWeight: 700, color: CI.blau, marginBottom: 6 } }, "So geht es los"),
+        E("ol", { style: { margin: 0, paddingLeft: 20, fontSize: 13, lineHeight: 1.7 } },
+          E("li", null, "Unter „Gewerke“ die Handwerker mit E-Mail anlegen, unter „Kunden-Zugänge“ den Käufer mit seiner Einheit."),
+          E("li", null, "Eine Einheit in der Tabelle unten anklicken (oder „📁 Akte“ im Reiter Einheiten) — das ist die Wohnungsakte."),
+          E("li", null, "Dort „📋 Abnahme starten“: Räume durchgehen, je Raum „+ Mangel“ (Diktat, Foto, Gewerk, Frist), unterschreiben, „Abnahme abschließen & verteilen“."),
+          E("li", null, "Mängel, Fristen, Handwerker-Rückmeldungen und Raten laufen danach hier im Cockpit zusammen."))) : null,
       E("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 10 } },
         kachel(offenJe().length, "offene Mängel"), kachel(daten.maengel.filter(istUeberfaellig).length, "überfällig", CI.danger), kachel(daten.maengel.filter(function (m) { return m.status === "gemeldet_erledigt"; }).length, "zu prüfen", "#7a5c00"),
         kachel(kommende.length + entwuerfe.length, "anstehende Abnahmen"), kachel(daten.raten.length, "Raten anforderbar", "#1e7e34")),
