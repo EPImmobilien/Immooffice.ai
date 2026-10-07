@@ -238,7 +238,43 @@ Schnappschuss von damals gibt — keine erfundene Null. Die Demo-Daten
 - [x] Wasserfall, Verteilung, Kohorten, Fristenlisten
 - [ ] Stripe-Spiegeltabellen `rechnungen`/`zahlungen` und Stripe-Abgleich — Schritt 6
 
-## Noch offen aus dem Auftrag (Schritte 4–10)
+## Schritt 4 — Kosten & Marge (fork_72) · erledigt 07.10.2026
+
+Alles aus **einer** Datenbankfunktion, `plattform_kosten(von, bis)`;
+die Edge Function reicht den Zeitraum durch und hängt Namen an.
+
+| Größe | Rechnung |
+|---|---|
+| Erlös je Mandant | MRR (aus `plattform_mrr_je_mandant()`) × Tage ÷ 30 |
+| KI-Kosten | Summe `ki_kosten_eur` gebuchter Buchungen im Zeitraum |
+| Stripe-Gebühr | **Schätzung**: Erlös × `stripe_gebuehr_prozent` + `stripe_gebuehr_fix_cent` × Tage ÷ 30 — bis Balance Transactions gespiegelt sind (Schritt 6). Die Oberfläche nennt sie „GESCHÄTZT". |
+| Infrastruktur | `infrastruktur_pauschale_cent` (Start 150) je zahlendem Mandanten × Tage ÷ 30 |
+| Deckungsbeitrag | Erlös − KI − Gebühr − Pauschale; Marge = Deckung ÷ Erlös |
+| Ist-Kosten je Credit | Σ `ki_kosten_eur` ÷ Σ Credits der Buchungen **mit** Kostenangabe, je Aktion; Ampel gegen `credit_zielkosten_eur` (Start 0,02): grün ≤ 20 % Abweichung, gelb ≤ 50 %, sonst rot |
+| Warnliste | KI-Kosten > `kosten_warnung_prozent` (Start 30) % des Erlöses — oder KI-Kosten ohne jeden Erlös |
+| Ergebnis vor Personal & Miete | Deckungsbeitrag − Σ aktive `plattform_fixkosten` × Tage ÷ 30 |
+
+**Anbieter und Modell** stehen seit fork_72 im Ledger (`credit_buchungen.anbieter`,
+`.modell`, nullable). `credits_buchen` hat eine Fünfer-Fassung, die sie
+entgegennimmt; die Dreier-Fassung bleibt für die fünf bestehenden Aufrufer.
+Die Beilage `_credits/credits.ts` reicht sie durch (`buchen(eur, notiz,
+anbieter, modell)`). Zentral gesetzt werden sie mit der KI-Steuerung
+(Schritt 9); bis dahin zeigt „je Anbieter" `unbekannt`.
+
+`tests/betreiber-kosten.sql`: 30 Tage, Erlös 30,00, KI 12,00, Pauschale
+1,50 → Deckung 16,50; 40 % > 30 % → Warnliste; Ist je Credit 0,12; support
+legt keine Fixkosten an, admin schon.
+
+### Abnahme Schritt 4
+
+- [x] KI-Kosten je Tag, je Aktion, je Anbieter/Modell
+- [x] Ist-Kosten je Credit neben dem Ziel, Ampel > 20 %
+- [x] Deckungsbeitrag je Tarif und je Mandant, sortiert, CSV; Marge
+- [x] Warnliste mit einstellbarem Prozentsatz
+- [x] Fixkostenliste, „Ergebnis vor Personal & Miete"
+- [ ] Stripe-Gebühren aus Balance Transactions statt Schätzung — Schritt 6
+
+## Noch offen aus dem Auftrag (Schritte 5–10)
 
 Werden hier je Schritt nachgetragen. Reihenfolge wie im Auftrag.
 

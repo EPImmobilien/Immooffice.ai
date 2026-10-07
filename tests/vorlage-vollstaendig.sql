@@ -435,7 +435,17 @@ zuwachs(bereich, mehr, grund) as (values
   ('Pruefbedingungen', 1, 'fork_71: art ist abo, einmal oder gutschrift'),
   ('Fremdschluessel', 1, 'fork_71: auf mandanten'),
   ('Indizes ohne Constraint', 3, 'fork_71: je Mandant, je Mandant nach Zeit, nach Status'),
-  ('Richtlinien', 3, 'fork_71: lesen (Chef), die restriktive Mandantentrennung und die Loeschsperre')
+  ('Richtlinien', 3, 'fork_71: lesen (Chef), die restriktive Mandantentrennung und die Loeschsperre'),
+
+  -- fork_72: Betreiber, Schritt 4 — Kosten & Marge.
+  ('Spalten', 2, 'fork_72: anbieter, modell an credit_buchungen'),
+  ('Tabellen', 1, 'fork_72: plattform_fixkosten'),
+  ('Tabellen mit RLS', 1, 'fork_72: auch diese'),
+  ('Spalten', 6, 'fork_72: id, bezeichnung, betrag_cent, aktiv, notiz, geaendert_am'),
+  ('Primaer- und Eindeutigkeitsschluessel', 1, 'fork_72: der Primaerschluessel'),
+  ('Pruefbedingungen', 2, 'fork_72: Bezeichnung nicht leer, Betrag nicht negativ'),
+  ('Richtlinien', 2, 'fork_72: lesen alle Betreiber, pflegen owner/admin'),
+  ('Funktionen', 1, 'fork_72: plattform_kosten — credits_buchen bekam nur zwei weitere Parameter')
 ),
 soll(bereich, soll) as (
   select v.bereich,

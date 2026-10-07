@@ -41,7 +41,8 @@ export interface Abrechnung {
   nutzer: string;
   credits: number;
   /** Nach erfolgreichem KI-Aufruf. `kosten` in Euro, wenn bekannt. */
-  buchen: (kosten?: number | null, notiz?: string) => Promise<void>;
+  /** Anbieter und Modell sind freiwillig (fork_72) — wer sie kennt, gibt sie mit. */
+  buchen: (kosten?: number | null, notiz?: string | null, anbieter?: string | null, modell?: string | null) => Promise<void>;
   /** Wenn der Aufruf scheitert. Gibt die Credits zurück. */
   freigeben: (grund?: string) => Promise<void>;
 }
@@ -139,9 +140,13 @@ export async function kiAbrechnen(
     vorgang: String(vorgang),
     mandant, nutzer: u.user.id,
     credits: Number(kosten ?? 0),
-    async buchen(eur, notiz) {
+    async buchen(eur, notiz, anbieter, modell) {
+      // Anbieter und Modell sind freiwillig (fork_72): wer sie kennt, gibt
+      // sie mit, und "Kosten & Marge" kann je Modell rechnen. Die
+      // Fuenfer-Fassung von credits_buchen ruft innen die Dreier-Fassung.
       const { error: f } = await db.rpc("credits_buchen", {
         p_vorgang: vorgang, p_ki_kosten_eur: eur ?? null, p_notiz: notiz ?? null,
+        p_anbieter: anbieter ?? null, p_modell: modell ?? null,
       });
       // Ein Fehler beim Buchen darf das Ergebnis nicht wegwerfen: der Nutzer
       // hat seinen Text. Er steht im Protokoll und faellt beim Abgleich auf.

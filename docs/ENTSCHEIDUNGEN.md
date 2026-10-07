@@ -6142,3 +6142,21 @@ Schlüssel passt; das Seed-Skript legt einen Live-Katalog nur mit `--live` an.
 **Hinweis an den Betreiber (bei der Entscheidung gegeben):** Kontoverifizierung
 bei Stripe mit echten Daten, Rechtsträger, Impressum, AGB, Datenschutzerklärung
 und AVV sind Voraussetzung für den Verkauf — der Code prüft das nicht.
+
+## 2026-10-07 · Betreiberbereich, Schritt 4: eine Schätzung mit Etikett statt einer Null ohne (fork_72)
+
+Der Auftrag rechnet den Deckungsbeitrag mit Stripe-Gebühren „aus Balance
+Transactions". Die werden erst in Schritt 6 gespiegelt; heute gibt es keine
+einzige Stripe-Zahlung im Projekt. Zwei Wege: die Gebühr bis dahin auf null
+setzen — dann steht ein Deckungsbeitrag da, der um ein bis zwei Prozent zu
+schön ist, und niemand sieht es — oder eine Schätzung aus zwei
+Plattformwerten, die die Oberfläche als **GESCHÄTZT** beschriftet und die
+Schritt 6 durch Ist-Werte ersetzt. Gewählt: die Schätzung. Eine Zahl, die
+sagt, dass sie geschätzt ist, ist ehrlicher als eine Null, die so tut, als
+wüsste sie es.
+
+Anbieter und Modell gehören ins Ledger — ohne sie lässt sich „je Modell"
+nicht rechnen. Als zwei nullable Spalten und eine zweite Fassung von
+`credits_buchen`; die alte bleibt. Ein Ledger-Aufruf, der an einer neuen
+Signatur scheitert, verliert eine Buchung, und das ist der eine Fehler,
+den ein Ledger nicht haben darf.

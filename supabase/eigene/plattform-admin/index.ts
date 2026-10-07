@@ -54,6 +54,9 @@ const AENDERBAR: Record<string, string[]> = {
 const ROLLEN: Record<string, string[]> = {
   wer:                    ["owner", "admin", "support", "finanzen"],
   umsatz:                 ["owner", "admin", "finanzen"],
+  kosten:                 ["owner", "admin", "finanzen"],
+  fixkosten_speichern:    ["owner", "admin"],
+  fixkosten_loeschen:     ["owner", "admin"],
   uebersicht:             ["owner", "admin", "support", "finanzen"],
   mandanten:              ["owner", "admin", "support", "finanzen"],
   mandant:                ["owner", "admin", "support", "finanzen"],
@@ -419,6 +422,55 @@ Deno.serve(async (req) => {
           .map(([aktion, e]) => ({ aktion, ...e, kosten: Math.round(e.kosten * 1e6) / 1e6 }))
           .sort((a, b) => b.credits - a.credits),
       });
+    }
+
+    // --- Kosten & Marge (fork_72) -----------------------------------------
+    // Alles aus einer Datenbankfunktion; die Edge Function reicht nur den
+    // Zeitraum durch und haengt die Namen der Haeuser an.
+    if (aktion === "kosten") {
+      const tage = Math.max(1, Math.min(365, Math.floor(Number(body.tage || 30))));
+      const bis = new Date().toISOString().slice(0, 10);
+      const von = new Date(Date.now() - (tage - 1) * 86400000).toISOString().slice(0, 10);
+      const [{ data: k, error }, { data: namen }] = await Promise.all([
+        db.rpc("plattform_kosten", { p_von: von, p_bis: bis }),
+        db.from("mandanten").select("id, name"),
+      ]);
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      const name = new Map((namen || []).map((m) => [String(m.id), m.name]));
+      const kk = (k || {}) as Record<string, unknown>;
+      kk.je_mandant = ((kk.je_mandant as Record<string, unknown>[]) || []).map((j) => ({ ...j, name: name.get(String(j.mandant_id)) || j.mandant_id }));
+      return antwort({ ok: true, ...kk });
+    }
+    if (aktion === "fixkosten_speichern") {
+      const bez = String(body.bezeichnung || "").trim();
+      const betrag = Math.max(0, Math.floor(Number(body.betrag_cent || 0)));
+      if (bez.length < 2) return antwort({ ok: false, fehler: "Bezeichnung fehlt." }, 400);
+      const zeile: Record<string, unknown> = { bezeichnung: bez.slice(0, 120), betrag_cent: betrag,
+        aktiv: body.aktiv !== false, notiz: body.notiz ? String(body.notiz).slice(0, 500) : null,
+        geaendert_am: new Date().toISOString() };
+      let vorher: unknown = null;
+      if (body.id) {
+        const { data: v } = await db.from("plattform_fixkosten").select("*").eq("id", String(body.id)).maybeSingle();
+        vorher = v;
+        const { error } = await db.from("plattform_fixkosten").update(zeile).eq("id", String(body.id));
+        if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      } else {
+        const { error } = await db.from("plattform_fixkosten").insert(zeile);
+        if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      }
+      await protokoll("fixkosten_geaendert", String(body.id || bez), { bezeichnung: bez, betrag_cent: betrag },
+                      { typ: "fixkosten", vorher, nachher: zeile });
+      return antwort({ ok: true });
+    }
+    if (aktion === "fixkosten_loeschen") {
+      const fid = String(body.id || "");
+      if (!fid) return antwort({ ok: false, fehler: "Keine Kennung." }, 400);
+      const { data: vorher } = await db.from("plattform_fixkosten").select("*").eq("id", fid).maybeSingle();
+      // Erst das Protokoll, dann das Loeschen — wie beim Mandanten.
+      await protokoll("fixkosten_geloescht", fid, {}, { typ: "fixkosten", vorher, nachher: null });
+      const { error } = await db.from("plattform_fixkosten").delete().eq("id", fid);
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      return antwort({ ok: true });
     }
 
     // --- Umsatz & Abos (fork_70) ------------------------------------------

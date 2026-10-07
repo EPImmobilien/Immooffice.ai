@@ -235,6 +235,125 @@
           + "Zahl wäre hier schlimmer als eine fehlende.")));
   }
 
+  // --- Kosten & Marge (fork_72) ------------------------------------------------
+  function Kosten(p) {
+    var d = p.daten;
+    var fZ = React.useState({ bezeichnung: "", betrag: "" }), form = fZ[0], setzeForm = fZ[1];
+    if (!d) return E("div", { style: { color: CI.muted } }, "Lade Kosten …");
+    var g = d.gesamt || {};
+    var darf = p.rolle === "owner" || p.rolle === "admin";
+    var ergebnis = Number(g.deckung_cent || 0) - Number(d.fixkosten_cent || 0);
+    function ampel(ist, ziel) {
+      if (ist === null || ist === undefined || !ziel) return E("span", { style: { color: CI.muted } }, "—");
+      var abw = (Number(ist) - Number(ziel)) / Number(ziel);
+      var farbe = Math.abs(abw) <= 0.2 ? CI.success : Math.abs(abw) <= 0.5 ? CI.gold : CI.danger;
+      return E("span", { style: { color: farbe, fontWeight: 600 } }, (abw >= 0 ? "+" : "") + Math.round(abw * 100) + " %");
+    }
+    async function fixSpeichern() {
+      try { await ruf("fixkosten_speichern", { bezeichnung: form.bezeichnung, betrag_cent: Math.round(Number(String(form.betrag).replace(",", ".")) * 100) });
+        setzeForm({ bezeichnung: "", betrag: "" }); p.melden("Gespeichert."); p.neuLaden(); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    return E("div", null,
+      E("div", { style: { display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", marginBottom: 18 } },
+        [["Erlös (anteilig)", geld(g.erloes_cent || 0), zahl(d.tage) + " Tage, MRR auf den Zeitraum"],
+         ["KI-Kosten", euro(g.ki_eur || 0), "Summe ki_kosten_eur gebuchter Buchungen"],
+         ["Stripe-Gebühren", geld(g.gebuehr_cent || 0), d.gebuehr_geschaetzt ? "GESCHÄTZT (" + d.gebuehr_prozent + " % + " + geld(d.gebuehr_fix_cent) + ") — echte Werte mit Schritt 6" : "aus Balance Transactions"],
+         ["Infrastruktur", geld(g.pauschale_cent || 0), geld(d.pauschale_cent) + " je zahlendem Mandanten und Monat"],
+         ["Deckungsbeitrag", geld(g.deckung_cent || 0), g.erloes_cent ? "Marge " + Math.round(Number(g.deckung_cent) / Number(g.erloes_cent) * 100) + " %" : "—"],
+         ["Ergebnis vor Personal & Miete", geld(ergebnis), "Deckungsbeitrag minus " + geld(d.fixkosten_cent || 0) + " Fixkosten (anteilig)"]].map(function (k, i) {
+          return E("div", { key: i, style: kasten },
+            E("div", { style: { fontSize: 11, color: CI.muted, letterSpacing: "0.06em", textTransform: "uppercase" } }, k[0]),
+            E("div", { style: { fontSize: 22, fontWeight: 700, color: CI.blau, margin: "6px 0 4px" } }, k[1]),
+            E("div", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.5 } }, k[2]));
+        })),
+      E("div", { style: kasten },
+        Ueberschrift("KI-Kosten je Tag"),
+        E(Stapelbalken, { reihen: (d.je_tag || []).map(function (t) { return { tag: String(t.tag).slice(5), "EUR": Number(t.eur) }; }), x: "tag", format: euro, leer: "Keine gebuchten KI-Kosten im Zeitraum." })),
+      E("div", { style: kasten },
+        Ueberschrift("Ist-Kosten je Credit — Ziel " + euro(d.ziel_je_credit_eur) + " (Ampel bei > 20 % Abweichung)"),
+        (d.je_aktion || []).length
+          ? E("table", { style: { width: "100%", borderCollapse: "collapse" } },
+              E("thead", null, E("tr", null, ["Aktion", "Credits", "KI-Kosten", "Ist je Credit", "Abweichung", "konfiguriert (Credits/Aufruf)"].map(function (h, i) {
+                return E("th", { key: i, style: Object.assign({}, kopfzelle, i ? { textAlign: "right" } : {}) }, h); }))),
+              E("tbody", null, d.je_aktion.map(function (a) {
+                return E("tr", { key: a.aktion },
+                  E("td", { style: zelle }, a.aktion),
+                  E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, zahl(a.credits)),
+                  E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, a.mit_kosten ? euro(a.eur) : "—"),
+                  E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, a.ist_je_credit !== null && a.ist_je_credit !== undefined ? euro(a.ist_je_credit) : "—"),
+                  E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, ampel(a.ist_je_credit, d.ziel_je_credit_eur)),
+                  E("td", { style: Object.assign({}, zelle, { textAlign: "right", color: CI.muted }) }, a.konfiguriert !== null && a.konfiguriert !== undefined ? zahl(a.konfiguriert) : "—"));
+              })))
+          : E("div", { style: { fontSize: 13, color: CI.muted } }, "Keine Buchungen im Zeitraum.")),
+      E("div", { style: kasten },
+        Ueberschrift("Je Anbieter und Modell"),
+        (d.je_anbieter || []).length
+          ? (d.je_anbieter || []).map(function (a, i) {
+              return E("div", { key: i, style: { fontSize: 13, padding: "3px 0" } }, a.anbieter + " · " + a.modell + ": " + euro(a.eur || 0) + " · " + zahl(a.credits) + " Credits · " + zahl(a.buchungen) + " Buchungen");
+            })
+          : E("div", { style: { fontSize: 13, color: CI.muted } }, "Noch keine Buchung trägt Anbieter und Modell — die Spalten gibt es seit fork_72; die KI-Steuerung (Schritt 9) setzt sie zentral.")),
+      E("div", { style: kasten },
+        Ueberschrift("Deckungsbeitrag je Tarif"),
+        E("table", { style: { width: "100%", borderCollapse: "collapse" } },
+          E("thead", null, E("tr", null, ["Tarif", "Mandanten", "Erlös", "KI", "Gebühr*", "Pauschale", "Deckung", "Marge"].map(function (h, i) {
+            return E("th", { key: i, style: Object.assign({}, kopfzelle, i ? { textAlign: "right" } : {}) }, h); }))),
+          E("tbody", null, (d.je_tarif || []).map(function (t) {
+            return E("tr", { key: t.tarif },
+              E("td", { style: zelle }, t.tarif),
+              E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, zahl(t.mandanten)),
+              E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, geld(t.erloes_cent)),
+              E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, euro(t.ki_eur)),
+              E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, geld(t.gebuehr_cent)),
+              E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, geld(t.pauschale_cent)),
+              E("td", { style: Object.assign({}, zelle, { textAlign: "right", fontWeight: 600 }) }, geld(t.deckung_cent)),
+              E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, t.erloes_cent ? Math.round(t.deckung_cent / t.erloes_cent * 100) + " %" : "—"));
+          })))),
+      E("div", { style: kasten },
+        E("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
+          Ueberschrift("Deckungsbeitrag je Mandant"),
+          E("button", { type: "button", style: Object.assign({}, knopfLeer, { marginLeft: "auto", marginBottom: 12 }), onClick: function () {
+            csvExport("deckungsbeitrag.csv", [["Mandant", "name"], ["Tarif", "tarif"],
+              ["Erloes EUR", function (r) { return r.erloes_cent / 100; }], ["KI EUR", "ki_eur"],
+              ["Gebuehr EUR (geschaetzt)", function (r) { return r.gebuehr_cent / 100; }],
+              ["Pauschale EUR", function (r) { return r.pauschale_cent / 100; }],
+              ["Deckung EUR", function (r) { return r.deckung_cent / 100; }], ["ueber Kostengrenze", "ueber_grenze"]], d.je_mandant || []); } }, "CSV")),
+        E("div", { style: { overflowX: "auto" } }, E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 760 } },
+          E("thead", null, E("tr", null, ["Mandant", "Tarif", "Erlös", "KI", "Gebühr*", "Pauschale", "Deckung", ""].map(function (h, i) {
+            return E("th", { key: i, style: Object.assign({}, kopfzelle, i > 1 ? { textAlign: "right" } : {}) }, h); }))),
+          E("tbody", null, (d.je_mandant || []).map(function (j) {
+            return E("tr", { key: j.mandant_id, style: j.ueber_grenze ? { background: "#fff7e6" } : null },
+              E("td", { style: zelle }, j.name, j.ueber_grenze ? E("span", { style: { fontSize: 11, color: "#6b4e13", marginLeft: 6 } }, "über Kostengrenze") : null),
+              E("td", { style: zelle }, j.tarif || "—"),
+              E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, geld(j.erloes_cent)),
+              E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, euro(j.ki_eur)),
+              E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, geld(j.gebuehr_cent)),
+              E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, geld(j.pauschale_cent)),
+              E("td", { style: Object.assign({}, zelle, { textAlign: "right", fontWeight: 600, color: j.deckung_cent < 0 ? CI.danger : CI.blau }) }, geld(j.deckung_cent)),
+              E("td", { style: zelle }, p.oeffnen ? E("button", { type: "button", style: knopfLeer, onClick: function () { p.oeffnen(j.mandant_id); } }, "Öffnen") : null));
+          })))),
+        E("p", { style: { fontSize: 11.5, color: CI.muted, marginTop: 10 } },
+          "* Gebühr geschätzt, bis die Stripe-Balance-Transactions gespiegelt sind (Schritt 6). Warnliste: KI-Kosten über " + zahl(d.warnung_prozent) + " % des Erlöses.")),
+      E("div", { style: kasten },
+        Ueberschrift("Monatliche Fixkosten"),
+        (d.fixkosten || []).map(function (f) {
+          return E("div", { key: f.id, style: { display: "flex", gap: 8, alignItems: "center", fontSize: 13, padding: "4px 0", borderBottom: "1px solid " + CI.border } },
+            E("span", { style: { flex: 1, color: f.aktiv ? CI.blau : CI.muted } }, f.bezeichnung + (f.aktiv ? "" : " (inaktiv)")),
+            E("span", null, geld(f.betrag_cent) + " / Monat"),
+            darf ? E("button", { type: "button", style: knopfLeer, onClick: function () {
+              ruf("fixkosten_speichern", { id: f.id, bezeichnung: f.bezeichnung, betrag_cent: f.betrag_cent, aktiv: !f.aktiv }).then(p.neuLaden).catch(function (e) { p.melden(e.message, "fehler"); }); } }, f.aktiv ? "Deaktivieren" : "Aktivieren") : null,
+            darf ? E("button", { type: "button", style: knopfLeer, onClick: function () {
+              if (!window.confirm("„" + f.bezeichnung + "“ löschen?")) return;
+              ruf("fixkosten_loeschen", { id: f.id }).then(p.neuLaden).catch(function (e) { p.melden(e.message, "fehler"); }); } }, "Löschen") : null);
+        }),
+        darf ? E("div", { style: { display: "grid", gap: 8, gridTemplateColumns: "2fr 1fr auto", alignItems: "end", marginTop: 10 } },
+          E("input", { style: feld, placeholder: "Bezeichnung (Hosting, Werkzeuge, Versicherung …)", value: form.bezeichnung,
+            onChange: function (e) { setzeForm(Object.assign({}, form, { bezeichnung: e.target.value })); } }),
+          E("input", { style: feld, placeholder: "EUR je Monat", value: form.betrag,
+            onChange: function (e) { setzeForm(Object.assign({}, form, { betrag: e.target.value })); } }),
+          E("button", { type: "button", style: knopf, disabled: form.bezeichnung.trim().length < 2 || !form.betrag, onClick: fixSpeichern }, "Hinzufügen")) : null));
+  }
+
   // --- Umsatz & Abos (fork_70) ------------------------------------------------
   function Umsatz(p) {
     var d = p.daten;
@@ -1225,13 +1344,14 @@
     var laden = React.useCallback(function (welcher, id) {
       var aktion = welcher === "zahlen" ? "uebersicht"
         : welcher === "umsatz" ? "umsatz"
+        : welcher === "kosten" ? "kosten"
         : welcher === "mandanten" ? "mandanten"
         : welcher === "katalog" ? "katalog"
         : welcher === "konten" ? "nutzer"
         : welcher === "system" ? "system"
         : welcher === "admins" ? "admin_liste"
         : welcher === "mandant" ? "mandant" : "protokoll";
-      ruf(aktion, welcher === "mandant" ? { mandant_id: id } : welcher === "zahlen" ? { tage: tage } : null).then(function (d) {
+      ruf(aktion, welcher === "mandant" ? { mandant_id: id } : (welcher === "zahlen" || welcher === "kosten") ? { tage: tage } : null).then(function (d) {
         var n = {};
         n[welcher] = welcher === "mandanten" ? d.mandanten
           : welcher === "admins" ? d.admins
@@ -1282,6 +1402,7 @@
     var rolle = wer.rolle || "admin";
     var alleReiter = [["zahlen", "Übersicht", ["owner", "admin", "support", "finanzen"]],
       ["umsatz", "Umsatz & Abos", ["owner", "admin", "finanzen"]],
+      ["kosten", "Kosten & Marge", ["owner", "admin", "finanzen"]],
       ["mandanten", "Mandanten", ["owner", "admin", "support", "finanzen"]],
       ["konten", "Konten", ["owner", "admin", "support"]],
       ["katalog", "Katalog", ["owner", "admin", "support", "finanzen"]],
@@ -1344,6 +1465,8 @@
             zurueck: function () { setzeOffen(null); laden("mandanten"); } })
         : reiter === "zahlen" ? E(Zahlen, { daten: daten.zahlen, oeffnen: function (id) { setzeOffen(id); } })
         : reiter === "umsatz" ? E(Umsatz, { daten: daten.umsatz, oeffnen: function (id) { setzeOffen(id); } })
+        : reiter === "kosten" ? E(Kosten, { daten: daten.kosten, rolle: rolle, melden: melden, neuLaden: function () { laden("kosten"); },
+            oeffnen: function (id) { setzeOffen(id); } })
         : reiter === "mandanten" ? E(Mandanten, { daten: daten.mandanten, melden: melden,
             oeffnen: function (id) { setzeOffen(id); },
             neuLaden: function () { laden("mandanten"); } })
