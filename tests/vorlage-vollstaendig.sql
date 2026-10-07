@@ -499,7 +499,16 @@ zuwachs(bereich, mehr, grund) as (values
   ('Funktionen', 5, 'fork_78: ki_schranke, system_mail_rendern, rechtstexte_offen, plattform_rechtstexte_stand, meine_ankuendigungen'),
   ('Trigger', 2, 'fork_78: ki_schranke am Ledger, support_protokoll_tr an rechtstext_zustimmungen'),
   ('Fremdschluessel', 3, 'fork_78: mandant_ki_limits; zustimmungen auf mandanten und rechtstexte'),
-  ('Pruefbedingungen', 9, 'fork_78: anbieter, temperatur, max_tokens; credits_tag, eur_tag; art; typ, titel, zeitraum')
+  ('Pruefbedingungen', 9, 'fork_78: anbieter, temperatur, max_tokens; credits_tag, eur_tag; art; typ, titel, zeitraum'),
+  -- fork_79: Betreiber, Schritt 10 — Warnregeln, Zusammenfassung, Demo-Daten.
+  ('Tabellen', 2, 'fork_79: plattform_warnregeln, plattform_warnungen'),
+  ('Tabellen mit RLS', 2, 'fork_79: beide'),
+  ('Spalten', 17, 'fork_79: 7 warnregeln, 8 warnungen, mandanten.ist_demo, plattform_kennzahlen_tag.ist_demo'),
+  ('Primaer- und Eindeutigkeitsschluessel', 3, 'fork_79: zwei Primaerschluessel, warnungen.eindeutig'),
+  ('Indizes ohne Constraint', 1, 'fork_79: warnungen nach Zeit'),
+  ('Funktionen', 4, 'fork_79: plattform_warnungen_pruefen, plattform_tageszusammenfassung, plattform_demo_anlegen, plattform_demo_entfernen'),
+  ('Fremdschluessel', 2, 'fork_79: warnungen auf regeln und mandanten'),
+  ('Cron-Jobs', 3, 'fork_79: plattform-warnungen-stuendlich, plattform-zusammenfassung-sommer/-winter')
 ),
 soll(bereich, soll) as (
   select v.bereich,

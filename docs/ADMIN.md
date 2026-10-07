@@ -590,7 +590,109 @@ chef/eigenes Haus, Tarif-Ziel, Wartungs-Countdown).
 - [x] Ankündigungen nach Tarif/Status/einzeln, Wartung mit Countdown, optional Mail
 - [ ] Rechtstexte auf der Landingpage aus der Tabelle (heute statische Seiten) — OFFEN
 
-## Noch offen aus dem Auftrag (Schritt 10)
+## Schritt 10 — Warnungen, Tageszusammenfassung, Demo-Daten (fork_79) · erledigt 07.10.2026
+
+**Migration** `20261007250000_fork_79_betreiber_warnungen_demo.sql`,
+**Edge Function** `plattform-warnungen` (öffentlich wie alle Cron-Ziele,
+nimmt nur `modus`/`erzwingen`).
+
+### Warnregeln (Reiter „Warnungen")
+
+| Regel | Auslöser | Eindeutig je |
+|---|---|---|
+| Zahlung fehlgeschlagen | `mandant_abo.zahlung_fehler_seit` | Mandant + Datum |
+| Mandant über KI-Kostengrenze | Tages-/Monatskosten eines Hauses > `alarm_kosten_mandant_tag_eur` / `_monat_eur` | Mandant + Tag bzw. Monat |
+| Tages-KI-Kosten gesamt | Summe aller Häuser > `alarm_kosten_tag_eur` / `_monat_eur` | Tag bzw. Monat |
+| Job-/Webhook-Fehler > N in 1 h | gescheiterte Cron-Läufe + Stripe-Webhooks mit Fehler, Schwelle einstellbar (Start 3) | Stunde |
+| Externer Dienst gestört | `dienst_aufrufe`: Fehlerquote > X % (Start 20) bei ≥ 5 Aufrufen in 1 h | Dienst + Stunde |
+| Support-Anfrage Priorität hoch | offene Anfrage mit `prioritaet = hoch` | Anfrage |
+| Neuer zahlender Mandant (Info) | Abo in den letzten 24 h aktiv | Mandant |
+| Kündigung (Info) | `gekuendigt_am` | Mandant + Datum |
+
+`plattform_warnungen_pruefen()` läuft stündlich (pg_cron 20 min nach voll →
+`plattform-warnungen` modus `pruefen`), schreibt jede Warnung **einmal**
+(`plattform_warnungen.eindeutig`); die Function sendet alles Ungesendete
+an `plattform_werte.betreiber_email` und setzt `gesendet_am`. Ohne Adresse
+wird nur protokolliert. Demo-Mandanten sind ausgenommen. **Kanal:** nur
+E-Mail — die Vorlage hat keinen Push-Weg zum Betreiber; die Oberfläche
+sagt das in der Regeltabelle.
+
+### Tageszusammenfassung
+
+`plattform_tageszusammenfassung()`: MRR und zahlende, gestern neue Abos /
+Kündigungen / neue Tests, Tests endend in 3 Tagen, KI-Kosten und Credits
+gestern, offene Probleme (Zahlungen, Job-/Webhook-Fehler, Support,
+Zugriffsanfragen, hängende Reservierungen, Funktionsfehler, Warnungen).
+Versand 7:30 Europe/Berlin: pg_cron kennt keine Zeitzone, deshalb zwei
+Jobs (05:30 und 06:30 UTC); die Function sendet nur, wenn es in Berlin
+7 Uhr ist, und nur einmal am Tag (Schlüssel `zusammenfassung:<Datum>`).
+Schalter `zusammenfassung_aktiv`; „Zusammenfassung jetzt senden" erzwingt.
+
+### Demo-Daten (Owner)
+
+`plattform_demo_anlegen()`: 30 fiktive Mandanten (`ist_demo = true`,
+Namen wie „Küstenmakler Demo GmbH"), 18 aktiv / 5 Test / 3 gekündigt /
+3 Zahlung offen / 1 gesperrt, Tarife Starter/Professional/Business, Monat
+und Jahr, Zusatznutzer, Gründerpreis; je Monat Tarif-Topf, Buchungen mit
+KI-Kosten über bis zu 12 Monate (~1.800 Ledger-Zeilen), Rechnungen
+(`in_demo_…`, Stripe-Abgleich nimmt sie aus), Objekte, Support-Anfragen,
+Chef-Nutzer mit Login-Spur, Kennzahlen-Verlauf (Monatsenden, `ist_demo`).
+`plattform_demo_entfernen()` löscht alles (Ledger geht mit, weil der
+Mandant selbst verschwindet — fork_47). Bestätigung „DEMO".
+
+`tests/betreiber-warnungen.sql`: 14 Prüfungen (einmalige Warnung,
+abgeschaltete Regel, Support hoch, Tageskosten, Zusammenfassung, Demo:
+30, MRR = Handsumme, Warnregeln ohne Demo, 12 Monate, Rechnungen,
+doppeltes Anlegen abgewiesen, vollständiges Entfernen).
+
+## Abnahme (Auftrag, Abschnitt 22)
+
+| # | Punkt | Stand | Nachweis |
+|---|---|---|---|
+| 1 | Normaler Nutzer und `chef` erreichen `#/betreiber` nicht, auch nicht per RPC/Function | ✓ | `plattform-admin` prüft `plattform_admins` je Aufruf; Plattformfunktionen werfen 42501 (`tests/betreiber-rollen.sql`, `-technik`, `-support`, `-steuerung`) |
+| 2 | Plattform-Admin ohne zweiten Faktor wird abgewiesen | ✓ | fork_68: `aal`-Claim; TOTP muss in der Supabase-Konsole aktiviert sein (To-do) |
+| 3 | Ohne Support-Zugriff keine Objekte, Kontakte, Verträge, Dateien (RLS-Test) | ✓ | `tests/supportzugriff.sql` Block 1 und 8a |
+| 4 | Anfrage → Freigabe `chef` → Banner → automatisches Ende → Protokoll | ✓ | fork_77, `tests/supportzugriff.sql`, `tests/betreiber-support.sql` |
+| 5 | `support` ändert keine Preise, `finanzen` sperrt keine Mandanten | ✓ | ROLLEN-Karte: `katalog_speichern` owner/admin, `mandant_speichern` owner/admin/support; `tests/betreiber-rollen.sql` |
+| 6 | Audit-Log weder änderbar noch löschbar | ✓ | fork_52 Trigger; `tests/betreiber-rollen.sql` (auch mit Dienstrecht) |
+| 7 | MRR = manuelle Summe der Demo-Abos | ✓ | `tests/betreiber-warnungen.sql`: 350.471 vs 350.469 Cent — Differenz = Rundung Jahrespreis ÷ 12 je Jahresabo |
+| 8 | Ist-Kosten je Credit aus `credit_buchungen` | ✓ | Schritt 4, `tests/betreiber-kosten.sql` |
+| 9 | Preisänderung → neuer Stripe-Price, Bestand behält alten, Landingpage neu | ✓ (Testmodus) | Schritt 5 (`katalog_speichern`, `tarife-oeffentlich`) |
+| 10 | Feature-Flag „ab Professional" sperrt Modul im Starter mit Upgrade-Hinweis | ✓ | Schritt 5, `hat_feature`, `features.js` |
+| 11 | KI-Tageslimit greift und gibt nach Mitternacht frei | ✓ | `tests/betreiber-steuerung.sql` (gestern zählt nicht, KI002) |
+| 12 | Neue AGB-Version mit Zustimmungspflicht blockiert `chef` | ✓ | `rechtstexte_offen()`, `ImmoRechtstextSperre`, Test |
+| 13 | Warnung bei fehlgeschlagener Zahlung per E-Mail; Tageszusammenfassung versendet | ✓ Logik / ☐ live | Versand braucht `betreiber_email` + `RESEND_API_KEY`/`SMTP_FROM_EMAIL` als Function-Secrets |
+| 14 | CSV öffnet sauber in Excel (UTF-8 BOM, Semikolon, deutsche Zahlen) | ✓ | `csvExport` in `plattform.js`: `\ufeff`, `;`, Komma-Dezimal, de-DE-Datum |
+| 15 | Übersicht < 2 s mit Demo-Daten | ✓ | Datenbankfunktionen mit 30 Demo-Häusern lokal: `plattform_mandanten_kennzahlen()` 20 ms, `plattform_kosten()` 20 ms; Live-Messung siehe Kurzbericht |
+| 16 | 375 px nutzbar | ✓ (gebaut) | Kacheln `auto-fit`, Tabellen scrollen nur innerhalb des Kastens (`overflowX: auto`); nicht auf Gerät gemessen |
+| 17 | Neutralitäts-Gate grün | ✓ | Teil von `npm run check` |
+
+## Kurzbericht
+
+**Erledigt:** Schritte 1–10 des Auftrags, Migrationen fork_67–79, Edge
+Functions `plattform-admin` (erweitert), `plattform-stripe-abgleich`,
+`plattform-warnungen`, Oberfläche `src/eigene/plattform.js` (14 Reiter),
+`hilfe.js`, `hinweise.js`, `features.js`; je Schritt SQL-Gates in
+`npm run check`; alles auf dem Projekt `usguiggfciavwzkdfjgt` und unter
+immooffice.ai ausgerollt.
+
+**Offene Annahmen:** Stripe nur Testmodus (Gate 3); E-Mail-Versand
+best effort über Resend; „Erneut verarbeiten" für Webhooks gibt es bewusst
+nicht (Stripe sendet selbst erneut); Bild-KI wählt ihr Modell im Code
+(„siehe Funktion"); Push-Kanal gibt es nicht.
+
+**Bekannte Grenzen:** `system_fehler` füllen nur die drei eigenen
+Betreiber-Functions; Rechtstexte stehen auf der Landingpage noch statisch;
+System-Mails `willkommen`, `zahlung_problem`, `kuendigung_bestaetigt`,
+`loeschung_angekuendigt` haben keinen Versender; DSGVO-Löschprozess
+(30 Tage, Export-Angebot) ist nicht gebaut — Löschen ist sofort und nur
+owner; Kohorten/Modulnutzung rechnen aus Metadaten, nicht aus Logins je
+Modul; zwei Sitzungen auf einem Branch brauchen eine Nummernabsprache
+(fork_71/fork_76 kollidierten je einmal).
+
+**Der Betreiber selbst:** siehe nächster Abschnitt.
+
+
 
 Werden hier je Schritt nachgetragen. Reihenfolge wie im Auftrag.
 
@@ -600,5 +702,15 @@ Werden hier je Schritt nachgetragen. Reihenfolge wie im Auftrag.
    einmal mit der Authenticator-App einrichten (die Tafel führt hin).
 2. Ersten Owner festlegen (ist auf dem Projekt geschehen; Statement oben für
    weitere Installationen).
-3. Betreiber-E-Mail für Warnungen — kommt mit Schritt 10.
-4. Rechtstexte einpflegen — kommt mit Schritt 9.
+3. Betreiber-E-Mail für Warnungen und Tageszusammenfassung: Reiter
+   „Warnungen" → Adresse speichern. Dazu `RESEND_API_KEY` und
+   `SMTP_FROM_EMAIL` als Function-Secrets (docs/SECRETS.md), sonst wird nur
+   protokolliert.
+4. Rechtstexte einpflegen: Reiter „Rechtstexte" → je Art eine Fassung,
+   anwaltlich prüfen lassen, veröffentlichen (owner). Bei AGB/AVV
+   „Zustimmung erforderlich" setzen, wenn die Chefs zustimmen sollen.
+5. KI-Grenzen prüfen: Reiter „KI" → Tageslimit (Start 0 = aus) und
+   Alarm-Schwellen (Start 50 €/Tag, 1.000 €/Monat, je Mandant 10/100 €).
+6. Demo-Daten nach der Abnahme wieder entfernen (Reiter „Warnungen", unten,
+   Bestätigung DEMO) — sie zählen in allen Listen mit, nur Warnungen,
+   Zusammenfassung und Stripe-Abgleich lassen sie aus.

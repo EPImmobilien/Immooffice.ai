@@ -1411,3 +1411,17 @@ System-Mails `willkommen`, `zahlung_problem`, `kuendigung_bestaetigt`,
 die Selbstregistrierung, Zahlungsproblem und Kündigung an den
 Stripe-Webhook (Sitzung der Stripe-Integration), Löschung an den
 DSGVO-Löschprozess (Schritt 2, offen).
+
+
+## Betreiberbereich: was nach Schritt 10 offen bleibt
+
+- **Live-Nachweis des Versands** (Warnungen, Zusammenfassung, Support-Mails,
+  Testphase): braucht `betreiber_email` im Reiter „Warnungen" und die
+  Resend-Secrets an den Functions.
+- **DSGVO-Löschprozess** (Auftrag, Abschnitt 6): 30 Tage Frist,
+  Export-Angebot per Mail, getrennte Aufbewahrung der Rechnungsdaten.
+  Heute: sofortiges Löschen durch den owner mit Namensbestätigung.
+- **375 px** ist gebaut (auto-fit, Tabellen scrollen im Kasten), aber nicht
+  auf einem Gerät gemessen.
+- **Dashboard < 2 s** lokal mit 30 Demo-Häusern nachgewiesen (20 ms je
+  Funktion); auf dem Projekt mit Demo-Daten messen, sobald sie dort liegen.

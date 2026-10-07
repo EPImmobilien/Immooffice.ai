@@ -48,6 +48,11 @@ OHNE_MANDANT = {
     'stripe_ereignisse',
     # fork_74: Summen des Stripe-Abgleichs ueber ALLE Mandanten; GLOBAL, nur Betreiber lesen.
     'stripe_abgleich',
+    # fork_79: Technik- und Warnprotokolle des Betreibers. dienst_aufrufe
+    # (Latenz je Fremddienst) und system_fehler (Funktionsfehler) sind DIENST
+    # ohne Mandantenspalte; plattform_warnungen traegt mandant_id als Bezug
+    # (GRENZE) — eine Tageskosten-Warnung hat keinen Mandanten.
+    'dienst_aufrufe', 'system_fehler', 'plattform_warnungen',
 }
 
 # Tabellen, deren Mandant seit fork_22 aus dem Elternsatz kommt: ein

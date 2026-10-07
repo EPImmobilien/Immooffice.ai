@@ -68,7 +68,9 @@ Deno.serve(async (req) => {
     const stripeRechnungen = await alle("invoices", { "created[gte]": sek(vormonatAnfang) });
     const { data: spiegel } = await db.from("stripe_rechnungen")
       .select("id, status, brutto_cent, bezahlt_cent, offen_cent, erstellt_am, gebuehr_cent, bezahlt_am")
-      .gte("erstellt_am", vormonatAnfang.toISOString());
+      .gte("erstellt_am", vormonatAnfang.toISOString())
+      // fork_79: Demo-Rechnungen (in_demo_…) gibt es bei Stripe nicht — sie waeren jeden Tag eine Abweichung.
+      .not("id", "like", "in_demo_%");
     const spiegelNach = new Map((spiegel || []).map((r) => [String(r.id), r]));
     const zeitraeume: [string, Date, Date][] = [["laufend", monatAnfang, new Date(jetzt.getTime() + 86400000)], ["vormonat", vormonatAnfang, monatAnfang]];
     for (const [name, von, bis] of zeitraeume) {

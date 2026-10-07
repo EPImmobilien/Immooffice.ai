@@ -769,6 +769,13 @@ else
   schlecht
 fi
 
+abschnitt "Betreiber-Warnungen: Regeln, Zusammenfassung, Demo-Daten"
+if scripts/lokale-db.sh psql -q -f tests/betreiber-warnungen.sql; then
+  :
+else
+  schlecht
+fi
+
 abschnitt "IMAP: liest der Abruf die Ordnerliste jedes Servers?"
 node tests/imap-ordnerliste.js || schlecht
 

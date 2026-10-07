@@ -405,6 +405,9 @@ verify_jwt = false
 [functions.plattform-stripe-abgleich]
 verify_jwt = false
 
+[functions.plattform-warnungen]
+verify_jwt = false
+
 # Oeffentlich, zwangslaeufig: Stripe bringt kein Supabase-Token mit. Die
 # Echtheit haengt an der Signatur, und die prueft die Funktion selbst.
 [functions.stripe-webhook]

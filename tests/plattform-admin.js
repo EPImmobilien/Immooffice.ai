@@ -56,6 +56,8 @@ const ERLAUBT = new Set([
   // Zeilen ohne Mandant (globale Vorlagen), siehe VORLAGEN in der Funktion.
   'plattform_ki_einstellungen', 'mandant_ki_limits', 'system_mail_vorlagen', 'rechtstexte',
   'rechtstext_zustimmungen', 'ankuendigungen', 'expose_vorlagen', 'vertragsvorlagen', 'mpe_bausteine', 'marketing_print_vorlagen',
+  // fork_79: Warnregeln und ausgeloeste Warnungen des Betreibers.
+  'plattform_warnregeln', 'plattform_warnungen',
   // Nur GEZAEHLT (head: true) fuer "Technikfehler 24 h"; keine Meldung geht hinaus.
   'fehler_protokoll',
   // Die Vertragsbeziehung. `credit_konten` und `credit_buchungen` sind das
@@ -304,6 +306,12 @@ if (fs.existsSync(TAFEL)) {
       liste: [{ id: 'k1', typ: 'wartung', titel: 'Wartung Samstag', text: 'Ab 22 Uhr', von: '2026-10-11T20:00:00Z', bis: '2026-10-11T23:00:00Z', schliessbar: false, ziel_tarife: null, ziel_status: null, ziel_mandanten: null, mail_an_chefs: true, mail_gesendet_am: null }],
       mandanten: [{ id: 'a', name: 'Alpha GmbH' }], tarife: [{ schluessel: 'starter', name: 'Starter' }],
     },
+    warnungen: {
+      regeln: [{ schluessel: 'zahlung_fehlgeschlagen', name: 'Zahlung fehlgeschlagen', aktiv: true, kanal: ['email'], schwelle: null },
+        { schluessel: 'job_webhook_fehler', name: 'Job-/Webhook-Fehler > N in 1 h', aktiv: true, kanal: ['email'], schwelle: 3 }],
+      liste: [{ id: 'w1', regel: 'zahlung_fehlgeschlagen', zeit: '2026-10-06T09:00:00Z', text: 'Alpha GmbH: Zahlung fehlgeschlagen seit 01.10.2026', gesendet_am: null, gelesen_am: null, mandant_id: 'a' }],
+      werte: { betreiber_email: '', zusammenfassung_aktiv: true }, demo: 0,
+    },
     mandant: {
       mandant: { id: 'a', name: 'Alpha GmbH', slug: 'alpha', erstellt_am: '2026-01-02',
         testphase_bis: null, gesperrt_am: null },
@@ -321,7 +329,7 @@ if (fs.existsSync(TAFEL)) {
   };
 
   for (const reiter of ['zahlen', 'mandanten', 'konten', 'katalog', 'system', 'support',
-                        'ki', 'vorlagen', 'recht', 'hinweise', 'protokoll', 'DETAIL']) {
+                        'ki', 'vorlagen', 'recht', 'hinweise', 'warnungen', 'protokoll', 'DETAIL']) {
     let i = 0;
     const detail = reiter === 'DETAIL';
     // Reihenfolge der useState-Aufrufe: reiter, daten, fehler, meldung,
@@ -438,6 +446,11 @@ if (fs.existsSync(TAFEL)) {
     }
     if (reiter === 'hinweise') {
       melde('Ankuendigungen: die Wartung steht da, nicht schliessbar', /Wartung Samstag/.test(text) && /nicht schließbar/.test(text));
+    }
+    if (reiter === 'warnungen') {
+      melde('Warnungen: die Regel steht da', /Zahlung fehlgeschlagen/.test(text));
+      melde('Warnungen: ohne Betreiber-Adresse wird gewarnt', /keine Adresse|Adresse fehlt|Betreiber-Adresse/.test(text));
+      melde('Warnungen: die Demo-Daten lassen sich anlegen', /Demo-Mandanten anlegen/.test(text));
     }
     if (detail) {
       melde('Detail: das Haus steht da', /Alpha GmbH/.test(text));

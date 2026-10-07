@@ -6295,3 +6295,32 @@ unverändert.
 **Offen:** Registergericht/HRB, E-Mail und Telefon für das Impressum; die
 Produktion der Website bleibt gesperrt, bis E-Mail und Telefon eingetragen
 sind (Workflow „Website ausliefern").
+
+## 2026-10-07 · Betreiberbereich, Schritt 10: Warnungen entstehen in der Datenbank, die Function trägt sie nur hinaus (fork_79)
+
+Die Regeln wertet `plattform_warnungen_pruefen()` aus — nicht die Edge
+Function. So steht jede Warnung mit eindeutigem Schlüssel in der Tabelle,
+bevor irgendetwas verschickt wird; ein Versand, der scheitert, lässt sie
+ohne `gesendet_am` stehen, und der nächste Lauf nimmt sie mit. Eine
+Function, die rechnet UND sendet, verliert bei einem Netzfehler beides.
+
+7:30 Uhr Europe/Berlin: pg_cron hat keine Zeitzone, die Serverzeit ist
+UTC, und die Sommerzeit wechselt zweimal im Jahr. Statt den Job zweimal
+jährlich umzustellen, laufen zwei Jobs (05:30 und 06:30 UTC), und die
+Function fragt, ob es in Berlin gerade 7 Uhr ist. Der Tagesschlüssel
+verhindert, dass beide senden.
+
+Push als Kanal steht im Auftrag „falls vorhanden". Die Vorlage hat einen
+Push-Weg für Makler-Termine, nicht für den Betreiber; einen zu erfinden
+wäre neue Architektur. Die Regeltabelle sagt es offen: „Push: kein Weg
+vorhanden".
+
+Demo-Daten tragen `ist_demo` und sind sonst echte Zeilen — in denselben
+Tabellen, mit denselben Funktionen gerechnet. Das ist der Zweck: die
+Diagramme sollen zeigen, was sie mit echten Daten zeigen würden.
+Ausgenommen sind nur die drei Stellen, an denen Demo Schaden anrichten
+würde: Warnungen (Mail an den Betreiber), Tageszusammenfassung und
+Stripe-Abgleich (Rechnungen, die Stripe nie gesehen hat). Namen wie
+„Küstenmakler Demo GmbH" tragen „Demo" im Namen; „Musterhaus" aus dem
+Auftrag fehlt mit Absicht — das Firmennamen-Gate (tests/firmenname-verdrahtet.py)
+kennt es als Beispielnamen der Vorlage.

@@ -170,6 +170,13 @@ UNBEDENKLICH = {
         'und die ist eine Anzahl ohne Bezug: sie sagt "noch 37 frei" und '
         'nicht, wer die anderen dreizehn sind. Stripe-Kennungen gehen '
         'bewusst NICHT hinaus.',
+    'plattform-warnungen':
+        'Ziel zweier Cron-Jobs (stuendlich "pruefen", morgens "zusammenfassung") '
+        'und der Knoepfe im Betreiberbereich. Nimmt nur `modus` und `erzwingen`: '
+        'die Regeln wertet die Datenbank aus, die Adresse steht in '
+        'plattform_werte.betreiber_email, jede Warnung geht genau einmal hinaus '
+        '(eindeutig). Wer die Funktion anonym ruft, loest hoechstens eine '
+        'Pruefung aus, die ohnehin stuendlich laeuft. Heraus gehen Zahlen.',
     'plattform-stripe-abgleich':
         'Ziel eines Cron-Jobs (03:10 Uhr) und des Knopfes "Jetzt abgleichen" '
         'im Betreiberbereich. Nimmt NICHTS aus dem Koerper: liest Stripe mit '

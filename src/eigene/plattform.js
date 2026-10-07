@@ -494,7 +494,8 @@
           E("tbody", null, zeilen.map(function (m) {
             return E("tr", { key: m.id },
               E("td", { style: zelle },
-                E("div", { style: { fontWeight: 600, color: CI.blau } }, m.name),
+                E("div", { style: { fontWeight: 600, color: CI.blau } }, m.name,
+                  m.ist_demo ? E("span", { style: { marginLeft: 6, fontSize: 10, fontWeight: 700, color: "#fff", background: CI.gold, borderRadius: 4, padding: "1px 5px", verticalAlign: "middle" } }, "DEMO") : null),
                 E("div", { style: { fontSize: 11, color: CI.muted } },
                   "seit " + datum(m.erstellt_am) + (m.gruenderpreis ? " · Gründerpreis" : ""))),
               E("td", { style: zelle }, m.tarif_name || "—",
@@ -1319,6 +1320,108 @@
         }) : E("div", { style: { fontSize: 13, color: CI.muted } }, "Keine Ausnahmen. Ausnahmen setzt man in der Mandantenansicht (Beta-Module für einzelne Häuser)."),
         E("p", { style: { fontSize: 11.5, color: CI.muted, marginTop: 10 } },
           "Reihenfolge der Entscheidung: Ausnahme des Hauses (befristbar) → Tarif → Standard. Gesperrte Module zeigen im Portal einen Upgrade-Hinweis, sie verschwinden nicht.")));
+  }
+
+  // --- Warnungen, Tageszusammenfassung, Demo-Daten (fork_79) --------------------
+  function Warnungen(p) {
+    var d = p.daten;
+    var eZ = React.useState(null), email = eZ[0], setzeEmail = eZ[1];
+    var vZ = React.useState(null), vorschau = vZ[0], setzeVorschau = vZ[1];
+    var bZ = React.useState(""), bestaetigung = bZ[0], setzeBestaetigung = bZ[1];
+    var busyZ = React.useState(""), busy = busyZ[0], setzeBusy = busyZ[1];
+    if (!d) return E("div", { style: { color: CI.muted } }, "Lade Warnungen …");
+    var darf = p.rolle === "owner" || p.rolle === "admin";
+    var adresse = String(d.werte.betreiber_email || "").replace(/"/g, "");
+    var zusammenfassungAn = String(d.werte.zusammenfassung_aktiv) !== "false";
+    async function regel(r, was) {
+      try { await ruf("warnregel_speichern", Object.assign({ schluessel: r.schluessel }, was)); p.neuLaden(); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    async function einstellungen(zus) {
+      try { await ruf("betreiber_einstellungen", { betreiber_email: email === null ? adresse : email, zusammenfassung_aktiv: zus === undefined ? zusammenfassungAn : zus });
+        p.melden("Gespeichert."); setzeEmail(null); p.neuLaden(); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    async function pruefen() {
+      setzeBusy("pruefen");
+      try { var x = await ruf("warnung_pruefen_jetzt"); var e = x.ergebnis || {};
+        p.melden("Geprüft: " + zahl(e.neu) + " neu, " + zahl(e.gesendet) + " gesendet" + (e.adresse ? "." : " — keine Betreiber-Adresse hinterlegt."), e.adresse ? "ok" : "warnung"); p.neuLaden(); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+      setzeBusy("");
+    }
+    async function zusammenfassung(senden) {
+      setzeBusy("zus");
+      try {
+        if (senden) { var x = await ruf("zusammenfassung_jetzt"); var e = x.ergebnis || {}; p.melden(e.gesendet ? "Zusammenfassung gesendet." : "Nicht gesendet — " + (e.adresse ? "Versanddienst nicht eingerichtet." : "keine Betreiber-Adresse."), e.gesendet ? "ok" : "warnung"); }
+        else { var y = await ruf("zusammenfassung_vorschau"); setzeVorschau(y.zusammenfassung); }
+      } catch (f) { p.melden(f.message || String(f), "fehler"); }
+      setzeBusy("");
+    }
+    async function demo(anlegen) {
+      setzeBusy("demo");
+      try { var x = await ruf(anlegen ? "demo_anlegen" : "demo_entfernen", anlegen ? {} : { bestaetigung: bestaetigung });
+        p.melden(anlegen ? zahl(x.mandanten) + " Demo-Mandanten angelegt." : zahl(x.mandanten) + " Demo-Mandanten entfernt."); setzeBestaetigung(""); p.neuLaden(); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+      setzeBusy("");
+    }
+    var zp = vorschau && vorschau.probleme || {};
+    return E("div", null,
+      E("div", { style: kasten }, Ueberschrift("Betreiber-Adresse und Tageszusammenfassung"),
+        !adresse ? E("div", { style: { fontSize: 13, color: CI.danger, marginBottom: 8 } }, "Keine Betreiber-Adresse hinterlegt — Warnungen und Zusammenfassung werden nur protokolliert, nicht gesendet.") : null,
+        E("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" } },
+          E("input", { style: Object.assign({}, feld, { width: 300 }), placeholder: "warnungen@ihre-domain.de", value: email === null ? adresse : email, disabled: !darf, onChange: function (e) { setzeEmail(e.target.value); } }),
+          darf ? E("button", { type: "button", style: knopf, disabled: email === null, onClick: function () { einstellungen(); } }, "Adresse speichern") : null,
+          E("label", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 13 } },
+            E("input", { type: "checkbox", checked: zusammenfassungAn, disabled: !darf, onChange: function (e) { einstellungen(e.target.checked); } }), "Tägliche Zusammenfassung um 7:30 Uhr (Europe/Berlin)")),
+        E("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 } },
+          E("button", { type: "button", style: knopfLeer, disabled: !!busy, onClick: function () { zusammenfassung(false); } }, "Zusammenfassung ansehen"),
+          darf ? E("button", { type: "button", style: knopfLeer, disabled: !!busy, onClick: function () { zusammenfassung(true); } }, "Zusammenfassung jetzt senden") : null,
+          darf ? E("button", { type: "button", style: knopfLeer, disabled: !!busy, onClick: pruefen }, busy === "pruefen" ? "Prüft …" : "Warnregeln jetzt prüfen") : null),
+        vorschau ? E("div", { style: { marginTop: 12, background: "#f7f8fa", borderRadius: 8, padding: "10px 12px", fontSize: 13, lineHeight: 1.7 } },
+          E("div", null, E("strong", null, "Stand " + vorschau.datum), " · MRR " + geld(vorschau.mrr_cent) + " · " + zahl(vorschau.zahlende) + " zahlende"),
+          E("div", null, "Gestern: " + zahl(vorschau.neu_gestern) + " neue Abos, " + zahl(vorschau.kuendigungen_gestern) + " Kündigungen, " + zahl(vorschau.neue_tests_gestern) + " neue Tests · Tests endend in 3 Tagen: " + zahl(vorschau.tests_endend_3t)),
+          E("div", null, "KI-Kosten gestern " + euro(vorschau.ki_kosten_gestern_eur) + " · Credits gestern " + zahl(vorschau.credits_gestern)),
+          E("div", null, "Offen: Zahlungen " + zahl(zp.zahlung_offen) + " · Job-Fehler " + zahl(zp.cron_fehler_24h) + " · Webhook-Fehler " + zahl(zp.webhook_fehler_24h) + " · Support " + zahl(zp.support_offen) + " (> 24 h: " + zahl(zp.support_ohne_antwort_24h) + ") · Zugriffsanfragen " + zahl(zp.zugriffe_offen) + " · hängende Reservierungen " + zahl(zp.reservierungen_haengend) + " · Funktionsfehler " + zahl(zp.funktionsfehler_24h))) : null),
+
+      E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+        E("div", { style: { padding: "16px 18px 0" } }, Ueberschrift("Warnregeln")),
+        E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 700 } },
+          E("thead", null, E("tr", null, ["Regel", "Was", "Kanal", "Schwelle", "Aktiv"].map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
+          E("tbody", null, (d.regeln || []).filter(function (r) { return r.schluessel !== "tageszusammenfassung"; }).map(function (r) {
+            return E("tr", { key: r.schluessel },
+              E("td", { style: Object.assign({}, zelle, { fontWeight: 600 }) }, r.name),
+              E("td", { style: Object.assign({}, zelle, { fontSize: 11.5, color: CI.muted }) }, r.beschreibung || ""),
+              E("td", { style: zelle }, (r.kanal || []).join(", ") + " (Push: kein Weg vorhanden)"),
+              E("td", { style: zelle }, r.schluessel === "job_webhook_fehler" || r.schluessel === "dienst_gestoert"
+                ? E("input", { style: Object.assign({}, feld, { width: 80 }), defaultValue: r.schwelle === null ? "" : r.schwelle, disabled: !darf,
+                    onBlur: function (e) { if (String(e.target.value) !== String(r.schwelle === null ? "" : r.schwelle)) regel(r, { schwelle: e.target.value }); } })
+                : E("span", { style: { color: CI.muted, fontSize: 12 } }, r.schluessel === "mandant_kostengrenze" || r.schluessel === "tageskosten_gesamt" ? "siehe KI → Grenzen" : "—")),
+              E("td", { style: zelle }, E("input", { type: "checkbox", checked: !!r.aktiv, disabled: !darf, onChange: function (e) { regel(r, { aktiv: e.target.checked }); } })));
+          })))),
+
+      E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+        E("div", { style: { padding: "16px 18px 0" } }, Ueberschrift("Ausgelöste Warnungen (letzte 200)")),
+        !(d.liste || []).length ? E("div", { style: { padding: "0 18px 16px", fontSize: 13, color: CI.muted } }, "Noch keine.")
+        : E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 760 } },
+          E("thead", null, E("tr", null, ["Zeit", "Regel", "Text", "Gesendet", ""].map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
+          E("tbody", null, d.liste.map(function (x) {
+            return E("tr", { key: x.id, style: { opacity: x.gelesen_am ? 0.55 : 1 } },
+              E("td", { style: Object.assign({}, zelle, { whiteSpace: "nowrap" }) }, zeit(x.zeit)),
+              E("td", { style: Object.assign({}, zelle, { fontFamily: "ui-monospace, monospace", fontSize: 11.5 }) }, x.regel),
+              E("td", { style: zelle }, x.mandant_id ? E("a", { href: "#", onClick: function (e) { e.preventDefault(); p.oeffnen(x.mandant_id); }, style: { color: CI.blau } }, x.text) : x.text),
+              E("td", { style: Object.assign({}, zelle, { color: x.gesendet_am ? CI.success : CI.muted }) }, x.gesendet_am ? zeit(x.gesendet_am) : "nein"),
+              E("td", { style: zelle }, !x.gelesen_am && darf ? E("button", { type: "button", style: knopfLeer, onClick: async function () { try { await ruf("warnung_gelesen", { id: x.id }); p.neuLaden(); } catch (f) { p.melden(f.message || String(f), "fehler"); } } }, "Gelesen") : null));
+          })))),
+
+      E("div", { style: Object.assign({}, kasten, { borderColor: "#e8d9b0" }) }, Ueberschrift("Demo-Daten (Testmodus)"),
+        E("p", { style: { fontSize: 13, color: CI.muted, lineHeight: 1.7, marginTop: 0 } },
+          "30 fiktive Mandanten mit gemischten Tarifen, Tests, Kündigungen, fehlgeschlagenen Zahlungen, Credit-Verbrauch und KI-Kosten über 12 Monate — damit Diagramme und Listen etwas zeigen. Gekennzeichnet mit „DEMO“; Warnregeln, Tageszusammenfassung und Stripe-Abgleich lassen sie aus. Derzeit: " + zahl(d.demo) + " Demo-Mandanten."),
+        p.rolle === "owner" ? (d.demo > 0
+          ? E("div", { style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" } },
+              E("input", { style: Object.assign({}, feld, { width: 160 }), placeholder: "DEMO eintragen", value: bestaetigung, onChange: function (e) { setzeBestaetigung(e.target.value); } }),
+              E("button", { type: "button", style: Object.assign({}, knopf, { background: CI.danger, borderColor: CI.danger }), disabled: bestaetigung !== "DEMO" || !!busy, onClick: function () { demo(false); } }, busy === "demo" ? "Entfernt …" : "Demo-Daten vollständig entfernen"))
+          : E("button", { type: "button", style: knopf, disabled: !!busy, onClick: function () { if (window.confirm("30 Demo-Mandanten anlegen? Sie erscheinen in allen Listen und Kennzahlen (mit Kennzeichen DEMO).")) demo(true); } }, busy === "demo" ? "Legt an …" : "30 Demo-Mandanten anlegen"))
+          : E("div", { style: { fontSize: 12.5, color: CI.muted } }, "Anlegen und Entfernen kann nur der Owner.")));
   }
 
   // --- KI-Steuerung (fork_78) -------------------------------------------------
@@ -2148,6 +2251,7 @@
         : welcher === "vorlagen" ? "vorlagen"
         : welcher === "recht" ? "rechtstexte"
         : welcher === "hinweise" ? "ankuendigungen"
+        : welcher === "warnungen" ? "warnungen"
         : welcher === "admins" ? "admin_liste"
         : welcher === "mandant" ? "mandant" : "protokoll";
       ruf(aktion, welcher === "mandant" ? { mandant_id: id } : (welcher === "zahlen" || welcher === "kosten" || welcher === "zahlungen") ? { tage: tage } : null).then(function (d) {
@@ -2214,6 +2318,7 @@
       ["vorlagen", "Vorlagen & Mails", ["owner", "admin", "support"]],
       ["recht", "Rechtstexte", ["owner", "admin", "support"]],
       ["hinweise", "Ankündigungen", ["owner", "admin", "support"]],
+      ["warnungen", "Warnungen", ["owner", "admin"]],
       ["system", "Technik", ["owner", "admin"]],
       ["admins", "Admins", ["owner", "admin", "support", "finanzen"]],
       ["protokoll", "Audit-Log", ["owner", "admin", "support", "finanzen"]]];
@@ -2294,6 +2399,8 @@
         : reiter === "zahlungen" ? E(Zahlungen, { daten: daten.zahlungen, rolle: rolle, melden: melden, neuLaden: function () { laden("zahlungen"); },
             oeffnen: function (id) { setzeOffen(id); } })
         : reiter === "funktionen" ? E(Funktionen, { daten: daten.funktionen, rolle: rolle, melden: melden, neuLaden: function () { laden("funktionen"); } })
+        : reiter === "warnungen" ? E(Warnungen, { daten: daten.warnungen, rolle: rolle, melden: melden, neuLaden: function () { laden("warnungen"); laden("mandanten"); },
+            oeffnen: function (id) { setzeOffen(id); } })
         : reiter === "ki" ? E(KiSteuerung, { daten: daten.ki, rolle: rolle, melden: melden, neuLaden: function () { laden("ki"); } })
         : reiter === "vorlagen" ? E(VorlagenMails, { daten: daten.vorlagen, rolle: rolle, melden: melden, neuLaden: function () { laden("vorlagen"); } })
         : reiter === "recht" ? E(Rechtstexte, { daten: daten.recht, rolle: rolle, melden: melden, neuLaden: function () { laden("recht"); } })

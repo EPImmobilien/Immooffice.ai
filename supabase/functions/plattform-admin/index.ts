@@ -125,6 +125,15 @@ const ROLLEN: Record<string, string[]> = {
   speicher:               ["owner", "admin"],
   support:                ["owner", "admin", "support"],
   steuerung:              ["owner", "admin", "support"],
+  warnungen:              ["owner", "admin"],
+  warnregel_speichern:    ["owner", "admin"],
+  betreiber_einstellungen: ["owner", "admin"],
+  warnung_pruefen_jetzt:  ["owner", "admin"],
+  zusammenfassung_vorschau: ["owner", "admin", "finanzen"],
+  zusammenfassung_jetzt:  ["owner", "admin"],
+  warnung_gelesen:        ["owner", "admin"],
+  demo_anlegen:           ["owner"],
+  demo_entfernen:         ["owner"],
   ki_speichern:           ["owner", "admin"],
   ki_limit_setzen:        ["owner", "admin"],
   werte_speichern:        ["owner", "admin"],
@@ -351,6 +360,84 @@ Deno.serve(async (req) => {
       }
       await protokoll("tarif_umgestellt", schluessel, { grund, ergebnis }, { typ: "plattform_tarife" });
       return antwort({ ok: true, ergebnis });
+    }
+
+    // --- Warnungen, Zusammenfassung, Demo-Daten (fork_79) -------------------
+    const warnFunktion = async (koerper: Record<string, unknown>) => {
+      const basis = (Deno.env.get("SUPABASE_URL") || "").replace(/\/+$/, "");
+      const r = await fetch(basis + "/functions/v1/plattform-warnungen", {
+        method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + (Deno.env.get("SUPABASE_ANON_KEY") || "") },
+        body: JSON.stringify(koerper) });
+      return await r.json().catch(() => ({ ok: false, fehler: "Keine Antwort der Funktion." }));
+    };
+    if (aktion === "warnungen") {
+      const [{ data: regeln }, { data: liste }, { data: werte }, { count: demo }] = await Promise.all([
+        db.from("plattform_warnregeln").select("*").order("schluessel"),
+        db.from("plattform_warnungen").select("*").order("zeit", { ascending: false }).limit(200),
+        db.from("plattform_werte").select("schluessel, wert").in("schluessel", ["betreiber_email", "zusammenfassung_aktiv"]),
+        db.from("mandanten").select("id", { count: "exact", head: true }).eq("ist_demo", true),
+      ]);
+      const w: Record<string, unknown> = {};
+      for (const z of werte || []) w[String(z.schluessel)] = typeof z.wert === "string" ? z.wert : z.wert;
+      const { data: namen } = await db.from("mandanten").select("id, name");
+      const name = new Map((namen || []).map((m) => [String(m.id), m.name]));
+      return antwort({ ok: true, regeln: regeln || [], werte: w, demo: Number(demo || 0),
+        liste: (liste || []).map((x) => ({ ...x, mandant_name: x.mandant_id ? name.get(String(x.mandant_id)) || null : null })) });
+    }
+    if (aktion === "warnregel_speichern") {
+      const schluessel = String(body.schluessel || "");
+      const { data: vorher } = await db.from("plattform_warnregeln").select("*").eq("schluessel", schluessel).maybeSingle();
+      if (!vorher) return antwort({ ok: false, fehler: "Unbekannte Regel." }, 400);
+      const neu: Record<string, unknown> = { geaendert_am: new Date().toISOString() };
+      if (body.aktiv !== undefined) neu.aktiv = !!body.aktiv;
+      if (body.schwelle !== undefined) neu.schwelle = body.schwelle === null || body.schwelle === "" ? null : Number(body.schwelle);
+      const { error } = await db.from("plattform_warnregeln").update(neu).eq("schluessel", schluessel);
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll("warnregel_geaendert", schluessel, { nachher: neu }, { typ: "plattform_warnregeln", vorher, nachher: neu });
+      return antwort({ ok: true });
+    }
+    if (aktion === "betreiber_einstellungen") {
+      const email = String(body.betreiber_email ?? "").trim();
+      if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return antwort({ ok: false, fehler: "Das ist keine E-Mail-Adresse." }, 400);
+      await db.from("plattform_werte").update({ wert: JSON.stringify(email) }).eq("schluessel", "betreiber_email");
+      if (body.zusammenfassung_aktiv !== undefined) {
+        await db.from("plattform_werte").update({ wert: body.zusammenfassung_aktiv ? "true" : "false" }).eq("schluessel", "zusammenfassung_aktiv");
+      }
+      await protokoll("betreiber_einstellungen", "warnungen", { betreiber_email: email, zusammenfassung_aktiv: body.zusammenfassung_aktiv }, { typ: "plattform_werte" });
+      return antwort({ ok: true });
+    }
+    if (aktion === "warnung_pruefen_jetzt") {
+      const d = await warnFunktion({ modus: "pruefen" });
+      await protokoll("warnungen_geprueft", "jetzt", { ergebnis: d }, { typ: "plattform_warnungen" });
+      return antwort({ ok: !!d.ok, ergebnis: d });
+    }
+    if (aktion === "zusammenfassung_vorschau") {
+      const { data, error } = await db.rpc("plattform_tageszusammenfassung");
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      return antwort({ ok: true, zusammenfassung: data });
+    }
+    if (aktion === "zusammenfassung_jetzt") {
+      const d = await warnFunktion({ modus: "zusammenfassung", erzwingen: true });
+      await protokoll("zusammenfassung_gesendet", "jetzt", { gesendet: d.gesendet, adresse: d.adresse }, { typ: "plattform_warnungen" });
+      return antwort({ ok: !!d.ok, ergebnis: d });
+    }
+    if (aktion === "warnung_gelesen") {
+      const id = String(body.id || "");
+      await db.from("plattform_warnungen").update({ gelesen_am: new Date().toISOString() }).eq("id", id);
+      return antwort({ ok: true });
+    }
+    if (aktion === "demo_anlegen") {
+      const { data, error } = await db.rpc("plattform_demo_anlegen");
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll("demo_angelegt", "demo", { mandanten: data }, { typ: "mandanten" });
+      return antwort({ ok: true, mandanten: data });
+    }
+    if (aktion === "demo_entfernen") {
+      if (String(body.bestaetigung || "") !== "DEMO") return antwort({ ok: false, fehler: "Zur Bestaetigung DEMO eintragen." }, 400);
+      const { data, error } = await db.rpc("plattform_demo_entfernen");
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll("demo_entfernt", "demo", { mandanten: data }, { typ: "mandanten" });
+      return antwort({ ok: true, mandanten: data });
     }
 
     // --- Steuerung (fork_78): KI, System-Mails, Rechtstexte, Ankuendigungen, Vorlagen
@@ -998,7 +1085,7 @@ Deno.serve(async (req) => {
     // hier und nicht in einer Ansicht, die jemand erweitern koennte.
     if (aktion === "mandanten") {
       const { data: mandanten } = await db.from("mandanten")
-        .select("id, name, slug, abo_status, testphase_bis, gesperrt_am, erstellt_am")
+        .select("id, name, slug, abo_status, testphase_bis, gesperrt_am, erstellt_am, ist_demo")
         .order("erstellt_am");
       const { data: abos } = await db.from("mandant_abo")
         .select("mandant_id, tarif, intervall, status, zusatznutzer, gruenderpreis, "
