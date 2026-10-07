@@ -49,7 +49,7 @@ if (!SUPABASE_URL || !DIENST) abbruch("SUPABASE_URL und SUPABASE_SERVICE_ROLE_KE
 
 // --- Stripe ------------------------------------------------------------------
 // Dieselbe feste API-Fassung wie in den Edge Functions und am Webhook-Endpunkt.
-const STRIPE_VERSION = "2025-12-15.clover";
+const STRIPE_VERSION = "2026-08-26.dahlia";
 // Steuerkategorie für Stripe Tax: „Software as a service (SaaS) – business use".
 const STEUERKATEGORIE = "txcd_10103001";
 // Diese Ereignisse braucht der Webhook (docs/BILLING.md, Abschnitt 4).

@@ -142,9 +142,9 @@ Sandbox-Konto. Was er verlangt und wo es steht:
 | Smart Retries, Mahn-Mails | Einstellung im Stripe-Dashboard (Betreiber) |
 | Rechnungen automatisch, Abgleich per Webhook | `stripe_rechnungen` (fork_71), geschrieben vom Webhook |
 
-**Feste API-Fassung `2025-12-15.clover`.** Die Funktionen senden sie im
+**Feste API-Fassung `2026-08-26.dahlia`.** Die Funktionen senden sie im
 Kopf `Stripe-Version`, der Webhook-Endpunkt wird mit derselben angelegt.
-Ohne feste Fassung gälte, was im Konto eingestellt ist — ein Klick dort
+Am 07.10.2026 von Clover auf Dahlia gehoben, weil das Stripe-Dashboard für neue Endpunkte nur noch Dahlia anbietet; die Dahlia-Brüche (Checkout-UI-Modi, Event-Destination-Parameter, Kündigungsgrund, Connect/Issuing/Elements) betreffen diese Integration nicht. Ohne feste Fassung gälte, was im Konto eingestellt ist — ein Klick dort
 änderte still die Form jeder Antwort. Seit der Basil-Fassung liegen drei
 Dinge woanders: die Abo-Periode an den Positionen, der Preis einer
 Rechnungszeile unter `pricing.price_details.price`, das Abo einer Rechnung
@@ -529,7 +529,7 @@ Betreiber einmal durchspielen. Die Reihenfolge ist die sinnvolle.
 1. `node scripts/stripe-einrichten.mjs --trocken` — zeigt, was angelegt
    würde. Dann ohne `--trocken`.
 2. Webhook-Endpunkt bei Stripe anlegen auf
-   `…/functions/v1/stripe-webhook`, API-Fassung `2025-12-15.clover`,
+   `…/functions/v1/stripe-webhook`, API-Fassung `2026-08-26.dahlia`,
    Ereignisse wie in Abschnitt 4. `STRIPE_WEBHOOK_SECRET` setzen.
 3. **Testkarte 4242 4242 4242 4242** → Abo kommt zustande, `mandant_abo`
    steht auf `aktiv`, Inklusiv-Credits sind zugeteilt.
