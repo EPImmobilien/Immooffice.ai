@@ -54,6 +54,7 @@ GEMEINSAME_BEILAGEN = {
         'signatur-vorgang-starten',
         'ki-assistent',     # eigene Funktion (supabase/eigene/), fork_83
         'firma-ermitteln',  # eigene Funktion (supabase/eigene/), fork_82
+        'mangel-text',      # eigene Funktion (supabase/eigene/), fork_85
     },
     # fork_61 — die Abo-Schranke. Sie liegt bei den Funktionen, die ein
     # Sprachmodell rufen und (noch) keinen Preis im Katalog haben. Welche
@@ -94,6 +95,15 @@ ABO_SCHRANKE = {
     'radar-erfassen', 'sprachmemo-auswerten',
 }
 GEMEINSAME_BEILAGEN['_abo/abo.ts'] = set(ABO_SCHRANKE)
+# fork_85 — Bautraeger-Paket: Mail ohne Nutzerpostfach, Push, Glocke, Vermerk,
+# Verlauf. Eine Datei, drei Kopien. Steht hier und nicht im Woerterbuch oben,
+# weil tests/credits.js das Woerterbuch bis zur ersten schliessenden Klammer
+# als Empfaengerliste von credits.ts liest.
+GEMEINSAME_BEILAGEN['_bautraeger/bautraeger.ts'] = {
+    'abnahme-abschliessen',
+    'handwerker-portal',
+    'maengel-fristen',
+}
 
 # --------------------------------------------------------------- Phase 1.4
 # Vier Funktionen entfallen ersatzlos. jotform-* ist der Formular-Sync des
@@ -715,6 +725,47 @@ ERSETZUNGEN = [
      '    .select("*").eq("mandant_id", mandant).eq("aktiv", true)\n',
      'Neubauportal: das Postfach gehoert dem Mandanten des Projekts.',
      {'projekt-interaktion', 'projekt-login'}),
+
+    # =====================================================================
+    # fork_85 — Bautraeger-Paket: das Kundenportal sieht seine Maengel und
+    # Protokolle. Additiv: zwei neue Schluessel in der Antwort von
+    # projekt-daten, nur fuer den angemeldeten Kaeufer. Die externe
+    # Portalseite der Vorlage liest sie nicht und bricht deshalb nicht.
+    # =====================================================================
+    ('FORK',
+     re.escape('      kundenDateien = kd || [];'),
+     '      kundenDateien = kd || [];\n'
+     '      // fork_85: Maengel des Kaeufers (eigene Meldungen und die seiner Einheit) mit Status,\n'
+     '      // dazu die abgeschlossenen Protokolle seiner Einheit. Das PDF kommt als persoenliche\n'
+     '      // Datei ueber `dateien`, sobald die Verwaltung es freigibt (Knopf „An Kaeufer senden").\n'
+     '      try {\n'
+     '        let mq = admin.from("projekt_maengel").select("id, titel, raum, gewerk, status, frist, termin_am, created_at, bearbeitet_am, quelle, einheit_id, zugang_id")\n'
+     '          .eq("projekt_id", projekt.id).order("created_at", { ascending: false }).limit(200);\n'
+     '        mq = zugang && zugang.einheit_id ? mq.or("zugang_id.eq." + zugangId + ",einheit_id.eq." + zugang.einheit_id) : mq.eq("zugang_id", zugangId);\n'
+     '        const { data: mg } = await mq;\n'
+     '        const MSTAT = { offen: "Gemeldet", beauftragt: "Handwerker beauftragt", termin_geplant: "Termin geplant", gemeldet_erledigt: "Erledigt gemeldet – wird geprüft", geprueft_erledigt: "Erledigt", abgelehnt: "Kein Mangel", in_bearbeitung: "In Bearbeitung", erledigt: "Erledigt" };\n'
+     '        immoMaengel = (mg || []).map((m) => ({ id: m.id, titel: m.titel, raum: m.raum, gewerk: m.gewerk, status: m.status, status_text: MSTAT[m.status] || m.status,\n'
+     '          frist: m.frist, termin_am: m.termin_am, created_at: m.created_at, bearbeitet_am: m.bearbeitet_am, quelle: m.quelle, erledigt: ["geprueft_erledigt", "erledigt", "abgelehnt"].includes(m.status) }));\n'
+     '        if (zugang && zugang.einheit_id) {\n'
+     '          const { data: pk } = await admin.from("uebergabeprotokoll").select("id, protokoll_typ, uebergabe_datum, abgeschlossen_am, status")\n'
+     '            .eq("einheit_id", zugang.einheit_id).eq("projekt_id", projekt.id).eq("status", "abgeschlossen").order("uebergabe_datum", { ascending: false }).limit(20);\n'
+     '          const PTYP = { neubau_vorabnahme: "Vorabnahme", neubau_abnahme: "Abnahme", neubau_nachabnahme: "Nachabnahme", einzug: "Übergabe", auszug: "Rückgabe" };\n'
+     '          immoProtokolle = (pk || []).map((x) => ({ id: x.id, typ: x.protokoll_typ, typ_text: PTYP[x.protokoll_typ] || x.protokoll_typ, datum: x.uebergabe_datum, abgeschlossen_am: x.abgeschlossen_am,\n'
+     '            offene_maengel: (mg || []).filter((m) => m.einheit_id === zugang.einheit_id && !["geprueft_erledigt", "erledigt", "abgelehnt"].includes(m.status)).length }));\n'
+     '        }\n'
+     '      } catch (_e) { /* Portal bleibt nutzbar */ }',
+     'Neubauportal (fork_85): Maengel und Protokolle des Kaeufers laden.',
+     {'projekt-daten'}),
+    ('FORK',
+     re.escape('    let nachrichten: any[] = [];\n    if (eingeloggt && zugangId) {'),
+     '    let nachrichten: any[] = [];\n    let immoMaengel: any[] = [];\n    let immoProtokolle: any[] = [];\n    if (eingeloggt && zugangId) {',
+     'Neubauportal (fork_85): Platz fuer Maengel und Protokolle.',
+     {'projekt-daten'}),
+    ('FORK',
+     re.escape('      kunden_dateien: kundenDateien,'),
+     '      kunden_dateien: kundenDateien,\n      maengel: immoMaengel,\n      protokolle: immoProtokolle,',
+     'Neubauportal (fork_85): Maengel und Protokolle in der Antwort.',
+     {'projekt-daten'}),
 
     # Damit die Aufrufer den Mandanten weiterreichen koennen, muss er in den
     # geladenen Zeilen stehen.

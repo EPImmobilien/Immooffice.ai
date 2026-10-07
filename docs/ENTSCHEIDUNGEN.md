@@ -6516,3 +6516,70 @@ A4 quer) als vierte Systemvorlage neben Raster, Signature und Studio.
 - **Datenbank**: fork_64 führt die Prüfbedingungen für `expose_vorlage` und
   `basis` jetzt aus der Liste der Systemvorlagen mit (vor den Einfügungen),
   statt eine eigene Migration nachzuschieben.
+
+## 2026-10-07 · Bauträger-Paket v2 (fork_84–86): auf Bestand aufbauen, alles verknüpfen
+
+Auftrag „FEATURE-PAKET BAUTRÄGER v2". Bestand und Zusammenhang stehen in
+`docs/BAUTRAEGER.md`, Abschnitt 1. Entschieden wurde:
+
+**Kein neues Protokoll-Modul, keine neue Mängeltabelle.** Das
+Übergabeprotokoll der Vorlage bekommt Fremdschlüssel (Objekt, Projekt,
+Einheit, Zugang, Kontakte, Signaturvorgang, PDF, Termin) und drei
+Neubau-Typen; `projekt_maengel` wird mit `quelle` die eine Mängeltabelle
+für Kundenmeldung, Abnahme und Bauleitung. Der Status bekommt die sechs
+Werte des Auftrags; die zwei Altwerte der externen Portalseite
+(in_bearbeitung, erledigt) bleiben erlaubt, damit nichts bricht, und
+werden von der Oberfläche nicht mehr geschrieben.
+
+**Mängel aus der Abnahme entstehen beim Abschluss, nicht beim Tippen.**
+Während der Begehung liegen sie als strukturierte Einträge im Raum-jsonb
+des Protokolls — damit funktioniert der vorhandene Offline-Entwurf, und ein
+abgebrochener Entwurf hinterlässt keine halben Vorgänge. `abnahme-
+abschliessen` macht daraus in einem Zug `projekt_maengel` (Fotos ins
+Storage, Token, Frist), To-dos aus der Vorlage „Mängelbeseitigung",
+Sammelmail je Handwerker, Glocke/Push/Mail an die Verwaltung, Vermerke und
+Projekt-Aktivität. Wiederholbar über `db_id` je Mangel. Alternative — jeden
+Mangel sofort schreiben — hätte beim Abbruch des Entwurfs Vorgänge ohne
+Protokoll hinterlassen.
+
+**Das PDF bleibt clientseitig** (jsPDF der Vorlage, erweitert um
+Bauträger/Käufer, Neubau-Typ und die Mängel je Raum) und wandert als
+Base64 mit dem Abschluss in `projekt-dateien`, als persönliche Datei des
+Käufers, **nicht freigegeben**. Freigabe und Mail an den Käufer sind ein
+Knopf („An Käufer senden" → Composer-Entwurf). Mails an Käufer nie
+automatisch; Mails an Handwerker (Auftrag, Erinnerung) automatisch; die
+Mahnung je Projekteinstellung `mahnung_automatisch` (Vorgabe: aus, Entwurf
+im To-do mit `entwurf_betreff/-text/empfaenger_email`, wie die Vorlage
+Entwürfe führt).
+
+**Handwerker ohne Konto.** `handwerker-portal` (verify_jwt false) arbeitet
+über `projekt_kontakte.portal_token` (alle Mängel des Handwerkers im
+Projekt) oder `projekt_maengel.handwerker_token` (ein Mangel). Der Token
+benennt die Zeile, die Zeile den Mandanten; es gehen Einheit, Raum, Mangel,
+Frist hinaus — keine Käuferdaten. Die Seite ist ein Overlay der Anwendung
+(`?handwerker=`), kein eigener Netlify-Standort: eine Adresse, ein Deploy.
+
+**QR an der Tür** = `projekt_einheiten.qr_token` + `?qr=`. Nicht angemeldet
+antwortet `einheit-qr` nur mit Projekt, Ort, Nummer, Geschoss; nach dem
+Anmelden öffnet die Oberfläche die Wohnungsakte (`_immoNeubauStart`).
+Druck A6 je Tür und Sammeldruck clientseitig (jsPDF + qrcode der Vorlage).
+
+**MaBV ohne Rechnung.** `projekt_bautenstand` hält erreichte Abschnitte
+(1–13) je Haus oder Einheit; `projekt_zahlungsplan.abschnitte` sagt, welche
+eine Rate bündelt. `rate_anforderbar()` ist eine Abfrage, kein Betrag; der
+Trigger auf Bautenstand legt einmal den Glockeneintrag „Rate x
+anforderbar" an. Die Zahlungsanforderung ist ein Klick: PDF-Entwurf +
+Composer, dann `angefordert_am`. Die 13 Abschnitte mit Höchstsätzen stehen
+in der Oberfläche (`IMMO_MABV`) als Text; was der Kaufvertrag vorsieht,
+trägt die Verwaltung ein (höchstens sieben Raten, prüft die Oberfläche).
+
+**Verwaltung = Chefs plus wer das Protokoll angelegt hat** (`verwaltung()`
+in der Beilage). Eine Rolle „Bauleitung" einzuführen hätte das Rollenmodell
+der Vorlage geändert (CLAUDE.md: keine neuen Rollen).
+
+**Gate-Anpassung:** `tests/funktionen-angemeldet.py` erkennt den
+Dienstschlüssel jetzt auch in der Beilage `bautraeger.ts`; vorher zählte
+nur `index.ts`, und drei Functions wären unsichtbar gewesen.
+`tests/credits.js` liest das Wörterbuch `GEMEINSAME_BEILAGEN` bis zur
+ersten schließenden Klammer — die neue Beilage steht deshalb als
+Zuweisung dahinter, wie `_abo`.

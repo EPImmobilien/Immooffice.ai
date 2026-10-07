@@ -24,6 +24,17 @@ FUNKTIONEN = WURZEL / 'supabase' / 'functions'
 
 # --- Gelesen und abgesichert: der Quelltext muss das Kennzeichen enthalten ---
 ABGESICHERT = {
+    'handwerker-portal': ('portal_token',
+        'Link ohne Anmeldung fuer den Handwerker (fork_85). Der Token '
+        '(projekt_kontakte.portal_token oder projekt_maengel.handwerker_token) '
+        'benennt genau eine Zeile; aus ihr kommen Mandant und Projekt, und '
+        'jede Abfrage ist auf beide begrenzt. Es gehen nur Einheit, Raum, '
+        'Mangel und Frist hinaus — keine Kaeuferdaten.'),
+    'einheit-qr': ('qr_token',
+        'QR-Code an der Wohnungstuer (fork_86). Der Token benennt genau eine '
+        'Einheit; ohne Anmeldung gehen nur Projektname, Ort, Einheitennummer '
+        'und Geschoss hinaus. Alles Weitere laedt die angemeldete Oberflaeche '
+        'unter RLS.'),
     'oeffentliche-objekte': ('immoMandantAusAnfrage',
         'Liefert die Objektliste. Filtert beide Quellen auf den Mandanten aus '
         'der Anfrage; ohne eindeutigen Mandanten antwortet sie mit 400.'),

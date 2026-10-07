@@ -490,3 +490,22 @@ verify_jwt = true
 
 [functions.firma-ermitteln]
 verify_jwt = true
+
+# fork_85/86 — Bautraeger-Paket
+[functions.abnahme-abschliessen]
+verify_jwt = true
+
+[functions.mangel-text]
+verify_jwt = true
+
+[functions.maengel-fristen]
+verify_jwt = true
+
+# Token statt Anmeldung: der Handwerker hat kein Konto, der QR-Code an der
+# Tuer wird von jedem gescannt. Beide Functions geben nur preis, was an der
+# Zeile des Tokens haengt (tests/funktionen-oeffentlich.py).
+[functions.handwerker-portal]
+verify_jwt = false
+
+[functions.einheit-qr]
+verify_jwt = false

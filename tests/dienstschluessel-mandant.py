@@ -210,6 +210,8 @@ BUCH = {
         (1, 'BEABSICHTIGT', 'wie oben, fuer Rechnungsmails'),
     ('objekt-landing', 'landing_fragen'):
         (1, 'BEABSICHTIGT', 'offene Fragen aller Mandanten, Weiterleitung je Frage'),
+    ('maengel-fristen', 'projekt_maengel'):
+        (1, 'BEABSICHTIGT', 'taeglicher Fristenlauf: faellige Maengel aller Mandanten, danach je Zeile im Mandanten der Zeile (fork_85)'),
     ('projekt-datei-benachrichtigung', 'projekt_dateien'):
         (1, 'BEABSICHTIGT', 'freigegebene Dateien aller Mandanten, Versand je Projekt'),
     ('projekt-datei-benachrichtigung', 'projekt_updates'):

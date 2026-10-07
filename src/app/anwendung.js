@@ -24371,7 +24371,18 @@ function NeubauProjekteBereich({
       } = await window._sb.from("projekte").select("*").order("created_at", {
         ascending: !1
       });
-      n(e || []), r(!1)
+      n(e || []), r(!1);
+      // fork_86: Start aus QR-Scan, Push oder Mail (?qr=, ?akte=): Projekt waehlen, Akte oeffnen.
+      const start = window._immoNeubauStart;
+      if (start && e) {
+        window._immoNeubauStart = null;
+        const p = e.find(x => x.id === start.projekt_id);
+        if (p) {
+          window._immoAkteEinheit = start.einheit_id || null;
+          await Be(p);
+          oe("cockpit")
+        }
+      }
     })()
   }, []), useEffect(() => {
     (async () => {
@@ -25204,6 +25215,7 @@ function NeubauProjekteBereich({
       flexWrap: "wrap"
     }
   }, [
+    ["cockpit", "Cockpit"],
     ["einheiten", `Einheiten (${o.length})`],
     ["dateien", `Dateien (${c.filter(e=>!e.zugang_id).length})`],
     ["baufortschritt", `Baufortschritt (${g.length})`],
@@ -25226,7 +25238,15 @@ function NeubauProjekteBereich({
       color: ie === e ? CI.blau : CI.muted,
       borderBottom: ie === e ? `2px solid ${CI.gold}` : "2px solid transparent"
     }
-  }, t))), "einheiten" === ie && React.createElement("div", {
+  }, t))), "cockpit" === ie && window.ImmoNeubauCockpit && React.createElement(window.ImmoNeubauCockpit, {
+    projekt: l,
+    einheiten: o,
+    zugaenge: u,
+    kontakte: K,
+    dateien: c,
+    user: e,
+    neuLaden: () => Be(l)
+  }), "einheiten" === ie && React.createElement("div", {
     style: {
       overflowX: "auto"
     }
@@ -25716,6 +25736,17 @@ function NeubauProjekteBereich({
       marginRight: 6
     }
   }, "Bearbeiten"), React.createElement("button", {
+    onClick: () => {
+      window._immoAkteEinheit = e.id;
+      oe("cockpit")
+    },
+    style: {
+      ...Ue,
+      padding: "5px 9px",
+      fontSize: 10.5,
+      marginRight: 6
+    }
+  }, "📁 Akte"), React.createElement("button", {
     onClick: () => (async e => {
       if (!confirm(`Einheit ${e.we_nr} wirklich löschen?\n\nAchtung: Einheitsgebundene Dateien, Merklisten-Einträge und Reservierungsanfragen zu dieser Einheit werden mitgelöscht. Kunden-Zugänge bleiben bestehen (verlieren nur die Einheitsbindung).`)) return;
       const {
@@ -28296,7 +28327,7 @@ function NeubauProjekteBereich({
 function ImmobilienPage({
   user: e
 }) {
-  const [t, n] = useState(() => window._epObjektOeffnen ? "bestand" : null);
+  const [t, n] = useState(() => window._immoNeubauStart ? "neubau" : window._epObjektOeffnen ? "bestand" : null);
   if (null === t) {
     const e = (e, t, a, r) => React.createElement("div", {
       onClick: () => n(r),
@@ -57209,10 +57240,10 @@ async function uebergabeProtokollAlsPDF(e) {
     o += e
   }
   const m = "verkauf" === (e.kontext || "vermietung"),
-    g = m ? "Verkäufer" : "Vermieter",
-    A = m ? "Käufer" : "Mieter";
+    g = e.projekt_id ? "Bauträger" : m ? "Verkäufer" : "Vermieter",
+    A = e.projekt_id || m ? "Käufer" : "Mieter";
   let f;
-  if (n.setFont("helvetica", "bold"), n.setFontSize(18), n.setTextColor(38, 49, 89), n.text("ÜBERGABEPROTOKOLL", l, o), o += 8, n.setFontSize(11), n.setFont("helvetica", "normal"), n.setTextColor(80, 80, 80), f = m ? "Übergabe an Käufer" : "einzug" === e.protokoll_typ ? "Einzug (Übergabe an Mieter)" : "Auszug (Rückgabe an Vermieter)", n.text(f, l, o), o += 5, n.text(immoMarkeMit("", " · immooffice.example"), l, o), o += 6, n.setDrawColor(199, 164, 85), n.setLineWidth(.8), n.line(l, o, l + i, o), o += 8, n.setTextColor(0, 0, 0), c("Stammdaten"), d("Datum", e.uebergabe_datum + (e.uebergabe_uhrzeit ? ", " + e.uebergabe_uhrzeit + " Uhr" : "")), d("Objekt", e.objekt_adresse + (e.objekt_etage ? ", " + e.objekt_etage : "") + (e.objekt_lage ? " " + e.objekt_lage : "")), u(2), d(g, e.vermieter_name + (!1 === e.vermieter_anwesend ? " (nicht anwesend)" : "")), e.vermieter_anschrift && d("Anschrift", e.vermieter_anschrift), u(2), d(A, e.mieter_name + (!1 === e.mieter_anwesend ? " (nicht anwesend)" : "")), e.mieter_anschrift && d("Anschrift", e.mieter_anschrift), u(4), e.schluessel && e.schluessel.length > 0) {
+  if (n.setFont("helvetica", "bold"), n.setFontSize(18), n.setTextColor(38, 49, 89), n.text(e.projekt_id ? "ABNAHMEPROTOKOLL" : "ÜBERGABEPROTOKOLL", l, o), o += 8, n.setFontSize(11), n.setFont("helvetica", "normal"), n.setTextColor(80, 80, 80), f = e.projekt_id ? (((window.IMMO_NEUBAU_TYPEN || []).find(x => x.id === e.protokoll_typ) || {}).label || "Abnahme") + " (Neubau)" : m ? "Übergabe an Käufer" : "einzug" === e.protokoll_typ ? "Einzug (Übergabe an Mieter)" : "Auszug (Rückgabe an Vermieter)", n.text(f, l, o), o += 5, n.text(immoMarkeMit("", " · immooffice.example"), l, o), o += 6, n.setDrawColor(199, 164, 85), n.setLineWidth(.8), n.line(l, o, l + i, o), o += 8, n.setTextColor(0, 0, 0), c("Stammdaten"), d("Datum", e.uebergabe_datum + (e.uebergabe_uhrzeit ? ", " + e.uebergabe_uhrzeit + " Uhr" : "")), d("Objekt", e.objekt_adresse + (e.objekt_etage ? ", " + e.objekt_etage : "") + (e.objekt_lage ? " " + e.objekt_lage : "")), u(2), d(g, e.vermieter_name + (!1 === e.vermieter_anwesend ? " (nicht anwesend)" : "")), e.vermieter_anschrift && d("Anschrift", e.vermieter_anschrift), u(2), d(A, e.mieter_name + (!1 === e.mieter_anwesend ? " (nicht anwesend)" : "")), e.mieter_anschrift && d("Anschrift", e.mieter_anschrift), u(4), e.schluessel && e.schluessel.length > 0) {
     c("Schlüsselübergabe");
     for (const t of e.schluessel) {
       if (d("", "• " + (`${t.anzahl}× ${t.art}` + (t.bemerkung ? ` — ${t.bemerkung}` : ""))), t.foto_data_urls && t.foto_data_urls.length > 0) {
@@ -57281,6 +57312,8 @@ async function uebergabeProtokollAlsPDF(e) {
       const e = t.notizen && t.notizen.trim() ? t.notizen : "Keine besonderen Anmerkungen.",
         a = n.splitTextToSize(e, i);
       for (const e of a) s(5), n.text(e, 22, o), o += 4.5;
+      // fork_84: die strukturierten Maengel des Raums stehen unter den Notizen.
+      if (window.ImmoMaengelInsPdf) o = window.ImmoMaengelInsPdf(n, t, o, s, i);
       if (t.foto_data_urls && t.foto_data_urls.length > 0) {
         const e = 50,
           a = 38,
@@ -57548,7 +57581,9 @@ function UebergabeprotokollEditor({
     bemerkungen: "",
     unterschrift_vermieter: "",
     unterschrift_mieter: "",
-    status: "entwurf"
+    status: "entwurf",
+    // fork_84: Vorbelegung aus Wohnungsakte, QR-Scan oder Abnahmetermin — einmal gelesen, dann weg.
+    ...(window.ImmoProtokollVorbelegung ? window.ImmoProtokollVorbelegung() : {})
   })), [A, f] = useState(!!t);
   useEffect(() => {
     t && (async () => {
@@ -57737,7 +57772,9 @@ function UebergabeprotokollEditor({
       }
     },
     pdfErzeuge: d,
-    kontext: a
+    kontext: a,
+    immoSpeichern: p,
+    immoProtokollId: r
   })), React.createElement("div", {
     style: {
       display: "flex",
@@ -58055,7 +58092,7 @@ function UpStepStammdaten({
   setFeld: t,
   kontext: n = "vermietung"
 }) {
-  const [a, r] = useState(!1), [l, i] = useState(null), o = "verkauf" === n, s = o ? "Verkäufer" : "Vermieter", c = o ? "Käufer" : "Mieter", d = o ? "Übergabe an Käufer" : "Einzug", u = o ? "Rückgabe an Verkäufer" : "Auszug", m = (e, t, n) => [e, [t, n].filter(Boolean).join(" ")].filter(Boolean).join("\n");
+  const [a, r] = useState(!1), [l, i] = useState(null), o = "verkauf" === n, s = e.projekt_id ? "Bauträger" : o ? "Verkäufer" : "Vermieter", c = e.projekt_id || o ? "Käufer" : "Mieter", d = o ? "Übergabe an Käufer" : "Einzug", u = o ? "Rückgabe an Verkäufer" : "Auszug", m = (e, t, n) => [e, [t, n].filter(Boolean).join(" ")].filter(Boolean).join("\n");
   useEffect(() => {
     o && "auszug" === e.protokoll_typ && t("protokoll_typ", "einzug")
   }, [o, e.protokoll_typ]);
@@ -58111,7 +58148,11 @@ function UpStepStammdaten({
       ...secondaryBtn,
       fontSize: 12
     }
-  }, "📋 Aus Mietvertrag befüllen")), a && !o && React.createElement(MietvertragAuswahlModal, {
+  }, "📋 Aus Mietvertrag befüllen")), window.ImmoProtokollVerknuepfung && React.createElement(window.ImmoProtokollVerknuepfung, {
+    data: e,
+    setFeld: t,
+    kontext: n
+  }), a && !o && React.createElement(MietvertragAuswahlModal, {
     onSchliessen: () => r(!1),
     onAuswahl: e => {
       t("vermieter_name", e.vermieter_name || ""), t("vermieter_anschrift", m(e.vermieter_strasse, e.vermieter_plz, e.vermieter_ort)), t("mieter_name", e.mieter_name || ""), t("mieter_anschrift", m(e.mieter_strasse, e.mieter_plz, e.mieter_ort)), t("objekt_adresse", m(e.objekt_strasse, e.objekt_plz, e.objekt_ort)), e.objekt_lage && t("objekt_lage", e.objekt_lage), r(!1)
@@ -58150,7 +58191,7 @@ function UpStepStammdaten({
     label: u,
     subtitle: o ? "Rückabwicklung" : "Rückgabe an Vermieter",
     farbe: "#c1272d"
-  }].filter(n => !(o && "auszug" === n.id)).map(n => {
+  }].concat(window.IMMO_NEUBAU_TYPEN || []).filter(n => e.projekt_id ? String(n.id).startsWith("neubau_") : !String(n.id).startsWith("neubau_") && !(o && "auszug" === n.id)).map(n => {
     const a = e.protokoll_typ === n.id;
     return React.createElement("button", {
       key: n.id,
@@ -59006,6 +59047,7 @@ function UpStepRaeume({
   data: e,
   setData: t
 }) {
+  const immoProtokoll = e;
   const n = e => {
       t(t => ({
         ...t,
@@ -59169,6 +59211,10 @@ function UpStepRaeume({
       notizen: t.target.value
     }),
     placeholder: "Notizen zum Zustand (Mängel, Schäden, Besonderheiten …)"
+  }), window.ImmoRaumMaengel && React.createElement(window.ImmoRaumMaengel, {
+    raum: e,
+    aendern: n => a(e.id, n),
+    protokoll: immoProtokoll
   }), React.createElement("div", {
     style: {
       display: "flex",
@@ -59431,8 +59477,8 @@ function UpStepUnterschriften({
   kontext: n = "vermietung"
 }) {
   const a = "verkauf" === n,
-    r = a ? "Verkäufer" : "Vermieter",
-    l = a ? "Käufer" : "Mieter";
+    r = e.projekt_id ? "Bauträger" : a ? "Verkäufer" : "Vermieter",
+    l = e.projekt_id || a ? "Käufer" : "Mieter";
   return React.createElement("div", {
     style: {
       display: "flex",
@@ -59609,11 +59655,13 @@ function UpStepAbschluss({
   setFeld: t,
   onPDFErzeugen: n,
   pdfErzeuge: a,
-  kontext: r = "vermietung"
+  kontext: r = "vermietung",
+  immoSpeichern,
+  immoProtokollId
 }) {
   const l = "verkauf" === r,
-    i = l ? "Verkäufer" : "Vermieter",
-    o = l ? "Käufer" : "Mieter",
+    i = e.projekt_id ? "Bauträger" : l ? "Verkäufer" : "Vermieter",
+    o = e.projekt_id || l ? "Käufer" : "Mieter",
     s = [];
   e.objekt_adresse && e.objekt_adresse.trim() || s.push("Objektadresse (Schritt 1)"), e.vermieter_name && e.vermieter_name.trim() || s.push(`${i}-Name (Schritt 1)`), e.mieter_name && e.mieter_name.trim() || s.push(`${o}-Name (Schritt 1)`), e.unterschrift_vermieter || s.push(`Unterschrift ${i} (Schritt 6)`), e.unterschrift_mieter || s.push(`Unterschrift ${o} (Schritt 6)`);
   const c = [];
@@ -59716,7 +59764,14 @@ function UpStepAbschluss({
     data: e,
     kontext: r,
     gesperrt: a || d
-  }), l && !d && React.createElement(UebergabeprotokollPortalPush, {
+  }), e.projekt_id && window.ImmoAbnahmeAbschluss && React.createElement(window.ImmoAbnahmeAbschluss, {
+    data: e,
+    setFeld: t,
+    speichern: immoSpeichern,
+    protokollId: immoProtokollId,
+    pdfErzeugen: uebergabeProtokollAlsPDF,
+    fehlt: s
+  }), l && !d && !e.projekt_id && React.createElement(UebergabeprotokollPortalPush, {
     data: e
   }))
 }

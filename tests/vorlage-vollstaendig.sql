@@ -510,7 +510,19 @@ zuwachs(bereich, mehr, grund) as (values
   ('Fremdschluessel', 2, 'fork_79: warnungen auf regeln und mandanten'),
   ('Cron-Jobs', 3, 'fork_79: plattform-warnungen-stuendlich, plattform-zusammenfassung-sommer/-winter'),
   -- fork_80: Advisor-Nachlese — Indizes auf 17 Fremdschluessel der Betreiber-Tabellen.
-  ('Indizes ohne Constraint', 17, 'fork_80: Fremdschluessel der Betreiber-Tabellen')
+  ('Indizes ohne Constraint', 17, 'fork_80: Fremdschluessel der Betreiber-Tabellen'),
+  -- fork_84–86: Bautraeger-Paket v2 — Verknuepfungen, Maengel-Workflow, QR, Bautenstand/MaBV.
+  ('Tabellen', 1, 'fork_86: projekt_bautenstand'),
+  ('Tabellen mit RLS', 1, 'fork_86: projekt_bautenstand'),
+  ('Spalten', 51, 'fork_84: 11 uebergabeprotokoll, 19 projekt_maengel, 3 projekt_kontakte, 2 projekt_einheiten (raeume, fork_86 qr_token); fork_85: 3 projekte; fork_86: 3 projekt_zahlungsplan, 10 projekt_bautenstand'),
+  ('Fremdschluessel', 18, 'fork_84: 7 uebergabeprotokoll, 5 projekt_maengel, 1 projekt_kontakte, 1 projekt_einheiten.immobilie_id; fork_86: 4 projekt_bautenstand'),
+  ('Indizes ohne Constraint', 22, 'fork_84: 7 + 7 + 2 + 1; fork_86: 4 projekt_bautenstand, qr_token'),
+  ('Primaer- und Eindeutigkeitsschluessel', 1, 'fork_86: projekt_bautenstand'),
+  ('Pruefbedingungen', 4, 'fork_84: neubau_projekt, quelle, status; fork_86: abschnitt 1–13'),
+  ('Richtlinien', 5, 'fork_84: 2 Team-Richtlinien am Protokoll mit Projekt; fork_86: 3 projekt_bautenstand'),
+  ('Funktionen', 8, 'fork_84: objekte_zu_adresse; fork_85: mangel_verlauf_anhaengen, projekt_maengel_verlauf_trg, projekt_maengel_todo_trg, projekt_glocke, maengel_vorlage_sicherstellen; fork_86: rate_anforderbar, projekt_bautenstand_hinweis_trg'),
+  ('Trigger', 3, 'fork_85: Verlauf, To-do-Abschluss; fork_86: Ratenhinweis'),
+  ('Cron-Jobs', 1, 'fork_85: maengel-fristen-taeglich')
 ),
 soll(bereich, soll) as (
   select v.bereich,

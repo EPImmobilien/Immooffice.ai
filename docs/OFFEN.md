@@ -1437,3 +1437,33 @@ Hilfsfunktionen der Vorlage (`set_*_updated_at`, `rechnung_*`,
 könnte die `intern.*`-Funktionen brechen, die unqualifiziert in ihr Schema
 greifen. Je Funktion prüfen, dann setzen — Phase-9-Arbeit, keine
 Betreiberarbeit.
+
+## Bauträger-Paket v2: was nach fork_84–86 offen bleibt
+
+- **E-Signatur statt Unterschrift auf dem Gerät.** Spalte
+  `uebergabeprotokoll.signatur_vorgang_id` ist da; der Weg über
+  `signatur-vorgang-starten` (braucht `vertrag_id`) ist nicht angebunden.
+  Heute: Canvas-Unterschriften der Vorlage auf dem Gerät.
+- **Kalender → Protokoll.** Aus der Wohnungsakte lässt sich ein Termin
+  (Art „Abnahme") anlegen und von dort das Protokoll vorbelegt starten.
+  Der Weg aus der Termin-Detailansicht des Kalenders heraus fehlt noch;
+  der Termin trägt `projekt:<id> · einheit:<id>` in der Notiz, damit er
+  sich zuordnen lässt.
+- **Offline.** Die Offline-Variante der Vorlage (`OfflineUebergabeprotokoll`)
+  kennt die neuen Felder nur durchgereicht (sie kopiert `daten`); „+ Mangel"
+  mit Diktat und Gewerk gibt es offline nicht. Online hält der Editor den
+  Zustand im Speicher; ein lokaler Zwischenspeicher je Protokoll fehlt.
+- **Entwurfs-To-dos senden.** Die Mahnung liegt als Entwurf im To-do
+  (`entwurf_betreff/-text/empfaenger_email`); das Senden läuft über den
+  To-do-Knopf der Vorlage. Nicht live geprüft, ob er den Mangel-Verlauf
+  nachträgt — er kennt den Mangel nicht. Fürs Protokoll steht die
+  Mahnung als `mahnung_entwurf` im Verlauf.
+- **Live-Nachweis** der Mails (Resend-Secret `RESEND_API_KEY`, Absender aus
+  dem Standardpostfach des Mandanten oder `SMTP_FROM_EMAIL`) und des Push
+  (`PUSH_HOOK_SECRET`) steht aus; ohne Secret wird still nicht gesendet
+  und im Verlauf vermerkt.
+- **projekt-wohnungen** sucht Projekte weiter über den global eindeutigen
+  Slug (`tests/mandant-nachzug.py`, nicht Teil von `npm run check`; Befund
+  war vor diesem Paket da).
+- **E&P World**: dieselben Migrationen und Functions sind dort noch
+  einzuspielen (Auftrag: „je Codebasis einmal").

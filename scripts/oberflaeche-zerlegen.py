@@ -4719,6 +4719,100 @@ WOERTLICH = [
      'Einstellungen: der Reiter kommt aus dem Pfad-Verweis.'),
 
     # =====================================================================
+    # fork_84–86 — Bautraeger-Paket v2: das Uebergabeprotokoll bekommt den
+    # Neubau-Modus, der Neubau-Bereich Cockpit und Wohnungsakte.
+    # ---------------------------------------------------------------------
+    # Kein neues Protokoll-Modul (Auftrag C). Die Haken sitzen in den
+    # vorhandenen Schritten; was sie zeigen, steht in src/eigene/
+    # bautraeger-*.js und ist ohne diese Dateien schlicht nicht da.
+    # =====================================================================
+    # Editor: Vorbelegung aus Wohnungsakte, QR oder Termin (einmalig gelesen).
+    ('FORK',
+     '    unterschrift_mieter: "",\n    status: "entwurf"\n  })), [A, f] = useState(!!t);',
+     '    unterschrift_mieter: "",\n    status: "entwurf",\n    // fork_84: Vorbelegung aus Wohnungsakte, QR-Scan oder Abnahmetermin — einmal gelesen, dann weg.\n    ...(window.ImmoProtokollVorbelegung ? window.ImmoProtokollVorbelegung() : {})\n  })), [A, f] = useState(!!t);',
+     'Protokoll: Vorbelegung aus der Wohnungsakte.'),
+    # Stammdaten: Parteien heissen im Neubau Bautraeger und Kaeufer.
+    ('FORK',
+     '  const [a, r] = useState(!1), [l, i] = useState(null), o = "verkauf" === n, s = o ? "Verkäufer" : "Vermieter", c = o ? "Käufer" : "Mieter", d = o ? "Übergabe an Käufer" : "Einzug", u = o ? "Rückgabe an Verkäufer" : "Auszug",',
+     '  const [a, r] = useState(!1), [l, i] = useState(null), o = "verkauf" === n, s = e.projekt_id ? "Bauträger" : o ? "Verkäufer" : "Vermieter", c = e.projekt_id || o ? "Käufer" : "Mieter", d = o ? "Übergabe an Käufer" : "Einzug", u = o ? "Rückgabe an Verkäufer" : "Auszug",',
+     'Protokoll: Bautraeger und Kaeufer im Neubau.'),
+    # Stammdaten: Objekt, Projekt, Einheit, Kaeufer und Kontakte waehlen.
+    ('FORK',
+     '  }, "📋 Aus Mietvertrag befüllen")), a && !o && React.createElement(MietvertragAuswahlModal, {',
+     '  }, "📋 Aus Mietvertrag befüllen")), window.ImmoProtokollVerknuepfung && React.createElement(window.ImmoProtokollVerknuepfung, {\n    data: e,\n    setFeld: t,\n    kontext: n\n  }), a && !o && React.createElement(MietvertragAuswahlModal, {',
+     'Protokoll: Verknuepfung mit Objekt, Einheit und Kontakten.'),
+    # Stammdaten: die drei Neubau-Typen, sobald ein Projekt gewaehlt ist.
+    ('FORK',
+     '  }].filter(n => !(o && "auszug" === n.id)).map(n => {\n    const a = e.protokoll_typ === n.id;',
+     '  }].concat(window.IMMO_NEUBAU_TYPEN || []).filter(n => e.projekt_id ? String(n.id).startsWith("neubau_") : !String(n.id).startsWith("neubau_") && !(o && "auszug" === n.id)).map(n => {\n    const a = e.protokoll_typ === n.id;',
+     'Protokoll: Vorabnahme, Abnahme, Nachabnahme.'),
+    # Raeume: strukturierte Maengel je Raum.
+    ('FORK',
+     'function UpStepRaeume({\n  data: e,\n  setData: t\n}) {\n  const n = e => {',
+     'function UpStepRaeume({\n  data: e,\n  setData: t\n}) {\n  const immoProtokoll = e;\n  const n = e => {',
+     'Protokoll: das Protokoll bleibt im Raumschritt greifbar.'),
+    ('FORK',
+     '    placeholder: "Notizen zum Zustand (Mängel, Schäden, Besonderheiten …)"\n  }), React.createElement("div", {\n    style: {\n      display: "flex",\n      flexWrap: "wrap",\n      gap: 8,\n      marginBottom: 10\n    }\n  }, (e.foto_data_urls || []).map((n, a) => React.createElement("div", {',
+     '    placeholder: "Notizen zum Zustand (Mängel, Schäden, Besonderheiten …)"\n  }), window.ImmoRaumMaengel && React.createElement(window.ImmoRaumMaengel, {\n    raum: e,\n    aendern: n => a(e.id, n),\n    protokoll: immoProtokoll\n  }), React.createElement("div", {\n    style: {\n      display: "flex",\n      flexWrap: "wrap",\n      gap: 8,\n      marginBottom: 10\n    }\n  }, (e.foto_data_urls || []).map((n, a) => React.createElement("div", {',
+     'Protokoll: „+ Mangel“ je Raum.'),
+    # Unterschriften: Bautraeger und Kaeufer.
+    ('FORK',
+     '  const a = "verkauf" === n,\n    r = a ? "Verkäufer" : "Vermieter",\n    l = a ? "Käufer" : "Mieter";\n  return React.createElement("div", {\n    style: {\n      display: "flex",\n      flexDirection: "column",\n      gap: 24',
+     '  const a = "verkauf" === n,\n    r = e.projekt_id ? "Bauträger" : a ? "Verkäufer" : "Vermieter",\n    l = e.projekt_id || a ? "Käufer" : "Mieter";\n  return React.createElement("div", {\n    style: {\n      display: "flex",\n      flexDirection: "column",\n      gap: 24',
+     'Protokoll: Unterschriften von Bautraeger und Kaeufer.'),
+    # Abschluss: Speichern und Kennung kommen mit; der Neubau-Abschluss uebernimmt.
+    ('FORK',
+     '    pdfErzeuge: d,\n    kontext: a\n  })), React.createElement("div", {',
+     '    pdfErzeuge: d,\n    kontext: a,\n    immoSpeichern: p,\n    immoProtokollId: r\n  })), React.createElement("div", {',
+     'Protokoll: der Abschluss kann speichern.'),
+    ('FORK',
+     'function UpStepAbschluss({\n  data: e,\n  setFeld: t,\n  onPDFErzeugen: n,\n  pdfErzeuge: a,\n  kontext: r = "vermietung"\n}) {\n  const l = "verkauf" === r,\n    i = l ? "Verkäufer" : "Vermieter",\n    o = l ? "Käufer" : "Mieter",',
+     'function UpStepAbschluss({\n  data: e,\n  setFeld: t,\n  onPDFErzeugen: n,\n  pdfErzeuge: a,\n  kontext: r = "vermietung",\n  immoSpeichern,\n  immoProtokollId\n}) {\n  const l = "verkauf" === r,\n    i = e.projekt_id ? "Bauträger" : l ? "Verkäufer" : "Vermieter",\n    o = e.projekt_id || l ? "Käufer" : "Mieter",',
+     'Protokoll: Abschluss kennt Speichern und Kennung.'),
+    ('FORK',
+     '  }), l && !d && React.createElement(UebergabeprotokollPortalPush, {\n    data: e\n  }))\n}',
+     '  }), e.projekt_id && window.ImmoAbnahmeAbschluss && React.createElement(window.ImmoAbnahmeAbschluss, {\n    data: e,\n    setFeld: t,\n    speichern: immoSpeichern,\n    protokollId: immoProtokollId,\n    pdfErzeugen: uebergabeProtokollAlsPDF,\n    fehlt: s\n  }), l && !d && !e.projekt_id && React.createElement(UebergabeprotokollPortalPush, {\n    data: e\n  }))\n}',
+     'Protokoll: Abnahme abschliessen statt Eigentuemerportal.'),
+    # PDF: Titel, Parteien und die Maengel je Raum.
+    ('FORK',
+     '    g = m ? "Verkäufer" : "Vermieter",\n    A = m ? "Käufer" : "Mieter";\n  let f;',
+     '    g = e.projekt_id ? "Bauträger" : m ? "Verkäufer" : "Vermieter",\n    A = e.projekt_id || m ? "Käufer" : "Mieter";\n  let f;',
+     'Protokoll-PDF: Bautraeger und Kaeufer.'),
+    ('FORK',
+     'n.text("ÜBERGABEPROTOKOLL", l, o)',
+     'n.text(e.projekt_id ? "ABNAHMEPROTOKOLL" : "ÜBERGABEPROTOKOLL", l, o)',
+     'Protokoll-PDF: Abnahmeprotokoll heisst so.'),
+    ('FORK',
+     'f = m ? "Übergabe an Käufer" : "einzug" === e.protokoll_typ ? "Einzug (Übergabe an Mieter)" : "Auszug (Rückgabe an Vermieter)", n.text(f, l, o)',
+     'f = e.projekt_id ? (((window.IMMO_NEUBAU_TYPEN || []).find(x => x.id === e.protokoll_typ) || {}).label || "Abnahme") + " (Neubau)" : m ? "Übergabe an Käufer" : "einzug" === e.protokoll_typ ? "Einzug (Übergabe an Mieter)" : "Auszug (Rückgabe an Vermieter)", n.text(f, l, o)',
+     'Protokoll-PDF: Untertitel nennt den Neubau-Typ.'),
+    ('FORK',
+     '      for (const e of a) s(5), n.text(e, 22, o), o += 4.5;\n      if (t.foto_data_urls && t.foto_data_urls.length > 0) {',
+     '      for (const e of a) s(5), n.text(e, 22, o), o += 4.5;\n      // fork_84: die strukturierten Maengel des Raums stehen unter den Notizen.\n      if (window.ImmoMaengelInsPdf) o = window.ImmoMaengelInsPdf(n, t, o, s, i);\n      if (t.foto_data_urls && t.foto_data_urls.length > 0) {',
+     'Protokoll-PDF: Maengel je Raum.'),
+    # Neubau-Bereich: Cockpit als erster Reiter, Akte je Einheit, Start aus QR/Push.
+    ('FORK',
+     '  }, [\n    ["einheiten", `Einheiten (${o.length})`],',
+     '  }, [\n    ["cockpit", "Cockpit"],\n    ["einheiten", `Einheiten (${o.length})`],',
+     'Neubau: Reiter Cockpit.'),
+    ('FORK',
+     '  }, t))), "einheiten" === ie && React.createElement("div", {\n    style: {\n      overflowX: "auto"\n    }',
+     '  }, t))), "cockpit" === ie && window.ImmoNeubauCockpit && React.createElement(window.ImmoNeubauCockpit, {\n    projekt: l,\n    einheiten: o,\n    zugaenge: u,\n    kontakte: K,\n    dateien: c,\n    user: e,\n    neuLaden: () => Be(l)\n  }), "einheiten" === ie && React.createElement("div", {\n    style: {\n      overflowX: "auto"\n    }',
+     'Neubau: das Cockpit mit Wohnungsakte.'),
+    ('FORK',
+     '  }, "Bearbeiten"), React.createElement("button", {\n    onClick: () => (async e => {\n      if (!confirm(`Einheit ${e.we_nr} wirklich löschen?',
+     '  }, "Bearbeiten"), React.createElement("button", {\n    onClick: () => {\n      window._immoAkteEinheit = e.id;\n      oe("cockpit")\n    },\n    style: {\n      ...Ue,\n      padding: "5px 9px",\n      fontSize: 10.5,\n      marginRight: 6\n    }\n  }, "📁 Akte"), React.createElement("button", {\n    onClick: () => (async e => {\n      if (!confirm(`Einheit ${e.we_nr} wirklich löschen?',
+     'Neubau: „Akte“ an jeder Einheit.'),
+    ('FORK',
+     '      } = await window._sb.from("projekte").select("*").order("created_at", {\n        ascending: !1\n      });\n      n(e || []), r(!1)\n    })()\n  }, []), useEffect(() => {',
+     '      } = await window._sb.from("projekte").select("*").order("created_at", {\n        ascending: !1\n      });\n      n(e || []), r(!1);\n      // fork_86: Start aus QR-Scan, Push oder Mail (?qr=, ?akte=): Projekt waehlen, Akte oeffnen.\n      const start = window._immoNeubauStart;\n      if (start && e) {\n        window._immoNeubauStart = null;\n        const p = e.find(x => x.id === start.projekt_id);\n        if (p) {\n          window._immoAkteEinheit = start.einheit_id || null;\n          await Be(p);\n          oe("cockpit")\n        }\n      }\n    })()\n  }, []), useEffect(() => {',
+     'Neubau: Start aus QR-Code oder Benachrichtigung.'),
+    ('FORK',
+     '  const [t, n] = useState(() => window._epObjektOeffnen ? "bestand" : null);',
+     '  const [t, n] = useState(() => window._immoNeubauStart ? "neubau" : window._epObjektOeffnen ? "bestand" : null);',
+     'Immobilien: Reiter Neubau, wenn ein QR-Code oder eine Benachrichtigung dorthin fuehrt.'),
+
+    # =====================================================================
     # fork_52 — der Plattform-Bereich des Betreibers
     # ---------------------------------------------------------------------
     # Eine Kachel, eine Ansicht, eine Sperre und die Frage beim Anmelden.

@@ -783,6 +783,20 @@ else
   schlecht
 fi
 
+abschnitt "Bautraeger: Verlauf, To-do-Kopplung, Ratenregel, Mandantengrenze"
+if scripts/lokale-db.sh psql -q -f tests/bautraeger.sql; then
+  :
+else
+  schlecht
+fi
+
+abschnitt "Bautraeger: Functions, Oberflaeche und Regeln halten den Auftrag"
+if node tests/bautraeger.js; then
+  :
+else
+  schlecht
+fi
+
 abschnitt "CSV-Import: Lesen, Zuordnen, Pruefen"
 if node tests/csv-import.js; then
   :

@@ -164,6 +164,8 @@ Deno.serve(async (req) => {
     let ansprechpartner: any = null;
     let kontakte: any[] = [];
     let nachrichten: any[] = [];
+    let immoMaengel: any[] = [];
+    let immoProtokolle: any[] = [];
     if (eingeloggt && zugangId) {
       const einheitName = new Map((einheiten || []).map((e: any) => [e.id, e.we_nr]));
       const [{ data: kd }, { data: ml }, { data: an }, { data: ko }, { data: nx }] = await Promise.all([
@@ -179,6 +181,25 @@ Deno.serve(async (req) => {
           .eq("zugang_id", zugangId).order("created_at", { ascending: true }).limit(100),
       ]);
       kundenDateien = kd || [];
+      // fork_85: Maengel des Kaeufers (eigene Meldungen und die seiner Einheit) mit Status,
+      // dazu die abgeschlossenen Protokolle seiner Einheit. Das PDF kommt als persoenliche
+      // Datei ueber `dateien`, sobald die Verwaltung es freigibt (Knopf „An Kaeufer senden").
+      try {
+        let mq = admin.from("projekt_maengel").select("id, titel, raum, gewerk, status, frist, termin_am, created_at, bearbeitet_am, quelle, einheit_id, zugang_id")
+          .eq("projekt_id", projekt.id).order("created_at", { ascending: false }).limit(200);
+        mq = zugang && zugang.einheit_id ? mq.or("zugang_id.eq." + zugangId + ",einheit_id.eq." + zugang.einheit_id) : mq.eq("zugang_id", zugangId);
+        const { data: mg } = await mq;
+        const MSTAT = { offen: "Gemeldet", beauftragt: "Handwerker beauftragt", termin_geplant: "Termin geplant", gemeldet_erledigt: "Erledigt gemeldet – wird geprüft", geprueft_erledigt: "Erledigt", abgelehnt: "Kein Mangel", in_bearbeitung: "In Bearbeitung", erledigt: "Erledigt" };
+        immoMaengel = (mg || []).map((m) => ({ id: m.id, titel: m.titel, raum: m.raum, gewerk: m.gewerk, status: m.status, status_text: MSTAT[m.status] || m.status,
+          frist: m.frist, termin_am: m.termin_am, created_at: m.created_at, bearbeitet_am: m.bearbeitet_am, quelle: m.quelle, erledigt: ["geprueft_erledigt", "erledigt", "abgelehnt"].includes(m.status) }));
+        if (zugang && zugang.einheit_id) {
+          const { data: pk } = await admin.from("uebergabeprotokoll").select("id, protokoll_typ, uebergabe_datum, abgeschlossen_am, status")
+            .eq("einheit_id", zugang.einheit_id).eq("projekt_id", projekt.id).eq("status", "abgeschlossen").order("uebergabe_datum", { ascending: false }).limit(20);
+          const PTYP = { neubau_vorabnahme: "Vorabnahme", neubau_abnahme: "Abnahme", neubau_nachabnahme: "Nachabnahme", einzug: "Übergabe", auszug: "Rückgabe" };
+          immoProtokolle = (pk || []).map((x) => ({ id: x.id, typ: x.protokoll_typ, typ_text: PTYP[x.protokoll_typ] || x.protokoll_typ, datum: x.uebergabe_datum, abgeschlossen_am: x.abgeschlossen_am,
+            offene_maengel: (mg || []).filter((m) => m.einheit_id === zugang.einheit_id && !["geprueft_erledigt", "erledigt", "abgelehnt"].includes(m.status)).length }));
+        }
+      } catch (_e) { /* Portal bleibt nutzbar */ }
       merkliste = (ml || []).map((m: any) => einheitName.get(m.einheit_id)).filter(Boolean);
       anfragen = (an || []).map((a: any) => ({ we_nr: einheitName.get(a.einheit_id), status: a.status, created_at: a.created_at })).filter((a: any) => a.we_nr);
       kontakte = ko || [];
@@ -205,6 +226,8 @@ Deno.serve(async (req) => {
       dateien,
       updates,
       kunden_dateien: kundenDateien,
+      maengel: immoMaengel,
+      protokolle: immoProtokolle,
       merkliste,
       anfragen,
       ansprechpartner,

@@ -32,10 +32,19 @@ from pathlib import Path
 WURZEL = Path(__file__).resolve().parent.parent
 FUNKTIONEN = WURZEL / 'supabase' / 'functions'
 
+# Beilagen, die den Dienstschluessel mitbringen (siehe Schleife unten).
+BEILAGEN_MIT_DIENSTSCHLUESSEL = {'bautraeger.ts'}
+
 # --- Abgesichert: die Kennung wird gegen den Mandanten des Aufrufers
 # geprueft. Der Wert ist das Kennzeichen, an dem sich das im Quelltext
 # nachsehen laesst.
 ABGESICHERT = {
+    'abnahme-abschliessen': ('immoMandantSichern',
+        'Schliesst ein Neubau-Protokoll ab (fork_85). Der Aufrufer kommt aus '
+        'dem JWT, sein Mandant aus profiles; die protokoll_id aus dem Koerper '
+        'wird gegen diesen Mandanten geprueft, bevor irgendetwas geschieht. '
+        'Alle weiteren Zeilen (Projekt, Einheit, Zugang, Handwerker) werden '
+        'ueber das Protokoll geladen und auf denselben Mandanten begrenzt.'),
     'credentials-anzeigen': ('immoMandantSichern',
         'Gibt das ENTSCHLUESSELTE Passwort heraus. Mit einer credential_id '
         'aus dem Koerper waere das der FTP- oder Portalzugang eines fremden '
@@ -251,6 +260,11 @@ ABGESICHERT = {
 
 # --- Gelesen und fuer unbedenklich befunden ---------------------------------
 UNBEDENKLICH = {
+    'maengel-fristen':
+        'Taeglicher Lauf (fork_85). Liest nichts aus dem Koerper; die '
+        'faelligen Maengel aller Mandanten kommen aus der Datenbank, und je '
+        'Zeile wird im Mandanten DIESER Zeile weitergearbeitet. Es gibt keine '
+        'Kennung, die der Aufrufer mitgeben koennte.',
     'akq-ki-vorlage':
         'Erzeugt aus den Textbausteinen des Anfragekoerpers einen Vorschlag. '
         'Liest aus der Datenbank nur die Rolle des Aufrufers und schreibt '
@@ -277,7 +291,12 @@ def main():
         if not datei.is_file():
             continue
         text = datei.read_text(encoding='utf-8')
-        if 'SUPABASE_SERVICE_ROLE_KEY' not in text:
+        # Der Dienstschluessel kann auch in einer Beilage stecken (fork_85:
+        # bautraeger.ts). Dann ist die Funktion genauso betroffen — nur
+        # steht der Schluessel in der Datei daneben. credits.ts und abo.ts
+        # fuehren tests/credits.js und tests/abo-schranke.js gesondert.
+        beilage = any((FUNKTIONEN / name / b).is_file() for b in BEILAGEN_MIT_DIENSTSCHLUESSEL)
+        if 'SUPABASE_SERVICE_ROLE_KEY' not in text and not beilage:
             continue
         betroffen.append(name)
 

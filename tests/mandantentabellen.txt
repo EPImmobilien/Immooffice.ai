@@ -3,7 +3,7 @@
 # usguiggfciavwzkdfjgt. Liegt als Datei bei, damit tests/
 # dienstschluessel-mandant.py ohne Netzzugang laeuft — `npm run check`
 # hat keinen.
-# 179 Tabellen.
+# 185 Tabellen.
 akq_aktivitaeten
 akq_automation_lauf
 akq_automationen
@@ -122,12 +122,14 @@ onoffice_objekte
 onoffice_schreib_felder
 onoffice_status_log
 onoffice_sync_log
+plattform_warnungen
 portal_diagnose
 portal_einstellungen
 portal_zugaenge
 profiles
 projekt_aktivitaeten
 projekt_anfragen
+projekt_bautenstand
 projekt_datei_freigaben
 projekt_dateien
 projekt_einheiten
@@ -156,6 +158,7 @@ rechnung_nummern_sequence
 rechnung_positionen
 rechnungen
 rechnungen_audit
+rechtstext_zustimmungen
 reservierungen_neubau
 rundgaenge
 rundgang_hotspots
@@ -164,6 +167,9 @@ signatur_empfaenger
 signatur_events
 signatur_vorgaenge
 suchkriterien_treffer
+support_anfragen
+support_antworten
+support_protokoll
 termin_einladungen
 termine
 todo_kommentar
@@ -183,8 +189,3 @@ vertragsvorlagen
 vorlagen_felder
 web_leads
 zahlungsbedingungen
-support_anfragen
-support_antworten
-support_protokoll
-rechtstext_zustimmungen
-plattform_warnungen
