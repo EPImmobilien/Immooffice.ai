@@ -1,6 +1,7 @@
 # Tarife, Abos und Credits
 
-Stand 06.10.2026 · Auftrag „Tarife, Abos & Credits für immoOffice.ai"
+Stand 07.10.2026 · Auftrag „Tarife, Abos & Credits für immoOffice.ai",
+abgeglichen mit dem Stripe-Integrationsplan vom 07.10.2026 (Abschnitt 4a)
 
 Dieses Dokument hält fest, **was gebaut wurde, welche Annahmen dabei getroffen
 wurden und was davon geprüft ist** — getrennt nach dem, was hier prüfbar war,
@@ -77,7 +78,7 @@ Verhalten der Vorlage und den Regeln in `CLAUDE.md` am nächsten kommt.
 | 2 | Kündigung über das Stripe-Kundenportal? | nein, über `abo-verwalten` | Stripe kennt die Mindestlaufzeit nicht und würde zum Periodenende kündigen, auch wenn noch vier Monate offen sind. Das Portal bleibt für Zahlungsmittel und Rechnungen zuständig. |
 | 3 | Kündigungstermin | der **spätere** von Periodenende und Mindestlaufzeitende | Das ist die ganze Regel; sie steht an einer Stelle und wird dem Kunden vor der Bestätigung als Datum gezeigt. |
 | 4 | Preisänderung im Admin | legt bei Stripe einen **neuen** Preis an, der alte wird stillgelegt | Preise sind bei Stripe unveränderlich. Laufende Abos bleiben auf ihrem alten Preis — ein laufender Vertrag wird nicht im Vorbeigehen teurer. |
-| 5 | Umsatzsteuer | `tax_behavior: exclusive`, Stripe Tax **aus** | `CLAUDE.md`: Preise sind Nettopreise zzgl. USt. Stripe Tax ist vorbereitet, aber ein steuerliches Thema des Betreibers. |
+| 5 | Umsatzsteuer | `tax_behavior: exclusive`, **Stripe Tax an** (seit 07.10.2026) | Preise bleiben netto. Stripe rechnet 19 % für Deutschland und Reverse Charge bei gültiger EU-USt-IdNr. ausserhalb Deutschlands; die Kasse fragt die USt-IdNr. ab. Voraussetzung: Steuerregistrierung Deutschland im Stripe-Konto. Vorher stand hier „aus" — überholt durch den Integrationsplan. |
 | 6 | Zahlung schlägt fehl | `zahlung_offen`, volle Nutzung für `zahlung_frist_tage` (14), danach Lesezugriff, dann gesperrt | Eine Karte, die einmal abgelehnt wird, ist kein Kündigungsgrund. |
 | 7 | Nach Testende / Kündigung | **30 Tage Lesezugriff** (`lesezugriff_tage`) | Wer aufhört, muss exportieren können, was ihm gehört. |
 | 8 | Testphase | 28 Tage, 300 Credits, **ohne** Zahlungsmittel, kein automatischer Übergang ins Abo | Eine stillschweigende Verlängerung wäre eine Abofalle. |
@@ -116,8 +117,73 @@ ohne irgendetwas zu buchen. Geht die Verarbeitung schief, wird die Zeile
 wieder gelöscht, damit Stripes Wiederholung eine Chance hat.
 
 **Verarbeitet:** `checkout.session.completed` ·
-`customer.subscription.created/updated/deleted` · `invoice.paid` ·
-`invoice.payment_failed`.
+`customer.subscription.created/updated/deleted` · `invoice.finalized` ·
+`invoice.paid` · `invoice.payment_failed` · `invoice.voided` ·
+`invoice.marked_uncollectible` · `credit_note.created`.
+
+---
+
+## 4a. Abgleich mit dem Stripe-Integrationsplan (07.10.2026)
+
+Der Plan kam aus Stripes eigenem Integrationsplaner, angewendet auf das
+Sandbox-Konto. Was er verlangt und wo es steht:
+
+| Plan | Umsetzung |
+|---|---|
+| Stripe-gehostete Kasse (Weiterleitung) | `abo-checkout`, unverändert |
+| Pauschaltarife, Zusatznutzer als Menge | unverändert |
+| Test ohne Zahlungsmittel, Abo erst beim Abschluss | unverändert |
+| Flexible Abrechnung | `subscription_data[billing_mode][type]=flexible` |
+| Stripe Tax mit Erhebung | `automatic_tax`, `tax_id_collection`, `customer_update` in jeder Kasse; Produkte mit Steuerkategorie `txcd_10103001` (SaaS, geschäftlich) |
+| Karte und SEPA-Lastschrift | `payment_method_types` in jeder Kasse |
+| Eigene Abo-Verwaltung statt Kundenportal (Mindestlaufzeit) | `abo-verwalten`: Kündigung, Widerruf, Zusatznutzer, **neu: `tarif_wechseln`** |
+| Kundenportal nur für Zahlungsmittel und Rechnungen | eigene Portal-Konfiguration ohne Kündigung und ohne Tarifwechsel; Kennung in `plattform_werte.stripe_portal_konfiguration` |
+| Smart Retries, Mahn-Mails | Einstellung im Stripe-Dashboard (Betreiber) |
+| Rechnungen automatisch, Abgleich per Webhook | `stripe_rechnungen` (fork_71), geschrieben vom Webhook |
+
+**Feste API-Fassung `2025-12-15.clover`.** Die Funktionen senden sie im
+Kopf `Stripe-Version`, der Webhook-Endpunkt wird mit derselben angelegt.
+Ohne feste Fassung gälte, was im Konto eingestellt ist — ein Klick dort
+änderte still die Form jeder Antwort. Seit der Basil-Fassung liegen drei
+Dinge woanders: die Abo-Periode an den Positionen, der Preis einer
+Rechnungszeile unter `pricing.price_details.price`, das Abo einer Rechnung
+unter `parent.subscription_details`. Der Webhook liest beide Formen.
+
+**Drei Fehler, die dabei gefunden und behoben wurden:**
+
+1. *Ein Paketkauf brachte ein Monatskontingent mit.* `invoice.paid` schrieb
+   Tarif-Credits für **jede** bezahlte Rechnung gut — auch für die Rechnung
+   eines Credit-Pakets. Jetzt nur bei `billing_reason` `subscription_create`
+   und `subscription_cycle`. Eine Nachberechnung beim Wechsel nach oben
+   bringt kein zweites Kontingent; das grössere kommt mit der nächsten
+   Periode.
+2. *Ein Paketkauf löschte die Abo-Kennung.* `checkout.session.completed`
+   schrieb bei einer Einmalzahlung `stripe_subscription_id = null`. Danach
+   fand der Webhook das Abo nicht mehr. Jetzt nur im Abo-Modus.
+3. *Die Rechnung zum Paket kam nie zustande.* `invoice_creation=true` ist
+   kein gültiger Wert; Stripe verlangt `invoice_creation[enabled]=true`.
+
+Dazu: eine zweite Kasse bei laufendem Abo wird abgewiesen (vorher hätte die
+Tarifwahl bei einem gekündigten Abo ein **zweites** Abo angelegt), und das
+Seed-Skript legte den Gründer-Coupon beim ersten Lauf **ohne**
+Tarifbeschränkung an, weil es die Produktkennung aus einer Liste las, die
+vor dem Anlegen gelesen worden war.
+
+### Tarif wechseln
+
+`abo-verwalten`, Aktion `tarif_wechseln`. Verglichen wird der Monatswert
+(Jahrespreis durch zwölf), damit auch ein Wechsel des Takts richtig
+eingeordnet wird.
+
+- **Höher:** sofort, `proration_behavior: always_invoice` — die Differenz
+  wird gleich berechnet.
+- **Niedriger:** zum Ende der laufenden Periode über einen Subscription
+  Schedule; danach gibt der Zeitplan das Abo wieder frei.
+- Der Gründerpreis entfällt beim Wechsel endgültig.
+- Reicht der neue Tarif nicht für alle, die im Haus arbeiten, wird
+  abgewiesen. Bei einem gekündigten Abo ebenso — erst widerrufen.
+- Eine Kündigung löst einen vorgemerkten Wechsel nach unten (Stripe nimmt
+  `cancel_at` an einem Abo mit Zeitplan nicht an).
 
 ---
 
@@ -462,8 +528,8 @@ Betreiber einmal durchspielen. Die Reihenfolge ist die sinnvolle.
 1. `node scripts/stripe-einrichten.mjs --trocken` — zeigt, was angelegt
    würde. Dann ohne `--trocken`.
 2. Webhook-Endpunkt bei Stripe anlegen auf
-   `…/functions/v1/stripe-webhook`, Ereignisse wie in Abschnitt 4.
-   `STRIPE_WEBHOOK_SECRET` setzen.
+   `…/functions/v1/stripe-webhook`, API-Fassung `2025-12-15.clover`,
+   Ereignisse wie in Abschnitt 4. `STRIPE_WEBHOOK_SECRET` setzen.
 3. **Testkarte 4242 4242 4242 4242** → Abo kommt zustande, `mandant_abo`
    steht auf `aktiv`, Inklusiv-Credits sind zugeteilt.
 4. **Testkarte 4000 0000 0000 0341** (Zahlung schlägt später fehl) →
@@ -477,7 +543,14 @@ Betreiber einmal durchspielen. Die Reihenfolge ist die sinnvolle.
    `gueltig_bis` in 12 Monaten.
 8. **Gründerpreis** → der Coupon greift nur auf dem dafür bestimmten Tarif,
    und der Zähler auf der Website zählt herunter.
-9. **Zwei Mandanten nebeneinander** → Mandant A sieht in der Oberfläche
+9. **SEPA-Lastschrift** (IBAN `DE89370400440532013000`) → Credits erst nach
+   `invoice.paid`, nicht beim Rücksprung aus der Kasse.
+10. **USt-IdNr. eines anderen EU-Landes** in der Kasse → Rechnung mit Reverse
+   Charge, 0 % USt.; ohne USt-IdNr. in Deutschland → 19 %.
+11. **Tarif wechseln** Starter → Professional (sofort, anteilige Rechnung) und
+   zurück (vorgemerkt zum Periodenende).
+12. **Kundenportal** zeigt weder „Kündigen" noch „Tarif ändern".
+13. **Zwei Mandanten nebeneinander** → Mandant A sieht in der Oberfläche
    nichts von B. (Die Datenbankseite ist unter 10.1 geprüft; hier geht es um
    den Weg durch die Anwendung.)
 

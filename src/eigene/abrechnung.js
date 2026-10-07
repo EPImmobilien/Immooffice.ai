@@ -246,7 +246,12 @@
           gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))" } },
           katalog.tarife.map(function (t) {
             var cent = takt === "jahr" ? t.preis_jahr_cent : t.preis_monat_cent;
-            var ist = a && a.tarif === t.schluessel && a.status !== "test";
+            // Läuft schon ein Abo, wird gewechselt statt neu gekauft — eine
+            // zweite Kasse hiesse zweimal bezahlen. Höher gilt sofort,
+            // niedriger zum Periodenende; das entscheidet der Server.
+            var laeuft = !!(a && a.laeuft);
+            var ist = a && a.tarif === t.schluessel && a.status !== "test"
+              && (!laeuft || (a.intervall || "monat") === takt);
             return E("div", { key: t.schluessel, style: {
               border: "1px solid " + (t.empfohlen ? CI.gold : CI.border),
               borderRadius: 9, padding: 14,
@@ -260,11 +265,27 @@
               E("div", { style: { fontSize: 12, color: CI.muted, margin: "6px 0 12px" } },
                 zahl(t.inkl_nutzer) + " Nutzer · " + zahl(t.credits_monat) + " Credits/Monat"),
               E("button", { type: "button", disabled: ist || !!arbeit,
-                onClick: function () { tun("tarif:" + t.schluessel, function () {
-                  return kasse({ tarif: t.schluessel, intervall: takt }); }); },
+                onClick: function () {
+                  if (!laeuft) {
+                    tun("tarif:" + t.schluessel, function () {
+                      return kasse({ tarif: t.schluessel, intervall: takt }); });
+                    return;
+                  }
+                  if (!window.confirm("Zu " + t.name + " (" + (takt === "jahr" ? "jährlich" : "monatlich")
+                    + ") wechseln?\n\nEin höherer Tarif gilt sofort und wird anteilig "
+                    + "abgerechnet. Ein niedrigerer gilt ab dem Ende der laufenden Periode.")) return;
+                  tun("tarif:" + t.schluessel, async function () {
+                    var r = await abo("tarif_wechseln", { tarif: t.schluessel, intervall: takt });
+                    setzeMeldung(r.wirksam === "sofort"
+                      ? "Gewechselt zu " + t.name + ". Die Differenz wird anteilig abgerechnet."
+                      : "Wechsel zu " + t.name + " vorgemerkt ab " + datum(r.wirksam_ab) + ".");
+                  });
+                },
                 style: Object.assign({}, ist ? knopfLeer : knopf,
                   { width: "100%", opacity: ist ? 0.6 : 1, cursor: ist ? "default" : "pointer" }) },
-                ist ? "Ihr Tarif" : (arbeit === "tarif:" + t.schluessel ? "Öffnet Kasse …" : "Wählen")));
+                ist ? "Ihr Tarif" : (arbeit === "tarif:" + t.schluessel
+                  ? (laeuft ? "Wechselt …" : "Öffnet Kasse …")
+                  : (laeuft ? "Wechseln" : "Wählen"))));
           })),
         E("div", { key: "fuss", style: { fontSize: 11.5, color: CI.muted, marginTop: 12, lineHeight: 1.6 } },
           "Nettopreise zzgl. " + zahl(katalog.ust_prozent) + " % USt. · "
@@ -383,7 +404,10 @@
       // waere schlechter als keiner.
       a && a.status !== "test" && a.tarif && a.hat_zahlungsmittel
         ? E(Zusatznutzer, null) : null,
-      !a || a.status === "test" || !a.tarif || a.cancel_at ? E(Tarifwahl, null) : null,
+      // Tarifwahl: ohne Abo zum Abschliessen, mit laufendem Abo zum Wechseln.
+      // Ist es gekündigt, erst die Kündigung zurücknehmen — sonst entstünde
+      // neben dem auslaufenden ein zweites Abo.
+      !a || !a.laeuft || !a.cancel_at ? E(Tarifwahl, null) : null,
 
       E("div", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.7, marginTop: 8 } },
         "Alle Beträge sind Nettopreise zzgl. Umsatzsteuer. Rechnungen und "

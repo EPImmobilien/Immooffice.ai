@@ -423,7 +423,19 @@ zuwachs(bereich, mehr, grund) as (values
   ('Indizes ohne Constraint', 1, 'fork_70: je Mandant nach Datum'),
   ('Richtlinien', 4, 'fork_70: lesen, Mandantentrennung und Loeschsperre auf plattform_mandanten_tag; lesen auf plattform_kennzahlen_tag'),
   ('Funktionen', 2, 'fork_70: plattform_mrr_je_mandant, plattform_kennzahlen_schreiben'),
-  ('Cron-Jobs', 1, 'fork_70: plattform-kennzahlen-naechtlich')
+  ('Cron-Jobs', 1, 'fork_70: plattform-kennzahlen-naechtlich'),
+
+  -- fork_71: Rechnungen und Gutschriften aus Stripe, gespiegelt vom Webhook.
+  ('Tabellen', 1, 'fork_71: stripe_rechnungen'),
+  ('Tabellen mit RLS', 1, 'fork_71: auch diese'),
+  ('Spalten', 20, 'fork_71: id, mandant_id, art, nummer, status, waehrung, fünf '
+     'Betragsspalten, reverse_charge, bezug_rechnung_id, stripe_abo_id, '
+     'stripe_kunde_id, rechnung_url, pdf_url, erstellt_am, bezahlt_am, geaendert_am'),
+  ('Primaer- und Eindeutigkeitsschluessel', 1, 'fork_71: (mandant_id, id)'),
+  ('Pruefbedingungen', 1, 'fork_71: art ist abo, einmal oder gutschrift'),
+  ('Fremdschluessel', 1, 'fork_71: auf mandanten'),
+  ('Indizes ohne Constraint', 3, 'fork_71: je Mandant, je Mandant nach Zeit, nach Status'),
+  ('Richtlinien', 3, 'fork_71: lesen (Chef), die restriktive Mandantentrennung und die Loeschsperre')
 ),
 soll(bereich, soll) as (
   select v.bereich,

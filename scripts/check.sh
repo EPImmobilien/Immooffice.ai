@@ -697,6 +697,15 @@ else
   schlecht
 fi
 
+abschnitt "Stripe: haelt der Code den Integrationsplan?"
+# Feste API-Fassung, Steuer, SEPA, Paketrechnung, Tarifwechsel, Portal —
+# und die drei Fehler vom 07.10.2026 (docs/BILLING.md, Abschnitt 4a).
+if node tests/stripe-plan.js; then
+  :
+else
+  schlecht
+fi
+
 abschnitt "Betreiberrollen: halten sie in der Datenbank?"
 if scripts/lokale-db.sh psql -q -f tests/betreiber-rollen.sql; then
   :

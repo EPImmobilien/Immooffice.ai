@@ -15,6 +15,8 @@
 //   kuendigen    — zum spätestmöglichen der beiden Termine
 //   widerrufen   — eine Kündigung zurücknehmen, solange sie nicht wirkt
 //   zusatznutzer — Anzahl im laufenden Abo ändern
+//   tarif_wechseln — höherer Tarif sofort (anteilig abgerechnet), niedrigerer
+//                  zum Ende der laufenden Periode (Subscription Schedule)
 // ============================================================================
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
@@ -32,6 +34,9 @@ function immoFehlt(was: string): never {
   throw new Error(was + " fehlt (siehe docs/SECRETS.md).");
 }
 
+// Feste API-Fassung — dieselbe wie in abo-checkout und im Webhook.
+const STRIPE_VERSION = "2025-12-15.clover";
+
 async function stripe(pfad: string, felder?: Record<string, string>, methode = "POST") {
   const schluessel = Deno.env.get("STRIPE_SECRET_KEY") || immoFehlt("STRIPE_SECRET_KEY");
   if (!schluessel.startsWith("sk_test_")) {
@@ -41,6 +46,7 @@ async function stripe(pfad: string, felder?: Record<string, string>, methode = "
     method: methode,
     headers: {
       Authorization: "Bearer " + schluessel,
+      "Stripe-Version": STRIPE_VERSION,
       ...(felder ? { "Content-Type": "application/x-www-form-urlencoded" } : {}),
     },
     body: felder ? new URLSearchParams(felder).toString() : undefined,
@@ -122,6 +128,10 @@ Deno.serve(async (req) => {
           cancel_at: abo.cancel_at, gekuendigt_am: abo.gekuendigt_am,
           zahlung_fehler_seit: abo.zahlung_fehler_seit,
           hat_zahlungsmittel: !!abo.stripe_customer_id,
+          // Läuft ein Stripe-Abo? Dann wechselt die Tarifwahl den Tarif,
+          // statt eine zweite Kasse zu öffnen.
+          laeuft: !!abo.stripe_subscription_id
+            && ["aktiv", "gekuendigt", "zahlung_offen"].includes(String(abo.status)),
         } : null,
       });
     }
@@ -134,9 +144,18 @@ Deno.serve(async (req) => {
     // --- Kundenportal ------------------------------------------------------
     if (aktion === "portal") {
       if (!abo.stripe_customer_id) return antwort({ ok: false, fehler: "Noch kein Zahlungsmittel." }, 400);
+      // Die Portal-Konfiguration erlaubt NUR Zahlungsmittel, Rechnungs-
+      // adresse, USt-IdNr. und Rechnungen — Kündigung und Tarifwechsel sind
+      // dort abgeschaltet, sonst liesse sich die Mindestlaufzeit umgehen.
+      // Ihre Kennung steht im Katalog (plattform_werte), weil sie je
+      // Stripe-Konto verschieden ist.
+      const { data: konf } = await db.from("plattform_werte").select("wert")
+        .eq("schluessel", "stripe_portal_konfiguration").maybeSingle();
+      const konfId = String(konf?.wert ?? "").replace(/"/g, "");
       const s = await stripe("billing_portal/sessions", {
         customer: abo.stripe_customer_id,
         return_url: zurueck + "/?abo=zurueck",
+        ...(konfId.startsWith("bpc_") ? { configuration: konfId } : {}),
       });
       return antwort({ ok: true, url: s.url });
     }
@@ -150,6 +169,14 @@ Deno.serve(async (req) => {
       const mindest = abo.mindestlaufzeit_bis ? new Date(abo.mindestlaufzeit_bis).getTime() : 0;
       const ende = new Date(Math.max(periode, mindest));
 
+      // Hängt ein vorgemerkter Tarifwechsel am Abo (Subscription Schedule),
+      // nimmt Stripe kein cancel_at an. Der Wechsel entfällt mit der
+      // Kündigung ohnehin — also zuerst lösen.
+      const laufend = await stripe("subscriptions/" + abo.stripe_subscription_id, undefined, "GET");
+      if (laufend?.schedule) {
+        const sid = typeof laufend.schedule === "string" ? laufend.schedule : laufend.schedule.id;
+        await stripe("subscription_schedules/" + sid + "/release", {});
+      }
       await stripe("subscriptions/" + abo.stripe_subscription_id, {
         cancel_at: String(Math.floor(ende.getTime() / 1000)),
       });
@@ -220,6 +247,131 @@ Deno.serve(async (req) => {
       }
       // Den Stand schreibt der Webhook; hier nur die Antwort.
       return antwort({ ok: true, zusatznutzer: anzahl, nutzer_limit: neuesLimit });
+    }
+
+    // --- Tarif wechseln ----------------------------------------------------
+    // Höher: sofort, anteilig abgerechnet (always_invoice — der Kunde zahlt
+    // die Differenz gleich und hat den grösseren Tarif sofort). Niedriger:
+    // erst zum Ende der laufenden Periode, sonst bekäme er Geld für eine
+    // Leistung zurück, die er schon genutzt hat. Die Mindestlaufzeit bleibt,
+    // wie sie ist — sie entstand mit der ersten Periode, nicht mit jedem
+    // Wechsel.
+    if (aktion === "tarif_wechseln") {
+      if (!abo.stripe_subscription_id) return antwort({ ok: false, fehler: "Kein laufendes Abo." }, 400);
+      if (abo.cancel_at) {
+        return antwort({ ok: false, fehler:
+          "Das Abo ist gekündigt. Bitte zuerst die Kündigung zurücknehmen." }, 409);
+      }
+      const { data: alle } = await db.from("plattform_tarife").select("*");
+      const tarife = alle || [];
+      const ziel = tarife.find((t: any) => t.schluessel === String(body.tarif || "")
+        && t.aktiv && !t.ist_zusatznutzer);
+      if (!ziel) return antwort({ ok: false, fehler: "Unbekannter Tarif." }, 400);
+      const altIntervall = abo.intervall === "jahr" ? "jahr" : "monat";
+      const neuIntervall = body.intervall === "jahr" ? "jahr" : body.intervall === "monat" ? "monat" : altIntervall;
+      if (ziel.schluessel === abo.tarif && neuIntervall === altIntervall) {
+        return antwort({ ok: false, fehler: "Das ist bereits Ihr Tarif." }, 400);
+      }
+      const neuPreis = neuIntervall === "jahr" ? ziel.stripe_price_jahr_id : ziel.stripe_price_monat_id;
+      const addon = tarife.find((t: any) => t.ist_zusatznutzer && t.aktiv);
+      const addonNeu = neuIntervall === "jahr" ? addon?.stripe_price_jahr_id : addon?.stripe_price_monat_id;
+      if (!neuPreis || (abo.zusatznutzer > 0 && !addonNeu)) {
+        return antwort({ ok: false, fehler: "Der Tarif ist bei Stripe noch nicht angelegt." }, 409);
+      }
+
+      // Reicht der neue Tarif für alle, die schon im Haus arbeiten?
+      const { count: ist } = await db.from("profiles")
+        .select("id", { count: "exact", head: true }).eq("mandant_id", mandant);
+      const limitNeu = Number(ziel.inkl_nutzer ?? 0) + Number(abo.zusatznutzer ?? 0);
+      if (limitNeu < (ist || 0)) {
+        return antwort({ ok: false, fehler:
+          `Im Haus arbeiten ${ist} Personen; ${ziel.name} hat mit den zugebuchten `
+          + `Plätzen ${limitNeu}. Bitte zuerst Plätze dazubuchen oder Zugänge entfernen.` }, 409);
+      }
+
+      // Monatswert vergleichen, damit auch ein Wechsel des Takts richtig
+      // eingeordnet wird.
+      const monatswert = (t: any, iv: string) =>
+        iv === "jahr" ? Number(t?.preis_jahr_cent ?? 0) / 12 : Number(t?.preis_monat_cent ?? 0);
+      const alt = tarife.find((t: any) => t.schluessel === abo.tarif);
+      const hoeher = monatswert(ziel, neuIntervall) >= monatswert(alt, altIntervall);
+
+      const laufend = await stripe("subscriptions/" + abo.stripe_subscription_id, undefined, "GET");
+      const tarifPreise = new Set(tarife.filter((t: any) => !t.ist_zusatznutzer)
+        .flatMap((t: any) => [t.stripe_price_monat_id, t.stripe_price_jahr_id]).filter(Boolean));
+      const addonPreise = new Set([addon?.stripe_price_monat_id, addon?.stripe_price_jahr_id].filter(Boolean));
+      const positionen = laufend.items?.data || [];
+      const tarifPos = positionen.find((p: any) => tarifPreise.has(p?.price?.id));
+      const addonPos = positionen.find((p: any) => addonPreise.has(p?.price?.id));
+      if (!tarifPos) return antwort({ ok: false, fehler: "Der Tarif im Abo ist nicht zuzuordnen." }, 409);
+
+      if (hoeher) {
+        if (laufend.schedule) {
+          // Ein vorgemerkter Wechsel nach unten wird vom Wechsel nach oben
+          // überholt.
+          const sid = typeof laufend.schedule === "string" ? laufend.schedule : laufend.schedule.id;
+          await stripe("subscription_schedules/" + sid + "/release", {});
+        }
+        const felder: Record<string, string> = {
+          "items[0][id]": tarifPos.id,
+          "items[0][price]": neuPreis,
+          proration_behavior: "always_invoice",
+          "metadata[mandant_id]": mandant,
+        };
+        if (addonPos && addonNeu && addonPos.price.id !== addonNeu) {
+          felder["items[1][id]"] = addonPos.id;
+          felder["items[1][price]"] = addonNeu;
+        }
+        // Der Gründerpreis gilt nur im Gründertarif und entfällt beim
+        // Wechsel endgültig (Auftrag). Ein leerer Wert leert die Liste.
+        if (abo.gruenderpreis) felder.discounts = "";
+        await stripe("subscriptions/" + abo.stripe_subscription_id, felder);
+        return antwort({ ok: true, wirksam: "sofort", tarif: ziel.schluessel, intervall: neuIntervall });
+      }
+
+      // Nach unten: zum Periodenende über einen Zeitplan. Phase 0 ist das,
+      // was gerade läuft; Phase 1 der neue Tarif; danach gibt der Zeitplan
+      // das Abo wieder frei, und es läuft normal weiter.
+      let plan: any;
+      if (laufend.schedule) {
+        const sid = typeof laufend.schedule === "string" ? laufend.schedule : laufend.schedule.id;
+        plan = await stripe("subscription_schedules/" + sid, undefined, "GET");
+      } else {
+        plan = await stripe("subscription_schedules", { from_subscription: abo.stripe_subscription_id });
+      }
+      const jetzt = plan.current_phase || plan.phases?.[0];
+      const ph0 = (plan.phases || []).find((p: any) =>
+        p.start_date === jetzt?.start_date) || plan.phases?.[0];
+      if (!ph0) return antwort({ ok: false, fehler: "Laufende Phase nicht gefunden." }, 409);
+
+      const f: Record<string, string> = {
+        end_behavior: "release",
+        "phases[0][start_date]": String(ph0.start_date),
+        "phases[0][end_date]": String(ph0.end_date),
+        "phases[0][proration_behavior]": "none",
+        "phases[1][proration_behavior]": "none",
+        "phases[1][duration][interval]": neuIntervall === "jahr" ? "year" : "month",
+        "phases[1][duration][interval_count]": "1",
+        "phases[1][metadata][mandant_id]": mandant,
+      };
+      (ph0.items || []).forEach((it: any, i: number) => {
+        f[`phases[0][items][${i}][price]`] = typeof it.price === "string" ? it.price : it.price?.id;
+        f[`phases[0][items][${i}][quantity]`] = String(it.quantity ?? 1);
+      });
+      (ph0.discounts || []).forEach((d: any, i: number) => {
+        const c = typeof d.coupon === "string" ? d.coupon : d.coupon?.id;
+        if (c) f[`phases[0][discounts][${i}][coupon]`] = c;
+      });
+      f["phases[1][items][0][price]"] = neuPreis;
+      f["phases[1][items][0][quantity]"] = "1";
+      if (Number(abo.zusatznutzer ?? 0) > 0 && addonNeu) {
+        f["phases[1][items][1][price]"] = addonNeu;
+        f["phases[1][items][1][quantity]"] = String(abo.zusatznutzer);
+      }
+      await stripe("subscription_schedules/" + plan.id, f);
+      const ab = new Date(Number(ph0.end_date) * 1000).toISOString();
+      return antwort({ ok: true, wirksam: "periodenende", wirksam_ab: ab,
+        tarif: ziel.schluessel, intervall: neuIntervall });
     }
 
     return antwort({ ok: false, fehler: "Unbekannte Aktion." }, 400);
