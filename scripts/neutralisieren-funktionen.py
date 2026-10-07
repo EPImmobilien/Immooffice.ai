@@ -1336,6 +1336,16 @@ ERSETZUNGEN = [
      '(mit immoMandant).',
      {'signatur-vorgang-starten'}),
 
+    # --- FORK (07.10.2026): die Energieskala als Objektfoto. Die Vorlage
+    # prueft nur doktyp === "Energieskala"; hochgeladen wird sie aber als
+    # gewoehnliches Foto mit dem TITEL "Energieskala" (doktyp null) — und
+    # stand im Testexposé dreimal als Impression zwischen den Zimmern.
+    ('FORK',
+     r'd\.doktyp !== "Energieskala" && d\.speicher_typ === "supabase" && d\.expose_ausschliessen !== true\);',
+     'd.doktyp !== "Energieskala" && !/energie(skala|ausweis)/i.test(String(d.titel || d.name || "")) && d.speicher_typ === "supabase" && d.expose_ausschliessen !== true);',
+     'Energieskala auch am Titel erkennen, nicht nur am doktyp.',
+     {'expose-pdf-erzeugen'}),
+
     ('FORK',
      r'if \(!firma\) \{ const \{ data \} = await admin\.from\("firma_stammdaten"\)\.select\("\*"\)\.eq\("slug", "standard"\)\.maybeSingle\(\); firma = data; \}',
      'if (!firma) { const { data } = await admin.from("firma_stammdaten").select("*")'

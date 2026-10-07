@@ -4349,7 +4349,7 @@ function rechnen(immo, annahmen) {
   d["rechnung.darlehen"] = gesamt - ek;
   d["rechnung.monatsrate"] = (gesamt - ek) * (zinsSatz + tilgSatz) / 100 / 12;
   const miete = zahl2(immo["miete_ist"]) ?? zahl2(immo["kaltmiete"]) ?? zahl2(immo["miete_soll"]);
-  if (miete !== void 0) {
+  if (miete !== void 0 && miete > 0) {
     const jahr = miete * 12;
     const nichtUmlage = zahl2(immo["hausgeld_nicht_umlagefaehig"]) ?? 0;
     d["rechnung.bruttorendite"] = jahr / preis * 100;

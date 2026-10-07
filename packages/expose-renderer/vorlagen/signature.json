@@ -77,7 +77,7 @@
         "farbe": "onD",
         "sperrung": -0.5,
         "ausrichtung": "mitte",
-        "min_groesse": 26
+        "min_groesse": 30
       },
       "cover_titel_kursiv": {
         "schrift": {
@@ -88,7 +88,8 @@
         "farbe": "onD",
         "sperrung": -0.5,
         "ausrichtung": "mitte",
-        "min_groesse": 26
+        "min_groesse": 30,
+        "zeilen": 52
       },
       "cover_unter": {
         "schrift": {
@@ -194,29 +195,29 @@
           "familie": "jakarta",
           "schnitt": "Light"
         },
-        "groesse": 9.2,
+        "groesse": 10.2,
         "farbe": "text",
-        "zeilen": 16,
-        "min_groesse": 7.0
+        "zeilen": 17.5,
+        "min_groesse": 8.5
       },
       "fliesstext_eng": {
         "schrift": {
           "familie": "jakarta",
           "schnitt": "Light"
         },
-        "groesse": 8.9,
+        "groesse": 9.6,
         "farbe": "text",
-        "zeilen": 15.2,
-        "min_groesse": 7.0
+        "zeilen": 16.2,
+        "min_groesse": 8
       },
       "bild_label": {
         "schrift": {
           "familie": "jakarta",
           "schnitt": "Medium"
         },
-        "groesse": 5.2,
+        "groesse": 6.6,
         "farbe": "onD",
-        "sperrung": 1.8,
+        "sperrung": 1.6,
         "grossbuchstaben": true
       },
       "fuss_marke": {
@@ -505,10 +506,10 @@
           "familie": "jakarta",
           "schnitt": "Light"
         },
-        "groesse": 8.7,
+        "groesse": 9.4,
         "farbe": "text",
         "zeilen": 14.6,
-        "min_groesse": 7.0
+        "min_groesse": 8
       },
       "dist_name": {
         "schrift": {
@@ -999,12 +1000,14 @@
           "id": "cover-titel-2",
           "typ": "text",
           "x": 36.0,
-          "y": 190,
+          "y": 92,
           "b": 523.28,
-          "h": 52,
+          "h": 150,
           "stil": "cover_titel_kursiv",
           "inhalt": "{{objekt.titel_zweite_zeile}}",
-          "einzeilig": true
+          "zeilenschritt": 50,
+          "verdichten": true,
+          "max_zeilen": 3
         },
         {
           "id": "cover-strich",
@@ -1016,17 +1019,6 @@
           "form": "linie",
           "strich": "a",
           "linienbreite": 0.8
-        },
-        {
-          "id": "cover-unter",
-          "typ": "text",
-          "x": 36.0,
-          "y": 177,
-          "b": 523.28,
-          "h": 13,
-          "stil": "cover_unter",
-          "inhalt": "{{objekt.untertitel}}",
-          "einzeilig": true
         },
         {
           "id": "cover-fuss",
@@ -1079,7 +1071,10 @@
           "zeilenschritt": 30,
           "verdichten": false,
           "umbruch": "saetze",
-          "absatzabstand": 0
+          "absatzabstand": 0,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.expose_zitat"
+          }
         },
         {
           "id": "prolog-strich",
@@ -1090,7 +1085,10 @@
           "h": 0,
           "form": "linie",
           "strich": "a",
-          "linienbreite": 0.8
+          "linienbreite": 0.8,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.expose_zitat"
+          }
         },
         {
           "id": "prolog-initiale",
@@ -1103,7 +1101,37 @@
           "inhalt": "{{objekt.expose_prolog_initiale}}",
           "einzeilig": true,
           "sichtbar_wenn": {
-            "vorhanden": "objekt.expose_prolog_initiale"
+            "und": [
+              {
+                "vorhanden": "objekt.expose_zitat"
+              },
+              {
+                "vorhanden": "objekt.expose_prolog_initiale"
+              }
+            ]
+          }
+        },
+        {
+          "id": "prolog-initiale-ohne-zitat",
+          "typ": "text",
+          "x": 115.64,
+          "y": 633.89,
+          "b": 40,
+          "h": 56,
+          "stil": "initiale",
+          "inhalt": "{{objekt.expose_prolog_initiale}}",
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "und": [
+              {
+                "nicht": {
+                  "vorhanden": "objekt.expose_zitat"
+                }
+              },
+              {
+                "vorhanden": "objekt.expose_prolog_initiale"
+              }
+            ]
           }
         },
         {
@@ -1120,7 +1148,40 @@
           "einzug": 40,
           "einzug_zeilen": 3,
           "sichtbar_wenn": {
-            "vorhanden": "objekt.expose_prolog_initiale"
+            "und": [
+              {
+                "vorhanden": "objekt.expose_zitat"
+              },
+              {
+                "vorhanden": "objekt.expose_prolog_initiale"
+              }
+            ]
+          }
+        },
+        {
+          "id": "prolog-text-ohne-zitat",
+          "typ": "text",
+          "x": 117.64,
+          "y": 440,
+          "b": 360,
+          "h": 279.89,
+          "stil": "fliesstext",
+          "inhalt": "{{objekt.expose_prolog_rest}}",
+          "blocksatz": true,
+          "verdichten": true,
+          "einzug": 40,
+          "einzug_zeilen": 3,
+          "sichtbar_wenn": {
+            "und": [
+              {
+                "nicht": {
+                  "vorhanden": "objekt.expose_zitat"
+                }
+              },
+              {
+                "vorhanden": "objekt.expose_prolog_initiale"
+              }
+            ]
           }
         },
         {
@@ -1135,9 +1196,42 @@
           "blocksatz": true,
           "verdichten": true,
           "sichtbar_wenn": {
-            "nicht": {
-              "vorhanden": "objekt.expose_prolog_initiale"
-            }
+            "und": [
+              {
+                "vorhanden": "objekt.expose_zitat"
+              },
+              {
+                "nicht": {
+                  "vorhanden": "objekt.expose_prolog_initiale"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "prolog-text-ohne-initiale-ohne-zitat",
+          "typ": "text",
+          "x": 117.64,
+          "y": 440,
+          "b": 360,
+          "h": 279.89,
+          "stil": "fliesstext",
+          "inhalt": "{{objekt.expose_prolog}}",
+          "blocksatz": true,
+          "verdichten": true,
+          "sichtbar_wenn": {
+            "und": [
+              {
+                "nicht": {
+                  "vorhanden": "objekt.expose_zitat"
+                }
+              },
+              {
+                "nicht": {
+                  "vorhanden": "objekt.expose_prolog_initiale"
+                }
+              }
+            ]
           }
         },
         {
@@ -1159,11 +1253,11 @@
           "label_deckkraft": 0.55,
           "label_x": 12,
           "label_y": 12,
-          "label_hoehe": 13,
+          "label_hoehe": 15,
           "label_radius": 0,
           "label_luft": 16,
           "label_polster": 8,
-          "label_grundlinie": 4.6
+          "label_grundlinie": 5.2
         }
       ]
     },
@@ -1353,7 +1447,7 @@
             },
             {
               "label": "Objektart",
-              "wert": "Freistehende Villa"
+              "feld": "objekt.objektart"
             },
             {
               "label": "Zustand",
@@ -1379,11 +1473,11 @@
         {
           "id": "fuss-seite-hell",
           "typ": "text",
-          "x": 36.0,
+          "x": 541.28,
           "y": 19,
-          "b": 523.28,
+          "b": 18,
           "h": 10,
-          "stil": "fuss_seite",
+          "stil": "fuss_seite_rechts",
           "inhalt": "{{seite.nummer_zweistellig}}",
           "einzeilig": true
         },
@@ -1392,7 +1486,7 @@
           "typ": "text",
           "x": 291.28,
           "y": 24.8,
-          "b": 250,
+          "b": 228,
           "h": 5.2,
           "stil": "fuss_objekt_hell",
           "inhalt": "{{objekt.objekttitel}}",
@@ -1435,11 +1529,11 @@
           "label_deckkraft": 0.55,
           "label_x": 12,
           "label_y": 12,
-          "label_hoehe": 13,
+          "label_hoehe": 15,
           "label_radius": 0,
           "label_luft": 16,
           "label_polster": 8,
-          "label_grundlinie": 4.6
+          "label_grundlinie": 5.2
         },
         {
           "id": "kapitel-label",
@@ -1461,7 +1555,12 @@
           "h": 34,
           "stil": "kapitel_titel",
           "inhalt": "Architektur,",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "nicht": {
+              "vorhanden": "objekt.ueberschrift_objektbeschreibung"
+            }
+          }
         },
         {
           "id": "kapitel-titel-2",
@@ -1472,7 +1571,28 @@
           "h": 34,
           "stil": "kapitel_titel_kursiv",
           "inhalt": "die bleibt.",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "nicht": {
+              "vorhanden": "objekt.ueberschrift_objektbeschreibung"
+            }
+          }
+        },
+        {
+          "id": "kapitel-titel-eigen",
+          "typ": "text",
+          "x": 301.9232,
+          "y": 639.89,
+          "b": 250,
+          "h": 70.0,
+          "stil": "kapitel_titel",
+          "inhalt": "{{objekt.ueberschrift_objektbeschreibung}}",
+          "zeilenschritt": 36,
+          "verdichten": true,
+          "max_zeilen": 2,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.ueberschrift_objektbeschreibung"
+          }
         },
         {
           "id": "anwesen-text",
@@ -1570,11 +1690,11 @@
           "label_deckkraft": 0.55,
           "label_x": 12,
           "label_y": 12,
-          "label_hoehe": 13,
+          "label_hoehe": 15,
           "label_radius": 0,
           "label_luft": 16,
           "label_polster": 8,
-          "label_grundlinie": 4.6
+          "label_grundlinie": 5.2
         },
         {
           "id": "strecke-label",
@@ -1658,7 +1778,13 @@
           "fuellmodus": "cover",
           "platzhalter_farbe": "paper2",
           "stil_label": "bild_label",
-          "label_hintergrund": "paper"
+          "label_hintergrund": "d",
+          "label_deckkraft": 0.6,
+          "label_hoehe": 15,
+          "label_radius": 0,
+          "label_luft": 16,
+          "label_polster": 8,
+          "label_grundlinie": 5.2
         },
         {
           "id": "strecke-label",
@@ -1729,11 +1855,11 @@
           "label_deckkraft": 0.55,
           "label_x": 12,
           "label_y": 12,
-          "label_hoehe": 13,
+          "label_hoehe": 15,
           "label_radius": 0,
           "label_luft": 16,
           "label_polster": 8,
-          "label_grundlinie": 4.6
+          "label_grundlinie": 5.2
         },
         {
           "id": "dip-rechts",
@@ -1754,11 +1880,11 @@
           "label_deckkraft": 0.55,
           "label_x": 12,
           "label_y": 12,
-          "label_hoehe": 13,
+          "label_hoehe": 15,
           "label_radius": 0,
           "label_luft": 16,
           "label_polster": 8,
-          "label_grundlinie": 4.6
+          "label_grundlinie": 5.2
         },
         {
           "id": "dip-links-zeile",
@@ -1885,11 +2011,11 @@
           "label_deckkraft": 0.55,
           "label_x": 12,
           "label_y": 12,
-          "label_hoehe": 13,
+          "label_hoehe": 15,
           "label_radius": 0,
           "label_luft": 16,
           "label_polster": 8,
-          "label_grundlinie": 4.6
+          "label_grundlinie": 5.2
         },
         {
           "id": "gruppen",
@@ -1991,7 +2117,29 @@
             "nr": 1
           },
           "fuellmodus": "contain",
-          "platzhalter_farbe": "paper2"
+          "platzhalter_farbe": "paper2",
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.raumaufteilung"
+          }
+        },
+        {
+          "id": "gr-plan-gross",
+          "typ": "bild",
+          "x": 74,
+          "y": 80,
+          "b": 447.28,
+          "h": 543.89,
+          "slot": {
+            "art": "grundriss",
+            "nr": 1
+          },
+          "fuellmodus": "contain",
+          "platzhalter_farbe": "paper2",
+          "sichtbar_wenn": {
+            "nicht": {
+              "vorhanden": "objekt.raumaufteilung"
+            }
+          }
         },
         {
           "id": "gr-eg-titel",
@@ -2002,7 +2150,10 @@
           "h": 6.2,
           "stil": "tab_titel",
           "inhalt": "Erdgeschoss",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.raumaufteilung"
+          }
         },
         {
           "id": "gr-eg-linie",
@@ -2013,7 +2164,10 @@
           "h": 0,
           "form": "linie",
           "strich": "ink",
-          "linienbreite": 0.6
+          "linienbreite": 0.6,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.raumaufteilung"
+          }
         },
         {
           "id": "gr-eg",
@@ -2035,7 +2189,10 @@
           "stil_name": "raum_name",
           "stil_flaeche": "raum_wert",
           "stil_summe": "raum_summe",
-          "stil_summe_wert": "raum_summe_wert"
+          "stil_summe_wert": "raum_summe_wert",
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.raumaufteilung"
+          }
         },
         {
           "id": "gr-og-titel",
@@ -2046,7 +2203,10 @@
           "h": 6.2,
           "stil": "tab_titel",
           "inhalt": "Obergeschoss",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.raumaufteilung"
+          }
         },
         {
           "id": "gr-og-linie",
@@ -2057,7 +2217,10 @@
           "h": 0,
           "form": "linie",
           "strich": "ink",
-          "linienbreite": 0.6
+          "linienbreite": 0.6,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.raumaufteilung"
+          }
         },
         {
           "id": "gr-og",
@@ -2079,7 +2242,10 @@
           "stil_name": "raum_name",
           "stil_flaeche": "raum_wert",
           "stil_summe": "raum_summe",
-          "stil_summe_wert": "raum_summe_wert"
+          "stil_summe_wert": "raum_summe_wert",
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.raumaufteilung"
+          }
         },
         {
           "id": "gr-hinweis",
@@ -2423,17 +2589,17 @@
           "id": "energie-skala",
           "typ": "energieskala",
           "x": 84,
-          "y": 263.89,
+          "y": 257.89,
           "b": 427.28,
-          "h": 3,
+          "h": 12,
           "darstellung": "linie",
-          "balken_hoehe": 3,
+          "balken_hoehe": 12,
           "luft": 1,
           "klasse_abstand": 14,
           "marke_farbe": "onD",
-          "marke_spitze": 2,
-          "marke_hoehe": 7,
-          "marke_breite": 4,
+          "marke_spitze": 3,
+          "marke_hoehe": 9,
+          "marke_breite": 6,
           "stil_klasse": "skala_klasse",
           "stil_klasse_erste": "skala_klasse_erste",
           "stil_grenze": "skala_klasse",
@@ -2442,101 +2608,47 @@
             {
               "name": "A+",
               "grenze": 30,
-              "farbe": {
-                "mix": [
-                  "a",
-                  "d",
-                  0.15
-                ]
-              }
+              "farbe": "#1A9850"
             },
             {
               "name": "A",
               "grenze": 50,
-              "farbe": {
-                "mix": [
-                  "a",
-                  "d",
-                  0.23
-                ]
-              }
+              "farbe": "#4CB050"
             },
             {
               "name": "B",
               "grenze": 75,
-              "farbe": {
-                "mix": [
-                  "a",
-                  "d",
-                  0.31
-                ]
-              }
+              "farbe": "#8CC43F"
             },
             {
               "name": "C",
               "grenze": 100,
-              "farbe": {
-                "mix": [
-                  "a",
-                  "d",
-                  0.39
-                ]
-              }
+              "farbe": "#D4D400"
             },
             {
               "name": "D",
               "grenze": 130,
-              "farbe": {
-                "mix": [
-                  "a",
-                  "d",
-                  0.47
-                ]
-              }
+              "farbe": "#F6C300"
             },
             {
               "name": "E",
               "grenze": 160,
-              "farbe": {
-                "mix": [
-                  "a",
-                  "d",
-                  0.55
-                ]
-              }
+              "farbe": "#F39C12"
             },
             {
               "name": "F",
               "grenze": 200,
-              "farbe": {
-                "mix": [
-                  "a",
-                  "d",
-                  0.63
-                ]
-              }
+              "farbe": "#E8761B"
             },
             {
               "name": "G",
               "grenze": 250,
-              "farbe": {
-                "mix": [
-                  "a",
-                  "d",
-                  0.71
-                ]
-              }
+              "farbe": "#E53935"
             },
             {
               "name": "H",
               "grenze": 300,
-              "farbe": {
-                "mix": [
-                  "a",
-                  "d",
-                  0.79
-                ]
-              }
+              "farbe": "#B71C1C"
             }
           ]
         },
@@ -2998,11 +3110,11 @@
         {
           "id": "kon-seite",
           "typ": "text",
-          "x": 36.0,
+          "x": 541.28,
           "y": 16,
-          "b": 523.28,
+          "b": 18,
           "h": 10,
-          "stil": "fuss_seite",
+          "stil": "fuss_seite_rechts",
           "inhalt": "{{seite.nummer_zweistellig}}",
           "einzeilig": true
         }

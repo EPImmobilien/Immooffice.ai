@@ -581,7 +581,7 @@ return jsonOk({ storage_path: pfad, geocoding_stufe: geo.stufe });
 }
 const { data: dateien } = await admin.from("immobilie_datei").select("*").eq("immobilie_id", immobilie_id).order("sortierung", { ascending: true });
 const alleDateien = dateien || [];
-const fotos = alleDateien.filter((d: any) => d.kategorie === "foto" && d.oeffentlich && d.doktyp !== "Energieskala" && d.speicher_typ === "supabase" && d.expose_ausschliessen !== true);
+const fotos = alleDateien.filter((d: any) => d.kategorie === "foto" && d.oeffentlich && d.doktyp !== "Energieskala" && !/energie(skala|ausweis)/i.test(String(d.titel || d.name || "")) && d.speicher_typ === "supabase" && d.expose_ausschliessen !== true);
 const grundrisse = alleDateien.filter((d: any) => d.kategorie === "grundriss" && d.oeffentlich && d.speicher_typ === "supabase" && d.expose_ausschliessen !== true);
 let lageplaene = alleDateien.filter((d: any) => d.kategorie === "lageplan" && d.oeffentlich && d.speicher_typ === "supabase" && d.expose_ausschliessen !== true);
 if (!fotos.length) return jsonErr(422, "Keine externen Fotos am Objekt.");

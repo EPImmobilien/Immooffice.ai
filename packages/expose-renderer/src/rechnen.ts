@@ -181,7 +181,9 @@ export function rechnen(immo: Record<string, unknown>,
   // wirklich fliesst. Die Soll-Miete ist eine Erwartung.
   const miete = zahl(immo["miete_ist"]) ?? zahl(immo["kaltmiete"])
     ?? zahl(immo["miete_soll"]);
-  if (miete !== undefined) {
+  // Eine Miete von 0 ist keine Miete, sondern ein leeres Feld: eine Rendite
+  // von "0,00 %" und eine "Marktmiete 0 €" im Exposé waeren falsche Zahlen.
+  if (miete !== undefined && miete > 0) {
     const jahr = miete * 12;
     const nichtUmlage = zahl(immo["hausgeld_nicht_umlagefaehig"]) ?? 0;
     d["rechnung.bruttorendite"] = jahr / preis * 100;

@@ -307,10 +307,10 @@
           "familie": "archivo",
           "schnitt": "Regular"
         },
-        "groesse": 9.2,
+        "groesse": 9.8,
         "farbe": "text",
-        "zeilen": 15,
-        "min_groesse": 7.0
+        "zeilen": 15.8,
+        "min_groesse": 8.2
       },
       "bild_wort": {
         "schrift": {
@@ -374,7 +374,7 @@
           "familie": "archivo",
           "schnitt": "SemiBold"
         },
-        "groesse": 5.8,
+        "groesse": 6.6,
         "farbe": "weiss",
         "sperrung": 1,
         "grossbuchstaben": true
@@ -446,10 +446,10 @@
           "familie": "archivo",
           "schnitt": "Regular"
         },
-        "groesse": 8.9,
+        "groesse": 9.4,
         "farbe": "text",
-        "zeilen": 14.2,
-        "min_groesse": 7.0
+        "zeilen": 15,
+        "min_groesse": 8
       },
       "wege_titel": {
         "schrift": {
@@ -846,7 +846,20 @@
           "b": 126,
           "h": 54,
           "form": "rechteck",
-          "fuell": "rule"
+          "fuell": "rule",
+          "sichtbar_wenn": {
+            "oder": [
+              {
+                "vorhanden": "firma.logo.hell"
+              },
+              {
+                "vorhanden": "firma.logo.dunkel"
+              },
+              {
+                "vorhanden": "firma.marken_name"
+              }
+            ]
+          }
         },
         {
           "id": "cover-logo",
@@ -1532,7 +1545,15 @@
           "fuellmodus": "cover",
           "platzhalter_farbe": "tint2",
           "stil_label": "bild_label",
-          "label_hintergrund": "paper"
+          "label_hintergrund": "rule",
+          "label_deckkraft": 1,
+          "label_x": 0,
+          "label_y": 0,
+          "label_hoehe": 15,
+          "label_radius": 0,
+          "label_luft": 12,
+          "label_polster": 6,
+          "label_grundlinie": 5
         },
         {
           "id": "fuss-linie-hell",
@@ -2094,7 +2115,63 @@
           "stil_name": "wege_name",
           "stil_wert": "wege_wert",
           "stil_wert_erster": "wege_wert_erster",
-          "stil_kopf": "wege_kopf"
+          "stil_kopf": "wege_kopf",
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.expose_wege"
+          }
+        },
+        {
+          "id": "dist-titel",
+          "typ": "text",
+          "x": 279.7776,
+          "y": 391.89,
+          "b": 279.5024,
+          "h": 14,
+          "stil": "wege_titel",
+          "inhalt": "Entfernungen",
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "und": [
+              {
+                "nicht": {
+                  "vorhanden": "objekt.expose_wege"
+                }
+              },
+              {
+                "vorhanden": "objekt.lage_distanzen"
+              }
+            ]
+          }
+        },
+        {
+          "id": "distanzen",
+          "typ": "distanzen",
+          "x": 279.7776,
+          "y": 62,
+          "b": 279.5024,
+          "h": 325.89,
+          "darstellung": "balken",
+          "zeilenhoehe": 26,
+          "balken_versatz": 8,
+          "balken_hoehe": 4,
+          "balken_radius": 0,
+          "balken_min": 4,
+          "spur_farbe": "tint",
+          "balken_farbe": "rule",
+          "stil_name": "wege_name",
+          "stil_wert": "wege_wert",
+          "sichtbar_wenn": {
+            "und": [
+              {
+                "nicht": {
+                  "vorhanden": "objekt.expose_wege"
+                }
+              },
+              {
+                "vorhanden": "objekt.lage_distanzen"
+              }
+            ]
+          }
         }
       ]
     },
@@ -2522,7 +2599,20 @@
           "b": 126,
           "h": 54,
           "form": "rechteck",
-          "fuell": "rule"
+          "fuell": "rule",
+          "sichtbar_wenn": {
+            "oder": [
+              {
+                "vorhanden": "firma.logo.hell"
+              },
+              {
+                "vorhanden": "firma.logo.dunkel"
+              },
+              {
+                "vorhanden": "firma.marken_name"
+              }
+            ]
+          }
         },
         {
           "id": "kontakt-logo",
