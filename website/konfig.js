@@ -17,10 +17,10 @@
 // ============================================================================
 window.IMMO_WEB = {
   // --- Pflicht für die Produktion -------------------------------------
-  firma: "",              // z. B. "Musterbetrieb GmbH"
-  strasse: "",            // "Musterweg 1"
-  plz_ort: "",            // "20095 Hamburg"
-  vertreten_durch: "",    // Geschäftsführer / Inhaber
+  firma: "E&P Immobilien Schwerin GmbH",
+  strasse: "Am Vögenteich 26r",
+  plz_ort: "18055 Rostock",
+  vertreten_durch: "Lasse Engfer",
   email: "",              // Kontaktadresse
   telefon: "",            // mit Vorwahl
 
@@ -32,7 +32,7 @@ window.IMMO_WEB = {
 
   // --- Wohin der Anmelde-Knopf führt -----------------------------------
   // Die ausgelieferte Oberfläche. Später die eigene Domain.
-  anwendung: "https://immoofficeeai.netlify.app",
+  anwendung: "https://app.immooffice.ai",
 
   // --- Woher die Preise kommen -----------------------------------------
   // Der öffentliche, nur lesende Endpunkt `tarife-oeffentlich`. Er liefert

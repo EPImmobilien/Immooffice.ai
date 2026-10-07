@@ -12,6 +12,12 @@
 # die Abgrenzung selbst beschreiben: docs/, CLAUDE.md, dieses Skript, die
 # beiden Neutralisierungsskripte und der Test, der ihr Ergebnis prueft.
 # reference/ ist nicht versioniert und ebenfalls aus.
+#
+# website/konfig.js ist seit dem 07.10.2026 ausgenommen: dort stehen die
+# Pflichtangaben des Anbieters fuer das Impressum (§ 5 DDG). Der Betreiber
+# hat entschieden, dass immoOffice.ai ein Service der E&P Immobilien Schwerin
+# GmbH ist — das Gesetz verlangt dann genau diese Angaben, und ein Gate darf
+# kein Pflichtimpressum verhindern. Nur DIESE eine Datei, nichts sonst.
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
@@ -23,6 +29,7 @@ AUS=(--glob '!reference/**' --glob '!docs/**' --glob '!CLAUDE.md'
      --glob '!scripts/nebenseiten.py'
      --glob '!scripts/check.sh'
      --glob '!scripts/analyse-referenz.sh'
+     --glob '!website/konfig.js'
      --glob '!.git/**' --glob '!node_modules/**' --glob '!.next/**')
 
 # Kennzeichen des Referenzunternehmens und seiner Anwendung.
