@@ -79,7 +79,11 @@ def ist_platzhalter(ziffern):
 
 # Nummern, die bleiben duerfen, mit Grund. Wer eine eintraegt, traegt sie
 # hier mit Grund ein oder nimmt sie wieder heraus.
-ERLAUBT = {}
+ERLAUBT = {
+    # Impressum der Website (website/konfig.js): die Kontaktnummer des
+    # Betreibers. § 5 DDG verlangt sie, und die Website hat keine Datenbank,
+    # aus der sie sie lesen koennte. Vom Betreiber selbst angegeben, 07.10.2026.
+}
 
 # Dateien, die keine Rufnummer der Vorlage tragen KOENNEN, weil sie die
 # Pflichtangaben des Anbieters tragen: das Impressum der Website (§ 5 DDG).
