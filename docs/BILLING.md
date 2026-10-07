@@ -170,6 +170,20 @@ Seed-Skript legte den Gründer-Coupon beim ersten Lauf **ohne**
 Tarifbeschränkung an, weil es die Produktkennung aus einer Liste las, die
 vor dem Anlegen gelesen worden war.
 
+### Erstattung nimmt die Credits mit (fork_76)
+
+Gefunden beim ersten Live-Kauf: eine erstattete Paketrechnung liess die 250
+Credits stehen. Jetzt verarbeitet der Webhook `charge.refunded` und
+`credit_note.created` und ruft `credits_erstattung(mandant, rechnung,
+anteil)`. Abgezogen wird der **erstattete Anteil** der Credits, die diese
+Rechnung gutgeschrieben hat — Paket (`paket:<rechnung>:…`) wie Tarif
+(`rechnung:<rechnung>`) —, höchstens der freie Rest. Was schon verbraucht
+ist, steht mit Notiz im Ledger. Der Anteil ist kumulativ, deshalb bucht eine
+zweite Meldung derselben Erstattung nichts. Die Rechnung zur Zahlung findet
+der Webhook über `invoice_payments` (eine Zahlung trägt seit Basil keine
+Rechnungskennung mehr). **Am Webhook-Endpunkt muss `charge.refunded`
+ausgewählt sein.**
+
 ### Tarif wechseln
 
 `abo-verwalten`, Aktion `tarif_wechseln`. Verglichen wird der Monatswert

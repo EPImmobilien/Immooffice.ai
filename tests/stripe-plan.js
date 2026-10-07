@@ -74,10 +74,13 @@ pruefe("Webhook: Abo-Periode auch an den Positionen",
   /items\?\.data\?\.\[0\]/.test(webhook) && /current_period_start/.test(webhook));
 pruefe("Webhook: Rechnungen werden gespiegelt, je Mandant",
   /from\("stripe_rechnungen"\)\.upsert/.test(webhook) && /onConflict: "mandant_id,id"/.test(webhook));
-for (const e of ["invoice.finalized", "invoice.voided", "invoice.marked_uncollectible", "credit_note.created"]) {
+for (const e of ["invoice.finalized", "invoice.voided", "invoice.marked_uncollectible", "credit_note.created", "charge.refunded"]) {
   pruefe(`Webhook verarbeitet ${e}`, webhook.includes(`case "${e}"`));
   pruefe(`Seed nennt ${e} für den Endpunkt`, seed.includes(`"${e}"`));
 }
+
+pruefe("Webhook: Erstattung nimmt die Credits mit (charge.refunded und credit_note.created → credits_erstattung)",
+  (webhook.match(/erstattungVerbuchen\(db, mandant/g) || []).length >= 2 && /rpc\("credits_erstattung"/.test(webhook));
 
 // --- Verwaltung ------------------------------------------------------------------
 pruefe("Verwaltung: Tarifwechsel vorhanden", /aktion === "tarif_wechseln"/.test(verwalten));

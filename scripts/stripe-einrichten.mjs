@@ -58,7 +58,7 @@ const EREIGNISSE = [
   "customer.subscription.created", "customer.subscription.updated", "customer.subscription.deleted",
   "invoice.finalized", "invoice.paid", "invoice.payment_failed",
   "invoice.voided", "invoice.marked_uncollectible",
-  "credit_note.created",
+  "credit_note.created", "charge.refunded",
 ];
 
 async function stripe(pfad, felder, methode = "POST") {

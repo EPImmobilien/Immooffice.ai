@@ -239,6 +239,33 @@ async function gutschriftSpiegeln(db: any, mandant: string, g: any) {
   }, { onConflict: "mandant_id,id" });
 }
 
+/** Lesender Stripe-Aufruf (für Erstattungen: Rechnung zur Zahlung finden). */
+async function stripeLesen(pfad: string): Promise<any> {
+  const schluessel = Deno.env.get("STRIPE_SECRET_KEY") || "";
+  if (!schluessel) throw new Error("STRIPE_SECRET_KEY fehlt.");
+  const r = await fetch("https://api.stripe.com/v1/" + pfad, {
+    headers: { Authorization: "Bearer " + schluessel, "Stripe-Version": STRIPE_VERSION },
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d?.error?.message || ("Stripe: " + r.status));
+  return d;
+}
+
+/**
+ * Erstattung: den erstatteten Anteil der Credits zurücknehmen, die diese
+ * Rechnung gutgeschrieben hat (fork_76). Der Anteil ist kumulativ — die
+ * Datenbank bucht nur die Differenz zum schon Abgezogenen, deshalb schadet
+ * es nicht, wenn charge.refunded und credit_note.created dieselbe
+ * Erstattung melden.
+ */
+async function erstattungVerbuchen(db: any, mandant: string, rechnungId: string, anteil: number) {
+  if (!rechnungId || !(anteil > 0)) return;
+  const { error } = await db.rpc("credits_erstattung", {
+    p_mandant: mandant, p_rechnung: rechnungId, p_anteil: Math.min(1, anteil),
+  });
+  if (error) throw new Error("credits_erstattung: " + error.message);
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
@@ -476,6 +503,36 @@ Deno.serve(async (req) => {
 
       case "credit_note.created": {
         await gutschriftSpiegeln(db, mandant, obj);
+        // Gutschrift mit Erstattung: Anteil = alle Gutschriften ÷ Rechnungsbetrag.
+        const rid = typeof obj.invoice === "string" ? obj.invoice : obj.invoice?.id;
+        if (rid) {
+          const r = await stripeLesen("invoices/" + rid);
+          const gutgeschrieben = Number(r.post_payment_credit_notes_amount ?? 0)
+            + Number(r.pre_payment_credit_notes_amount ?? 0);
+          const gesamt = Number(r.total ?? 0);
+          if (gesamt > 0) await erstattungVerbuchen(db, mandant, rid, gutgeschrieben / gesamt);
+        }
+        break;
+      }
+
+      // --- Zahlung erstattet: Credits gehen mit -----------------------------
+      // Seit Basil trägt eine Zahlung keine Rechnungskennung mehr; die
+      // Rechnung kommt über invoice_payments. amount_refunded ist kumulativ.
+      case "charge.refunded": {
+        const pi = typeof obj.payment_intent === "string" ? obj.payment_intent : obj.payment_intent?.id;
+        let rid: string | null = typeof obj.invoice === "string" ? obj.invoice : null;
+        if (!rid && pi) {
+          const z = await stripeLesen("invoice_payments?payment[type]=payment_intent"
+            + "&payment[payment_intent]=" + encodeURIComponent(pi) + "&limit=1");
+          const inv = z?.data?.[0]?.invoice;
+          rid = typeof inv === "string" ? inv : inv?.id ?? null;
+        }
+        const betrag = Number(obj.amount ?? 0);
+        if (rid && betrag > 0) {
+          await erstattungVerbuchen(db, mandant, rid, Number(obj.amount_refunded ?? 0) / betrag);
+          // Den Rechnungsspiegel nachziehen (Status, offener Betrag).
+          await rechnungSpiegeln(db, mandant, await stripeLesen("invoices/" + rid));
+        }
         break;
       }
 
