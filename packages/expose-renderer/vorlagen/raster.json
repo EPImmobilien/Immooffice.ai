@@ -878,21 +878,7 @@
             "art": "titelbild"
           },
           "fuellmodus": "cover",
-          "platzhalter_farbe": "surf2",
-          "label": "{{objekt.hauptbild_url.titel}}",
-          "stil_label": "bild_label",
-          "label_hintergrund": "weiss"
-        },
-        {
-          "id": "cover-markenfeld",
-          "typ": "form",
-          "gesperrt": true,
-          "x": 28,
-          "y": 763.89,
-          "b": 196,
-          "h": 50,
-          "form": "rechteck",
-          "fuell": "weiss"
+          "platzhalter_farbe": "surf2"
         },
         {
           "id": "cover-logo",
@@ -918,7 +904,7 @@
           "y": 778.89,
           "b": 150,
           "h": 10,
-          "stil": "marke_name",
+          "stil": "marke_name_hell",
           "inhalt": "{{firma.marken_name}}",
           "einzeilig": true,
           "sichtbar_wenn": {
@@ -935,7 +921,7 @@
           "y": 773.89,
           "b": 150,
           "h": 6,
-          "stil": "marke_zusatz",
+          "stil": "marke_zusatz_hell",
           "inhalt": "{{firma.linie?}}",
           "einzeilig": true,
           "sichtbar_wenn": {
@@ -1586,7 +1572,33 @@
           "platzhalter_farbe": "surf2",
           "label": "{{bild.foto.3.titel}}",
           "stil_label": "bild_label",
-          "label_hintergrund": "weiss"
+          "label_hintergrund": "weiss",
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.beschreibung_ausstattung_expose"
+          }
+        },
+        {
+          "id": "ausstattung-bild-gross",
+          "typ": "bild",
+          "x": 42,
+          "y": 62,
+          "b": 511.28,
+          "h": 639.89,
+          "slot": {
+            "art": "foto",
+            "nr": 3
+          },
+          "fuellmodus": "cover",
+          "eckradius": 10,
+          "platzhalter_farbe": "surf2",
+          "label": "{{bild.foto.3.titel}}",
+          "stil_label": "bild_label",
+          "label_hintergrund": "weiss",
+          "sichtbar_wenn": {
+            "nicht": {
+              "vorhanden": "objekt.beschreibung_ausstattung_expose"
+            }
+          }
         },
         {
           "id": "ausstattung-liste",
@@ -1610,7 +1622,10 @@
           "polster": 10,
           "einzug": 28,
           "text_versatz": -0.5,
-          "stil_punkt": "ausstattung_punkt"
+          "stil_punkt": "ausstattung_punkt",
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.beschreibung_ausstattung_expose"
+          }
         }
       ]
     },
@@ -1677,12 +1692,7 @@
           "ab_nr": 4,
           "platzhalter_farbe": "surf2",
           "stil_label": "bild_label",
-          "label_hintergrund": "weiss",
-          "beschriftungen": [
-            "Terrasse & Garten",
-            "Elternschlafzimmer",
-            "Tageslichtbad"
-          ]
+          "label_hintergrund": "weiss"
         }
       ]
     },
@@ -1809,15 +1819,34 @@
           "einzeilig": true
         },
         {
-          "id": "eg-kasten",
+          "id": "eg-kasten-og",
           "typ": "form",
           "x": 42,
           "y": 379.89,
-          "b": 341.28,
+          "b": 511.28,
           "h": 330,
           "form": "rechteck",
           "fuell": "surf",
-          "eckradius": 10
+          "eckradius": 10,
+          "sichtbar_wenn": {
+            "vorhanden": "bild.grundriss.2"
+          }
+        },
+        {
+          "id": "eg-kasten-hoch",
+          "typ": "form",
+          "x": 42,
+          "y": 80,
+          "b": 511.28,
+          "h": 629.89,
+          "form": "rechteck",
+          "fuell": "surf",
+          "eckradius": 10,
+          "sichtbar_wenn": {
+            "nicht": {
+              "vorhanden": "bild.grundriss.2"
+            }
+          }
         },
         {
           "id": "eg-label",
@@ -1831,78 +1860,40 @@
           "einzeilig": true
         },
         {
-          "id": "eg-plan-1",
+          "id": "eg-plan-1-og",
           "typ": "bild",
-          "x": 76,
+          "x": 72,
           "y": 409.89,
-          "b": 273.28,
+          "b": 451.28,
           "h": 250,
           "slot": {
             "art": "grundriss",
             "nr": 1
           },
           "fuellmodus": "contain",
-          "platzhalter_farbe": "surf"
+          "platzhalter_farbe": "surf",
+          "sichtbar_wenn": {
+            "vorhanden": "bild.grundriss.2"
+          }
         },
         {
-          "id": "eg-liste-label",
-          "typ": "text",
-          "x": 403.28,
-          "y": 678.89,
-          "b": 150,
-          "h": 7,
-          "stil": "abschnitt_label",
-          "inhalt": "Erdgeschoss",
-          "einzeilig": true
-        },
-        {
-          "id": "eg-liste",
-          "typ": "raumliste",
-          "x": 403.28,
-          "y": 555.89,
-          "b": 150,
-          "h": 114,
-          "ebene": "eg",
-          "zeilenhoehe": 19,
-          "linien_versatz": 6,
-          "linien_farbe": "line",
-          "linienbreite": 0.5,
-          "mit_summe": true,
-          "summe_versatz": 2,
-          "summe_label": "Summe",
-          "stil_name": "raum_name",
-          "stil_flaeche": "raum_wert",
-          "stil_summe": "raum_summe"
-        },
-        {
-          "id": "og-liste-label",
-          "typ": "text",
-          "x": 403.28,
-          "y": 518.89,
-          "b": 150,
-          "h": 7,
-          "stil": "abschnitt_label",
-          "inhalt": "Obergeschoss",
-          "einzeilig": true
-        },
-        {
-          "id": "og-liste",
-          "typ": "raumliste",
-          "x": 403.28,
-          "y": 414.89,
-          "b": 150,
-          "h": 95,
-          "ebene": "og",
-          "zeilenhoehe": 19,
-          "linien_versatz": 6,
-          "linien_farbe": "line",
-          "linienbreite": 0.5,
-          "mit_summe": true,
-          "summe_versatz": 2,
-          "summe_label": "Summe",
-          "stil_name": "raum_name",
-          "stil_flaeche": "raum_wert",
-          "stil_summe": "raum_summe"
+          "id": "eg-plan-1-hoch",
+          "typ": "bild",
+          "x": 72,
+          "y": 110,
+          "b": 451.28,
+          "h": 539.89,
+          "slot": {
+            "art": "grundriss",
+            "nr": 1
+          },
+          "fuellmodus": "contain",
+          "platzhalter_farbe": "surf",
+          "sichtbar_wenn": {
+            "nicht": {
+              "vorhanden": "bild.grundriss.2"
+            }
+          }
         },
         {
           "id": "og-kasten",
@@ -1914,7 +1905,10 @@
           "form": "rechteck",
           "strich": "line",
           "linienbreite": 0.8,
-          "eckradius": 10
+          "eckradius": 10,
+          "sichtbar_wenn": {
+            "vorhanden": "bild.grundriss.2"
+          }
         },
         {
           "id": "og-label",
@@ -1925,7 +1919,10 @@
           "h": 7,
           "stil": "abschnitt_label",
           "inhalt": "Obergeschoss",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "vorhanden": "bild.grundriss.2"
+          }
         },
         {
           "id": "og-plan-2",
@@ -1939,7 +1936,10 @@
             "nr": 2
           },
           "fuellmodus": "contain",
-          "platzhalter_farbe": "surf"
+          "platzhalter_farbe": "surf",
+          "sichtbar_wenn": {
+            "vorhanden": "bild.grundriss.2"
+          }
         },
         {
           "id": "grundriss-hinweis",
@@ -2187,7 +2187,14 @@
       "typ": "energie",
       "name": "Energie",
       "sichtbar_wenn": {
-        "vorhanden": "objekt.energie_kennwert"
+        "oder": [
+          {
+            "vorhanden": "objekt.energie_kennwert"
+          },
+          {
+            "vorhanden": "objekt.energie_klasse"
+          }
+        ]
       },
       "elemente": [
         {
@@ -2688,7 +2695,10 @@
           "wert_grundlinie": 38,
           "einheit": "€",
           "stil_label": "kachel_name",
-          "stil_wert": "kachel_zahl"
+          "stil_wert": "kachel_zahl",
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.laufende_kosten"
+          }
         },
         {
           "id": "laufend-summe-kasten",
@@ -2699,7 +2709,10 @@
           "h": 54,
           "form": "rechteck",
           "fuell": "asoft",
-          "eckradius": 10
+          "eckradius": 10,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.laufende_kosten"
+          }
         },
         {
           "id": "laufend-summe-label",
@@ -2710,7 +2723,10 @@
           "h": 10,
           "stil": "summe_label",
           "inhalt": "Summe laufende Kosten",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.laufende_kosten"
+          }
         },
         {
           "id": "laufend-summe-wert",
@@ -2721,7 +2737,10 @@
           "h": 13,
           "stil": "summe_wert",
           "inhalt": "ca. {{rechnung.laufende_summe}} / Monat",
-          "einzeilig": true
+          "einzeilig": true,
+          "sichtbar_wenn": {
+            "vorhanden": "objekt.laufende_kosten"
+          }
         },
         {
           "id": "kosten-hinweis",
