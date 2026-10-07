@@ -125,24 +125,92 @@
   }
 
   // --- Zahlen ---------------------------------------------------------------
+  // Pfeil und Prozent zum Vorzeitraum. Ohne Vorwert (vor dem ersten
+  // Schnappschuss) steht da nichts — eine erfundene Null waere eine Luege.
+  function Vergleich(p) {
+    if (p.vorher === null || p.vorher === undefined || !isFinite(p.vorher)) return null;
+    var diff = Number(p.jetzt) - Number(p.vorher);
+    if (!p.vorher && !diff) return null;
+    var pct = p.vorher ? Math.round(diff / Math.abs(Number(p.vorher)) * 100) : null;
+    var gut = p.umgekehrt ? diff <= 0 : diff >= 0;
+    return E("span", { style: { fontSize: 12, fontWeight: 600, color: diff === 0 ? CI.muted : gut ? CI.success : CI.danger, marginLeft: 8 } },
+      (diff > 0 ? "▲ " : diff < 0 ? "▼ " : "= ") + (pct !== null ? Math.abs(pct) + " %" : zahl(Math.abs(diff))));
+  }
+  // Gestapelte Balken ohne Bibliothek: SVG, eine Spalte je Monat, eine
+  // Farbe je Tarif. Reicht fuer zwoelf Monate und ist in jeder Breite lesbar.
+  var FARBEN = ["#1B2A47", "#B5934F", "#5B7DB1", "#C9AE72", "#7A828C", "#2F6F4E", "#A33A3A"];
+  function Stapelbalken(p) {
+    var reihen = p.reihen || [];
+    if (!reihen.length) return E("div", { style: { fontSize: 13, color: CI.muted } }, p.leer || "Noch keine Tageswerte — der erste Schnappschuss kommt heute Nacht.");
+    var schluessel = {};
+    reihen.forEach(function (r) { Object.keys(r).forEach(function (k) { if (k !== p.x) schluessel[k] = true; }); });
+    var serien = Object.keys(schluessel);
+    var max = Math.max.apply(null, reihen.map(function (r) { return serien.reduce(function (s, k) { return s + Math.max(0, Number(r[k] || 0)); }, 0); }).concat([1]));
+    var B = 640, H = 180, l = 8, b = Math.max(14, Math.floor((B - 2 * l) / reihen.length) - 6);
+    return E("div", null,
+      E("svg", { viewBox: "0 0 " + B + " " + (H + 28), style: { width: "100%", height: "auto", display: "block" } },
+        reihen.map(function (r, i) {
+          var x = l + i * (b + 6), y = H, teile = serien.map(function (k, j) {
+            var h = Math.max(0, Number(r[k] || 0)) / max * (H - 10);
+            y -= h;
+            return E("rect", { key: k, x: x, y: y, width: b, height: h, fill: FARBEN[j % FARBEN.length] },
+              E("title", null, r[p.x] + " · " + k + ": " + (p.format ? p.format(r[k]) : zahl(r[k]))));
+          });
+          return E("g", { key: i }, teile,
+            E("text", { x: x + b / 2, y: H + 16, fontSize: 10, textAnchor: "middle", fill: CI.muted }, String(r[p.x]).slice(2)));
+        })),
+      E("div", { style: { display: "flex", gap: 12, flexWrap: "wrap", fontSize: 11.5, color: CI.muted, marginTop: 6 } },
+        serien.map(function (k, j) {
+          return E("span", { key: k }, E("span", { style: { display: "inline-block", width: 10, height: 10, background: FARBEN[j % FARBEN.length], marginRight: 4, borderRadius: 2 } }), k);
+        })));
+  }
+  function prozent(x) { return x === null || x === undefined ? "—" : Math.round(Number(x) * 100) + " %"; }
+
   function Zahlen(p) {
     var d = p.daten;
     if (!d) return E("div", { style: { color: CI.muted } }, "Lade Zahlen …");
     var status = d.abos_nach_status || {};
+    var v = d.vorher || {};
+    var kacheln = [
+      ["MRR (netto)", geld(d.mrr_cent), E(Vergleich, { jetzt: d.mrr_cent, vorher: v.mrr_cent }), "ARR " + geld(d.arr_cent || 0)],
+      ["Zahlende Mandanten", zahl(d.zahlende !== undefined ? d.zahlende : (status.aktiv || 0) + (status.gekuendigt || 0)),
+        E(Vergleich, { jetzt: d.zahlende, vorher: v.zahlende }),
+        Object.keys(d.je_tarif || {}).map(function (k) { return k + " " + zahl(d.je_tarif[k].zahlende); }).join(" · ") || "—"],
+      ["Neu / gekündigt", zahl(d.neu_zahlend || 0) + " / " + zahl(d.gekuendigt || 0), null,
+        zahl(d.kuendigung_vorgemerkt || 0) + " vorgemerkt · Quote " + prozent(d.kuendigungsquote)],
+      ["Aktive Testkonten", zahl(d.test_aktiv !== undefined ? d.test_aktiv : status.test || 0), E(Vergleich, { jetzt: d.test_aktiv, vorher: v.test_aktiv }),
+        "Umwandlung " + prozent(d.umwandlungsquote) + " (" + zahl(d.test_beendet || 0) + " beendet)"],
+      ["Gründerplätze", zahl(d.gruender_belegt || 0) + " / " + zahl(d.gruender_plaetze || 50), null, zahl(d.gruender_frei) + " frei"],
+      ["KI-Kosten", euro(d.ki_kosten_eur), null, zahl(d.buchungen_ohne_kosten) + " Buchungen ohne Kostenangabe"],
+      ["Deckungsbeitrag", d.deckungsbeitrag_eur !== undefined ? euro(d.deckungsbeitrag_eur) : "—", null,
+        "Marge " + prozent(d.marge) + " — ohne Stripe-Gebühren und Pauschale (Schritt 4)"],
+      ["Zahlungen offen", zahl(d.zahlung_offen || 0), E(Vergleich, { jetzt: d.zahlung_offen, vorher: v.zahlung_offen, umgekehrt: true }), "fehlgeschlagen, nicht erledigt"],
+      ["Support / Technik", (d.support_offen === null || d.support_offen === undefined ? "—" : zahl(d.support_offen)) + " / " + zahl(d.technikfehler_24h || 0), null,
+        "offene Anfragen (Schritt 8) / Fehler 24 h"],
+    ];
     return E("div", null,
-      E("div", { style: { display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", marginBottom: 18 } },
-        [
-          ["Monatserlös (netto)", geld(d.mrr_cent), "aus laufenden Abos; ein Jahresabo zählt mit einem Zwölftel"],
-          ["Zahlende Abos", zahl((status.aktiv || 0) + (status.gekuendigt || 0)), zahl(status.test || 0) + " in der Testphase"],
-          ["Credits in " + zahl(d.zeitraum_tage) + " Tagen", zahl(d.credits_verbraucht), "verbraucht, über alle Mandanten"],
-          ["Anbieterkosten", euro(d.ki_kosten_eur), zahl(d.buchungen_ohne_kosten) + " Buchungen ohne Kostenangabe"],
-          ["Gründerplätze frei", zahl(d.gruender_frei), "von der im Katalog gesetzten Zahl"],
-        ].map(function (k, i) {
+      E("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 8 } },
+        "Zeitraum " + zahl(d.zeitraum_tage) + " Tage · Vergleich mit den " + zahl(d.zeitraum_tage) + " Tagen davor"),
+      E("div", { style: { display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", marginBottom: 18 } },
+        kacheln.map(function (k, i) {
           return E("div", { key: i, style: kasten },
             E("div", { style: { fontSize: 11, color: CI.muted, letterSpacing: "0.06em", textTransform: "uppercase" } }, k[0]),
-            E("div", { style: { fontSize: 26, fontWeight: 700, color: CI.blau, margin: "6px 0 4px" } }, k[1]),
-            E("div", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.5 } }, k[2]));
+            E("div", { style: { fontSize: 24, fontWeight: 700, color: CI.blau, margin: "6px 0 4px" } }, k[1], k[2]),
+            E("div", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.5 } }, k[3]));
         })),
+      E("div", { style: kasten },
+        Ueberschrift("Heute zu tun"),
+        (d.zu_tun || []).length
+          ? (d.zu_tun || []).map(function (z, i) {
+              return E("div", { key: i, style: { display: "flex", gap: 8, alignItems: "center", padding: "5px 0", borderBottom: "1px solid " + CI.border, fontSize: 13 } },
+                E("span", { style: { fontSize: 10, letterSpacing: "0.06em", textTransform: "uppercase", color: CI.muted, minWidth: 80 } }, z.art.replace("_", " ")),
+                E("span", { style: { flex: 1 } }, z.text),
+                p.oeffnen ? E("button", { type: "button", style: knopfLeer, onClick: function () { p.oeffnen(z.mandant_id); } }, "Öffnen") : null);
+            })
+          : E("div", { style: { fontSize: 13, color: CI.muted } }, "Nichts offen.")),
+      E("div", { style: kasten },
+        Ueberschrift("MRR-Verlauf, 12 Monate, nach Tarif"),
+        E(Stapelbalken, { reihen: d.verlauf || [], x: "monat", format: geld })),
       E("div", { style: kasten },
         Ueberschrift("Verbrauch nach Aktion (" + zahl(d.zeitraum_tage) + " Tage)"),
         !(d.je_aktion || []).length
@@ -157,16 +225,89 @@
                 return E("tr", { key: a.aktion },
                   E("td", { style: zelle }, a.aktion),
                   E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, zahl(a.credits)),
-                  E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) },
-                    a.mit ? euro(a.kosten) : "—"),
-                  E("td", { style: Object.assign({}, zelle, { textAlign: "right", color: CI.muted }) },
-                    zahl(a.ohne)));
+                  E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, a.mit ? euro(a.kosten) : "—"),
+                  E("td", { style: Object.assign({}, zelle, { textAlign: "right", color: CI.muted }) }, zahl(a.ohne)));
               }))),
         E("p", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.6, marginTop: 12 } },
           "„Ohne Kostenangabe" + "“" + " heisst: der Anbieter nennt keinen Preis je Aufruf "
           + "(Anthropic liefert Token) oder der Dollarkurs fehlt. Diese Buchungen "
           + "zählen beim Verbrauch mit, bei den Kosten nicht — eine geschätzte "
           + "Zahl wäre hier schlimmer als eine fehlende.")));
+  }
+
+  // --- Umsatz & Abos (fork_70) ------------------------------------------------
+  function Umsatz(p) {
+    var d = p.daten;
+    if (!d) return E("div", { style: { color: CI.muted } }, "Lade Umsatz …");
+    var vt = d.verteilung || { je_tarif: {} };
+    var kohorten = Object.keys(d.kohorten || {}).sort();
+    return E("div", null,
+      E("div", { style: { display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", marginBottom: 18 } },
+        [["Monatlich / jährlich", zahl(vt.monat || 0) + " / " + zahl(vt.jahr || 0)],
+         ["Gründerkunden", zahl(vt.gruender || 0)],
+         ["Je Tarif", Object.keys(vt.je_tarif || {}).map(function (k) { return k + " " + zahl(vt.je_tarif[k]); }).join(" · ") || "—"],
+         ["Tagesschnappschüsse", zahl(d.schnappschuesse || 0)]].map(function (k, i) {
+          return E("div", { key: i, style: kasten },
+            E("div", { style: { fontSize: 11, color: CI.muted, letterSpacing: "0.06em", textTransform: "uppercase" } }, k[0]),
+            E("div", { style: { fontSize: 20, fontWeight: 700, color: CI.blau, marginTop: 6 } }, k[1]));
+        })),
+      E("div", { style: kasten },
+        Ueberschrift("MRR-Bewegung je Monat (Wasserfall)"),
+        (d.wasserfall || []).length
+          ? E("div", { style: { overflowX: "auto" } }, E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 640 } },
+              E("thead", null, E("tr", null, ["Monat", "Neu", "Erweiterung", "Verkleinerung", "Kündigung", "Netto"].map(function (h, i) {
+                return E("th", { key: i, style: Object.assign({}, kopfzelle, i ? { textAlign: "right" } : {}) }, h); }))),
+              E("tbody", null, d.wasserfall.map(function (w) {
+                return E("tr", { key: w.monat },
+                  E("td", { style: zelle }, w.monat),
+                  E("td", { style: Object.assign({}, zelle, { textAlign: "right", color: CI.success }) }, geld(w.neu)),
+                  E("td", { style: Object.assign({}, zelle, { textAlign: "right", color: CI.success }) }, geld(w.erweiterung)),
+                  E("td", { style: Object.assign({}, zelle, { textAlign: "right", color: CI.danger }) }, geld(w.verkleinerung)),
+                  E("td", { style: Object.assign({}, zelle, { textAlign: "right", color: CI.danger }) }, geld(w.kuendigung)),
+                  E("td", { style: Object.assign({}, zelle, { textAlign: "right", fontWeight: 600 }) }, geld(w.netto)));
+              }))))
+          : E("div", { style: { fontSize: 13, color: CI.muted } }, "Noch keine zwei Monate mit Schnappschüssen.")),
+      E("div", { style: kasten },
+        Ueberschrift("Kohorten — Verbleib nach Startmonat"),
+        kohorten.length
+          ? E("table", { style: { width: "100%", borderCollapse: "collapse" } },
+              E("thead", null, E("tr", null, ["Startmonat", "Größe", "nach 1", "nach 3", "nach 6", "nach 12"].map(function (h, i) {
+                return E("th", { key: i, style: Object.assign({}, kopfzelle, i ? { textAlign: "right" } : {}) }, h); }))),
+              E("tbody", null, kohorten.map(function (k) {
+                var c = d.kohorten[k];
+                return E("tr", { key: k }, E("td", { style: zelle }, k),
+                  E("td", { style: Object.assign({}, zelle, { textAlign: "right" }) }, zahl(c.groesse)),
+                  ["1", "3", "6", "12"].map(function (n) {
+                    return E("td", { key: n, style: Object.assign({}, zelle, { textAlign: "right" }) },
+                      c.groesse ? Math.round(c.nach[n] / c.groesse * 100) + " %" : "—");
+                  }));
+              })))
+          : E("div", { style: { fontSize: 13, color: CI.muted } }, "Noch keine Kohorte.")),
+      E("div", { style: kasten },
+        Ueberschrift("Credit-Pakete je Monat"),
+        Object.keys(d.pakete || {}).length
+          ? Object.keys(d.pakete).sort().map(function (m) {
+              return E("div", { key: m, style: { fontSize: 13, padding: "3px 0" } }, m + ": " + zahl(d.pakete[m].anzahl) + " Pakete · " + zahl(d.pakete[m].credits) + " Credits");
+            })
+          : E("div", { style: { fontSize: 13, color: CI.muted } }, "Keine Pakete im letzten Jahr. Umsatz je Paket kommt mit den Rechnungen (Schritt 6).")),
+      E("div", { style: kasten },
+        Ueberschrift("Mindestlaufzeit endet in den nächsten 30 Tagen"),
+        (d.mindestlaufzeit || []).length
+          ? (d.mindestlaufzeit || []).map(function (m) {
+              return E("div", { key: m.mandant_id, style: { fontSize: 13, padding: "4px 0", display: "flex", gap: 8, alignItems: "center" } },
+                E("span", { style: { flex: 1 } }, m.name + " · " + (m.tarif || "") + " · bis " + datum(m.bis)),
+                p.oeffnen ? E("button", { type: "button", style: knopfLeer, onClick: function () { p.oeffnen(m.mandant_id); } }, "Öffnen") : null);
+            })
+          : E("div", { style: { fontSize: 13, color: CI.muted } }, "Keine.")),
+      E("div", { style: kasten },
+        Ueberschrift("Kündigung vorgemerkt"),
+        (d.vorgemerkt || []).length
+          ? (d.vorgemerkt || []).map(function (m) {
+              return E("div", { key: m.mandant_id, style: { fontSize: 13, padding: "4px 0", display: "flex", gap: 8, alignItems: "center" } },
+                E("span", { style: { flex: 1 } }, m.name + " · gekündigt " + datum(m.gekuendigt_am) + " · wirksam " + datum(m.wirksam)),
+                p.oeffnen ? E("button", { type: "button", style: knopfLeer, onClick: function () { p.oeffnen(m.mandant_id); } }, "Öffnen") : null);
+            })
+          : E("div", { style: { fontSize: 13, color: CI.muted } }, "Keine.")));
   }
 
   // --- Mandanten ------------------------------------------------------------
@@ -1080,15 +1221,17 @@
       };
     }, []);
 
+    var tZ = React.useState(30), tage = tZ[0], setzeTage = tZ[1];
     var laden = React.useCallback(function (welcher, id) {
       var aktion = welcher === "zahlen" ? "uebersicht"
+        : welcher === "umsatz" ? "umsatz"
         : welcher === "mandanten" ? "mandanten"
         : welcher === "katalog" ? "katalog"
         : welcher === "konten" ? "nutzer"
         : welcher === "system" ? "system"
         : welcher === "admins" ? "admin_liste"
         : welcher === "mandant" ? "mandant" : "protokoll";
-      ruf(aktion, welcher === "mandant" ? { mandant_id: id } : null).then(function (d) {
+      ruf(aktion, welcher === "mandant" ? { mandant_id: id } : welcher === "zahlen" ? { tage: tage } : null).then(function (d) {
         var n = {};
         n[welcher] = welcher === "mandanten" ? d.mandanten
           : welcher === "admins" ? d.admins
@@ -1096,7 +1239,7 @@
           : welcher === "protokoll" ? d.eintraege : d;
         setzeDaten(function (alt) { return Object.assign({}, alt, n); });
       }).catch(function (f) { setzeFehler(f.message || String(f)); });
-    }, []);
+    }, [tage]);
 
     var supportLaden = React.useCallback(function () {
       ruf("support_stand").then(function (d) { setzeSupport(d.sitzung || null); })
@@ -1137,7 +1280,8 @@
     // Welche Reiter eine Rolle sieht. Ausgeblendet ist Bequemlichkeit; die
     // Schranke steht in der Funktion.
     var rolle = wer.rolle || "admin";
-    var alleReiter = [["zahlen", "Zahlen", ["owner", "admin", "support", "finanzen"]],
+    var alleReiter = [["zahlen", "Übersicht", ["owner", "admin", "support", "finanzen"]],
+      ["umsatz", "Umsatz & Abos", ["owner", "admin", "finanzen"]],
       ["mandanten", "Mandanten", ["owner", "admin", "support", "finanzen"]],
       ["konten", "Konten", ["owner", "admin", "support"]],
       ["katalog", "Katalog", ["owner", "admin", "support", "finanzen"]],
@@ -1147,8 +1291,17 @@
     var reiterListe = alleReiter.filter(function (r) { return r[2].indexOf(rolle) >= 0; });
 
     return E("div", null,
-      E("div", { style: { fontSize: 11, color: CI.muted, textAlign: "right", marginBottom: -6 } },
-        "Rolle: " + rolle),
+      E("div", { style: { display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap", marginBottom: 6 } },
+        E("span", { style: { fontSize: 11, color: CI.muted } }, "Zeitraum:"),
+        [[7, "7 Tage"], [30, "30 Tage"], [90, "90 Tage"], [365, "12 Monate"]].map(function (z) {
+          var an = tage === z[0];
+          return E("button", { key: z[0], type: "button", onClick: function () { setzeTage(z[0]); },
+            style: Object.assign({}, knopfLeer, { padding: "4px 10px", fontSize: 12 },
+              an ? { background: CI.blau, color: "#fff", borderColor: CI.blau } : {}) }, z[1]);
+        }),
+        E("input", { type: "number", min: 1, max: 365, style: Object.assign({}, feld, { width: 70, padding: "4px 8px", fontSize: 12 }),
+          value: tage, title: "frei, in Tagen", onChange: function (e) { var n = Number(e.target.value); if (n >= 1 && n <= 365) setzeTage(n); } }),
+        E("span", { style: { fontSize: 11, color: CI.muted, marginLeft: "auto" } }, "Rolle: " + rolle)),
       // Ein laufender Supportzugriff muss sichtbar sein, immer. Wer vergisst,
       // dass er in fremden Daten steht, haelt sie fuer seine eigenen.
       support ? E("div", { "data-support-band": "1", style: {
@@ -1189,7 +1342,8 @@
             melden: melden, supportNeu: supportLaden,
             neuLaden: function () { laden("mandant", offen); },
             zurueck: function () { setzeOffen(null); laden("mandanten"); } })
-        : reiter === "zahlen" ? E(Zahlen, { daten: daten.zahlen })
+        : reiter === "zahlen" ? E(Zahlen, { daten: daten.zahlen, oeffnen: function (id) { setzeOffen(id); } })
+        : reiter === "umsatz" ? E(Umsatz, { daten: daten.umsatz, oeffnen: function (id) { setzeOffen(id); } })
         : reiter === "mandanten" ? E(Mandanten, { daten: daten.mandanten, melden: melden,
             oeffnen: function (id) { setzeOffen(id); },
             neuLaden: function () { laden("mandanten"); } })

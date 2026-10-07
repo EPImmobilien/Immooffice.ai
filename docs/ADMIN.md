@@ -176,7 +176,69 @@ gibt es nur die sofortige Löschung durch owner, mit Namensbestätigung).
       gutschreiben/abziehen, sperren/entsperren
 - [x] Kein Inhalt einer Fachtabelle in der Antwort (Test)
 
-## Noch offen aus dem Auftrag (Schritte 3–10)
+## Schritt 3 — Übersicht, Kennzahlen-Job, Umsatz & Abos (fork_70) · erledigt 07.10.2026
+
+### Kennzahl-Definitionen (verbindlich)
+
+| Kennzahl | Definition | Wo gerechnet |
+|---|---|---|
+| **MRR** (netto) | Summe der monatlichen Nettobeträge aller zahlenden Abos (`aktiv`, und `gekuendigt` solange `cancel_at` in der Zukunft) inkl. Zusatznutzer; Jahresabos ÷ 12 (gerundet); Gründer-Rabatt (`gruender_rabatt_cent`) abgezogen, wenn `gruenderpreis` und Tarif = `gruender_tarif`; Testkonten und Credit-Pakete nicht enthalten | `plattform_mrr_je_mandant()` — **die eine Rechnung**, Dashboard und Schnappschuss lesen sie |
+| **ARR** | MRR × 12 | Function |
+| **Kündigungsquote** | im Zeitraum von zahlend auf nicht zahlend gewechselte Mandanten ÷ zahlende Mandanten am Anfang des Zeitraums (Schnappschuss) | Function, aus `plattform_mandanten_tag` |
+| **Umwandlungsquote** | im Zeitraum beendete Tests, die in ein zahlendes Abo übergingen ÷ alle im Zeitraum beendeten Tests | Function, aus `plattform_mandanten_tag` |
+| **Deckungsbeitrag** (Schritt 3) | Erlös (MRR anteilig auf den Zeitraum) − KI-Kosten (`ki_kosten_eur` gebuchter Buchungen) — **ohne** Stripe-Gebühren und Infrastrukturpauschale, die kommen mit Schritt 4 | Function |
+| **Aktiver Nutzer** | mindestens ein Login im Zeitraum (`auth.users.last_sign_in_at`) | `plattform_mandanten_kennzahlen()` (14 Tage) |
+
+`tests/betreiber-kennzahlen.sql` rechnet die MRR-Probe von Hand nach:
+Monatsabo 100,00, Jahresabo 1.080,00 ÷ 12 + zwei Zusatznutzer, Gründer
+100,00 − 10,00, Testkonto 0 — Summe muss gleich sein.
+
+### Datenbasis
+
+- `plattform_mandanten_tag` — nächtlicher Schnappschuss je Mandant (Tarif,
+  Intervall, Status, zahlend, MRR, Gründer). **Die Historie, die
+  `mandant_abo` nicht hat.** Daraus: Wasserfall, Kohorten, Quoten.
+- `plattform_kennzahlen_tag` — Tagessummen (`mrr_cent`, `zahlende`,
+  `test_aktiv`, `gruender_belegt`, `zahlung_offen`, `kuendigung_vorgemerkt`,
+  `ki_kosten_eur`, `credits_verbraucht`, `technikfehler`, `mandanten`), je
+  Tarif und gesamt (`tarif = ''`).
+- `pg_cron` **02:10 Uhr** (`plattform-kennzahlen-naechtlich`) schreibt den
+  Vortag; `plattform_kennzahlen_schreiben(datum)` ist idempotent und von Hand
+  nachholbar. Der erste Schnappschuss entstand mit der Migration.
+- Live-Werte für heute kommen direkt aus `plattform_mrr_je_mandant()`.
+
+**Ehrlichkeit vor dem ersten Schnappschuss:** Vergleich zum Vorzeitraum,
+Wasserfall, Kohorten und Quoten zeigen nichts, solange es keinen
+Schnappschuss von damals gibt — keine erfundene Null. Die Demo-Daten
+(Schritt 10) füllen zwölf Monate rückwirkend.
+
+### Oberfläche
+
+- Zeitraumleiste 7 / 30 / 90 / 12 Monate / frei (Tage) über allen Reitern.
+- Übersicht: neun Kacheln mit Pfeil und Prozent zum Vorzeitraum, „Heute zu
+  tun" (Test endet ≤ 3 Tage, Zahlung offen, laufende Supportzugriffe,
+  Gesundheit < 40 — jeder Eintrag öffnet den Mandanten), MRR-Verlauf 12
+  Monate gestapelt nach Tarif.
+- Reiter „Umsatz & Abos" (owner/admin/finanzen): Wasserfall je Monat,
+  Verteilung Monat/Jahr/Gründer/je Tarif, Kohorten 1/3/6/12, Credit-Pakete
+  je Monat (Anzahl, Credits — Umsatz je Paket mit Schritt 6),
+  Mindestlaufzeit endet in 30 Tagen, Kündigung vorgemerkt.
+- **Diagramme ohne Bibliothek**: der Auftrag nennt Chart.js als Beispiel,
+  falls keine vorhanden ist. Es ist keine vorhanden, und eine neue
+  CDN-Bibliothek müsste in Hülle und Service-Worker-Liste. Für gestapelte
+  Balken reicht SVG aus `React.createElement` — kein neues Paket, kein
+  Zwischenspeicher-Eintrag. Wenn Linien- oder Kreisdiagramme nötig werden,
+  wird das neu entschieden.
+
+### Abnahme Schritt 3
+
+- [x] MRR = Handrechnung (Jahr ÷ 12, Gründerrabatt ab, Test/Pakete nicht) — Test
+- [x] Kennzahlen-Tabelle nächtlich per pg_cron, Live-Werte für heute
+- [x] Kacheln mit Vorzeitraum, Heute-zu-tun mit Direktlink, MRR-Verlauf
+- [x] Wasserfall, Verteilung, Kohorten, Fristenlisten
+- [ ] Stripe-Spiegeltabellen `rechnungen`/`zahlungen` und Stripe-Abgleich — Schritt 6
+
+## Noch offen aus dem Auftrag (Schritte 4–10)
 
 Werden hier je Schritt nachgetragen. Reihenfolge wie im Auftrag.
 

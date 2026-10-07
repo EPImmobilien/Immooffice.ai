@@ -174,6 +174,9 @@ BUCH = {
     # Ein Cron hat keinen Mandanten. Er liest die Warteschlange ueber alle
     # Mandanten und arbeitet danach je Zeile im Mandanten DIESER Zeile
     # weiter — die Bauform aus Phase 2 ("ein Lauf je Mandant").
+    ('plattform-admin', 'fehler_protokoll'):
+        (1, 'BEABSICHTIGT', 'nur GEZAEHLT (head: true) fuer "Technikfehler 24 h" auf der '
+                            'Betreiber-Uebersicht; keine Meldung verlaesst die Funktion (fork_70)'),
     ('akq-automation-lauf', 'akq_automation_lauf'):
         (1, 'BEABSICHTIGT', 'faellige Schritte aller Mandanten, danach je Lead weiter'),
     ('akq-mail-leads', 'akq_mail_leads'):

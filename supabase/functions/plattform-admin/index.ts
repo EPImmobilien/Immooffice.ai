@@ -48,6 +48,43 @@ const AENDERBAR: Record<string, string[]> = {
     "sortierung", "aktiv"],
   plattform_werte: ["wert", "beschreibung"],
 };
+// Welche Rolle welche Aktion rufen darf (fork_68). Nicht aufgefuehrte
+// Aktionen: nur owner und admin. Die vier Rollen und ihr Zuschnitt stehen
+// in docs/ADMIN.md.
+const ROLLEN: Record<string, string[]> = {
+  wer:                    ["owner", "admin", "support", "finanzen"],
+  umsatz:                 ["owner", "admin", "finanzen"],
+  uebersicht:             ["owner", "admin", "support", "finanzen"],
+  mandanten:              ["owner", "admin", "support", "finanzen"],
+  mandant:                ["owner", "admin", "support", "finanzen"],
+  katalog:                ["owner", "admin", "support", "finanzen"],
+  protokoll:              ["owner", "admin", "support", "finanzen"],
+  system:                 ["owner", "admin"],
+  nutzer:                 ["owner", "admin", "support"],
+  katalog_speichern:      ["owner", "admin"],
+  credits_schenken:       ["owner", "admin", "support"],
+  credits_abziehen:       ["owner", "admin"],
+  notiz_anlegen:          ["owner", "admin", "support"],
+  mandant_speichern:      ["owner", "admin", "support"],
+  mandant_loeschen:       ["owner"],
+  admin_setzen:           ["owner"],
+  admin_liste:            ["owner", "admin", "support", "finanzen"],
+  passwort_zuruecksetzen: ["owner", "admin", "support"],
+  support_start:          ["owner", "admin", "support"],
+  support_ende:           ["owner", "admin", "support"],
+  support_stand:          ["owner", "admin", "support", "finanzen"],
+};
+
+/** Die Anmeldestufe aus dem Token: "aal1" oder "aal2". Ohne Pruefung der
+ *  Signatur — die hat getUser() gerade gemacht; hier wird nur gelesen. */
+function tokenStufe(jwt: string): string {
+  try {
+    const teil = jwt.split(".")[1] || "";
+    const json = atob(teil.replace(/-/g, "+").replace(/_/g, "/"));
+    return String(JSON.parse(json).aal || "aal1");
+  } catch { return "aal1"; }
+}
+
 const SCHLUESSELSPALTE: Record<string, string> = {
   plattform_tarife: "schluessel",
   plattform_credit_preise: "aktion",
@@ -68,16 +105,49 @@ Deno.serve(async (req) => {
     if (!u?.user) return antwort({ ok: false, fehler: "Nicht angemeldet." }, 401);
 
     const { data: admin } = await db.from("plattform_admins")
-      .select("benutzer_id").eq("benutzer_id", u.user.id).maybeSingle();
-    if (!admin) return antwort({ ok: false, fehler: "Kein Plattform-Administrator." }, 403);
+      .select("benutzer_id, rolle, aktiv").eq("benutzer_id", u.user.id).maybeSingle();
+    if (!admin || !admin.aktiv) return antwort({ ok: false, fehler: "Kein Plattform-Administrator." }, 403);
+    const rolle = String(admin.rolle || "admin");
+
+    // Zweiter Faktor (fork_68). Supabase schreibt die Stufe der Anmeldung in
+    // das Token: "aal1" ist Passwort, "aal2" ist Passwort UND bestaetigter
+    // zweiter Faktor. Die Pflicht ist ein Plattformwert, damit der Betreiber
+    // sich nicht aussperrt, bevor TOTP eingerichtet ist — und damit sie sich
+    // ohne Ausrollen abschalten laesst, wenn jemand den Zugang verliert.
+    const { data: mfaWert } = await db.from("plattform_werte")
+      .select("wert").eq("schluessel", "betreiber_mfa_pflicht").maybeSingle();
+    const mfaPflicht = mfaWert ? mfaWert.wert === true : true;
+    if (mfaPflicht && tokenStufe(kopf) !== "aal2") {
+      return antwort({ ok: false, mfa: true, fehler:
+        "Zweiter Faktor erforderlich. Bitte TOTP einrichten oder bestaetigen." }, 403);
+    }
 
     const body = await req.json().catch(() => ({}));
     const aktion = String(body.aktion || "uebersicht");
 
-    const protokoll = async (was: string, gegenstand: string, einzelheiten: unknown) => {
+    // Die Rollenschranke steht VOR der Aktion, nicht in ihr. Was nicht in
+    // der Liste steht, duerfen nur owner und admin — ein Versehen sperrt
+    // also zu viel, nie zu wenig.
+    const erlaubt = ROLLEN[aktion] || ["owner", "admin"];
+    if (!erlaubt.includes(rolle)) {
+      return antwort({ ok: false, fehler:
+        `Die Rolle "${rolle}" darf das nicht (${aktion}).` }, 403);
+    }
+
+    // Jede schreibende Aktion ins Audit-Log: wer (mit Rolle), was, woran,
+    // warum, von wo. `vorher`/`nachher` dort, wo es einen Zustand gibt.
+    const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || null;
+    const userAgent = (req.headers.get("user-agent") || "").slice(0, 300) || null;
+    const protokoll = async (was: string, gegenstand: string, einzelheiten: unknown,
+                             stand?: { typ?: string; vorher?: unknown; nachher?: unknown }) => {
+      const e = (einzelheiten || {}) as Record<string, unknown>;
       await db.from("plattform_protokoll").insert({
         benutzer_id: u.user.id, aktion: was, gegenstand,
-        einzelheiten: einzelheiten as Record<string, unknown>,
+        einzelheiten: e,
+        rolle, ziel_typ: stand?.typ || null, ziel_id: gegenstand || null,
+        vorher: stand?.vorher ?? null, nachher: stand?.nachher ?? null,
+        begruendung: typeof e.grund === "string" ? e.grund : null,
+        ip, user_agent: userAgent,
       });
     };
 
@@ -141,6 +211,12 @@ Deno.serve(async (req) => {
           + "periode_bis, mindestlaufzeit_bis, cancel_at, zahlung_fehler_seit, stripe_customer_id");
       const { data: tarife } = await db.from("plattform_tarife").select("*");
       const { data: profile } = await db.from("profiles").select("mandant_id");
+      // Letzter Login, aktive Nutzer, Onboarding, Gesundheit — aus einer
+      // Datenbankfunktion, die nur ZAEHLT (fork_69). Die Fachtabellen
+      // bleiben dieser Function verschlossen, auch zum Zaehlen.
+      const { data: kennzahlen } = await db.rpc("plattform_mandanten_kennzahlen");
+      const kzNach = new Map<string, Record<string, unknown>>();
+      for (const k of (kennzahlen || []) as Record<string, unknown>[]) kzNach.set(String(k.mandant_id), k);
 
       const nachMandant = new Map<string, Record<string, unknown>>();
       for (const a of abos || []) nachMandant.set(String(a.mandant_id), a);
@@ -188,73 +264,232 @@ Deno.serve(async (req) => {
           zahlung_fehler_seit: a?.zahlung_fehler_seit || null,
           zahlt: !!a?.stripe_customer_id,
           mrr_cent: mrr,
+          letzter_login: kzNach.get(String(m.id))?.letzter_login || null,
+          aktive_14: Number(kzNach.get(String(m.id))?.aktive_14 || 0),
+          onboarding: Number(kzNach.get(String(m.id))?.onboarding || 0),
+          aktionen_30: Number(kzNach.get(String(m.id))?.aktionen_30 || 0),
+          gesundheit: kzNach.has(String(m.id)) ? Number(kzNach.get(String(m.id))?.gesundheit || 0) : null,
         });
       }
       return antwort({ ok: true, mandanten: zeilen });
     }
 
     // --- Die Zahlen ---------------------------------------------------------
+    if (aktion === "wer") {
+      return antwort({ ok: true, rolle, mfa_pflicht: mfaPflicht });
+    }
+
     if (aktion === "uebersicht") {
-      const seit = new Date(Date.now() - 30 * 86400000).toISOString();
-      const [{ data: verbrauch }, { data: frei }, { data: abos }, { data: tarife }] =
+      // Zeitraum aus der Leiste: 7 / 30 / 90 / 365 Tage. Vergleich mit dem
+      // ebenso langen Zeitraum davor — aus den Tagesschnappschuessen
+      // (fork_70). Vor dem ersten Schnappschuss gibt es keinen Vergleich,
+      // und dann steht da auch keiner.
+      const tage = Math.max(1, Math.min(365, Math.floor(Number(body.tage || 30))));
+      const seit = new Date(Date.now() - tage * 86400000).toISOString();
+      const heute = new Date().toISOString().slice(0, 10);
+      const tagVor = (n: number) => new Date(Date.now() - n * 86400000).toISOString().slice(0, 10);
+      const [{ data: verbrauch }, { data: frei }, { data: mrrZeilen }, { data: abos },
+             { data: kz }, { data: schnapp }, { data: gruender }, { data: kennzahlen }] =
         await Promise.all([
           db.from("credit_buchungen")
-            .select("aktion, credits, ki_kosten_eur, status, erstellt_am")
-            .gte("erstellt_am", seit).in("status", ["gebucht"]),
+            .select("aktion, credits, ki_kosten_eur, status, zeitpunkt")
+            .gte("zeitpunkt", seit).in("status", ["gebucht"]),
           db.rpc("gruender_plaetze_frei"),
-          db.from("mandant_abo").select("tarif, intervall, status, zusatznutzer"),
-          db.from("plattform_tarife").select("*"),
+          db.rpc("plattform_mrr_je_mandant"),
+          db.from("mandant_abo").select("mandant_id, tarif, intervall, status, zahlung_fehler_seit, cancel_at, testphase_ende:periode_bis, mindestlaufzeit_bis"),
+          db.from("plattform_kennzahlen_tag").select("datum, kennzahl, tarif, wert")
+            .in("datum", [tagVor(tage), tagVor(2 * tage)]),
+          db.from("plattform_mandanten_tag").select("datum, mandant_id, zahlend, status, mrr_cent")
+            .gte("datum", tagVor(2 * tage)),
+          db.from("plattform_werte").select("schluessel, wert").in("schluessel", ["gruender_plaetze", "kosten_warnung_prozent"]),
+          db.rpc("plattform_mandanten_kennzahlen"),
         ]);
-
-      const tarifNach = new Map<string, Record<string, unknown>>();
-      for (const t of tarife || []) tarifNach.set(String(t.schluessel), t);
-      const addon = (tarife || []).find((x: Record<string, unknown>) => x.ist_zusatznutzer);
-
-      let mrr = 0;
-      const nachStatus: Record<string, number> = {};
-      for (const a of abos || []) {
-        nachStatus[String(a.status)] = (nachStatus[String(a.status)] || 0) + 1;
-        if (a.status !== "aktiv" && a.status !== "gekuendigt") continue;
-        const t = tarifNach.get(String(a.tarif));
-        if (!t) continue;
-        mrr += a.intervall === "jahr"
-          ? jeMonat(Number(t.preis_jahr_cent), "jahr")
-          : Number(t.preis_monat_cent);
-        if (Number(a.zusatznutzer || 0) > 0 && addon) {
-          mrr += (a.intervall === "jahr"
-            ? jeMonat(Number(addon.preis_jahr_cent), "jahr")
-            : Number(addon.preis_monat_cent)) * Number(a.zusatznutzer);
-        }
+      const mrrNach = (mrrZeilen || []) as Record<string, unknown>[];
+      let mrr = 0; const jeTarif: Record<string, { zahlende: number; mrr_cent: number }> = {};
+      let zahlende = 0;
+      for (const z of mrrNach) {
+        if (!z.zahlend) continue;
+        zahlende++; mrr += Number(z.mrr_cent || 0);
+        const k = String(z.tarif || "?");
+        jeTarif[k] = jeTarif[k] || { zahlende: 0, mrr_cent: 0 };
+        jeTarif[k].zahlende++; jeTarif[k].mrr_cent += Number(z.mrr_cent || 0);
       }
+      const nachStatus: Record<string, number> = {};
+      for (const a of abos || []) nachStatus[String(a.status)] = (nachStatus[String(a.status)] || 0) + 1;
 
-      // Verbrauch und Anbieterkosten, nach Aktion. Die Kostenspalte ist oft
-      // leer (nicht jeder Anbieter nennt einen Preis) — deshalb wird sie
-      // getrennt gezählt und nicht stillschweigend als Null gerechnet.
+      // Vorzeitraum aus dem Schnappschuss von vor `tage` Tagen.
+      const wert = (datum: string, k: string, tarif = "") => {
+        const z = (kz || []).find((x) => x.datum === datum && x.kennzahl === k && x.tarif === tarif);
+        return z ? Number(z.wert) : null;
+      };
+      const vor = tagVor(tage);
+      const vorher = { mrr_cent: wert(vor, "mrr_cent"), zahlende: wert(vor, "zahlende"),
+                       test_aktiv: wert(vor, "test_aktiv"), zahlung_offen: wert(vor, "zahlung_offen") };
+
+      // Bewegungen im Zeitraum aus den Mandantenschnappschuessen: wer am
+      // Anfang nicht zahlte und am Ende zahlt, ist neu; umgekehrt gekuendigt.
+      const anfang = new Map<string, Record<string, unknown>>(), endeTag = new Map<string, Record<string, unknown>>();
+      for (const s of schnapp || []) {
+        if (s.datum === vor) anfang.set(String(s.mandant_id), s);
+        if (s.datum === heute || s.datum === tagVor(1)) endeTag.set(String(s.mandant_id), s);
+      }
+      let neu = 0, gekuendigt = 0, testBeendet = 0, umgewandelt = 0;
+      for (const [id, e] of endeTag) {
+        const a = anfang.get(id);
+        if (e.zahlend && !(a && a.zahlend)) neu++;
+        if (!e.zahlend && a && a.zahlend) gekuendigt++;
+        if (a && a.status === "test" && e.status !== "test") { testBeendet++; if (e.zahlend) umgewandelt++; }
+      }
+      const kuendigungsquote = vorher.zahlende ? gekuendigt / Number(vorher.zahlende) : null;
+      const umwandlungsquote = testBeendet ? umgewandelt / testBeendet : null;
+
+      // Verbrauch und Anbieterkosten, nach Aktion.
       const jeAktion = new Map<string, { credits: number; kosten: number; mit: number; ohne: number }>();
       let credits = 0, kosten = 0, ohneKosten = 0;
       for (const b of verbrauch || []) {
         const k = String(b.aktion);
         const e = jeAktion.get(k) || { credits: 0, kosten: 0, mit: 0, ohne: 0 };
-        e.credits += Number(b.credits || 0);
-        credits += Number(b.credits || 0);
+        e.credits += Number(b.credits || 0); credits += Number(b.credits || 0);
         if (b.ki_kosten_eur === null || b.ki_kosten_eur === undefined) { e.ohne++; ohneKosten++; }
         else { e.kosten += Number(b.ki_kosten_eur); e.mit++; kosten += Number(b.ki_kosten_eur); }
         jeAktion.set(k, e);
       }
+      // Deckungsbeitrag im Zeitraum: Erloes (MRR anteilig) minus KI-Kosten.
+      // Stripe-Gebuehren und Infrastrukturpauschale kommen mit Schritt 4.
+      const erloes = mrr * tage / 30 / 100;
+      const deckung = erloes - kosten;
+
+      const plaetze = Number((gruender || []).find((w) => w.schluessel === "gruender_plaetze")?.wert ?? 50);
+      const zahlungOffen = (abos || []).filter((a) => a.zahlung_fehler_seit).length;
+      const kuendigungVorgemerkt = (abos || []).filter((a) => a.status === "gekuendigt" && a.cancel_at && new Date(String(a.cancel_at)) > new Date()).length;
+
+      // Heute zu tun — mit dem Mandanten als Ziel; die Tafel verlinkt.
+      const { data: mandantenNamen } = await db.from("mandanten").select("id, name, testphase_bis, abo_status");
+      const name = new Map((mandantenNamen || []).map((m) => [String(m.id), m]));
+      const zuTun: { art: string; mandant_id: string; text: string }[] = [];
+      for (const m of mandantenNamen || []) {
+        if (m.abo_status === "test" && m.testphase_bis && new Date(String(m.testphase_bis)).getTime() < Date.now() + 3 * 86400000) {
+          zuTun.push({ art: "test_endet", mandant_id: String(m.id), text: `${m.name}: Test endet ${String(m.testphase_bis).slice(0, 10)}` });
+        }
+      }
+      for (const a of abos || []) {
+        if (a.zahlung_fehler_seit) zuTun.push({ art: "zahlung", mandant_id: String(a.mandant_id),
+          text: `${name.get(String(a.mandant_id))?.name || a.mandant_id}: Zahlung offen seit ${String(a.zahlung_fehler_seit).slice(0, 10)}` });
+      }
+      const { data: sitzungen } = await db.from("support_sitzungen").select("mandant_id, gueltig_bis")
+        .is("beendet_am", null).gt("gueltig_bis", new Date().toISOString());
+      for (const s of sitzungen || []) zuTun.push({ art: "support", mandant_id: String(s.mandant_id),
+        text: `${name.get(String(s.mandant_id))?.name || s.mandant_id}: Supportzugriff laeuft bis ${String(s.gueltig_bis).slice(11, 16)}` });
+      for (const k of (kennzahlen || []) as Record<string, unknown>[]) {
+        if (k.gesundheit !== null && Number(k.gesundheit) < 40) zuTun.push({ art: "risiko", mandant_id: String(k.mandant_id),
+          text: `${name.get(String(k.mandant_id))?.name || k.mandant_id}: Gesundheit ${k.gesundheit}` });
+      }
+
+      // MRR-Verlauf: je Monat der letzte Schnappschuss, gestapelt nach Tarif.
+      const { data: verlauf } = await db.from("plattform_kennzahlen_tag").select("datum, tarif, wert")
+        .eq("kennzahl", "mrr_cent").neq("tarif", "").gte("datum", tagVor(370)).order("datum");
+      const monate = new Map<string, Record<string, number>>();
+      for (const v of verlauf || []) {
+        const mon = String(v.datum).slice(0, 7);
+        const e = monate.get(mon) || {};
+        e[String(v.tarif)] = Number(v.wert); // spaeterer Tag ueberschreibt frueheren
+        monate.set(mon, e);
+      }
+      const { count: technikfehler } = await db.from("fehler_protokoll")
+        .select("id", { count: "exact", head: true }).gte("created_at", tagVor(1));
 
       return antwort({
-        ok: true,
-        mrr_cent: mrr,
+        ok: true, tage, stand: heute,
+        mrr_cent: mrr, arr_cent: mrr * 12, zahlende, je_tarif: jeTarif,
         abos_nach_status: nachStatus,
+        neu_zahlend: neu, gekuendigt, kuendigung_vorgemerkt: kuendigungVorgemerkt, kuendigungsquote,
+        test_aktiv: nachStatus.test || 0, test_beendet: testBeendet, umwandlungsquote,
+        gruender_belegt: mrrNach.filter((z) => z.gruenderpreis).length, gruender_plaetze: plaetze,
         gruender_frei: Number(frei ?? 0),
-        zeitraum_tage: 30,
+        zeitraum_tage: tage,
         credits_verbraucht: credits,
         ki_kosten_eur: Math.round(kosten * 1e6) / 1e6,
         buchungen_ohne_kosten: ohneKosten,
+        erloes_eur: Math.round(erloes * 100) / 100, deckungsbeitrag_eur: Math.round(deckung * 100) / 100,
+        marge: erloes > 0 ? deckung / erloes : null,
+        zahlung_offen: zahlungOffen, support_offen: null, technikfehler_24h: Number(technikfehler || 0),
+        vorher, zu_tun: zuTun,
+        verlauf: Array.from(monate.entries()).map(([monat, t]) => ({ monat, ...t })),
         je_aktion: Array.from(jeAktion.entries())
           .map(([aktion, e]) => ({ aktion, ...e, kosten: Math.round(e.kosten * 1e6) / 1e6 }))
           .sort((a, b) => b.credits - a.credits),
       });
+    }
+
+    // --- Umsatz & Abos (fork_70) ------------------------------------------
+    if (aktion === "umsatz") {
+      const heute = new Date();
+      const [{ data: schnapp }, { data: mrrZeilen }, { data: abos }, { data: pakete }, { data: namen }] = await Promise.all([
+        db.from("plattform_mandanten_tag").select("datum, mandant_id, tarif, intervall, status, zahlend, mrr_cent, gruenderpreis")
+          .gte("datum", new Date(Date.now() - 400 * 86400000).toISOString().slice(0, 10)).order("datum"),
+        db.rpc("plattform_mrr_je_mandant"),
+        db.from("mandant_abo").select("mandant_id, tarif, intervall, status, gruenderpreis, cancel_at, mindestlaufzeit_bis, gekuendigt_am"),
+        db.from("credit_konten").select("mandant_id, credits, erstellt_am").eq("quelle", "paket")
+          .gte("erstellt_am", new Date(Date.now() - 365 * 86400000).toISOString()),
+        db.from("mandanten").select("id, name"),
+      ]);
+      const name = new Map((namen || []).map((m) => [String(m.id), m.name]));
+      // Letzter Schnappschuss je Monat je Mandant.
+      const jeMonatMandant = new Map<string, Map<string, Record<string, unknown>>>();
+      for (const s of schnapp || []) {
+        const mon = String(s.datum).slice(0, 7);
+        if (!jeMonatMandant.has(mon)) jeMonatMandant.set(mon, new Map());
+        jeMonatMandant.get(mon)!.set(String(s.mandant_id), s);
+      }
+      const monate = Array.from(jeMonatMandant.keys()).sort();
+      // Wasserfall: Neu / Erweiterung / Verkleinerung / Kuendigung / netto je Monat.
+      const wasserfall = monate.map((mon, i) => {
+        const jetzt = jeMonatMandant.get(mon)!, davor = i > 0 ? jeMonatMandant.get(monate[i - 1])! : new Map();
+        let neu = 0, erweiterung = 0, verkleinerung = 0, kuendigung = 0;
+        for (const [id, s] of jetzt) {
+          const v = davor.get(id);
+          const m1 = v ? Number(v.mrr_cent) : 0, m2 = Number(s.mrr_cent);
+          if (m2 > 0 && m1 === 0) neu += m2;
+          else if (m2 > m1) erweiterung += m2 - m1;
+          else if (m2 < m1 && m2 > 0) verkleinerung += m1 - m2;
+          else if (m2 === 0 && m1 > 0) kuendigung += m1;
+        }
+        for (const [id, v] of davor) if (!jetzt.has(id) && Number(v.mrr_cent) > 0) kuendigung += Number(v.mrr_cent);
+        return { monat: mon, neu, erweiterung, verkleinerung: -verkleinerung, kuendigung: -kuendigung,
+                 netto: neu + erweiterung - verkleinerung - kuendigung };
+      });
+      // Kohorten: Startmonat (erster zahlender Schnappschuss) x Verbleib.
+      const start = new Map<string, string>();
+      for (const s of schnapp || []) if (s.zahlend && !start.has(String(s.mandant_id))) start.set(String(s.mandant_id), String(s.datum).slice(0, 7));
+      const kohorten: Record<string, { groesse: number; nach: Record<string, number> }> = {};
+      const monIdx = (m: string) => Number(m.slice(0, 4)) * 12 + Number(m.slice(5, 7));
+      for (const [id, sm] of start) {
+        kohorten[sm] = kohorten[sm] || { groesse: 0, nach: { "1": 0, "3": 0, "6": 0, "12": 0 } };
+        kohorten[sm].groesse++;
+        for (const n of [1, 3, 6, 12]) {
+          const ziel = monate.find((m) => monIdx(m) === monIdx(sm) + n);
+          if (ziel && jeMonatMandant.get(ziel)!.get(id)?.zahlend) kohorten[sm].nach[String(n)]++;
+        }
+      }
+      const zahlend = ((mrrZeilen || []) as Record<string, unknown>[]).filter((z) => z.zahlend);
+      const verteilung = { monat: zahlend.filter((z) => z.intervall === "monat").length,
+                           jahr: zahlend.filter((z) => z.intervall === "jahr").length,
+                           gruender: zahlend.filter((z) => z.gruenderpreis).length,
+                           je_tarif: {} as Record<string, number> };
+      for (const z of zahlend) verteilung.je_tarif[String(z.tarif)] = (verteilung.je_tarif[String(z.tarif)] || 0) + 1;
+      const in30 = new Date(Date.now() + 30 * 86400000);
+      const mindestlaufzeit = (abos || []).filter((a) => a.mindestlaufzeit_bis && new Date(String(a.mindestlaufzeit_bis)) <= in30 && new Date(String(a.mindestlaufzeit_bis)) >= heute)
+        .map((a) => ({ mandant_id: a.mandant_id, name: name.get(String(a.mandant_id)) || a.mandant_id, bis: a.mindestlaufzeit_bis, tarif: a.tarif }));
+      const vorgemerkt = (abos || []).filter((a) => a.status === "gekuendigt" && a.cancel_at)
+        .map((a) => ({ mandant_id: a.mandant_id, name: name.get(String(a.mandant_id)) || a.mandant_id, wirksam: a.cancel_at, gekuendigt_am: a.gekuendigt_am, tarif: a.tarif }));
+      const paketeJeMonat: Record<string, { anzahl: number; credits: number }> = {};
+      for (const p of pakete || []) {
+        const mon = String(p.erstellt_am).slice(0, 7);
+        paketeJeMonat[mon] = paketeJeMonat[mon] || { anzahl: 0, credits: 0 };
+        paketeJeMonat[mon].anzahl++; paketeJeMonat[mon].credits += Number(p.credits || 0);
+      }
+      return antwort({ ok: true, wasserfall, kohorten, verteilung, mindestlaufzeit, vorgemerkt,
+                       pakete: paketeJeMonat, schnappschuesse: (schnapp || []).length });
     }
 
     // --- Credits gutschreiben (Kulanz, Störung, Erstattung) -----------------
@@ -265,6 +500,12 @@ Deno.serve(async (req) => {
       if (!mandant) return antwort({ ok: false, fehler: "Kein Mandant." }, 400);
       if (!(anzahl > 0) || anzahl > 100000) {
         return antwort({ ok: false, fehler: "Anzahl zwischen 1 und 100000." }, 400);
+      }
+      // Die Rolle support darf bis 500 gutschreiben — mehr ist eine
+      // Entscheidung, keine Kulanz.
+      if (rolle === "support" && anzahl > 500) {
+        return antwort({ ok: false, fehler:
+          "Die Rolle support darf hoechstens 500 Credits gutschreiben." }, 403);
       }
       // Ohne Grund nicht. Wer in einem halben Jahr fragt, warum ein Haus
       // 2000 Credits bekam, soll eine Antwort finden.
@@ -283,6 +524,47 @@ Deno.serve(async (req) => {
       if (error) return antwort({ ok: false, fehler: error.message }, 400);
       await protokoll("credits_geschenkt", mandant, { credits: anzahl, grund, referenz });
       return antwort({ ok: true, referenz });
+    }
+
+    // --- Credits abziehen (fork_69) ----------------------------------------
+    // Das Gegenstueck zur Gutschrift: aelteste Toepfe zuerst, nie unter null,
+    // jede Buchung mit Quelle `betreiber` und Grund im Ledger. Nur owner und
+    // admin — das steht in ROLLEN und noch einmal in der Datenbankfunktion.
+    if (aktion === "credits_abziehen") {
+      const mandant = String(body.mandant_id || "");
+      const anzahl = Math.floor(Number(body.credits || 0));
+      const grund = String(body.grund || "").trim();
+      if (!mandant) return antwort({ ok: false, fehler: "Kein Mandant." }, 400);
+      if (!(anzahl > 0) || anzahl > 100000) {
+        return antwort({ ok: false, fehler: "Anzahl zwischen 1 und 100000." }, 400);
+      }
+      if (grund.length < 5) {
+        return antwort({ ok: false, fehler:
+          "Bitte einen Grund angeben — er steht im Ledger und im Protokoll." }, 400);
+      }
+      const referenz = "abzug:" + mandant + ":" + (body.vorgang || crypto.randomUUID());
+      const { data: saldoVorher } = await db.rpc("credits_saldo", { p_mandant: mandant });
+      const { error } = await db.rpc("credits_abziehen", {
+        p_mandant: mandant, p_credits: anzahl, p_grund: grund, p_referenz: referenz,
+      });
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll("credits_abgezogen", mandant, { credits: anzahl, grund, referenz },
+                      { typ: "mandant", vorher: { saldo: saldoVorher },
+                        nachher: { saldo: Number(saldoVorher || 0) - anzahl } });
+      return antwort({ ok: true, referenz });
+    }
+
+    // --- Notiz des Betreibers (fork_69) -----------------------------------
+    if (aktion === "notiz_anlegen") {
+      const mandant = String(body.mandant_id || "");
+      const text = String(body.text || "").trim();
+      if (!mandant) return antwort({ ok: false, fehler: "Kein Mandant." }, 400);
+      if (!text) return antwort({ ok: false, fehler: "Leere Notiz." }, 400);
+      const { error } = await db.from("plattform_notizen")
+        .insert({ betrifft_mandant_id: mandant, admin_id: u.user.id, text: text.slice(0, 4000) });
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll("notiz_angelegt", mandant, { laenge: text.length }, { typ: "mandant" });
+      return antwort({ ok: true });
     }
 
     // --- Ein Mandant im Einzelnen ------------------------------------------
@@ -310,16 +592,33 @@ Deno.serve(async (req) => {
             .order("begonnen_am", { ascending: false }).limit(20),
         ]);
       if (!m) return antwort({ ok: false, fehler: "Unbekannter Mandant." }, 404);
-      const [{ data: saldo }, { data: zugriff }, { data: limit }] = await Promise.all([
+      const [{ data: saldo }, { data: zugriff }, { data: limit }, { data: metadaten },
+             { data: notizen }, { data: verlauf }] = await Promise.all([
         db.rpc("credits_saldo", { p_mandant: id }),
         db.rpc("abo_zugriff", { p_mandant: id }),
         db.rpc("nutzer_limit", { p_mandant: id }),
+        // Onboarding, Zaehlwerte, Logins, Module, Speicher — nur Metadaten (fork_69).
+        db.rpc("plattform_mandant_metadaten", { p_mandant: id }),
+        db.from("plattform_notizen").select("id, admin_id, text, erstellt_am")
+          .eq("betrifft_mandant_id", id).order("erstellt_am", { ascending: false }).limit(100),
+        // Der Verlauf: alles, was Betreiber an diesem Haus getan haben.
+        db.from("plattform_protokoll").select("id, erstellt_am, benutzer_id, rolle, aktion, einzelheiten, begruendung")
+          .eq("gegenstand", id).order("erstellt_am", { ascending: false }).limit(100),
       ]);
+      // Die Logins je Konto an die Konten haengen (Name/E-Mail kommen aus
+      // profiles, der Zeitpunkt aus der Funktion).
+      const loginNach = new Map<string, unknown>();
+      for (const l of ((metadaten as Record<string, unknown>)?.logins as Record<string, unknown>[] || [])) {
+        loginNach.set(String(l.id), l.letzter_login);
+      }
       return antwort({
-        ok: true, mandant: m, abo, nutzer: nutzer || [], konten: konten || [],
+        ok: true, mandant: m, abo,
+        nutzer: (nutzer || []).map((n) => ({ ...n, letzter_login: loginNach.get(String(n.id)) || null })),
+        konten: konten || [],
         buchungen: buchungen || [], erinnerungen: erinnerungen || [],
         sitzungen: sitzungen || [],
         saldo: Number(saldo ?? 0), zugriff, nutzer_limit: Number(limit ?? 0),
+        metadaten: metadaten || null, notizen: notizen || [], verlauf: verlauf || [],
       });
     }
 
@@ -339,6 +638,21 @@ Deno.serve(async (req) => {
       }
       const { data: vorher } = await db.from("mandanten").select("*").eq("id", id).maybeSingle();
       if (!vorher) return antwort({ ok: false, fehler: "Unbekannter Mandant." }, 404);
+      // support: Testphase verlaengern ja — Name, Sperre, Tarif, Abo nein.
+      if (rolle === "support") {
+        const fremd = Object.keys(body).filter((k) =>
+          !["aktion", "mandant_id", "grund", "testphase_bis"].includes(k));
+        if (fremd.length) {
+          return antwort({ ok: false, fehler:
+            "Die Rolle support darf nur die Testphase verlaengern." }, 403);
+        }
+        // Hoechstens 30 Tage ueber heute hinaus.
+        const bis = body.testphase_bis ? new Date(body.testphase_bis).getTime() : 0;
+        if (!bis || bis > Date.now() + 30 * 86400000) {
+          return antwort({ ok: false, fehler:
+            "Verlaengerung um hoechstens 30 Tage ab heute." }, 400);
+        }
+      }
 
       const m: Record<string, unknown> = {};
       if (typeof body.name === "string" && body.name.trim().length >= 2) {
@@ -389,7 +703,8 @@ Deno.serve(async (req) => {
         if (error) return antwort({ ok: false, fehler: error.message }, 400);
       }
 
-      await protokoll("mandant_geaendert", id, { vorher, mandant: m, abo: a, grund });
+      await protokoll("mandant_geaendert", id, { mandant: m, abo: a, grund },
+                      { typ: "mandant", vorher, nachher: { ...vorher, ...m, abo: a } });
       return antwort({ ok: true, stripe_laeuft: stripeLaeuft });
     }
 
@@ -427,7 +742,7 @@ Deno.serve(async (req) => {
       const { data } = await db.from("profiles")
         .select("id, name, email, role, mandant_id");
       const { data: mandanten } = await db.from("mandanten").select("id, name");
-      const { data: admins } = await db.from("plattform_admins").select("benutzer_id");
+      const { data: admins } = await db.from("plattform_admins").select("benutzer_id").eq("aktiv", true);
       const nameVon = new Map((mandanten || []).map((m) => [String(m.id), m.name]));
       const istAdmin = new Set((admins || []).map((a) => String(a.benutzer_id)));
       return antwort({ ok: true, nutzer: (data || []).map((p) => ({
@@ -437,37 +752,61 @@ Deno.serve(async (req) => {
     }
 
     // --- Plattform-Recht vergeben und entziehen ----------------------------
+    if (aktion === "admin_liste") {
+      const { data: admins } = await db.from("plattform_admins")
+        .select("benutzer_id, rolle, aktiv, notiz, erstellt_am, erstellt_von");
+      const ids = (admins || []).map((a) => String(a.benutzer_id));
+      const { data: profile } = ids.length
+        ? await db.from("profiles").select("id, name, email").in("id", ids)
+        : { data: [] };
+      const pv = new Map((profile || []).map((p) => [String(p.id), p]));
+      return antwort({ ok: true, admins: (admins || []).map((a) => ({
+        ...a, name: pv.get(String(a.benutzer_id))?.name || null,
+        email: pv.get(String(a.benutzer_id))?.email || null,
+      })) });
+    }
+
+    // Admins ernennen, Rolle aendern, deaktivieren — nur owner (fork_68).
+    // Deaktiviert statt geloescht: das Audit-Log soll weiter zeigen, wer
+    // damals gehandelt hat. Den letzten aktiven Owner schuetzt die
+    // Datenbank selbst (Trigger plattform_admins_letzter_owner).
     if (aktion === "admin_setzen") {
       const nutzerId = String(body.benutzer_id || "");
       const an = !!body.an;
       const grund = String(body.grund || "").trim();
+      const neueRolle = String(body.rolle || "admin");
       if (!nutzerId) return antwort({ ok: false, fehler: "Kein Konto." }, 400);
       if (grund.length < 5) return antwort({ ok: false, fehler: "Bitte einen Grund angeben." }, 400);
-      // Sich selbst das Recht zu entziehen ist erlaubt — aber nicht, wenn
-      // danach niemand mehr eines hat. Dann kaeme niemand mehr hinein.
-      if (!an) {
-        const { count } = await db.from("plattform_admins")
-          .select("benutzer_id", { count: "exact", head: true });
-        if ((count || 0) <= 1) {
-          return antwort({ ok: false, fehler:
-            "Das ist der letzte Plattform-Administrator. Erst einen zweiten "
-            + "ernennen, sonst kommt niemand mehr in diesen Bereich." }, 409);
-        }
+      if (!["owner", "admin", "support", "finanzen"].includes(neueRolle)) {
+        return antwort({ ok: false, fehler: "Unbekannte Rolle." }, 400);
       }
+      const { data: vorher } = await db.from("plattform_admins")
+        .select("benutzer_id, rolle, aktiv").eq("benutzer_id", nutzerId).maybeSingle();
       if (an) {
         const { error } = await db.from("plattform_admins")
-          .upsert({ benutzer_id: nutzerId, notiz: grund.slice(0, 300) },
+          .upsert({ benutzer_id: nutzerId, rolle: neueRolle, aktiv: true,
+                    notiz: grund.slice(0, 300), erstellt_von: vorher ? undefined : u.user.id },
                   { onConflict: "benutzer_id" });
-        if (error) return antwort({ ok: false, fehler: error.message }, 400);
+        if (error) return antwort({ ok: false, fehler: error.message.includes("letzte aktive Owner")
+          ? "Das ist der letzte aktive Owner. Erst einen zweiten ernennen." : error.message }, 409);
       } else {
-        await db.from("plattform_admins").delete().eq("benutzer_id", nutzerId);
+        if (!vorher) return antwort({ ok: false, fehler: "Kein Betreiber." }, 404);
+        const { error } = await db.from("plattform_admins")
+          .update({ aktiv: false, notiz: grund.slice(0, 300) }).eq("benutzer_id", nutzerId);
+        if (error) return antwort({ ok: false, fehler: error.message.includes("letzte aktive Owner")
+          ? "Das ist der letzte Plattform-Administrator mit Owner-Rolle. Erst einen "
+            + "zweiten ernennen, sonst kommt niemand mehr in diesen Bereich." : error.message }, 409);
         // Laufende Sitzungen enden mit dem Recht. Die Datenbankfunktion
         // prueft das ohnehin bei jedem Zugriff; hier wird es auch sichtbar.
         await db.from("support_sitzungen")
           .update({ beendet_am: new Date().toISOString() })
           .eq("admin_id", nutzerId).is("beendet_am", null);
       }
-      await protokoll(an ? "admin_ernannt" : "admin_entzogen", nutzerId, { grund });
+      await protokoll(an ? (vorher ? "admin_rolle_geaendert" : "admin_ernannt") : "admin_deaktiviert",
+                      nutzerId, { grund, rolle: an ? neueRolle : null },
+                      { typ: "plattform_admin", vorher,
+                        nachher: an ? { benutzer_id: nutzerId, rolle: neueRolle, aktiv: true }
+                                    : { ...(vorher || {}), aktiv: false } });
       return antwort({ ok: true });
     }
 

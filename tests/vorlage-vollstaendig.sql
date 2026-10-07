@@ -412,7 +412,18 @@ zuwachs(bereich, mehr, grund) as (values
   ('Fremdschluessel', 2, 'fork_69: auf mandanten und profiles'),
   ('Indizes ohne Constraint', 1, 'fork_69: je Mandant nach Zeit'),
   ('Richtlinien', 2, 'fork_69: lesen alle Betreiber, schreiben owner/admin/support'),
-  ('Funktionen', 3, 'fork_69: credits_abziehen, plattform_mandanten_kennzahlen, plattform_mandant_metadaten')
+  ('Funktionen', 3, 'fork_69: credits_abziehen, plattform_mandanten_kennzahlen, plattform_mandant_metadaten'),
+
+  -- fork_70: Betreiber, Schritt 3 — die eine MRR-Rechnung und die Tagestabellen.
+  ('Tabellen', 2, 'fork_70: plattform_mandanten_tag, plattform_kennzahlen_tag'),
+  ('Tabellen mit RLS', 2, 'fork_70: beide'),
+  ('Spalten', 12, 'fork_70: 8 in plattform_mandanten_tag, 4 in plattform_kennzahlen_tag'),
+  ('Primaer- und Eindeutigkeitsschluessel', 2, 'fork_70: je ein Primaerschluessel'),
+  ('Fremdschluessel', 1, 'fork_70: plattform_mandanten_tag auf mandanten'),
+  ('Indizes ohne Constraint', 1, 'fork_70: je Mandant nach Datum'),
+  ('Richtlinien', 4, 'fork_70: lesen, Mandantentrennung und Loeschsperre auf plattform_mandanten_tag; lesen auf plattform_kennzahlen_tag'),
+  ('Funktionen', 2, 'fork_70: plattform_mrr_je_mandant, plattform_kennzahlen_schreiben'),
+  ('Cron-Jobs', 1, 'fork_70: plattform-kennzahlen-naechtlich')
 ),
 soll(bereich, soll) as (
   select v.bereich,

@@ -6106,3 +6106,24 @@ Für `credits_abziehen` gilt dieselbe Reihenfolge wie beim Verbrauch —
 älteste Töpfe zuerst. Andersherum nähme ein Abzug dem Haus die Credits mit
 der längsten Gültigkeit und ließe die verfallenden stehen; das wäre ein
 versteckter zweiter Abzug.
+
+
+## 2026-10-07 · Betreiberbereich, Schritt 3: eine Rechnung, eine Historie (fork_70)
+
+Der bisherige Plattform-Reiter rechnete den MRR in der Edge Function — und
+ließ den Gründerrabatt weg. Der Auftrag definiert den MRR verbindlich, mit
+Rabatt. Zwei Stellen, die dieselbe Zahl rechnen, laufen auseinander; dann
+stimmt eine, ohne dass jemand weiß, welche. Jetzt rechnet
+`plattform_mrr_je_mandant()` in der Datenbank, und Dashboard wie
+Schnappschuss lesen dieselbe Funktion. Die Probe rechnet die vier Fälle von
+Hand nach.
+
+`mandant_abo` hat keine Historie — nur den Stand. Kündigungsquote,
+Umwandlungsquote, Wasserfall und Kohorten brauchen aber ein Gestern. Also
+schreibt pg_cron ab heute jede Nacht einen Schnappschuss je Mandant. Was es
+vor dem ersten Schnappschuss nicht gibt, zeigt die Tafel nicht — eine
+erfundene Null wäre schlimmer als eine fehlende Zahl.
+
+Kein Chart.js: eine CDN-Bibliothek müsste in die Hülle und die
+Service-Worker-Liste. Für gestapelte Balken reicht SVG. Der Auftrag nennt
+Chart.js als Beispiel, nicht als Vorgabe.

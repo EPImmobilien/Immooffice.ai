@@ -45,7 +45,9 @@ const ERLAUBT = new Set([
   // Der Katalog der Plattform — ihr eigenes Regal.
   'plattform_admins', 'plattform_tarife', 'plattform_credit_preise',
   'plattform_credit_pakete', 'plattform_werte', 'plattform_protokoll',
-  'plattform_notizen',
+  'plattform_notizen', 'plattform_kennzahlen_tag', 'plattform_mandanten_tag',
+  // Nur GEZAEHLT (head: true) fuer "Technikfehler 24 h"; keine Meldung geht hinaus.
+  'fehler_protokoll',
   // Die Vertragsbeziehung. `credit_konten` und `credit_buchungen` sind das
   // Guthaben und seine Bewegungen — sie gehoeren zur Abrechnung, nicht zur
   // Arbeit des Hauses. `abo_erinnerungen` haelt fest, welche Fristmeldung

@@ -53,6 +53,7 @@ const AENDERBAR: Record<string, string[]> = {
 // in docs/ADMIN.md.
 const ROLLEN: Record<string, string[]> = {
   wer:                    ["owner", "admin", "support", "finanzen"],
+  umsatz:                 ["owner", "admin", "finanzen"],
   uebersicht:             ["owner", "admin", "support", "finanzen"],
   mandanten:              ["owner", "admin", "support", "finanzen"],
   mandant:                ["owner", "admin", "support", "finanzen"],
@@ -279,66 +280,216 @@ Deno.serve(async (req) => {
     }
 
     if (aktion === "uebersicht") {
-      const seit = new Date(Date.now() - 30 * 86400000).toISOString();
-      const [{ data: verbrauch }, { data: frei }, { data: abos }, { data: tarife }] =
+      // Zeitraum aus der Leiste: 7 / 30 / 90 / 365 Tage. Vergleich mit dem
+      // ebenso langen Zeitraum davor — aus den Tagesschnappschuessen
+      // (fork_70). Vor dem ersten Schnappschuss gibt es keinen Vergleich,
+      // und dann steht da auch keiner.
+      const tage = Math.max(1, Math.min(365, Math.floor(Number(body.tage || 30))));
+      const seit = new Date(Date.now() - tage * 86400000).toISOString();
+      const heute = new Date().toISOString().slice(0, 10);
+      const tagVor = (n: number) => new Date(Date.now() - n * 86400000).toISOString().slice(0, 10);
+      const [{ data: verbrauch }, { data: frei }, { data: mrrZeilen }, { data: abos },
+             { data: kz }, { data: schnapp }, { data: gruender }, { data: kennzahlen }] =
         await Promise.all([
           db.from("credit_buchungen")
-            .select("aktion, credits, ki_kosten_eur, status, erstellt_am")
-            .gte("erstellt_am", seit).in("status", ["gebucht"]),
+            .select("aktion, credits, ki_kosten_eur, status, zeitpunkt")
+            .gte("zeitpunkt", seit).in("status", ["gebucht"]),
           db.rpc("gruender_plaetze_frei"),
-          db.from("mandant_abo").select("tarif, intervall, status, zusatznutzer"),
-          db.from("plattform_tarife").select("*"),
+          db.rpc("plattform_mrr_je_mandant"),
+          db.from("mandant_abo").select("mandant_id, tarif, intervall, status, zahlung_fehler_seit, cancel_at, testphase_ende:periode_bis, mindestlaufzeit_bis"),
+          db.from("plattform_kennzahlen_tag").select("datum, kennzahl, tarif, wert")
+            .in("datum", [tagVor(tage), tagVor(2 * tage)]),
+          db.from("plattform_mandanten_tag").select("datum, mandant_id, zahlend, status, mrr_cent")
+            .gte("datum", tagVor(2 * tage)),
+          db.from("plattform_werte").select("schluessel, wert").in("schluessel", ["gruender_plaetze", "kosten_warnung_prozent"]),
+          db.rpc("plattform_mandanten_kennzahlen"),
         ]);
-
-      const tarifNach = new Map<string, Record<string, unknown>>();
-      for (const t of tarife || []) tarifNach.set(String(t.schluessel), t);
-      const addon = (tarife || []).find((x: Record<string, unknown>) => x.ist_zusatznutzer);
-
-      let mrr = 0;
-      const nachStatus: Record<string, number> = {};
-      for (const a of abos || []) {
-        nachStatus[String(a.status)] = (nachStatus[String(a.status)] || 0) + 1;
-        if (a.status !== "aktiv" && a.status !== "gekuendigt") continue;
-        const t = tarifNach.get(String(a.tarif));
-        if (!t) continue;
-        mrr += a.intervall === "jahr"
-          ? jeMonat(Number(t.preis_jahr_cent), "jahr")
-          : Number(t.preis_monat_cent);
-        if (Number(a.zusatznutzer || 0) > 0 && addon) {
-          mrr += (a.intervall === "jahr"
-            ? jeMonat(Number(addon.preis_jahr_cent), "jahr")
-            : Number(addon.preis_monat_cent)) * Number(a.zusatznutzer);
-        }
+      const mrrNach = (mrrZeilen || []) as Record<string, unknown>[];
+      let mrr = 0; const jeTarif: Record<string, { zahlende: number; mrr_cent: number }> = {};
+      let zahlende = 0;
+      for (const z of mrrNach) {
+        if (!z.zahlend) continue;
+        zahlende++; mrr += Number(z.mrr_cent || 0);
+        const k = String(z.tarif || "?");
+        jeTarif[k] = jeTarif[k] || { zahlende: 0, mrr_cent: 0 };
+        jeTarif[k].zahlende++; jeTarif[k].mrr_cent += Number(z.mrr_cent || 0);
       }
+      const nachStatus: Record<string, number> = {};
+      for (const a of abos || []) nachStatus[String(a.status)] = (nachStatus[String(a.status)] || 0) + 1;
 
-      // Verbrauch und Anbieterkosten, nach Aktion. Die Kostenspalte ist oft
-      // leer (nicht jeder Anbieter nennt einen Preis) — deshalb wird sie
-      // getrennt gezählt und nicht stillschweigend als Null gerechnet.
+      // Vorzeitraum aus dem Schnappschuss von vor `tage` Tagen.
+      const wert = (datum: string, k: string, tarif = "") => {
+        const z = (kz || []).find((x) => x.datum === datum && x.kennzahl === k && x.tarif === tarif);
+        return z ? Number(z.wert) : null;
+      };
+      const vor = tagVor(tage);
+      const vorher = { mrr_cent: wert(vor, "mrr_cent"), zahlende: wert(vor, "zahlende"),
+                       test_aktiv: wert(vor, "test_aktiv"), zahlung_offen: wert(vor, "zahlung_offen") };
+
+      // Bewegungen im Zeitraum aus den Mandantenschnappschuessen: wer am
+      // Anfang nicht zahlte und am Ende zahlt, ist neu; umgekehrt gekuendigt.
+      const anfang = new Map<string, Record<string, unknown>>(), endeTag = new Map<string, Record<string, unknown>>();
+      for (const s of schnapp || []) {
+        if (s.datum === vor) anfang.set(String(s.mandant_id), s);
+        if (s.datum === heute || s.datum === tagVor(1)) endeTag.set(String(s.mandant_id), s);
+      }
+      let neu = 0, gekuendigt = 0, testBeendet = 0, umgewandelt = 0;
+      for (const [id, e] of endeTag) {
+        const a = anfang.get(id);
+        if (e.zahlend && !(a && a.zahlend)) neu++;
+        if (!e.zahlend && a && a.zahlend) gekuendigt++;
+        if (a && a.status === "test" && e.status !== "test") { testBeendet++; if (e.zahlend) umgewandelt++; }
+      }
+      const kuendigungsquote = vorher.zahlende ? gekuendigt / Number(vorher.zahlende) : null;
+      const umwandlungsquote = testBeendet ? umgewandelt / testBeendet : null;
+
+      // Verbrauch und Anbieterkosten, nach Aktion.
       const jeAktion = new Map<string, { credits: number; kosten: number; mit: number; ohne: number }>();
       let credits = 0, kosten = 0, ohneKosten = 0;
       for (const b of verbrauch || []) {
         const k = String(b.aktion);
         const e = jeAktion.get(k) || { credits: 0, kosten: 0, mit: 0, ohne: 0 };
-        e.credits += Number(b.credits || 0);
-        credits += Number(b.credits || 0);
+        e.credits += Number(b.credits || 0); credits += Number(b.credits || 0);
         if (b.ki_kosten_eur === null || b.ki_kosten_eur === undefined) { e.ohne++; ohneKosten++; }
         else { e.kosten += Number(b.ki_kosten_eur); e.mit++; kosten += Number(b.ki_kosten_eur); }
         jeAktion.set(k, e);
       }
+      // Deckungsbeitrag im Zeitraum: Erloes (MRR anteilig) minus KI-Kosten.
+      // Stripe-Gebuehren und Infrastrukturpauschale kommen mit Schritt 4.
+      const erloes = mrr * tage / 30 / 100;
+      const deckung = erloes - kosten;
+
+      const plaetze = Number((gruender || []).find((w) => w.schluessel === "gruender_plaetze")?.wert ?? 50);
+      const zahlungOffen = (abos || []).filter((a) => a.zahlung_fehler_seit).length;
+      const kuendigungVorgemerkt = (abos || []).filter((a) => a.status === "gekuendigt" && a.cancel_at && new Date(String(a.cancel_at)) > new Date()).length;
+
+      // Heute zu tun — mit dem Mandanten als Ziel; die Tafel verlinkt.
+      const { data: mandantenNamen } = await db.from("mandanten").select("id, name, testphase_bis, abo_status");
+      const name = new Map((mandantenNamen || []).map((m) => [String(m.id), m]));
+      const zuTun: { art: string; mandant_id: string; text: string }[] = [];
+      for (const m of mandantenNamen || []) {
+        if (m.abo_status === "test" && m.testphase_bis && new Date(String(m.testphase_bis)).getTime() < Date.now() + 3 * 86400000) {
+          zuTun.push({ art: "test_endet", mandant_id: String(m.id), text: `${m.name}: Test endet ${String(m.testphase_bis).slice(0, 10)}` });
+        }
+      }
+      for (const a of abos || []) {
+        if (a.zahlung_fehler_seit) zuTun.push({ art: "zahlung", mandant_id: String(a.mandant_id),
+          text: `${name.get(String(a.mandant_id))?.name || a.mandant_id}: Zahlung offen seit ${String(a.zahlung_fehler_seit).slice(0, 10)}` });
+      }
+      const { data: sitzungen } = await db.from("support_sitzungen").select("mandant_id, gueltig_bis")
+        .is("beendet_am", null).gt("gueltig_bis", new Date().toISOString());
+      for (const s of sitzungen || []) zuTun.push({ art: "support", mandant_id: String(s.mandant_id),
+        text: `${name.get(String(s.mandant_id))?.name || s.mandant_id}: Supportzugriff laeuft bis ${String(s.gueltig_bis).slice(11, 16)}` });
+      for (const k of (kennzahlen || []) as Record<string, unknown>[]) {
+        if (k.gesundheit !== null && Number(k.gesundheit) < 40) zuTun.push({ art: "risiko", mandant_id: String(k.mandant_id),
+          text: `${name.get(String(k.mandant_id))?.name || k.mandant_id}: Gesundheit ${k.gesundheit}` });
+      }
+
+      // MRR-Verlauf: je Monat der letzte Schnappschuss, gestapelt nach Tarif.
+      const { data: verlauf } = await db.from("plattform_kennzahlen_tag").select("datum, tarif, wert")
+        .eq("kennzahl", "mrr_cent").neq("tarif", "").gte("datum", tagVor(370)).order("datum");
+      const monate = new Map<string, Record<string, number>>();
+      for (const v of verlauf || []) {
+        const mon = String(v.datum).slice(0, 7);
+        const e = monate.get(mon) || {};
+        e[String(v.tarif)] = Number(v.wert); // spaeterer Tag ueberschreibt frueheren
+        monate.set(mon, e);
+      }
+      const { count: technikfehler } = await db.from("fehler_protokoll")
+        .select("id", { count: "exact", head: true }).gte("created_at", tagVor(1));
 
       return antwort({
-        ok: true,
-        mrr_cent: mrr,
+        ok: true, tage, stand: heute,
+        mrr_cent: mrr, arr_cent: mrr * 12, zahlende, je_tarif: jeTarif,
         abos_nach_status: nachStatus,
+        neu_zahlend: neu, gekuendigt, kuendigung_vorgemerkt: kuendigungVorgemerkt, kuendigungsquote,
+        test_aktiv: nachStatus.test || 0, test_beendet: testBeendet, umwandlungsquote,
+        gruender_belegt: mrrNach.filter((z) => z.gruenderpreis).length, gruender_plaetze: plaetze,
         gruender_frei: Number(frei ?? 0),
-        zeitraum_tage: 30,
+        zeitraum_tage: tage,
         credits_verbraucht: credits,
         ki_kosten_eur: Math.round(kosten * 1e6) / 1e6,
         buchungen_ohne_kosten: ohneKosten,
+        erloes_eur: Math.round(erloes * 100) / 100, deckungsbeitrag_eur: Math.round(deckung * 100) / 100,
+        marge: erloes > 0 ? deckung / erloes : null,
+        zahlung_offen: zahlungOffen, support_offen: null, technikfehler_24h: Number(technikfehler || 0),
+        vorher, zu_tun: zuTun,
+        verlauf: Array.from(monate.entries()).map(([monat, t]) => ({ monat, ...t })),
         je_aktion: Array.from(jeAktion.entries())
           .map(([aktion, e]) => ({ aktion, ...e, kosten: Math.round(e.kosten * 1e6) / 1e6 }))
           .sort((a, b) => b.credits - a.credits),
       });
+    }
+
+    // --- Umsatz & Abos (fork_70) ------------------------------------------
+    if (aktion === "umsatz") {
+      const heute = new Date();
+      const [{ data: schnapp }, { data: mrrZeilen }, { data: abos }, { data: pakete }, { data: namen }] = await Promise.all([
+        db.from("plattform_mandanten_tag").select("datum, mandant_id, tarif, intervall, status, zahlend, mrr_cent, gruenderpreis")
+          .gte("datum", new Date(Date.now() - 400 * 86400000).toISOString().slice(0, 10)).order("datum"),
+        db.rpc("plattform_mrr_je_mandant"),
+        db.from("mandant_abo").select("mandant_id, tarif, intervall, status, gruenderpreis, cancel_at, mindestlaufzeit_bis, gekuendigt_am"),
+        db.from("credit_konten").select("mandant_id, credits, erstellt_am").eq("quelle", "paket")
+          .gte("erstellt_am", new Date(Date.now() - 365 * 86400000).toISOString()),
+        db.from("mandanten").select("id, name"),
+      ]);
+      const name = new Map((namen || []).map((m) => [String(m.id), m.name]));
+      // Letzter Schnappschuss je Monat je Mandant.
+      const jeMonatMandant = new Map<string, Map<string, Record<string, unknown>>>();
+      for (const s of schnapp || []) {
+        const mon = String(s.datum).slice(0, 7);
+        if (!jeMonatMandant.has(mon)) jeMonatMandant.set(mon, new Map());
+        jeMonatMandant.get(mon)!.set(String(s.mandant_id), s);
+      }
+      const monate = Array.from(jeMonatMandant.keys()).sort();
+      // Wasserfall: Neu / Erweiterung / Verkleinerung / Kuendigung / netto je Monat.
+      const wasserfall = monate.map((mon, i) => {
+        const jetzt = jeMonatMandant.get(mon)!, davor = i > 0 ? jeMonatMandant.get(monate[i - 1])! : new Map();
+        let neu = 0, erweiterung = 0, verkleinerung = 0, kuendigung = 0;
+        for (const [id, s] of jetzt) {
+          const v = davor.get(id);
+          const m1 = v ? Number(v.mrr_cent) : 0, m2 = Number(s.mrr_cent);
+          if (m2 > 0 && m1 === 0) neu += m2;
+          else if (m2 > m1) erweiterung += m2 - m1;
+          else if (m2 < m1 && m2 > 0) verkleinerung += m1 - m2;
+          else if (m2 === 0 && m1 > 0) kuendigung += m1;
+        }
+        for (const [id, v] of davor) if (!jetzt.has(id) && Number(v.mrr_cent) > 0) kuendigung += Number(v.mrr_cent);
+        return { monat: mon, neu, erweiterung, verkleinerung: -verkleinerung, kuendigung: -kuendigung,
+                 netto: neu + erweiterung - verkleinerung - kuendigung };
+      });
+      // Kohorten: Startmonat (erster zahlender Schnappschuss) x Verbleib.
+      const start = new Map<string, string>();
+      for (const s of schnapp || []) if (s.zahlend && !start.has(String(s.mandant_id))) start.set(String(s.mandant_id), String(s.datum).slice(0, 7));
+      const kohorten: Record<string, { groesse: number; nach: Record<string, number> }> = {};
+      const monIdx = (m: string) => Number(m.slice(0, 4)) * 12 + Number(m.slice(5, 7));
+      for (const [id, sm] of start) {
+        kohorten[sm] = kohorten[sm] || { groesse: 0, nach: { "1": 0, "3": 0, "6": 0, "12": 0 } };
+        kohorten[sm].groesse++;
+        for (const n of [1, 3, 6, 12]) {
+          const ziel = monate.find((m) => monIdx(m) === monIdx(sm) + n);
+          if (ziel && jeMonatMandant.get(ziel)!.get(id)?.zahlend) kohorten[sm].nach[String(n)]++;
+        }
+      }
+      const zahlend = ((mrrZeilen || []) as Record<string, unknown>[]).filter((z) => z.zahlend);
+      const verteilung = { monat: zahlend.filter((z) => z.intervall === "monat").length,
+                           jahr: zahlend.filter((z) => z.intervall === "jahr").length,
+                           gruender: zahlend.filter((z) => z.gruenderpreis).length,
+                           je_tarif: {} as Record<string, number> };
+      for (const z of zahlend) verteilung.je_tarif[String(z.tarif)] = (verteilung.je_tarif[String(z.tarif)] || 0) + 1;
+      const in30 = new Date(Date.now() + 30 * 86400000);
+      const mindestlaufzeit = (abos || []).filter((a) => a.mindestlaufzeit_bis && new Date(String(a.mindestlaufzeit_bis)) <= in30 && new Date(String(a.mindestlaufzeit_bis)) >= heute)
+        .map((a) => ({ mandant_id: a.mandant_id, name: name.get(String(a.mandant_id)) || a.mandant_id, bis: a.mindestlaufzeit_bis, tarif: a.tarif }));
+      const vorgemerkt = (abos || []).filter((a) => a.status === "gekuendigt" && a.cancel_at)
+        .map((a) => ({ mandant_id: a.mandant_id, name: name.get(String(a.mandant_id)) || a.mandant_id, wirksam: a.cancel_at, gekuendigt_am: a.gekuendigt_am, tarif: a.tarif }));
+      const paketeJeMonat: Record<string, { anzahl: number; credits: number }> = {};
+      for (const p of pakete || []) {
+        const mon = String(p.erstellt_am).slice(0, 7);
+        paketeJeMonat[mon] = paketeJeMonat[mon] || { anzahl: 0, credits: 0 };
+        paketeJeMonat[mon].anzahl++; paketeJeMonat[mon].credits += Number(p.credits || 0);
+      }
+      return antwort({ ok: true, wasserfall, kohorten, verteilung, mindestlaufzeit, vorgemerkt,
+                       pakete: paketeJeMonat, schnappschuesse: (schnapp || []).length });
     }
 
     // --- Credits gutschreiben (Kulanz, Störung, Erstattung) -----------------
