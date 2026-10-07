@@ -15,7 +15,7 @@
 export const SCHRIFTEN = {
   // Arch-Bold: 42,368 B, gepackt 18,565 B
   "Arch-Bold":
-    "H4sIAAAAAAAC/7V9B2Bb1dXwve9JlocsWcua1l6WrW1JnvKO4xE7ju3Ymc5ypkNCQhYJCYQwwwgjYZS9oZSWtB9lFyhQKFD4gNKW" +
+    "H4sIAAAAAAACA7V9B2Bb1dXwve9JlocsWcua1l6WrW1JnvKO4xE7ju3Ymc5ypkNCQhYJCYQwwwgjYZS9oZSWtB9lFyhQKFD4gNKW" +
     "FVpGB7RQfsrXQiz/5973JMu2PALf5+RKT+/de9Y999xzzx0PYYSQGJ2NWFTX1eMPrb6y/BqE8Fy4u2L15pVbv7Zd+WeERC8jJOhY" +
     "t3L7VrhfgNCdu+E7e93wnrWtYrcOIWkZQkd164dWrtHdvu8LeAb5UXQ93BAxggMATwC/7es3n7H70FvxNfD7HoSy7MNbVq+0qJtX" +
     "AgFmhFjl5pW7t+Ir0Hp47ob85tNWbh6yv1W6EaE75sO97K1btp8xugWVAv4B8nzrtqGt67MuOQ/Ka+C3CBFeGNTw3tK79g9Kq/+F" +
@@ -265,7 +265,7 @@ export const SCHRIFTEN = {
     "6gJfdS38Wg1lkjm9qZws5QiNDpPdWhn+MMKjo0j6/wG4xA+CgKUAAA==",
   // Arch-CondBlack: 42,016 B, gepackt 17,198 B
   "Arch-CondBlack":
-    "H4sIAAAAAAAC/7U9B4BUxdkz723vvdzt7W25Lbd3e21vb6/3445+yB29NzUUUUQQURTBAga7xoaIWELQYEUjJNhQ0RijkpiYKJpE" +
+    "H4sIAAAAAAACA7U9B4BUxdkz723vvdzt7W25Lbd3e21vb6/3445+yB29NzUUUUQQURTBAga7xoaIWELQYEUjJNhQ0RijkpiYKJpE" +
     "jcYSNfmNcnv/N/Pe234FSA7mvbfvzXxtZr755puGMEJIhS5FLGqdPLW8asmsWniBe+CyYPHKhav/7b3hY4SkryEkmnDmwjWr4b0O" +
     "oT02uMvOXHHhsieWr/8WIW01QjcuO2vpwiV5uo3fwzeIj2rOgheSc9j3AJ4IfhedtfL89fctc2+H3w8iJClacc7ihY/I3gb4KhdC" +
     "rGnlwvWr8fXoLPgehPiuVQtXLv3JfQ97Edp9J7ybufqcNecPnoNKEbr3O/J99XlLV58luWYrpCf0SBHhhUHtB58qqpyvbfwXYtlP" +
@@ -497,7 +497,7 @@ export const SCHRIFTEN = {
     "Qg6tICuzcvxh4l1A2v8HOy4O0CCkAAA=",
   // Arch-CondXB: 42,060 B, gepackt 18,331 B
   "Arch-CondXB":
-    "H4sIAAAAAAAC/7U9B2AcxbUze72Xvb2qO12vujtJp9Pp1CVLtiULW5Yl94oLxrjI3bhgE2xMD9gkwflgIJBQk0AKIcQBAoEQSqgm" +
+    "H4sIAAAAAAACA7U9B2AcxbUze72Xvb2qO12vujtJp9Pp1CVLtiULW5Yl94oLxrjI3bhgE2xMD9gkwflgIJBQk0AKIcQBAoEQSqgm" +
     "kBBKQoCEhPDzIeR/0Om/md2TTtKp2Pwve27vdmdem5k3b968mUUYIaRGh5AINc+Zl6xc/a/MPxDCM+HuytWbVvX/y3fsfYRkzyIk" +
     "7jpv1fZ+uK9H6PY2uMrP23jhutW6q19ESFeF0PFL169dtcZeekAEzyA/ql4PN6QXiT4CeGL47V+/aceeq2YFr4DfdyIk9W/csnrV" +
     "g0+9cS8Q4EZIZNq0ak8/vg6th+dhyO/evGrT2mvvTlUg9K1TcG99/5btOwa3oDLA7yfP+7et7V8vveoIlLfCbxkivDCo9fo7Xy1Z" +
@@ -744,7 +744,7 @@ export const SCHRIFTEN = {
     "Q3AWQhkRlRga3Eh2axX5wwgPDiLd/wIOeMxdTKQAAA==",
   // Arch-Light: 42,452 B, gepackt 18,661 B
   "Arch-Light":
-    "H4sIAAAAAAAC/7V9B2Bb1dXwve/Zloc8ZC1r7y3L1raWt2XZjlfs2Imd5QyygISZQNizpWzKx2ihQMsohVA6WKXQslo+aKHk66SQ" +
+    "H4sIAAAAAAACA7V9B2Bb1dXwve/Zloc8ZC1r7y3L1raWt2XZjlfs2Imd5QyygISZQNizpWzKx2ihQMsohVA6WKXQslo+aKHk66SQ" +
     "0BLK19IW+gXaQiz95973JMu2PEL+OrnS03v3nnXPPfecux7CCCEhugixqHVwpMG3iWk6DSGcgrsbN58ytecT041/QkjwKkJFK7ZN" +
     "nbEH7tcgdC/8RqXbTj7npETpgx8jVB1A6OYt27dObVG+cd5n8Iw8D22HGwJv0aMArwh+m7efcua+vj93PgK/H0CoxHzy7s1T9f+7" +
     "shsI0CPESk6Z2rcH34C2w3M75NefOnXKVtu3h0YQ+satcE+0Z/cZZ2Z2Izfgf4g833P61j3bS66+HMrXwW8BIrwwqL2322vaUB3/" +
@@ -995,7 +995,7 @@ export const SCHRIFTEN = {
     "SrQVrs5CJ6MpeFooRwx+7UCnwL/daBCc1ZPg12Yolc1bn5eX8kv/MieTGZMCfxjhTAZV/z8swAfP1KUAAA==",
   // Arch-Medium: 42,432 B, gepackt 18,604 B
   "Arch-Medium":
-    "H4sIAAAAAAAC/7U9B2Bb1bX3vidLHrJkWdNa1rC2NWwtS95723Ecj4QMjwzHWSaDEFaBMgJdjP5A6adACy0ECJS2lEJadssohRJo" +
+    "H4sIAAAAAAACA7U9B2Bb1bX3vidLHrJkWdNa1rC2NWwtS95723Ecj4QMjwzHWSaDEFaBMgJdjP5A6adACy0ECJS2lEJadssohRJo" +
     "oUCB0kLht0AZbSmx9M+978mWbdlxwv9Orp703r1n3XvPPefc8RBGCInR+YhFdb39/vKxpyq+hBBug7sj4ztGp/5pveodhES/RkjQ" +
     "tWV0zxTcL0Dolvvgmr1l+4HNPysVnoGQNITQf7VNbBrdqL39nE/hGeRHkQm4IcoVHAR4AvhdMrFj75ljefX74PetCAlLtu8aH3Uf" +
     "7kkAASaEWMWO0TOn8JVoAp47Ib9p5+iOTT8c+psfoZvPgXvaqV179iZ3oVLAfy15PrV709SE8KsXQ3kN/BYhwguDGtSfrcjeIK36" +
@@ -1246,7 +1246,7 @@ export const SCHRIFTEN = {
     "wKUAAA==",
   // Arch-Regular: 42,456 B, gepackt 18,647 B
   "Arch-Regular":
-    "H4sIAAAAAAAC/7V9B2Bbxfn43Xu25CHLlmVZW9awJGtZyxq2LNmyLa94b2c5zk5IAiSEsBoCP2iZZZXSMgoUwkghpS20lN0yftBC" +
+    "H4sIAAAAAAACA7V9B2Bbxfn43Xu25CHLlmVZW9awJGtZyxq2LNmyLa94b2c5zk5IAiSEsBoCP2iZZZXSMgoUwkghpS20lN0yftBC" +
     "C01byiihg0IpBUqhpRRL/+/uPcmyLTtO+P+cnPT03t237u677/tuPIQRQiJ0ALGouX/Y7Vu/OXwGQrgT7q7bsHP6lH+Zrn4bIeHz" +
     "COX1bJnecwrcL0Po4IvwXbBlx5mb//PKr5sQKq1D6NqJrZumN6oeO+dTeAb5UXAr3BBq824EeHnwu3rrztPOGEu2CuH3XQgJqnec" +
     "vGHaee9gPhCgR4it2Dl9xin4KrQVntdAfv2u6Z2bbtMf3ofQ7ZfBPdMpJ+85LXUycgL++8jzU3ZvOmWr4LILobwCfgsR4YVBLU/f" +
@@ -1497,7 +1497,7 @@ export const SCHRIFTEN = {
     "Ane2oZ3w72QgczP82wb5NmXyu+blJ3VH/lI7yD6vHH8Y4VQKlf4/nXxm69ilAAA=",
   // Arch-SemiBold: 42,416 B, gepackt 17,901 B
   "Arch-SemiBold":
-    "H4sIAAAAAAAC/7V9CWAbxdXwzK4s2bIsWZZ135J1WLYsW4d1+D7jM7Zjxw65DzuJczkkgSQmhJAmUFquEijQlhZouSEf5WspJVAo" +
+    "H4sIAAAAAAACA7V9CWAbxdXwzK4s2bIsWZZ135J1WLYsW4d1+D7jM7Zjxw65DzuJczkkgSQmhJAmUFquEijQlhZouSEf5WspJVAo" +
     "hZajlLP9OEoJLVfPv7QplBLL/5vZlSzLkuPA9zkZrbQ786558+bNm2MRRghJ0CHEosa+QZ9/Q0XkywjhDri7dsP2dTs/tl/zAUKi" +
     "XyIk6Nm0bvdOuF+I0G13wjV307b9G/8iWn8VQrIgQtc5N4+tG9Vdd+AjeAb5UfVmuCE8JdgF8ATwu2Tz9j37duxr+AP8hvLCkm0T" +
     "G9aV7O14EgiwIMQWb1+3byf+GtoMz92Q37Jj3faxtt/t+ASh762Ee+U7J3bvmZ5A5YD/y+T5zl1jOzcLLz8K5TXwW4QILwxqPjBw" +
@@ -1738,7 +1738,7 @@ export const SCHRIFTEN = {
     "T/Z8NXBvHO5sh9994MduhF8bIE+ihHdOCZZyjaa3kT1dGf4wwtPTSPb/AZ3cZaWwpQAA",
   // Corm-Light: 69,272 B, gepackt 24,755 B
   "Corm-Light":
-    "H4sIAAAAAAAC/9R9eYAcVbX3vbeq933f932Z7umeXmbfMjOZzCSZJJN9D1lZkhASEpYQ9n1TFPUBisqmqCjg9lBUXPHpU/QJKuBj" +
+    "H4sIAAAAAAACA9R9eYAcVbX3vbeq933f932Z7umeXmbfMjOZzCSZJJN9D1lZkhASEpYQ9n1TFPUBisqmqCjg9lBUXPHpU/QJKuBj" +
     "UXg8MYgCDxXS851bvc/0zHT3hD++gUp1V1XX/f3Ovffcc+49dQphhJAUXYYY1D8xGU9ettn5NkJ4FI5u37l/x7lv6X90ECHB8wix" +
     "W/fuOHwuHFciLP8Q7IV7z7lwz9eOvPIEQortCJ16f9/uHbt8B/vugnM/hy2zDw7w/0ewD+7Hwnfvvv1HLvjzMykPfP8cQvzkOQd3" +
     "7jia/boNAAwhxFj377jgXPwJBPfGQbjeeWDH/t3LfnzBDoRlm+GY6tyDh49M3Y2SUD7F4Tz3vN3n7uPfdDX8vhu+CxDlwqLBt+zb" +
@@ -2071,7 +2071,7 @@ export const SCHRIFTEN = {
     "kZgOAQA=",
   // Corm-LightItalic: 71,144 B, gepackt 26,532 B
   "Corm-LightItalic":
-    "H4sIAAAAAAAC/9R9d4BkRbV3Vd3U4XbOOafpmemZjpPjTti8s2k2s4HNxIWFXeKSRJIiyYRPBUEUFcwIBhBUniLwVAQRJCggwvp4" +
+    "H4sIAAAAAAACA9R9d4BkRbV3Vd3U4XbOOafpmemZjpPjTti8s2k2s4HNxIWFXeKSRJIiyYRPBUEUFcwIBhBUniLwVAQRJCggwvp4" +
     "giK62/1V3dtxpmemu2f84xu42/ne3+/UqVPnnDpVF0AAAA+OAQoMrFwTi1/yFcO7AMBx/O72XafvOOu5Tb/6CgDcywDQp+3dcc5Z" +
     "+H01gAb8Gkj2nnZ0z4qTT7UBoDoXQDq7b/eOU93H287Bnz2Bj/Q+/AY3yX6Az0fj1/59p5975EtfDS3Hr+8BgO047cxdO46d22/D" +
     "ANYCQDlP33HkLPhJcCP+PIy/7z5jx+m7Lw/wzwKoPxe/t+SsM885N3criOPrP0w+P+vQ7rP2sddfhX+/DL/mAOFCgyE2vf9Dp6h6" +
@@ -2427,7 +2427,7 @@ export const SCHRIFTEN = {
     "Zt+q4z9eexj+PgA1DkHNLcDHZebZ/c0re9qubL+OtRO38lv4fzdbt7zOB7EoNs7+3xVgFlnoFQEA",
   // Corm-Medium: 69,364 B, gepackt 25,724 B
   "Corm-Medium":
-    "H4sIAAAAAAAC/9R9eYAkRZV3RGTWfZ9Z931fXV1n3+f0dM/dTM99wcwwNwMMAwzXgHLKIYqIIqCuLgzoiisK64UriLruuiuuAiLi" +
+    "H4sIAAAAAAACA9R9eYAkRZV3RGTWfZ9Z931fXV1n3+f0dM/dTM99wcwwNwMMAwzXgHLKIYqIIqCuLgzoiisK64UriLruuiuuAiLi" +
     "AioKIogCHjBT/b3IrKqu6rOqevzjG8iuqqysjN/vxXsvXkS8iEQYIaRE70MMGlgz0ZZ5f8DzF4TwGJw9a/fhnee/Zf7eeQhJnkeI" +
     "3bFv59Hz4bwWYfUf4FW675xL997yIfx5hDRnIVQa379n59nBs/vvge/+G47Cfjghfl6yBe7HwufA/sMXXvLmFent8PkBhMS5c87b" +
     "vfNG9X9KAcAShBjH4Z2XnI/vRB+G7yNwvefcnYf3fPtKshFh1ZfgnO38845eOPlplIHy6f0951+w5/z94luug9/3wGcJolxYNNTm" +
@@ -2772,7 +2772,7 @@ export const SCHRIFTEN = {
     "AnMMZ/lbmXnmRuYwcwqPdmL+ZswdZQ5i6ep1xvD4MKbHsHSOuQn/DzOHsLxTO7esNuXb+Ft8hHpuXeUPGMCe4/4f3jR+PvQOAQA=",
   // Corm-MediumItalic: 71,256 B, gepackt 27,625 B
   "Corm-MediumItalic":
-    "H4sIAAAAAAAC/9R9d4BjVfX/La+k97z09tImMykzyUwyvc/u7GzvvbFsYXdZdqUsTdmlfKmiiGDBhggi6tfeEAsWsCEoxYJ8Rb4o" +
+    "H4sIAAAAAAACA9R9d4BjVfX/La+k97z09tImMykzyUwyvc/u7GzvvbFsYXdZdqUsTdmlfKmiiGDBhggi6tfeEAsWsCEoxYJ8Rb4o" +
     "KKxfpSnKJr9730syyeyUJDP+8Vt4k0wmyf18zj333HPOPfc+AAEAGnACYDC4cm0qfcUF1n8CAMfJq7v2nLv76K+3/PIzAPDPAsAc" +
     "3r/7/KPkdQOAwiryqNh/+JJ9V992w5cA0F8AILvvwN7dZ/v/3nol+dvPyJU9QF7gt3JvkO9jyO+hA+decPHnh4JvI7/fCwDXefi8" +
     "PbtvuWGVkQBYBwD2nrv74qPwA+Dd5O9N5P3+I7vP3WtdF3kngJbfkdfWHj3v/AsKt4E0ab+V/v3o2/YePcDddA35/DLyOw8oFwYM" +
@@ -3143,7 +3143,7 @@ export const SCHRIFTEN = {
     "/g7+P0hXOW/xR9dvrTHOfwTfFOEaWBYBAA==",
   // Corm-Regular: 69,360 B, gepackt 25,519 B
   "Corm-Regular":
-    "H4sIAAAAAAAC/9R9eYBcRbV3Vd3b+77v+7739PQy+5ZMZjLZM9k3spCFQBJCEgIhC0RlXwQFQUVUZBFFRXi4oII+VHz6QFQQQQRU" +
+    "H4sIAAAAAAACA9R9eYBcRbV3Vd3b+77v+7739PQy+5ZMZjLZM9k3spCFQBJCEgIhC0RlXwQFQUVUZBFFRXi4oII+VHz6QFQQQQRU" +
     "FGURBXwKSc936vYy3TM9M9098Y8vcKe7b9++9fudqnPqnKpTdRFGCEnRpYhBfUtGE6lLH3O+hxAehrObt+3Zcv47+h/uQ0jwW4TY" +
     "TTu3HDgfzisRlr8Gr8Kd512840ufFx9FSLEZofzAru1bzvad0/tp+O5ncGR3wQn+K4JtcD8WPnt37Tl40Zs3p74Cn+9FiJ8+b9+2" +
     "LVcqn+ADgLkIMdY9Wy46H9+KPgrfB+F6594te7a/HHr0JoRlX4BznvP3HTg4dgdKQflP0O/Pv2D7+bv4134Eft8FnwWIcmHRwDdt" +
@@ -3486,7 +3486,7 @@ export const SCHRIFTEN = {
     "9d464IMYBH3I8d8y9VS+8A4BAA==",
   // Corm-RegularItalic: 71,204 B, gepackt 27,470 B
   "Corm-RegularItalic":
-    "H4sIAAAAAAAC/9S9d4BjVdk/fsot6fXmpvdepiWZZPrs1J3ZnW2zZbYXll22UHZpS4elKEoTEFBUVERB9CuIDUERFRVfCwq2V1BQ" +
+    "H4sIAAAAAAACA9S9d4BjVdk/fsot6fXmpvdepiWZZPrs1J3ZnW2zZbYXll22UHZpS4elKEoTEFBUVERB9CuIDUERFRVfCwq2V1BQ" +
     "UZor+ipK2+R3zk2ZZHZKkln/+A3cTSaT5Hw+zznnaec55wIIAFCBKwAGS1atbUlerjO9AQAcI6/u3H3GrkO/2fz05wHgXwCAOf20" +
     "XeccIq/rABQd5FF22ukX7v33E6bnAdCeCyAb27dn16me11svIn/7Mbky+8gL/CbuTfJ9DPk9sO+Mcy/4/PXB28nv9wHAdZx+1u5d" +
     "11wybCYA1gGAXWfsuuAQ/DD4APl7hLzfc+auM/aEmh/8F4DCJ8hrWw+ddc65+dtAEkDTu/Tvh87ec2gfd/015PMT5HceUC4MGNz2" +
@@ -3855,7 +3855,7 @@ export const SCHRIFTEN = {
     "7nHe4A/RXcSM4/8AR2cjUiQWAQA=",
   // Corm-SemiBold: 69,384 B, gepackt 25,799 B
   "Corm-SemiBold":
-    "H4sIAAAAAAAC/9S9d4BkRdU+XOF2ztM555zz5Dw7m9OwkY1sZGGXhV1YFpYFQUGiCqIIioqAmBMivibwZ04YABVEQEXwJanAqwLb" +
+    "H4sIAAAAAAACA9S9d4BkRdU+XOF2ztM555zz5Dw7m9OwkY1sZGGXhV1YFpYFQUGiCqIIioqAmBMivibwZ04YABVEQEXwJanAqwLb" +
     "8526HaZ7YvfM+se3UNPdt2/fep5TVafOOXVuXYQRQnJ0BaKof9VYMvOOd7v+jRBeDEd37Dq48/Brhu+fh5DoDwhx2/btPHIYjqsR" +
     "VsELEu879/hezvnX/0FItQOh0tr9e3bu9m/p+xh89zMohf1wQPioaDNcj4PPvv0Hj1782g3xz8Ln+xAS5s49b9fOmy79xTEAMIwQ" +
     "tR3cefFhfBt6L3wfgvNdh3Ye3LPTerEYYcX9cCx2+LwjR8c/ijIIK59h3x++YM/h/cIb3gW/74bPIsS4cGjwRUfHO7erut9AlL7A" +
@@ -4201,7 +4201,7 @@ export const SCHRIFTEN = {
     "d3AH8HyYm8GcI9yN3Ha8Psjdhun9WOPK9cYw7zDmLOL1Vu4m/D/M3YB12ncULruD6lxzSx9g3lxX+QO05Jc46b8AdMtfAAgPAQA=",
   // Jak-Bold: 27,228 B, gepackt 15,706 B
   "Jak-Bold":
-    "H4sIAAAAAAAC/7W9CUBbxxEwvPseIG4QQggdoAtJSEIIJIS4TwPiBgMG2/jAgG3AN2BjYyeObRI7vlLHdhzfcZzLtXO3aXM49+Uk" +
+    "H4sIAAAAAAACA7W9CUBbxxEwvPseIG4QQggdoAtJSEIIJIS4TwPiBgMG2/jAgG3AN2BjYyeObRI7vlLHdhzfcZzLtXO3aXM49+Uk" +
     "TdKcjZvGTZM2btqcTtu05umf3fckZEyO//v+X3j13pvdnZ2dnZ2dmbcrI4wQikQbEYtKGlvsjo2ri8IRwh6Azu9e2rXi4berGhAK" +
     "XYJQ0MiirsEVAI9FqL8VrqGLlqxdOOu1fhmAmhDqOLi4t6tH3XQv3KNXIWUvBkDo34JWAr4geE5ZvHRo5G8Pt22C57sRCnlmyfLu" +
     "rnfX/PMPQMA/EGJ7lnaNrMBPo2cgPxXKa5Z1Le399MZ5doQWQz6uWrF8cMi7GEFefxbJX7Gqd8XikB1jUP8TeBYh0hcmzlbe1lQ9" +
@@ -4413,7 +4413,7 @@ export const SCHRIFTEN = {
     "UM/mr0f/Bweyja6XRFGn+GCEyY7G/wfRcvbxXGoAAA==",
   // Jak-ExtraBold: 27,244 B, gepackt 15,380 B
   "Jak-ExtraBold":
-    "H4sIAAAAAAAC/7V9CWBURdJw93tJJncySWYmmcw9mZlkZnLOTCb3fZGbJJCTQCCBECAgZ1BRCGoEIkaFgITbYxFvRNdbEUXXz1vc" +
+    "H4sIAAAAAAACA7V9CWBURdJw93tJJncySWYmmcw9mZlkZnLOTCb3fZGbJJCTQCCBECAgZ1BRCGoEIkaFgITbYxFvRNdbEUXXz1vc" +
     "1VXAY1fFdT1WYNfVvPmr+72ZTEI8/ovY896r7q6urq6urqrX/UQYIRSMNiIWFdQ1Jqdt/DAvCiFcAdB5C5Z1rTh+urwWIf+lCPkM" +
     "LOpatQLg4Qj1dcPVf9HS9Qs/uaW3D0D1CLVs7O3p6lZ3PEDqvgYpvRcA/j/4tAA+H3iO6122euCSb8NueD6CkN8LS5cv6Hrrf740" +
     "AQFfI8R2L+saWIFPoBcgPx7Ka/q7lvUo2L9BXu9bAFu9Yvmq1a5eBHl9JSR/xcqeFb1+w9dD/b/BswiRvjARiY+Ntg7MDcu5iFj2" +
@@ -4621,7 +4621,7 @@ export const SCHRIFTEN = {
     "+GxqAAA=",
   // Jak-Light: 27,276 B, gepackt 15,571 B
   "Jak-Light":
-    "H4sIAAAAAAAC/7V9CXwURfZwVXeSScg5mUwmd+bIzCQzySSZ++hJMkkm952QCwiEJIQb5JAbD0BQQUUBFVREXRcv1vtAV13FW1d3" +
+    "H4sIAAAAAAACA7V9CXwURfZwVXeSScg5mUwmd+bIzCQzySSZ++hJMkkm952QCwiEJIQb5JAbD0BQQUUBFVREXRcv1vtAV13FW1d3" +
     "VVzXA1H3r6jouuK5pOd7Vd0zGUIUv9//+4I13f2q6tWrV69evfe6qkUYIRSHLkQsqmjtLDZv/ND7EUK4DqCzhhYNLn3wrdoWhKIX" +
     "IhSxenRw+VKAJyE0fzNco0cXrpnD3cdeCqA2hHqfmTsyOJwrPzQL8l6FZJ8LgOi7I/YDvgh4zpu7aMXqhxfOXgDPBxGKembhkqHB" +
     "j276iRDwFULs8KLB1UvxX9AzkJ8PQOXiwUUjf33vnfUIzUsBWNvSJctXBOYiyJs/TPKXLhtZOjdq+xao/yk8SxDpC5NcFKgbe3lm" +
@@ -4831,7 +4831,7 @@ export const SCHRIFTEN = {
     "zUOL6Pf7W9Ec+DcP1s2RX6lZFFaTFf9PCCN0t/zZfxh0XwAl/h8YUUFZjGoAAA==",
   // Jak-Medium: 27,276 B, gepackt 15,730 B
   "Jak-Medium":
-    "H4sIAAAAAAAC/7W9B2BbRfIwvvuebbnbsixLtmRZXZZkW7aK5SLZlpvcm+y4xU5sJ3Gq04lDAoReQjtIAoSQSglHrwe/o4RyB8cH" +
+    "H4sIAAAAAAACA7W9B2BbRfIwvvuebbnbsixLtmRZXZZkW7aK5SLZlpvcm+y4xU5sJ3Gq04lDAoReQjtIAoSQSglHrwe/o4RyB8cH" +
     "hDsI7Sihk1COuwTu4OKnb3bfk6w4pvy/7/8lWb33ZndnZ2dnZ2fm7b4gjBBKRFsQi6raAzb7eXd5TyKEGwA6f2zFyKqH3/C3IRS7" +
     "HKGoyfGRtasAnorQ0ovgGju+fOOi+477dgOoA6G+RxcvHFmQU3rvEOS9DKl4MQBiX4s6APii4Fm/eMW6yZf+MCCF54MIxTy7fOXY" +
     "yPuXnPwaCIDELlgxMrkKP4OehfxcKK+eGFmxsOHbz9YgtCQWYP2rVq5dF1yMIG/pApK/as3CVYtjrrwY6n8KzyJE+sKk5SP15hXz" +
@@ -5043,7 +5043,7 @@ export const SCHRIFTEN = {
     "af5vqVEOz0vgSj7d344Wwd8lsGgu/Jm6+afVFf7HB/I/ISwksdVZ/mBylh6l/G/UbzH2jGoAAA==",
   // Jak-Regular: 27,292 B, gepackt 15,238 B
   "Jak-Regular":
-    "H4sIAAAAAAAC/7V9CXxTxfbwzL1tU7q3aZq0TZutWZqkS5pmaZou6ZKmTZd0o6VlqxTKviNFEFBxBdweIgKigKgoKvpEfepz9+nT" +
+    "H4sIAAAAAAACA7V9CXxTxfbwzL1tU7q3aZq0TZutWZqkS5pmaZou6ZKmTZd0o6VlqxTKviNFEFBxBdweIgKigKgoKvpEfepz9+nT" +
     "9/6KCj59qLih+NwfPH1qb74zc2/StFTx+/2/D5jce8/MnHPmzJkzZ86duSCMEEpAGxGLqts6i0o21Fd8jhD2AXTmrEUDSx9+q6EV" +
     "odiFCEUNDw2sWArwFITmb4Nr7NDCNXO+mHT9vQAKINT7zNzZA4OKgvsHIe9vkOxzARD7QtQhwBcFz3lzF60cfuJM/4fwfDdCMc8t" +
     "XDJr4KTnB7hP+BIhdnDRwPBS/Cx6DvINUF65eGDR7GVVl5UhNA9o4guWLlmxMjgXQd78lSR/6fLZS+fGbLkc6n8CzyJE2sKkFXQ1" +
@@ -5249,7 +5249,7 @@ export const SCHRIFTEN = {
     "gyj5/wD5stOEnGoAAA==",
   // Jak-SemiBold: 27,280 B, gepackt 15,648 B
   "Jak-SemiBold":
-    "H4sIAAAAAAAC/7W9B0BbRxIwvPseIDoIEEINdQlJCIEKAkTvIMA02+COEca424DtuMV24jTbuRTbcYvtxJfec+nJpTffOeUu9S7N" +
+    "H4sIAAAAAAACA7W9B0BbRxIwvPseIDoIEEINdQlJCIEKAkTvIMA02+COEca424DtuMV24jTbuRTbcYvtxJfec+nJpTffOeUu9S7N" +
     "jpNL7MsluUt8l7uYp39235OQMSn//32/yeq9N7s7Ozs7Ozszb/cFYYRQItqMWFQ5pcvh3JxaxiGEGwE6r39p34qH3m5oQyh2CUJR" +
     "awf7hlcAPBWhRVfANXZwyUUL7n1aVwGgdoR67lw40BdQ1907HfKOQypcCIDYD6OuBHxR8GxYuHRk7V9apwMufDtCMc8vWd7f9/6x" +
     "b/OBgK8QYgNL+9auwM+h5yE/B8prlvUtHRiJ/cshhBaeA9jiFcuHR4ILEeQtWkjyV6waWLEwZsc2qP8ZPIsQ6QuTZr9h78lX5qaU" +
