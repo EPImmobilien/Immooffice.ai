@@ -35,7 +35,7 @@ function immoFehlt(was: string): never {
 // Feste API-Fassung. Ohne sie gilt, was im Stripe-Konto eingestellt ist —
 // und ein Klick dort änderte still die Form jeder Antwort. Dieselbe Fassung
 // steht im Webhook, in abo-verwalten und am Webhook-Endpunkt bei Stripe.
-const STRIPE_VERSION = "2025-12-15.clover";
+const STRIPE_VERSION = "2026-08-26.dahlia";
 
 /** Stripe über das Formular-API — kein SDK, dieselbe Begründung wie im Webhook. */
 async function stripe(pfad: string, felder: Record<string, string>, methode = "POST") {

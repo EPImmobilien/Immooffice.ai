@@ -35,7 +35,7 @@ function immoFehlt(was: string): never {
 }
 
 // Feste API-Fassung — dieselbe wie in abo-checkout und im Webhook.
-const STRIPE_VERSION = "2025-12-15.clover";
+const STRIPE_VERSION = "2026-08-26.dahlia";
 
 async function stripe(pfad: string, felder?: Record<string, string>, methode = "POST") {
   const schluessel = Deno.env.get("STRIPE_SECRET_KEY") || immoFehlt("STRIPE_SECRET_KEY");

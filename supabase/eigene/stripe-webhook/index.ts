@@ -89,7 +89,7 @@ async function signaturGueltig(roh: string, kopf: string, geheim: string): Promi
 // ---------------------------------------------------------------------------
 // API-FASSUNG
 // ---------------------------------------------------------------------------
-// Der Webhook-Endpunkt bei Stripe ist auf 2025-12-15.clover festgelegt
+// Der Webhook-Endpunkt bei Stripe ist auf 2026-08-26.dahlia festgelegt
 // (dieselbe Fassung senden abo-checkout und abo-verwalten). Seit der
 // Basil-Fassung liegen drei Dinge woanders als vorher:
 //   * die Periode eines Abos an den Positionen (items.data[].current_period_*)
@@ -97,7 +97,7 @@ async function signaturGueltig(roh: string, kopf: string, geheim: string): Promi
 //   * das Abo einer Rechnung unter parent.subscription_details
 // Die Helfer unten lesen beide Formen. Ein Endpunkt, den jemand auf eine
 // ältere Fassung zurückstellt, bricht damit nicht still.
-const STRIPE_VERSION = "2025-12-15.clover";
+const STRIPE_VERSION = "2026-08-26.dahlia";
 
 function periode(abo: any): { von: unknown; bis: unknown } {
   const pos = abo?.items?.data?.[0] || {};
