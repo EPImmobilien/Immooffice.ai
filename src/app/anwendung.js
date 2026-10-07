@@ -2732,6 +2732,11 @@ function PageShell({
   // Lesezugriff oder Sperre, Credits knapp. Sonst ist es nicht da; ein
   // Band, das immer steht, liest niemand mehr.
   window.ImmoSupportBand && React.createElement(window.ImmoSupportBand, null),
+  // fork_77: der Chef sieht eine wartende Zugriffsanfrage des Supports.
+  window.ImmoSupportAnfrageBand && React.createElement(window.ImmoSupportAnfrageBand, null),
+  // fork_78: Hinweise des Betreibers und die Zustimmung zu neuen Rechtstexten.
+  window.ImmoAnkuendigungBand && React.createElement(window.ImmoAnkuendigungBand, null),
+  window.ImmoRechtstextSperre && React.createElement(window.ImmoRechtstextSperre, null),
   window.ImmoAboBanner && React.createElement(window.ImmoAboBanner, {
     onNavigate: i
   }), c && i && React.createElement(MobileBurgerMenu, {
@@ -22729,6 +22734,14 @@ function HomePage({
       icon: Wrench,
       num: "★",
       isChef: !0
+    },
+    // fork_77: Hilfe — Anfragen an den Betreiber. Fuer jeden im Haus.
+    immoHilfeKachel = {
+      id: "hilfe",
+      title: "Hilfe & Support",
+      subtitle: "Anfragen an den Betreiber",
+      icon: Mail,
+      num: "★"
     };
   let c = [{
     id: "immobilien",
@@ -22821,7 +22834,7 @@ function HomePage({
     icon: Search,
     num: "14"
   }].filter(t => hatRecht(e, t.id));
-  hatRecht(e, "posteingang") && c.push(o), hatRecht(e, "rechnungen") && !hatRecht(e, "finanzen") && c.push(i), hatRecht(e, "finanzen") && c.push(l), e && "chef" === e.role && c.push(s), hatRecht(e, "expose_vorlagen_bearbeiten") && c.push(immoExposeVorlagenKachel), hatRecht(e, "admin") && c.push(r), e && "chef" === e.role && c.push(immoEinstellungenKachel), window.IMMO_PLATTFORM_ADMIN && c.push(immoPlattformKachel);
+  hatRecht(e, "posteingang") && c.push(o), hatRecht(e, "rechnungen") && !hatRecht(e, "finanzen") && c.push(i), hatRecht(e, "finanzen") && c.push(l), e && "chef" === e.role && c.push(s), hatRecht(e, "expose_vorlagen_bearbeiten") && c.push(immoExposeVorlagenKachel), hatRecht(e, "admin") && c.push(r), e && "chef" === e.role && c.push(immoEinstellungenKachel), window.IMMO_PLATTFORM_ADMIN && c.push(immoPlattformKachel), c.push(immoHilfeKachel);
   const d = Object.fromEntries(c.map(e => [e.id, e])),
     u = c.map(e => e.id),
     [m, g] = useState(u),
@@ -123696,6 +123709,16 @@ function App() {
           : React.createElement("div", {
               style: { padding: 24, color: CI.muted }
             }, "Der Plattform-Bereich konnte nicht geladen werden.")
+      },
+      // fork_77: Hilfe & Support. Die Tafel steht in src/eigene/hilfe.js.
+      hilfe: {
+        title: "Hilfe & Support",
+        subtitle: "Anfragen an den Betreiber",
+        comp: window.ImmoHilfe
+          ? React.createElement(window.ImmoHilfe, { user: k })
+          : React.createElement("div", {
+              style: { padding: 24, color: CI.muted }
+            }, "Die Hilfe konnte nicht geladen werden.")
       }
     };
   if ("posteingang" === g && !hatRecht(k, "posteingang")) {
@@ -133581,7 +133604,7 @@ function EinstellungenPage({ user }) {
   // fork_51: Abo, Credits und Rechnungen. Steht in den Einstellungen und
   // damit hinter der Chef-Schranke der Seite — Abrechnung ist Chefsache,
   // und die Edge Function prueft dieselbe Rolle noch einmal.
-  const reiterListe = [["firma", "Firma & Impressum"], ["gesellschaften", "Gesellschaften"], ["standorte", "Standorte"], ["belegnummern", "Belegnummern"], ["zahlung", "Zahlung & Freigabe"], ["signatur", "Signatur & Texte"], ["vorgaben", "Vorgaben"], ["vertragsvorlagen", "Vertragsvorlagen"], ["abrechnung", "Abo & Abrechnung"]];
+  const reiterListe = [["firma", "Firma & Impressum"], ["gesellschaften", "Gesellschaften"], ["standorte", "Standorte"], ["belegnummern", "Belegnummern"], ["zahlung", "Zahlung & Freigabe"], ["signatur", "Signatur & Texte"], ["vorgaben", "Vorgaben"], ["vertragsvorlagen", "Vertragsvorlagen"], ["abrechnung", "Abo & Abrechnung"], ["supportzugriffe", "Support-Zugriffe"]];
   return React.createElement(React.Fragment, null,
     React.createElement("div", { style: { display: "flex", borderBottom: `1px solid ${CI.border}`, marginBottom: 24, flexWrap: "wrap" } },
       reiterListe.map(([id, label]) => React.createElement("button", { key: id, "data-einst-reiter": id,
@@ -133598,6 +133621,10 @@ function EinstellungenPage({ user }) {
           ? React.createElement(window.ImmoAbrechnung, null)
           : React.createElement("div", { style: { padding: 20, color: CI.muted } },
               "Die Abrechnung konnte nicht geladen werden."))
+      : reiter === "supportzugriffe" ? (window.ImmoSupportZugriffe
+          ? React.createElement(window.ImmoSupportZugriffe, { user })
+          : React.createElement("div", { style: { padding: 20, color: CI.muted } },
+              "Die Support-Zugriffe konnten nicht geladen werden."))
       : React.createElement(EinstVorgaben, null));
 }
 

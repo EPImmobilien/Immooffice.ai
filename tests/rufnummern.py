@@ -86,6 +86,12 @@ ERLAUBT = {
     '01632188125': 'Impressum, Betreiber',
 }
 
+# Dateien, die keine Rufnummer der Vorlage tragen KOENNEN, weil sie die
+# Pflichtangaben des Anbieters tragen: das Impressum der Website (§ 5 DDG).
+# Dieselbe Ausnahme macht scripts/neutral.sh. Die Nummer selbst steht hier
+# mit Absicht nicht — sie waere ein Treffer des Neutralitaets-Gates.
+AUSGENOMMEN = {'website/konfig.js'}
+
 
 def dateien():
     for b in BEREICHE:
@@ -96,6 +102,8 @@ def dateien():
             if not f.is_file() or f.suffix not in ENDUNGEN:
                 continue
             if 'node_modules' in str(f) or '__pycache__' in str(f):
+                continue
+            if str(f.relative_to(WURZEL)) in AUSGENOMMEN:
                 continue
             yield f
 
