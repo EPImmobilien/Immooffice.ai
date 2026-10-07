@@ -21,12 +21,12 @@ window.IMMO_WEB = {
   strasse: "Am Vögenteich 26r",
   plz_ort: "18055 Rostock",
   vertreten_durch: "Lasse Engfer",
-  email: "",              // Kontaktadresse
-  telefon: "",            // mit Vorwahl
+  email: "info@immooffice.ai",
+  telefon: "0163 2188125",
 
   // --- Freiwillig ------------------------------------------------------
-  registergericht: "",    // "Amtsgericht Musterstadt"
-  hrb: "",                // "HRB 12345"
+  registergericht: "",    // noch offen: "Amtsgericht …" — gehört zur HRB-Nummer
+  hrb: "HRB 45283",
   ust_id: "",             // "DE123456789"
   aufsichtsbehoerde: "",  // bei erlaubnispflichtiger Tätigkeit (§ 34c GewO)
 
