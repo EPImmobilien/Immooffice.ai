@@ -6127,3 +6127,18 @@ erfundene Null wäre schlimmer als eine fehlende Zahl.
 Kein Chart.js: eine CDN-Bibliothek müsste in die Hülle und die
 Service-Worker-Liste. Für gestapelte Balken reicht SVG. Der Auftrag nennt
 Chart.js als Beispiel, nicht als Vorgabe.
+
+## 07.10.2026 — Gate 3 freigegeben: Stripe live
+
+**Entscheidung des Betreibers:** „ich will direkt live alles machen" — ohne
+vorherigen Probelauf in der Sandbox.
+
+**Umsetzung:** Die harten Testmodus-Sperren in `abo-checkout`,
+`abo-verwalten`, `stripe-webhook` und `scripts/stripe-einrichten.mjs` sind
+ersetzt. Erlaubt sind `sk_test_…` und `sk_live_…`. Neu ist die Modus-Sperre:
+der Webhook weist jedes Ereignis ab, dessen `livemode` nicht zum hinterlegten
+Schlüssel passt; das Seed-Skript legt einen Live-Katalog nur mit `--live` an.
+
+**Hinweis an den Betreiber (bei der Entscheidung gegeben):** Kontoverifizierung
+bei Stripe mit echten Daten, Rechtsträger, Impressum, AGB, Datenschutzerklärung
+und AVV sind Voraussetzung für den Verkauf — der Code prüft das nicht.
