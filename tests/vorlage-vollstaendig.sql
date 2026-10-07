@@ -381,7 +381,14 @@ zuwachs(bereich, mehr, grund) as (values
   -- Exposé-Vorlagen; unterschieden werden sie ueber eine neue Spalte.
   ('Spalten', 1, 'fork_56: expose_vorlagen.art'),
   ('Pruefbedingungen', 1, 'fork_56: art ist expose oder social'),
-  ('Indizes ohne Constraint', 1, 'fork_56: nach art')
+  ('Indizes ohne Constraint', 1, 'fork_56: nach art'),
+
+  -- fork_67: der Mandant kommt auch vom Besitzer. Dreissig MANDANT-Tabellen
+  -- tragen ein Besitzerfeld auf profiles und hatten keinen Wachposten — der
+  -- Grund, warum ein frisch angelegtes Postfach am 07.10.2026 unsichtbar
+  -- blieb. Keine neue Funktion: es ist derselbe mandant_aus_eltern() aus
+  -- fork_22, nur an dreissig weiteren Tabellen.
+  ('Trigger', 30, 'fork_67: mandant_aus_eltern an dreissig Tabellen mit Besitzerfeld')
 ),
 soll(bereich, soll) as (
   select v.bereich,

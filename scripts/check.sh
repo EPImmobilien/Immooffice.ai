@@ -10,121 +10,133 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 
 fehler=0
-abschnitt() { printf '\n──── %s\n' "$1"; }
+# Welcher Abschnitt laeuft gerade, und welche sind gescheitert.
+#
+# WARUM: Bis zum 07.10.2026 sagte dieses Skript am Ende "check: ROT" und
+# sonst nichts. Welches Gate gefallen war, stand irgendwo in tausend Zeilen
+# Protokoll — und bei einem Gate, dessen Meldung auf stderr geht, auch da
+# nicht auffaellig. Zweimal habe ich an einem Tag danach gesucht und einmal
+# den Lauf fuer unerklaerlich gehalten. Ein Gate, das nicht sagt, was es
+# beanstandet, wird irgendwann ueberlesen; das ist das Schlimmste, was einem
+# Gate passieren kann.
+aktuell=""
+gescheitert=()
+abschnitt() { aktuell="$1"; printf '\n──── %s\n' "$1"; }
+schlecht() { fehler=1; gescheitert+=("$aktuell"); }
 
 abschnitt "Neutralitaets-Gate"
-scripts/neutral.sh || fehler=1
+scripts/neutral.sh || schlecht
 
 abschnitt "Migrationen auf einer leeren Instanz"
 if scripts/lokale-db.sh neu >/dev/null 2>&1 && scripts/lokale-db.sh migrieren; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Vorlage vollstaendig uebernommen"
 if scripts/lokale-db.sh psql -q -f tests/vorlage-vollstaendig.sql; then
   echo "Alle Kennzahlen stimmen mit dem Quellprojekt ueberein."
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Mandantentrennung: jede Tabelle eingestuft"
 if scripts/lokale-db.sh psql -q -f tests/mandant-einstufung.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Mandantentrennung: haelt sie einem Angriff stand?"
 if scripts/lokale-db.sh psql -q -f tests/mandant.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Rechnungen: Zahlungsbedingungen und Freigabe"
 if scripts/lokale-db.sh psql -q -f tests/rechnung-freigabe.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Belegnummern: Muster, Ruecksetzung, Lueckenlosigkeit"
 if scripts/lokale-db.sh psql -q -f tests/belegnummern.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Kann der zweite Mandant dieselben Namen fuehren?"
 if scripts/lokale-db.sh psql -q -f tests/eindeutig-je-mandant.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Mandantengrenze: halten auch die Funktionen?"
 if scripts/lokale-db.sh psql -q -f tests/funktionen-mandant.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Mandantengrenze: verkuppeln die Hintergrundjobs?"
 if scripts/lokale-db.sh psql -q -f tests/hintergrund-mandant.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Vorlagen: markierte Felder"
 if scripts/lokale-db.sh psql -q -f tests/vorlagen-felder.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Vorlagen: Laufzeit, Provision, Fristen"
 if scripts/lokale-db.sh psql -q -f tests/vorlagen-vorgaben.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Mandant aus dem Elternsatz"
 if scripts/lokale-db.sh psql -q -f tests/mandant-aus-eltern.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Konfliktschluessel der Oberflaeche"
 if python3 tests/onconflict.py; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Angemeldete Endpunkte: Kennung aus dem Anfragekoerper"
 if python3 tests/funktionen-angemeldet.py; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Dienstschluessel: liest eine Funktion ueber die Mandantengrenze?"
 if python3 tests/dienstschluessel-mandant.py; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Verdrahtete Firmennamen"
 if python3 tests/firmenname-verdrahtet.py; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Funktionsrechte: wer darf eine RPC rufen?"
@@ -135,7 +147,7 @@ abschnitt "Funktionsrechte: wer darf eine RPC rufen?"
 if scripts/lokale-db.sh psql -q -f tests/funktionsrechte.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Sichten: halten sie die Mandantengrenze?"
@@ -146,14 +158,14 @@ abschnitt "Sichten: halten sie die Mandantengrenze?"
 if scripts/lokale-db.sh psql -q -f tests/sichten.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Rufnummern: nur dort suchen, wo eine steht"
 if python3 tests/rufnummern.py; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Mandantentrennung: Zeilen ohne Mandanten"
@@ -165,35 +177,35 @@ abschnitt "Mandantentrennung: Zeilen ohne Mandanten"
 if scripts/lokale-db.sh psql -q -f tests/mandant-ohne.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Mandantentrennung: Rundumschlag ueber alle Tabellen"
 if scripts/lokale-db.sh psql -q -f tests/mandant-rundumschlag.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Selbstregistrierung"
 if scripts/lokale-db.sh psql -q -f tests/selbstregistrierung.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Einstellungen je Mandant"
 if scripts/lokale-db.sh psql -q -f tests/einstellungen-je-mandant.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Rechte: Sichtbarkeitsbereich und Modulrechte"
 if scripts/lokale-db.sh psql -q -f tests/rechte.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Supportzugriff: sehen duerfen, ohne heimlich zu sehen"
@@ -202,14 +214,14 @@ abschnitt "Supportzugriff: sehen duerfen, ohne heimlich zu sehen"
 if scripts/lokale-db.sh psql -q -f tests/supportzugriff.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Abrechnung: Credits, Ledger, Limits"
 if scripts/lokale-db.sh psql -q -f tests/abrechnung.sql; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Oberflaeche: Zerlegung verliert nichts"
@@ -220,7 +232,7 @@ if [[ -f reference/epworld-src.html ]]; then
     echo "[ok] src/ laesst sich byte-genau zur Vorlage zurueckbauen."
   else
     echo "[FEHLER] Der Rueckbau weicht von der Vorlage ab."
-    fehler=1
+    schlecht
   fi
   rm -rf "$roh"
 else
@@ -231,7 +243,7 @@ abschnitt "Oberflaeche: dist/index.html bauen"
 if python3 scripts/bauen.py; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Oberflaeche: die Nebenseiten sind da"
@@ -247,7 +259,7 @@ for f in src/seiten/sw.js src/seiten/freigabe.html src/seiten/objekt.html \
 done
 if [[ -n "$fehlend" ]]; then
   echo "[FEHLER] Es fehlt:$fehlend — `npm run nebenseiten` ausfuehren."
-  fehler=1
+  schlecht
 else
   echo "[ok] Alle sechs Nebenseiten liegen in src/seiten/."
 fi
@@ -262,7 +274,7 @@ if [[ -d src ]]; then
   if [[ $syntaxfehler -eq 0 ]]; then
     echo "[ok] Alle Skripte der Oberflaeche sind syntaktisch gueltig."
   else
-    fehler=1
+    schlecht
   fi
 else
   echo "src/ fehlt — nichts zu pruefen."
@@ -272,14 +284,14 @@ abschnitt "Vorlagen fuellen: die Rechnung dahinter"
 if node tests/vorlagen-fuellen.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Oberflaeche: Storage-Huelle"
 if node tests/storage-huelle.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Expose-Schriften: dieselben wie in den Referenz-PDFs"
@@ -289,7 +301,7 @@ abschnitt "Expose-Schriften: dieselben wie in den Referenz-PDFs"
 if python3 scripts/expose-schriften.py --pruefen && python3 tests/expose-schriften.py; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Expose-Renderer: Feldkatalog deckt das Schema"
@@ -299,7 +311,7 @@ abschnitt "Expose-Renderer: Feldkatalog deckt das Schema"
 if node tests/expose-felder.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Expose-Renderer: aus Datenbankzeilen werden Werte"
@@ -309,7 +321,7 @@ abschnitt "Expose-Renderer: aus Datenbankzeilen werden Werte"
 if node tests/expose-aufbereiten.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Expose-Renderer: Zufallsfolge wie Pythons random"
@@ -318,7 +330,7 @@ abschnitt "Expose-Renderer: Zufallsfolge wie Pythons random"
 if node tests/expose-zufall.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Expose-Renderer: Zeilenbreiten wie pdfmetrics.stringWidth"
@@ -328,7 +340,7 @@ abschnitt "Expose-Renderer: Zeilenbreiten wie pdfmetrics.stringWidth"
 if node tests/expose-breiten.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Expose-Vorlagen: Farbableitung wie in den Prototypen"
@@ -338,7 +350,7 @@ abschnitt "Expose-Vorlagen: Farbableitung wie in den Prototypen"
 if node tests/expose-farben.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Expose-Vorlagen: Schema und Elementtypen"
@@ -347,7 +359,7 @@ abschnitt "Expose-Vorlagen: Schema und Elementtypen"
 if node tests/expose-schema.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Expose-Renderer: Seitenlogik"
@@ -356,7 +368,7 @@ abschnitt "Expose-Renderer: Seitenlogik"
 if node tests/expose-seitenlogik.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Expose-Renderer: Buendel entsprechen der Quelle"
@@ -365,7 +377,7 @@ abschnitt "Expose-Renderer: Buendel entsprechen der Quelle"
 if node packages/expose-renderer/bauen.mjs --pruefen; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Expose-Schriften: eingebettet wie in assets/fonts/expose/"
@@ -375,7 +387,7 @@ abschnitt "Expose-Schriften: eingebettet wie in assets/fonts/expose/"
 if python3 scripts/expose-schriften-einbetten.py --pruefen; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Expose-Systemvorlagen: Migration entspricht den JSON-Dateien"
@@ -386,7 +398,7 @@ abschnitt "Expose-Systemvorlagen: Migration entspricht den JSON-Dateien"
 if python3 scripts/expose-systemvorlagen.py --pruefen; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Social-Baukasten: zeichnen die Vorlagen, und erfinden sie nichts?"
@@ -397,7 +409,7 @@ abschnitt "Social-Baukasten: zeichnen die Vorlagen, und erfinden sie nichts?"
 if node tests/social.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Social-Vorlagen: Erzeuger, Dateien und Migration stimmen ueberein"
@@ -408,7 +420,7 @@ if python3 scripts/social-vorlagen.py --pruefen \
    && python3 scripts/social-systemvorlagen.py --pruefen; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Expose-Vorlagen: zeichnet der Renderer wie die Prototypen?"
@@ -418,7 +430,7 @@ abschnitt "Expose-Vorlagen: zeichnet der Renderer wie die Prototypen?"
 if node tests/expose-vorlagen.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Expose-Vorlagen: wird daraus ein PDF?"
@@ -428,7 +440,7 @@ abschnitt "Expose-Vorlagen: wird daraus ein PDF?"
 if node tests/expose-pdf.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Expose: laeuft der Editor durch?"
@@ -438,7 +450,7 @@ abschnitt "Expose: laeuft der Editor durch?"
 if node tests/expose-editor.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Expose: wird aus einem fremden PDF eine Vorlage?"
@@ -448,7 +460,7 @@ abschnitt "Expose: wird aus einem fremden PDF eine Vorlage?"
 if node tests/expose-einlesen.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Expose: malt die Bearbeitungsflaeche im Browser?"
@@ -459,7 +471,7 @@ abschnitt "Expose: malt die Bearbeitungsflaeche im Browser?"
 if node tests/expose-leinwand.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Expose: laeuft die Edge Function durch?"
@@ -469,7 +481,7 @@ abschnitt "Expose: laeuft die Edge Function durch?"
 if node tests/expose-funktion.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Exposés: kommen ALLE Bilder hinein?"
@@ -479,7 +491,7 @@ abschnitt "Exposés: kommen ALLE Bilder hinein?"
 if node tests/expose-bildzahl.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Exposés: sieht das Gezeichnete fertig aus?"
@@ -491,42 +503,42 @@ abschnitt "Exposés: sieht das Gezeichnete fertig aus?"
 if node tests/expose-probe.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Oberflaeche: Rauchtest"
 if python3 tests/oberflaeche-rauchtest.py; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Edge Functions: nur Kennzeichen geaendert"
 if python3 tests/funktionen-unveraendert.py; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Edge Functions: oeffentliche Endpunkte im Buch"
 if python3 tests/funktionen-oeffentlich.py; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Edge Functions: schreiben sie mit Mandanten?"
 if python3 tests/oeffentlich-insert-mandant.py; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Edge Functions: Syntax"
 if node tests/funktionen-syntax.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Workflows: YAML gueltig"
@@ -552,7 +564,7 @@ PYENDE
 then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Marke: Logo, Bildmarke, Icons"
@@ -565,7 +577,7 @@ abschnitt "Marke: Logo, Bildmarke, Icons"
 if python3 tests/marke.py; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Website: was sie behaupten darf"
@@ -574,7 +586,7 @@ abschnitt "Website: was sie behaupten darf"
 if python3 tests/website.py; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Website: laeuft sie im Browser?"
@@ -588,7 +600,7 @@ abschnitt "Website: laeuft sie im Browser?"
 if node tests/website-browser.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Pflichtangaben: kein Rueckfall ins Leere"
@@ -599,7 +611,7 @@ abschnitt "Pflichtangaben: kein Rueckfall ins Leere"
 if python3 tests/pflichtangaben.py; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Schreibstil und Antwort-Absichten"
@@ -610,7 +622,7 @@ abschnitt "Schreibstil und Antwort-Absichten"
 if node tests/mail-stil.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Exposé-Sofortversand"
@@ -620,7 +632,7 @@ abschnitt "Exposé-Sofortversand"
 if node tests/expose-sofortversand.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Postfaecher je Anbieter: Microsoft, Google, IMAP"
@@ -631,7 +643,7 @@ abschnitt "Postfaecher je Anbieter: Microsoft, Google, IMAP"
 if node tests/postfach-anbieter.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Credits an den KI-Aufrufen"
@@ -641,7 +653,7 @@ abschnitt "Credits an den KI-Aufrufen"
 if node tests/credits.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Abo-Schranke vor den KI-Aufrufen ohne Preis"
@@ -652,7 +664,7 @@ abschnitt "Abo-Schranke vor den KI-Aufrufen ohne Preis"
 if node tests/abo-schranke.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Testphase: Erinnerung und Band"
@@ -662,7 +674,7 @@ abschnitt "Testphase: Erinnerung und Band"
 if node tests/testphase.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Plattform-Bereich: was der Betreiber sieht — und was nicht"
@@ -672,7 +684,7 @@ abschnitt "Plattform-Bereich: was der Betreiber sieht — und was nicht"
 if node tests/plattform-admin.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Abo & Abrechnung: die Tafel im Kundenbereich"
@@ -682,7 +694,7 @@ abschnitt "Abo & Abrechnung: die Tafel im Kundenbereich"
 if node tests/abrechnung-ui.js; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Umgebungsvariablen: jede gelesene ist dokumentiert"
@@ -693,14 +705,14 @@ abschnitt "Umgebungsvariablen: jede gelesene ist dokumentiert"
 if python3 tests/umgebungsvariablen.py; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Edge Functions: verify_jwt fuer jede festgelegt"
 if python3 tests/funktionen-config.py; then
   :
 else
-  fehler=1
+  schlecht
 fi
 
 abschnitt "Noch nicht abgedeckt"
@@ -712,5 +724,10 @@ cat <<'ENDE'
 ENDE
 
 printf '\n'
-if [[ $fehler -eq 0 ]]; then echo "check: gruen"; else echo "check: ROT"; fi
+if [[ $fehler -eq 0 ]]; then
+  echo "check: gruen"
+else
+  echo "check: ROT — gescheitert sind:"
+  for a in "${gescheitert[@]}"; do echo "  · $a"; done
+fi
 exit $fehler

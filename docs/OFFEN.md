@@ -207,6 +207,38 @@ irren, eine Zeile, die niemandem gehört, nicht. Gegen das laufende Projekt
 gehört dasselbe Skript regelmäßig gestartet; im Durchlauf prüft es nur die
 frisch migrierte Instanz.
 
+## Das Gate gegen herrenlose Zeilen sieht die echten Daten nicht
+
+`tests/mandant-ohne.sql` fragt bei jedem Commit, ob eine MANDANT-Tabelle
+Zeilen ohne `mandant_id` hält — aber gegen die **lokale** Datenbank aus den
+Migrationen (`scripts/lokale-db.sh`). Die ist leer. Das Gate kann dort
+nichts finden, und genau deshalb ist der Fall vom 07.10.2026 (zwei
+unsichtbare Postfächer) nicht aufgefallen, obwohl das Gate seit dem Vortag
+läuft.
+
+Was es prüft, ist trotzdem richtig: es fängt eine Migration ab, die Zeilen
+ohne Mandanten anlegt. Was es nicht kann, ist der Bestand im Betrieb.
+
+Bis es dafür einen Weg gibt — ein Lauf gegen das echte Projekt braucht
+Zugangsdaten, die nicht ins Repository gehören — bleibt die Abfrage von
+Hand. Sie steht hier, damit sie nicht jedes Mal neu erfunden wird:
+
+```sql
+select e.tabelle,
+       (xpath('/row/c/text()',
+         query_to_xml(format('select count(*) c from public.%I where mandant_id is null',
+                             e.tabelle), false, true, '')))[1]::text::bigint as ohne_mandant
+from public.mandanten_einstufung e
+join information_schema.columns c
+  on c.table_schema = 'public' and c.table_name = e.tabelle and c.column_name = 'mandant_id'
+where e.gruppe = 'MANDANT'
+  and to_regclass('public.' || quote_ident(e.tabelle)) is not null
+order by 2 desc;
+```
+
+Erwartet wird genau eine Zeile ungleich null: `expose_vorlagen` mit den
+zwölf Systemvorlagen. Alles andere gehört nachgetragen.
+
 ## Das alte Betreiber-Konto trägt noch die Adresse der Referenz
 
 `plattform_admins` führt seit dem 07.10.2026 zwei Einträge:

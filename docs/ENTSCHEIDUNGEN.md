@@ -5954,3 +5954,58 @@ Abfrage oben, wenn doch einmal von Hand angelegt wird.
 **Noch offen, unabhängig davon:** Ein Magic Link an `info@immooffice.ai`
 kommt vorerst nirgends an. Zu der Domain gibt es kein Postfach, und sie zeigt
 noch nicht auf Netlify. Die Anmeldung geht über das Passwort.
+
+## 2026-10-07 · Zum dritten Mal unsichtbar — und diesmal die ganze Klasse (fork_67)
+
+„Ich habe info@immooffice.ai als Postfach angeblich erfolgreich hinzugefügt,
+aber es ist nicht sichtbar." Zwei von vier Zeilen in `mail_postfaecher`
+trugen `mandant_id = null`.
+
+Der Mechanismus ist zum dritten Mal derselbe: Die Spalte hat den Vorgabewert
+`aktuelle_mandant_id()`, der den Mandanten aus dem Anmelde-Token liest. Die
+Edge Function, die das Postfach speichert, läuft mit dem Dienstschlüssel —
+ohne Token. `null` ist mit nichts gleich, die restriktive Richtlinie blendet
+die Zeile für **jeden** aus, und niemand bekommt einen Fehler zu sehen. Der
+Test der Verbindung meldete sogar „erfolgreich", denn der lief ja.
+
+**Was ich diesmal anders gemacht habe.** fork_22 hat die Lücke für
+Kindsätze mit Elternsatz geschlossen, fork_65 für den Posteingang. Beide
+Male dort, wo es gerade weh tat. Die Frage, die keiner von beiden gestellt
+hat: *welche Tabellen haben dasselbe Problem, ohne dass es jemand gemeldet
+hat?*
+
+Die Antwort: der häufigste Elternsatz ist gar kein Fachdatensatz, sondern
+der **Besitzer**. Ein Postfach gehört dem Mandanten seines Nutzers, eine
+Mailkategorie auch, ein Arbeitszeitmodell ebenso. Dreißig MANDANT-Tabellen
+tragen ein Besitzerfeld auf `profiles` und hatten keinen Wachposten.
+`fork_67` hängt den vorhandenen `mandant_aus_eltern()` an alle dreißig und
+trägt nach, was schon ohne Mandanten lag. Keine neue Funktion, keine neue
+Idee — dieselbe aus fork_22, nur vollständig angewandt.
+
+Danach hält live nur noch `expose_vorlagen` Zeilen ohne Mandanten: die zwölf
+Systemvorlagen, die genau so gemeint sind und im Gate mit Grund ausgenommen
+sind.
+
+**Der Nebenbefund wiegt schwerer als der Befund.** `npm run check` meldete
+rot — und nannte nicht, welches Gate. Jeder Abschnitt stand auf `[ok]`, die
+Meldung des gefallenen Gates ging auf stderr und verlief sich in tausend
+Zeilen Protokoll. Ich habe an einem Tag zweimal danach gesucht und einen Lauf
+für unerklärlich gehalten und das dem Auftraggeber auch so geschrieben. Das
+war kein Flackern, sondern ein Gate, das nicht sagt, was es beanstandet.
+
+`scripts/check.sh` führt jetzt mit, welcher Abschnitt gerade läuft, und nennt
+am Ende jeden gescheiterten beim Namen. Nachgewiesen mit einem Lauf, in dem
+ein Gate absichtlich fällt.
+
+Dabei noch ein Fehler an mir selbst, der zeigt, warum `bash -n` nichts
+beweist: die Hilfsfunktion hieß nach einer zu großzügigen Ersetzung
+`schlecht() { schlecht; ... }` — eine Endlosschleife, syntaktisch tadellos,
+die beim ersten gefallenen Gate mit einem Speicherzugriffsfehler endete. Erst
+der Lauf mit einem absichtlich gefallenen Gate hat es gezeigt. Eine Probe,
+die den Fehlerfall nicht ausführt, prüft den Fehlerfall nicht.
+
+**Was dieser Fund über das Gate von fork_65 sagt:** `tests/mandant-ohne.sql`
+läuft gegen die lokale Datenbank aus den Migrationen. Dort gibt es keine
+Daten, also findet es dort nie etwas. Die Bestandsfrage muss gegen das echte
+Projekt gestellt werden — das habe ich bei fork_65 von Hand getan und danach
+nicht wieder. In `docs/OFFEN.md` steht jetzt die Abfrage dafür.
