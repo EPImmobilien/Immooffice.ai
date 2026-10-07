@@ -21,8 +21,14 @@ import sys
 
 STAMM = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VORLAGEN = os.path.join(STAMM, "packages", "expose-renderer", "vorlagen")
+# Das Ziel muss die LETZTE Migration sein, die diese Kennungen anfasst.
+# Am 07.10.2026 war es das nicht: fork_42 und fork_43 sind spaetere
+# Schnappschuesse derselben drei Vorlagen, und bei einem Neuaufbau von Null
+# gewann der aeltere Stand. Jede Vorlagenaenderung ueber dieses Skript war
+# damit nur auf dem laufenden Projekt wirksam, nicht in der Migrationskette.
+# pruefen() sieht das jetzt nach.
 ZIEL = os.path.join(STAMM, "supabase", "migrations",
-                    "20261005190100_fork_38_expose_systemvorlagen.sql")
+                    "20261007110000_fork_64_expose_vorlagen_stand.sql")
 
 # Feste Kennungen. Erzeugt mit uuidgen, hier festgeschrieben.
 KENNUNG = {
@@ -156,8 +162,33 @@ def main():
               f"spielt noch die alte Fassung ein.")
         print(f"  `python3 scripts/expose-systemvorlagen.py` ausfuehren.")
         return 1
+    # Und: keine SPAETERE Migration darf diese Kennungen noch anfassen.
+    #
+    # Genau das war am 07.10.2026 der Fall. fork_42 und fork_43 sind
+    # spaetere Schnappschuesse derselben drei Vorlagen; bei einem Neuaufbau
+    # von Null gewann deren alter Stand. Die Aenderung war auf dem
+    # laufenden Projekt da und in der Migrationskette nicht — zwei
+    # Staende, und der Unterschied faellt erst beim naechsten Projekt auf.
+    ordner = os.path.dirname(ZIEL)
+    nach_ziel = sorted(n for n in os.listdir(ordner)
+                       if n.endswith(".sql") and n > os.path.basename(ZIEL))
+    spaeter = []
+    for n in nach_ziel:
+        with open(os.path.join(ordner, n), encoding="utf-8") as f:
+            inhalt = f.read()
+        if any(k in inhalt for k in KENNUNG.values()):
+            spaeter.append(n)
+    if spaeter:
+        print(f"  [FEHLER] Diese Migration laeuft VOR {', '.join(spaeter)}, "
+              f"und die fassen dieselben Vorlagen an. Der letzte Stand "
+              f"gewinnt — also muss dieses Skript in die letzte schreiben.")
+        print(f"  ZIEL in {os.path.basename(__file__)} auf eine neuere "
+              f"Datei stellen und neu erzeugen.")
+        return 1
+
     print(f"  [ok] Die Migration spielt genau die {len(KENNUNG)} Vorlagen ein, "
-          f"die in packages/expose-renderer/vorlagen/ liegen.")
+          f"die in packages/expose-renderer/vorlagen/ liegen — und keine "
+          f"spaetere ueberschreibt sie.")
     return 0
 
 

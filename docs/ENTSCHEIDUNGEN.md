@@ -5692,3 +5692,19 @@ Grundriss genau **einmal** gezeichnet wird. „Genau einmal" ist beides — kein
 Bild fehlt, keines steht zweimal. Gegenproben in beide Richtungen gemacht.
 
 100 Fotos und 20 Grundrisse ergeben 51 Seiten.
+
+**Nebenbefund, älter als fork_64:** Das Erzeugerskript schrieb in
+`20261005190100_fork_38_…`, aber `fork_42` und `fork_43` sind **spätere**
+Schnappschüsse derselben drei Vorlagen. Bei einem Neuaufbau von Null gewann
+deren alter Stand. Jede Vorlagenänderung über das Skript war damit auf dem
+laufenden Projekt wirksam und in der Migrationskette **nicht** — zwei
+Stände, und der Unterschied fällt erst beim nächsten Projekt auf. Aufgefallen
+ist es, weil fork_64 die Seitenzahl ändert: live 12 Seiten, lokal nach
+`npm run db:test` 10.
+
+Das Ziel des Skripts ist jetzt
+`20261007110000_fork_64_expose_vorlagen_stand.sql` — die letzte —, und
+`--pruefen` sieht nach, dass keine spätere Migration dieselben Kennungen
+anfasst. Gegenprobe gemacht: Ziel zurück auf fork_38 gestellt, der Test
+nennt beide Überschreiber. Lokal und live tragen jetzt dieselben drei
+Prüfsummen.
