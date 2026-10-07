@@ -715,9 +715,20 @@ function Logo({
   return React.createElement("img", {
     src: quelle,
     alt: marke,
+    // maxWidth und objectFit gehoeren zusammen und sind kein Schmuck.
+    // Das Logo der Vorlage war fast quadratisch; unseres steht im
+    // Verhaeltnis 1831:284. Bei height 90 — so steht es auf der
+    // Anmeldeseite — sind das 580 px Breite, waehrend die Anmeldekarte
+    // innen 344 px hat. Ohne Begrenzung ragte das Haus links aus der
+    // Karte heraus und stand dunkelblau auf dunkelblauem Grund: ein
+    // Gespenst, das wie ein Anschnitt aussah. Am 07.10.2026 gemeldet.
+    //
+    // Wo das Logo ohnehin hineinpasst, aendert sich dadurch nichts.
     style: {
       height: e,
       width: "auto",
+      maxWidth: "100%",
+      objectFit: "contain",
       display: "block"
     }
   })

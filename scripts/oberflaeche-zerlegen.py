@@ -825,7 +825,7 @@ ERSETZUNGEN = [
     # dieselbe Referenz.
     # =====================================================================
     ('FORK',
-     r'\nfunction Logo\(\{\n  height: e = 60,\n  variant: t = "blau"\n\}\) \{\n  return React\.createElement\("img", \{\n    src: "dunkel" === t \? LOGO_DUNKEL : LOGO_BLAU,\n    alt: "Musterhaus Immobilien GmbH",',
+     r'\nfunction Logo\(\{\n  height: e = 60,\n  variant: t = "blau"\n\}\) \{\n  return React\.createElement\("img", \{\n    src: "dunkel" === t \? LOGO_DUNKEL : LOGO_BLAU,\n    alt: "Musterhaus Immobilien GmbH",\n    style: \{\n      height: e,\n      width: "auto",\n      display: "block"\n    \}',
      '\n'
      '// Die CI des Mandanten anwenden. Wird aus getProfile gerufen, also nach\n'
      '// der Anmeldung und bevor React mit dem Profil neu rendert.\n'
@@ -926,8 +926,25 @@ ERSETZUNGEN = [
      '  }, marke);\n'
      '  return React.createElement("img", {\n'
      '    src: quelle,\n'
-     '    alt: marke,',
-     'Mandanten-CI anwenden und das Logo mit Wortmarken-Ersatz.'),
+     '    alt: marke,\n'
+     '    // maxWidth und objectFit gehoeren zusammen und sind kein Schmuck.\n'
+     '    // Das Logo der Vorlage war fast quadratisch; unseres steht im\n'
+     '    // Verhaeltnis 1831:284. Bei height 90 — so steht es auf der\n'
+     '    // Anmeldeseite — sind das 580 px Breite, waehrend die Anmeldekarte\n'
+     '    // innen 344 px hat. Ohne Begrenzung ragte das Haus links aus der\n'
+     '    // Karte heraus und stand dunkelblau auf dunkelblauem Grund: ein\n'
+     '    // Gespenst, das wie ein Anschnitt aussah. Am 07.10.2026 gemeldet.\n'
+     '    //\n'
+     '    // Wo das Logo ohnehin hineinpasst, aendert sich dadurch nichts.\n'
+     '    style: {\n'
+     '      height: e,\n'
+     '      width: "auto",\n'
+     '      maxWidth: "100%",\n'
+     '      objectFit: "contain",\n'
+     '      display: "block"\n'
+     '    }',
+     'Mandanten-CI anwenden und das Logo mit Wortmarken-Ersatz; das Bild '
+     'bleibt in seinem Platz.'),
 
     # getProfile holt die CI gleich mit — es ist die einzige Stelle, an der das
     # Profil des Angemeldeten geladen wird.
