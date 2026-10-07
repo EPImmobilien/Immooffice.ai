@@ -28675,7 +28675,11 @@ function BestandsImmobilienPage({
     }
   }, React.createElement(Plus, {
     size: 14
-  }), " Neues Objekt"), React.createElement("input", {
+  }), " Neues Objekt"), "eigene" === h && window.ImmoCsvImportKnopf && React.createElement(window.ImmoCsvImportKnopf, {
+    art: "immobilien",
+    user: e,
+    fertig: j
+  }), React.createElement("input", {
     type: "text",
     placeholder: "Suche — Straße, Hausnummer, PLZ, Ort, Objekt-Nr., Bezeichnung (mehrere Wörter möglich)",
     value: c,
@@ -38844,7 +38848,11 @@ function KontaktePage({
       ? b.length + " angezeigte Kontakte als CSV herunterladen"
       : "Keine Kontakte in der aktuellen Auswahl",
     style: { ...secondaryBtn, opacity: b.length ? 1 : .5 }
-  }, "CSV-Export (" + b.length + ")"), React.createElement(NewsletterKnopf, {
+  }, "CSV-Export (" + b.length + ")"), window.ImmoCsvImportKnopf && React.createElement(window.ImmoCsvImportKnopf, {
+    art: "kontakte",
+    user: e,
+    fertig: f
+  }), React.createElement(NewsletterKnopf, {
     user: e
   }), React.createElement("input", {
     type: "text",

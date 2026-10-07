@@ -776,6 +776,13 @@ else
   schlecht
 fi
 
+abschnitt "CSV-Import: Lesen, Zuordnen, Pruefen"
+if node tests/csv-import.js; then
+  :
+else
+  schlecht
+fi
+
 abschnitt "IMAP: liest der Abruf die Ordnerliste jedes Servers?"
 node tests/imap-ordnerliste.js || schlecht
 

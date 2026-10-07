@@ -4690,6 +4690,23 @@ WOERTLICH = [
      'Einstellungen: die Reiter zeigen Abrechnungstafel und Support-Zugriffe.'),
 
     # =====================================================================
+    # fork_81 — CSV-Import: Kontakte ins Adressbuch, Objekte in den Bestand
+    # ---------------------------------------------------------------------
+    # Ein Knopf neben dem CSV-Export bzw. neben "Neues Objekt". Das Fenster
+    # steht in src/eigene/csv-import.js; fehlt es, fehlt nur der Knopf.
+    # `f` bzw. `j` ist die Ladefunktion der Seite — nach dem Import laedt
+    # die Liste neu.
+    # =====================================================================
+    ('FORK',
+     '  }, "CSV-Export (" + b.length + ")"), React.createElement(NewsletterKnopf, {\n    user: e\n  }),',
+     '  }, "CSV-Export (" + b.length + ")"), window.ImmoCsvImportKnopf && React.createElement(window.ImmoCsvImportKnopf, {\n    art: "kontakte",\n    user: e,\n    fertig: f\n  }), React.createElement(NewsletterKnopf, {\n    user: e\n  }),',
+     'Adressbuch: CSV-Import neben dem Export.'),
+    ('FORK',
+     '  }, React.createElement(Plus, {\n    size: 14\n  }), " Neues Objekt"), React.createElement("input", {\n    type: "text",\n    placeholder: "Suche — Straße, Hausnummer, PLZ, Ort, Objekt-Nr., Bezeichnung (mehrere Wörter möglich)",',
+     '  }, React.createElement(Plus, {\n    size: 14\n  }), " Neues Objekt"), "eigene" === h && window.ImmoCsvImportKnopf && React.createElement(window.ImmoCsvImportKnopf, {\n    art: "immobilien",\n    user: e,\n    fertig: j\n  }), React.createElement("input", {\n    type: "text",\n    placeholder: "Suche — Straße, Hausnummer, PLZ, Ort, Objekt-Nr., Bezeichnung (mehrere Wörter möglich)",',
+     'Objekte: CSV-Import neben "Neues Objekt".'),
+
+    # =====================================================================
     # fork_52 — der Plattform-Bereich des Betreibers
     # ---------------------------------------------------------------------
     # Eine Kachel, eine Ansicht, eine Sperre und die Frage beim Anmelden.

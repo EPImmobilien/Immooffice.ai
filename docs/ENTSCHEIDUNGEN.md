@@ -6379,3 +6379,29 @@ Briefe und Verträge anlegen lassen können.
 - **Nächster Schritt**: dieselben Werkzeuge als MCP-Server (Claude-Connector,
   Schalter `mcp_connector`, ab Professional). ChatGPT nimmt denselben
   MCP-Server als Connector — ein Server, zwei Assistenten.
+
+## 2026-10-07 · CSV-Import für Kontakte und Objekte (fork_81)
+
+Der Import läuft im Browser mit dem Konto des Angemeldeten — keine Edge
+Function, kein Dienstschlüssel. Was der Nutzer nicht anlegen dürfte, legt
+auch der Import nicht an (RLS, `mandant_id` aus dem Vorgabewert), und die
+Mandantengrenze bekommt keinen zweiten Pfad.
+
+Drei Schritte, keiner übersprungen: Datei lesen, Spalten zuordnen
+(automatisch vorbelegt, vom Nutzer sichtbar bestätigt oder geändert),
+prüfen mit Vorschau. Das ist das Prinzip „KI-Auslese immer über ein
+editierbares Formular" ohne KI — eine Zuordnung, die der Nutzer nicht
+gesehen hat, ist eine Vermutung. Eine Zahl, die sich nicht lesen lässt,
+macht die Zeile unlesbar und landet im Bericht; sie wird nicht auf 0
+gesetzt.
+
+Dubletten: Kontakte über die E-Mail, Objekte über Objekt-Nr. oder
+Straße + Hausnummer + PLZ. Beides ist nur ein Hinweis mit Schalter, keine
+Sperre — wer zwei Eigentümer mit derselben Sammeladresse hat, soll sie
+anlegen können. Rollen, die der Katalog nicht kennt, werden „sonstiges",
+nicht erfunden; Vertragsart und Status haben eine sichtbare Vorgabe für
+Dateien ohne diese Spalte.
+
+Rückgängig gibt es nicht gesammelt: die Vorlage kennt keine Import-
+Stapel, und ein nachträglich angebauter würde eine Löschung über die
+Mandantengrenze hinweg ermöglichen müssen. Die Vorschau ist der Schutz.
