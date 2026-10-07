@@ -54,6 +54,9 @@ pruefe("Kasse: zweite Kasse bei laufendem Abo wird abgewiesen",
 pruefe("Kasse: Aktionscode nur ohne festen Rabatt (Stripe lehnt beides zugleich ab)",
   /if \(!felder\["discounts\[0\]\[coupon\]"\]\) felder\.allow_promotion_codes/.test(kasse));
 
+pruefe("Kasse: keine Idempotenzschlüssel an Checkout-Sitzungen (sperrten den Starter-Tarif, 07.10.)",
+  !/__idem: "abo:/.test(kasse));
+
 // --- Webhook -------------------------------------------------------------------
 const paid = webhook.slice(webhook.indexOf('case "invoice.paid"'),
   webhook.indexOf('case "invoice.finalized"'));
