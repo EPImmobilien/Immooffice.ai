@@ -4797,6 +4797,17 @@ WOERTLICH = [
     ('MARKE', '  if (!window.msal) throw new Error("Microsoft-Login-Modul wird noch geladen.',
      '  if (!ONEDRIVE_CLIENT_ID) throw new Error("OneDrive ist für diese Installation noch nicht eingerichtet. Bitte wenden Sie sich an den Support.");\n  if (!window.msal) throw new Error("Microsoft-Login-Modul wird noch geladen.',
      'OneDrive: klare Meldung ohne Client-ID.'),
+    # --- fork_83: das Chat-Fenster ruft den KI-Assistenten mit Werkzeugen ---
+    # (supabase/eigene/ki-assistent) statt claude-chat, das nur reden kann.
+    ('FORK', 'await window._sb.functions.invoke("claude-chat", {',
+     'await window._sb.functions.invoke("ki-assistent", {',
+     'Chat-Fenster: KI-Assistent mit Werkzeugen (fork_83).'),
+    ('FORK', '}, "Frag mich was — z.B.:"), React.createElement("div", {',
+     '}, "Ich kann Ihre Objekte und Kontakte lesen und Entwürfe anlegen — z. B.:"), React.createElement("div", {',
+     'Chat-Fenster: KI-Assistent mit Werkzeugen (fork_83).'),
+    ('FORK', 'React.createElement("div", null, \'• "Schreib mir einen Exposé-Text für ..."\'), React.createElement("div", null, \'• "Wie hoch ist die Grunderwerbsteuer in MV?"\'), React.createElement("div", null, \'• "Verfass eine E-Mail an einen Kunden"\'), React.createElement("div", null, \'• "Berechne 3,57% Provision auf 449.000 €"\')',
+     'React.createElement("div", null, \'• "Lege eine E-Mail-Vorlage für die Absage nach einer Besichtigung an"\'), React.createElement("div", null, \'• "Schreib einen Brief an den Eigentümer der Hafenstraße 12"\'), React.createElement("div", null, \'• "Erstelle eine ToDo-Kette für die Vermietung einer Wohnung"\'), React.createElement("div", null, \'• "Entwirf eine Reservierungsvereinbarung für Objekt 1042"\')',
+     'Chat-Fenster: KI-Assistent mit Werkzeugen (fork_83).'),
 ]
 
 

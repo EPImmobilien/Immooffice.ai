@@ -68,17 +68,20 @@ for (const name of empfaenger) {
 // --- 2. Die Aktionsschluessel muss es im Katalog geben --------------------
 // Gelesen wird aus der Migration, die den Katalog saet — nicht aus einer
 // zweiten Liste hier. Eine Liste, die man doppelt pflegt, prueft nichts.
-const katalogDatei = path.join(WURZEL, 'supabase', 'migrations',
-  '20261006210000_fork_47_abrechnung.sql');
-const katalog = fs.existsSync(katalogDatei) ? fs.readFileSync(katalogDatei, 'utf8') : '';
-// Nur der EINE insert-Block. Bis zum 06.10.2026 lief der Ausdruck ueber die
+// fork_47 saet den Katalog, spaetere Migrationen fuegen Aktionen hinzu
+// (fork_83: ki_assistent). Gelesen werden deshalb die insert-Bloecke in
+// plattform_credit_preise aus ALLEN Migrationen.
+const MIGRATIONEN = path.join(WURZEL, 'supabase', 'migrations');
+const katalog = fs.readdirSync(MIGRATIONEN).filter((f) => f.endsWith('.sql')).sort()
+  .map((f) => fs.readFileSync(path.join(MIGRATIONEN, f), 'utf8')).join('\n');
+// Nur die insert-Bloecke. Bis zum 06.10.2026 lief der Ausdruck ueber die
 // ganze Datei und nahm die Tarifzeilen aus plattform_tarife mit — starter,
 // professional, business, zusatznutzer standen damit als "bekannte
 // Aktionen" da. Aufgefallen ist es erst, als die Gegenrichtung geprueft
 // wurde: ein zu grosser Satz bekannter Namen faellt bei einer Pruefung auf
 // Zugehoerigkeit nie auf.
-const katalogBlock = (katalog.match(
-  /insert into public\.plattform_credit_preise[\s\S]*?on conflict/) || [''])[0];
+const katalogBlock = Array.from(katalog.matchAll(
+  /insert into public\.plattform_credit_preise[\s\S]*?on conflict/g)).map((m) => m[0]).join('\n');
 const bekannt = new Set(
   Array.from(katalogBlock.matchAll(/\('([a-z_]+)',\s*'[^']*',\s*\d+,/g)).map((m) => m[1]));
 melde('der Katalog nennt Aktionen', bekannt.size >= 5, `${bekannt.size} Aktionen`);

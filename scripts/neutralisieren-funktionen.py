@@ -52,6 +52,7 @@ GEMEINSAME_BEILAGEN = {
         'expose-pruefen',
         'ki-bildbearbeitung',
         'signatur-vorgang-starten',
+        'ki-assistent',     # eigene Funktion (supabase/eigene/), fork_83
     },
     # fork_61 — die Abo-Schranke. Sie liegt bei den Funktionen, die ein
     # Sprachmodell rufen und (noch) keinen Preis im Katalog haben. Welche
