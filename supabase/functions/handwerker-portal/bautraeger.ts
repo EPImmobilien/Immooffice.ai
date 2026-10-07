@@ -83,11 +83,14 @@ export async function mailen(db: Db, mandant: string, an: string, anName: string
   if (!abs) return { ok: false, grund: "kein Absender (Postfach des Mandanten oder SMTP_FROM_EMAIL)" };
   const start = Date.now();
   let r: Response | null = null;
+  // Anzeigenamen in Anfuehrungszeichen (RFC 5322): Umlaute, Kommas und
+  // Klammern im Firmennamen sind sonst ein 400 von Resend.
+  const name = (s: string) => `"${String(s || "").replace(/["\\]/g, "").trim()}"`;
   try {
     r = await fetch("https://api.resend.com/emails", {
       method: "POST", headers: { Authorization: "Bearer " + schluessel, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: `${abs.name} <${abs.mail}>`, to: [anName ? `${anName} <${an}>` : an],
+        from: `${name(abs.name)} <${abs.mail}>`, to: [anName ? `${name(anName)} <${an}>` : an],
         reply_to: opts.antwort_an || abs.antwort_an, subject: betreff, text,
         ...(opts.html ? { html: opts.html } : {}),
         ...(opts.anhaenge?.length ? { attachments: opts.anhaenge } : {}),
@@ -96,7 +99,12 @@ export async function mailen(db: Db, mandant: string, an: string, anName: string
   } catch { r = null; }
   await db.from("dienst_aufrufe").insert({ dienst: "resend", funktion: (globalThis as any).__immoFunktion || "bautraeger", dauer_ms: Date.now() - start, ok: !!r?.ok, status: r?.status ?? null }).then(() => {}, () => {});
   if (!r) return { ok: false, grund: "Resend nicht erreichbar" };
-  if (!r.ok) return { ok: false, grund: `Resend ${r.status}` };
+  if (!r.ok) {
+    // Den Grund mitnehmen: "domain is not verified", "Invalid `from` field" —
+    // ohne ihn steht im Protokoll nur eine Zahl.
+    const text = await r.text().catch(() => "");
+    return { ok: false, grund: `Resend ${r.status}: ${text.replace(/\s+/g, " ").slice(0, 240)}` };
+  }
   return { ok: true };
 }
 
