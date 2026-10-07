@@ -32,8 +32,8 @@ Supabase: **Edge Functions → Secrets** (in älteren Oberflächen:
 
 | Name | Wert |
 |---|---|
-| `PORTAL_URL` | `https://immoofficeeai.netlify.app` — ohne Schrägstrich am Ende. Später die eigene Domain. |
-| `EXPOSE_FREIGABE_BASIS` | `https://immoofficeeai.netlify.app/freigabe.html` |
+| `PORTAL_URL` | `https://app.immooffice.ai` — ohne Schrägstrich am Ende (bis die Domain auflöst: `https://immoofficeeai.netlify.app`). |
+| `EXPOSE_FREIGABE_BASIS` | `https://app.immooffice.ai/freigabe.html` |
 | `MAIL_SECRET_KEY` | selbst erzeugen: `openssl rand -base64 32` |
 | `CREDENTIALS_OBF_SECRET` | selbst erzeugen: `openssl rand -base64 32` |
 
@@ -180,9 +180,13 @@ Kurzform:
    dann müssen `MX`-Einträge mit) oder `A @ → 75.2.60.5` und
    `CNAME www → immoofficeeai.netlify.app` setzen.
 3. Warten, bis die Domain auflöst und Netlify das Zertifikat ausgestellt hat.
-4. Danach in Supabase `PORTAL_URL` und `EXPOSE_FREIGABE_BASIS` umstellen —
-   **und** unter *Authentication → URL Configuration* die **Site URL**. Die
-   Registrierung baut den Bestätigungslink aus ihr.
+4. Danach in Supabase `PORTAL_URL` (`https://app.immooffice.ai`) und
+   `EXPOSE_FREIGABE_BASIS` (`https://app.immooffice.ai/freigabe.html`)
+   umstellen — **und** unter *Authentication → URL Configuration* die
+   **Site URL** auf `https://app.immooffice.ai`, Redirect URL
+   `https://app.immooffice.ai/**` dazu. Die Registrierung baut den
+   Bestätigungslink aus der Site URL. Die Website ohne `app.` ist eine
+   andere Site (`website-ausliefern.yml`).
 
 Reihenfolge einhalten: Links, die vor der Umstellung verschickt wurden,
 zeigen weiter auf die Netlify-Adresse. Die bleibt erreichbar.

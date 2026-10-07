@@ -67,7 +67,7 @@ das aus. Jeder Zugang hier ist ein **neuer**, auf immoOffice.ai ausgestellter.
 | Wert | Woher | Aufwand |
 |---|---|---|
 | `ANTHROPIC_API_KEY` | console.anthropic.com → *API Keys* → *Create Key*. Beginnt mit `sk-ant-`. Kostet nach Verbrauch; für den Anfang reicht ein kleines Guthaben. | 5 Minuten |
-| `PORTAL_URL` | **Kein Passwort.** Die eigene Adresse der Anwendung, ohne Schrägstrich am Ende. Heute: `https://immoofficeeai.netlify.app`, nach Schritt 7 der Inbetriebnahme die eigene Domain (siehe `docs/DOMAIN_VERBINDEN.md`). Solange sie fehlt, zeigt jeder Einladungs- und Freigabelink auf `https://immooffice.example` — eine reservierte Platzhalter-Domain, die nirgendwo hinführt. | 1 Minute |
+| `PORTAL_URL` | **Kein Passwort.** Die eigene Adresse der Anwendung, ohne Schrägstrich am Ende. Heute: `https://app.immooffice.ai` (Rückfall `https://immoofficeeai.netlify.app`), nach Schritt 7 der Inbetriebnahme die eigene Domain (siehe `docs/DOMAIN_VERBINDEN.md`). Solange sie fehlt, zeigt jeder Einladungs- und Freigabelink auf `https://immooffice.example` — eine reservierte Platzhalter-Domain, die nirgendwo hinführt. | 1 Minute |
 | `RESEND_API_KEY` | resend.com → Konto anlegen → *API Keys* → *Create API Key*. Beginnt mit `re_`. **Vorher** unter *Domains* die eigene Absenderdomäne eintragen und die drei DNS-Einträge setzen, die Resend anzeigt (SPF, DKIM, DMARC). Ohne verifizierte Domäne nimmt Resend nur Post an die eigene Kontoadresse an. | 20 Minuten plus DNS-Wartezeit |
 | `EXPOSE_FREIGABE_BASIS` | Wieder kein Passwort: die Adresse der Freigabeseite, in aller Regel `{PORTAL_URL}/freigabe.html`. | 1 Minute |
 

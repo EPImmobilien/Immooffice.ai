@@ -160,8 +160,8 @@ jobs:
           fi
           cd ..
           # ZWEI Adressen, nicht eine. Bei --prod gibt die CLI unter "url" die
-          # PRIMAERE DOMAIN der Site zurueck — bei dieser Site immooffice.ai,
-          # die am 07.10.2026 noch gar nicht auf Netlify zeigte. Lauf 29 hat
+          # PRIMAERE DOMAIN der Site zurueck — bei dieser Site app.immooffice.ai
+          # (am Morgen des 07.10.2026 noch immooffice.ai, das damals nicht auflöste). Lauf 29 hat
           # deshalb rot gemeldet, obwohl die Auslieferung geglueckt war: der
           # Nachsehen-Schritt rief eine Adresse, die es noch nicht gibt.
           #

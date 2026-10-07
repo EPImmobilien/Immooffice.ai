@@ -39,13 +39,19 @@ werden und niemand sieht, warum.
 
 ## Gemeinsamer Anfang: die Domain bei Netlify anmelden
 
-**Vermutlich schon passiert.** Die Produktions-Auslieferung vom 07.10.2026
-(Lauf 29) hat als Adresse der Site `https://immooffice.ai` zurückgegeben —
-`netlify deploy --prod --json` nennt dort die **primäre Domain**. Diese Domain
-ist also bereits an die Site gehängt und als primär gesetzt; es fehlt allein
-das DNS. Wenn die Strato-Domain `immooffice.ai` ist, ist dieser Abschnitt
-erledigt und es geht direkt bei Weg A weiter. Ist es eine **andere** Domain,
-muss sie hier dazukommen und unter *Primary domain* an die erste Stelle.
+**Stand 07.10.2026 — zwei Adressen, zwei Sites:**
+
+| Adresse | Was | Netlify-Site | Workflow |
+|---|---|---|---|
+| `https://immooffice.ai` | Landingpage (`website/`) | eigene Site | `website-ausliefern.yml` |
+| `https://app.immooffice.ai` | die Anwendung (`dist/`) | **`immoofficeeai`** | `oberflaeche-ausliefern.yml` |
+
+Die Anwendung heißt also **`app.immooffice.ai`**; `immooffice.ai` ohne
+`app.` ist die Website und zeigt mit ihrem Anmelde-Knopf
+(`website/konfig.js`, `anwendung`) auf die App. Für die App-Site muss
+`app.immooffice.ai` unter *Primary domain* stehen; `netlify deploy --prod`
+nennt dann diese Adresse. Die Schritte unten gelten je Site — für die App
+mit `app.immooffice.ai` statt `ihre-domain.de`.
 
 1. Netlify → die Site **`immoofficeeai`** → *Domain management* →
    *Domains* → **Add a domain**.
@@ -140,8 +146,8 @@ Supabase → *Edge Functions → Secrets*:
 
 | Name | Wert |
 |---|---|
-| `PORTAL_URL` | `https://ihre-domain.de` — **ohne** Schrägstrich am Ende |
-| `EXPOSE_FREIGABE_BASIS` | `https://ihre-domain.de/freigabe.html` |
+| `PORTAL_URL` | `https://app.immooffice.ai` — **ohne** Schrägstrich am Ende |
+| `EXPOSE_FREIGABE_BASIS` | `https://app.immooffice.ai/freigabe.html` |
 
 Diese beiden lesen 20 Edge Functions; davon hängen Eigentümer-Einladung,
 Exposé-Freigabe, Upload-Benachrichtigung, Signaturvorgang, Terminerinnerung
@@ -153,8 +159,8 @@ reservierte Platzhalter-Domain, die nirgendwo hinführt.
 
 Supabase → *Authentication → URL Configuration*:
 
-- **Site URL**: `https://ihre-domain.de`
-- **Redirect URLs**: `https://ihre-domain.de/**` ergänzen
+- **Site URL**: `https://app.immooffice.ai`
+- **Redirect URLs**: `https://app.immooffice.ai/**` ergänzen
 
 Der Grund ist nicht Kosmetik. Die Registrierung ruft `auth.signUp` **ohne**
 `emailRedirectTo` (`src/app/anwendung.js`) — der Bestätigungslink wird also

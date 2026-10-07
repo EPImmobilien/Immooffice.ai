@@ -687,7 +687,7 @@ Functions `plattform-admin` (erweitert), `plattform-stripe-abgleich`,
 `plattform-warnungen`, Oberfläche `src/eigene/plattform.js` (14 Reiter),
 `hilfe.js`, `hinweise.js`, `features.js`; je Schritt SQL-Gates in
 `npm run check`; alles auf dem Projekt `usguiggfciavwzkdfjgt` und unter
-immooffice.ai ausgerollt.
+app.immooffice.ai ausgerollt (die Website ohne `app.` ist eine eigene Site).
 
 **Offene Annahmen:** Stripe nur Testmodus (Gate 3); E-Mail-Versand
 best effort über Resend; „Erneut verarbeiten" für Webhooks gibt es bewusst
@@ -728,6 +728,11 @@ Werden hier je Schritt nachgetragen. Reihenfolge wie im Auftrag.
    Alarm-Schwellen (Start 50 €/Tag, 1.000 €/Monat, je Mandant 10/100 €).
 6. Leaked-Password-Schutz unter *Authentication → Password* einschalten
    (Supabase-Advisor).
-7. Demo-Daten nach der Abnahme wieder entfernen (Reiter „Warnungen", unten,
+7. Domain-Werte prüfen: `PORTAL_URL` = `https://app.immooffice.ai`,
+   `EXPOSE_FREIGABE_BASIS` = `https://app.immooffice.ai/freigabe.html`,
+   Supabase *Site URL* = `https://app.immooffice.ai` (docs/DOMAIN_VERBINDEN.md).
+   Alle Mails des Betreiberbereichs (Support, Zugriffsanfrage) bauen ihre
+   Links aus `PORTAL_URL`.
+8. Demo-Daten nach der Abnahme wieder entfernen (Reiter „Warnungen", unten,
    Bestätigung DEMO) — sie zählen in allen Listen mit, nur Warnungen,
    Zusammenfassung und Stripe-Abgleich lassen sie aus.
