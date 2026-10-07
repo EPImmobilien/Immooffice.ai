@@ -1,0 +1,83 @@
+# Legt den Stripe-Katalog (Tarife, Preise, Pakete, Gründer-Coupon,
+# Kundenportal) an und schreibt die Kennungen in die Datenbank —
+# scripts/stripe-einrichten.mjs, ausgeführt auf einem Runner.
+#
+# Warum über GitHub Actions: Der Stripe-Zugang über den Model-Context-Server
+# darf im Livemodus nur lesen, und der Betreiber hat keinen Rechner mit Node.
+# Ein Runner hat freien Ausgang; das Skript ist idempotent und darf beliebig
+# oft laufen.
+#
+# Voraussetzungen (Repository → Settings → Secrets and variables → Actions):
+#   STRIPE_SECRET_KEY_LIVE   sk_live_…  (für modus = live)
+#   STRIPE_SECRET_KEY_TEST   sk_test_…  (für modus = test, optional)
+#   SUPABASE_ACCESS_TOKEN    besteht schon (Migrationen, Funktionen)
+# Den Dienstschlüssel des Projekts holt der Lauf selbst über die
+# Verwaltungs-API — er muss nirgends zusätzlich hinterlegt werden.
+#
+# Von Hand gestartet, nie automatisch.
+name: Stripe einrichten
+
+on:
+  workflow_dispatch:
+    inputs:
+      modus:
+        description: 'test oder live'
+        type: choice
+        options: [live, test]
+        default: live
+      trocken:
+        description: 'Nur anzeigen, was angelegt würde'
+        type: boolean
+        default: false
+
+concurrency:
+  group: stripe-einrichten
+  cancel-in-progress: false
+
+jobs:
+  einrichten:
+    runs-on: ubuntu-24.04
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJEKT: usguiggfciavwzkdfjgt
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Schlüssel bereitstellen
+        env:
+          LIVE_KEY: ${{ secrets.STRIPE_SECRET_KEY_LIVE }}
+          TEST_KEY: ${{ secrets.STRIPE_SECRET_KEY_TEST }}
+          MODUS: ${{ inputs.modus }}
+        run: |
+          set -euo pipefail
+          if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
+            echo "::error::Das Repository-Geheimnis SUPABASE_ACCESS_TOKEN fehlt."; exit 1
+          fi
+          if [ "$MODUS" = "live" ]; then KEY="$LIVE_KEY"; NAME=STRIPE_SECRET_KEY_LIVE; else KEY="$TEST_KEY"; NAME=STRIPE_SECRET_KEY_TEST; fi
+          if [ -z "$KEY" ]; then
+            echo "::error::Das Repository-Geheimnis $NAME fehlt."; exit 1
+          fi
+          echo "::add-mask::$KEY"
+          echo "STRIPE_SECRET_KEY=$KEY" >> "$GITHUB_ENV"
+
+          DIENST=$(curl -sSf -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            "https://api.supabase.com/v1/projects/$PROJEKT/api-keys?reveal=true" \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const k=JSON.parse(s).find(x=>x.name==="service_role");if(!k)process.exit(1);process.stdout.write(k.api_key)})')
+          echo "::add-mask::$DIENST"
+          echo "SUPABASE_SERVICE_ROLE_KEY=$DIENST" >> "$GITHUB_ENV"
+          echo "SUPABASE_URL=https://$PROJEKT.supabase.co" >> "$GITHUB_ENV"
+
+      - name: Katalog anlegen
+        env:
+          MODUS: ${{ inputs.modus }}
+          TROCKEN: ${{ inputs.trocken }}
+        run: |
+          set -euo pipefail
+          ARGS=()
+          [ "$MODUS" = "live" ] && ARGS+=(--live)
+          [ "$TROCKEN" = "true" ] && ARGS+=(--trocken)
+          node scripts/stripe-einrichten.mjs "${ARGS[@]}"
