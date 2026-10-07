@@ -138,6 +138,13 @@ export function aufbereiten(q: Quellen): Daten {
     if (LEER(roh)) continue;
     d[f.schluessel] = roh;
   }
+  // Ein Energiekennwert von 0 ist ein nicht gepflegtes Feld (Importe liefern
+  // "0"), kein Messwert. Stuende er in den Daten, zeigte das Exposé
+  // "0 kWh/(m²a)" in Fakten, Kacheln und an der Skala.
+  {
+    const kw = z(d["objekt.energie_kennwert"]);
+    if (kw !== undefined && !(kw > 0)) delete d["objekt.energie_kennwert"];
+  }
 
   // --- 2. Zusammengesetzte Textfelder --------------------------------------
   // Die Adresse nur, wenn sie freigegeben ist. adresse_freigeben=false
@@ -502,7 +509,9 @@ function energieAngaben(immo: Record<string, unknown>): { label: string; wert: s
   };
   nimm("Ausweisart", immo["energieausweis_typ"], "text");
   const kennwert = z(immo["energie_kennwert"]);
-  if (kennwert !== undefined) {
+  // 0 ist kein Kennwert, sondern ein nicht gepflegtes Feld (aus Importen
+  // kommt "0"). Ein Exposé mit "0,0 kWh/(m²a)" behauptet etwas Falsches.
+  if (kennwert !== undefined && kennwert > 0) {
     aus.push({ label: "Energiekennwert", wert: `${zahlDe(kennwert, 1, true)} kWh/(m²a)` });
   }
   nimm("Effizienzklasse", immo["energie_klasse"], "text");

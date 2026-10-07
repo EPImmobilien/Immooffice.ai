@@ -2970,7 +2970,9 @@ var energieskala = (el, u) => {
       "r"
     );
   }
-  if (kennwertRoh === void 0) {
+  const genannteKlasse = String(u.daten["objekt.energie_klasse"] ?? "").trim().toLocaleUpperCase("de-DE");
+  const nurKlasse = kennwertRoh === void 0 || !(kennwertRoh > 0) ? klassen.findIndex((k) => k.name.toLocaleUpperCase("de-DE") === genannteKlasse) : -1;
+  if ((kennwertRoh === void 0 || !(kennwertRoh > 0)) && nurKlasse < 0) {
     warne(
       u,
       "fehlender_wert",
@@ -2982,10 +2984,14 @@ var energieskala = (el, u) => {
   let marke = el.x;
   let vorige = 0;
   let getroffen = -1;
-  for (let i = 0; i < klassen.length; i++) {
+  if (nurKlasse >= 0) {
+    marke = el.x + nurKlasse * bw + bw / 2;
+    getroffen = nurKlasse;
+  } else for (let i = 0; i < klassen.length; i++) {
     const g = klassen[i].grenze;
-    if (kennwertRoh <= g) {
-      marke = el.x + i * bw + bw * (kennwertRoh - vorige) / (g - vorige);
+    const kw = kennwertRoh ?? 0;
+    if (kw <= g) {
+      marke = el.x + i * bw + bw * (kw - vorige) / (g - vorige);
       getroffen = i;
       break;
     }
@@ -2996,12 +3002,12 @@ var energieskala = (el, u) => {
     }
   }
   const genannt = String(u.daten["objekt.energie_klasse"] ?? "").trim().toLocaleUpperCase("de-DE");
-  if (genannt && getroffen >= 0 && klassen[getroffen].name.toLocaleUpperCase("de-DE") !== genannt) {
+  if (genannt && getroffen >= 0 && nurKlasse < 0 && klassen[getroffen].name.toLocaleUpperCase("de-DE") !== genannt) {
     warne(
       u,
       "gekuerzt",
       el,
-      `Der Kennwert ${zahlDe(kennwertRoh, 0)} liegt in Klasse ${klassen[getroffen].name}, am Objekt steht aber Klasse ${genannt}. Die Markierung folgt dem Kennwert — bitte den Energieausweis pruefen.`
+      `Der Kennwert ${zahlDe(kennwertRoh ?? 0, 0)} liegt in Klasse ${klassen[getroffen].name}, am Objekt steht aber Klasse ${genannt}. Die Markierung folgt dem Kennwert — bitte den Energieausweis pruefen.`
     );
   }
   const tinte = farbRef(el, "marke_farbe", u) ?? [0, 0, 0, 1];
@@ -3023,7 +3029,7 @@ var energieskala = (el, u) => {
   const fy = yBalken + bh + zahl(el, "fahne_abstand", 18);
   u.blatt.rect(marke - fb / 2, fy, fb, fh, tinte, null, zahl(el, "fahne_radius", 6));
   const sFahne = stilVon(el, u, "stil_fahne");
-  const text3 = zeichenkette(el, "fahne_text") ?? "{{objekt.energie_kennwert}}";
+  const text3 = nurKlasse >= 0 ? `Klasse ${klassen[nurKlasse].name}` : zeichenkette(el, "fahne_text") ?? "{{objekt.energie_kennwert}}";
   const beschriftung = ersetze(u.daten, text3);
   if (beschriftung !== void 0) {
     u.blatt.T(
@@ -4395,6 +4401,10 @@ function aufbereiten(q) {
     if (LEER(roh)) continue;
     d[f.schluessel] = roh;
   }
+  {
+    const kw = z(d["objekt.energie_kennwert"]);
+    if (kw !== void 0 && !(kw > 0)) delete d["objekt.energie_kennwert"];
+  }
   const freigabe = immo["adresse_freigeben"];
   const mitAdresse = freigabe === void 0 || freigabe === null || freigabe === true;
   if (!mitAdresse) {
@@ -4641,7 +4651,7 @@ function energieAngaben(immo) {
   };
   nimm("Ausweisart", immo["energieausweis_typ"], "text");
   const kennwert = z(immo["energie_kennwert"]);
-  if (kennwert !== void 0) {
+  if (kennwert !== void 0 && kennwert > 0) {
     aus.push({ label: "Energiekennwert", wert: `${zahlDe(kennwert, 1, true)} kWh/(m²a)` });
   }
   nimm("Effizienzklasse", immo["energie_klasse"], "text");

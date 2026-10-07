@@ -1439,7 +1439,15 @@ const energieskala: Zeichner = (el, u) => {
               sGrenze.schnitt, sGrenze.groesse, sGrenze.farbe, sGrenze.sperrung, "r");
   }
 
-  if (kennwertRoh === undefined) {
+  // Ohne Kennwert (oder mit 0, dem Wert eines nicht gepflegten Feldes)
+  // steht die Markierung in der MITTE der genannten Klasse — der
+  // Energieausweis nennt oft nur die Klasse. Ohne beides bleibt die Skala
+  // ohne Markierung.
+  const genannteKlasse = String(u.daten["objekt.energie_klasse"] ?? "").trim()
+    .toLocaleUpperCase("de-DE");
+  const nurKlasse = (kennwertRoh === undefined || !(kennwertRoh > 0))
+    ? klassen.findIndex((k) => k.name.toLocaleUpperCase("de-DE") === genannteKlasse) : -1;
+  if ((kennwertRoh === undefined || !(kennwertRoh > 0)) && nurKlasse < 0) {
     warne(u, "fehlender_wert", el,
           "Kein Energiekennwert — die Skala steht ohne Markierung.");
     return;
@@ -1447,10 +1455,14 @@ const energieskala: Zeichner = (el, u) => {
   let marke = el.x;
   let vorige = 0;
   let getroffen = -1;
-  for (let i = 0; i < klassen.length; i++) {
+  if (nurKlasse >= 0) {
+    marke = el.x + nurKlasse * bw + bw / 2;
+    getroffen = nurKlasse;
+  } else for (let i = 0; i < klassen.length; i++) {
     const g = klassen[i].grenze;
-    if (kennwertRoh <= g) {
-      marke = el.x + i * bw + (bw * (kennwertRoh - vorige)) / (g - vorige);
+    const kw = kennwertRoh ?? 0;
+    if (kw <= g) {
+      marke = el.x + i * bw + (bw * (kw - vorige)) / (g - vorige);
       getroffen = i;
       break;
     }
@@ -1464,10 +1476,10 @@ const energieskala: Zeichner = (el, u) => {
   // (aus dem Feld) und in der anderen die Markierung bei "A" (aus 46 kWh).
   const genannt = String(u.daten["objekt.energie_klasse"] ?? "").trim()
     .toLocaleUpperCase("de-DE");
-  if (genannt && getroffen >= 0
+  if (genannt && getroffen >= 0 && nurKlasse < 0
       && klassen[getroffen].name.toLocaleUpperCase("de-DE") !== genannt) {
     warne(u, "gekuerzt", el,
-          `Der Kennwert ${zahlDe(kennwertRoh, 0)} liegt in Klasse `
+          `Der Kennwert ${zahlDe(kennwertRoh ?? 0, 0)} liegt in Klasse `
           + `${klassen[getroffen].name}, am Objekt steht aber Klasse ${genannt}. `
           + `Die Markierung folgt dem Kennwert — bitte den Energieausweis pruefen.`);
   }
@@ -1487,7 +1499,10 @@ const energieskala: Zeichner = (el, u) => {
   const fy = yBalken + bh + zahl(el, "fahne_abstand", 18);
   u.blatt.rect(marke - fb / 2, fy, fb, fh, tinte, null, zahl(el, "fahne_radius", 6));
   const sFahne = stilVon(el, u, "stil_fahne");
-  const text = zeichenkette(el, "fahne_text") ?? "{{objekt.energie_kennwert}}";
+  // Nur die Klasse bekannt: die Fahne nennt die Klasse statt eines Kennwerts.
+  const text = nurKlasse >= 0
+    ? `Klasse ${klassen[nurKlasse].name}`
+    : (zeichenkette(el, "fahne_text") ?? "{{objekt.energie_kennwert}}");
   const beschriftung = ersetze(u.daten, text);
   if (beschriftung !== undefined) {
     u.blatt.T(marke, fy + zahl(el, "fahne_grundlinie", 9), beschriftung,
