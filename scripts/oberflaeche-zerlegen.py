@@ -4825,6 +4825,9 @@ WOERTLICH = [
     ('FORK', 'React.createElement("div", null, \'• "Schreib mir einen Exposé-Text für ..."\'), React.createElement("div", null, \'• "Wie hoch ist die Grunderwerbsteuer in MV?"\'), React.createElement("div", null, \'• "Verfass eine E-Mail an einen Kunden"\'), React.createElement("div", null, \'• "Berechne 3,57% Provision auf 449.000 €"\')',
      'React.createElement("div", null, \'• "Lege eine E-Mail-Vorlage für die Absage nach einer Besichtigung an"\'), React.createElement("div", null, \'• "Schreib einen Brief an den Eigentümer der Hafenstraße 12"\'), React.createElement("div", null, \'• "Erstelle eine ToDo-Kette für die Vermietung einer Wohnung"\'), React.createElement("div", null, \'• "Entwirf eine Reservierungsvereinbarung für Objekt 1042"\')',
      'Chat-Fenster: KI-Assistent mit Werkzeugen (fork_83).'),
+    ('FORK', '            system_context: t || null\n          }\n        });\n      if (r) throw r;\n      if (!a?.ok) throw new Error(a?.error || "Unbekannter Fehler");',
+     '            system_context: t || null\n          }\n        });\n      if (r) {\n        // fork_83: die Begruendung der Funktion zeigen (z. B. "Nicht genug\n        // Credits") statt "non-2xx status code".\n        let m = r.message;\n        try { const j = await r.context.json(); m = j.error || j.fehler || m } catch {}\n        throw new Error(m)\n      }\n      if (!a?.ok) throw new Error(a?.error || "Unbekannter Fehler");',
+     'Chat-Fenster: Begruendung der Funktion anzeigen (fork_83).'),
 ]
 
 

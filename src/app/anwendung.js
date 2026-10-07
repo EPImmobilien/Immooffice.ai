@@ -114454,7 +114454,13 @@ function ClaudeChatWidget({
             system_context: t || null
           }
         });
-      if (r) throw r;
+      if (r) {
+        // fork_83: die Begruendung der Funktion zeigen (z. B. "Nicht genug
+        // Credits") statt "non-2xx status code".
+        let m = r.message;
+        try { const j = await r.context.json(); m = j.error || j.fehler || m } catch {}
+        throw new Error(m)
+      }
       if (!a?.ok) throw new Error(a?.error || "Unbekannter Fehler");
       l(e => [...e, {
         role: "assistant",
