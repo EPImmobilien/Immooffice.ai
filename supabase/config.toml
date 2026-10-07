@@ -509,3 +509,6 @@ verify_jwt = false
 
 [functions.einheit-qr]
 verify_jwt = false
+
+[functions.kaufvertrag-lesen]
+verify_jwt = true

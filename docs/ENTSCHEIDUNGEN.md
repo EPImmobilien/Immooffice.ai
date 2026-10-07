@@ -6583,3 +6583,36 @@ nur `index.ts`, und drei Functions wären unsichtbar gewesen.
 `tests/credits.js` liest das Wörterbuch `GEMEINSAME_BEILAGEN` bis zur
 ersten schließenden Klammer — die neue Beilage steht deshalb als
 Zuweisung dahinter, wie `_abo`.
+
+## 2026-10-07 · Bauträger v3: QR einseitig, Grundriss nur für Gewerke, Kaufvertrag als Vorschlag (fork_87)
+
+**QR bleibt einseitig und ohne Chat.** Der Auftraggeber hat es selbst
+abgewogen („wer nutzt den QR-Code? … Schindluder"): Der Code hängt an
+der Tür, jeder kann ihn scannen. Darum zeigt er Hinweise und freigegebene
+Unterlagen, nimmt aber nichts entgegen. Rückfragen laufen über den
+Handwerker-Link mit Token — dort weiß die Verwaltung, wer schreibt. Eine
+persönliche Käuferdatei kann nie QR-sichtbar sein (CHECK in der
+Datenbank, nicht nur ein ausgeblendeter Schalter).
+
+**Grundriss-Markierung getrennt vom Käufer-Protokoll.** Die Stelle im
+Grundriss steht am Mangel (`grundriss_position`), nicht im PDF. Das
+Protokoll bleibt das Dokument für den Käufer; der Mängelplan ist ein
+Arbeitsmittel der Gewerke (Handwerker-Link, Akte). Ein zweites PDF nur für
+Gewerke wäre möglich, ist aber nicht verlangt — der Link zeigt den Plan
+mit X direkt.
+
+**Kaufvertrag: nur Vorschlag mit Beleg.** Die Function gibt das PDF als
+Dokument an das Modell und verlangt zu jedem Wert eine Belegstelle; ohne
+Beleg kein Wert. Übernommen wird per Haken, Raten nur, wenn noch kein
+Zahlungsplan existiert. Personenbezug minimal: keine Anschriften,
+Geburtsdaten, Kontonummern (Systemvorgabe). Preis 3 Credits als Vorgabe,
+änderbar im Plattform-Bereich.
+
+**Rolle für Handwerker: „dienstleister".** Das Adressbuch der Vorlage hat
+„Dienstleister / Handwerk" schon; eine neue Rolle hätte das Rollenmodell
+geändert (CLAUDE.md).
+
+**Post je Einheit heuristisch.** `mail_eingang` kennt kein Einheitsfeld;
+gebündelt wird über das CRM-Objekt der Einheit und die Absenderadressen
+von Käufer und Handwerkern. Das trifft nicht jede Mail, aber erfindet
+keine Zuordnung.

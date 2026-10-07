@@ -39,14 +39,22 @@ async function geltung(db: any, token: string) {
 
 async function maengelFuer(db: any, g: NonNullable<Awaited<ReturnType<typeof geltung>>>) {
   let q = db.from("projekt_maengel")
-    .select("id, titel, beschreibung, raum, gewerk, frist, nachfrist, status, termin_am, foto_pfade, erledigt_fotos, verlauf, created_at, einheit_id, kategorie")
+    .select("id, titel, beschreibung, raum, gewerk, frist, nachfrist, status, termin_am, foto_pfade, erledigt_fotos, verlauf, created_at, einheit_id, kategorie, grundriss_position")
     .eq("projekt_id", g.projekt).eq("mandant_id", g.mandant).order("frist", { ascending: true, nullsFirst: false });
   q = g.art === "mangel" ? q.eq("id", g.mangelId) : q.eq("projekt_kontakt_id", g.kontakt.id).in("status", [...OFFEN, "geprueft_erledigt", "abgelehnt"]);
   const { data } = await q;
   const liste: any[] = data || [];
   const einheitIds = Array.from(new Set(liste.map((m) => m.einheit_id).filter(Boolean)));
   const we = new Map<string, string>();
-  if (einheitIds.length) { const { data: e } = await db.from("projekt_einheiten").select("id, we_nr, geschoss").in("id", einheitIds).eq("mandant_id", g.mandant); for (const x of e || []) we.set(x.id, `WE ${x.we_nr}${x.geschoss ? " · " + x.geschoss : ""}`); }
+  // fork_87: der Grundriss der Einheit (signiert, 1 h) — der Maengelplan ist fuer die Gewerke.
+  const grundriss = new Map<string, string>();
+  if (einheitIds.length) {
+    const { data: e } = await db.from("projekt_einheiten").select("id, we_nr, geschoss, grundriss_datei").in("id", einheitIds).eq("mandant_id", g.mandant);
+    for (const x of e || []) {
+      we.set(x.id, `WE ${x.we_nr}${x.geschoss ? " · " + x.geschoss : ""}`);
+      if (x.grundriss_datei) { const { data: s } = await db.storage.from("projekt-dateien").createSignedUrl(x.grundriss_datei, 3600); if (s?.signedUrl) grundriss.set(x.id, s.signedUrl); }
+    }
+  }
   const aus = [];
   for (const m of liste) {
     const fotos: string[] = [];
@@ -55,6 +63,7 @@ async function maengelFuer(db: any, g: NonNullable<Awaited<ReturnType<typeof gel
     for (const p of (m.erledigt_fotos || []).slice(0, 8)) { const { data: s } = await db.storage.from("projekt-dateien").createSignedUrl(p, 3600); if (s?.signedUrl) erledigt.push(s.signedUrl); }
     aus.push({ id: m.id, titel: m.titel, beschreibung: m.beschreibung, raum: m.raum, gewerk: m.gewerk, frist: m.frist, nachfrist: m.nachfrist, status: m.status,
       termin_am: m.termin_am, einheit: we.get(m.einheit_id) || null, fotos, erledigt_fotos: erledigt, kategorie: m.kategorie,
+      grundriss_url: grundriss.get(m.einheit_id) || null, grundriss_position: m.grundriss_position || null,
       // Der Verlauf fuer den Handwerker: nur, was ihn betrifft — keine internen Notizen der Verwaltung.
       verlauf: (Array.isArray(m.verlauf) ? m.verlauf : []).filter((v: any) => ["angelegt", "beauftragt", "erinnerung", "mahnung", "termin", "erledigt_gemeldet", "rueckfrage", "antwort", "status", "geprueft", "abgelehnt", "zurueck"].includes(String(v.was))).slice(-12) });
   }
@@ -77,7 +86,15 @@ Deno.serve(async (req) => {
       handwerker: g.kontakt ? { firma: g.kontakt.firma, name: g.kontakt.name, gewerk: g.kontakt.gewerk } : null,
       bautraeger: firma ? { name: firma.marken_name || firma.firma_name, telefon: firma.telefon, email: firma.email } : null };
 
-    if (req.method === "GET") return antwort({ ok: true, ...kopf, maengel: await maengelFuer(db, g) });
+    if (req.method === "GET") {
+      // fork_87: Unterlagen und Hinweise des Bautraegers fuer die Gewerke (qr_sichtbar), einseitig.
+      const { data: dateien } = await db.from("projekt_dateien").select("id, name, pfad, kategorie, created_at, einheit_id")
+        .eq("projekt_id", g.projekt).eq("mandant_id", g.mandant).eq("qr_sichtbar", true).is("zugang_id", null).order("created_at", { ascending: false }).limit(40);
+      const unterlagen: { name: string; url: string; kategorie: string | null; datum: string }[] = [];
+      for (const d of dateien || []) { const { data: s } = await db.storage.from("projekt-dateien").createSignedUrl(d.pfad, 3600); if (s?.signedUrl) unterlagen.push({ name: d.name, url: s.signedUrl, kategorie: d.kategorie, datum: d.created_at }); }
+      const { data: pq } = await db.from("projekte").select("qr_hinweis").eq("id", g.projekt).maybeSingle();
+      return antwort({ ok: true, ...kopf, maengel: await maengelFuer(db, g), unterlagen, hinweise: [pq?.qr_hinweis].filter((h) => h && String(h).trim()) });
+    }
 
     const aktion = String(body.aktion || "");
     const mangelId = String(body.mangel_id || g.mangelId || "");

@@ -95,6 +95,18 @@ begin
   insert into befund values (default, 'Adressabgleich findet das Objekt zur Adresse', n = 1, n::text);
   select count(*) into n from public.objekte_zu_adresse('Kirchstr. 9');
   insert into befund values (default, '…und nichts zu einer fremden Adresse', n = 0, n::text);
+  -- fork_87: eine persoenliche Kaeuferdatei kann nie ueber den QR-Code gehen
+  begin
+    insert into public.projekt_dateien (projekt_id, zugang_id, name, pfad, kategorie, sichtbarkeit, qr_sichtbar) values (p, z, 'Privat.pdf', 'x/privat.pdf', 'sonstiges', 'kaeufer', true);
+    ok := false;
+  exception when check_violation then ok := true; end;
+  insert into befund values (default, 'QR-Freigabe einer persoenlichen Kaeuferdatei wird abgewiesen', ok, null);
+  insert into public.projekt_dateien (projekt_id, einheit_id, name, pfad, kategorie, sichtbarkeit, qr_sichtbar) values (p, e, 'Bauzeitenplan.pdf', 'gewerke/x.pdf', 'sonstiges', 'ausgewaehlt', true);
+  insert into befund values (default, 'Unterlage fuer die Gewerke laesst sich fuer den QR-Code freigeben', (select count(*) from public.projekt_dateien where projekt_id = p and qr_sichtbar) = 1, null);
+  begin update public.projekt_einheiten set sonderleistungen = '{"a":1}'::jsonb where id = e; ok := false; exception when check_violation then ok := true; end;
+  insert into befund values (default, 'Sonderleistungen muessen eine Liste sein', ok, null);
+  update public.projekt_maengel set grundriss_position = '{"x":0.42,"y":0.17}'::jsonb where id = m;
+  insert into befund (pruefung, bestanden) select 'Mangel merkt sich seine Stelle im Grundriss', (grundriss_position->>'x')::numeric = 0.42 from public.projekt_maengel where id = m;
   -- Glocke fuer den fremden Mandanten: abgewiesen
   begin perform public.projekt_glocke((select wert from wer where was = 'b'), 'x', 'x', 'x'); ok := false; exception when insufficient_privilege then ok := true; end;
   insert into befund values (default, 'Glocke fuer einen fremden Mandanten wird abgewiesen', ok, null);

@@ -66,6 +66,7 @@
       m.beschreibung ? E("div", { style: { fontSize: 13.5, whiteSpace: "pre-wrap", marginBottom: 6 } }, m.beschreibung) : null,
       E("div", { style: { fontSize: 13, color: m.frist && m.frist < B.heute() && offen ? CI.danger : CI.muted, marginBottom: 8 } }, m.frist ? "Frist: " + B.datumDe(m.frist) : "", m.nachfrist ? " · Nachfrist: " + B.datumDe(m.nachfrist) : "", m.termin_am ? " · Ihr Termin: " + B.datumDe(m.termin_am) : ""),
       m.fotos && m.fotos.length ? E("div", { style: { display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 } }, m.fotos.map(function (u, i) { return E("a", { key: i, href: u, target: "_blank", rel: "noopener" }, E("img", { src: u, alt: "", style: { width: 84, height: 84, objectFit: "cover", borderRadius: 8 } })); })) : null,
+      m.grundriss_url && m.grundriss_position ? E("details", { style: { marginBottom: 8 } }, E("summary", { style: Object.assign({}, B.klein, { cursor: "pointer" }) }, "📍 Stelle im Grundriss"), E("div", { style: { marginTop: 6 } }, E(B.GrundrissBild, { url: m.grundriss_url, maxHeight: 360, marker: [{ x: m.grundriss_position.x, y: m.grundriss_position.y, label: "×" }] }))) : null,
       m.erledigt_fotos && m.erledigt_fotos.length ? E("div", { style: { fontSize: 12.5, color: CI.muted, marginBottom: 8 } }, "Ihre Erledigungsfotos: ", m.erledigt_fotos.length) : null,
       (m.verlauf || []).length ? E("details", { style: { marginBottom: 8 } }, E("summary", { style: Object.assign({}, B.klein, { cursor: "pointer" }) }, "Verlauf (" + m.verlauf.length + ")"),
         m.verlauf.slice().reverse().map(function (v, i) { return E("div", { key: i, style: { fontSize: 12, padding: "2px 0" } }, B.zeitDe(v.am), " · ", v.wer, " · ", v.was === "status" ? (window.IMMO_MANGEL_STATUS[v.nach] || [v.nach])[0] : v.was, v.text ? " — " + v.text : ""); })) : null,
@@ -96,20 +97,36 @@
       E("div", { style: { padding: 14, maxWidth: 720, margin: "0 auto" } },
         fehler ? E("div", { style: Object.assign({}, B.karte, { color: CI.danger }) }, fehler) : !daten ? E("div", { style: B.klein }, "Lädt …") :
           E("div", null,
+            (daten.hinweise || []).length ? E("div", { style: Object.assign({}, B.karte, { marginBottom: 12, background: "#fbf7ee", borderColor: "#e3cfa6", fontSize: 13.5, whiteSpace: "pre-wrap" }) }, E("div", { style: { fontWeight: 700, marginBottom: 4 } }, "Hinweise des Bauträgers"), daten.hinweise.join("\n\n")) : null,
+            (daten.unterlagen || []).length ? E("div", { style: Object.assign({}, B.karte, { marginBottom: 12 }) }, E("div", { style: { fontWeight: 700, marginBottom: 4, fontSize: 13.5 } }, "Unterlagen"), daten.unterlagen.map(function (u, i) { return E("div", { key: i, style: { padding: "4px 0", fontSize: 13.5 } }, E("a", { href: u.url, target: "_blank", rel: "noopener", style: { color: CI.blau } }, "📎 " + u.name), E("span", { style: B.klein }, " · " + B.datumDe(u.datum))); })) : null,
             E("div", { style: { fontSize: 13.5, marginBottom: 10 } }, offen.length ? offen.length + " offene " + (offen.length === 1 ? "Mangel" : "Mängel") + " — bitte Termin, Erledigung (mit Foto) oder Rückfrage melden." : "Keine offenen Mängel. Danke!"),
             offen.map(function (m) { return E(HandwerkerMangel, { key: m.id, mangel: m, token: p.token, neuLaden: laden }); }),
             erledigt.length ? E("details", { style: { marginTop: 10 } }, E("summary", { style: Object.assign({}, B.klein, { cursor: "pointer" }) }, erledigt.length + " abgeschlossen"), erledigt.map(function (m) { return E(HandwerkerMangel, { key: m.id, mangel: m, token: p.token, neuLaden: laden }); })) : null,
             daten.bautraeger ? E("div", { style: Object.assign({}, B.klein, { marginTop: 16 }) }, "Fragen: ", daten.bautraeger.name, daten.bautraeger.telefon ? " · " + daten.bautraeger.telefon : "", daten.bautraeger.email ? " · " + daten.bautraeger.email : "") : null)));
   }
 
-  // --- QR ohne Anmeldung: Hinweis über der Anmeldung -------------------------------------------------
-  function QrHinweis(p) {
+  // --- QR ohne Anmeldung: die Seite fuer die Gewerke -----------------------------------------------------
+  // Einseitig: Projekt, Einheit, Hinweise und freigegebene Unterlagen des Bautraegers.
+  // Keine Antwortmoeglichkeit — wer antworten soll, hat seinen Handwerker-Link.
+  // „Anmelden" blendet die Seite aus; darunter liegt die Anmeldung der Anwendung.
+  function QrSeite(p) {
     var dZ = React.useState(null), d = dZ[0], setzeD = dZ[1];
     var fZ = React.useState(""), fehler = fZ[0], setzeFehler = fZ[1];
     React.useEffect(function () { oeffentlich("einheit-qr", "token=" + encodeURIComponent(p.token)).then(setzeD).catch(function (e) { setzeFehler(e.message || String(e)); }); }, [p.token]);
-    if (!d && !fehler) return null;
-    return E("div", { style: { position: "fixed", top: 12, left: "50%", transform: "translateX(-50%)", zIndex: 10040, background: "#fff", color: CI.blau, borderRadius: 10, padding: "10px 16px", boxShadow: "0 8px 30px rgba(0,0,0,.25)", fontSize: 13.5, maxWidth: "92vw", textAlign: "center" } },
-      fehler ? E("span", null, "QR-Code: ", fehler) : E("span", null, E("b", null, d.projekt ? d.projekt.name : ""), " · WE ", d.we_nr, d.geschoss ? " · " + d.geschoss : "", E("div", { style: B.klein }, "Bitte anmelden — danach öffnet sich die Wohnungsakte.")));
+    return E("div", { style: { minHeight: "100vh", background: CI.bg, fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", color: CI.blau } },
+      E("div", { style: { background: CI.blau, color: "#fff", padding: "14px 16px" } },
+        E("div", { style: { fontSize: 12, opacity: 0.8 } }, d && d.bautraeger ? d.bautraeger.name : "Baustelle"),
+        E("div", { style: { fontSize: 20, fontWeight: 700 } }, d ? (d.projekt ? d.projekt.name : "") + " · WE " + d.we_nr + (d.geschoss ? " · " + d.geschoss : "") : (fehler ? "Code ungültig" : "…"))),
+      E("div", { style: { padding: 14, maxWidth: 720, margin: "0 auto", display: "flex", flexDirection: "column", gap: 12 } },
+        fehler ? E("div", { style: Object.assign({}, B.karte, { color: CI.danger }) }, fehler) : null,
+        d && (d.hinweise || []).length ? E("div", { style: Object.assign({}, B.karte, { background: "#fbf7ee", borderColor: "#e3cfa6", fontSize: 14, whiteSpace: "pre-wrap" }) }, E("div", { style: { fontWeight: 700, marginBottom: 4 } }, "Hinweise des Bauträgers"), d.hinweise.join("\n\n")) : null,
+        d ? E("div", { style: B.karte }, E("div", { style: { fontWeight: 700, marginBottom: 6, fontSize: 14 } }, "Unterlagen für die Gewerke"),
+          (d.unterlagen || []).length ? d.unterlagen.map(function (u, i) { return E("div", { key: i, style: { padding: "6px 0", borderBottom: "1px solid " + CI.border, fontSize: 14 } }, E("a", { href: u.url, target: "_blank", rel: "noopener", style: { color: CI.blau } }, "📎 " + u.name), E("span", { style: B.klein }, (u.einheit ? " · diese Wohnung" : " · Projekt") + " · " + B.datumDe(u.datum))); }) : E("div", { style: B.klein }, "Für diese Wohnung sind noch keine Unterlagen freigegeben.")) : null,
+        d && d.bautraeger && (d.bautraeger.telefon || d.bautraeger.email) ? E("div", { style: Object.assign({}, B.klein, { fontSize: 13 }) }, "Fragen: ", d.bautraeger.name, d.bautraeger.telefon ? " · " + d.bautraeger.telefon : "", d.bautraeger.email ? " · " + d.bautraeger.email : "") : null,
+        E("div", { style: Object.assign({}, B.karte, { textAlign: "center" }) },
+          E("div", { style: { fontSize: 13, marginBottom: 8 } }, "Bauträger, Bauleitung und Verwaltung: anmelden, dann öffnet sich die Wohnungsakte dieser Tür."),
+          E("button", { type: "button", style: Object.assign({}, B.knopf, { padding: "11px 18px", fontSize: 14 }), onClick: p.anmelden }, "Anmelden (autorisierte Personen)")),
+        E("div", { style: Object.assign({}, B.klein, { textAlign: "center" }) }, "Handwerker melden Termine und Erledigungen über ihren persönlichen Link aus der Auftragsmail.")));
   }
 
   // --- Start -----------------------------------------------------------------------------------------------
@@ -122,8 +139,12 @@
       return;
     }
     if (!qrToken && !akteId) return;
-    var hinweisWurzel = null;
-    if (qrToken) { hinweisWurzel = ReactDOM.createRoot(wurzel("immo-qr-hinweis")); hinweisWurzel.render(E(QrHinweis, { token: qrToken })); }
+    var hinweisWurzel = null, hinweisKasten = null;
+    if (qrToken) {
+      hinweisKasten = wurzel("immo-qr-seite"); hinweisKasten.style.cssText = "position:fixed;inset:0;z-index:10050;overflow:auto;background:" + CI.bg;
+      hinweisWurzel = ReactDOM.createRoot(hinweisKasten);
+      hinweisWurzel.render(E(QrSeite, { token: qrToken, anmelden: function () { if (hinweisKasten) hinweisKasten.style.display = "none"; } }));
+    }
     // Sobald die Anwendung läuft und jemand angemeldet ist: Einheit auflösen, Neubau öffnen.
     var versuche = 0;
     var t = setInterval(async function () {
@@ -137,6 +158,7 @@
         if (!r.data) { B.hinweis("Diese Einheit ist in Ihrem Haus nicht bekannt.", true); return; }
         window._immoNeubauStart = { projekt_id: r.data.projekt_id, einheit_id: r.data.id };
         if (hinweisWurzel) { try { hinweisWurzel.unmount(); } catch (e) { /* weg */ } }
+        if (hinweisKasten && hinweisKasten.parentNode) hinweisKasten.parentNode.removeChild(hinweisKasten);
         try { history.replaceState(null, "", location.pathname); } catch (e) { /* egal */ }
         window.epNavigiere("immobilien");
       } catch (e) { B.hinweis("Wohnungsakte nicht erreichbar: " + (e.message || e), true); }

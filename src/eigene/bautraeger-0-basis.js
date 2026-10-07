@@ -156,7 +156,49 @@
       E("option", { value: "" }, "— Gewerk —"), liste.map(function (g) { return E("option", { key: g, value: g }, g); }));
   }
 
+  // Standardplan: die 13 MaBV-Abschnitte zu sieben Raten gebuendelt (Summe 100 %).
+  // Was der Kaufvertrag anders vorsieht, aendert die Verwaltung je Rate.
+  window.IMMO_RATEN_STANDARD = [
+    { nr: 1, bezeichnung: "Beginn der Erdarbeiten", abschnitte: [1] },
+    { nr: 2, bezeichnung: "Rohbau und Dach", abschnitte: [2, 3] },
+    { nr: 3, bezeichnung: "Rohinstallationen und Fenster", abschnitte: [4, 5, 6, 7] },
+    { nr: 4, bezeichnung: "Innenputz, Estrich, Fliesen", abschnitte: [8, 9, 10] },
+    { nr: 5, bezeichnung: "Bezugsfertigkeit und Übergabe", abschnitte: [11] },
+    { nr: 6, bezeichnung: "Fassade", abschnitte: [12] },
+    { nr: 7, bezeichnung: "Vollständige Fertigstellung", abschnitte: [13] }
+  ];
+  function ratenProzent(abschnitte) { return Math.round((abschnitte || []).reduce(function (s, a) { return s + ((window.IMMO_MABV[a - 1] || {}).prozent || 0); }, 0) * 10) / 10; }
+
+  // Grundriss mit Markierungen. marker: [{x, y, label, farbe}] als Anteile 0–1; onClick(pos) setzt eine neue Stelle.
+  function GrundrissBild(p) {
+    var ref = React.useRef(null);
+    function klick(e) {
+      if (!p.onClick || !ref.current) return;
+      var r = ref.current.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+      if (x < 0 || x > 1 || y < 0 || y > 1) return;
+      p.onClick({ x: Math.round(x * 1000) / 1000, y: Math.round(y * 1000) / 1000 });
+    }
+    return E("div", { style: Object.assign({ position: "relative", display: "inline-block", maxWidth: "100%", lineHeight: 0, cursor: p.onClick ? "crosshair" : "default", border: "1px solid " + CI.border, borderRadius: 8, overflow: "hidden", background: "#fff" }, p.style || {}) },
+      E("img", { ref: ref, src: p.url, alt: "Grundriss", onClick: klick, style: { maxWidth: "100%", maxHeight: p.maxHeight || 520, display: "block" } }),
+      (p.marker || []).map(function (m, i) { return E("div", { key: i, title: m.label || "", style: { position: "absolute", left: (m.x * 100) + "%", top: (m.y * 100) + "%", transform: "translate(-50%, -50%)", width: 26, height: 26, borderRadius: 999, background: (m.farbe || CI.danger), color: "#fff", fontSize: 13, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, boxShadow: "0 0 0 2px #fff, 0 2px 8px rgba(0,0,0,.35)", pointerEvents: "none" } }, m.label || "×"); }));
+  }
+  // Grundriss als Datei vorbereiten: Bilder bleiben, PDF wird mit pdf.js (Seite 1) zu PNG.
+  async function grundrissAlsPng(file) {
+    if (!/pdf/i.test(file.type) && !/\.pdf$/i.test(file.name)) return file;
+    if (typeof pdfjsLib === "undefined") throw new Error("PDF-Anzeige nicht geladen — bitte den Grundriss als Bild (PNG/JPG) hochladen.");
+    var daten = new Uint8Array(await file.arrayBuffer());
+    var pdf = await pdfjsLib.getDocument({ data: daten }).promise;
+    var seite = await pdf.getPage(1);
+    var vp = seite.getViewport({ scale: 2 });
+    var canvas = document.createElement("canvas"); canvas.width = Math.round(vp.width); canvas.height = Math.round(vp.height);
+    await seite.render({ canvasContext: canvas.getContext("2d"), viewport: vp }).promise;
+    var blob = await new Promise(function (ok) { canvas.toBlob(ok, "image/png"); });
+    return new File([blob], file.name.replace(/\.pdf$/i, "") + ".png", { type: "image/png" });
+  }
+
   window.ImmoBT = {
+    GrundrissBild: GrundrissBild, grundrissAlsPng: grundrissAlsPng, ratenProzent: ratenProzent,
     CI: CI, E: E, knopf: knopf, knopfLeer: knopfLeer, knopfGold: knopfGold, knopfRot: knopfRot, feld: feld, karte: karte, klein: klein,
     datumDe: datumDe, zeitDe: zeitDe, heute: heute, tageDazu: tageDazu, euro: euro, hinweis: hinweis, rufen: rufen, signiert: signiert,
     fotoAlsDataUrl: fotoAlsDataUrl, dataUrlZuFile: dataUrlZuFile, useDiktat: useDiktat,

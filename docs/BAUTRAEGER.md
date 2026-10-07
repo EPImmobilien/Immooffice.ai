@@ -140,3 +140,23 @@ Datei nach Freigabe) ↔ Zahlungsplan (`abschnitte`, `projekt_bautenstand`,
   einheit-qr), `tests/funktionen-angemeldet.py` (abnahme-abschliessen,
   maengel-fristen), `tests/dienstschluessel-mandant.py` (maengel-fristen),
   `tests/vorlage-vollstaendig.sql` (Zuwachs), `tests/mandantentabellen.txt`.
+
+## 4. Nachtrag v3 (07.10.2026): QR-Unterlagen, Grundriss, Kaufvertrag, Post
+
+Auf Zuruf des Auftraggebers nach der ersten Abnahme des Pakets.
+
+| Wunsch | Umsetzung |
+|---|---|
+| QR-Code zeigt den Gewerken Unterlagen und Nachrichten, einseitig, dazu Login für Autorisierte | `?qr=` öffnet ohne Anmeldung eine eigene Seite: Projekt, Einheit, **Hinweise** (`projekte.qr_hinweis`, `projekt_einheiten.qr_hinweis`) und **Unterlagen** mit `projekt_dateien.qr_sichtbar` (per CHECK nie eine persönliche Käuferdatei). Kein Chat, keine Antwort — wer antworten soll, hat seinen Handwerker-Link. Knopf „Anmelden" blendet die Seite aus; nach der Anmeldung öffnet sich die Wohnungsakte. Function `einheit-qr` (fork_87). |
+| Gewerke aus dem Adressbuch, automatische Mail | Cockpit → ⚙ Einstellungen → „Handwerker aus dem Adressbuch hinzufügen" (Gewerk + Kontaktsuche). Legt `projekt_kontakte` mit `kontakt_id` an und ergänzt im Adressbuch die Rolle **Dienstleister / Handwerk** (die Vorlage kennt sie schon). Aufträge, Erinnerungen, Mahnungen gehen an die E-Mail des Kontakts. |
+| Grundriss je Einheit, Mangel mit X markieren, nur für Gewerke | Akte → „Grundriss hochladen" (Bild oder PDF; PDF wird mit pdf.js zu PNG) → `projekt_einheiten.grundriss_datei`. Im Protokoll je Mangel „📍 Im Grundriss markieren" → `grundriss_position {x,y}` (0–1), beim Abschluss in `projekt_maengel`. Der **Mängelplan** steht in der Akte und im Handwerker-Link; das Käufer-PDF enthält keinen Grundriss (`ImmoMaengelInsPdf` zeichnet nur Text und Fotos). |
+| 13 MaBV-Abschnitte zu 7 Raten bündeln | Gab es je Rate per Klick; neu der Knopf **„Standardplan: 7 Raten aus 13 Abschnitten"** (`IMMO_RATEN_STANDARD`, Summe der Höchstsätze 100 %, Beträge aus dem Kaufpreis). |
+| Kaufvertrag hinterlegen und auslesen | Akte → „Kaufvertrag (PDF) hochladen" → „Auslesen (KI, 3 Credits)": Function `kaufvertrag-lesen` gibt dem Modell das PDF als Dokument und liefert Kaufpreis, Übergabe, Notar/Urkunde, Raten mit Abschnitten und **Sonderleistungen**, jeweils mit Belegstelle. Übernahme per Haken: Kaufpreis → Einheit, Raten → Zahlungsplan (nur wenn leer), Sonderleistungen → Liste. Gespeichert in `kaufvertrag_daten`/`sonderleistungen`. |
+| Sonderleistungen dürfen nicht untergehen | Block „Sonderleistungen" in der Akte mit Häkchen, dazu Erinnerung im Protokoll (Schritt Stammdaten, sobald die Einheit gewählt ist). |
+| Mails von Käufer und Handwerkern je Einheit bündeln | Block „Post zu dieser Einheit": `mail_eingang` nach `immobilie_id` der Einheit **oder** Absenderadresse von Käufer/Handwerkern; Klick öffnet die Mail im Posteingang. |
+
+### Schnittstellen, die das Paket nutzt oder nutzen kann
+
+- **Vorhanden und genutzt:** `notiz-transkribieren` (Whisper, Diktat), `parse-zaehler`, `push-senden` (APNs), Resend-Mail über das Mandantenpostfach, `projekt-daten`/`projekt-interaktion` (externes Kundenportal), `mail_eingang` (IMAP-Abruf der Vorlage) für die Post je Einheit, Kalender (`termine`), To-dos mit Vorlagen, jsPDF und qrcode-generator im Browser, pdf.js für Grundriss-PDFs.
+- **Vorhanden, nicht angebunden:** E-Signatur (`signatur-vorgang-starten`, braucht `vertrag_id`), OneDrive-Ablage (`eigentuemer-dokument-onedrive-push`), OpenImmo/Portalexport (für Einheiten als Objekte), Stripe (nur Abrechnung des Betreibers, nicht für Käuferraten).
+- **Nicht vorhanden, bei Bedarf prüfbar:** Bank-Schnittstelle für Zahlungseingänge (Raten „bezahlt" ist heute ein Klick), DATEV-Export der Raten, Kalender-Sync (Microsoft 365 steht hinter Funktionsschalter bis Phase 2b), Dokumenten-Signatur durch einen Vertrauensdiensteanbieter.

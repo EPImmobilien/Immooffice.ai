@@ -73,6 +73,26 @@ melde('Portal: Handwerker-Seite ersetzt die Anwendung bei ?handwerker=', /handwe
 melde('Portal: QR ohne Anmeldung zeigt nur Hinweis, danach Wohnungsakte', /einheit-qr/.test(port) && /_immoNeubauStart = \{ projekt_id/.test(port));
 melde('Portal: Erledigung ohne Foto nicht absendbar', /aktion === "erledigt" && !w\.fotos\.length/.test(port));
 
+// --- v3: QR-Unterlagen, Grundriss, Kaufvertrag, Post ---------------------------------
+const kv = lies('supabase/eigene/kaufvertrag-lesen/index.ts');
+melde('einheit-qr: nur freigegebene, nicht-persoenliche Unterlagen', /eq\("qr_sichtbar", true\)\.is\("zugang_id", null\)/.test(qr));
+melde('einheit-qr: weiterhin keine Kaeuferdaten, keine Maengel', !/projekt_maengel|projekt_zugaenge|kaufpreis/.test(qr));
+melde('handwerker-portal: Grundriss signiert, Stelle je Mangel, Unterlagen und Hinweise', /grundriss_datei/.test(hw) && /grundriss_position/.test(hw) && /qr_sichtbar/.test(hw) && /hinweise/.test(hw));
+melde('kaufvertrag-lesen: Mandant aus der Abrechnung, Einheit und Pfad geprueft', /immoMandantSichern/.test(kv) && /e\.mandant_id !== mandant/.test(kv) && /kaufvertraege\/\$\{e\.projekt_id\}\/\$\{e\.id\}\//.test(kv));
+melde('kaufvertrag-lesen: PDF als Dokument an das Modell, ohne Beleg kein Wert', /type: "document"/.test(kv) && /ohne Beleg kein Wert/.test(kv));
+melde('kaufvertrag-lesen: schreibt nichts, rechnet ueber die Beilage ab', !/\.insert\(|\.update\(|\.upsert\(/.test(kv) && /kiAbrechnen\(req, "kaufvertrag_lesen"/.test(kv));
+melde('kaufvertrag-lesen: keine Anschriften, Geburtsdaten, Kontonummern', /Keine Anschriften, keine Geburtsdaten, keine Kontonummern/.test(kv));
+melde('abnahme-abschliessen: Grundriss-Stelle wandert in den Mangel', /grundriss_position: m\.grundriss_position/.test(ab));
+melde('Standardplan: sieben Raten decken alle 13 Abschnitte genau einmal', (() => { const m = basis.match(/abschnitte: \[([\d, ]+)\]/g) || []; const alle = m.flatMap((x) => x.replace(/\D+/g, ' ').trim().split(/\s+/).map(Number)); return m.length === 7 && alle.length === 13 && new Set(alle).size === 13; })());
+melde('Grundriss: PDF wird mit pdf.js zu PNG, Markierung als Anteil 0–1', /pdfjsLib\.getDocument/.test(basis) && /Math\.round\(x \* 1000\) \/ 1000/.test(basis));
+melde('Protokoll: Markierung nur fuer Gewerke, nicht im Kaeufer-PDF', /nicht im Käufer-Protokoll/.test(prot) && !/grundriss/i.test(prot.slice(prot.indexOf('function ImmoMaengelInsPdf'))));
+melde('Akte: QR-Schalter nie fuer persoenliche Dateien', /Persönliche Käuferdateien gehen nie über den QR-Code/.test(cock));
+melde('Akte: Unterlagen fuer Gewerke mit Sichtbarkeit „ausgewaehlt“, nicht freigegeben', /sichtbarkeit: "ausgewaehlt"[^}]*freigegeben: false[^}]*qr_sichtbar: true/.test(cock));
+melde('Akte: Kaufvertrag nur als Vorschlag mit Haken, Uebernahme per Klick', /kvVorschlag\.haken/.test(cock) && /kaufvertragUebernehmen/.test(cock));
+melde('Akte: Handwerker aus dem Adressbuch bekommen die Rolle dienstleister', /rollen\.concat\(\["dienstleister"\]\)/.test(cock));
+melde('Akte: Post je Einheit ueber Objekt und Absenderadressen, oeffnet im Posteingang', /from\("mail_eingang"\)/.test(cock) && /window\._epMailOeffnen = m\.id/.test(cock));
+melde('QR-Seite: einseitig, Anmelden blendet nur aus', /Keine Antwortmoeglichkeit/.test(port) && /style\.display = "none"/.test(port));
+
 // --- Regeln, Erzeuger, Konfiguration ---------------------------------------------
 const zer = lies('scripts/oberflaeche-zerlegen.py');
 for (const r of ['Protokoll: Vorbelegung aus der Wohnungsakte.', 'Protokoll: Verknuepfung mit Objekt, Einheit und Kontakten.', 'Protokoll: Vorabnahme, Abnahme, Nachabnahme.', 'Protokoll: „+ Mangel“ je Raum.', 'Protokoll: Abnahme abschliessen statt Eigentuemerportal.', 'Protokoll-PDF: Maengel je Raum.', 'Neubau: Reiter Cockpit.', 'Neubau: „Akte“ an jeder Einheit.', 'Neubau: Start aus QR-Code oder Benachrichtigung.']) {
@@ -86,7 +106,7 @@ const erz = lies('scripts/neutralisieren-funktionen.py');
 melde('Erzeuger: Beilage bautraeger.ts an drei Functions, credits.ts an mangel-text', /'_bautraeger\/bautraeger\.ts'\] = \{[\s\S]*?'abnahme-abschliessen',[\s\S]*?'handwerker-portal',[\s\S]*?'maengel-fristen'/.test(erz) && /'mangel-text',\s*#/.test(erz));
 melde('Erzeuger: projekt-daten liefert Maengel und Protokolle des Kaeufers (additiv)', /maengel: immoMaengel,/.test(erz) && /protokolle: immoProtokolle,/.test(erz));
 const cfg = lies('supabase/config.toml');
-melde('config: verify_jwt true fuer abnahme-abschliessen, mangel-text, maengel-fristen', /\[functions\.abnahme-abschliessen\]\nverify_jwt = true/.test(cfg) && /\[functions\.mangel-text\]\nverify_jwt = true/.test(cfg) && /\[functions\.maengel-fristen\]\nverify_jwt = true/.test(cfg));
+melde('config: verify_jwt true fuer abnahme-abschliessen, mangel-text, maengel-fristen, kaufvertrag-lesen', /\[functions\.abnahme-abschliessen\]\nverify_jwt = true/.test(cfg) && /\[functions\.mangel-text\]\nverify_jwt = true/.test(cfg) && /\[functions\.maengel-fristen\]\nverify_jwt = true/.test(cfg) && /\[functions\.kaufvertrag-lesen\]\nverify_jwt = true/.test(cfg));
 melde('config: verify_jwt false nur fuer handwerker-portal und einheit-qr', /\[functions\.handwerker-portal\]\nverify_jwt = false/.test(cfg) && /\[functions\.einheit-qr\]\nverify_jwt = false/.test(cfg));
 melde('Gates kennen die oeffentlichen und angemeldeten Endpunkte', /'handwerker-portal': \('portal_token'/.test(lies('tests/funktionen-oeffentlich.py')) && /'einheit-qr': \('qr_token'/.test(lies('tests/funktionen-oeffentlich.py')) && /'abnahme-abschliessen': \('immoMandantSichern'/.test(lies('tests/funktionen-angemeldet.py')));
 const mig = lies('supabase/migrations/20261007300000_fork_84_bautraeger_verknuepfungen.sql') + lies('supabase/migrations/20261007310000_fork_85_bautraeger_maengel_workflow.sql') + lies('supabase/migrations/20261007320000_fork_86_bautraeger_qr_bautenstand.sql');

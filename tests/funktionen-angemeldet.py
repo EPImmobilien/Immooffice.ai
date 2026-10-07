@@ -45,6 +45,11 @@ ABGESICHERT = {
         'wird gegen diesen Mandanten geprueft, bevor irgendetwas geschieht. '
         'Alle weiteren Zeilen (Projekt, Einheit, Zugang, Handwerker) werden '
         'ueber das Protokoll geladen und auf denselben Mandanten begrenzt.'),
+    'kaufvertrag-lesen': ('immoMandantSichern',
+        'Liest den Kaufvertrag einer Einheit (fork_87). Der Mandant kommt aus '
+        'der Abrechnung (JWT); die einheit_id aus dem Koerper wird gegen ihn '
+        'geprueft, der Pfad muss unter kaufvertraege/<projekt>/<einheit>/ '
+        'liegen. Geschrieben wird nichts.'),
     'credentials-anzeigen': ('immoMandantSichern',
         'Gibt das ENTSCHLUESSELTE Passwort heraus. Mit einer credential_id '
         'aus dem Koerper waere das der FTP- oder Portalzugang eines fremden '

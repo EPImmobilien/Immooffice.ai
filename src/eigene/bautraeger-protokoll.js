@@ -37,6 +37,16 @@
     projektCache[id] = { zeit: Date.now(), wert: wert };
     return wert;
   }
+  var einheitCache = {};
+  async function einheitLaden(id) {
+    if (!id) return null;
+    if (einheitCache[id] && Date.now() - einheitCache[id].zeit < 120000) return einheitCache[id].wert;
+    var r = await window._sb.from("projekt_einheiten").select("id, we_nr, grundriss_datei, sonderleistungen, raeume").eq("id", id).maybeSingle();
+    var wert = r.data || null;
+    if (wert && wert.grundriss_datei) wert.grundriss_url = await B.signiert(wert.grundriss_datei);
+    einheitCache[id] = { zeit: Date.now(), wert: wert };
+    return wert;
+  }
   function anschrift(k) { return k ? [[k.strasse].filter(Boolean).join(" "), [k.plz, k.ort].filter(Boolean).join(" ")].filter(Boolean).join("\n") : ""; }
   function kName(k) { return k ? ([k.vorname, k.nachname].filter(Boolean).join(" ") || k.firma || "") : ""; }
 
@@ -129,6 +139,10 @@
     React.useEffect(function () { if (d.einheit_id && !d.zugang_id && zugaenge.length === 1) zugangWaehlen(zugaenge[0].id); }, [zugaenge.length, d.einheit_id]);
 
     var projekt = projekte.find(function (x) { return x.id === d.projekt_id; });
+    var einheitSatz = einheiten.find(function (x) { return x.id === d.einheit_id; });
+    var sZ = React.useState([]), sonder = sZ[0], setzeSonder = sZ[1];
+    React.useEffect(function () { var aktiv = true; if (!d.einheit_id) { setzeSonder([]); return; } einheitLaden(d.einheit_id).then(function (x) { if (aktiv) setzeSonder(x && Array.isArray(x.sonderleistungen) ? x.sonderleistungen : []); }); return function () { aktiv = false; }; }, [d.einheit_id]);
+    void einheitSatz;
     return E("div", { style: Object.assign({}, B.karte, { padding: 12 }) },
       E("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap", cursor: "pointer" }, onClick: function () { setzeOffen(!offen); } },
         E("div", { style: { fontSize: 13.5, fontWeight: 700, color: CI.blau } }, "🔗 Verknüpfungen", d.projekt_id ? E(B.Abzeichen, { farbe: "#2da14b", style: { marginLeft: 8 } }, "Neubau" + (projekt ? " · " + projekt.name : "")) : null),
@@ -159,6 +173,9 @@
           vorschlaege.slice(0, 3).map(function (v) { return E("div", { key: v.id, style: { display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", padding: "3px 0" } },
             E("span", null, v.bezeichnung, " · ", [v.strasse, v.hausnummer].filter(Boolean).join(" "), ", ", [v.plz, v.ort].filter(Boolean).join(" ")),
             E("button", { type: "button", style: Object.assign({}, B.knopfLeer, { padding: "4px 10px", fontSize: 12 }), onClick: function () { setFeld("immobilie_id", v.id); } }, "Übernehmen")); })) : null,
+        d.einheit_id && sonder.length ? E("div", { style: { padding: 10, background: "#f1f8f1", border: "1px solid #cfe3cf", borderRadius: 8, fontSize: 12.5 } },
+          E("div", { style: { fontWeight: 600, marginBottom: 4 } }, "Vereinbarte Sonderleistungen laut Kaufvertrag (" + sonder.length + ") — bei der Abnahme prüfen"),
+          sonder.map(function (s, i) { return E("div", { key: i, style: { padding: "2px 0" } }, s.erledigt ? "☑ " : "☐ ", s.text, s.betrag ? " (" + B.euro(s.betrag) + ")" : ""); })) : null,
         d.projekt_id ? E("div", { style: zeile },
           E("div", null, E("label", { style: etikett }, "Standardfrist für Mängel (Tage)"),
             E("input", { type: "number", min: 1, max: 180, style: B.feld, value: d.frist_standard_tage || 14, onChange: function (e) { setFeld("frist_standard_tage", parseInt(e.target.value, 10) || 14); } }))) : null
@@ -191,7 +208,13 @@
       e.target.value = "";
     }
     var handwerker = kontakte.filter(function (k) { return !m.gewerk || k.gewerk === m.gewerk; });
+    var gZ = React.useState(false), grundrissOffen = gZ[0], setzeGrundrissOffen = gZ[1];
     return E("div", { style: { border: "1px solid " + CI.gold, borderRadius: 10, padding: 12, background: "#fffdf8", display: "flex", flexDirection: "column", gap: 10 } },
+      p.grundrissUrl ? E("div", null,
+        E("button", { type: "button", style: Object.assign({}, B.knopfLeer, { fontSize: 12 }), onClick: function () { setzeGrundrissOffen(!grundrissOffen); } }, m.grundriss_position ? "📍 Stelle im Grundriss ändern" : "📍 Im Grundriss markieren"),
+        m.grundriss_position ? E("span", { style: Object.assign({}, B.klein, { marginLeft: 8 }) }, "Markiert (nur für Gewerke sichtbar, nicht im Käufer-Protokoll)") : null,
+        grundrissOffen ? E("div", { style: { marginTop: 8 } }, E("div", { style: Object.assign({}, B.klein, { marginBottom: 4 }) }, "Auf die Stelle im Grundriss tippen."),
+          E(B.GrundrissBild, { url: p.grundrissUrl, marker: m.grundriss_position ? [Object.assign({ label: "×" }, m.grundriss_position)] : [], onClick: function (pos) { aendern({ grundriss_position: pos }); setzeGrundrissOffen(false); } })) : null) : null,
       E("div", { style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" } },
         E("button", { type: "button", onClick: diktat.laeuft ? diktat.stop : diktat.start, disabled: diktat.verarbeitet || kiLaeuft,
           style: Object.assign({}, diktat.laeuft ? B.knopfRot : B.knopfLeer, { fontSize: 12 }) }, diktat.laeuft ? "■ Aufnahme beenden" : diktat.verarbeitet ? "… wird transkribiert" : kiLaeuft ? "… KI formuliert" : "🎙 Diktieren"),
@@ -222,7 +245,10 @@
     var raum = p.raum, pr = p.protokoll || {}, liste = raum.maengel || [];
     var pZ = React.useState(null), projekt = pZ[0], setzeProjekt = pZ[1];
     var fZ = React.useState(null), form = fZ[0], setzeForm = fZ[1];   // null | "neu" | id
+    var gZ = React.useState(null), einheit = gZ[0], setzeEinheit = gZ[1];
     React.useEffect(function () { var aktiv = true; if (!pr.projekt_id) { setzeProjekt(null); return; } projektLaden(pr.projekt_id).then(function (x) { if (aktiv) setzeProjekt(x); }); return function () { aktiv = false; }; }, [pr.projekt_id]);
+    React.useEffect(function () { var aktiv = true; if (!pr.einheit_id) { setzeEinheit(null); return; } einheitLaden(pr.einheit_id).then(function (x) { if (aktiv) setzeEinheit(x); }); return function () { aktiv = false; }; }, [pr.einheit_id]);
+    var grundrissUrl = einheit && einheit.grundriss_url || null;
     function speichern(m) {
       var neu = form === "neu" ? liste.concat([m]) : liste.map(function (x) { return x.id === m.id ? m : x; });
       p.aendern({ maengel: neu }); setzeForm(null);
@@ -233,17 +259,17 @@
         E("div", { style: { fontSize: 12.5, fontWeight: 700, color: CI.blau } }, "Mängel", liste.length ? " (" + liste.length + ")" : ""),
         form ? null : E("button", { type: "button", onClick: function () { setzeForm("neu"); }, style: Object.assign({}, B.knopfGold, { fontSize: 12, padding: "5px 10px" }) }, "+ Mangel")),
       liste.map(function (m) {
-        if (form === m.id) return E("div", { key: m.id, style: { marginBottom: 8 } }, E(MangelFormular, { wert: m, projekt: projekt, raumName: raum.name, fristTage: pr.frist_standard_tage, fertig: speichern, abbrechen: function () { setzeForm(null); } }));
+        if (form === m.id) return E("div", { key: m.id, style: { marginBottom: 8 } }, E(MangelFormular, { wert: m, projekt: projekt, grundrissUrl: grundrissUrl, raumName: raum.name, fristTage: pr.frist_standard_tage, fertig: speichern, abbrechen: function () { setzeForm(null); } }));
         return E("div", { key: m.id, style: { display: "flex", gap: 10, alignItems: "flex-start", padding: "8px 10px", border: "1px solid " + CI.border, borderRadius: 8, marginBottom: 6, background: "#fff" } },
           E("div", { style: { flex: 1, minWidth: 0 } },
             E("div", { style: { fontWeight: 600, fontSize: 13 } }, m.titel, m.db_id ? E(B.Abzeichen, { farbe: "#1e7e34", style: { marginLeft: 8 } }, "angelegt") : null),
-            E("div", { style: B.klein }, [m.gewerk, hk(m.projekt_kontakt_id), m.frist ? "Frist " + B.datumDe(m.frist) : null, (m.foto_data_urls || m.foto_pfade || []).length ? (m.foto_data_urls || m.foto_pfade).length + " Foto(s)" : null].filter(Boolean).join(" · ")),
+            E("div", { style: B.klein }, [m.gewerk, hk(m.projekt_kontakt_id), m.frist ? "Frist " + B.datumDe(m.frist) : null, (m.foto_data_urls || m.foto_pfade || []).length ? (m.foto_data_urls || m.foto_pfade).length + " Foto(s)" : null, m.grundriss_position ? "📍 im Grundriss" : null].filter(Boolean).join(" · ")),
             m.beschreibung ? E("div", { style: { fontSize: 12.5, marginTop: 3, whiteSpace: "pre-wrap" } }, m.beschreibung) : null),
           m.db_id ? null : E("div", { style: { display: "flex", gap: 4 } },
             E("button", { type: "button", onClick: function () { setzeForm(m.id); }, style: Object.assign({}, B.knopfLeer, { padding: "3px 8px", fontSize: 11.5 }) }, "Ändern"),
             E("button", { type: "button", onClick: function () { p.aendern({ maengel: liste.filter(function (x) { return x.id !== m.id; }) }); }, style: Object.assign({}, B.knopfRot, { padding: "3px 8px", fontSize: 11.5 }) }, "×")));
       }),
-      form === "neu" ? E(MangelFormular, { projekt: projekt, raumName: raum.name, fristTage: pr.frist_standard_tage, fertig: speichern, abbrechen: function () { setzeForm(null); } }) : null);
+      form === "neu" ? E(MangelFormular, { projekt: projekt, grundrissUrl: grundrissUrl, raumName: raum.name, fristTage: pr.frist_standard_tage, fertig: speichern, abbrechen: function () { setzeForm(null); } }) : null);
   }
 
   // ---------------------------------------------------------------------------
@@ -340,4 +366,5 @@
   window.ImmoMaengelInsPdf = ImmoMaengelInsPdf;
   window.ImmoBT.projektLaden = projektLaden;
   window.ImmoBT.alleMaengel = alleMaengel;
+  window.ImmoBT.einheitLaden = einheitLaden;
 })();

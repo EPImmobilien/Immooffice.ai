@@ -175,7 +175,19 @@
     var dl = useProjektDaten(projekt, einheiten), daten = dl[0], neuLaden = dl[1];
     var aZ = React.useState(window._immoAkteEinheit || null), akte = aZ[0], setzeAkte = aZ[1];
     var eZ = React.useState(false), einstellungen = eZ[0], setzeEinstellungen = eZ[1];
-    var sZ = React.useState({ gewerke: (projekt.gewerke || []).join(", "), frist_standard_tage: projekt.frist_standard_tage || 14, mahnung_automatisch: !!projekt.mahnung_automatisch }), einst = sZ[0], setzeEinst = sZ[1];
+    var sZ = React.useState({ gewerke: (projekt.gewerke || []).join(", "), frist_standard_tage: projekt.frist_standard_tage || 14, mahnung_automatisch: !!projekt.mahnung_automatisch, qr_hinweis: projekt.qr_hinweis || "" }), einst = sZ[0], setzeEinst = sZ[1];
+    var hZ = React.useState({ gewerk: "", kontakt: null }), neuerHk = hZ[0], setzeNeuerHk = hZ[1];
+    async function handwerkerAusAdressbuch() {
+      var k = neuerHk.kontakt; if (!k || !neuerHk.gewerk) return;
+      var r = await window._sb.from("projekt_kontakte").insert({ projekt_id: projekt.id, gewerk: neuerHk.gewerk, firma: k.firma || null, name: [k.vorname, k.nachname].filter(Boolean).join(" ") || null, telefon: k.telefon || k.mobil || null, email: k.email || null, fuer_kunden: false, kontakt_id: k.id, sortierung: kontakte.length + 1 });
+      if (r.error) { B.hinweis(r.error.message, true); return; }
+      // Im Adressbuch die Rolle „Dienstleister / Handwerk“ ergänzen, wenn sie fehlt.
+      var kr = await window._sb.from("kontakte").select("rollen").eq("id", k.id).maybeSingle();
+      var rollen = (kr.data && kr.data.rollen) || [];
+      if (rollen.indexOf("dienstleister") < 0) await window._sb.from("kontakte").update({ rollen: rollen.concat(["dienstleister"]) }).eq("id", k.id);
+      B.hinweis((k.firma || k.nachname) + " als " + neuerHk.gewerk + " hinterlegt" + (k.email ? "." : " — ohne E-Mail, bitte im Adressbuch ergänzen."));
+      setzeNeuerHk({ gewerk: "", kontakt: null }); p.neuLaden && p.neuLaden();
+    }
     React.useEffect(function () { window._immoAkteEinheit = null; }, []);
     if (akte) {
       var e = einheiten.find(function (x) { return x.id === akte; });
@@ -186,7 +198,7 @@
     var kommende = daten.termine.filter(function (t) { return t.datum >= B.heute(); });
     var entwuerfe = daten.protokolle.filter(function (x) { return x.status !== "abgeschlossen"; });
     async function einstellungenSpeichern() {
-      var r = await window._sb.from("projekte").update({ gewerke: einst.gewerke.split(",").map(function (s) { return s.trim(); }).filter(Boolean), frist_standard_tage: parseInt(einst.frist_standard_tage, 10) || 14, mahnung_automatisch: !!einst.mahnung_automatisch }).eq("id", projekt.id);
+      var r = await window._sb.from("projekte").update({ gewerke: einst.gewerke.split(",").map(function (s) { return s.trim(); }).filter(Boolean), frist_standard_tage: parseInt(einst.frist_standard_tage, 10) || 14, mahnung_automatisch: !!einst.mahnung_automatisch, qr_hinweis: einst.qr_hinweis || null }).eq("id", projekt.id);
       if (r.error) B.hinweis(r.error.message, true); else { B.hinweis("Einstellungen gespeichert."); setzeEinstellungen(false); p.neuLaden && p.neuLaden(); }
     }
     var kachel = function (zahl, text, farbe) { return E("div", { style: Object.assign({}, B.karte, { textAlign: "center", padding: 12 }) }, E("div", { style: { fontSize: 24, fontWeight: 700, color: farbe || CI.blau } }, zahl), E("div", { style: B.klein }, text)); };
@@ -211,7 +223,15 @@
           E("div", { style: zeile },
             E("div", null, E("label", { style: etikett }, "Standardfrist Mängel (Tage)"), E("input", { type: "number", min: 1, style: B.feld, value: einst.frist_standard_tage, onChange: function (e) { setzeEinst(Object.assign({}, einst, { frist_standard_tage: e.target.value })); } })),
             E("label", { style: { display: "flex", gap: 8, alignItems: "center", fontSize: 13, marginTop: 18 } }, E("input", { type: "checkbox", checked: einst.mahnung_automatisch, onChange: function (e) { setzeEinst(Object.assign({}, einst, { mahnung_automatisch: e.target.checked })); } }), "Mahnung mit Nachfrist automatisch senden (sonst Entwurf zur Freigabe)")),
-          E("div", null, E("button", { type: "button", style: B.knopf, onClick: einstellungenSpeichern }, "Speichern"))) : null,
+          E("div", null, E("label", { style: etikett }, "Hinweis für die Gewerke am QR-Code (ohne Anmeldung sichtbar, z. B. Bauzeiten, Ansprechpartner, Zufahrt)"), E("textarea", { style: Object.assign({}, B.feld, { minHeight: 56 }), value: einst.qr_hinweis, onChange: function (e) { setzeEinst(Object.assign({}, einst, { qr_hinweis: e.target.value })); } })),
+          E("div", null, E("button", { type: "button", style: B.knopf, onClick: einstellungenSpeichern }, "Speichern")),
+          E("div", { style: { borderTop: "1px solid " + CI.border, paddingTop: 10, marginTop: 4 } },
+            E("div", { style: { fontWeight: 600, fontSize: 13, marginBottom: 6 } }, "Handwerker aus dem Adressbuch hinzufügen"),
+            E("div", { style: zeile },
+              E("div", null, E("label", { style: etikett }, "Gewerk"), E(B.GewerkWahl, { projekt: projekt, kontakte: kontakte, value: neuerHk.gewerk, onChange: function (g) { setzeNeuerHk(Object.assign({}, neuerHk, { gewerk: g })); } })),
+              E("div", null, E("label", { style: etikett }, "Kontakt"), typeof KontaktSuchfeld === "function" ? E(KontaktSuchfeld, { value: neuerHk.kontakt ? neuerHk.kontakt.id : "", onChange: function (id, k) { setzeNeuerHk(Object.assign({}, neuerHk, { kontakt: k || null })); }, placeholder: "Firma oder Name suchen …", style: B.feld }) : E("span", { style: B.klein }, "Suchfeld nicht verfügbar")),
+              E("div", { style: { display: "flex", alignItems: "flex-end" } }, E("button", { type: "button", style: B.knopf, disabled: !neuerHk.kontakt || !neuerHk.gewerk, onClick: handwerkerAusAdressbuch }, "Hinzufügen"))),
+            E("div", { style: Object.assign({}, B.klein, { marginTop: 4 }) }, "Der Kontakt bekommt die Rolle „Dienstleister / Handwerk“ und erhält Aufträge, Erinnerungen und Mahnungen automatisch an seine E-Mail-Adresse."))) : null,
         E("div", { style: { overflowX: "auto" } }, E("table", { style: { width: "100%", borderCollapse: "collapse" } },
           E("thead", null, E("tr", null, E("th", { style: th }, "Einheit"), E("th", { style: th }, "Käufer"), E("th", { style: th }, "Bautenstand"), gewerke.map(function (g) { return E("th", { key: g, style: Object.assign({}, th, { textAlign: "center" }) }, g); }), E("th", { style: Object.assign({}, th, { textAlign: "center" }) }, "offen / überf."), E("th", { style: th }, "Abnahme"), E("th", { style: th }, ""))),
           E("tbody", null, einheiten.map(function (e) {
@@ -231,7 +251,7 @@
         E("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } }, kontakte.map(function (k) {
           var o = daten.maengel.filter(function (m) { return istOffen(m) && m.projekt_kontakt_id === k.id; }), u = o.filter(istUeberfaellig);
           return E("div", { key: k.id, style: { padding: "8px 10px", border: "1px solid " + (u.length ? "#e5c5c2" : CI.border), borderRadius: 8, fontSize: 12.5, minWidth: 160 } },
-            E("div", { style: { fontWeight: 600 } }, hkName(k)), E("div", { style: B.klein }, k.gewerk, k.email ? "" : " · ohne E-Mail"),
+            E("div", { style: { fontWeight: 600 } }, hkName(k)), E("div", { style: B.klein }, k.gewerk, k.email ? "" : " · ohne E-Mail", k.kontakt_id ? " · Adressbuch" : ""),
             E("div", null, E("b", null, o.length), " offen", u.length ? E("span", { style: { color: CI.danger } }, " · " + u.length + " überfällig") : null, k.portal_token ? E("span", { style: B.klein }, " · Link aktiv") : null));
         }))) : null,
       daten.raten.length ? E("div", { style: Object.assign({}, B.karte, { borderColor: "#cfe3cf" }) }, E(B.Kopf, { titel: "Raten anforderbar (alle Bauabschnitte erreicht)" }),
@@ -255,6 +275,26 @@
     var zlZ = React.useState([]), zeitleiste = zlZ[0], setzeZeitleiste = zlZ[1];
     var dZ = React.useState([]), dokumente = dZ[0], setzeDokumente = dZ[1];
     var zpZ = React.useState(null), zpForm = zpZ[0], setzeZpForm = zpZ[1];
+    var grZ = React.useState(null), grundrissUrl = grZ[0], setzeGrundrissUrl = grZ[1];
+    var qhZ = React.useState(e.qr_hinweis || ""), qrHinweis = qhZ[0], setzeQrHinweis = qhZ[1];
+    var kvZ = React.useState(null), kvVorschlag = kvZ[0], setzeKvVorschlag = kvZ[1];
+    var kvlZ = React.useState(false), kvLaeuft = kvlZ[0], setzeKvLaeuft = kvlZ[1];
+    var poZ = React.useState([]), post = poZ[0], setzePost = poZ[1];
+    var sonder = Array.isArray(e.sonderleistungen) ? e.sonderleistungen : [];
+    React.useEffect(function () { var aktiv = true; if (!e.grundriss_datei) { setzeGrundrissUrl(null); return; } B.signiert(e.grundriss_datei).then(function (u) { if (aktiv) setzeGrundrissUrl(u); }); return function () { aktiv = false; }; }, [e.grundriss_datei]);
+    React.useEffect(function () {
+      var aktiv = true;
+      var mails = [];
+      (p.zugaenge || []).filter(function (x) { return x.einheit_id === e.id && x.email; }).forEach(function (x) { mails.push(x.email.toLowerCase()); });
+      kontakte.filter(function (k) { return k.email; }).forEach(function (k) { mails.push(k.email.toLowerCase()); });
+      var teile = [];
+      if (e.immobilie_id) teile.push("immobilie_id.eq." + e.immobilie_id);
+      if (mails.length) teile.push("absender_email.in.(" + mails.map(function (m) { return '"' + m.replace(/"/g, "") + '"'; }).join(",") + ")");
+      if (!teile.length) { setzePost([]); return; }
+      window._sb.from("mail_eingang").select("id, absender_email, absender_name, betreff, gesendet_am, gelesen, immobilie_id").or(teile.join(",")).order("gesendet_am", { ascending: false }).limit(40)
+        .then(function (r) { if (aktiv) setzePost(r.data || []); });
+      return function () { aktiv = false; };
+    }, [e.id, e.immobilie_id, kontakte.length]);
     React.useEffect(function () { window._sb.from("firma_stammdaten").select("firma_name, marken_name, strasse, plz, ort, email, telefon, bank_name, bank_iban, bank_bic").eq("aktiv", true).order("sortierung").limit(1).maybeSingle().then(function (r) { setzeFirma(r.data || null); }); }, []);
     React.useEffect(function () { if (!zugang || !zugang.kontakt_id) { setzeKontakt(null); return; } window._sb.from("kontakte").select("id, vorname, nachname, firma, strasse, plz, ort, email, telefon").eq("id", zugang.kontakt_id).maybeSingle().then(function (r) { setzeKontakt(r.data || null); }); }, [zugang && zugang.kontakt_id]);
     React.useEffect(function () {
@@ -368,6 +408,93 @@
       if (typeof window.setView === "function") window.setView("posteingang");
     }
 
+    async function grundrissHochladen(ev) {
+      var f = ev.target.files && ev.target.files[0]; ev.target.value = ""; if (!f) return;
+      try {
+        var bild = await B.grundrissAlsPng(f);
+        var pfad = "grundrisse/" + projekt.id + "/" + e.id + "/" + Date.now() + "." + (/png/i.test(bild.type) ? "png" : "jpg");
+        var up = await window._sb.storage.from("projekt-dateien").upload(pfad, bild, { contentType: bild.type || "image/png" });
+        if (up.error) throw up.error;
+        var r = await window._sb.from("projekt_einheiten").update({ grundriss_datei: pfad }).eq("id", e.id);
+        if (r.error) throw r.error;
+        e.grundriss_datei = pfad; setzeGrundrissUrl(await B.signiert(pfad)); B.hinweis("Grundriss hinterlegt."); p.neuLaden();
+      } catch (x) { B.hinweis("Grundriss nicht gespeichert: " + (x.message || x), true); }
+    }
+    async function qrHinweisSpeichern() {
+      var r = await window._sb.from("projekt_einheiten").update({ qr_hinweis: qrHinweis || null }).eq("id", e.id);
+      if (r.error) B.hinweis(r.error.message, true); else { e.qr_hinweis = qrHinweis; B.hinweis("Hinweis gespeichert."); }
+    }
+    async function qrUmschalten(d) {
+      if (d.zugang_id) { B.hinweis("Persönliche Käuferdateien gehen nie über den QR-Code.", true); return; }
+      var r = await window._sb.from("projekt_dateien").update({ qr_sichtbar: !d.qr_sichtbar }).eq("id", d.id);
+      if (r.error) B.hinweis(r.error.message, true); else { setzeDokumente(dokumente.map(function (x) { return x.id === d.id ? Object.assign({}, x, { qr_sichtbar: !d.qr_sichtbar }) : x; })); }
+    }
+    async function unterlageFuerGewerke(ev) {
+      var dateien = Array.from(ev.target.files || []); ev.target.value = ""; if (!dateien.length) return;
+      for (var i = 0; i < dateien.length; i++) {
+        var f = dateien[i], pfad = "gewerke/" + projekt.id + "/" + e.id + "/" + Date.now() + "-" + f.name.replace(/[^\w.\-]+/g, "_");
+        var up = await window._sb.storage.from("projekt-dateien").upload(pfad, f, { contentType: f.type || "application/octet-stream" });
+        if (up.error) { B.hinweis(up.error.message, true); continue; }
+        var r = await window._sb.from("projekt_dateien").insert({ projekt_id: projekt.id, einheit_id: e.id, name: f.name, pfad: pfad, content_type: f.type || null, groesse: f.size, kategorie: "sonstiges", sichtbarkeit: "ausgewaehlt", hochgeladen_von: p.user && p.user.id || null, freigegeben: false, benachrichtigt: true, qr_sichtbar: true }).select("*").single();
+        if (r.error) B.hinweis(r.error.message, true); else setzeDokumente([r.data].concat(dokumente));
+      }
+      B.hinweis("Unterlage für die Gewerke hinterlegt — über QR-Code und Handwerker-Link abrufbar, nicht im Kundenportal.");
+    }
+    async function standardplan() {
+      if (!zugang) { B.hinweis("Für den Zahlungsplan braucht die Einheit einen Käufer (Portalzugang).", true); return; }
+      if (zahlungsplan.length) { B.hinweis("Es gibt schon Raten — bitte einzeln bearbeiten.", true); return; }
+      var kp = Number(e.kaufpreis) || 0;
+      var zeilen = window.IMMO_RATEN_STANDARD.map(function (r) { var pz = B.ratenProzent(r.abschnitte); return { projekt_id: projekt.id, zugang_id: zugang.id, einheit_id: e.id, position: r.nr, bezeichnung: r.bezeichnung, prozent: pz, betrag: kp ? Math.round(kp * pz) / 100 : null, abschnitte: r.abschnitte }; });
+      var r = await window._sb.from("projekt_zahlungsplan").insert(zeilen);
+      if (r.error) B.hinweis(r.error.message, true); else { B.hinweis("Standardplan mit sieben Raten angelegt" + (kp ? " (Beträge aus dem Kaufpreis)." : " — Kaufpreis fehlt, Beträge bitte nachtragen.")); p.neuLaden(); }
+    }
+    async function kaufvertragHochladen(ev) {
+      var f = ev.target.files && ev.target.files[0]; ev.target.value = ""; if (!f) return;
+      if (!/pdf/i.test(f.type) && !/\.pdf$/i.test(f.name)) { B.hinweis("Bitte den Kaufvertrag als PDF.", true); return; }
+      var pfad = "kaufvertraege/" + projekt.id + "/" + e.id + "/" + Date.now() + ".pdf";
+      var up = await window._sb.storage.from("projekt-dateien").upload(pfad, f, { contentType: "application/pdf" });
+      if (up.error) { B.hinweis(up.error.message, true); return; }
+      var r = await window._sb.from("projekt_einheiten").update({ kaufvertrag_datei: pfad }).eq("id", e.id);
+      if (r.error) { B.hinweis(r.error.message, true); return; }
+      e.kaufvertrag_datei = pfad; B.hinweis("Kaufvertrag hinterlegt. Jetzt „Auslesen“ — der Vorschlag kommt ins Formular."); p.neuLaden();
+    }
+    async function kaufvertragLesen() {
+      if (!e.kaufvertrag_datei) return;
+      setzeKvLaeuft(true);
+      try {
+        var r = await B.rufen("kaufvertrag-lesen", { einheit_id: e.id, pfad: e.kaufvertrag_datei });
+        r.haken = { kaufpreis: !!(r.kaufpreis && r.kaufpreis.wert), raten: !!(r.raten && r.raten.length) && !zahlungsplan.length, sonder: !!(r.sonderleistungen && r.sonderleistungen.length) };
+        setzeKvVorschlag(r);
+      } catch (x) { B.hinweis("Kaufvertrag nicht gelesen: " + (x.message || x), true); }
+      setzeKvLaeuft(false);
+    }
+    async function kaufvertragUebernehmen() {
+      var v = kvVorschlag; if (!v) return;
+      var patch = { kaufvertrag_daten: { kaufpreis: v.kaufpreis, kaufgegenstand: v.kaufgegenstand, uebergabe_bis: v.uebergabe_bis, fertigstellung_bis: v.fertigstellung_bis, notar: v.notar, urkunde: v.urkunde, vertragsdatum: v.vertragsdatum, raten: v.raten, gelesen_am: new Date().toISOString() } };
+      if (v.haken.kaufpreis && v.kaufpreis.wert) patch.kaufpreis = v.kaufpreis.wert;
+      if (v.haken.sonder) patch.sonderleistungen = sonder.concat(v.sonderleistungen.filter(function (s) { return !sonder.some(function (a) { return a.text === s.text; }); }));
+      var r = await window._sb.from("projekt_einheiten").update(patch).eq("id", e.id);
+      if (r.error) { B.hinweis(r.error.message, true); return; }
+      Object.assign(e, patch);
+      if (v.haken.raten && zugang && !zahlungsplan.length) {
+        var zeilen = v.raten.slice(0, 7).map(function (x, i) { return { projekt_id: projekt.id, zugang_id: zugang.id, einheit_id: e.id, position: x.nr || i + 1, bezeichnung: x.bezeichnung || "Rate " + (i + 1), prozent: x.prozent, betrag: x.betrag != null ? x.betrag : (x.prozent && patch.kaufpreis ? Math.round(patch.kaufpreis * x.prozent) / 100 : null), abschnitte: x.abschnitte || [] }; });
+        var rz = await window._sb.from("projekt_zahlungsplan").insert(zeilen);
+        if (rz.error) B.hinweis("Raten nicht angelegt: " + rz.error.message, true);
+      }
+      if (e.immobilie_id) await window._sb.from("vermerke").insert({ immobilie_id: e.immobilie_id, kontakt_id: kontakt ? kontakt.id : null, typ: "kaufvertrag", titel: "Kaufvertrag ausgelesen und übernommen", text: [patch.kaufpreis ? "Kaufpreis " + B.euro(patch.kaufpreis) : null, v.raten && v.raten.length ? v.raten.length + " Raten" : null, v.sonderleistungen && v.sonderleistungen.length ? v.sonderleistungen.length + " Sonderleistungen" : null].filter(Boolean).join(" · "), benutzer_id: p.user && p.user.id || null, quelle: "manuell" });
+      setzeKvVorschlag(null); B.hinweis("Übernommen."); p.neuLaden();
+    }
+    async function sonderUmschalten(i) {
+      var neu = sonder.map(function (s, j) { return j === i ? Object.assign({}, s, { erledigt: !s.erledigt, erledigt_am: !s.erledigt ? B.heute() : null }) : s; });
+      var r = await window._sb.from("projekt_einheiten").update({ sonderleistungen: neu }).eq("id", e.id);
+      if (r.error) B.hinweis(r.error.message, true); else { e.sonderleistungen = neu; p.neuLaden(); }
+    }
+    async function sonderDazu() {
+      var text = prompt("Sonderleistung / Sonderwunsch (wird in Akte und Abnahme geführt):", ""); if (!text) return;
+      var neu = sonder.concat([{ text: text.trim(), betrag: null, erledigt: false, quelle: "manuell" }]);
+      var r = await window._sb.from("projekt_einheiten").update({ sonderleistungen: neu }).eq("id", e.id);
+      if (r.error) B.hinweis(r.error.message, true); else { e.sonderleistungen = neu; p.neuLaden(); }
+    }
     var abschnitt = function (a) { var m = window.IMMO_MABV[a - 1] || {}; return a + ". " + m.name; };
     var block = function (titel, inhalt, rechts) { return E("div", { style: B.karte }, E(B.Kopf, { titel: titel }, rechts), inhalt); };
     return E("div", { style: { display: "flex", flexDirection: "column", gap: 14 } },
@@ -387,6 +514,14 @@
           E("div", { style: Object.assign({}, B.klein, { marginTop: 4 }) }, "Verknüpft die Einheit mit dem Objekt im CRM: Vermerke, Termine und Protokolle landen dann an beiden Stellen."))),
         block("Räume (für Abnahme und Protokoll)", E("div", null, E("input", { style: B.feld, value: raeumeText, onChange: function (ev) { setzeRaeumeText(ev.target.value); }, placeholder: (typeof UEBERGABE_STANDARDRAEUME !== "undefined" ? UEBERGABE_STANDARDRAEUME : []).join(", ") }),
           E("div", { style: { display: "flex", justifyContent: "space-between", marginTop: 6, alignItems: "center" } }, E("span", { style: B.klein }, "Mit Komma trennen. Leer = Standardräume."), E("button", { type: "button", style: Object.assign({}, B.knopfLeer, { fontSize: 12 }), onClick: raeumeSpeichern }, "Speichern"))))),
+      E("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(300px, 100%), 1fr))", gap: 14 } },
+        block("Grundriss & Mängelplan (für Gewerke, nicht im Käufer-Protokoll)", E("div", null,
+          grundrissUrl ? E(B.GrundrissBild, { url: grundrissUrl, maxHeight: 420, marker: maengel.filter(function (m) { return m.grundriss_position && istOffen(m); }).map(function (m, i) { return { x: m.grundriss_position.x, y: m.grundriss_position.y, label: String(i + 1), farbe: istUeberfaellig(m) ? CI.danger : CI.blau }; }) }) : E(B.Leer, null, "Noch kein Grundriss. Bild oder PDF hochladen — dann lässt sich jeder Mangel bei der Abnahme im Grundriss markieren."),
+          grundrissUrl ? E("ol", { style: { margin: "6px 0 0", paddingLeft: 18, fontSize: 12 } }, maengel.filter(function (m) { return m.grundriss_position && istOffen(m); }).map(function (m) { return E("li", { key: m.id }, m.titel, m.raum ? " · " + m.raum : "", m.gewerk ? " · " + m.gewerk : ""); })) : null,
+          E("div", { style: { marginTop: 8 } }, E("label", { style: Object.assign({}, B.knopfLeer, { fontSize: 12, display: "inline-block" }) }, grundrissUrl ? "Grundriss ersetzen" : "📐 Grundriss hochladen", E("input", { type: "file", accept: "image/*,application/pdf", style: { display: "none" }, onChange: grundrissHochladen }))))),
+        block("QR-Code dieser Tür: Hinweis für die Gewerke", E("div", null,
+          E("textarea", { style: Object.assign({}, B.feld, { minHeight: 70 }), value: qrHinweis, onChange: function (ev) { setzeQrHinweis(ev.target.value); }, placeholder: "z. B. Elektro bitte erst nach Trockenbau; Schlüssel beim Bauleiter; Bauzeiten 7–17 Uhr" }),
+          E("div", { style: { display: "flex", justifyContent: "space-between", marginTop: 6, alignItems: "center" } }, E("span", { style: B.klein }, "Ohne Anmeldung sichtbar — einseitig, keine Antwortmöglichkeit. Keine Personendaten eintragen."), E("button", { type: "button", style: Object.assign({}, B.knopfLeer, { fontSize: 12 }), onClick: qrHinweisSpeichern }, "Speichern"))))),
       bautenstandForm ? E("div", { style: Object.assign({}, B.karte, { borderColor: CI.gold }) }, E(B.Kopf, { titel: "Bautenstand melden (§ 3 Abs. 2 MaBV)" }),
         bautenstandForm.gemeldet ? E("div", null, E("div", { style: { marginBottom: 8, fontSize: 13 } }, "✓ Gemeldet: ", abschnitt(Number(bautenstandForm.abschnitt))), E("div", { style: { display: "flex", gap: 8 } }, E("button", { type: "button", style: B.knopf, onClick: function () { alsUpdate(bautenstandForm); } }, "Als Baufortschritt im Kundenportal veröffentlichen"), E("button", { type: "button", style: B.knopfLeer, onClick: function () { setzeBautenstandForm(null); } }, "Nicht veröffentlichen")))
         : E("div", { style: { display: "flex", flexDirection: "column", gap: 8 } },
@@ -416,7 +551,11 @@
           !termine.length && !protokolle.length ? E(B.Leer, null, "Noch kein Protokoll, kein Termin.") : null))),
       block("Mängel " + we(e), E(ImmoMaengelTafel, { maengel: daten.maengel, einheitId: e.id, einheiten: p.einheiten, kontakte: kontakte, projekt: projekt, neuLaden: p.neuLaden })),
       E("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(300px, 100%), 1fr))", gap: 14 } },
-        block("Dokumente", dokumente.length ? E("div", null, dokumente.map(function (d) { return E("div", { key: d.id, style: { display: "flex", justifyContent: "space-between", gap: 8, padding: "5px 0", borderBottom: "1px solid " + CI.border, fontSize: 12.5 } }, E("a", { href: "#", onClick: async function (ev) { ev.preventDefault(); var u = await B.signiert(d.pfad); if (u) window.open(u, "_blank"); }, style: { color: CI.blau } }, d.name), E("span", { style: B.klein }, (d.zugang_id ? "persönlich · " : "") + (d.freigegeben ? "freigegeben" : "intern") + " · " + B.datumDe(d.created_at))); })) : E(B.Leer, null, "Keine Dokumente an dieser Einheit.")),
+        block("Dokumente", E("div", null, dokumente.length ? dokumente.map(function (d) { return E("div", { key: d.id, style: { display: "flex", justifyContent: "space-between", gap: 8, padding: "5px 0", borderBottom: "1px solid " + CI.border, fontSize: 12.5, alignItems: "center", flexWrap: "wrap" } },
+            E("a", { href: "#", onClick: async function (ev) { ev.preventDefault(); var u = await B.signiert(d.pfad); if (u) window.open(u, "_blank"); }, style: { color: CI.blau } }, d.name),
+            E("span", { style: { display: "flex", gap: 6, alignItems: "center" } }, E("span", { style: B.klein }, (d.zugang_id ? "persönlich · " : "") + (d.freigegeben ? "Käufer" : "intern") + " · " + B.datumDe(d.created_at)),
+              d.zugang_id ? null : E("button", { type: "button", title: "Über den QR-Code an der Tür ohne Anmeldung abrufbar", onClick: function () { qrUmschalten(d); }, style: Object.assign({}, B.knopfLeer, { fontSize: 11, padding: "2px 7px", background: d.qr_sichtbar ? CI.blau : "#fff", color: d.qr_sichtbar ? "#fff" : CI.blau }) }, d.qr_sichtbar ? "⬚ QR an" : "QR aus"))); }) : E(B.Leer, null, "Keine Dokumente an dieser Einheit."),
+          E("div", { style: { marginTop: 8, display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" } }, E("label", { style: Object.assign({}, B.knopfLeer, { fontSize: 12, display: "inline-block" }) }, "＋ Unterlage für die Gewerke", E("input", { type: "file", multiple: true, style: { display: "none" }, onChange: unterlageFuerGewerke })), E("span", { style: B.klein }, "Landet mit „QR an“ ohne Anmeldung am Türcode und im Handwerker-Link — nicht im Kundenportal.")))),
         block("Zahlungsplan (MaBV)", E("div", null,
           zahlungsplan.length ? E("table", { style: { width: "100%", borderCollapse: "collapse" } }, E("thead", null, E("tr", null, E("th", { style: th }, "#"), E("th", { style: th }, "Rate"), E("th", { style: th }, "Abschnitte"), E("th", { style: Object.assign({}, th, { textAlign: "right" }) }, "Betrag"), E("th", { style: th }, "Status"), E("th", { style: th }, ""))),
             E("tbody", null, zahlungsplan.map(function (z) { var r = raten.find(function (x) { return x.id === z.id; }); return E("tr", { key: z.id },
@@ -426,7 +565,8 @@
                 z.angefordert_am && !z.bezahlt_am ? E("button", { type: "button", style: Object.assign({}, B.knopfLeer, { fontSize: 11.5, padding: "3px 8px" }), onClick: async function () { await window._sb.from("projekt_zahlungsplan").update({ status: "bezahlt", bezahlt_am: B.heute() }).eq("id", z.id); p.neuLaden(); } }, "Bezahlt") : null,
                 E("button", { type: "button", style: Object.assign({}, B.knopfLeer, { fontSize: 11.5, padding: "3px 8px" }), onClick: function () { setzeZpForm({ id: z.id, position: z.position, bezeichnung: z.bezeichnung, prozent: z.prozent == null ? "" : z.prozent, betrag: z.betrag == null ? "" : z.betrag, faellig_am: z.faellig_am || "", abschnitte: z.abschnitte || [], zugang_id: z.zugang_id }); } }, "✎")))); })))
             : E(B.Leer, null, "Noch kein Zahlungsplan. Bis zu sieben Raten; jede bündelt Bauabschnitte nach § 3 Abs. 2 MaBV."),
-          E("div", { style: { marginTop: 8 } }, E("button", { type: "button", style: Object.assign({}, B.knopfLeer, { fontSize: 12 }), onClick: function () { setzeZpForm(zpForm ? null : { position: zahlungsplan.length + 1, bezeichnung: "", prozent: "", betrag: "", faellig_am: "", abschnitte: [], zugang_id: zugang && zugang.id }); } }, zpForm ? "Abbrechen" : "+ Rate")),
+          E("div", { style: { marginTop: 8, display: "flex", gap: 6, flexWrap: "wrap" } }, E("button", { type: "button", style: Object.assign({}, B.knopfLeer, { fontSize: 12 }), onClick: function () { setzeZpForm(zpForm ? null : { position: zahlungsplan.length + 1, bezeichnung: "", prozent: "", betrag: "", faellig_am: "", abschnitte: [], zugang_id: zugang && zugang.id }); } }, zpForm ? "Abbrechen" : "+ Rate"),
+            !zahlungsplan.length ? E("button", { type: "button", style: Object.assign({}, B.knopfGold, { fontSize: 12 }), onClick: standardplan, title: window.IMMO_RATEN_STANDARD.map(function (r) { return r.nr + ". " + r.bezeichnung + " (" + B.ratenProzent(r.abschnitte) + " %)"; }).join("\n") }, "Standardplan: 7 Raten aus 13 Abschnitten") : null),
           zpForm ? E("div", { style: { marginTop: 8, padding: 10, background: "#fbf7ee", borderRadius: 8, display: "flex", flexDirection: "column", gap: 8 } },
             E("div", { style: zeile }, E("div", null, E("label", { style: etikett }, "Nr."), E("input", { type: "number", min: 1, max: 7, style: B.feld, value: zpForm.position, onChange: function (ev) { setzeZpForm(Object.assign({}, zpForm, { position: ev.target.value })); } })),
               E("div", null, E("label", { style: etikett }, "Bezeichnung"), E("input", { style: B.feld, value: zpForm.bezeichnung, onChange: function (ev) { setzeZpForm(Object.assign({}, zpForm, { bezeichnung: ev.target.value })); }, placeholder: "z. B. Rohbau fertig" })),
@@ -436,6 +576,30 @@
             E("div", null, E("label", { style: etikett }, "Bauabschnitte dieser Rate (MaBV, Summe der Höchstsätze: " + (zpForm.abschnitte || []).reduce(function (s, a) { return s + ((window.IMMO_MABV[a - 1] || {}).prozent || 0); }, 0).toFixed(1) + " %)"),
               E("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" } }, window.IMMO_MABV.map(function (m) { var an = (zpForm.abschnitte || []).indexOf(m.nr) >= 0; var belegt = zahlungsplan.some(function (z) { return z.id !== zpForm.id && (z.abschnitte || []).indexOf(m.nr) >= 0; }); return E("button", { key: m.nr, type: "button", disabled: belegt && !an, title: m.name + (belegt ? " — schon in einer anderen Rate" : ""), onClick: function () { setzeZpForm(Object.assign({}, zpForm, { abschnitte: an ? zpForm.abschnitte.filter(function (x) { return x !== m.nr; }) : zpForm.abschnitte.concat([m.nr]) })); }, style: Object.assign({}, B.knopfLeer, { fontSize: 11.5, padding: "3px 8px", background: an ? CI.blau : belegt ? "#f1f3f6" : "#fff", color: an ? "#fff" : belegt ? CI.muted : CI.blau }) }, m.nr + ". " + m.name.split(" ").slice(0, 2).join(" ")); }))),
             E("div", null, E("button", { type: "button", style: B.knopf, onClick: zahlungsplanSpeichern }, "Speichern"))) : null))),
+      E("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(300px, 100%), 1fr))", gap: 14 } },
+        block("Kaufvertrag", E("div", null,
+          E("div", { style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 8 } },
+            E("label", { style: Object.assign({}, B.knopfLeer, { fontSize: 12, display: "inline-block" }) }, e.kaufvertrag_datei ? "Kaufvertrag ersetzen" : "📄 Kaufvertrag (PDF) hochladen", E("input", { type: "file", accept: "application/pdf", style: { display: "none" }, onChange: kaufvertragHochladen })),
+            e.kaufvertrag_datei ? E("button", { type: "button", style: Object.assign({}, B.knopfLeer, { fontSize: 12 }), onClick: async function () { var u = await B.signiert(e.kaufvertrag_datei); if (u) window.open(u, "_blank"); } }, "Öffnen") : null,
+            e.kaufvertrag_datei ? E("button", { type: "button", style: Object.assign({}, B.knopfGold, { fontSize: 12 }), disabled: kvLaeuft, onClick: kaufvertragLesen }, kvLaeuft ? "… liest" : "Auslesen (KI, 3 Credits)") : null),
+          e.kaufvertrag_daten ? E("div", { style: { fontSize: 12.5, lineHeight: 1.6 } },
+            e.kaufvertrag_daten.kaufpreis && e.kaufvertrag_daten.kaufpreis.wert ? E("div", null, "Kaufpreis laut Vertrag: ", E("b", null, B.euro(e.kaufvertrag_daten.kaufpreis.wert))) : null,
+            e.kaufvertrag_daten.uebergabe_bis && e.kaufvertrag_daten.uebergabe_bis.wert ? E("div", null, "Übergabe bis: ", B.datumDe(e.kaufvertrag_daten.uebergabe_bis.wert)) : null,
+            e.kaufvertrag_daten.notar && e.kaufvertrag_daten.notar.wert ? E("div", null, "Notar: ", e.kaufvertrag_daten.notar.wert, e.kaufvertrag_daten.urkunde && e.kaufvertrag_daten.urkunde.wert ? " · " + e.kaufvertrag_daten.urkunde.wert : "") : null,
+            E("div", { style: B.klein }, "Ausgelesen " + B.zeitDe(e.kaufvertrag_daten.gelesen_am) + " — Vorschlag der KI, im Formular bestätigt.")) : E("div", { style: B.klein }, "Kaufpreis, Raten, Übergabetermin und vereinbarte Sonderleistungen werden ausgelesen und als Vorschlag gezeigt. Nichts wird ungeprüft übernommen."),
+          kvVorschlag ? E("div", { style: { marginTop: 8, padding: 10, background: "#fbf7ee", borderRadius: 8, fontSize: 12.5, display: "flex", flexDirection: "column", gap: 6 } },
+            E("div", { style: { fontWeight: 600 } }, "Vorschlag aus dem Kaufvertrag — übernehmen?"),
+            kvVorschlag.kaufpreis && kvVorschlag.kaufpreis.wert ? E("label", { style: { display: "flex", gap: 8 } }, E("input", { type: "checkbox", checked: kvVorschlag.haken.kaufpreis, onChange: function (ev) { setzeKvVorschlag(Object.assign({}, kvVorschlag, { haken: Object.assign({}, kvVorschlag.haken, { kaufpreis: ev.target.checked }) })); } }), E("span", null, "Kaufpreis ", E("b", null, B.euro(kvVorschlag.kaufpreis.wert)), E("div", { style: B.klein }, "Beleg: ", kvVorschlag.kaufpreis.beleg))) : E("div", { style: B.klein }, "Kein Kaufpreis mit Beleg gefunden."),
+            kvVorschlag.raten && kvVorschlag.raten.length ? E("label", { style: { display: "flex", gap: 8 } }, E("input", { type: "checkbox", checked: kvVorschlag.haken.raten, disabled: !!zahlungsplan.length || !zugang, onChange: function (ev) { setzeKvVorschlag(Object.assign({}, kvVorschlag, { haken: Object.assign({}, kvVorschlag.haken, { raten: ev.target.checked }) })); } }), E("span", null, kvVorschlag.raten.length + " Raten als Zahlungsplan anlegen" + (zahlungsplan.length ? " (es gibt schon einen Plan)" : !zugang ? " (kein Käufer zugeordnet)" : ""), E("div", { style: B.klein }, kvVorschlag.raten.map(function (r) { return r.nr + ". " + r.bezeichnung + (r.prozent ? " " + r.prozent + " %" : "") + (r.abschnitte && r.abschnitte.length ? " [" + r.abschnitte.join(",") + "]" : ""); }).join(" · ")))) : null,
+            kvVorschlag.sonderleistungen && kvVorschlag.sonderleistungen.length ? E("label", { style: { display: "flex", gap: 8 } }, E("input", { type: "checkbox", checked: kvVorschlag.haken.sonder, onChange: function (ev) { setzeKvVorschlag(Object.assign({}, kvVorschlag, { haken: Object.assign({}, kvVorschlag.haken, { sonder: ev.target.checked }) })); } }), E("span", null, kvVorschlag.sonderleistungen.length + " Sonderleistungen in die Liste", E("ul", { style: { margin: "4px 0 0", paddingLeft: 18 } }, kvVorschlag.sonderleistungen.map(function (s, i) { return E("li", { key: i }, s.text, s.betrag ? " (" + B.euro(s.betrag) + ")" : "", E("div", { style: B.klein }, s.beleg)); })))) : E("div", { style: B.klein }, "Keine Sonderleistungen gefunden."),
+            (kvVorschlag.hinweise || []).map(function (h, i) { return E("div", { key: i, style: { color: "#7a5c00" } }, "⚠ ", h); }),
+            E("div", { style: { display: "flex", gap: 6 } }, E("button", { type: "button", style: B.knopf, onClick: kaufvertragUebernehmen }, "Übernehmen"), E("button", { type: "button", style: B.knopfLeer, onClick: function () { setzeKvVorschlag(null); } }, "Verwerfen"))) : null)),
+        block("Sonderleistungen (dürfen nicht untergehen)", E("div", null,
+          sonder.length ? sonder.map(function (s, i) { return E("label", { key: i, style: { display: "flex", gap: 8, alignItems: "flex-start", padding: "4px 0", borderBottom: "1px dotted " + CI.border, fontSize: 12.5, cursor: "pointer" } }, E("input", { type: "checkbox", checked: !!s.erledigt, onChange: function () { sonderUmschalten(i); } }), E("span", { style: { textDecoration: s.erledigt ? "line-through" : "none", color: s.erledigt ? CI.muted : "inherit" } }, s.text, s.betrag ? " (" + B.euro(s.betrag) + ")" : "", E("div", { style: B.klein }, (s.quelle === "kaufvertrag" ? "aus dem Kaufvertrag" : "manuell") + (s.beleg ? " · " + s.beleg : "") + (s.erledigt_am ? " · erledigt " + B.datumDe(s.erledigt_am) : "")))); }) : E(B.Leer, null, "Keine Sonderleistungen hinterlegt. Sie kommen aus dem Kaufvertrag oder von Hand und erscheinen bei der Abnahme."),
+          E("div", { style: { marginTop: 8 } }, E("button", { type: "button", style: Object.assign({}, B.knopfLeer, { fontSize: 12 }), onClick: sonderDazu }, "+ Sonderleistung"))),
+          null),
+        block("Post zu dieser Einheit", post.length ? E("div", null, post.map(function (m) { return E("div", { key: m.id, style: { display: "flex", justifyContent: "space-between", gap: 8, padding: "5px 0", borderBottom: "1px solid " + CI.border, fontSize: 12.5, cursor: "pointer", fontWeight: m.gelesen ? 400 : 600 }, onClick: function () { window._epMailOeffnen = m.id; if (typeof window.setView === "function") window.setView("posteingang"); } },
+            E("span", { style: { minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, (m.absender_name || m.absender_email || "?") + " — " + (m.betreff || "(ohne Betreff)")), E("span", { style: Object.assign({}, B.klein, { whiteSpace: "nowrap" }) }, B.datumDe(m.gesendet_am))); })) : E(B.Leer, null, "Keine Mails von Käufer oder Handwerkern dieser Einheit" + (e.immobilie_id ? "." : " — ohne CRM-Objekt werden nur Absenderadressen verglichen.")))),
       block("Zeitleiste", zeitleiste.length ? E("div", null, zeitleiste.map(function (z, i) { return E("div", { key: i, style: { fontSize: 12.5, padding: "4px 0", borderBottom: "1px dotted " + CI.border } }, E("span", { style: { color: CI.muted } }, B.zeitDe(z.am), " · "), z.text); })) : E(B.Leer, null, "Noch nichts geschehen.")));
   }
 

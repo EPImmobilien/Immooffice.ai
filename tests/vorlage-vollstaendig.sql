@@ -522,7 +522,11 @@ zuwachs(bereich, mehr, grund) as (values
   ('Richtlinien', 5, 'fork_84: 2 Team-Richtlinien am Protokoll mit Projekt; fork_86: 3 projekt_bautenstand'),
   ('Funktionen', 8, 'fork_84: objekte_zu_adresse; fork_85: mangel_verlauf_anhaengen, projekt_maengel_verlauf_trg, projekt_maengel_todo_trg, projekt_glocke, maengel_vorlage_sicherstellen; fork_86: rate_anforderbar, projekt_bautenstand_hinweis_trg'),
   ('Trigger', 3, 'fork_85: Verlauf, To-do-Abschluss; fork_86: Ratenhinweis'),
-  ('Cron-Jobs', 1, 'fork_85: maengel-fristen-taeglich')
+  ('Cron-Jobs', 1, 'fork_85: maengel-fristen-taeglich'),
+  -- fork_87: QR-Unterlagen, Grundriss-Markierung, Kaufvertrag, Hinweise.
+  ('Spalten', 7, 'fork_87: projekt_dateien.qr_sichtbar, projekte.qr_hinweis, projekt_einheiten qr_hinweis/kaufvertrag_datei/kaufvertrag_daten/sonderleistungen, projekt_maengel.grundriss_position'),
+  ('Pruefbedingungen', 2, 'fork_87: qr_nicht_persoenlich, sonderleistungen ist Liste'),
+  ('Indizes ohne Constraint', 1, 'fork_87: projekt_dateien_qr_idx')
 ),
 soll(bereich, soll) as (
   select v.bereich,

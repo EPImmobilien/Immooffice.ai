@@ -55,6 +55,7 @@ GEMEINSAME_BEILAGEN = {
         'ki-assistent',     # eigene Funktion (supabase/eigene/), fork_83
         'firma-ermitteln',  # eigene Funktion (supabase/eigene/), fork_82
         'mangel-text',      # eigene Funktion (supabase/eigene/), fork_85
+        'kaufvertrag-lesen',  # eigene Funktion (supabase/eigene/), fork_87
     },
     # fork_61 — die Abo-Schranke. Sie liegt bei den Funktionen, die ein
     # Sprachmodell rufen und (noch) keinen Preis im Katalog haben. Welche

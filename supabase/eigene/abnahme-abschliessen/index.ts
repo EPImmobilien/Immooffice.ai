@@ -210,6 +210,7 @@ Deno.serve(async (req) => {
           frist, kategorie: m.kategorie ? String(m.kategorie).slice(0, 60) : null,
           titel: String(m.titel).trim().slice(0, 200), beschreibung: m.beschreibung ? String(m.beschreibung).slice(0, 4000) : null,
           foto_pfade: fotoPfade, status: m.projekt_kontakt_id ? "beauftragt" : "offen",
+          grundriss_position: m.grundriss_position && typeof m.grundriss_position.x === "number" ? { x: m.grundriss_position.x, y: m.grundriss_position.y } : null,
           handwerker_token: tokenNeu(), erstellt_von: wer.id,
           verlauf: [{ am: new Date().toISOString(), wer: wer.name, was: "angelegt", text: `${typName}${einheitText ? " " + einheitText : ""}, Raum ${raum.name || "–"}` }],
         }).select("*").single();
