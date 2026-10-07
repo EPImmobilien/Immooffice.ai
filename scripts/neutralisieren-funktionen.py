@@ -3414,6 +3414,24 @@ NACHBESSERN = [
      'generate-text: Kontaktdaten aus dem Anfragekoerper statt aus dem '
      'Quelltext.',
      {'generate-text'}),
+    # fork_78 — Modell, Max-Tokens und Temperatur kommen vom Betreiber
+    # (plattform_ki_einstellungen), wenn er sie gesetzt hat; sonst bleibt
+    # der eingebaute Wert. Die Beilage _credits liefert die Zeile mit.
+    ('FORK',
+     '        model: "claude-sonnet-4-6",\n        max_tokens,\n        system,',
+     '        model: abr.modell("claude-sonnet-4-6"),\n        max_tokens: abr.maxTokens(max_tokens),\n        ...(abr.temperatur() !== undefined ? { temperature: abr.temperatur() } : {}),\n        system,',
+     'generate-text: Modell und Max-Tokens aus der KI-Steuerung des Betreibers.',
+     {'generate-text'}),
+    ('FORK',
+     '        model: MODEL,\n        max_tokens: 6000,\n        temperature: 0,',
+     '        model: abr.modell(MODEL),\n        max_tokens: abr.maxTokens(6000),\n        temperature: abr.temperatur(0),',
+     'text-korrigieren: Modell, Max-Tokens und Temperatur aus der KI-Steuerung.',
+     {'text-korrigieren'}),
+    ('FORK',
+     '        model: modell,\n        max_tokens: 8192,',
+     '        model: abr.modell(modell),\n        max_tokens: abr.maxTokens(8192),',
+     'expose-pruefen: Modell und Max-Tokens aus der KI-Steuerung.',
+     {'expose-pruefen'}),
     ('FORK',
      '  const { textart, daten, kuerzer } = body;',
      '  const { textart, daten, kuerzer } = body;\n'

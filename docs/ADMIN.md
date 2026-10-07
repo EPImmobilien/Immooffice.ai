@@ -520,7 +520,77 @@ nur Betreiber).
 - [x] Datenübernahme als eigener Anfragetyp mit Stand und Paketverknüpfung
 - [ ] E-Mail-Versand live nachweisen — braucht `RESEND_API_KEY`/`SMTP_FROM_EMAIL` als Function-Secrets
 
-## Noch offen aus dem Auftrag (Schritte 9–10)
+## Schritt 9 — KI-Steuerung, Vorlagen & System-Mails, Rechtstexte, Ankündigungen (fork_78) · erledigt 07.10.2026
+
+**Migration** `20261007240000_fork_78_betreiber_steuerung.sql`.
+
+### KI-Steuerung (Reiter „KI")
+
+| Was | Wo | Wirkung |
+|---|---|---|
+| Anbieter, Modell, Temperatur, Max-Tokens je Funktion | `plattform_ki_einstellungen` | Die Beilage `_credits` liefert die Zeile mit (`abr.modell(standard)`, `abr.maxTokens(standard)`, `abr.temperatur(standard)`); `generate-text`, `text-korrigieren`, `expose-pruefen` nutzen sie. Bild-KI (Replicate) trägt „siehe Funktion": das Modell steht dort fest im Code. |
+| Notschalter mit Hinweis | `aktiv = false` + `hinweis` | Zweifach: die Beilage antwortet 503 `notschalter` mit dem Hinweis, **und** der Trigger `ki_schranke` am Ledger wirft `KI001` — auch an jeder Stelle, die die Beilage nicht nutzt. |
+| Tageslimit je Mandant | `plattform_werte.ki_tageslimit_credits` / `_eur` (0 = kein Limit), Ausnahme je Haus in `mandant_ki_limits` | Trigger `ki_schranke` vor jeder Reservierung: Summe von heute (Mitternacht **Europe/Berlin**, Status reserviert/gebucht) + Kosten der Aktion > Limit → `KI002`, Beilage antwortet 429 `tageslimit`. Kostenfreie Aktionen (`pdf_export` …) sind nie betroffen. |
+| Kostenalarm-Schwellen | `alarm_kosten_tag_eur`, `alarm_kosten_monat_eur`, `alarm_kosten_mandant_tag_eur`, `alarm_kosten_mandant_monat_eur` | Gespeichert; ausgewertet von den Warnregeln in Schritt 10. |
+
+### Vorlagen & System-Mails (Reiter „Vorlagen & Mails")
+
+Globale Vorlagen sind die Zeilen **ohne Mandant** in `expose_vorlagen`,
+`vertragsvorlagen`, `mpe_bausteine`, `marketing_print_vorlagen`. Der
+Betreiber archiviert/aktiviert sie (`archiviert` bzw. `aktiv`) und legt
+für Exposé-Systemvorlagen eine neue Version an (Kopie mit `version + 1`,
+alte archiviert). Mandanten-Kopien werden nie angefasst. Neue globale
+Vorlagen entstehen weiterhin im jeweiligen Modul.
+
+System-Mails (`system_mail_vorlagen`, Schlüssel `willkommen`, `test_7`,
+`test_2`, `test_0`, `zahlung_problem`, `kuendigung_bestaetigt`,
+`support_zugriff_angefragt`, `support_antwort`, `loeschung_angekuendigt`):
+Betreff + Text mit `{{firma.name}}`-Platzhaltern, Vorschau mit
+Beispielwerten, Testversand an die eigene Adresse. `system_mail_rendern()`
+setzt ein; unbekannte Platzhalter bleiben sichtbar stehen. **Angeschlossen:**
+`testphase-erinnerung` (test_7/2/0), `plattform-admin`
+(support_zugriff_angefragt, support_antwort). Die übrigen Schlüssel sind
+gepflegt, aber noch ohne Versender — siehe OFFEN.
+
+### Rechtstexte (Reiter „Rechtstexte")
+
+`rechtstexte` (AGB, AVV, Datenschutz, Impressum; Version, gültig ab,
+Änderungshinweis, Zustimmungspflicht). Entwurf → Veröffentlichen (nur
+**owner**, mit Grund im Audit-Log); veröffentlichte Texte sind öffentlich
+lesbar (auch anon) und werden nicht mehr geändert. Bei
+`zustimmung_noetig`: `rechtstexte_offen()` nennt dem Chef die jüngste
+gültige Fassung je Art ohne Zustimmung seines Hauses; das Portal legt
+`ImmoRechtstextSperre` über die Anwendung (Chef; Mitarbeiter sehen
+nichts). Zustimmung = Zeile in `rechtstext_zustimmungen` (nur chef,
+eigenes Haus, RLS). Übersicht „X von Y" über
+`plattform_rechtstexte_stand()`.
+
+### Ankündigungen (Reiter „Ankündigungen")
+
+`ankuendigungen`: Typ (Info/Wartung/Neue Funktion/Warnung), Zeitraum,
+schließbar ja/nein, Ziel nach Tarif, Status, einzelnen Häusern (leer =
+alle), optional einmalige Mail an die Chefs. `meine_ankuendigungen()`
+filtert serverseitig; Wartungen erscheinen sieben Tage vorher mit
+Countdown. Weggeklickte Hinweise merkt sich der Browser (`localStorage`).
+
+`tests/betreiber-steuerung.sql`: 20 Prüfungen (KI001 ohne Ledger-Zeile,
+KI002 mit Tageszählung ohne gestern, Ausnahme je Haus, kostenfrei nie
+betroffen, Rendern, anon liest nur Veröffentlichtes, Zustimmung nur
+chef/eigenes Haus, Tarif-Ziel, Wartungs-Countdown).
+
+### Abnahme Schritt 9
+
+- [x] Je KI-Funktion Anbieter/Modell wählbar, Temperatur/Max-Tokens
+- [x] Tageslimit greift und gibt nach Mitternacht wieder frei (Trigger, Zeitzone Europe/Berlin)
+- [x] Globaler Notschalter je Funktion mit Hinweistext
+- [x] Kostenalarm-Schwellen hinterlegt (Auswertung Schritt 10)
+- [x] Globale Vorlagen: archivieren, neue Version (Exposé), Mandanten-Kopien unberührt
+- [x] System-E-Mails mit Platzhaltern, Vorschau, Testversand
+- [x] Rechtstexte versioniert; neue AGB-Version mit Zustimmungspflicht blockiert `chef` bis zur Zustimmung; Übersicht X von Y
+- [x] Ankündigungen nach Tarif/Status/einzeln, Wartung mit Countdown, optional Mail
+- [ ] Rechtstexte auf der Landingpage aus der Tabelle (heute statische Seiten) — OFFEN
+
+## Noch offen aus dem Auftrag (Schritt 10)
 
 Werden hier je Schritt nachgetragen. Reihenfolge wie im Auftrag.
 

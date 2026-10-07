@@ -1321,6 +1321,297 @@
           "Reihenfolge der Entscheidung: Ausnahme des Hauses (befristbar) → Tarif → Standard. Gesperrte Module zeigen im Portal einen Upgrade-Hinweis, sie verschwinden nicht.")));
   }
 
+  // --- KI-Steuerung (fork_78) -------------------------------------------------
+  function KiSteuerung(p) {
+    var d = p.daten;
+    var eZ = React.useState({}), entwurf = eZ[0], setzeEntwurf = eZ[1];
+    var wZ = React.useState(null), werte = wZ[0], setzeWerte = wZ[1];
+    var lZ = React.useState({ mandant_id: "", credits_tag: "", eur_tag: "", notiz: "" }), limit = lZ[0], setzeLimit = lZ[1];
+    if (!d) return E("div", { style: { color: CI.muted } }, "Lade KI-Steuerung …");
+    var darf = p.rolle === "owner" || p.rolle === "admin";
+    var w = werte || d.werte || {};
+    function feldWert(k, std) { var x = w[k]; return x === undefined || x === null ? std : String(x).replace(/"/g, ""); }
+    async function speichern(f) {
+      var e = entwurf[f.funktion] || {};
+      try { await ruf("ki_speichern", Object.assign({ funktion: f.funktion }, e)); p.melden("Gespeichert: " + f.name); setzeEntwurf(Object.assign({}, entwurf, { [f.funktion]: undefined })); p.neuLaden(); }
+      catch (x) { p.melden(x.message || String(x), "fehler"); }
+    }
+    async function schalten(f) {
+      var e = entwurf[f.funktion] || {};
+      var hinweis = f.aktiv ? (e.hinweis !== undefined ? e.hinweis : f.hinweis) : undefined;
+      if (f.aktiv && !String(hinweis || "").trim()) { p.melden("Zum Abschalten zuerst den Hinweistext für die Nutzer eintragen.", "warnung"); return; }
+      if (!window.confirm((f.aktiv ? "„" + f.name + "“ vorübergehend ABSCHALTEN? Nutzer sehen: " + hinweis : "„" + f.name + "“ wieder einschalten?"))) return;
+      try { await ruf("ki_speichern", { funktion: f.funktion, aktiv: !f.aktiv, hinweis: hinweis }); p.melden(f.aktiv ? "Abgeschaltet." : "Eingeschaltet."); p.neuLaden(); }
+      catch (x) { p.melden(x.message || String(x), "fehler"); }
+    }
+    async function werteSpeichern() {
+      try { await ruf("werte_speichern", { werte: werte }); p.melden("Grenzen gespeichert."); setzeWerte(null); p.neuLaden(); }
+      catch (x) { p.melden(x.message || String(x), "fehler"); }
+    }
+    async function limitSetzen(entfernen, id) {
+      try { await ruf("ki_limit_setzen", entfernen ? { mandant_id: id, entfernen: true } : limit); p.melden(entfernen ? "Ausnahme entfernt." : "Ausnahme gesetzt.");
+        setzeLimit({ mandant_id: "", credits_tag: "", eur_tag: "", notiz: "" }); p.neuLaden(); }
+      catch (x) { p.melden(x.message || String(x), "fehler"); }
+    }
+    function eingabe(f, k, v) { setzeEntwurf(Object.assign({}, entwurf, { [f.funktion]: Object.assign({}, entwurf[f.funktion] || {}, { [k]: v }) })); }
+    function wert(f, k) { var e = entwurf[f.funktion]; return e && e[k] !== undefined ? e[k] : (f[k] === null || f[k] === undefined ? "" : f[k]); }
+    return E("div", null,
+      E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+        E("div", { style: { padding: "16px 18px 0" } }, Ueberschrift("KI-Funktionen: Anbieter, Modell, Notschalter")),
+        E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 900 } },
+          E("thead", null, E("tr", null, ["Funktion", "Anbieter", "Modell", "Temp.", "Max-Tokens", "Hinweis bei Abschaltung", "Stand", ""].map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
+          E("tbody", null, (d.ki || []).map(function (f) {
+            return E("tr", { key: f.funktion, style: { opacity: f.aktiv ? 1 : 0.75, background: f.aktiv ? "transparent" : "#fdf2f2" } },
+              E("td", { style: zelle }, E("div", { style: { fontWeight: 600 } }, f.name), E("div", { style: { fontSize: 11, color: CI.muted, fontFamily: "ui-monospace, monospace" } }, f.funktion)),
+              E("td", { style: zelle }, E("select", { style: Object.assign({}, feld, { width: 110 }), value: wert(f, "anbieter"), disabled: !darf, onChange: function (e) { eingabe(f, "anbieter", e.target.value); } },
+                ["anthropic", "openai", "replicate", "sonstiger"].map(function (a) { return E("option", { key: a, value: a }, a); }))),
+              E("td", { style: zelle }, E("input", { style: Object.assign({}, feld, { width: 200, fontFamily: "ui-monospace, monospace", fontSize: 12 }), value: wert(f, "modell"), disabled: !darf, onChange: function (e) { eingabe(f, "modell", e.target.value); } })),
+              E("td", { style: zelle }, E("input", { style: Object.assign({}, feld, { width: 60 }), value: wert(f, "temperatur"), placeholder: "—", disabled: !darf, onChange: function (e) { eingabe(f, "temperatur", e.target.value); } })),
+              E("td", { style: zelle }, E("input", { style: Object.assign({}, feld, { width: 80 }), value: wert(f, "max_tokens"), placeholder: "—", disabled: !darf, onChange: function (e) { eingabe(f, "max_tokens", e.target.value); } })),
+              E("td", { style: zelle }, E("input", { style: Object.assign({}, feld, { width: 220 }), value: wert(f, "hinweis"), placeholder: "z. B. Bild-KI heute gestört, bitte morgen erneut", disabled: !darf, onChange: function (e) { eingabe(f, "hinweis", e.target.value); } })),
+              E("td", { style: Object.assign({}, zelle, { color: f.aktiv ? CI.success : CI.danger, fontWeight: 700 }) }, f.aktiv ? "an" : "AUS"),
+              E("td", { style: Object.assign({}, zelle, { whiteSpace: "nowrap" }) }, darf ? [
+                E("button", { key: "s", type: "button", style: knopfLeer, disabled: !entwurf[f.funktion], onClick: function () { speichern(f); } }, "Speichern"),
+                E("button", { key: "n", type: "button", style: Object.assign({}, knopfLeer, { marginLeft: 6, color: f.aktiv ? CI.danger : CI.success }), onClick: function () { schalten(f); } }, f.aktiv ? "Abschalten" : "Einschalten")] : null));
+          }))),
+        E("p", { style: { padding: "8px 18px 14px", margin: 0, fontSize: 11.5, color: CI.muted, lineHeight: 1.6 } },
+          "Temperatur und Max-Tokens leer = eingebauter Wert der Funktion. „siehe Funktion“ als Modell heißt: das Modell steht fest im Code (Bild-KI über Replicate). Abschalten wirkt sofort: die Datenbank lehnt jede Reservierung ab (KI001), die Funktion antwortet mit dem Hinweis.")),
+
+      E("div", { style: kasten }, Ueberschrift("Tageslimit und Kostenalarm"),
+        E("div", { style: { display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" } },
+          [["ki_tageslimit_credits", "Credits je Mandant und Tag (0 = kein Limit)"], ["ki_tageslimit_eur", "KI-Kosten in EUR je Mandant und Tag (0 = kein Limit)"],
+           ["alarm_kosten_tag_eur", "Alarm: KI-Kosten je Tag, gesamt (EUR)"], ["alarm_kosten_monat_eur", "Alarm: KI-Kosten je Monat, gesamt (EUR)"],
+           ["alarm_kosten_mandant_tag_eur", "Alarm je Mandant: Tag (EUR)"], ["alarm_kosten_mandant_monat_eur", "Alarm je Mandant: Monat (EUR)"],
+           ["kosten_warnung_prozent", "Warnliste: KI-Kosten > X % des Nettoumsatzes"]
+          ].map(function (k) {
+            return E("label", { key: k[0], style: { fontSize: 12.5 } }, E("div", { style: { color: CI.muted, marginBottom: 3 } }, k[1]),
+              E("input", { style: feld, value: feldWert(k[0], ""), disabled: !darf, onChange: function (e) { setzeWerte(Object.assign({}, w, { [k[0]]: e.target.value })); } }));
+          })),
+        darf ? E("button", { type: "button", style: Object.assign({}, knopf, { marginTop: 10 }), disabled: !werte, onClick: werteSpeichern }, "Grenzen speichern") : null,
+        E("p", { style: { fontSize: 11.5, color: CI.muted, marginTop: 10, marginBottom: 0 } },
+          "Das Tageslimit prüft die Datenbank vor jeder Reservierung (Mitternacht Europe/Berlin); überschritten heißt: Meldung an den Nutzer, nichts wird reserviert (KI002). Die Alarme nutzt Schritt 10 (Warnregeln).")),
+
+      E("div", { style: kasten }, Ueberschrift("Ausnahmen je Mandant"),
+        (d.limits || []).length ? E("div", { style: { marginBottom: 10 } }, d.limits.map(function (l) {
+          return E("div", { key: l.mandant_id, style: { display: "flex", gap: 10, alignItems: "center", fontSize: 13, padding: "4px 0", borderBottom: "1px solid " + CI.border } },
+            E("strong", null, l.name), E("span", null, (l.credits_tag === null ? "Credits: global" : "Credits: " + zahl(l.credits_tag)) + " · " + (l.eur_tag === null ? "EUR: global" : "EUR: " + l.eur_tag)),
+            l.notiz ? E("span", { style: { color: CI.muted } }, l.notiz) : null,
+            darf ? E("button", { type: "button", style: Object.assign({}, knopfLeer, { marginLeft: "auto" }), onClick: function () { limitSetzen(true, l.mandant_id); } }, "Entfernen") : null);
+        })) : E("div", { style: { fontSize: 13, color: CI.muted, marginBottom: 10 } }, "Keine Ausnahmen — für alle gilt der globale Wert."),
+        darf ? E("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" } },
+          E("select", { style: Object.assign({}, feld, { width: 240 }), value: limit.mandant_id, onChange: function (e) { setzeLimit(Object.assign({}, limit, { mandant_id: e.target.value })); } },
+            [E("option", { key: "", value: "" }, "— Mandant —")].concat((d.mandanten || []).map(function (m) { return E("option", { key: m.id, value: m.id }, m.name); }))),
+          E("input", { style: Object.assign({}, feld, { width: 120 }), placeholder: "Credits/Tag", value: limit.credits_tag, onChange: function (e) { setzeLimit(Object.assign({}, limit, { credits_tag: e.target.value })); } }),
+          E("input", { style: Object.assign({}, feld, { width: 100 }), placeholder: "EUR/Tag", value: limit.eur_tag, onChange: function (e) { setzeLimit(Object.assign({}, limit, { eur_tag: e.target.value })); } }),
+          E("input", { style: Object.assign({}, feld, { width: 220 }), placeholder: "Notiz", value: limit.notiz, onChange: function (e) { setzeLimit(Object.assign({}, limit, { notiz: e.target.value })); } }),
+          E("button", { type: "button", style: knopf, disabled: !limit.mandant_id, onClick: function () { limitSetzen(false); } }, "Setzen")) : null),
+
+      (d.heute || []).length ? E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+        E("div", { style: { padding: "16px 18px 0" } }, Ueberschrift("Heute: Credits und KI-Kosten je Mandant")),
+        E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 480 } },
+          E("thead", null, E("tr", null, ["Haus", "Credits heute", "KI-Kosten heute"].map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
+          E("tbody", null, d.heute.map(function (h) {
+            return E("tr", { key: h.mandant_id }, E("td", { style: zelle }, h.name), E("td", { style: zelle }, zahl(h.credits)), E("td", { style: zelle }, euro(h.eur)));
+          })))) : null);
+  }
+
+  // --- Vorlagen & System-Mails (fork_78) ---------------------------------------
+  function VorlagenMails(p) {
+    var d = p.daten;
+    var mZ = React.useState(null), mails = mZ[0], setzeMails = mZ[1];
+    var oZ = React.useState(null), offen = oZ[0], setzeOffen = oZ[1];
+    var vZ = React.useState(null), vorschau = vZ[0], setzeVorschau = vZ[1];
+    React.useEffect(function () { ruf("mails").then(function (x) { setzeMails(x.vorlagen || []); }).catch(function (f) { p.melden(f.message || String(f), "fehler"); }); }, []);
+    if (!d) return E("div", { style: { color: CI.muted } }, "Lade Vorlagen …");
+    var darf = p.rolle === "owner" || p.rolle === "admin";
+    async function setzen(gruppe, v, an) {
+      try { await ruf("vorlage_setzen", { gruppe: gruppe, id: v.id, aktiv: an }); p.melden(an ? "Aktiviert." : "Archiviert."); p.neuLaden(); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    async function neueVersion(v) {
+      var name = window.prompt("Name der neuen Version (Kopie von „" + v.name + "“; die alte wird archiviert, Mandanten-Kopien bleiben unberührt):", v.name);
+      if (name === null) return;
+      try { var x = await ruf("vorlage_neue_version", { id: v.id, name: name }); p.melden("Version " + x.version + " angelegt."); p.neuLaden(); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    async function mailSpeichern() {
+      try { await ruf("mail_speichern", { schluessel: offen.schluessel, betreff: offen.betreff, text: offen.text }); p.melden("Vorlage gespeichert.");
+        var x = await ruf("mails"); setzeMails(x.vorlagen || []); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    async function mailVorschau() {
+      try { setzeVorschau(await ruf("mail_vorschau", { schluessel: offen.schluessel, betreff: offen.betreff, text: offen.text })); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    async function mailTest() {
+      try { var x = await ruf("mail_test", { schluessel: offen.schluessel }); p.melden(x.ok ? "Testmail an Ihre Adresse gesendet (gespeicherte Fassung)." : x.fehler, x.ok ? "ok" : "fehler"); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    var gruppen = d.gruppen || {};
+    return E("div", null,
+      Object.keys(gruppen).map(function (g) {
+        var liste = (d.vorlagen && d.vorlagen[g]) || [];
+        var aktivSpalte = gruppen[g].aktivSpalte, aktivWert = gruppen[g].aktivWert;
+        return E("div", { key: g, style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+          E("div", { style: { padding: "16px 18px 0" } }, Ueberschrift(gruppen[g].name + " (global, " + zahl(liste.length) + ")")),
+          !liste.length ? E("div", { style: { padding: "0 18px 16px", fontSize: 13, color: CI.muted } }, "Keine globale Vorlage angelegt. Globale Vorlagen sind Zeilen ohne Mandant; sie entstehen im jeweiligen Modul (Exposé-Vorlagen, Vertragsvorlagen, …) durch den Betreiber.")
+          : E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 640 } },
+            E("thead", null, E("tr", null, ["Name", "Art / Version", "Stand", ""].map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
+            E("tbody", null, liste.map(function (v) {
+              var an = aktivWert === true ? v[aktivSpalte] === true : v[aktivSpalte] !== true;
+              return E("tr", { key: v.id, style: { opacity: an ? 1 : 0.6 } },
+                E("td", { style: zelle }, E("div", { style: { fontWeight: 600 } }, v.name || v.bezeichnung || v.titel), E("div", { style: { fontSize: 11.5, color: CI.muted } }, v.beschreibung || v.dateiname || "")),
+                E("td", { style: zelle }, (v.art || v.basis || v.kategorie || v.layout || "") + (v.version ? " · v" + v.version : "") + (v.ist_standard || v.standard ? " · Standard" : "")),
+                E("td", { style: Object.assign({}, zelle, { color: an ? CI.success : CI.muted }) }, an ? "aktiv" : "archiviert"),
+                E("td", { style: Object.assign({}, zelle, { whiteSpace: "nowrap" }) }, darf ? [
+                  E("button", { key: "a", type: "button", style: knopfLeer, onClick: function () { setzen(g, v, !an); } }, an ? "Archivieren" : "Aktivieren"),
+                  g === "expose" && an ? E("button", { key: "v", type: "button", style: Object.assign({}, knopfLeer, { marginLeft: 6 }), onClick: function () { neueVersion(v); } }, "Neue Version") : null] : null));
+            }))));
+      }),
+      E("p", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.7 } },
+        "Archivieren nimmt eine Vorlage aus der Auswahl neuer Mandanten; Kopien, die ein Haus schon gezogen hat, bleiben unberührt. „Neue Version“ kopiert eine Exposé-Systemvorlage mit erhöhter Versionsnummer und archiviert die alte."),
+
+      E("div", { style: kasten }, Ueberschrift("System-Mails"),
+        !mails ? E("div", { style: { color: CI.muted, fontSize: 13 } }, "Lade …")
+        : E("div", { style: { display: "grid", gap: 16, gridTemplateColumns: offen ? "260px 1fr" : "1fr" } },
+          E("div", null, mails.map(function (m) {
+            return E("div", { key: m.schluessel, onClick: function () { setzeOffen(Object.assign({}, m)); setzeVorschau(null); },
+              style: { padding: "8px 10px", borderRadius: 7, cursor: "pointer", background: offen && offen.schluessel === m.schluessel ? "#eef2f8" : "transparent", fontSize: 13 } },
+              E("div", { style: { fontWeight: 600 } }, m.name), E("div", { style: { fontSize: 11, color: CI.muted, fontFamily: "ui-monospace, monospace" } }, m.schluessel));
+          })),
+          offen ? E("div", null,
+            E("div", { style: { fontSize: 12, color: CI.muted, marginBottom: 6 } }, "Platzhalter: " + (offen.platzhalter || []).map(function (x) { return "{{" + x + "}}"; }).join(" ")),
+            E("input", { style: feld, value: offen.betreff, disabled: !darf, onChange: function (e) { setzeOffen(Object.assign({}, offen, { betreff: e.target.value })); } }),
+            E("textarea", { style: Object.assign({}, feld, { minHeight: 220, marginTop: 8, fontFamily: "inherit" }), value: offen.text, disabled: !darf, onChange: function (e) { setzeOffen(Object.assign({}, offen, { text: e.target.value })); } }),
+            E("div", { style: { display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap" } },
+              darf ? E("button", { type: "button", style: knopf, onClick: mailSpeichern }, "Speichern") : null,
+              E("button", { type: "button", style: knopfLeer, onClick: mailVorschau }, "Vorschau mit Beispielwerten"),
+              darf ? E("button", { type: "button", style: knopfLeer, onClick: mailTest }, "Testversand an mich") : null),
+            vorschau ? E("div", { style: { marginTop: 12, background: "#f7f8fa", borderRadius: 8, padding: "10px 12px", fontSize: 13.5 } },
+              E("div", { style: { fontWeight: 700, marginBottom: 6 } }, vorschau.betreff), E("div", { style: { whiteSpace: "pre-wrap", lineHeight: 1.6 } }, vorschau.text)) : null)
+          : null)));
+  }
+
+  // --- Rechtstexte (fork_78) ---------------------------------------------------
+  var R_ART = { agb: "AGB", avv: "AVV", datenschutz: "Datenschutzerklärung", impressum: "Impressum" };
+  function Rechtstexte(p) {
+    var d = p.daten;
+    var eZ = React.useState(null), entwurf = eZ[0], setzeEntwurf = eZ[1];
+    if (!d) return E("div", { style: { color: CI.muted } }, "Lade Rechtstexte …");
+    var darf = p.rolle === "owner" || p.rolle === "admin";
+    var stand = {}; (d.stand || []).forEach(function (x) { stand[x.rechtstext_id] = x; });
+    async function speichern() {
+      try { var x = await ruf("rechtstext_speichern", entwurf); p.melden("Entwurf gespeichert."); setzeEntwurf(null); p.neuLaden(); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    async function veroeffentlichen(t) {
+      var grund = window.prompt("„" + R_ART[t.art] + " " + t.version + "“ veröffentlichen? " + (t.zustimmung_noetig ? "Jeder Chef muss beim nächsten Login zustimmen. " : "") + "Grund fürs Audit-Log:");
+      if (grund === null) return;
+      try { await ruf("rechtstext_veroeffentlichen", { id: t.id, grund: grund }); p.melden("Veröffentlicht."); p.neuLaden(); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    function neu(art) { setzeEntwurf({ art: art || "agb", version: "", titel: "", text: "", aenderungshinweis: "", gueltig_ab: new Date().toISOString().slice(0, 10), zustimmung_noetig: art === "agb" || art === "avv" }); }
+    return E("div", null,
+      entwurf ? E("div", { style: kasten }, Ueberschrift(entwurf.id ? "Entwurf bearbeiten" : "Neue Fassung"),
+        E("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 } },
+          E("select", { style: Object.assign({}, feld, { width: 200 }), value: entwurf.art, onChange: function (e) { setzeEntwurf(Object.assign({}, entwurf, { art: e.target.value })); } },
+            Object.keys(R_ART).map(function (a) { return E("option", { key: a, value: a }, R_ART[a]); })),
+          E("input", { style: Object.assign({}, feld, { width: 120 }), placeholder: "Version, z. B. 2.0", value: entwurf.version, onChange: function (e) { setzeEntwurf(Object.assign({}, entwurf, { version: e.target.value })); } }),
+          E("input", { style: Object.assign({}, feld, { width: 160 }), type: "date", value: entwurf.gueltig_ab, onChange: function (e) { setzeEntwurf(Object.assign({}, entwurf, { gueltig_ab: e.target.value })); } }),
+          E("label", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 13 } },
+            E("input", { type: "checkbox", checked: !!entwurf.zustimmung_noetig, onChange: function (e) { setzeEntwurf(Object.assign({}, entwurf, { zustimmung_noetig: e.target.checked })); } }), "Zustimmung erforderlich (Chef beim nächsten Login)")),
+        E("input", { style: feld, placeholder: "Titel", value: entwurf.titel, onChange: function (e) { setzeEntwurf(Object.assign({}, entwurf, { titel: e.target.value })); } }),
+        E("input", { style: Object.assign({}, feld, { marginTop: 8 }), placeholder: "Änderungshinweis (was ist neu — steht im Zustimmungsdialog)", value: entwurf.aenderungshinweis || "", onChange: function (e) { setzeEntwurf(Object.assign({}, entwurf, { aenderungshinweis: e.target.value })); } }),
+        E("textarea", { style: Object.assign({}, feld, { minHeight: 300, marginTop: 8, fontFamily: "inherit" }), placeholder: "Text", value: entwurf.text, onChange: function (e) { setzeEntwurf(Object.assign({}, entwurf, { text: e.target.value })); } }),
+        E("div", { style: { display: "flex", gap: 8, marginTop: 8 } },
+          E("button", { type: "button", style: knopf, onClick: speichern, disabled: !entwurf.version || !entwurf.titel || !entwurf.text }, "Als Entwurf speichern"),
+          E("button", { type: "button", style: knopfLeer, onClick: function () { setzeEntwurf(null); } }, "Abbrechen")))
+      : darf ? E("div", { style: { display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" } }, Object.keys(R_ART).map(function (a) {
+          return E("button", { key: a, type: "button", style: knopfLeer, onClick: function () { neu(a); } }, "Neue Fassung: " + R_ART[a]); })) : null,
+      E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+        E("div", { style: { padding: "16px 18px 0" } }, Ueberschrift("Fassungen")),
+        !(d.texte || []).length ? E("div", { style: { padding: "0 18px 16px", fontSize: 13, color: CI.muted } }, "Noch kein Rechtstext hinterlegt. Bis dahin gelten die Texte der Landingpage; das Portal verlangt keine Zustimmung.")
+        : E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 760 } },
+          E("thead", null, E("tr", null, ["Art", "Version", "Titel", "Gültig ab", "Stand", "Zustimmungen", ""].map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
+          E("tbody", null, d.texte.map(function (t) {
+            var st = stand[t.id];
+            return E("tr", { key: t.id },
+              E("td", { style: zelle }, R_ART[t.art] || t.art), E("td", { style: zelle }, t.version), E("td", { style: zelle }, t.titel),
+              E("td", { style: zelle }, datum(t.gueltig_ab)),
+              E("td", { style: Object.assign({}, zelle, { color: t.veroeffentlicht_am ? CI.success : CI.gold, fontWeight: 600 }) }, t.veroeffentlicht_am ? "veröffentlicht " + datum(t.veroeffentlicht_am) : "Entwurf"),
+              E("td", { style: zelle }, t.zustimmung_noetig ? (st ? zahl(st.zugestimmt) + " von " + zahl(st.mandanten) : "—") : "nicht nötig"),
+              E("td", { style: Object.assign({}, zelle, { whiteSpace: "nowrap" }) },
+                !t.veroeffentlicht_am && darf ? [E("button", { key: "b", type: "button", style: knopfLeer, onClick: function () { setzeEntwurf(Object.assign({}, t)); } }, "Bearbeiten"),
+                  p.rolle === "owner" ? E("button", { key: "v", type: "button", style: Object.assign({}, knopf, { marginLeft: 6 }), onClick: function () { veroeffentlichen(t); } }, "Veröffentlichen") : null] : null));
+          })))),
+      E("p", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.7 } },
+        "Veröffentlichen kann nur der Owner; ein veröffentlichter Text wird nicht mehr geändert, sondern durch eine neue Version abgelöst. Rechtstexte sind kein Ersatz für anwaltliche Prüfung — bitte jede Fassung vor Veröffentlichung prüfen lassen."));
+  }
+
+  // --- Ankündigungen (fork_78) -------------------------------------------------
+  var A_TYP = { info: "Info", wartung: "Wartung", neue_funktion: "Neue Funktion", warnung: "Warnung" };
+  function Ankuendigungen(p) {
+    var d = p.daten;
+    var eZ = React.useState(null), entwurf = eZ[0], setzeEntwurf = eZ[1];
+    if (!d) return E("div", { style: { color: CI.muted } }, "Lade Ankündigungen …");
+    var darf = p.rolle === "owner" || p.rolle === "admin";
+    function neu() { setzeEntwurf({ typ: "info", titel: "", text: "", von: new Date().toISOString().slice(0, 16), bis: "", schliessbar: true, ziel_tarife: [], ziel_status: [], ziel_mandanten: [], mail_an_chefs: false }); }
+    async function speichern() {
+      try { var x = await ruf("ankuendigung_speichern", entwurf); p.melden("Gespeichert." + (x.mails ? " " + zahl(x.mails) + " Mail(s) an Chefs gesendet." : "")); setzeEntwurf(null); p.neuLaden(); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    async function loeschen(a) {
+      if (!window.confirm("„" + a.titel + "“ löschen?")) return;
+      try { await ruf("ankuendigung_loeschen", { id: a.id }); p.melden("Gelöscht."); p.neuLaden(); }
+      catch (f) { p.melden(f.message || String(f), "fehler"); }
+    }
+    function mehrfach(k, wert) { var l = (entwurf[k] || []).slice(); var i = l.indexOf(wert); if (i >= 0) l.splice(i, 1); else l.push(wert); setzeEntwurf(Object.assign({}, entwurf, { [k]: l })); }
+    var jetzt = Date.now();
+    return E("div", null,
+      entwurf ? E("div", { style: kasten }, Ueberschrift(entwurf.id ? "Ankündigung bearbeiten" : "Neue Ankündigung"),
+        E("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 } },
+          E("select", { style: Object.assign({}, feld, { width: 160 }), value: entwurf.typ, onChange: function (e) { setzeEntwurf(Object.assign({}, entwurf, { typ: e.target.value })); } },
+            Object.keys(A_TYP).map(function (t) { return E("option", { key: t, value: t }, A_TYP[t]); })),
+          E("label", { style: { fontSize: 12.5 } }, "von ", E("input", { type: "datetime-local", style: feld, value: entwurf.von, onChange: function (e) { setzeEntwurf(Object.assign({}, entwurf, { von: e.target.value })); } })),
+          E("label", { style: { fontSize: 12.5 } }, "bis ", E("input", { type: "datetime-local", style: feld, value: entwurf.bis || "", onChange: function (e) { setzeEntwurf(Object.assign({}, entwurf, { bis: e.target.value })); } })),
+          E("label", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 13 } }, E("input", { type: "checkbox", checked: !!entwurf.schliessbar, onChange: function (e) { setzeEntwurf(Object.assign({}, entwurf, { schliessbar: e.target.checked })); } }), "schließbar"),
+          E("label", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 13 } }, E("input", { type: "checkbox", checked: !!entwurf.mail_an_chefs, onChange: function (e) { setzeEntwurf(Object.assign({}, entwurf, { mail_an_chefs: e.target.checked })); } }), "zusätzlich per E-Mail an die Chefs")),
+        E("input", { style: feld, placeholder: "Titel", value: entwurf.titel, onChange: function (e) { setzeEntwurf(Object.assign({}, entwurf, { titel: e.target.value })); } }),
+        E("textarea", { style: Object.assign({}, feld, { minHeight: 90, marginTop: 8, fontFamily: "inherit" }), placeholder: "Text", value: entwurf.text, onChange: function (e) { setzeEntwurf(Object.assign({}, entwurf, { text: e.target.value })); } }),
+        E("div", { style: { fontSize: 12.5, marginTop: 10 } }, E("div", { style: { color: CI.muted, marginBottom: 4 } }, "Ziel (nichts angehakt = alle):"),
+          E("div", { style: { display: "flex", gap: 14, flexWrap: "wrap" } },
+            E("div", null, E("div", { style: { fontWeight: 600 } }, "Tarif"), (d.tarife || []).map(function (t) { return E("label", { key: t.schluessel, style: { display: "block" } }, E("input", { type: "checkbox", checked: entwurf.ziel_tarife.indexOf(t.schluessel) >= 0, onChange: function () { mehrfach("ziel_tarife", t.schluessel); } }), " " + t.name); })),
+            E("div", null, E("div", { style: { fontWeight: 600 } }, "Status"), ["test", "aktiv", "gesperrt", "gekuendigt"].map(function (st) { return E("label", { key: st, style: { display: "block" } }, E("input", { type: "checkbox", checked: entwurf.ziel_status.indexOf(st) >= 0, onChange: function () { mehrfach("ziel_status", st); } }), " " + st); })),
+            E("div", null, E("div", { style: { fontWeight: 600 } }, "Einzelne Häuser"),
+              E("select", { multiple: true, size: 6, style: Object.assign({}, feld, { width: 260 }), value: entwurf.ziel_mandanten,
+                onChange: function (e) { setzeEntwurf(Object.assign({}, entwurf, { ziel_mandanten: Array.prototype.slice.call(e.target.selectedOptions).map(function (o) { return o.value; }) })); } },
+                (d.mandanten || []).map(function (m) { return E("option", { key: m.id, value: m.id }, m.name); }))))),
+        E("div", { style: { display: "flex", gap: 8, marginTop: 10 } },
+          E("button", { type: "button", style: knopf, disabled: !entwurf.titel.trim() || !entwurf.text.trim(), onClick: speichern }, "Speichern"),
+          E("button", { type: "button", style: knopfLeer, onClick: function () { setzeEntwurf(null); } }, "Abbrechen")))
+      : darf ? E("button", { type: "button", style: Object.assign({}, knopf, { marginBottom: 12 }), onClick: neu }, "Neue Ankündigung") : null,
+      E("div", { style: Object.assign({}, kasten, { padding: 0, overflowX: "auto" }) },
+        !(d.liste || []).length ? E("div", { style: { padding: 18, fontSize: 13, color: CI.muted } }, "Noch keine Ankündigung.")
+        : E("table", { style: { width: "100%", borderCollapse: "collapse", minWidth: 800 } },
+          E("thead", null, E("tr", null, ["Typ", "Titel", "Zeitraum", "Ziel", "Stand", "Mail", ""].map(function (t, i) { return E("th", { key: i, style: kopfzelle }, t); }))),
+          E("tbody", null, d.liste.map(function (a) {
+            var von = new Date(a.von).getTime(), bis = a.bis ? new Date(a.bis).getTime() : null;
+            var st = bis && bis < jetzt ? "vorbei" : von > jetzt ? "geplant" : "läuft";
+            var ziel = [a.ziel_tarife ? "Tarif " + a.ziel_tarife.join("/") : null, a.ziel_status ? "Status " + a.ziel_status.join("/") : null, a.ziel_mandanten ? zahl(a.ziel_mandanten.length) + " Häuser" : null].filter(Boolean).join(" · ") || "alle";
+            return E("tr", { key: a.id, style: { opacity: st === "vorbei" ? 0.55 : 1 } },
+              E("td", { style: zelle }, A_TYP[a.typ] || a.typ), E("td", { style: Object.assign({}, zelle, { fontWeight: 600 }) }, a.titel),
+              E("td", { style: Object.assign({}, zelle, { whiteSpace: "nowrap", fontSize: 12 }) }, zeit(a.von) + (a.bis ? " – " + zeit(a.bis) : " – offen")),
+              E("td", { style: Object.assign({}, zelle, { fontSize: 12 }) }, ziel),
+              E("td", { style: Object.assign({}, zelle, { color: st === "läuft" ? CI.success : CI.muted }) }, st + (a.schliessbar ? "" : " · nicht schließbar")),
+              E("td", { style: zelle }, a.mail_gesendet_am ? "gesendet " + datum(a.mail_gesendet_am) : a.mail_an_chefs ? "vorgesehen" : "—"),
+              E("td", { style: Object.assign({}, zelle, { whiteSpace: "nowrap" }) }, darf ? [
+                E("button", { key: "b", type: "button", style: knopfLeer, onClick: function () { setzeEntwurf(Object.assign({}, a, { von: String(a.von).slice(0, 16), bis: a.bis ? String(a.bis).slice(0, 16) : "", ziel_tarife: a.ziel_tarife || [], ziel_status: a.ziel_status || [], ziel_mandanten: a.ziel_mandanten || [] })); } }, "Bearbeiten"),
+                E("button", { key: "l", type: "button", style: Object.assign({}, knopfLeer, { marginLeft: 6, color: CI.danger }), onClick: function () { loeschen(a); } }, "Löschen")] : null));
+          })))),
+      E("p", { style: { fontSize: 11.5, color: CI.muted, lineHeight: 1.7 } },
+        "Wartungen erscheinen schon sieben Tage vorher mit Countdown. Eine Mail an die Chefs geht genau einmal hinaus, beim ersten Speichern mit Häkchen."));
+  }
+
   // --- Support (fork_77) ------------------------------------------------------
   var S_STAND = { offen: "offen", in_arbeit: "in Arbeit", wartet_kunde: "wartet auf Kunde", geloest: "gelöst", geschlossen: "geschlossen" };
   var S_KAT = { frage: "Frage", fehler: "Fehler", abrechnung: "Abrechnung", datenuebernahme: "Datenübernahme", sonstiges: "Sonstiges" };
@@ -1853,6 +2144,10 @@
         : welcher === "konten" ? "nutzer"
         : welcher === "system" ? "technik"
         : welcher === "support" ? "support"
+        : welcher === "ki" ? "steuerung"
+        : welcher === "vorlagen" ? "vorlagen"
+        : welcher === "recht" ? "rechtstexte"
+        : welcher === "hinweise" ? "ankuendigungen"
         : welcher === "admins" ? "admin_liste"
         : welcher === "mandant" ? "mandant" : "protokoll";
       ruf(aktion, welcher === "mandant" ? { mandant_id: id } : (welcher === "zahlen" || welcher === "kosten" || welcher === "zahlungen") ? { tage: tage } : null).then(function (d) {
@@ -1915,6 +2210,10 @@
       ["konten", "Konten", ["owner", "admin", "support"]],
       ["katalog", "Katalog", ["owner", "admin", "support", "finanzen"]],
       ["support", "Support", ["owner", "admin", "support"]],
+      ["ki", "KI", ["owner", "admin", "support"]],
+      ["vorlagen", "Vorlagen & Mails", ["owner", "admin", "support"]],
+      ["recht", "Rechtstexte", ["owner", "admin", "support"]],
+      ["hinweise", "Ankündigungen", ["owner", "admin", "support"]],
       ["system", "Technik", ["owner", "admin"]],
       ["admins", "Admins", ["owner", "admin", "support", "finanzen"]],
       ["protokoll", "Audit-Log", ["owner", "admin", "support", "finanzen"]]];
@@ -1995,6 +2294,10 @@
         : reiter === "zahlungen" ? E(Zahlungen, { daten: daten.zahlungen, rolle: rolle, melden: melden, neuLaden: function () { laden("zahlungen"); },
             oeffnen: function (id) { setzeOffen(id); } })
         : reiter === "funktionen" ? E(Funktionen, { daten: daten.funktionen, rolle: rolle, melden: melden, neuLaden: function () { laden("funktionen"); } })
+        : reiter === "ki" ? E(KiSteuerung, { daten: daten.ki, rolle: rolle, melden: melden, neuLaden: function () { laden("ki"); } })
+        : reiter === "vorlagen" ? E(VorlagenMails, { daten: daten.vorlagen, rolle: rolle, melden: melden, neuLaden: function () { laden("vorlagen"); } })
+        : reiter === "recht" ? E(Rechtstexte, { daten: daten.recht, rolle: rolle, melden: melden, neuLaden: function () { laden("recht"); } })
+        : reiter === "hinweise" ? E(Ankuendigungen, { daten: daten.hinweise, rolle: rolle, melden: melden, neuLaden: function () { laden("hinweise"); } })
         : reiter === "support" ? E(Support, { daten: daten.support, rolle: rolle, melden: melden, neuLaden: function () { laden("support"); },
             oeffnen: function (id) { setzeOffen(id); } })
         : reiter === "system" ? E(System, { daten: daten.system, rolle: rolle, melden: melden, neuLaden: function () { laden("system"); } })

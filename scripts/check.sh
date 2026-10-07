@@ -762,6 +762,13 @@ else
   schlecht
 fi
 
+abschnitt "Betreiber-Steuerung: KI-Schranke, System-Mails, Rechtstexte, Ankuendigungen"
+if scripts/lokale-db.sh psql -q -f tests/betreiber-steuerung.sql; then
+  :
+else
+  schlecht
+fi
+
 abschnitt "IMAP: liest der Abruf die Ordnerliste jedes Servers?"
 node tests/imap-ordnerliste.js || schlecht
 

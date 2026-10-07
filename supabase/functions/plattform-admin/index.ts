@@ -42,6 +42,17 @@ function stripeModus(): "test" | "live" | null {
 /** Eine kurze Nachricht an den Mandanten — best effort. Ohne RESEND_API_KEY
  *  oder Absender geht nichts hinaus, und die Aktion scheitert daran NICHT:
  *  die Datenbank ist die Wahrheit, die Mail nur der Hinweis darauf. */
+/** fork_78: Betreff und Text einer System-Mail aus der Datenbank — oder null,
+ *  dann nimmt der Aufrufer seinen eingebauten Text. */
+async function systemMail(schluessel: string, werte: Record<string, unknown>): Promise<{ betreff: string; text: string } | null> {
+  try {
+    const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
+    const { data } = await db.rpc("system_mail_rendern", { p_schluessel: schluessel, p_werte: werte });
+    if (data && data.betreff && data.text) return { betreff: String(data.betreff), text: String(data.text) };
+  } catch { /* eingebauter Text */ }
+  return null;
+}
+
 async function mailen(an: string[], betreff: string, zeilen: string[]): Promise<boolean> {
   const schluessel = Deno.env.get("RESEND_API_KEY") || "";
   const absender = Deno.env.get("SMTP_FROM_EMAIL") || "";
@@ -113,6 +124,23 @@ const ROLLEN: Record<string, string[]> = {
   fehler_erledigt:        ["owner", "admin"],
   speicher:               ["owner", "admin"],
   support:                ["owner", "admin", "support"],
+  steuerung:              ["owner", "admin", "support"],
+  ki_speichern:           ["owner", "admin"],
+  ki_limit_setzen:        ["owner", "admin"],
+  werte_speichern:        ["owner", "admin"],
+  mails:                  ["owner", "admin", "support"],
+  mail_speichern:         ["owner", "admin"],
+  mail_vorschau:          ["owner", "admin", "support"],
+  mail_test:              ["owner", "admin"],
+  rechtstexte:            ["owner", "admin", "support"],
+  rechtstext_speichern:   ["owner", "admin"],
+  rechtstext_veroeffentlichen: ["owner"],
+  ankuendigungen:         ["owner", "admin", "support"],
+  ankuendigung_speichern: ["owner", "admin"],
+  ankuendigung_loeschen:  ["owner", "admin"],
+  vorlagen:               ["owner", "admin", "support"],
+  vorlage_setzen:         ["owner", "admin"],
+  vorlage_neue_version:   ["owner", "admin"],
   support_anfrage:        ["owner", "admin", "support"],
   support_antworten:      ["owner", "admin", "support"],
   support_anfrage_setzen: ["owner", "admin", "support"],
@@ -325,6 +353,270 @@ Deno.serve(async (req) => {
       return antwort({ ok: true, ergebnis });
     }
 
+    // --- Steuerung (fork_78): KI, System-Mails, Rechtstexte, Ankuendigungen, Vorlagen
+    const WERTE_FREI = ["ki_tageslimit_credits", "ki_tageslimit_eur", "alarm_kosten_tag_eur", "alarm_kosten_monat_eur",
+      "alarm_kosten_mandant_tag_eur", "alarm_kosten_mandant_monat_eur", "kosten_warnung_prozent"];
+    if (aktion === "steuerung") {
+      const [{ data: ki }, { data: werte }, { data: limits }, { data: namen }] = await Promise.all([
+        db.from("plattform_ki_einstellungen").select("*").order("funktion"),
+        db.from("plattform_werte").select("schluessel, wert, beschreibung").in("schluessel", WERTE_FREI),
+        db.from("mandant_ki_limits").select("*"),
+        db.from("mandanten").select("id, name").order("name"),
+      ]);
+      const name = new Map((namen || []).map((m) => [String(m.id), m.name]));
+      const w: Record<string, unknown> = {};
+      for (const z of werte || []) w[String(z.schluessel)] = z.wert;
+      // Heutige KI-Kosten je Mandant, damit man sieht, wo ein Limit greift.
+      const heute = new Date(); heute.setHours(0, 0, 0, 0);
+      const { data: heuteB } = await db.from("credit_buchungen").select("mandant_id, credits, ki_kosten_eur")
+        .gte("zeitpunkt", heute.toISOString()).in("status", ["reserviert", "gebucht"]);
+      const jeMandant = new Map<string, { credits: number; eur: number }>();
+      for (const b of heuteB || []) {
+        const e = jeMandant.get(String(b.mandant_id)) || { credits: 0, eur: 0 };
+        e.credits += Number(b.credits || 0); e.eur += Number(b.ki_kosten_eur || 0); jeMandant.set(String(b.mandant_id), e);
+      }
+      return antwort({ ok: true, ki: ki || [], werte: w,
+        limits: (limits || []).map((l) => ({ ...l, name: name.get(String(l.mandant_id)) || l.mandant_id })),
+        heute: Array.from(jeMandant.entries()).map(([id, e]) => ({ mandant_id: id, name: name.get(id) || id, ...e }))
+          .sort((a, b) => b.eur - a.eur).slice(0, 30),
+        mandanten: (namen || []) });
+    }
+    if (aktion === "ki_speichern") {
+      const funktion = String(body.funktion || "");
+      const { data: vorher } = await db.from("plattform_ki_einstellungen").select("*").eq("funktion", funktion).maybeSingle();
+      if (!vorher) return antwort({ ok: false, fehler: "Unbekannte KI-Funktion." }, 400);
+      const neu: Record<string, unknown> = { geaendert_am: new Date().toISOString(), geaendert_von: u.user.id };
+      if (body.anbieter !== undefined) neu.anbieter = String(body.anbieter);
+      if (body.modell !== undefined) { const m = String(body.modell).trim(); if (!m) return antwort({ ok: false, fehler: "Modell fehlt." }, 400); neu.modell = m; }
+      if (body.temperatur !== undefined) neu.temperatur = body.temperatur === null || body.temperatur === "" ? null : Number(body.temperatur);
+      if (body.max_tokens !== undefined) neu.max_tokens = body.max_tokens === null || body.max_tokens === "" ? null : Math.floor(Number(body.max_tokens));
+      if (body.aktiv !== undefined) neu.aktiv = !!body.aktiv;
+      if (body.hinweis !== undefined) neu.hinweis = String(body.hinweis || "").slice(0, 300) || null;
+      if (neu.aktiv === false && !String(neu.hinweis ?? vorher.hinweis ?? "").trim()) {
+        return antwort({ ok: false, fehler: "Beim Abschalten bitte einen Hinweistext fuer die Nutzer angeben." }, 400);
+      }
+      const { error } = await db.from("plattform_ki_einstellungen").update(neu).eq("funktion", funktion);
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll(neu.aktiv === false ? "ki_abgeschaltet" : neu.aktiv === true && vorher.aktiv === false ? "ki_eingeschaltet" : "ki_geaendert",
+        funktion, { nachher: neu, grund: String(body.grund || "") }, { typ: "plattform_ki_einstellungen", vorher, nachher: neu });
+      return antwort({ ok: true });
+    }
+    if (aktion === "ki_limit_setzen") {
+      const mandant = String(body.mandant_id || "");
+      if (!mandant) return antwort({ ok: false, fehler: "Kein Mandant." }, 400);
+      if (body.entfernen) {
+        await db.from("mandant_ki_limits").delete().eq("mandant_id", mandant);
+        await protokoll("ki_limit_entfernt", mandant, {}, { typ: "mandant" });
+        return antwort({ ok: true });
+      }
+      const zeile = { mandant_id: mandant,
+        credits_tag: body.credits_tag === null || body.credits_tag === "" || body.credits_tag === undefined ? null : Math.floor(Number(body.credits_tag)),
+        eur_tag: body.eur_tag === null || body.eur_tag === "" || body.eur_tag === undefined ? null : Number(body.eur_tag),
+        notiz: String(body.notiz || "").slice(0, 300) || null, geaendert_am: new Date().toISOString() };
+      const { error } = await db.from("mandant_ki_limits").upsert(zeile, { onConflict: "mandant_id" });
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll("ki_limit_gesetzt", mandant, { nachher: zeile }, { typ: "mandant", nachher: zeile });
+      return antwort({ ok: true });
+    }
+    if (aktion === "werte_speichern") {
+      const werte = (body.werte || {}) as Record<string, unknown>;
+      const geaendert: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(werte)) {
+        if (!WERTE_FREI.includes(k)) return antwort({ ok: false, fehler: `Dieser Wert (${k}) wird hier nicht gepflegt.` }, 400);
+        const zahl = Number(v);
+        if (!isFinite(zahl) || zahl < 0) return antwort({ ok: false, fehler: `${k}: bitte eine Zahl >= 0.` }, 400);
+        const { error } = await db.from("plattform_werte").update({ wert: zahl }).eq("schluessel", k);
+        if (error) return antwort({ ok: false, fehler: error.message }, 400);
+        geaendert[k] = zahl;
+      }
+      await protokoll("werte_geaendert", Object.keys(geaendert).join(","), { nachher: geaendert }, { typ: "plattform_werte", nachher: geaendert });
+      return antwort({ ok: true });
+    }
+    if (aktion === "mails") {
+      const { data } = await db.from("system_mail_vorlagen").select("*").order("schluessel");
+      return antwort({ ok: true, vorlagen: data || [] });
+    }
+    if (aktion === "mail_speichern") {
+      const schluessel = String(body.schluessel || "");
+      const { data: vorher } = await db.from("system_mail_vorlagen").select("*").eq("schluessel", schluessel).maybeSingle();
+      if (!vorher) return antwort({ ok: false, fehler: "Unbekannte Vorlage." }, 400);
+      const betreff = String(body.betreff || "").trim(), text = String(body.text || "").trim();
+      if (!betreff || !text) return antwort({ ok: false, fehler: "Betreff und Text duerfen nicht leer sein." }, 400);
+      const neu = { betreff: betreff.slice(0, 200), text: text.slice(0, 10000), geaendert_am: new Date().toISOString(), geaendert_von: u.user.id };
+      const { error } = await db.from("system_mail_vorlagen").update(neu).eq("schluessel", schluessel);
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll("systemmail_geaendert", schluessel, { zeichen: text.length }, { typ: "system_mail_vorlagen", vorher: { betreff: vorher.betreff, text: vorher.text }, nachher: neu });
+      return antwort({ ok: true });
+    }
+    const BEISPIEL = { firma: { name: "Beispiel-Makler" }, test: { ende: "31.10.2026", lesetage: "30" },
+      portal: { url: (Deno.env.get("PORTAL_URL") || "").replace(/\/$/, "") || "https://portal.example" },
+      rechnung: { betrag: "89,00 EUR" }, zahlung: { frist: "14.11.2026" }, abo: { ende: "31.12.2026" },
+      zugriff: { umfang: "Lesezugriff", dauer: "2 Stunden", grund: "Ticket 214" },
+      anfrage: { betreff: "Bilder fehlen" }, antwort: { text: "Wir haben es korrigiert." }, loeschung: { datum: "06.11.2026" } };
+    if (aktion === "mail_vorschau") {
+      const schluessel = String(body.schluessel || "");
+      if (body.betreff !== undefined || body.text !== undefined) {
+        // Vorschau des ungespeicherten Entwurfs: rendern wie die Datenbank es taete.
+        const ersetzen = (t: string) => t.replace(/\{\{\s*([a-zA-Z0-9_.]+)\s*\}\}/g, (ganz, k: string) => {
+          const w = k.split(".").reduce<unknown>((o, s) => (o && typeof o === "object") ? (o as Record<string, unknown>)[s] : undefined, BEISPIEL);
+          return w === undefined ? ganz : String(w); });
+        return antwort({ ok: true, betreff: ersetzen(String(body.betreff || "")), text: ersetzen(String(body.text || "")) });
+      }
+      const { data } = await db.rpc("system_mail_rendern", { p_schluessel: schluessel, p_werte: BEISPIEL });
+      if (!data) return antwort({ ok: false, fehler: "Unbekannte Vorlage." }, 400);
+      return antwort({ ok: true, betreff: data.betreff, text: data.text });
+    }
+    if (aktion === "mail_test") {
+      const schluessel = String(body.schluessel || "");
+      const { data } = await db.rpc("system_mail_rendern", { p_schluessel: schluessel, p_werte: BEISPIEL });
+      if (!data) return antwort({ ok: false, fehler: "Unbekannte Vorlage." }, 400);
+      const { data: ich } = await db.from("profiles").select("email").eq("id", u.user.id).maybeSingle();
+      const ok = await mailen([String(ich?.email || "")], "[TEST] " + String(data.betreff), String(data.text).split("\n"));
+      await protokoll("systemmail_test", schluessel, { an: ich?.email, versand: ok });
+      return antwort({ ok, fehler: ok ? undefined : "Kein Versand — RESEND_API_KEY/SMTP_FROM_EMAIL fehlen oder der Dienst lehnte ab." }, ok ? 200 : 400);
+    }
+    if (aktion === "rechtstexte") {
+      const [{ data: texte }, { data: stand }] = await Promise.all([
+        db.from("rechtstexte").select("*").order("art").order("gueltig_ab", { ascending: false }),
+        db.rpc("plattform_rechtstexte_stand"),
+      ]);
+      return antwort({ ok: true, texte: texte || [], stand: stand || [] });
+    }
+    if (aktion === "rechtstext_speichern") {
+      const id = body.id ? String(body.id) : null;
+      const zeile: Record<string, unknown> = {
+        art: String(body.art || ""), version: String(body.version || "").trim(), titel: String(body.titel || "").trim(),
+        text: String(body.text || ""), aenderungshinweis: String(body.aenderungshinweis || "").trim() || null,
+        gueltig_ab: String(body.gueltig_ab || new Date().toISOString().slice(0, 10)), zustimmung_noetig: !!body.zustimmung_noetig };
+      if (!["agb", "avv", "datenschutz", "impressum"].includes(String(zeile.art))) return antwort({ ok: false, fehler: "Unbekannte Art." }, 400);
+      if (!zeile.version || !zeile.titel || !String(zeile.text).trim()) return antwort({ ok: false, fehler: "Version, Titel und Text sind Pflicht." }, 400);
+      if (id) {
+        const { data: vorher } = await db.from("rechtstexte").select("*").eq("id", id).maybeSingle();
+        if (!vorher) return antwort({ ok: false, fehler: "Nicht gefunden." }, 404);
+        if (vorher.veroeffentlicht_am) return antwort({ ok: false, fehler: "Ein veroeffentlichter Text wird nicht mehr geaendert — neue Version anlegen." }, 400);
+        const { error } = await db.from("rechtstexte").update(zeile).eq("id", id);
+        if (error) return antwort({ ok: false, fehler: error.message }, 400);
+        await protokoll("rechtstext_geaendert", id, { art: zeile.art, version: zeile.version }, { typ: "rechtstexte" });
+        return antwort({ ok: true, id });
+      }
+      const { data: neu, error } = await db.from("rechtstexte").insert({ ...zeile, erstellt_von: u.user.id }).select("id").single();
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll("rechtstext_angelegt", String(neu?.id), { art: zeile.art, version: zeile.version }, { typ: "rechtstexte" });
+      return antwort({ ok: true, id: neu?.id });
+    }
+    if (aktion === "rechtstext_veroeffentlichen") {
+      const id = String(body.id || "");
+      const { data: vorher } = await db.from("rechtstexte").select("*").eq("id", id).maybeSingle();
+      if (!vorher) return antwort({ ok: false, fehler: "Nicht gefunden." }, 404);
+      if (vorher.veroeffentlicht_am) return antwort({ ok: false, fehler: "Schon veroeffentlicht." }, 400);
+      const { error } = await db.from("rechtstexte").update({ veroeffentlicht_am: new Date().toISOString() }).eq("id", id);
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll("rechtstext_veroeffentlicht", id, { art: vorher.art, version: vorher.version, zustimmung_noetig: vorher.zustimmung_noetig, grund: String(body.grund || "") }, { typ: "rechtstexte" });
+      return antwort({ ok: true });
+    }
+    if (aktion === "ankuendigungen") {
+      const [{ data }, { data: namen }, { data: tarife }] = await Promise.all([
+        db.from("ankuendigungen").select("*").order("von", { ascending: false }).limit(200),
+        db.from("mandanten").select("id, name").order("name"),
+        db.from("plattform_tarife").select("schluessel, name"),
+      ]);
+      return antwort({ ok: true, liste: data || [], mandanten: namen || [], tarife: tarife || [] });
+    }
+    if (aktion === "ankuendigung_speichern") {
+      const id = body.id ? String(body.id) : null;
+      const liste = (x: unknown) => Array.isArray(x) && x.length ? x.map(String) : null;
+      const zeile: Record<string, unknown> = {
+        typ: String(body.typ || "info"), titel: String(body.titel || "").trim(), text: String(body.text || "").trim(),
+        von: body.von ? new Date(String(body.von)).toISOString() : new Date().toISOString(),
+        bis: body.bis ? new Date(String(body.bis)).toISOString() : null,
+        schliessbar: body.schliessbar !== false, ziel_tarife: liste(body.ziel_tarife), ziel_status: liste(body.ziel_status),
+        ziel_mandanten: liste(body.ziel_mandanten), mail_an_chefs: !!body.mail_an_chefs };
+      if (!zeile.titel || !zeile.text) return antwort({ ok: false, fehler: "Titel und Text sind Pflicht." }, 400);
+      let kennung = id;
+      if (id) {
+        const { error } = await db.from("ankuendigungen").update(zeile).eq("id", id);
+        if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      } else {
+        const { data: neu, error } = await db.from("ankuendigungen").insert({ ...zeile, erstellt_von: u.user.id }).select("id").single();
+        if (error) return antwort({ ok: false, fehler: error.message }, 400);
+        kennung = String(neu?.id);
+      }
+      await protokoll(id ? "ankuendigung_geaendert" : "ankuendigung_angelegt", String(kennung), { typ: zeile.typ, titel: zeile.titel }, { typ: "ankuendigungen", nachher: zeile });
+      // Optional per Mail an die Chefs der Zielmandanten — einmal, hoechstens 500.
+      let mails = 0;
+      if (zeile.mail_an_chefs) {
+        const { data: schon } = await db.from("ankuendigungen").select("mail_gesendet_am").eq("id", String(kennung)).maybeSingle();
+        if (!schon?.mail_gesendet_am) {
+          let q = db.from("mandanten").select("id, abo_status");
+          if (zeile.ziel_status) q = q.in("abo_status", zeile.ziel_status as string[]);
+          if (zeile.ziel_mandanten) q = q.in("id", zeile.ziel_mandanten as string[]);
+          const { data: haeuser } = await q.limit(500);
+          let ids = (haeuser || []).map((h) => String(h.id));
+          if (zeile.ziel_tarife) {
+            const { data: abos } = await db.from("mandant_abo").select("mandant_id").in("tarif", zeile.ziel_tarife as string[]);
+            const mit = new Set((abos || []).map((a) => String(a.mandant_id))); ids = ids.filter((i) => mit.has(i));
+          }
+          if (ids.length) {
+            const { data: chefs } = await db.from("profiles").select("email").in("mandant_id", ids).eq("role", "chef");
+            const adressen = (chefs || []).map((c) => String(c.email || "")).filter((a) => /@/.test(a));
+            for (let i = 0; i < adressen.length; i += 50) {
+              if (await mailen(adressen.slice(i, i + 50), String(zeile.titel), String(zeile.text).split("\n"))) mails += Math.min(50, adressen.length - i);
+            }
+          }
+          await db.from("ankuendigungen").update({ mail_gesendet_am: new Date().toISOString() }).eq("id", String(kennung));
+        }
+      }
+      return antwort({ ok: true, id: kennung, mails });
+    }
+    if (aktion === "ankuendigung_loeschen") {
+      const id = String(body.id || "");
+      const { data: vorher } = await db.from("ankuendigungen").select("*").eq("id", id).maybeSingle();
+      if (!vorher) return antwort({ ok: false, fehler: "Nicht gefunden." }, 404);
+      await protokoll("ankuendigung_geloescht", id, { titel: vorher.titel }, { typ: "ankuendigungen", vorher });
+      await db.from("ankuendigungen").delete().eq("id", String(vorher.id));
+      return antwort({ ok: true });
+    }
+    // Globale Vorlagen: die Zeilen OHNE Mandant in den vier Vorlagentabellen.
+    // Mandanten-Kopien (mit mandant_id) werden hier nie angefasst.
+    const VORLAGEN: Record<string, { tabelle: string; name: string; aktivSpalte: string; aktivWert: boolean; felder: string }> = {
+      expose:   { tabelle: "expose_vorlagen",          name: "Expose-Systemvorlagen",  aktivSpalte: "archiviert", aktivWert: false, felder: "id, name, beschreibung, basis, version, ist_standard, archiviert, art, geaendert_am" },
+      vertrag:  { tabelle: "vertragsvorlagen",         name: "Maklervertrags-Vorlagen", aktivSpalte: "aktiv", aktivWert: true, felder: "id, art, bezeichnung, dateiname, version, aktiv, dateiformat, geaendert_am" },
+      mpe:      { tabelle: "mpe_bausteine",            name: "Einwertungs-/MPE-Bausteine", aktivSpalte: "aktiv", aktivWert: true, felder: "id, name, layout, titel, standard, aktiv, sortierung" },
+      social:   { tabelle: "marketing_print_vorlagen", name: "Social-/Print-Designs",   aktivSpalte: "aktiv", aktivWert: true, felder: "id, name, kategorie, beschreibung, aktiv, sortierung, updated_at" },
+    };
+    if (aktion === "vorlagen") {
+      const ergebnis: Record<string, unknown[]> = {};
+      for (const [k, v] of Object.entries(VORLAGEN)) {
+        const { data } = await db.from(v.tabelle).select(v.felder).is("mandant_id", null).limit(200);
+        ergebnis[k] = data || [];
+      }
+      return antwort({ ok: true, gruppen: Object.fromEntries(Object.entries(VORLAGEN).map(([k, v]) => [k, { name: v.name, aktivSpalte: v.aktivSpalte, aktivWert: v.aktivWert }])), vorlagen: ergebnis });
+    }
+    if (aktion === "vorlage_setzen") {
+      const g = VORLAGEN[String(body.gruppe || "")];
+      const id = String(body.id || "");
+      if (!g || !id) return antwort({ ok: false, fehler: "Unbekannte Vorlage." }, 400);
+      const an = !!body.aktiv;
+      const neu: Record<string, unknown> = { [g.aktivSpalte]: g.aktivWert === true ? an : !an };
+      const { error } = await db.from(g.tabelle).update(neu).eq("id", id).is("mandant_id", null);
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await protokoll(an ? "vorlage_aktiviert" : "vorlage_archiviert", `${g.tabelle}:${id}`, { grund: String(body.grund || "") }, { typ: g.tabelle, nachher: neu });
+      return antwort({ ok: true });
+    }
+    if (aktion === "vorlage_neue_version") {
+      // Nur Expose-Systemvorlagen tragen ein Dokument, das sich kopieren laesst.
+      const id = String(body.id || "");
+      const { data: alt } = await db.from("expose_vorlagen").select("*").eq("id", id).is("mandant_id", null).maybeSingle();
+      if (!alt) return antwort({ ok: false, fehler: "Systemvorlage nicht gefunden." }, 404);
+      const { id: _id, erstellt_am: _e, geaendert_am: _g, ...rest } = alt as Record<string, unknown>;
+      const { data: neu, error } = await db.from("expose_vorlagen").insert({ ...rest, version: Number(alt.version || 1) + 1, archiviert: false,
+        name: String(body.name || alt.name), beschreibung: body.beschreibung !== undefined ? String(body.beschreibung) : alt.beschreibung, erstellt_von: u.user.id }).select("id, version").single();
+      if (error) return antwort({ ok: false, fehler: error.message }, 400);
+      await db.from("expose_vorlagen").update({ archiviert: true, ist_standard: false }).eq("id", id).is("mandant_id", null);
+      await protokoll("vorlage_neue_version", `expose_vorlagen:${neu?.id}`, { vorher: id, version: neu?.version }, { typ: "expose_vorlagen" });
+      return antwort({ ok: true, id: neu?.id, version: neu?.version });
+    }
+
     // --- Support-Anfragen (fork_77) ----------------------------------------
     if (aktion === "support") {
       const [{ data: kennzahlen, error }, { data: anfragen }, { data: namen }, { data: zugriffe }] = await Promise.all([
@@ -383,8 +675,9 @@ Deno.serve(async (req) => {
       await protokoll("support_geantwortet", id, { mandant_id: a.mandant_id, zeichen: text.length }, { typ: "support_anfrage" });
       const { data: n } = a.nutzer_id ? await db.from("profiles").select("email").eq("id", String(a.nutzer_id)).maybeSingle() : { data: null };
       const portal = (Deno.env.get("PORTAL_URL") || "").replace(/\/$/, "");
-      const mailOk = await mailen([String(n?.email || "")], `Antwort zu Ihrer Anfrage: ${String(a.betreff).slice(0, 80)}`,
-        ["Guten Tag,", "", "zu Ihrer Anfrage gibt es eine Antwort vom Support:", "", text, "",
+      const vorlage = await systemMail("support_antwort", { anfrage: { betreff: String(a.betreff).slice(0, 80) }, antwort: { text }, portal: { url: portal } });
+      const mailOk = await mailen([String(n?.email || "")], vorlage?.betreff || `Antwort zu Ihrer Anfrage: ${String(a.betreff).slice(0, 80)}`,
+        vorlage ? vorlage.text.split("\n") : ["Guten Tag,", "", "zu Ihrer Anfrage gibt es eine Antwort vom Support:", "", text, "",
          "Sie koennen im Portal unter \u201eHilfe\u201c antworten." + (portal ? ` ${portal}` : ""), "",
          "Mit freundlichen Gruessen", "Ihr Team von immoOffice.ai"]);
       return antwort({ ok: true, mail: mailOk });
@@ -1422,9 +1715,14 @@ Deno.serve(async (req) => {
       const { data: chefs } = await db.from("profiles").select("email").eq("mandant_id", id).eq("role", "chef");
       const { data: haus } = await db.from("mandanten").select("name").eq("id", id).maybeSingle();
       const portal = (Deno.env.get("PORTAL_URL") || "").replace(/\/$/, "");
+      const vorlage = await systemMail("support_zugriff_angefragt", {
+        firma: { name: haus?.name || "Ihr Haus" },
+        zugriff: { umfang: schreiben ? "Lese- und Schreibzugriff" : "Lesezugriff",
+                   dauer: minuten >= 60 ? Math.round(minuten / 60) + " Stunde(n)" : minuten + " Minuten", grund },
+        portal: { url: portal } });
       const mailOk = await mailen((chefs || []).map((c) => String(c.email || "")),
-        "Support-Zugriff angefragt — bitte freigeben oder ablehnen",
-        ["Guten Tag,", "",
+        vorlage?.betreff || "Support-Zugriff angefragt — bitte freigeben oder ablehnen",
+        vorlage ? vorlage.text.split("\n") : ["Guten Tag,", "",
          `der Support von immoOffice.ai bittet um ${schreiben ? "Lese- und Schreibzugriff" : "Lesezugriff"} auf ${haus?.name || "Ihr Haus"} fuer ${minuten >= 60 ? Math.round(minuten / 60) + " Stunde(n)" : minuten + " Minuten"}.`,
          `Grund: ${grund}`, "",
          "Ohne Ihre Freigabe sieht der Support nichts. Sie entscheiden im Portal unter Einstellungen → Support-Zugriffe; dort koennen Sie den Zugriff auch jederzeit beenden und nachlesen, was waehrenddessen geschah.",

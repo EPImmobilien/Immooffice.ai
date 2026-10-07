@@ -270,8 +270,8 @@ Deno.serve(async (req: Request) => {
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        model: modell,
-        max_tokens: 8192,
+        model: abr.modell(modell),
+        max_tokens: abr.maxTokens(8192),
         system: SYSTEM_PROMPT,
         tools: [PRUEF_TOOL],
         tool_choice: { type: "tool", name: "pruefbericht_abgeben" },

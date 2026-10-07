@@ -1396,3 +1396,18 @@ Zugriffsanfrage an den Chef und Betreiber-Antworten gehen per Mail
 hinaus, wenn `RESEND_API_KEY` und `SMTP_FROM_EMAIL` als Function-Secrets
 gesetzt sind (docs/SECRETS.md). Ohne sie bleibt es beim Band im Portal.
 Push-Benachrichtigung gibt es nicht; die Vorlage hat keinen Push-Weg.
+
+
+## Rechtstexte: Landingpage liest noch die statischen Seiten
+
+`rechtstexte` ist versioniert und öffentlich lesbar (anon), aber die
+Landingpage (Impressum, Datenschutz, AGB) ist statisches HTML aus dem
+Bau. Anschluss: ein kleiner Loader in der Landingpage, der die jüngste
+veröffentlichte Fassung je Art über die REST-API liest. Bis dahin pflegt
+der Betreiber beide Stellen.
+
+System-Mails `willkommen`, `zahlung_problem`, `kuendigung_bestaetigt`,
+`loeschung_angekuendigt` haben noch keinen Versender: Willkommen gehört an
+die Selbstregistrierung, Zahlungsproblem und Kündigung an den
+Stripe-Webhook (Sitzung der Stripe-Integration), Löschung an den
+DSGVO-Löschprozess (Schritt 2, offen).

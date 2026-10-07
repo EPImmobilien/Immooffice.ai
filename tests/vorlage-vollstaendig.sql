@@ -488,7 +488,18 @@ zuwachs(bereich, mehr, grund) as (values
   ('Funktionen', 8, 'fork_77: Protokoll (2), Zugriffe (3), Anfragen (3)'),
   ('Trigger', 201, 'fork_77: Aenderungsprotokoll an 200 Mandantentabellen, support_antwort_nach'),
   ('Fremdschluessel', 9, 'fork_77: 2 support_sitzungen (freigegeben_von, beendet_von), 2 protokoll, 3 anfragen, 2 antworten'),
-  ('Pruefbedingungen', 8, 'fork_77: art; betreff, text, kategorie, prioritaet, status, uebernahme_status; text')
+  ('Pruefbedingungen', 8, 'fork_77: art; betreff, text, kategorie, prioritaet, status, uebernahme_status; text'),
+  -- fork_78: Betreiber, Schritt 9 — KI-Steuerung, System-Mails, Rechtstexte, Ankuendigungen.
+  ('Tabellen', 6, 'fork_78: plattform_ki_einstellungen, mandant_ki_limits, system_mail_vorlagen, rechtstexte, rechtstext_zustimmungen, ankuendigungen'),
+  ('Tabellen mit RLS', 6, 'fork_78: alle sechs'),
+  ('Spalten', 52, 'fork_78: 10 + 5 + 7 + 11 + 5 + 14'),
+  ('Primaer- und Eindeutigkeitsschluessel', 8, 'fork_78: 6 Primaerschluessel, rechtstexte (art, version), zustimmungen (mandant, text)'),
+  ('Indizes ohne Constraint', 3, 'fork_78: rechtstexte art, zustimmungen mandant, ankuendigungen zeit'),
+  ('Richtlinien', 6, 'fork_78: ki lesen; rechtstexte lesen; zustimmungen lesen, anlegen, trennung, loeschen'),
+  ('Funktionen', 5, 'fork_78: ki_schranke, system_mail_rendern, rechtstexte_offen, plattform_rechtstexte_stand, meine_ankuendigungen'),
+  ('Trigger', 2, 'fork_78: ki_schranke am Ledger, support_protokoll_tr an rechtstext_zustimmungen'),
+  ('Fremdschluessel', 3, 'fork_78: mandant_ki_limits; zustimmungen auf mandanten und rechtstexte'),
+  ('Pruefbedingungen', 9, 'fork_78: anbieter, temperatur, max_tokens; credits_tag, eur_tag; art; typ, titel, zeitraum')
 ),
 soll(bereich, soll) as (
   select v.bereich,

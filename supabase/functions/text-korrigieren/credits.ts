@@ -45,15 +45,25 @@ export interface Abrechnung {
   buchen: (kosten?: number | null, notiz?: string | null, anbieter?: string | null, modell?: string | null) => Promise<void>;
   /** Wenn der Aufruf scheitert. Gibt die Credits zurück. */
   freigeben: (grund?: string) => Promise<void>;
+  /** fork_78: die KI-Einstellung des Betreibers zu dieser Funktion, falls es eine gibt. */
+  einstellung: KiEinstellung | null;
+  /** Das Modell, das der Betreiber fuer diese Funktion gesetzt hat — sonst das eingebaute. */
+  modell: (standard: string) => string;
+  maxTokens: (standard: number) => number;
+  temperatur: (standard?: number) => number | undefined;
+}
+export interface KiEinstellung {
+  funktion: string; anbieter: string; modell: string;
+  temperatur: number | null; max_tokens: number | null; aktiv: boolean; hinweis: string | null;
 }
 
 export interface Abgelehnt {
   ok: false;
-  /** 401 nicht angemeldet · 402 Credits fehlen · 403 Abo gesperrt · 500 */
+  /** 401 nicht angemeldet · 402 Credits fehlen · 403 Abo gesperrt · 429 Tageslimit · 503 abgeschaltet · 500 */
   status: number;
   fehler: string;
   /** Für die Oberfläche: woran es lag, ohne den Text auszuwerten. */
-  grund: "anmeldung" | "mandant" | "abo" | "credits" | "fehler";
+  grund: "anmeldung" | "mandant" | "abo" | "credits" | "tageslimit" | "notschalter" | "fehler";
   saldo?: number;
   benoetigt?: number;
 }
@@ -108,6 +118,17 @@ export async function kiAbrechnen(
     };
   }
 
+  // fork_78: der Notschalter des Betreibers. Die Datenbank prueft ihn beim
+  // Reservieren noch einmal (Trigger ki_schranke); hier nur die freundliche
+  // Meldung, bevor etwas reserviert wird.
+  const { data: einstellung } = await db.from("plattform_ki_einstellungen")
+    .select("funktion, anbieter, modell, temperatur, max_tokens, aktiv, hinweis").eq("funktion", aktion).maybeSingle();
+  if (einstellung && einstellung.aktiv === false) {
+    return { ok: false, status: 503, grund: "notschalter",
+      fehler: "Diese KI-Funktion ist vorübergehend abgeschaltet. "
+        + (einstellung.hinweis || "Bitte später erneut versuchen.") };
+  }
+
   const { data: kosten } = await db.rpc("credits_kosten", { p_aktion: aktion });
   const { data: vorgang, error } = await db.rpc("credits_reservieren", {
     p_aktion: aktion, p_referenz: referenz ?? null,
@@ -115,9 +136,14 @@ export async function kiAbrechnen(
   });
 
   if (error || !vorgang) {
+    // fork_78: KI001 = Notschalter, KI002 = Tageslimit — beides aus dem
+    // Trigger ki_schranke, mit lesbarem Text fuer den Nutzer.
+    const code = String((error as { code?: string } | null)?.code || "");
+    if (code === "KI001") return { ok: false, status: 503, grund: "notschalter", fehler: String(error?.message || "KI-Funktion abgeschaltet.") };
+    if (code === "KI002") return { ok: false, status: 429, grund: "tageslimit", fehler: String(error?.message || "Tageslimit erreicht.") };
     // 53400 ist der Code, den credits_reservieren wirft, wenn es nicht
     // reicht. Alles andere ist ein echter Fehler und soll auch so aussehen.
-    const zuWenig = String((error as { code?: string } | null)?.code || "") === "53400"
+    const zuWenig = code === "53400"
       || /nicht genug credits/i.test(error?.message || "");
     if (zuWenig) {
       const { data: saldo } = await db.rpc("credits_saldo", { p_mandant: mandant });
@@ -140,6 +166,10 @@ export async function kiAbrechnen(
     vorgang: String(vorgang),
     mandant, nutzer: u.user.id,
     credits: Number(kosten ?? 0),
+    einstellung: (einstellung as KiEinstellung | null) ?? null,
+    modell(standard) { return (einstellung?.modell && einstellung.modell !== "siehe Funktion") ? String(einstellung.modell) : standard; },
+    maxTokens(standard) { return einstellung?.max_tokens ? Number(einstellung.max_tokens) : standard; },
+    temperatur(standard) { return einstellung?.temperatur !== null && einstellung?.temperatur !== undefined ? Number(einstellung.temperatur) : standard; },
     async buchen(eur, notiz, anbieter, modell) {
       // Anbieter und Modell sind freiwillig (fork_72): wer sie kennt, gibt
       // sie mit, und "Kosten & Marge" kann je Modell rechnen. Die

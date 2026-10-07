@@ -112,9 +112,9 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 6000,
-        temperature: 0,
+        model: abr.modell(MODEL),
+        max_tokens: abr.maxTokens(6000),
+        temperature: abr.temperatur(0),
         system: systemPrompt,
         messages: [
           { role: "user", content: text },

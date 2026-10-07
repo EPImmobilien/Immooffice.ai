@@ -148,8 +148,23 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      const mail = text(stufe, String(m.name || "Ihrem Haus"),
+      // fork_78: Betreff und Text aus system_mail_vorlagen, wenn der
+      // Betreiber sie gepflegt hat — sonst der eingebaute Text.
+      let mail = text(stufe, String(m.name || "Ihrem Haus"),
         String(m.testphase_bis), lesetage, portal);
+      try {
+        const { data: v } = await db.rpc("system_mail_rendern", { p_schluessel: stufe.art, p_werte: {
+          firma: { name: String(m.name || "Ihrem Haus") },
+          test: { ende: new Date(String(m.testphase_bis)).toLocaleDateString("de-DE", { day: "2-digit", month: "long", year: "numeric" }),
+                  lesetage: String(lesetage) },
+          portal: { url: portal } } });
+        if (v && v.betreff && v.text) {
+          const zeilen = String(v.text).split("\n");
+          mail = { betreff: String(v.betreff), text: String(v.text),
+            html: "<div style=\"font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.65;color:#1B2A47\">"
+              + zeilen.map((z) => z ? `<p style="margin:0 0 12px">${htmlSicher(z)}</p>` : "").join("") + "</div>" };
+        }
+      } catch { /* dann der eingebaute Text */ }
 
       if (probelauf) {
         ergebnis.push({ mandant: m.id, stufe: stufe.art, an: adressen, betreff: mail.betreff,

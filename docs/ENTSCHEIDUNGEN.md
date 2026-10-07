@@ -6252,3 +6252,31 @@ Mail ist best effort. Fehlt `RESEND_API_KEY`, scheitert weder die
 Zugriffsanfrage noch die Antwort — die Datenbank ist die Wahrheit, das
 Band im Portal der zweite Weg. Die Antwort sagt dem Betreiber, ob eine
 Mail hinausging.
+
+
+## 2026-10-07 · Betreiberbereich, Schritt 9: Notschalter und Tageslimit sitzen am Ledger (fork_78)
+
+Der Notschalter könnte in jeder KI-Funktion stehen — 130 Funktionen,
+130 Stellen. Stattdessen sitzt er dort, wo jede KI-Erzeugung ohnehin
+vorbeikommt: an der Reservierung im Credit-Ledger. Ein Trigger vor dem
+Insert, zwei Fehlercodes (KI001 abgeschaltet, KI002 Tageslimit), die
+Beilage `_credits` übersetzt sie in 503 und 429 mit dem Text des
+Betreibers. Die Beilage fragt den Schalter zusätzlich vorher ab, damit
+die Meldung freundlich ist — die Sperre ist aber der Trigger.
+
+Modellwahl über dieselbe Beilage (`abr.modell(standard)`): eine Funktion,
+die den Betreiber nicht fragt, nimmt ihr eingebautes Modell. Angeschlossen
+sind die drei Textfunktionen; die Bild-KI über Replicate wählt ihr Modell
+je Unterfunktion fest im Code und trägt deshalb „siehe Funktion".
+
+System-Mails: die Datenbank rendert, die Funktion fällt auf ihren
+eingebauten Text zurück. Eine leere oder kaputte Vorlage darf keine
+Erinnerung verhindern. Unbekannte Platzhalter bleiben stehen, damit der
+Betreiber sie in der Vorschau sieht, statt dass sie still verschwinden.
+
+Rechtstexte: Veröffentlichen nur der Owner, und ein veröffentlichter
+Text wird nie mehr geändert — die Zustimmung eines Mandanten gilt einer
+bestimmten Fassung, und die muss später noch so dastehen. Die Sperre
+im Portal trifft nur den Chef: Zustimmen ist Chefsache, ein
+Mitarbeiter kann nicht zustimmen (RLS) und soll deshalb auch nicht
+blockiert werden.

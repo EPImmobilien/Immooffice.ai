@@ -606,8 +606,9 @@ Deno.serve(async (req: Request) => {
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens,
+        model: abr.modell("claude-sonnet-4-6"),
+        max_tokens: abr.maxTokens(max_tokens),
+        ...(abr.temperatur() !== undefined ? { temperature: abr.temperatur() } : {}),
         system,
         messages: [{ role: "user", content: userContent }],
       }),

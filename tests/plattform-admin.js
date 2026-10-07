@@ -52,6 +52,10 @@ const ERLAUBT = new Set([
   'stripe_rechnungen', 'stripe_abgleich', 'system_fehler', 'dienst_aufrufe', 'stripe_ereignisse',
   // fork_77: Support-Anfragen sind an den Betreiber gerichtet — er liest und beantwortet sie.
   'support_anfragen', 'support_antworten',
+  // fork_78: Steuerung — Plattformtabellen; die vier Vorlagentabellen NUR fuer
+  // Zeilen ohne Mandant (globale Vorlagen), siehe VORLAGEN in der Funktion.
+  'plattform_ki_einstellungen', 'mandant_ki_limits', 'system_mail_vorlagen', 'rechtstexte',
+  'rechtstext_zustimmungen', 'ankuendigungen', 'expose_vorlagen', 'vertragsvorlagen', 'mpe_bausteine', 'marketing_print_vorlagen',
   // Nur GEZAEHLT (head: true) fuer "Technikfehler 24 h"; keine Meldung geht hinaus.
   'fehler_protokoll',
   // Die Vertragsbeziehung. `credit_konten` und `credit_buchungen` sind das
@@ -281,6 +285,25 @@ if (fs.existsSync(TAFEL)) {
         begonnen_am: '2026-10-06T09:00:00Z', freigegeben_am: null, abgelehnt_am: null, gueltig_bis: '2026-10-06T10:00:00Z', beendet_am: null, grund: 'Ticket anf1' }],
       admins: [{ id: 'o', name: 'Owner' }], stripe_modus: 'test',
     },
+    ki: {
+      ki: [{ funktion: 'ki_text', name: 'Texte', anbieter: 'anthropic', modell: 'claude-sonnet-4-6', temperatur: null, max_tokens: null, aktiv: true, hinweis: null },
+        { funktion: 'bild_homestaging', name: 'Bild-KI: Homestaging', anbieter: 'replicate', modell: 'siehe Funktion', temperatur: null, max_tokens: null, aktiv: false, hinweis: 'Bild-KI heute gestoert' }],
+      werte: { ki_tageslimit_credits: 0, ki_tageslimit_eur: 0, alarm_kosten_tag_eur: 50 },
+      limits: [{ mandant_id: 'a', name: 'Alpha GmbH', credits_tag: 40, eur_tag: null, notiz: 'Probe' }],
+      heute: [{ mandant_id: 'a', name: 'Alpha GmbH', credits: 12, eur: 0.4 }], mandanten: [{ id: 'a', name: 'Alpha GmbH' }],
+    },
+    vorlagen: {
+      gruppen: { expose: { name: 'Expose-Systemvorlagen', aktivSpalte: 'archiviert', aktivWert: false } },
+      vorlagen: { expose: [{ id: 'v1', name: 'Raster Klassik', basis: 'raster', version: 2, ist_standard: true, archiviert: false }] },
+    },
+    recht: {
+      texte: [{ id: 'r1', art: 'agb', version: '2.0', titel: 'AGB 2.0', gueltig_ab: '2026-11-01', zustimmung_noetig: true, veroeffentlicht_am: '2026-10-06T10:00:00Z' }],
+      stand: [{ rechtstext_id: 'r1', art: 'agb', version: '2.0', zugestimmt: 3, mandanten: 7 }],
+    },
+    hinweise: {
+      liste: [{ id: 'k1', typ: 'wartung', titel: 'Wartung Samstag', text: 'Ab 22 Uhr', von: '2026-10-11T20:00:00Z', bis: '2026-10-11T23:00:00Z', schliessbar: false, ziel_tarife: null, ziel_status: null, ziel_mandanten: null, mail_an_chefs: true, mail_gesendet_am: null }],
+      mandanten: [{ id: 'a', name: 'Alpha GmbH' }], tarife: [{ schluessel: 'starter', name: 'Starter' }],
+    },
     mandant: {
       mandant: { id: 'a', name: 'Alpha GmbH', slug: 'alpha', erstellt_am: '2026-01-02',
         testphase_bis: null, gesperrt_am: null },
@@ -298,7 +321,7 @@ if (fs.existsSync(TAFEL)) {
   };
 
   for (const reiter of ['zahlen', 'mandanten', 'konten', 'katalog', 'system', 'support',
-                        'protokoll', 'DETAIL']) {
+                        'ki', 'vorlagen', 'recht', 'hinweise', 'protokoll', 'DETAIL']) {
     let i = 0;
     const detail = reiter === 'DETAIL';
     // Reihenfolge der useState-Aufrufe: reiter, daten, fehler, meldung,
@@ -401,6 +424,20 @@ if (fs.existsSync(TAFEL)) {
       melde('Support: die Zugriffsanfrage wartet auf den Chef', /wartet/.test(text) && /Ticket anf1/.test(text));
       melde('Support: die Tafel sagt, dass nur der Chef freigibt',
             /Freigeben kann nur der Chef des Hauses/.test(text));
+    }
+    if (reiter === 'ki') {
+      melde('KI: der Notschalter faellt auf', /AUS/.test(text) && /Einschalten/.test(text));
+      melde('KI: Ausnahme je Mandant steht da', /Alpha GmbH/.test(text) && /Credits: 40/.test(text));
+    }
+    if (reiter === 'vorlagen') {
+      melde('Vorlagen: die Systemvorlage steht da', /Raster Klassik/.test(text) && /Standard/.test(text));
+    }
+    if (reiter === 'recht') {
+      melde('Recht: X von Y Zustimmungen', /3 von 7/.test(text));
+      melde('Recht: Hinweis auf anwaltliche Pruefung', /anwaltliche Prüfung/.test(text));
+    }
+    if (reiter === 'hinweise') {
+      melde('Ankuendigungen: die Wartung steht da, nicht schliessbar', /Wartung Samstag/.test(text) && /nicht schließbar/.test(text));
     }
     if (detail) {
       melde('Detail: das Haus steht da', /Alpha GmbH/.test(text));
