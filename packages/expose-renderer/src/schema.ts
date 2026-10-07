@@ -90,9 +90,17 @@ export type ElementBasis = {
   typ: ElementTyp;
   /** Rahmen in Punkt, Ursprung unten links. */
   x: number; y: number; b: number; h: number;
-  drehung?: 0 | 90 | 270;
+  /**
+   * Drehung in Grad, gegen den Uhrzeigersinn, um den linken unteren Punkt
+   * des Rahmens. 90 und 270 sind die Seitenbaender; jeder andere Winkel
+   * ist erlaubt — der Preis-Sticker der Vorlage „Buehne" steht um 8 Grad
+   * schief, wie ein aufgeklebter Zettel.
+   */
+  drehung?: number;
   /** Vom Vorlagenautor gesperrt: nicht verschiebbar, nicht loeschbar. */
   gesperrt?: boolean;
+  /** Darf ueber den Seitenrand ragen (Anschnitt als Gestaltung). */
+  ueberstand?: boolean;
   sichtbar_wenn?: Bedingung;
   deckkraft?: number;
 };
@@ -145,7 +153,7 @@ export type Vorlage = {
   schema: 1;
   format: { breite: number; hoehe: number; ausrichtung: Ausrichtung };
   stil: {
-    farben: { f1: FarbRef; f2: FarbRef; ableitung: "raster" | "signature" | "studio" };
+    farben: { f1: FarbRef; f2: FarbRef; ableitung: "raster" | "signature" | "studio" | "buehne" };
     schriften: { headline: SchriftRef; text: SchriftRef; label: SchriftRef };
     textstile: Record<string, TextStil>;
     raster: { spalten: number; rand: number; abstand: number };

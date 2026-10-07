@@ -48,6 +48,7 @@ const PAARE = {
   signature: [['#2B221D', '#B08A5E'], ['#1F2B26', '#A99C6E'], ['#341A20', '#C29A8C'], ['#232529', '#A6ACB3']],
   studio: [['#2F4BFF', '#111318'], ['#E0512F', '#1C1A24'], ['#C9E04A', '#16201A'], ['#E9668F', '#2B1631'],
            ['#F2F2F2', '#111318'], ['#FFE066', '#16201A']],
+  buehne: [['#2D2A4A', '#F08A5D'], ['#1F3B36', '#E9C46A'], ['#4A2C2A', '#9CC5A1'], ['#33363B', '#7FB3D5']],
 };
 
 // Die Soll-Werte rechnet tests/expose-farben-soll.py, indem es die
@@ -94,4 +95,4 @@ if (fehler) {
   process.exit(1);
 }
 console.log(`  [ok] ${geprueft} abgeleitete Farben stimmen mit den Prototypen ueberein`);
-console.log('       (3 Vorlagen, 14 Farbpaare, Kontrastautomatik von Studio).');
+console.log(`       (${Object.keys(erwartet).length} Vorlage(n) mit Prototyp in reference/, Kontrastautomatik von Studio).`);

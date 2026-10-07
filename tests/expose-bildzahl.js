@@ -94,7 +94,7 @@ function zeichne(name, fotos, grundrisse) {
   return { erg, zaehler };
 }
 
-const VORLAGENNAMEN = ['raster', 'signature', 'studio'];
+const VORLAGENNAMEN = ['raster', 'signature', 'studio', 'buehne'];
 // Die Zahlen sind nicht beliebig: 0 und 1 sind die Raender, 5 bis 8 liegen
 // um die festen Rahmen der drei Vorlagen (fuenf, sechs, sieben), 13 war die
 // alte Grenze der Probe, 30 ist ein gepflegtes Objekt und 100 die Frage, ob
@@ -168,7 +168,7 @@ if (fehler) {
 }
 const { erg: gross } = zeichne('raster', 100, 20);
 console.log(`  [ok] ${geprueft} Pruefungen zur Bildzahl im Exposé:`);
-console.log('       3 Vorlagen x 10 Bestueckungen von 0 bis 100 Fotos.');
+console.log('       4 Vorlagen x 10 Bestueckungen von 0 bis 100 Fotos.');
 console.log('       Jedes Foto und jeder Grundriss wird genau einmal gezeichnet,');
 console.log('       kein Rahmen bleibt leer, und ohne Bilder entsteht keine');
 console.log(`       Bildseite. 100 Fotos und 20 Grundrisse ergeben ${gross.seiten.length} Seiten.`);

@@ -81,6 +81,11 @@ function stilVon(el: Element, u: Umgebung, name = "stil", vorgabe?: string) {
   return u.stil(s);
 }
 
+/** Wie stilVon, aber mit einem ZWEITEN Attribut als Rueckfall. */
+function stilOder(el: Element, u: Umgebung, name: string, sonst: string) {
+  return zeichenkette(el, name) ? u.stil(zeichenkette(el, name)!) : stilVon(el, u, sonst);
+}
+
 /** Text eines Elements: Platzhalter ersetzt, Versalien angewandt. */
 function inhalt(el: Element, u: Umgebung, gross: boolean,
                 name = "inhalt"): string | undefined {
@@ -744,7 +749,17 @@ const faktentabelle: Zeichner = (el, u) => {
       u.blatt.rect(x, y - zeilenhoehe, sb, zeilenhoehe, flaecheFarbe, null,
                    zahl(el, "eckradius", 0));
     }
-    const grundlinie = spalten > 1 ? y : y - zeilenhoehe / 2 - versatz;
+    // "pillen": jede Zeile eine abgerundete Flaeche mit Luft zur naechsten
+    // (Buehne). Die Hoehe der Pille ist die Zeilenhoehe minus Abstand.
+    if (art === "pillen" && flaecheFarbe) {
+      const luft = zahl(el, "zeilenabstand", 4);
+      u.blatt.rect(x, y - zeilenhoehe + luft, sb, zeilenhoehe - luft, flaecheFarbe, null,
+                   zahl(el, "eckradius", (zeilenhoehe - luft) / 2));
+    }
+    // Pillen: die Grundlinie in der Mitte der Pille, nicht am Zeilenkopf.
+    const grundlinie = art === "pillen"
+      ? y - (zeilenhoehe - zahl(el, "zeilenabstand", 4)) / 2 - versatz
+      : spalten > 1 ? y : y - zeilenhoehe / 2 - versatz;
     u.blatt.T(x + polster, grundlinie, gross(sLabel, z.label), sLabel.schnitt,
               sLabel.groesse, sLabel.farbe, sLabel.sperrung);
     u.blatt.T(x + sb - polster, grundlinie - zahl(el, "wert_tiefer", 0), z.wert,
@@ -774,13 +789,34 @@ const faktentabelle: Zeichner = (el, u) => {
 
 // ----------------------------------------------------------------- raumliste
 
+/**
+ * Das Geschoss eines Raums, wie die Vorlage es nennt: "eg", "og", "dg",
+ * "ug". In der Oberflaeche ist das Geschoss ein FREITEXT ("Erdgeschoss",
+ * "1. OG", "Dach") — die Vorlage nennt ein Kuerzel. Vorher verglich die
+ * Liste beides woertlich, und kein Raum eines echten Objekts traf ein
+ * Kuerzel; die Raumliste von Signature blieb deshalb leer. Die Regel der
+ * Vorlage (so steht sie in der Oberflaeche): die Zuordnung laeuft ueber das
+ * Geschoss, und ohne Geschoss-Angabe erscheint die Zeile bei jedem
+ * Grundriss.
+ */
+export function ebeneKurz(roh: string | undefined): string | undefined {
+  const t = (roh ?? "").trim().toLowerCase();
+  if (!t) return undefined;
+  if (/^(eg|erdgeschoss|erdgeschoß|parterre|ebene\s*0|0)$|erdgesch/.test(t)) return "eg";
+  if (/^(dg|dachgeschoss|dachgeschoß|dach|spitzboden)$|dachgesch|^dach/.test(t)) return "dg";
+  if (/^(ug|kg|untergeschoss|keller|kellergeschoss|souterrain)$|untergesch|^keller/.test(t)) return "ug";
+  if (/^(og|obergeschoss|obergeschoß|1\.?\s*(og|obergeschoss|stock|etage)|1)$|obergesch|\bog\b|^\d+\.?\s*(og|stock|etage)/.test(t)) return "og";
+  return t;
+}
+
 /** Raeume mit Flaeche und Summe. Quelle ist objekt.raumaufteilung. */
 const raumliste: Zeichner = (el, u) => {
   const quelle = zeichenkette(el, "feld") ?? "objekt.raumaufteilung";
   const roh = liste(u.daten, quelle) as { name?: string; flaeche?: number | string;
                                           ebene?: string }[];
   const ebene = zeichenkette(el, "ebene");
-  const raeume = roh.filter((r) => r && r.name && (ebene === undefined || r.ebene === ebene));
+  const raeume = roh.filter((r) => r && r.name && (ebene === undefined
+    || ebeneKurz(r.ebene) === undefined || ebeneKurz(r.ebene) === ebeneKurz(ebene)));
   if (!raeume.length) {
     warne(u, "fehlender_wert", el, "Keine Raeume erfasst — die Liste entfaellt.");
     return;
@@ -794,15 +830,24 @@ const raumliste: Zeichner = (el, u) => {
   const linie = farbRef(el, "linien_farbe", u);
   const einheit = zeichenkette(el, "einheit") ?? "m²";
 
+  // "pillen" (Buehne): jede Zeile auf einer abgerundeten Flaeche, Text mit
+  // Polster. Die Grundlinie sitzt dann in der Pille, nicht am Zeilenkopf.
+  const pille = zeichenkette(el, "darstellung") === "pillen" ? farbRef(el, "zeilen_flaeche", u) : null;
+  const pPolster = zahl(el, "polster", 12);
   let y = el.y + el.h;
   let summe = 0;
   for (const r of raeume) {
     const f = Number(String(r.flaeche ?? "").replace(",", "."));
     const text = Number.isFinite(f) ? `${zahlDe(f, 1)} ${einheit}` : undefined;
-    u.blatt.T(el.x, y, String(r.name), sName.schnitt, sName.groesse, sName.farbe,
+    const px = pille ? pPolster : 0;
+    if (pille) {
+      const ph = zahl(el, "pille_hoehe", zh - 5);
+      u.blatt.rect(el.x, y - zahl(el, "pille_versatz", 9), el.b, ph, pille, null, ph / 2);
+    }
+    u.blatt.T(el.x + px, y, String(r.name), sName.schnitt, sName.groesse, sName.farbe,
               sName.sperrung);
     if (text !== undefined) {
-      u.blatt.T(el.x + el.b, y, text, sFlaeche.schnitt, sFlaeche.groesse,
+      u.blatt.T(el.x + el.b - px, y, text, sFlaeche.schnitt, sFlaeche.groesse,
                 sFlaeche.farbe, sFlaeche.sperrung, "r");
       summe += f;
     }
@@ -932,6 +977,44 @@ const distanzen: Zeichner = (el, u) => {
     return;
   }
 
+  // "minuten": zweispaltige Karten mit Gehminuten im Kreis (Buehne).
+  // Minuten aus dem Datensatz, sonst aus der Entfernung: 12 Minuten je
+  // Kilometer zu Fuss — die Annahme des Prototyps.
+  if (art === "minuten") {
+    const spalten = Math.max(1, zahl(el, "spalten", 2));
+    const sb = (el.b - zahl(el, "spaltenabstand", 12) * (spalten - 1)) / spalten;
+    const kh = zahl(el, "karten_hoehe", 30);
+    const karte = farbRef(el, "karten_farbe", u);
+    const kreis = farbRef(el, "kreis_farbe", u);
+    const sKreis = stilOder(el, u, "stil_minuten", "stil_wert");
+    const kr = zahl(el, "kreis_radius", 11);
+    eintraege.forEach((d, i) => {
+      const x = el.x + (i % spalten) * (sb + zahl(el, "spaltenabstand", 12));
+      const y = el.y + el.h - Math.floor(i / spalten) * zh - kh;
+      if (y < el.y - 0.01) return;
+      const min = d.minuten ?? (d.km !== undefined ? Math.max(1, Math.round(d.km * 12)) : undefined);
+      if (karte) u.blatt.rect(x, y, sb, kh, karte, null, zahl(el, "eckradius", 15));
+      const cx = x + zahl(el, "kreis_x", 15), cy = y + kh / 2;
+      if (kreis) u.blatt.kreis(cx, cy, kr, kreis);
+      if (min !== undefined) {
+        u.blatt.T(cx, cy - sKreis.groesse * 0.36, String(min), sKreis.schnitt,
+                  sKreis.groesse, sKreis.farbe, sKreis.sperrung, "c");
+      }
+      const tx = x + zahl(el, "text_x", 33);
+      u.blatt.T(tx, cy + zahl(el, "name_hoch", 1.5), d.name, sName.schnitt, sName.groesse,
+                sName.farbe, sName.sperrung);
+      const strecke = d.wert !== undefined ? d.wert
+        : d.km !== undefined ? (d.km < 1 ? `${Math.round(d.km * 1000)} m` : `${zahlDe(d.km, 1)} km`)
+        : undefined;
+      const unter = [min !== undefined ? `${min} Min.` : undefined, strecke].filter(Boolean).join(" · ");
+      if (unter) {
+        u.blatt.T(tx, cy - zahl(el, "wert_tief", 8.5), unter, sWert.schnitt, sWert.groesse,
+                  sWert.farbe, sWert.sperrung);
+      }
+    });
+    return;
+  }
+
   let y = el.y + el.h;
   for (const d of eintraege) {
     u.blatt.T(el.x, y, d.name, sName.schnitt, sName.groesse, sName.farbe,
@@ -1007,6 +1090,38 @@ const highlights: Zeichner = (el, u) => {
   const rahmen = farbRef(el, "rahmen", u);
   const regeln = satzRegeln(u.vorlage.stil.farben.ableitung, false);
 
+  // "pills": fliessende Chips mit Punkt oder laufender Nummer (Buehne:
+  // Highlights auf der Eckdatenseite, Ablauf auf der Kontaktseite). Was
+  // nicht mehr in die Zeile passt, rutscht in die naechste; was nicht mehr
+  // in den Rahmen passt, entfaellt mit Warnung.
+  if (art === "pills") {
+    const ph = zahl(el, "pill_hoehe", 22);
+    const pad = zahl(el, "pill_polster", 10);
+    const luft = zahl(el, "pill_abstand", 6);
+    const zeilenLuft = zahl(el, "zeilenabstand", 6);
+    const punkt = farbRef(el, "punkt_farbe", u);
+    const pr = zahl(el, "punkt_radius", 4.5);
+    const nummern = wahr(el, "nummern", false);
+    const einzug = punkt ? zahl(el, "punkt_einzug", 22) : pad;
+    let x = el.x;
+    let y = el.y + el.h - ph;
+    let weg = 0;
+    eintraege.forEach((h, i) => {
+      const t = nummern ? `${i + 1}  ${h.titel}` : h.titel;
+      const tb = u.blatt.sw(t, sTitel.schnitt, sTitel.groesse, sTitel.sperrung);
+      const pb = einzug + tb + pad;
+      if (x + pb > el.x + el.b + 0.01 && x > el.x) { x = el.x; y -= ph + zeilenLuft; }
+      if (y < el.y - 0.01) { weg++; return; }
+      u.blatt.rect(x, y, pb, ph, fuell, rahmen, ph / 2, zahl(el, "linienbreite", 1));
+      if (punkt) u.blatt.kreis(x + pad + pr / 2 + 0.5, y + ph / 2, pr, punkt);
+      u.blatt.T(x + einzug, y + ph / 2 - sTitel.groesse * 0.34, t, sTitel.schnitt,
+                sTitel.groesse, sTitel.farbe, sTitel.sperrung);
+      x += pb + luft;
+    });
+    if (weg) warne(u, "gekuerzt", el, `${weg} Highlight(s) passen nicht mehr in den Rahmen.`);
+    return;
+  }
+
   if (art === "karten") {
     const spalten = zahl(el, "spalten", eintraege.length);
     const kb = (el.b - abstand * (spalten - 1)) / spalten;
@@ -1078,12 +1193,14 @@ const highlights: Zeichner = (el, u) => {
 /** Ausstattungspunkte als Checkliste, Gruppen oder nummeriert. */
 const ausstattung: Zeichner = (el, u) => {
   const art0 = zeichenkette(el, "darstellung") ?? "checkliste";
+  // "gruppen" und "chips" lesen die Gruppenliste, alle anderen den Text.
+  const gruppiert = art0 === "gruppen" || art0 === "chips";
   const quelle = zeichenkette(el, "feld")
-    ?? (art0 === "gruppen" ? "objekt.expose_ausstattung_gruppen"
-                           : "objekt.beschreibung_ausstattung_expose");
-  const roh = art0 === "gruppen" ? undefined : wert(u.daten, quelle);
+    ?? (gruppiert ? "objekt.expose_ausstattung_gruppen"
+                  : "objekt.beschreibung_ausstattung_expose");
+  const roh = gruppiert ? undefined : wert(u.daten, quelle);
   const punkte = (roh ?? "").split("\n").map((z) => z.trim()).filter(Boolean);
-  if (art0 !== "gruppen" && !punkte.length) {
+  if (!gruppiert && !punkte.length) {
     warne(u, "fehlender_wert", el, "Keine Ausstattungspunkte — das Element entfaellt.");
     return;
   }
@@ -1099,6 +1216,52 @@ const ausstattung: Zeichner = (el, u) => {
   const art = art0;
   const polster = zahl(el, "polster", 10);
   const einzug = zahl(el, "einzug", 28);
+
+  // "chips": Gruppen als Karten nebeneinander, die Punkte darin als
+  // fliessende Chips (Buehne). Quelle wie bei "gruppen".
+  if (art === "chips") {
+    const gruppen = (liste(u.daten, zeichenkette(el, "feld") ?? "objekt.expose_ausstattung_gruppen") as
+      { titel?: string; punkte?: string[] }[])
+      .filter((g) => g && g.titel && Array.isArray(g.punkte) && g.punkte.length);
+    if (!gruppen.length) {
+      warne(u, "fehlender_wert", el, "Keine Ausstattungsgruppen — das Element entfaellt.");
+      return;
+    }
+    const sNummer = stilVon(el, u, "stil_nummer");
+    const sTitel = stilVon(el, u, "stil_titel");
+    const n = Math.min(gruppen.length, Math.max(1, zahl(el, "spalten", gruppen.length)));
+    const kb = (el.b - abstand * (n - 1)) / n;
+    const karte = farbRef(el, "karten_farbe", u);
+    const kreis = farbRef(el, "nummer_kreis", u);
+    const chip = farbRef(el, "chip_farbe", u);
+    const ch = zahl(el, "chip_hoehe", 20);
+    const cpad = zahl(el, "chip_polster", 10);
+    const cluft = zahl(el, "chip_abstand", 5);
+    const czeile = zahl(el, "chip_zeile", 26);
+    gruppen.slice(0, n).forEach((g, i) => {
+      const x = el.x + i * (kb + abstand);
+      if (karte) u.blatt.rect(x, el.y, kb, el.h, karte, null, zahl(el, "eckradius", 18));
+      const nx = x + zahl(el, "nummer_x", 26);
+      const ny = el.y + el.h - zahl(el, "nummer_y", 26);
+      if (kreis) u.blatt.kreis(nx, ny, zahl(el, "nummer_radius", 12), kreis);
+      u.blatt.T(nx, ny - sNummer.groesse * 0.36, String(i + 1), sNummer.schnitt,
+                sNummer.groesse, sNummer.farbe, sNummer.sperrung, "c");
+      u.blatt.T(x + zahl(el, "titel_x", 46), ny - sTitel.groesse * 0.36, g.titel!,
+                sTitel.schnitt, sTitel.groesse, sTitel.farbe, sTitel.sperrung);
+      let cx = x + polster;
+      let cy = el.y + el.h - zahl(el, "erste_zeile", 66);
+      for (const punkt of g.punkte!) {
+        const tb = u.blatt.sw(punkt, s.schnitt, s.groesse, s.sperrung) + 2 * cpad;
+        if (cx + tb > x + kb - polster + 0.01 && cx > x + polster) { cx = x + polster; cy -= czeile; }
+        if (cy < el.y) break;
+        if (chip) u.blatt.rect(cx, cy, tb, ch, chip, null, ch / 2);
+        u.blatt.T(cx + cpad, cy + ch / 2 - s.groesse * 0.34, punkt, s.schnitt, s.groesse,
+                  s.farbe, s.sperrung);
+        cx += tb + cluft;
+      }
+    });
+    return;
+  }
 
   // Gruppen: die Ausstattung ist nach Themen geordnet ("Architektur",
   // "Technik"), jede Gruppe mit Nummer, Ueberschrift und eigener Liste.
@@ -1194,6 +1357,35 @@ const ausstattung: Zeichner = (el, u) => {
               s.groesse, s.farbe, s.sperrung);
   });
 };
+
+/**
+ * Ein Ringsegment als gefuellter Pfad: aussen im Uhrzeigersinn, innen
+ * zurueck. Beziers statt eines Bogenbefehls, weil PfadSchritt nur
+ * Beziers kennt — und weil so Vorschau und PDF dieselbe Kurve zeichnen.
+ * Winkel in Grad, mathematisch (0 = rechts, 90 = oben).
+ */
+function ringSegment(u: Umgebung, cx: number, cy: number, rAussen: number,
+                     rInnen: number, von: number, bis: number, fuell: RGBA): void {
+  const bogen = (r: number, a0: number, a1: number, start: boolean): PfadSchritt[] => {
+    const aus: PfadSchritt[] = [];
+    const schritte = Math.max(1, Math.ceil(Math.abs(a1 - a0) / 45));
+    const d = (a1 - a0) / schritte;
+    for (let i = 0; i < schritte; i++) {
+      const w0 = ((a0 + i * d) * Math.PI) / 180;
+      const w1 = ((a0 + (i + 1) * d) * Math.PI) / 180;
+      const k = (4 / 3) * Math.tan((w1 - w0) / 4);
+      const x0 = cx + r * Math.cos(w0), y0 = cy + r * Math.sin(w0);
+      const x3 = cx + r * Math.cos(w1), y3 = cy + r * Math.sin(w1);
+      if (i === 0) aus.push([start ? "moveTo" : "lineTo", x0, y0]);
+      aus.push(["curveTo",
+        x0 - k * r * Math.sin(w0), y0 + k * r * Math.cos(w0),
+        x3 + k * r * Math.sin(w1), y3 - k * r * Math.cos(w1), x3, y3]);
+    }
+    return aus;
+  };
+  const p = [...bogen(rAussen, von, bis, true), ...bogen(rInnen, bis, von, false), ["close"] as PfadSchritt];
+  u.blatt.pfad(p, fuell, null, 0);
+}
 
 function hakenZeichnen(u: Umgebung, x: number, y: number, aussen: RGBA,
                        innen: RGBA, groesse: number): void {
@@ -1402,6 +1594,61 @@ const energieskala: Zeichner = (el, u) => {
     });
     return;
   }
+  // "tacho": ein Halbkreis aus Klassensegmenten, eine Nadel auf den
+  // Kennwert, der Wert darunter (Buehne). Ohne Kennwert zeigt die Nadel
+  // auf die Mitte der genannten Klasse; ohne beides bleibt sie weg.
+  if (zeichenkette(el, "darstellung") === "tacho") {
+    const cx = el.x + el.b / 2;
+    const cy = el.y + zahl(el, "mitte_hoehe", el.h * 0.3);
+    const r = zahl(el, "radius", Math.min(el.b / 2, el.h - (cy - el.y)) - 4);
+    const dicke = zahl(el, "ring_breite", 30);
+    const luecke = zahl(el, "luecke_grad", 1.6);
+    const seg = 180 / klassen.length;
+    const sKlasse = stilVon(el, u, "stil_klasse");
+    klassen.forEach((k, i) => {
+      const a0 = 180 - (i + 1) * seg + luecke / 2;
+      const a1 = 180 - i * seg - luecke / 2;
+      ringSegment(u, cx, cy, r + dicke / 2, r - dicke / 2, a0, a1, farbe(k.farbe, u.palette));
+      const am = ((180 - (i + 0.5) * seg) * Math.PI) / 180;
+      u.blatt.T(cx + r * Math.cos(am), cy + r * Math.sin(am) - sKlasse.groesse * 0.36, k.name,
+                sKlasse.schnitt, sKlasse.groesse, sKlasse.farbe, sKlasse.sperrung, "c");
+    });
+    const kw = rohzahl(u.daten, zeichenkette(el, "feld") ?? "objekt.energie_kennwert");
+    const klasseName = String(u.daten["objekt.energie_klasse"] ?? "").trim().toLocaleUpperCase("de-DE");
+    let anteil = -1;
+    if (kw !== undefined && kw > 0) {
+      let lo = 0;
+      for (let i = 0; i < klassen.length; i++) {
+        if (kw <= klassen[i].grenze) { anteil = (i + (kw - lo) / Math.max(1, klassen[i].grenze - lo)) / klassen.length; break; }
+        lo = klassen[i].grenze;
+      }
+      if (anteil < 0) anteil = 1;
+    } else {
+      const i = klassen.findIndex((k) => k.name.toLocaleUpperCase("de-DE") === klasseName);
+      if (i >= 0) anteil = (i + 0.5) / klassen.length;
+    }
+    const sWert = stilOder(el, u, "stil_wert", "stil_fahne");
+    const sEinheit = stilOder(el, u, "stil_einheit", "stil_grenze");
+    if (anteil < 0) {
+      warne(u, "fehlender_wert", el, "Kein Energiekennwert und keine Klasse — der Tacho steht ohne Nadel.");
+      return;
+    }
+    const tinte = farbRef(el, "nadel_farbe", u) ?? [0, 0, 0, 1];
+    const w = ((180 - anteil * 180) * Math.PI) / 180;
+    const nl = r - dicke / 2 - zahl(el, "nadel_abstand", 24);
+    u.blatt.linie(cx, cy, cx + nl * Math.cos(w), cy + nl * Math.sin(w), tinte, zahl(el, "nadel_breite", 3));
+    u.blatt.kreis(cx, cy, zahl(el, "nabe_radius", 8), tinte);
+    const wertText = kw !== undefined && kw > 0 ? zahlDe(kw, 1)
+      : `Klasse ${klassen[Math.floor(anteil * klassen.length)]?.name ?? klasseName}`;
+    u.blatt.T(cx, cy - zahl(el, "wert_tief", 34), wertText, sWert.schnitt, sWert.groesse,
+              sWert.farbe, sWert.sperrung, "c");
+    const einheit = kw !== undefined && kw > 0
+      ? (zeichenkette(el, "einheit") ?? "kWh/(m²·a)") : (zeichenkette(el, "einheit_ohne_wert") ?? "laut Energieausweis");
+    u.blatt.T(cx, cy - zahl(el, "einheit_tief", 50), einheit, sEinheit.schnitt, sEinheit.groesse,
+              sEinheit.farbe, sEinheit.sperrung, "c");
+    return;
+  }
+
   // "linie": eine schmale Leiste, die Klassen darunter, die Markierung
   // darueber — ohne Grenzwerte und ohne Fahne. So steht sie im
   // Energiefeld der Luxusvorlage.
@@ -1569,6 +1816,55 @@ const kostenrechnung: Zeichner = (el, u) => {
   const farben = farbliste.length
     ? farbliste.map((f) => farbe(f, u.palette))
     : [farbe({ palette: "schwarz" }, u.palette)];
+
+  // "donut": Ring links, Summe in der Mitte, Legende rechts (Buehne).
+  // Die Posten werden auf den Vollkreis verteilt; der Kaufpreis beginnt
+  // oben und laeuft im Uhrzeigersinn.
+  if (zeichenkette(el, "darstellung") === "donut") {
+    const r = zahl(el, "donut_radius", 88);
+    const dicke = zahl(el, "donut_breite", 26);
+    const cx = el.x + zahl(el, "donut_x", r + 12);
+    const cy = el.y + el.h / 2;
+    let winkel = 90;
+    posten.forEach((p, i) => {
+      const anteil = Number(p.betrag) / summe;
+      const bis = winkel - anteil * 360;
+      const spalt = i === 0 ? 0 : 0.8;
+      ringSegment(u, cx, cy, r + dicke / 2, r - dicke / 2, bis, winkel - spalt, farben[i % farben.length]);
+      winkel = bis;
+    });
+    const sMitteLabel = stilOder(el, u, "stil_mitte_label", "stil_name");
+    const sMitteWert = stilOder(el, u, "stil_mitte_wert", "stil_wert");
+    u.blatt.T(cx, cy + zahl(el, "mitte_label_hoch", 8), gross(sMitteLabel, zeichenkette(el, "mitte_label") ?? "Gesamt"),
+              sMitteLabel.schnitt, sMitteLabel.groesse, sMitteLabel.farbe, sMitteLabel.sperrung, "c");
+    u.blatt.T(cx, cy - zahl(el, "mitte_wert_tief", 12), `${zahlDe(summe, 0)} €`, sMitteWert.schnitt,
+              sMitteWert.groesse, sMitteWert.farbe, sMitteWert.sperrung, "c");
+    const sName = stilVon(el, u, "stil_name");
+    const sWert = stilVon(el, u, "stil_wert");
+    const lx = el.x + zahl(el, "legende_x", 238);
+    const rechts = el.x + el.b;
+    const zh = zahl(el, "zeilenhoehe", 32);
+    const linie = farbRef(el, "linien_farbe", u);
+    const pr = zahl(el, "punkt_radius", 5);
+    let ly = cy + zahl(el, "legende_hoch", 62);
+    posten.forEach((p, i) => {
+      u.blatt.kreis(lx + pr, ly + 3, pr, farben[i % farben.length]);
+      u.blatt.T(lx + zahl(el, "einzug", 16), ly, p.name, sName.schnitt, sName.groesse, sName.farbe, sName.sperrung);
+      u.blatt.T(rechts, ly, `${zahlDe(Number(p.betrag), 0)} €`, sWert.schnitt, sWert.groesse, sWert.farbe, sWert.sperrung, "r");
+      if (linie) u.blatt.linie(lx, ly - zahl(el, "linien_versatz", 12), rechts, ly - zahl(el, "linien_versatz", 12), linie, zahl(el, "linienbreite", 0.6));
+      ly -= zh;
+    });
+    if (wahr(el, "mit_summe", true)) {
+      const sSumme = stilVon(el, u, "stil_summe");
+      const sSummeWert = stilOder(el, u, "stil_summe_wert", "stil_summe");
+      ly -= zahl(el, "summe_versatz", 6);
+      u.blatt.T(lx, ly, gross(sSumme, zeichenkette(el, "summe_label") ?? "Gesamtaufwand"),
+                sSumme.schnitt, sSumme.groesse, sSumme.farbe, sSumme.sperrung);
+      u.blatt.T(rechts, ly, `${zahlDe(summe, 0)} €`, sSummeWert.schnitt, sSummeWert.groesse,
+                sSummeWert.farbe, sSummeWert.sperrung, "r");
+    }
+    return;
+  }
 
   // Der gestapelte Balken ist nicht Pflicht: Studio zeigt die Posten nur
   // als Liste. balken_hoehe 0 laesst ihn weg.

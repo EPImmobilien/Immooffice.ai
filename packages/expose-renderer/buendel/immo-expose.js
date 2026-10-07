@@ -631,14 +631,49 @@ var ImmoExpose = (() => {
       s_auf_d: abstandHalten(s, d)
     };
   }
+  function luminanz(c) {
+    const f = (v) => v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
+  }
+  function themaBuehne(primaer, akzent) {
+    const d = hx(primaer), a = hx(akzent);
+    const hell = luminanz(a) > 0.45;
+    const paper = mix(mix(WEISS, a, 0.07), d, 0.01);
+    return {
+      d,
+      a,
+      paper,
+      card: WEISS,
+      ink: mix(d, SCHWARZ, 0.2),
+      text: mix(d, paper, 0.14),
+      muted: mix(d, paper, 0.48),
+      line: mix(d, paper, 0.86),
+      soft: mix(paper, a, 0.2),
+      softD: mix(paper, d, 0.07),
+      ph: mix(mix(paper, d, 0.14), a, 0.1),
+      onD: mix(WEISS, d, 0.05),
+      onDm: mix(WEISS, d, 0.4),
+      dline: mix(d, WEISS, 0.2),
+      dsoft: mix(d, WEISS, 0.08),
+      dsoft2: mix(d, WEISS, 0.1),
+      onA: hell ? mix(d, SCHWARZ, 0.3) : WEISS,
+      aT: hell ? mix(a, d, 0.4) : a,
+      // Der grosse Betrag auf dem Dunkelton: Akzent, wenn er dort lesbar ist.
+      aAufD: luminanz(a) > 0.08 ? a : mix(WEISS, d, 0.05),
+      aSoft: mix(a, paper, 0.5),
+      dSoft: mix(d, paper, 0.55)
+    };
+  }
   var VORGABE = {
     raster: { f1: "#0F4C5C", f2: "#E8915A" },
     signature: { f1: "#2B221D", f2: "#B08A5E" },
-    studio: { f1: "#2F4BFF", f2: "#111318" }
+    studio: { f1: "#2F4BFF", f2: "#111318" },
+    buehne: { f1: "#2D2A4A", f2: "#F08A5D" }
   };
   function palette(ableitung, f1, f2) {
     if (ableitung === "raster") return { art: "raster", ...themaRaster(f1, f2) };
     if (ableitung === "signature") return { art: "signature", ...themaSignature(f1, f2) };
+    if (ableitung === "buehne") return { art: "buehne", ...themaBuehne(f1, f2) };
     return { art: "studio", ...themaStudio(f1, f2) };
   }
 
@@ -692,7 +727,9 @@ var ImmoExpose = (() => {
   var FAMILIE = {
     jakarta: "Jak",
     cormorant: "Corm",
-    archivo: "Arch"
+    archivo: "Arch",
+    bricolage: "Bric",
+    dmsans: "DMS"
   };
   function schnittName(ref, ersatz) {
     if (ref === "ci.font") {
@@ -727,7 +764,7 @@ var ImmoExpose = (() => {
     return textstil(s, p, vorlage.stil.schriften.text);
   }
   function satzRegeln(ableitung, blocksatz) {
-    const faktor = ableitung === "signature" ? 0.6 : ableitung === "studio" ? 0.5 : 0.55;
+    const faktor = ableitung === "signature" ? 0.6 : ableitung === "studio" ? 0.5 : ableitung === "buehne" ? 0.5 : 0.55;
     return { blocksatz, absatzFaktor: faktor, einzug: 0, einzugZeilen: 0 };
   }
 
@@ -759,6 +796,20 @@ var ImmoExpose = (() => {
       typ: "mehrzeilig",
       quelle: GERECHNET,
       hinweis: "Die Titelzeilen mit Umbruch dazwischen."
+    },
+    {
+      schluessel: "objekt.energie_klasse_urteil",
+      name: "Energieklasse, Wertung",
+      typ: "text",
+      quelle: GERECHNET,
+      hinweis: "Aus der Effizienzklasse: „Sehr effizient“ bis „Hoher Verbrauch“."
+    },
+    {
+      schluessel: "objekt.energie_klasse_hinweis",
+      name: "Energieklasse, Folge",
+      typ: "text",
+      quelle: GERECHNET,
+      hinweis: "Aus der Effizienzklasse: „niedrige Nebenkosten“ usw."
     },
     {
       schluessel: "objekt.untertitel",
@@ -818,6 +869,13 @@ var ImmoExpose = (() => {
       typ: "text",
       quelle: O("vertragsart"),
       hinweis: 'Als Text fuer das Exposé: "Verkauf", "Vermietung", "Verkauf & Vermietung".'
+    },
+    {
+      schluessel: "objekt.vermarktung_pille",
+      name: "Vermarktungsart, kurz",
+      typ: "text",
+      quelle: GERECHNET,
+      hinweis: '"Zum Kauf", "Zur Miete" oder "Kauf oder Miete" — fuer eine Pille auf dem Titel (Buehne).'
     },
     {
       schluessel: "objekt.vermarktung",
@@ -1497,6 +1555,9 @@ var ImmoExpose = (() => {
     }
     return u.stil(s);
   }
+  function stilOder(el, u, name, sonst) {
+    return zeichenkette(el, name) ? u.stil(zeichenkette(el, name)) : stilVon(el, u, sonst);
+  }
   function inhalt(el, u, gross2, name = "inhalt") {
     const roh = zeichenkette(el, name);
     if (roh === void 0) return void 0;
@@ -2143,7 +2204,19 @@ var ImmoExpose = (() => {
           zahl(el, "eckradius", 0)
         );
       }
-      const grundlinie = spalten > 1 ? y : y - zeilenhoehe / 2 - versatz;
+      if (art === "pillen" && flaecheFarbe) {
+        const luft = zahl(el, "zeilenabstand", 4);
+        u.blatt.rect(
+          x,
+          y - zeilenhoehe + luft,
+          sb,
+          zeilenhoehe - luft,
+          flaecheFarbe,
+          null,
+          zahl(el, "eckradius", (zeilenhoehe - luft) / 2)
+        );
+      }
+      const grundlinie = art === "pillen" ? y - (zeilenhoehe - zahl(el, "zeilenabstand", 4)) / 2 - versatz : spalten > 1 ? y : y - zeilenhoehe / 2 - versatz;
       u.blatt.T(
         x + polster,
         grundlinie,
@@ -2199,11 +2272,20 @@ var ImmoExpose = (() => {
       }
     });
   };
+  function ebeneKurz(roh) {
+    const t = (roh ?? "").trim().toLowerCase();
+    if (!t) return void 0;
+    if (/^(eg|erdgeschoss|erdgeschoß|parterre|ebene\s*0|0)$|erdgesch/.test(t)) return "eg";
+    if (/^(dg|dachgeschoss|dachgeschoß|dach|spitzboden)$|dachgesch|^dach/.test(t)) return "dg";
+    if (/^(ug|kg|untergeschoss|keller|kellergeschoss|souterrain)$|untergesch|^keller/.test(t)) return "ug";
+    if (/^(og|obergeschoss|obergeschoß|1\.?\s*(og|obergeschoss|stock|etage)|1)$|obergesch|\bog\b|^\d+\.?\s*(og|stock|etage)/.test(t)) return "og";
+    return t;
+  }
   var raumliste = (el, u) => {
     const quelle = zeichenkette(el, "feld") ?? "objekt.raumaufteilung";
     const roh = liste(u.daten, quelle);
     const ebene = zeichenkette(el, "ebene");
-    const raeume = roh.filter((r) => r && r.name && (ebene === void 0 || r.ebene === ebene));
+    const raeume = roh.filter((r) => r && r.name && (ebene === void 0 || ebeneKurz(r.ebene) === void 0 || ebeneKurz(r.ebene) === ebeneKurz(ebene)));
     if (!raeume.length) {
       warne(u, "fehlender_wert", el, "Keine Raeume erfasst — die Liste entfaellt.");
       return;
@@ -2214,13 +2296,20 @@ var ImmoExpose = (() => {
     const zh = zahl(el, "zeilenhoehe", 19);
     const linie = farbRef(el, "linien_farbe", u);
     const einheit = zeichenkette(el, "einheit") ?? "m²";
+    const pille = zeichenkette(el, "darstellung") === "pillen" ? farbRef(el, "zeilen_flaeche", u) : null;
+    const pPolster = zahl(el, "polster", 12);
     let y = el.y + el.h;
     let summe = 0;
     for (const r of raeume) {
       const f = Number(String(r.flaeche ?? "").replace(",", "."));
       const text3 = Number.isFinite(f) ? `${zahlDe(f, 1)} ${einheit}` : void 0;
+      const px = pille ? pPolster : 0;
+      if (pille) {
+        const ph = zahl(el, "pille_hoehe", zh - 5);
+        u.blatt.rect(el.x, y - zahl(el, "pille_versatz", 9), el.b, ph, pille, null, ph / 2);
+      }
       u.blatt.T(
-        el.x,
+        el.x + px,
         y,
         String(r.name),
         sName.schnitt,
@@ -2230,7 +2319,7 @@ var ImmoExpose = (() => {
       );
       if (text3 !== void 0) {
         u.blatt.T(
-          el.x + el.b,
+          el.x + el.b - px,
           y,
           text3,
           sFlaeche.schnitt,
@@ -2422,6 +2511,60 @@ var ImmoExpose = (() => {
       }
       return;
     }
+    if (art === "minuten") {
+      const spalten = Math.max(1, zahl(el, "spalten", 2));
+      const sb = (el.b - zahl(el, "spaltenabstand", 12) * (spalten - 1)) / spalten;
+      const kh = zahl(el, "karten_hoehe", 30);
+      const karte2 = farbRef(el, "karten_farbe", u);
+      const kreis = farbRef(el, "kreis_farbe", u);
+      const sKreis = stilOder(el, u, "stil_minuten", "stil_wert");
+      const kr = zahl(el, "kreis_radius", 11);
+      eintraege.forEach((d, i) => {
+        const x = el.x + i % spalten * (sb + zahl(el, "spaltenabstand", 12));
+        const y2 = el.y + el.h - Math.floor(i / spalten) * zh - kh;
+        if (y2 < el.y - 0.01) return;
+        const min = d.minuten ?? (d.km !== void 0 ? Math.max(1, Math.round(d.km * 12)) : void 0);
+        if (karte2) u.blatt.rect(x, y2, sb, kh, karte2, null, zahl(el, "eckradius", 15));
+        const cx = x + zahl(el, "kreis_x", 15), cy = y2 + kh / 2;
+        if (kreis) u.blatt.kreis(cx, cy, kr, kreis);
+        if (min !== void 0) {
+          u.blatt.T(
+            cx,
+            cy - sKreis.groesse * 0.36,
+            String(min),
+            sKreis.schnitt,
+            sKreis.groesse,
+            sKreis.farbe,
+            sKreis.sperrung,
+            "c"
+          );
+        }
+        const tx = x + zahl(el, "text_x", 33);
+        u.blatt.T(
+          tx,
+          cy + zahl(el, "name_hoch", 1.5),
+          d.name,
+          sName.schnitt,
+          sName.groesse,
+          sName.farbe,
+          sName.sperrung
+        );
+        const strecke = d.wert !== void 0 ? d.wert : d.km !== void 0 ? d.km < 1 ? `${Math.round(d.km * 1e3)} m` : `${zahlDe(d.km, 1)} km` : void 0;
+        const unter = [min !== void 0 ? `${min} Min.` : void 0, strecke].filter(Boolean).join(" · ");
+        if (unter) {
+          u.blatt.T(
+            tx,
+            cy - zahl(el, "wert_tief", 8.5),
+            unter,
+            sWert.schnitt,
+            sWert.groesse,
+            sWert.farbe,
+            sWert.sperrung
+          );
+        }
+      });
+      return;
+    }
     let y = el.y + el.h;
     for (const d of eintraege) {
       u.blatt.T(
@@ -2514,6 +2657,46 @@ var ImmoExpose = (() => {
     const fuell = farbRef(el, "hintergrund", u);
     const rahmen = farbRef(el, "rahmen", u);
     const regeln = satzRegeln(u.vorlage.stil.farben.ableitung, false);
+    if (art === "pills") {
+      const ph = zahl(el, "pill_hoehe", 22);
+      const pad = zahl(el, "pill_polster", 10);
+      const luft = zahl(el, "pill_abstand", 6);
+      const zeilenLuft = zahl(el, "zeilenabstand", 6);
+      const punkt = farbRef(el, "punkt_farbe", u);
+      const pr = zahl(el, "punkt_radius", 4.5);
+      const nummern = wahr(el, "nummern", false);
+      const einzug2 = punkt ? zahl(el, "punkt_einzug", 22) : pad;
+      let x = el.x;
+      let y2 = el.y + el.h - ph;
+      let weg = 0;
+      eintraege.forEach((h, i) => {
+        const t = nummern ? `${i + 1}  ${h.titel}` : h.titel;
+        const tb = u.blatt.sw(t, sTitel.schnitt, sTitel.groesse, sTitel.sperrung);
+        const pb = einzug2 + tb + pad;
+        if (x + pb > el.x + el.b + 0.01 && x > el.x) {
+          x = el.x;
+          y2 -= ph + zeilenLuft;
+        }
+        if (y2 < el.y - 0.01) {
+          weg++;
+          return;
+        }
+        u.blatt.rect(x, y2, pb, ph, fuell, rahmen, ph / 2, zahl(el, "linienbreite", 1));
+        if (punkt) u.blatt.kreis(x + pad + pr / 2 + 0.5, y2 + ph / 2, pr, punkt);
+        u.blatt.T(
+          x + einzug2,
+          y2 + ph / 2 - sTitel.groesse * 0.34,
+          t,
+          sTitel.schnitt,
+          sTitel.groesse,
+          sTitel.farbe,
+          sTitel.sperrung
+        );
+        x += pb + luft;
+      });
+      if (weg) warne(u, "gekuerzt", el, `${weg} Highlight(s) passen nicht mehr in den Rahmen.`);
+      return;
+    }
     if (art === "karten") {
       const spalten = zahl(el, "spalten", eintraege.length);
       const kb = (el.b - abstand * (spalten - 1)) / spalten;
@@ -2637,10 +2820,11 @@ var ImmoExpose = (() => {
   };
   var ausstattung = (el, u) => {
     const art0 = zeichenkette(el, "darstellung") ?? "checkliste";
-    const quelle = zeichenkette(el, "feld") ?? (art0 === "gruppen" ? "objekt.expose_ausstattung_gruppen" : "objekt.beschreibung_ausstattung_expose");
-    const roh = art0 === "gruppen" ? void 0 : wert(u.daten, quelle);
+    const gruppiert = art0 === "gruppen" || art0 === "chips";
+    const quelle = zeichenkette(el, "feld") ?? (gruppiert ? "objekt.expose_ausstattung_gruppen" : "objekt.beschreibung_ausstattung_expose");
+    const roh = gruppiert ? void 0 : wert(u.daten, quelle);
     const punkte = (roh ?? "").split("\n").map((z2) => z2.trim()).filter(Boolean);
-    if (art0 !== "gruppen" && !punkte.length) {
+    if (!gruppiert && !punkte.length) {
       warne(u, "fehlender_wert", el, "Keine Ausstattungspunkte — das Element entfaellt.");
       return;
     }
@@ -2655,6 +2839,72 @@ var ImmoExpose = (() => {
     const art = art0;
     const polster = zahl(el, "polster", 10);
     const einzug = zahl(el, "einzug", 28);
+    if (art === "chips") {
+      const gruppen = liste(u.daten, zeichenkette(el, "feld") ?? "objekt.expose_ausstattung_gruppen").filter((g) => g && g.titel && Array.isArray(g.punkte) && g.punkte.length);
+      if (!gruppen.length) {
+        warne(u, "fehlender_wert", el, "Keine Ausstattungsgruppen — das Element entfaellt.");
+        return;
+      }
+      const sNummer = stilVon(el, u, "stil_nummer");
+      const sTitel = stilVon(el, u, "stil_titel");
+      const n = Math.min(gruppen.length, Math.max(1, zahl(el, "spalten", gruppen.length)));
+      const kb = (el.b - abstand * (n - 1)) / n;
+      const karte2 = farbRef(el, "karten_farbe", u);
+      const kreis = farbRef(el, "nummer_kreis", u);
+      const chip = farbRef(el, "chip_farbe", u);
+      const ch = zahl(el, "chip_hoehe", 20);
+      const cpad = zahl(el, "chip_polster", 10);
+      const cluft = zahl(el, "chip_abstand", 5);
+      const czeile = zahl(el, "chip_zeile", 26);
+      gruppen.slice(0, n).forEach((g, i) => {
+        const x = el.x + i * (kb + abstand);
+        if (karte2) u.blatt.rect(x, el.y, kb, el.h, karte2, null, zahl(el, "eckradius", 18));
+        const nx = x + zahl(el, "nummer_x", 26);
+        const ny = el.y + el.h - zahl(el, "nummer_y", 26);
+        if (kreis) u.blatt.kreis(nx, ny, zahl(el, "nummer_radius", 12), kreis);
+        u.blatt.T(
+          nx,
+          ny - sNummer.groesse * 0.36,
+          String(i + 1),
+          sNummer.schnitt,
+          sNummer.groesse,
+          sNummer.farbe,
+          sNummer.sperrung,
+          "c"
+        );
+        u.blatt.T(
+          x + zahl(el, "titel_x", 46),
+          ny - sTitel.groesse * 0.36,
+          g.titel,
+          sTitel.schnitt,
+          sTitel.groesse,
+          sTitel.farbe,
+          sTitel.sperrung
+        );
+        let cx = x + polster;
+        let cy = el.y + el.h - zahl(el, "erste_zeile", 66);
+        for (const punkt of g.punkte) {
+          const tb = u.blatt.sw(punkt, s.schnitt, s.groesse, s.sperrung) + 2 * cpad;
+          if (cx + tb > x + kb - polster + 0.01 && cx > x + polster) {
+            cx = x + polster;
+            cy -= czeile;
+          }
+          if (cy < el.y) break;
+          if (chip) u.blatt.rect(cx, cy, tb, ch, chip, null, ch / 2);
+          u.blatt.T(
+            cx + cpad,
+            cy + ch / 2 - s.groesse * 0.34,
+            punkt,
+            s.schnitt,
+            s.groesse,
+            s.farbe,
+            s.sperrung
+          );
+          cx += tb + cluft;
+        }
+      });
+      return;
+    }
     if (art === "gruppen") {
       const gruppen = liste(u.daten, zeichenkette(el, "feld") ?? "objekt.expose_ausstattung_gruppen").filter((g) => g && g.titel && Array.isArray(g.punkte) && g.punkte.length);
       if (!gruppen.length) {
@@ -2797,6 +3047,33 @@ var ImmoExpose = (() => {
       );
     });
   };
+  function ringSegment(u, cx, cy, rAussen, rInnen, von, bis, fuell) {
+    const bogen = (r, a0, a1, start) => {
+      const aus = [];
+      const schritte = Math.max(1, Math.ceil(Math.abs(a1 - a0) / 45));
+      const d = (a1 - a0) / schritte;
+      for (let i = 0; i < schritte; i++) {
+        const w0 = (a0 + i * d) * Math.PI / 180;
+        const w1 = (a0 + (i + 1) * d) * Math.PI / 180;
+        const k = 4 / 3 * Math.tan((w1 - w0) / 4);
+        const x0 = cx + r * Math.cos(w0), y0 = cy + r * Math.sin(w0);
+        const x3 = cx + r * Math.cos(w1), y3 = cy + r * Math.sin(w1);
+        if (i === 0) aus.push([start ? "moveTo" : "lineTo", x0, y0]);
+        aus.push([
+          "curveTo",
+          x0 - k * r * Math.sin(w0),
+          y0 + k * r * Math.cos(w0),
+          x3 + k * r * Math.sin(w1),
+          y3 - k * r * Math.cos(w1),
+          x3,
+          y3
+        ]);
+      }
+      return aus;
+    };
+    const p = [...bogen(rAussen, von, bis, true), ...bogen(rInnen, bis, von, false), ["close"]];
+    u.blatt.pfad(p, fuell, null, 0);
+  }
   function hakenZeichnen(u, x, y, aussen, innen, groesse) {
     const g = groesse;
     u.blatt.rect(x, y, g, g, aussen, null, g * 0.278);
@@ -2964,6 +3241,82 @@ var ImmoExpose = (() => {
           "c"
         );
       });
+      return;
+    }
+    if (zeichenkette(el, "darstellung") === "tacho") {
+      const cx = el.x + el.b / 2;
+      const cy = el.y + zahl(el, "mitte_hoehe", el.h * 0.3);
+      const r = zahl(el, "radius", Math.min(el.b / 2, el.h - (cy - el.y)) - 4);
+      const dicke = zahl(el, "ring_breite", 30);
+      const luecke = zahl(el, "luecke_grad", 1.6);
+      const seg = 180 / klassen.length;
+      const sKlasse2 = stilVon(el, u, "stil_klasse");
+      klassen.forEach((k, i) => {
+        const a0 = 180 - (i + 1) * seg + luecke / 2;
+        const a1 = 180 - i * seg - luecke / 2;
+        ringSegment(u, cx, cy, r + dicke / 2, r - dicke / 2, a0, a1, farbe(k.farbe, u.palette));
+        const am = (180 - (i + 0.5) * seg) * Math.PI / 180;
+        u.blatt.T(
+          cx + r * Math.cos(am),
+          cy + r * Math.sin(am) - sKlasse2.groesse * 0.36,
+          k.name,
+          sKlasse2.schnitt,
+          sKlasse2.groesse,
+          sKlasse2.farbe,
+          sKlasse2.sperrung,
+          "c"
+        );
+      });
+      const kw = rohzahl(u.daten, zeichenkette(el, "feld") ?? "objekt.energie_kennwert");
+      const klasseName = String(u.daten["objekt.energie_klasse"] ?? "").trim().toLocaleUpperCase("de-DE");
+      let anteil = -1;
+      if (kw !== void 0 && kw > 0) {
+        let lo = 0;
+        for (let i = 0; i < klassen.length; i++) {
+          if (kw <= klassen[i].grenze) {
+            anteil = (i + (kw - lo) / Math.max(1, klassen[i].grenze - lo)) / klassen.length;
+            break;
+          }
+          lo = klassen[i].grenze;
+        }
+        if (anteil < 0) anteil = 1;
+      } else {
+        const i = klassen.findIndex((k) => k.name.toLocaleUpperCase("de-DE") === klasseName);
+        if (i >= 0) anteil = (i + 0.5) / klassen.length;
+      }
+      const sWert = stilOder(el, u, "stil_wert", "stil_fahne");
+      const sEinheit = stilOder(el, u, "stil_einheit", "stil_grenze");
+      if (anteil < 0) {
+        warne(u, "fehlender_wert", el, "Kein Energiekennwert und keine Klasse — der Tacho steht ohne Nadel.");
+        return;
+      }
+      const tinte2 = farbRef(el, "nadel_farbe", u) ?? [0, 0, 0, 1];
+      const w = (180 - anteil * 180) * Math.PI / 180;
+      const nl = r - dicke / 2 - zahl(el, "nadel_abstand", 24);
+      u.blatt.linie(cx, cy, cx + nl * Math.cos(w), cy + nl * Math.sin(w), tinte2, zahl(el, "nadel_breite", 3));
+      u.blatt.kreis(cx, cy, zahl(el, "nabe_radius", 8), tinte2);
+      const wertText = kw !== void 0 && kw > 0 ? zahlDe(kw, 1) : `Klasse ${klassen[Math.floor(anteil * klassen.length)]?.name ?? klasseName}`;
+      u.blatt.T(
+        cx,
+        cy - zahl(el, "wert_tief", 34),
+        wertText,
+        sWert.schnitt,
+        sWert.groesse,
+        sWert.farbe,
+        sWert.sperrung,
+        "c"
+      );
+      const einheit2 = kw !== void 0 && kw > 0 ? zeichenkette(el, "einheit") ?? "kWh/(m²·a)" : zeichenkette(el, "einheit_ohne_wert") ?? "laut Energieausweis";
+      u.blatt.T(
+        cx,
+        cy - zahl(el, "einheit_tief", 50),
+        einheit2,
+        sEinheit.schnitt,
+        sEinheit.groesse,
+        sEinheit.farbe,
+        sEinheit.sperrung,
+        "c"
+      );
       return;
     }
     const schmal = zeichenkette(el, "darstellung") === "linie";
@@ -3147,6 +3500,82 @@ var ImmoExpose = (() => {
       );
     }
     const farben = farbliste.length ? farbliste.map((f) => farbe(f, u.palette)) : [farbe({ palette: "schwarz" }, u.palette)];
+    if (zeichenkette(el, "darstellung") === "donut") {
+      const r = zahl(el, "donut_radius", 88);
+      const dicke = zahl(el, "donut_breite", 26);
+      const cx = el.x + zahl(el, "donut_x", r + 12);
+      const cy = el.y + el.h / 2;
+      let winkel = 90;
+      posten.forEach((p, i) => {
+        const anteil = Number(p.betrag) / summe;
+        const bis = winkel - anteil * 360;
+        const spalt = i === 0 ? 0 : 0.8;
+        ringSegment(u, cx, cy, r + dicke / 2, r - dicke / 2, bis, winkel - spalt, farben[i % farben.length]);
+        winkel = bis;
+      });
+      const sMitteLabel = stilOder(el, u, "stil_mitte_label", "stil_name");
+      const sMitteWert = stilOder(el, u, "stil_mitte_wert", "stil_wert");
+      u.blatt.T(
+        cx,
+        cy + zahl(el, "mitte_label_hoch", 8),
+        gross(sMitteLabel, zeichenkette(el, "mitte_label") ?? "Gesamt"),
+        sMitteLabel.schnitt,
+        sMitteLabel.groesse,
+        sMitteLabel.farbe,
+        sMitteLabel.sperrung,
+        "c"
+      );
+      u.blatt.T(
+        cx,
+        cy - zahl(el, "mitte_wert_tief", 12),
+        `${zahlDe(summe, 0)} €`,
+        sMitteWert.schnitt,
+        sMitteWert.groesse,
+        sMitteWert.farbe,
+        sMitteWert.sperrung,
+        "c"
+      );
+      const sName2 = stilVon(el, u, "stil_name");
+      const sWert2 = stilVon(el, u, "stil_wert");
+      const lx = el.x + zahl(el, "legende_x", 238);
+      const rechts = el.x + el.b;
+      const zh2 = zahl(el, "zeilenhoehe", 32);
+      const linie2 = farbRef(el, "linien_farbe", u);
+      const pr = zahl(el, "punkt_radius", 5);
+      let ly = cy + zahl(el, "legende_hoch", 62);
+      posten.forEach((p, i) => {
+        u.blatt.kreis(lx + pr, ly + 3, pr, farben[i % farben.length]);
+        u.blatt.T(lx + zahl(el, "einzug", 16), ly, p.name, sName2.schnitt, sName2.groesse, sName2.farbe, sName2.sperrung);
+        u.blatt.T(rechts, ly, `${zahlDe(Number(p.betrag), 0)} €`, sWert2.schnitt, sWert2.groesse, sWert2.farbe, sWert2.sperrung, "r");
+        if (linie2) u.blatt.linie(lx, ly - zahl(el, "linien_versatz", 12), rechts, ly - zahl(el, "linien_versatz", 12), linie2, zahl(el, "linienbreite", 0.6));
+        ly -= zh2;
+      });
+      if (wahr(el, "mit_summe", true)) {
+        const sSumme = stilVon(el, u, "stil_summe");
+        const sSummeWert = stilOder(el, u, "stil_summe_wert", "stil_summe");
+        ly -= zahl(el, "summe_versatz", 6);
+        u.blatt.T(
+          lx,
+          ly,
+          gross(sSumme, zeichenkette(el, "summe_label") ?? "Gesamtaufwand"),
+          sSumme.schnitt,
+          sSumme.groesse,
+          sSumme.farbe,
+          sSumme.sperrung
+        );
+        u.blatt.T(
+          rechts,
+          ly,
+          `${zahlDe(summe, 0)} €`,
+          sSummeWert.schnitt,
+          sSummeWert.groesse,
+          sSummeWert.farbe,
+          sSummeWert.sperrung,
+          "r"
+        );
+      }
+      return;
+    }
     const bh = zahl(el, "balken_hoehe", 16);
     const yBalken = el.y + el.h - bh;
     if (bh > 0) {
@@ -3784,8 +4213,8 @@ var ImmoExpose = (() => {
     }
     if (typeof el.b === "number" && el.b <= 0) melde("fehler", "Breite 0 oder kleiner.");
     if (typeof el.h === "number" && el.h < 0) melde("fehler", "Negative Hoehe.");
-    if (el.drehung !== void 0 && ![0, 90, 270].includes(el.drehung)) {
-      melde("fehler", `Drehung ${el.drehung} — erlaubt sind 0, 90 und 270.`);
+    if (el.drehung !== void 0 && (typeof el.drehung !== "number" || !Number.isFinite(el.drehung))) {
+      melde("fehler", `Drehung ${el.drehung} — eine Gradzahl, zum Beispiel 0, 8, 90 oder 270.`);
     }
     for (const [schluessel, wert2] of Object.entries(el)) {
       if (!schluessel.startsWith("stil") || typeof wert2 !== "string") continue;
@@ -3800,11 +4229,12 @@ var ImmoExpose = (() => {
         }
       }
     }
-    if (typeof el.x === "number" && typeof el.b === "number" && typeof el.y === "number" && typeof el.h === "number" && v.format) {
+    if (typeof el.x === "number" && typeof el.b === "number" && typeof el.y === "number" && typeof el.h === "number" && v.format && el["ueberstand"] !== true) {
       const drehung = typeof el.drehung === "number" ? (el.drehung % 360 + 360) % 360 : 0;
       const ecken = [[0, 0], [el.b, 0], [el.b, el.h], [0, el.h]];
       const bogen = drehung * Math.PI / 180;
-      const sin = Math.round(Math.sin(bogen)), cos = Math.round(Math.cos(bogen));
+      const rund = (z2) => Math.abs(z2) < 1e-9 ? 0 : Math.abs(Math.abs(z2) - 1) < 1e-9 ? Math.sign(z2) : z2;
+      const sin = rund(Math.sin(bogen)), cos = rund(Math.cos(bogen));
       const xs = ecken.map(([dx, dy]) => el.x + dx * cos - dy * sin);
       const ys = ecken.map(([dx, dy]) => el.y + dx * sin + dy * cos);
       const links = Math.min(...xs), rechts = Math.max(...xs);
@@ -4447,6 +4877,11 @@ var ImmoExpose = (() => {
     miete: "Vermietung",
     beides: "Verkauf & Vermietung"
   };
+  var VERMARKTUNG_PILLE = {
+    kauf: "Zum Kauf",
+    miete: "Zur Miete",
+    beides: "Kauf oder Miete"
+  };
   function aufbereiten(q) {
     const immo = q.immobilie ?? {};
     const firma = q.firma ?? {};
@@ -4493,6 +4928,24 @@ var ImmoExpose = (() => {
       d["objekt.titel_erste_zeile"] = m ? m[1] : titel;
       if (m) d["objekt.titel_zweite_zeile"] = m[2];
     }
+    {
+      const kl = text2(immo["energie_klasse"])?.toLocaleUpperCase("de-DE");
+      const urteil = {
+        "A+": ["Sehr effizient", "sehr niedrige Nebenkosten"],
+        "A": ["Sehr effizient", "niedrige Nebenkosten"],
+        "B": ["Effizient", "niedrige Nebenkosten"],
+        "C": ["Gut", "moderate Nebenkosten"],
+        "D": ["Durchschnittlich", "durchschnittliche Nebenkosten"],
+        "E": ["Unterdurchschnittlich", "erhöhte Nebenkosten"],
+        "F": ["Hoher Verbrauch", "hohe Nebenkosten"],
+        "G": ["Hoher Verbrauch", "hohe Nebenkosten"],
+        "H": ["Sehr hoher Verbrauch", "sehr hohe Nebenkosten"]
+      };
+      if (kl && urteil[kl]) {
+        d["objekt.energie_klasse_urteil"] = urteil[kl][0];
+        d["objekt.energie_klasse_hinweis"] = urteil[kl][1];
+      }
+    }
     const zimmer = z(immo["zimmer"]);
     const wohnflaeche = z(immo["wohnflaeche"]);
     const unter = fuegen([
@@ -4525,6 +4978,7 @@ var ImmoExpose = (() => {
     const vermarktung = vermarktungVon(immo);
     d["objekt.vermarktung"] = vermarktung;
     d["objekt.vertragsart"] = VERMARKTUNG_TEXT[vermarktung];
+    d["objekt.vermarktung_pille"] = VERMARKTUNG_PILLE[vermarktung];
     const kauf = vermarktung !== "miete";
     const preisZahl = kauf ? z(immo["angebotspreis"]) : z(immo["kaltmiete"]);
     if (immo["expose_preis_auf_anfrage"] === true) {
@@ -4854,7 +5308,13 @@ var ImmoExpose = (() => {
     "Arch-SemiBold",
     "Arch-Bold",
     "Arch-CondXB",
-    "Arch-CondBlack"
+    "Arch-CondBlack",
+    "Bric-Medium",
+    "Bric-Bold",
+    "Bric-ExtraBold",
+    "DMS-Regular",
+    "DMS-Medium",
+    "DMS-Bold"
   ];
   return __toCommonJS(index_exports);
 })();

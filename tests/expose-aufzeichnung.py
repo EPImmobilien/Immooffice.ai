@@ -31,6 +31,7 @@ DATEI = {
     "raster": "immoOffice_expose_generator.py",
     "signature": "immoOffice_luxus_generator.py",
     "studio": "immoOffice_studio_generator.py",
+    "buehne": "immoOffice_buehne_generator.py",
 }
 
 
@@ -101,6 +102,13 @@ class Pfad:
 
     def ellipse(self, x1, y1, x2, y2):
         self.schritte.append(["ellipse", x1, y1, x2, y2])
+
+    def arc(self, x1, y1, x2, y2, startAng=0, extent=90):
+        """Der Tacho der Vorlage Buehne: Kreisboegen als Pfad."""
+        self.schritte.append(["arc", x1, y1, x2, y2, startAng, extent])
+
+    def arcTo(self, x1, y1, x2, y2, startAng=0, extent=90):
+        self.schritte.append(["arcTo", x1, y1, x2, y2, startAng, extent])
 
 
 class Leinwand:
@@ -214,6 +222,22 @@ class Leinwand:
                 "farbe": farbe(farb if farb is not None else self.zustand["fuell"]),
                 "matrix": self._matrix(),
             })
+
+    def drawString(self, x, y, text, mode=None, charSpace=0, direction=None,
+                   wordSpace=None):
+        """Buehne schreibt kurze Zeilen direkt, ohne Textobjekt."""
+        self.schritte.append({
+            "art": "text", "x": round(x, 6), "y": round(y, 6), "text": text,
+            "schnitt": self.zustand.get("schnitt"),
+            "groesse": self.zustand.get("groesse"), "sperrung": charSpace,
+            "farbe": farbe(self.zustand["fuell"]), "matrix": self._matrix(),
+        })
+
+    def drawRightString(self, x, y, text, **k):
+        self.drawString(x, y, text, **k)
+
+    def drawCentredString(self, x, y, text, **k):
+        self.drawString(x, y, text, **k)
 
     def rect(self, x, y, w, h, stroke=1, fill=0):
         self.schritte.append({
@@ -343,8 +367,16 @@ def lade(vorlage):
         "A-SemiCondBold": "Arch-Bold.ttf",   # wdth nicht messbar, nie gezeichnet
     }
 
+    # Buehne nennt seine Dateien "B-Medium.ttf" und "S-Regular.ttf";
+    # assets/fonts/expose/ fuehrt sie als Bric-* und DMS-*. ("S-" ist bei
+    # Signature Cormorant — deshalb je Vorlage, nicht global.)
+    DATEI_ALIAS = {"buehne": {"B-": "Bric-", "S-": "DMS-"}}.get(vorlage, {})
+
     def umgeleitet(name, pfad, **k):
         datei = os.path.basename(pfad)
+        for kurz, lang in DATEI_ALIAS.items():
+            if datei.startswith(kurz):
+                datei = lang + datei[len(kurz):]
         voll = os.path.join(SCHRIFTEN, datei)
         if not os.path.exists(voll):
             ziel = ERSATZ.get(name)
@@ -409,10 +441,17 @@ def seiten(vorlage):
     """Die Seiten eines Prototyps, jede als Liste von Zeichenschritten."""
     modul, Aufnahme, _, ersetzt = lade(vorlage)
     leinwand = Aufnahme()
-    thema = modul.THEMES[0]
-    for seite in modul.PAGES:
-        seite(leinwand, thema)
-        leinwand.showPage()
+    if hasattr(modul, "erzeuge"):
+        # Buehne: kein PAGES/THEMES, sondern erzeuge(pfad, T, c=...) mit
+        # einem Seitenplan aus den Daten. Mit uebergebener Leinwand speichert
+        # es nicht, zeichnet aber jede Seite und ruft showPage().
+        thema = modul.theme("#2D2A4A", "#F08A5D", "Indigo / Mandarine")
+        modul.erzeuge(None, thema, c=leinwand)
+    else:
+        thema = modul.THEMES[0]
+        for seite in modul.PAGES:
+            seite(leinwand, thema)
+            leinwand.showPage()
     # Kein Schritt darf einen ersetzten Schnitt benutzen.
     for nr, schritte in enumerate(leinwand.seiten, 1):
         for schritt in schritte:
@@ -448,7 +487,16 @@ def main():
         print(json.dumps({"uebersprungen": "reportlab fehlt"}))
         return 0
     namen = list(DATEI) if welche == "alle" else [welche]
-    print(json.dumps({n: seiten(n) for n in namen}))
+    # Ein Prototyp, der nicht auf der Platte liegt, ist kein Fehler des
+    # Renderers: reference/ ist nicht versioniert, und wer nur einen der
+    # vier hat, soll den pruefen koennen.
+    ergebnis = {}
+    for n in namen:
+        if not os.path.exists(os.path.join(PROTOTYPEN, DATEI[n])):
+            ergebnis[n] = {"uebersprungen": f"{DATEI[n]} fehlt in reference/expose-vorlagen/"}
+        else:
+            ergebnis[n] = seiten(n)
+    print(json.dumps(ergebnis))
     return 0
 
 

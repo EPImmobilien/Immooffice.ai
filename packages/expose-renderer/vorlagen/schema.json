@@ -27,6 +27,7 @@
         "raster",
         "signature",
         "studio",
+        "buehne",
         "leer"
       ]
     },
@@ -82,7 +83,8 @@
               "enum": [
                 "raster",
                 "signature",
-                "studio"
+                "studio",
+                "buehne"
               ]
             }
           }
@@ -213,7 +215,9 @@
               "enum": [
                 "jakarta",
                 "cormorant",
-                "archivo"
+                "archivo",
+                "bricolage",
+                "dmsans"
               ]
             },
             "schnitt": {
@@ -536,13 +540,12 @@
           "minimum": 0
         },
         "drehung": {
-          "enum": [
-            0,
-            90,
-            270
-          ]
+          "type": "number"
         },
         "gesperrt": {
+          "type": "boolean"
+        },
+        "ueberstand": {
           "type": "boolean"
         },
         "deckkraft": {

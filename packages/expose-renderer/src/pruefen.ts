@@ -129,8 +129,9 @@ function pruefeElement(el: Element, seite: string | undefined, v: Vorlage,
   }
   if (typeof el.b === "number" && el.b <= 0) melde("fehler", "Breite 0 oder kleiner.");
   if (typeof el.h === "number" && el.h < 0) melde("fehler", "Negative Hoehe.");
-  if (el.drehung !== undefined && ![0, 90, 270].includes(el.drehung)) {
-    melde("fehler", `Drehung ${el.drehung} — erlaubt sind 0, 90 und 270.`);
+  if (el.drehung !== undefined &&
+      (typeof el.drehung !== "number" || !Number.isFinite(el.drehung))) {
+    melde("fehler", `Drehung ${el.drehung} — eine Gradzahl, zum Beispiel 0, 8, 90 oder 270.`);
   }
 
   // Textstile
@@ -160,13 +161,22 @@ function pruefeElement(el: Element, seite: string | undefined, v: Vorlage,
   // 200 Punkt lang und steht bei x = 569 — waagerecht gelesen ragt es weit
   // hinaus, gedreht laeuft es die Seite hinauf. Ein Hinweis, der bei jeder
   // Vorlage erscheint, wird nicht gelesen.
+  //
+  // `ueberstand: true` sagt: gewollt. Die Vorlage Buehne legt auf der
+  // Kontaktseite einen Kreis halb ueber den Rand — als Form, nicht als
+  // Versehen. Ein Hinweis, der bei jeder Probe erscheint, wird nicht
+  // gelesen; also sagt die Vorlage es einmal am Element.
   if (typeof el.x === "number" && typeof el.b === "number" &&
-      typeof el.y === "number" && typeof el.h === "number" && v.format) {
+      typeof el.y === "number" && typeof el.h === "number" && v.format &&
+      el["ueberstand"] !== true) {
     const drehung = typeof el.drehung === "number" ? ((el.drehung % 360) + 360) % 360 : 0;
     // Gedreht wird um den linken unteren Punkt des Rahmens.
     const ecken: [number, number][] = [[0, 0], [el.b, 0], [el.b, el.h], [0, el.h]];
     const bogen = drehung * Math.PI / 180;
-    const sin = Math.round(Math.sin(bogen)), cos = Math.round(Math.cos(bogen));
+    // Bei rechten Winkeln exakt (sonst macht 1e-16 aus 0 einen Befund),
+    // bei schiefen Winkeln die echten Werte.
+    const rund = (z: number) => (Math.abs(z) < 1e-9 ? 0 : Math.abs(Math.abs(z) - 1) < 1e-9 ? Math.sign(z) : z);
+    const sin = rund(Math.sin(bogen)), cos = rund(Math.cos(bogen));
     const xs = ecken.map(([dx, dy]) => el.x + dx * cos - dy * sin);
     const ys = ecken.map(([dx, dy]) => el.y + dx * sin + dy * cos);
     const links = Math.min(...xs), rechts = Math.max(...xs);

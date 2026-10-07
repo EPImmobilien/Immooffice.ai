@@ -64,6 +64,12 @@ def erzeugen() -> str:
         # Erzeugung von der vorigen ab — der Vergleich in --pruefen waere
         # wertlos.
         gz = gzip.compress(bytes_, 9, mtime=0)
+        # Byte 9 des gzip-Kopfs ist das Betriebssystem. Python schreibt dort
+        # je nach Fassung 3 (Unix) oder 255 (unbekannt) — am 07.10.2026 fiel
+        # --pruefen in einer Umgebung nur daran. Fest auf 3, dann ist das
+        # Ergebnis ueberall dasselbe; beim Entpacken spielt das Byte keine
+        # Rolle.
+        gz = gz[:9] + b'\x03' + gz[10:]
         roh += len(bytes_)
         gepackt += len(gz)
         kodiert = base64.b64encode(gz).decode()

@@ -65,12 +65,15 @@ PRUEFEN = {
     'raster': ['p', 'a', 'ink', 'text', 'muted', 'line', 'surf', 'surf2', 'pdark', 'asoft'],
     'signature': ['d', 'a', 'paper', 'paper2', 'ink', 'text', 'muted', 'hair', 'onD', 'onDm', 'dline'],
     'studio': ['s', 'd', 'on_s', 'paper', 'tint', 'tint2', 'text', 'muted', 'rule', 'hair'],
+    'buehne': ['d', 'a', 'paper', 'card', 'ink', 'text', 'muted', 'line', 'soft', 'softD', 'ph',
+               'onD', 'onDm', 'dline', 'onA', 'aT'],
 }
 
 DATEI = {
     'raster': 'immoOffice_expose_generator.py',
     'signature': 'immoOffice_luxus_generator.py',
     'studio': 'immoOffice_studio_generator.py',
+    'buehne': 'immoOffice_buehne_generator.py',
 }
 
 
@@ -79,8 +82,11 @@ def theme_aus(ordner, datei):
     text = open(f'{ordner}/{datei}', encoding='utf-8').read()
     i = text.index('def theme(')
     j = text.index('\nD = dict(', i)
+    def lum(c):
+        f = lambda v: v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4
+        return 0.2126 * f(c.red) + 0.7152 * f(c.green) + 0.0722 * f(c.blue)
     raum = {'hx': hx, 'mix': mix, 'alpha': alpha, 'WH': WH, 'WHITE': WHITE,
-            'BK': BK, 'Color': Color, 'HexColor': HexColor, 'dict': dict}
+            'BK': BK, 'Color': Color, 'HexColor': HexColor, 'dict': dict, 'lum': lum}
     exec(compile(text[i:j], datei, 'exec'), raum)
     return raum['theme']
 
@@ -88,7 +94,10 @@ def theme_aus(ordner, datei):
 def main():
     ordner, paare = sys.argv[1], json.loads(sys.argv[2])
     raus = {}
+    import os
     for art, datei in DATEI.items():
+        if not os.path.exists(f'{ordner}/{datei}') or art not in paare:
+            continue
         fn = theme_aus(ordner, datei)
         raus[art] = {}
         for f1, f2 in paare[art]:

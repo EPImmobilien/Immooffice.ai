@@ -377,10 +377,22 @@ const { daten: datenFuer, uebernahmen } = require('./expose-vorlagen-daten.js');
 // Prototypen; sie sind in derselben Sprache geschrieben, aber nicht aus
 // einem Vorbild uebersetzt. Ihre Form prueft tests/expose-schema.js, ihre
 // Vollstaendigkeit tests/social-vorlagen.js.
+//
+// „Buehne" (07.10.2026) ist die vierte Systemvorlage und faellt hier mit
+// Absicht heraus: ihr Prototyp kam als fertiges Skript nach der
+// Abnahme der drei verbindlichen, und er wurde NACHGEBAUT, nicht Schritt
+// fuer Schritt uebersetzt — Tacho, Donut und Chips zeichnet der Renderer
+// mit seinen eigenen Elementen (`darstellung`), nicht in der Reihenfolge
+// des ReportLab-Skripts. Abgenommen wurde sie nebeneinander mit dem
+// Referenz-PDF, Seite fuer Seite (docs/ENTSCHEIDUNGEN.md). Ihre Form
+// prueft tests/expose-schema.js, ihr PDF tests/expose-pdf.js, ihre
+// Bildzahlen tests/expose-bildzahl.js.
+const OHNE_PROTOTYP_VERGLEICH = new Set(['buehne']);
 const WELCHE = fs.readdirSync(VORLAGEN)
   .filter((f) => f.endsWith('.json') && f !== 'schema.json'
                  && !f.startsWith('social-'))
-  .map((f) => f.replace(/\.json$/, ''));
+  .map((f) => f.replace(/\.json$/, ''))
+  .filter((n) => !OHNE_PROTOTYP_VERGLEICH.has(n));
 if (!WELCHE.length) {
   console.log('  Noch keine Vorlage in packages/expose-renderer/vorlagen/.');
   process.exit(0);
@@ -603,10 +615,18 @@ const seitenzahl = (t) => {
 };
 const platzhalterArten = new Map();
 const meldungen = [];
+// Vorlagen, deren Prototyp fehlt: fuer sie kann eine Buchung „bewusst
+// anders" nichts treffen, und das heisst nicht, dass sie ueberholt ist.
+const nichtVerglichen = new Set();
 
 for (const name of WELCHE) {
   const soll = aufzeichnung[name];
   if (!soll) { console.log(`  [FEHLER] Keine Aufzeichnung fuer "${name}".`); fehler++; continue; }
+  if (soll.uebersprungen) {
+    console.log(`  ${name}: ${soll.uebersprungen} — uebersprungen.`);
+    nichtVerglichen.add(name);
+    continue;
+  }
 
   vorlageName = name;
   const vorlage = JSON.parse(fs.readFileSync(path.join(VORLAGEN, `${name}.json`), 'utf-8'));
@@ -784,7 +804,7 @@ function beschreibe(s) {
 fs.rmSync(tmp, { recursive: true, force: true });
 
 for (const [e, n] of bewusstGetroffen) {
-  if (!n && WELCHE.includes(e.vorlage)) {
+  if (!n && WELCHE.includes(e.vorlage) && !nichtVerglichen.has(e.vorlage)) {
     fehler++;
     meldungen.push(`${e.vorlage} S.${e.seite}: die Buchung „bewusst anders" trifft keinen ` +
       `Schritt mehr — ueberholt, bitte aus dem Test nehmen.`);
