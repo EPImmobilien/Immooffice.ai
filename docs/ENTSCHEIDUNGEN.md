@@ -5779,3 +5779,48 @@ MANDANT-Tabellen, ohne `mandant_id` zu nennen. Die meisten laufen in der
 Sitzung eines angemeldeten Nutzers, wo der Vorgabewert greift — sechs
 nicht. Einzeln aufgeführt in `docs/OFFEN.md`, mit der Abfrage, die sie
 findet. Das neue Gate fängt jede davon an ihrem Ergebnis.
+
+## 2026-10-07 · Die eigene Domain kommt von Strato, und die Zone bleibt wählbar
+
+Bis heute stand in `docs/INBETRIEBNAHME.md`, Schritt 7, die Domain
+`immooffice.ai` liege bei IONOS. Sie liegt jetzt bei **Strato**, und damit war
+der Absatz falsch — nicht ungenau, sondern falsch: er nannte einen Anbieter,
+in dessen Oberfläche niemand etwas einzutragen hat.
+
+**Was dabei auffiel und das Umstellen leicht macht:** die ausgelieferte
+Adresse steht an **keiner** Stelle im Repository. `grep` nach
+`immoofficeeai`/`immoofficeai` über `src/`, `scripts/`,
+`supabase/functions/` und `assets/` findet null Treffer. Sie kommt
+ausschließlich aus `PORTAL_URL`, `EXPOSE_FREIGABE_BASIS` und der
+Auth-Einstellung von Supabase. Ein Domainwechsel ist in diesem Projekt also
+Konfiguration, kein Eingriff — und das ist kein Zufall, sondern das Ergebnis
+der Regel, dass keine Adresse und kein Geheimnis in den Quelltext gehört.
+
+**Die Entscheidung, die nicht meine ist:** wer die DNS-Zone führt. Beide Wege
+tragen, und keiner ist allgemein besser:
+
+- **Zone zu Netlify** (vier Nameserver bei Strato eintragen) ist bequemer und
+  löst die Hauptdomain ohne feste IP auf — nimmt aber die ganze Zone mit,
+  **einschließlich `MX`**. Wer Strato-Postfächer auf der Domain hat und sie
+  nicht vorher bei Netlify neu einträgt, bekommt keine Mail mehr, und zwar
+  ohne Fehlermeldung.
+- **Zone bleibt bei Strato** (`A @ → 75.2.60.5`, `CNAME www → …`) lässt die
+  Mail unangetastet, bindet die Hauptdomain aber an eine feste IP von
+  Netlify statt an einen Namen.
+
+Deshalb steht in [`DOMAIN_VERBINDEN.md`](DOMAIN_VERBINDEN.md) beides mit
+seinem Haken, und nicht eine Empfehlung mit verschwiegener Kehrseite. Strato
+kennt weder `ALIAS` noch `ANAME`, ein `CNAME` auf der Hauptdomain ist nicht
+erlaubt — die feste IP ist dort keine Bequemlichkeit, sondern der einzige Weg.
+
+**Ein Nachzug, der in der alten Kurzfassung fehlte:** die **Site URL** in
+Supabase. `auth.signUp` in `src/app/anwendung.js` ruft **ohne**
+`emailRedirectTo` — der Bestätigungslink jeder Registrierung wird aus der
+Site URL gebaut. Bleibt dort die Netlify-Adresse stehen, bestätigt jeder
+Neukunde auf der alten Adresse. Das hätte niemand als Fehler gemeldet; es
+wäre nur dauerhaft komisch gewesen. Schritt 7 nannte vorher nur
+`PORTAL_URL` und `EXPOSE_FREIGABE_BASIS`.
+
+Die Adresse `immoofficeeai.netlify.app` wird **nicht** abgeschaltet und
+bleibt in den Redirect URLs stehen. Jeder Exposé-Freigabe-, Einladungs- und
+Bestätigungslink, der vor der Umstellung hinausging, zeigt dorthin.

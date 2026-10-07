@@ -138,13 +138,14 @@ Zwei Dinge, die unabhängig voneinander sind:
 
 ### 6a — Resend für den Versand aus der Anwendung
 
-resend.com → Konto → **Domains** → `immooffice.ai` eintragen → die drei
-angezeigten DNS-Einträge (SPF, DKIM, DMARC) bei **IONOS** setzen, wo die Zone
-liegt. Danach **API Keys → Create API Key**, und den Wert in Supabase als
-`RESEND_API_KEY` hinterlegen.
+resend.com → Konto → **Domains** → die eigene Domain eintragen → die drei
+angezeigten DNS-Einträge (SPF, DKIM, DMARC) dort setzen, wo die Zone liegt —
+bei **Strato**, oder bei Netlify, wenn die Zone dorthin umgezogen ist
+(Schritt 7). Danach **API Keys → Create API Key**, und den Wert in Supabase
+als `RESEND_API_KEY` hinterlegen.
 
 **Wichtig:** `immoofficeeai.netlify.app` lässt sich **nicht** verifizieren —
-die DNS-Zone gehört Netlify, nicht Ihnen. Es muss `immooffice.ai` sein.
+die DNS-Zone gehört Netlify, nicht Ihnen. Es muss die eigene Domain sein.
 
 *Ohne Resend:* Keine Mail aus der Anwendung geht hinaus — keine
 Eigentümer-Einladung, kein Exposé-Link, keine Terminerinnerung.
@@ -160,16 +161,25 @@ Versands weg.
 
 ## Schritt 7 — Eigene Domain (20 Minuten plus DNS-Wartezeit)
 
-`immooffice.ai` liegt bei IONOS und zeigt heute auf `217.160.0.104`, nicht auf
-Netlify.
+Die Domain liegt seit dem 07.10.2026 bei **Strato**. Die vollständige
+Anleitung steht in [`DOMAIN_VERBINDEN.md`](DOMAIN_VERBINDEN.md) — beide Wege
+(Zone zu Netlify oder Zone bleibt bei Strato), mit dem Haken an jedem, und
+den vier Nachzügen in der Anwendung.
 
-1. Netlify → die Site → *Domain management* → *Add a domain* → `immooffice.ai`.
-2. Die von Netlify angezeigten DNS-Einträge bei IONOS setzen.
-3. Danach in Supabase `PORTAL_URL` und `EXPOSE_FREIGABE_BASIS` auf die neue
-   Adresse umstellen.
+Kurzform:
+
+1. Netlify → die Site → *Domain management* → *Add a domain* → die Domain
+   ohne `www`.
+2. Bei Strato entweder die vier Netlify-Nameserver eintragen (Zone zieht um,
+   dann müssen `MX`-Einträge mit) oder `A @ → 75.2.60.5` und
+   `CNAME www → immoofficeeai.netlify.app` setzen.
+3. Warten, bis die Domain auflöst und Netlify das Zertifikat ausgestellt hat.
+4. Danach in Supabase `PORTAL_URL` und `EXPOSE_FREIGABE_BASIS` umstellen —
+   **und** unter *Authentication → URL Configuration* die **Site URL**. Die
+   Registrierung baut den Bestätigungslink aus ihr.
 
 Reihenfolge einhalten: Links, die vor der Umstellung verschickt wurden,
-zeigen weiter auf die Netlify-Adresse.
+zeigen weiter auf die Netlify-Adresse. Die bleibt erreichbar.
 
 ---
 
