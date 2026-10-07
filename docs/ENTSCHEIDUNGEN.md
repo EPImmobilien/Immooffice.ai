@@ -6280,3 +6280,18 @@ bestimmten Fassung, und die muss später noch so dastehen. Die Sperre
 im Portal trifft nur den Chef: Zustimmen ist Chefsache, ein
 Mitarbeiter kann nicht zustimmen (RLS) und soll deshalb auch nicht
 blockiert werden.
+
+## 07.10.2026 — Anbieter von immoOffice.ai und Ausnahme im Neutralitäts-Gate
+
+**Entscheidung des Betreibers:** „immoOffice.ai ist ein Service der E&P
+Immobilien Schwerin GmbH, Am Vögenteich 26r, 18055 Rostock, Lasse Engfer."
+
+**Folge:** Das Impressum der Website (§ 5 DDG) muss diese Angaben tragen.
+Sie stehen in `website/konfig.js`, und genau diese eine Datei ist vom
+Neutralitäts-Gate ausgenommen (`scripts/neutral.sh`). Die Anwendung selbst,
+Vorlagen, Mails und Dokumente bleiben neutral — die Blockliste gilt dort
+unverändert.
+
+**Offen:** Registergericht/HRB, E-Mail und Telefon für das Impressum; die
+Produktion der Website bleibt gesperrt, bis E-Mail und Telefon eingetragen
+sind (Workflow „Website ausliefern").
